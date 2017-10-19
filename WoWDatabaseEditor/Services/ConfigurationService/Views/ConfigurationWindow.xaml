@@ -1,0 +1,25 @@
+﻿<Window x:Class="WoWDatabaseEditor.Services.ConfigurationService.Views.ConfigurationWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TabControl ItemsSource="{Binding ContainerTabItems}" SelectedItem="{Binding SelectedTabItem}">
+            <TabControl.ItemTemplate>
+                <!-- this is the header template-->
+                <DataTemplate>
+                    <TextBlock Text="{Binding Header}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding Control}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+        <Button Margin="0,10,0,0" Content="Save" Grid.Row="1" HorizontalAlignment="Left" Width="119"  Command="{Binding SaveAction}" /></Grid>
+</Window>

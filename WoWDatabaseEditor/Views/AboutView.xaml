@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="WoWDatabaseEditor.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/">
+    <Grid Margin="20">
+        <StackPanel>
+            <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
+                <TextBlock FontSize="28" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
+            </Border>
+            <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow"><Run FontWeight="Bold" Text="WoW Database Editor"/><Run Text=" "/><Run Text="is an application used to create scripts (behaviours) in TrinityCore based servers."/></TextBlock>
+            <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow"><Run Text="To start work, add new &quot;file&quot; to the solution "/><Run Text="- File -&gt; Add. "/><Run Text="To edit script, double click on selected item in Solution Explorer."/></TextBlock>
+            <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow"><Run Text="Items in Solution Explorer are saved automatically, but scripts themselves are not. Remember to save them "/><Run Text="("/><Run Text="export to database"/><Run Text=")."/></TextBlock>
+            <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow"><Run Text="Database is not required"/><Run Text=", "/><Run Text="but in that"/><Run Text=" case features are limited."/><Run Text=" "/><Run Text="It is database editor by design"/><Run Text="."/></TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>

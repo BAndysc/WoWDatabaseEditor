@@ -1,0 +1,955 @@
+[
+	{
+	  "id": -1,
+	  "name": "CONDITION_LOGICAL_OR",
+	  "description": "or"	
+	},
+
+	{
+	  "id": 0,
+	  "name": "CONDITION_NONE",
+	  "description": "Always true"
+	},
+
+	{
+	  "id": 1,
+	  "name": "CONDITION_AURA",
+	  "parameters": [
+	    {
+	      "type": "SpellParameter",
+	      "name": "Spell",
+	      "description": "Aura from this spell id"
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Spell Effect Index",
+	      "values": {
+	      	"0": {"name": "EFFECT_0"},
+	      	"1": {"name": "EFFECT_1"},
+	      	"2": {"name": "EFFECT_2"}
+	      },
+	      "description": "Each spell has 'effects', you can see them in Spell Work"
+	    },
+	    {
+	    	"type": "Parameter",
+	    	"name": "Stacks count",
+	    	"description": "If 0, any amount is ok otherwise unit needs 'stack count' or more"
+	    }
+	  ],
+	  "description": "{target} has aura of spell {pram1}, effect {pram2}"
+	},
+
+	{
+	  "id": 2,
+	  "name": "CONDITION_ITEM",
+	  "parameters": [
+	    {
+	      "type": "ItemParameter",
+	      "name": "Item",
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Amount",
+	      "description": "Minimum amount of items to mark condition as met"
+	    },
+	    {
+	      "type": "BoolParameter",
+	      "name": "Check bank",
+	      "description": "true, core will check items in bank too"
+	    }
+	  ],
+	  "description": "{target} has {pram2} of item {pram1} in backpack{pram3value:choose(0):| or in bank}"
+	},
+
+	{
+	  "id": 3,
+	  "name": "CONDITION_ITEM_EQUIPPED",
+	  "parameters": [
+	    {
+	      "type": "ItemParameter",
+	      "name": "Item",
+	      "description": "Item id to check (this condition applies only to players!)"
+	    },
+	  ],
+	  "description": "{target} has equiped item {pram1}"
+	},
+
+	{
+	  "id": 4,
+	  "name": "CONDITION_ZONEID",
+	  "parameters": [
+	    {
+	      "type": "ZoneAreaParameter",
+	      "name": "Zone"
+	    },
+	  ],
+	  "description": "{target} in zone {pram1}"
+	},
+
+	{
+	  "id": 5,
+	  "name": "CONDITION_REPUTATION_RANK",
+	  "parameters": [
+	    {
+	      "type": "Parameter",
+	      "name": "Faction",
+	      "description": "Faction ID to test"
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Minimum rank",
+	      "values":
+	      {
+	      	"0": {"name": "REP_HATED"},
+	      	"1": {"name": "REP_HOSTILE"},
+	      	"2": {"name": "REP_UNFRIENDLY"},
+	      	"3": {"name": "REP_NEUTRAL"},
+	      	"4": {"name": "REP_FRIENDLY"},
+	      	"5": {"name": "REP_HONORED"},
+	      	"6": {"name": "REP_REVERED"},
+	      	"7": {"name": "REP_EXALTED"}
+	      }
+	    },
+	  ],
+	  "description": "{target} has at least reputation {pram2} to faction {pram1}"
+	},
+
+	{
+	  "id": 6,
+	  "name": "CONDITION_TEAM",
+	  "parameters": [
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Team",
+	      "description": "Team to test. Only applies to players",
+	      "values": {
+	      	"67": {"name": "Horde"},
+	      	"469": {"name": "Alliance"}
+	      }
+	    },
+	  ],
+	  "description": "{target} belongs to {pram1}"
+	},
+
+	{
+	  "id": 7,
+	  "name": "CONDITION_SKILL",
+	  "parameters": [
+	    {
+	      "type": "SkillParameter",
+	      "name": "Skill",
+	      "description": "Skill ID to test"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Minimum skill value"
+	    },
+	  ],
+	  "description": "{target} has at least value {pram2} for skill {pram1}"
+	},
+
+	{
+	  "id": 8,
+	  "name": "CONDITION_QUESTREWARDED",
+	  "parameters": [
+	    {
+	      "type": "QuestParameter",
+	      "name": "Quest",
+	      "description": "Quest ID to check"
+	    },
+	  ],
+	  "description": "{target} has quest {pram1} rewarded"
+	},
+
+	{
+	  "id": 9,
+	  "name": "CONDITION_QUESTTAKEN",
+	  "parameters": [
+	    {
+	      "type": "QuestParameter",
+	      "name": "Quest",
+	      "description": "Quest ID to check"
+	    },
+	  ],
+	  "description": "{target} has quest {pram1} active"
+	},
+
+	{
+	  "id": 10,
+	  "name": "CONDITION_DRUNKENSTATE",
+	  "parameters": [
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Drunken State",
+	      "values": {
+	      	"0": {"name": "DRUNKEN_SOBER"},
+	      	"1": {"name": "DRUNKEN_TIPSY"},
+	      	"2": {"name": "DRUNKEN_DRUNK"},
+	      	"3": {"name": "DRUNKEN_SMASHED"},	      	
+	      }
+	    },
+	  ],
+	  "description": "{target} has drunk state {pram1}"
+	},
+	{
+	  "id": 11,
+	  "name": "CONDITION_WORLD_STATE",
+	  "parameters": [
+	    {
+	      "type": "Parameter",
+	      "name": "Variable Index"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Variable Value"
+	    },
+	  ],
+	  "description": "world variable {pram1} is set to {pram2}"
+	},
+
+	{
+	  "id": 12,
+	  "name": "CONDITION_ACTIVE_EVENT",
+	  "parameters": [
+	    {
+	      "type": "GameEventParameter",
+	      "name": "Event"
+	    },
+	  ],
+	  "description": "event {pram1} is active"
+	},
+
+	{
+	  "id": 13,
+	  "name": "CONDITION_INSTANCE_INFO",
+	  "parameters": [
+	    {
+	      "type": "Parameter",
+	      "name": "Data Type",
+	      "description": "DEF"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Value",
+	      "description": "BOSS_STATE, avaliable values: NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5"
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Type",
+	      "values": {
+	      	    "0": {"name": "INSTANCE_INFO_DATA"},
+			    "1": {"name": "INSTANCE_INFO_GUID_DATA"},
+			    "2": {"name": "INSTANCE_INFO_BOSS_STATE"},
+			    "3": {"name": "INSTANCE_INFO_DATA64"}
+	      }
+	    }
+	  ],
+	  "description": "{pram3value:choose(0|1|2|3):instance data {pram1} equals {pram2}|??????|boss {pram1} {pram2value:choose(0|1|2|3|4|5):has not started|is in progress|failed|special state|is to be decided?}|data64[{pram1}] = {pram2}}"
+	},
+
+	{
+	  "id": 14,
+	  "name": "CONDITION_QUEST_NONE",
+	  "parameters": [
+	    {
+	      "type": "QuestParameter",
+	      "name": "Quest",
+	      "description": "Quest ID to check"
+	    },
+	  ],
+	  "description": "{target} has never finished not has active quest {pram1}"
+	},
+
+	{
+	  "id": 15,
+	  "name": "CONDITION_CLASS",
+	  "parameters": [
+	    {
+	      "type": "ClassParameter",
+	      "name": "Class",
+	      "description": "Only for players"
+	    },
+	  ],
+	  "description": "{target} is class {pram1}"
+	},
+
+	{
+	  "id": 16,
+	  "name": "CONDITION_RACE",
+	  "parameters": [
+	    {
+	      "type": "RaceParameter",
+	      "name": "Race",
+	      "description": "Only for players"
+	    },
+	  ],
+	  "description": "{target} is race {pram1}"
+	},
+
+	{
+	  "id": 17,
+	  "name": "CONDITION_ACHIEVEMENT",
+	  "parameters": [
+	    {
+	      "type": "AchievementParameter",
+	      "name": "Achievement"
+	    },
+	  ],
+	  "description": "{target} has achievement {pram1} completed"
+	},
+
+	{
+	  "id": 18,
+	  "name": "CONDITION_TITLE",
+	  "parameters": [
+	    {
+	      "type": "Parameter",
+	      "name": "Title ID"
+	    },
+	  ],
+	  "description": "{target} has title {pram1}"
+	},
+
+	{
+	  "id": 19,
+	  "name": "CONDITION_SPAWNMASK",
+	  "parameters": [
+	    {
+	      "type": "Parameter",
+	      "name": "Spawn mask"
+	    },
+	  ],
+	  "description": "{target} in spawn mask {pram1}"
+	},
+
+	{
+	  "id": 20,
+	  "name": "CONDITION_GENDER",
+	  "parameters": [
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Gender",
+	      "values": {
+	      	"0": {"name": "GENDER_MALE"},
+	      	"1": {"name": "GENDER_FEMALE"},
+	      	"2": {"name": "GENDER_NONE"}
+	      }
+	    },
+	  ],
+	  "description": "{target} is {pram1}"
+	},
+
+	{
+	  "id": 21,
+	  "name": "CONDITION_UNIT_STATE",
+	  "parameters": [
+	    {
+	      "type": "FlagParameter",
+	      "name": "Unit State",
+	      "values": {
+	      	"1": {"name": "UNIT_STATE_DIED", "description": "player has fake death aura"}, 
+	      	"2": {"name": "UNIT_STATE_MELEE_ATTACKING", "description": "player is melee attacking someone"},  
+	      	"8": {"name": "UNIT_STATE_STUNNED"},
+	      	"16": {"name": "UNIT_STATE_ROAMING"},
+	      	"32": {"name": "UNIT_STATE_CHASE"},
+	      	"128": {"name": "UNIT_STATE_FLEEING"},
+	      	"256": {"name": "UNIT_STATE_IN_FLIGHT", "description": "player is in flight mode"},     
+	      	"512": {"name": "UNIT_STATE_FOLLOW"},
+	      	"1024": {"name": "UNIT_STATE_ROOT"},
+	      	"2048": {"name": "UNIT_STATE_CONFUSED"},
+	      	"4096": {"name": "UNIT_STATE_DISTRACTED"},
+	      	"8192": {"name": "UNIT_STATE_ISOLATED", "description": "area auras do not affect other players"}, 
+	      	"16384": {"name": "UNIT_STATE_ATTACK_PLAYER"},
+	      	"32768": {"name": "UNIT_STATE_CASTING"},
+	      	"65536": {"name": "UNIT_STATE_POSSESSED"},
+	      	"131072": {"name": "UNIT_STATE_CHARGING"},
+	      	"262144": {"name": "UNIT_STATE_JUMPING"},
+	      	"1048576": {"name": "UNIT_STATE_MOVE"},
+	      	"2097152": {"name": "UNIT_STATE_ROTATING"},
+	      	"4194304": {"name": "UNIT_STATE_EVADE"},
+	      	"8388608": {"name": "UNIT_STATE_ROAMING_MOVE"},
+	      	"16777216": {"name": "UNIT_STATE_CONFUSED_MOVE"},
+	      	"33554432": {"name": "UNIT_STATE_FLEEING_MOVE"},
+	      	"67108864": {"name": "UNIT_STATE_CHASE_MOVE"},
+	      	"134217728": {"name": "UNIT_STATE_FOLLOW_MOVE"},
+	      	"268435456": {"name": "UNIT_STATE_IGNORE_PATHFINDING"},  
+	      }
+	    },
+	  ],
+	  "description": "{target} has unit state {pram1}"
+	},
+
+	{
+	  "id": 22,
+	  "name": "CONDITION_MAPID",
+	  "parameters": [
+	    {
+	      "type": "MapParameter",
+	      "name": "Map"
+	    },
+	  ],
+	  "description": "{target} in map {pram1}"
+	},
+
+	{
+	  "id": 23,
+	  "name": "CONDITION_AREAID",
+	  "parameters": [
+	    {
+	      "type": "ZoneAreaParameter",
+	      "name": "Area"
+	    },
+	  ],
+	  "description": "{target} in area {pram1}"
+	},
+
+	{
+	  "id": 24,
+	  "name": "CONDITION_CREATURE_TYPE",
+	  "parameters": [
+	    {
+	      "type": "CreatureTypeParameter",
+	      "name": "Type",
+	      "description": "From creature_template.type"
+	    },
+	  ],
+	  "description": "{target} is {pram1}"
+	},
+
+	{
+	  "id": 25,
+	  "name": "CONDITION_SPELL",
+	  "parameters": [
+	    {
+	      "type": "SpellParameter",
+	      "name": "Spell",
+	      "description": "Only for players"
+	    },
+	  ],
+	  "description": "{target} has learned spell {pram1}"
+	},
+
+	{
+	  "id": 26,
+	  "name": "CONDITION_PHASEID",
+	  "parameters": [
+	    {
+	      "type": "PhaseParameter",
+	      "name": "Phase"
+	    },
+	  ],
+	  "description": "{target} in phase {pram1}"
+	},
+
+	{
+	  "id": 27,
+	  "name": "CONDITION_LEVEL",
+	  "parameters": [
+	    {
+	      "type": "Parameter",
+	      "name": "Level",
+	      "description": "Level to compare"
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Comparison",
+		  "values": {
+			    "0": {"name": "equals (=)"},
+				"1": {"name": "higher than (>)"},
+				"2": {"name": "lower than (<)"},
+				"3": {"name": "higher or equals (>=)"},
+				"4": {"name": "lower or equals (<=)"}
+		  },
+	      "description": "Comparison type"
+	    },
+	  ],
+	  "description": "{target}'s level {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+	},
+
+	{
+	  "id": 28,
+	  "name": "CONDITION_QUEST_COMPLETE",
+	  "parameters": [
+	    {
+	      "type": "QuestParameter",
+	      "name": "Quest",
+	      "description": "Quest id which player has to have completed with all objectives, but not yet rewarded"
+	    },
+	  ],
+	  "description": "{target} has completed quest {pram1} (but not yet rewarded)"
+	},
+
+	{
+	  "id": 29,
+	  "name": "CONDITION_NEAR_CREATURE",
+	  "parameters": [
+	    {
+	      "type": "CreatureParameter",
+	      "name": "Creature"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Distance"
+	    },
+	  ],
+	  "description": "there is creature {pram1} within range {pram2} yards to {target}"
+	},
+
+	{
+	  "id": 30,
+	  "name": "CONDITION_NEAR_GAMEOBJECT",
+	  "parameters": [
+	    {
+	      "type": "GameObjectParameter",
+	      "name": "Gameobject"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Distance"
+	    },
+	  ],
+	  "description": "there is gameobject {pram1} within range {pram2} yards to {target}"
+	},
+
+	{
+	  "id": 31,
+	  "name": "CONDITION_OBJECT_ENTRY_GUID",
+	  "parameters": [
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Type ID",
+	      "values": {
+			"0": {"name": "TYPEID_OBJECT"},
+			"1": {"name": "TYPEID_ITEM"},
+			"2": {"name": "TYPEID_CONTAINER"},
+			"3": {"name": "TYPEID_UNIT"},
+			"4": {"name": "TYPEID_PLAYER"},
+			"5": {"name": "TYPEID_GAMEOBJECT"},
+			"6": {"name": "TYPEID_DYNAMICOBJECT"},
+			"7": {"name": "TYPEID_CORPSE"},
+			"8": {"name": "TYPEID_AREATRIGGER"}
+		  }
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Entry",
+	      "description": "Creature or gameobject entry"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Guid from DB"
+	    }
+	  ],
+	  "description": "{target} is {pram1}{pram2value:choose(0):|, entry is {pram2}} and guid is {pram3}"
+	},
+
+	{
+	  "id": 32,
+	  "name": "CONDITION_TYPE_MASK",
+	  "parameters": [
+	    {
+	      "type": "FlagParameter",
+	      "name": "Type Mask",
+		  "values": {
+				"1": {"name": "TYPEMASK_OBJECT"},
+				"2": {"name": "TYPEMASK_ITEM"},
+				"6": {"name": "TYPEMASK_CONTAINER", "description": "TYPEMASK_ITEM | 0x0004"},
+				"8": {"name": "TYPEMASK_UNIT"},
+				"16": {"name": "TYPEMASK_PLAYER"},
+				"32": {"name": "TYPEMASK_GAMEOBJECT"},
+				"64": {"name": "TYPEMASK_DYNAMICOBJECT"},
+				"128": {"name": "TYPEMASK_CORPSE"},
+				"256": {"name": "TYPEMASK_AREATRIGGER"},
+				"88": {"name": "TYPEMASK_SEER", "description": "TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT"}
+		   },
+		}
+	  ],
+	  "description": "{target} is of type {pram1}"
+	},
+
+	{
+	  "id": 33,
+	  "name": "CONDITION_RELATION_TO",
+	  "parameters": [
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Condition Target",
+	      "values": {
+				"0": {"name": "Invoker"},
+				"1": {"name": "Object"}
+		  }	      
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Relation",
+	      "values": {
+				"0": {"name": "RELATION_SELF"},
+				"1": {"name": "RELATION_IN_PARTY"},
+				"2": {"name": "RELATION_IN_RAID_OR_PARTY"},
+				"3": {"name": "RELATION_OWNED_BY"},
+				"4": {"name": "RELATION_PASSENGER_OF"},
+				"5": {"name": "RELATION_CREATED_BY"}
+		  },
+	    },
+	  ],
+	  "description": "{target} {pram2value:choose(0|1|2|3|4|5):is {pram1}|is in party with {pram2}|is in raid or party with {pram2}|is owned by {pram1}|is passenger of {pram1}|is summoned by {pram1}}"
+	},
+
+	{
+	  "id": 34,
+	  "name": "CONDITION_REACTION_TO",
+	  "parameters": [
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Condition Target",
+	      "values": {
+				"0": {"name": "Invoker"},
+				"1": {"name": "Object"}
+		  }	
+	    },
+	    {
+	      "type": "FlagParameter",
+	      "name": "Rank",
+	      "values": {
+			"1": {"name": "REP_HATED"},
+			"2": {"name": "REP_HOSTILE"},
+			"4": {"name": "REP_UNFRIENDLY"},
+			"8": {"name": "REP_NEUTRAL"},
+			"16": {"name": "REP_FRIENDLY"},
+			"32": {"name": "REP_HONORED"},
+			"64": {"name": "REP_REVERED"},
+			"128": {"name": "REP_EXALTED"},
+		  }
+	    },
+	  ],
+	  "description": "{target} reaction to {pram1} is {pram2}"
+	},
+	{
+	  "id": 35,
+	  "name": "CONDITION_DISTANCE_TO",
+	  "parameters": [
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Condition Target",
+	      "values": {
+				"0": {"name": "Invoker"},
+				"1": {"name": "Object"}
+		  }	
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Distance"
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Comparison",
+		  "values": {
+			    "0": {"name": "equals (=)"},
+				"1": {"name": "higher than (>)"},
+				"2": {"name": "lower than (<)"},
+				"3": {"name": "higher or equals (>=)"},
+				"4": {"name": "lower or equals (<=)"}
+		  },
+	    }
+	  ],
+	  "description": "{target} distance to {pram1} {pram3value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram2} yards"
+	},
+
+	{
+	  "id": 36,
+	  "name": "CONDITION_ALIVE",
+	  "description": "{target} is alvie"
+	},
+
+	{
+	  "id": 37,
+	  "name": "CONDITION_HP_VAL",
+	  "parameters": [
+	    {
+	      "type": "Parameter",
+	      "name": "HP"
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Comparison",
+		  "values": {
+			    "0": {"name": "equals (=)"},
+				"1": {"name": "higher than (>)"},
+				"2": {"name": "lower than (<)"},
+				"3": {"name": "higher or equals (>=)"},
+				"4": {"name": "lower or equals (<=)"}
+		  },
+	    },
+	  ],
+	  "description": "{target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+	},
+
+	{
+	  "id": 38,
+	  "name": "CONDITION_HP_PCT",
+	  "parameters": [
+	    {
+	      "type": "PercentageParameter",
+	      "name": "HP %"
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Comparison",
+		  "values": {
+			    "0": {"name": "equals (=)"},
+				"1": {"name": "higher than (>)"},
+				"2": {"name": "lower than (<)"},
+				"3": {"name": "higher or equals (>=)"},
+				"4": {"name": "lower or equals (<=)"}
+		  },
+	    },
+	  ],
+	  "description": "{target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+	},
+
+	{
+	  "id": 39,
+	  "name": "CONDITION_SMART_PHASE",
+	  "parameters": [
+	    {
+	      "type": "Parameter",
+	      "name": "Phase ID"
+	    },
+	  ],
+	  "description": "{target}'s selected unit is in smart phase {pram1}"
+	},
+
+	{
+	  "id": 40,
+	  "name": "CONDITION_NOT_NEAR_CREATURE",
+	  "parameters": [
+	    {
+	      "type": "CreatureParameter",
+	      "name": "Creature"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Distance"
+	    },
+	  ],
+	  "description": "there is NOT creature {pram1} within range {pram2} yards to {target} (must be player)"
+	},
+
+	{
+	  "id": 41,
+	  "name": "CONDITION_NOT_NEAR_GAMEOBJECT",
+	  "parameters": [
+	    {
+	      "type": "GameObjectParameter",
+	      "name": "Gameobject"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Distance"
+	    },
+	  ],
+	  "description": "there is NOT gameobject {pram1} within range {pram2} yards to {target} (must be player)"
+	},
+
+	{
+	  "id": 42,
+	  "name": "CONDITION_TARGET_NO_AURA_IN_RANGE",
+	  "parameters": [
+	    {
+	      "type": "SpellParameter",
+	      "name": "Spell"
+	    },
+	    {
+	      "type": "CreatureParameter",
+	      "name": "Creature"
+	    },
+	    {
+	      "type": "Parameter",
+	      "name": "Distance"
+	    },
+	  ],
+	  "description": "there is NOT creature {pram2} within range {pram3} yards with aura {pram1} to {target} (must be player)"
+	},
+
+
+	{
+	  "id": 43,
+	  "name": "CONDITION_QUEST_STATUS",
+	  "parameters": [
+	    {
+	      "type": "QuestParameter",
+	      "name": "Quest"
+	    },
+	    {
+	      "type": "SwitchParameter",
+	      "name": "State",
+	      "values": {
+	      	"1": {"name": "QUEST_STATUS_COMPLETE"},
+	      	"3": {"name": "QUEST_STATUS_INCOMPLETE"},
+	      	"4": {"name": "QUEST_STATUS_COMPLETE | QUEST_STATUS_INCOMPLETE"},
+	      	"6": {"name": "QUEST_STATUS_REWARDED"},
+	      	"7": {"name": "QUEST_STATUS_REWARDED | QUEST_STATUS_COMPLETE"},
+	      	"10": {"name": "QUEST_STATUS_REWARDED | QUEST_STATUS_COMPLETE | QUEST_STATUS_INCOMPLETE"}
+	      }
+	    }
+	  ],
+	  "description": "{target} (player) has quest {pram1} in state {pram2}"
+	},
+
+	{
+	  "id": 44,
+	  "name": "CONDITION_HAS_SPELL",
+	  "parameters": [
+	    {
+	      "type": "SpellParameter",
+	      "name": "Spell"
+	    }
+	  ],
+	  "description": "{target} has spell {pram1}"
+	},
+
+	{
+	  "id": 45,
+	  "name": "CONDITION_HAS_SUMMON",
+	  "parameters": [
+	    {
+	      "type": "SwitchParameter",
+	      "name": "Summon type",
+	      "values": {
+	      	"1": {"name": "Guardian"},
+	      	"2": {"name": "Minion"},
+	      }
+	    },
+	    {
+	    	"type": "CreatureParameter",
+	    	"name": "Entry"
+	    }
+	  ],
+	  "description": "{target} has NOT {pram1} {pram2}"
+	},
+	{
+	  "id": 46,
+	  "name": "CONDITION_DAILY_QUEST_REWARDED",
+	  "parameters": [
+	    {
+	    	"type": "QuestParameter",
+	    	"name": "Quest"
+	    }
+	  ],
+	  "description": "{target} has daily quest {pram1} rewarded"
+	},
+	{
+	  "id": 100,
+	  "name": "CONDITION_OWNER_AURA",
+	  "parameters": [
+	    {
+	    	"type": "SpellParameter",
+	    	"name": "Spell"
+	    },
+	    {
+	    	"type": "Parameter",
+	    	"name": "Effect index"
+	    },
+	    {
+	    	"type": "Parameter",
+	    	"name": "Stacks"
+	    }
+
+	  ],
+	  "description": "{target} has {pram3value:choose(0):|{pram3} stacks of }aura {pram1} effect {pram2}"
+	},
+
+	{
+	  "id": 101,
+	  "name": "CONDITION_AI_GET_DATA",
+	  "parameters": [
+	    {
+	    	"type": "Parameter",
+	    	"name": "Data"
+	    },
+	    {
+	    	"type": "Parameter",
+	    	"name": "Value"
+	    },
+	    {
+	    	"type": "SwitchParameter",
+	      	"name": "Comparison",
+		  	"values": {
+			    "0": {"name": "equals (=)"},
+				"1": {"name": "higher than (>)"},
+				"2": {"name": "lower than (<)"},
+				"3": {"name": "higher or equals (>=)"},
+				"4": {"name": "lower or equals (<=)"}
+		  	},
+	      	"description": "Comparison type"
+	    },
+	  ],
+	  "description": "{target}'s ⓵ {datapram1} ⓵ {pram3value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram2}"
+	},
+	{
+	  "id": "102",
+	  "name": "CONDITION_SPECIAL_DATA",
+	  "parameters": [
+	    {
+	    	"type": "Parameter",
+	    	"name": "Value"
+	    },
+	    {
+	    	"type": "SwitchParameter",
+	      	"name": "Comparison",
+		  	"values": {
+			    "0": {"name": "equals (=)"},
+				"1": {"name": "higher than (>)"},
+				"2": {"name": "lower than (<)"},
+				"3": {"name": "higher or equals (>=)"},
+				"4": {"name": "lower or equals (<=)"}
+		  	},
+	      	"description": "Comparison type"
+	    },
+	  ],
+	  "description": "{target}'s special data {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+	},
+	{
+		"id": 103,
+		"name": "CONDITION_QUEST_STATE_MASK",
+		"parameters": [
+			{
+				"type": "QuestParameter",
+				"name": "Quest"
+			},
+			{
+				"type": "FlagParameter",
+				"name": "QuestStatus",
+				"values": {
+					"1": {"name": "none", "description": "Player does not have or had quest at all. He could accept it, but he did not (yet)."},
+					"2": {"name": "complete", "description": "Player fulfilled objectives, but did not hand it in yet."},
+					"8": {"name": "incomplete", "description": "Player did not fulfill objectives yet"},
+					"32": {"name": "failed", "description": "Player failed to fulfill objectives for any reason, e.g. time limit"},
+					"64": {"name": "rewarded", "description": "Player handed quest in and this is sort of a post-quest interaction"},	
+				},
+			},
+		],
+		"description": "{target}'s quest {pram1} in state {pram2}"
+	},
+	{
+		"id":  104,
+		"name": "CONDITION_QUEST_OBJECTIVE",
+		"parameters": [
+			{
+				"type": "QuestParameter",
+				"name": "Quest"
+			},
+			{
+				"type": "CreatureParameter",
+				"name": "Kill credit"
+			},
+			{
+				"type": "Parameter",
+				"name": "Count"
+			}
+		],
+		"description": "{target}'s quest {pram1} kill credit {pram2} is {pram3}"
+	}
+
+]
+

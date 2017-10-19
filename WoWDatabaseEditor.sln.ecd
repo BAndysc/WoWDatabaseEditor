@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SolutionSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Version>0</Version>
+  <DisableAddin>false</DisableAddin>
+  <DoNotParseProjects>false</DoNotParseProjects>
+  <BuildProjectsInSolutionContext>false</BuildProjectsInSolutionContext>
+  <ECBreakpoint>false</ECBreakpoint>
+  <DoNotParseSpecificProjects />
+  <BuildSpecificProjectsInSolutionContext />
+  <ECBreakpointProjects />
+  <RunLocalLink />
+  <UseDevenvForProject />
+  <EnableDebugLog>false</EnableDebugLog>
+  <DebugLogName />
+  <LogName />
+  <MaxPDBFiles>16</MaxPDBFiles>
+  <AlwaysRescanSolution>false</AlwaysRescanSolution>
+  <UseOrderOnlyPrereqs>true</UseOrderOnlyPrereqs>
+  <EnableIncrementalLink>true</EnableIncrementalLink>
+  <RemoveDependencies>false</RemoveDependencies>
+  <ForceZ7>true</ForceZ7>
+  <UpToDateCheck>true</UpToDateCheck>
+  <CoarseGrainParallelization>false</CoarseGrainParallelization>
+  <DoNotDeleteTempMakefiles>false</DoNotDeleteTempMakefiles>
+  <AddEmakeRootsAutomatically>true</AddEmakeRootsAutomatically>
+  <InheritRoots>true</InheritRoots>
+  <DoNotUseUniqueNames>false</DoNotUseUniqueNames>
+  <IgnoreErrors>false</IgnoreErrors>
+  <ExpandLinkerObjects>false</ExpandLinkerObjects>
+  <KeepGoing>false</KeepGoing>
+  <RunDeploymentLocally>false</RunDeploymentLocally>
+  <RunLocalProject />
+  <SerializeAllProjects>false</SerializeAllProjects>
+  <UseDevenv>false</UseDevenv>
+  <UseMSBuild>true</UseMSBuild>
+  <HistoryFile />
+  <History>2</History>
+  <F5Behavior>0</F5Behavior>
+  <LocalClean>false</LocalClean>
+  <MonitorBuild>true</MonitorBuild>
+  <IntegrateIDE>true</IntegrateIDE>
+  <UseEnv>false</UseEnv>
+  <AutoDepend>true</AutoDepend>
+  <ExcludeEnv />
+  <MaxAgents />
+  <RegistryRoot />
+  <Monitor />
+  <MonitorPort />
+  <EnvironmentalVariables />
+  <EMakeOptions />
+  <VSSetupFile />
+  <AdditionalOptions />
+  <ClusterManager />
+  <Root />
+  <BuildLabel />
+  <BuildClass />
+  <Resource />
+  <Use64BitEmake>false</Use64BitEmake>
+  <VirtualizeToolchain>true</VirtualizeToolchain>
+  <AnnotationFile />
+  <AnnotationUpload>false</AnnotationUpload>
+  <UseLocalAgents>true</UseLocalAgents>
+  <MaxLocalAgents />
+  <YieldLocalAgents />
+  <AnnotationDetail>
+    <Basic>true</Basic>
+    <File>false</File>
+    <History>false</History>
+    <Lookup>false</Lookup>
+    <Waiting>false</Waiting>
+    <Environment>false</Environment>
+    <Registry>false</Registry>
+  </AnnotationDetail>
+  <DebugOptions>
+    <DebugJob>false</DebugJob>
+    <DebugHistory>false</DebugHistory>
+    <DebugProfile>false</DebugProfile>
+    <DebugFileSystem>false</DebugFileSystem>
+    <DebugEnvironmentalVariables>false</DebugEnvironmentalVariables>
+    <DebugCache>false</DebugCache>
+    <DebugNodeAllocation>false</DebugNodeAllocation>
+    <DebugNmakeLexer>false</DebugNmakeLexer>
+    <DebugParse>false</DebugParse>
+    <DebugSubbuilds>false</DebugSubbuilds>
+    <DebugLedger>false</DebugLedger>
+    <DebugRelocationData>false</DebugRelocationData>
+    <DebugMemoryUsage>false</DebugMemoryUsage>
+    <DebugNode>false</DebugNode>
+    <DebugParseOutputFile>false</DebugParseOutputFile>
+    <DebugClusterManager>false</DebugClusterManager>
+    <DebugParseAvoidance>false</DebugParseAvoidance>
+    <DebugEmulationPlatform>false</DebugEmulationPlatform>
+  </DebugOptions>
+</SolutionSettings>

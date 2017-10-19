@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="WDE.SmartScriptEditor.Editor.Views.ParameterEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/" 
+             xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Helpers">
+    <Grid>
+        <Grid.Resources>
+            <helpers:IsNullConverter x:Key="IsNullConverter"/>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Label HorizontalAlignment="Right" Content="{Binding Parameter.Name, Mode=OneWay}"/>
+        <TextBox Grid.Column="1" VerticalContentAlignment="Center" FontFamily="Consolas">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Text" Value="{Binding Parameter.String, Mode=OneWay}"></Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsFocused" Value="true">
+                            <Setter Property="Text" Value="{Binding Parameter.Value}" />
+                        </Trigger>
+
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <Button Grid.Column="2" Content="  ...  " Command="{Binding SelectItemAction}">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Parameter.Items, Converter={StaticResource IsNullConverter}}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+    </Grid>
+</UserControl>

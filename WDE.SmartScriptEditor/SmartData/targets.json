@@ -1,0 +1,951 @@
+[
+  {
+    "id": 0,
+    "name": "SMART_TARGET_NONE",
+    "name_readable": "None",
+    "deprecated": false,
+    "description": "None",
+    "help": "None",
+    "types": [
+      "Self"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 1,
+    "name": "SMART_TARGET_SELF",
+    "name_readable": "Self",
+    "deprecated": false,
+    "description": "Self",
+    "help": "Object from this script",
+    "types": [
+      "Self",
+      "Creature",
+      "GameObject"
+    ],
+    "is_only_target": false,
+    "uses_target": false,
+    "usable_with_event_types": [0, 1, 2, 3, 4, 5, 7, 8, 9, 11],
+  },
+  {
+    "id": 2,
+    "name": "SMART_TARGET_VICTIM",
+    "name_readable": "Victim",
+    "deprecated": false,
+    "description": "Victim",
+    "help": "Our current target (ie: highest aggro)",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 3,
+    "name": "SMART_TARGET_HOSTILE_SECOND_AGGRO",
+    "name_readable": "Second highest aggro",
+    "deprecated": false,
+    "description": "Second highest aggro",
+    "help": "Creature with second highest aggro on the threat list",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 4,
+    "name": "SMART_TARGET_HOSTILE_LAST_AGGRO",
+    "name_readable": "Least aggro",
+    "deprecated": false,
+    "description": "Least aggro",
+    "help": "Creature with least aggro on the threat list",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 5,
+    "name": "SMART_TARGET_HOSTILE_RANDOM",
+    "name_readable": "Random hostile",
+    "deprecated": false,
+    "description": "Random hostile",
+    "help": "Any random target on our threat list",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 6,
+    "name": "SMART_TARGET_HOSTILE_RANDOM_NOT_TOP",
+    "name_readable": "Random hostile but top",
+    "deprecated": false,
+    "description": "Random hostile (not top)",
+    "help": "Any random target except top threat",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 7,
+    "name": "SMART_TARGET_ACTION_INVOKER",
+    "name_readable": "Action invoker",
+    "deprecated": false,
+    "description": "Action invoker",
+    "help": "Unit who caused the event to occur",
+    "types": [
+      "Self",
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 8,
+    "name": "SMART_TARGET_POSITION",
+    "name_readable": "Absolute position",
+    "deprecated": false,
+    "description": "({x}, {y}, {z}{o:choose(0):|, {o}})",
+    "help": "Absolute world position, use xyz from event params",
+    "is_only_target": true,
+    "uses_target": false,
+    "types": [
+      "Position"
+    ]
+  },
+  {
+    "id": 9,
+    "name": "SMART_TARGET_CREATURE_RANGE",
+    "name_readable": "Creature in range",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Creature",
+        "description": "Creature Entry to find",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Minimum distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum distance",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "description": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} - {pram3} yards",
+    "help": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} - {pram3} yards",
+    "types": [
+      "Creature"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 10,
+    "name": "SMART_TARGET_CREATURE_GUID",
+    "name_readable": "Creature by spawnId",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Creature GUID",
+        "description": "Creature GUID to find",
+        "type": "CreatureGUIDParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Creature Entry",
+        "description": "It is used only to confirm found GUID is of this entry. Can be left to 0.",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Creature {pram1}",
+    "help": "Creature {pram1}",
+    "types": [
+      "Creature"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 11,
+    "name": "SMART_TARGET_CREATURE_DISTANCE",
+    "name_readable": "Creature in distance",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Creature Entry",
+        "description": "Creature entry to find in given distance",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "description": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} yd",
+    "help": "{pram1value:choose(0):Any creature|Creature {pram1}} in {pram2} yd",
+    "types": [
+      "Creature"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 12,
+    "name": "SMART_TARGET_STORED",
+    "name_readable": "Stored object",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Variable ID",
+        "description": "Stored through action STORE_TARGET target ID",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": " {stored} ",
+    "help": "storedTarget[{pram1}]",
+    "types": [
+      "Creature",
+      "GameObject",
+      "Player",
+      "Self"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 13,
+    "name": "SMART_TARGET_GAMEOBJECT_RANGE",
+    "name_readable": "Gameobject in range",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "GameObject",
+        "description": "Gameobject Entry to find",
+        "type": "GameobjectParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Minimum distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum distance",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "description": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} - {pram3} yards",
+    "help": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} - {pram3} yards",
+    "types": [
+      "GameObject"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 14,
+    "name": "SMART_TARGET_GAMEOBJECT_GUID",
+    "name_readable": "Gameobject by spawnId",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Gameobject GUID",
+        "description": "Gameobject GUID to find",
+        "type": "GameobjectGUIDParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Gameobject Entry",
+        "description": "It is used only to confirm found GUID is of this entry. Can be left to 0.",
+        "type": "GameobjectParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Gameobject {pram1}",
+    "help": "Gameobject {pram1}",
+    "types": [
+      "GameObject"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 15,
+    "name": "SMART_TARGET_GAMEOBJECT_DISTANCE",
+    "name_readable": "Gameobject in distance",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Gameobject Entry",
+        "description": "Gameobject entry to find in given distance",
+        "type": "GameobjectParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "description": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} yd",
+    "help": "{pram1value:choose(0):Any gameobject|Gameobject {pram1}} in {pram2} yd",
+    "types": [
+      "GameObject"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 16,
+    "name": "SMART_TARGET_INVOKER_PARTY",
+    "name_readable": "Invoker's party",
+    "deprecated": false,
+    "description": "Party invoker",
+    "help": "If in group, target will be player who created a party, if not, it will be action invoker",
+    "types": [
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 17,
+    "name": "SMART_TARGET_PLAYER_RANGE",
+    "name_readable": "Player in range",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum distance",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Players in {pram1} - {pram2} yards",
+    "help": "Finds *all* players in given range",
+    "types": [
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 18,
+    "name": "SMART_TARGET_PLAYER_DISTANCE",
+    "name_readable": "Player in distance",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Distance",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Players in {pram1} yards",
+    "help": "Finds *all* players in distance",
+    "types": [
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 19,
+    "name": "SMART_TARGET_CLOSEST_CREATURE",
+    "name_readable": "Closest creature",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Creature",
+        "description": "Creature Entry to find",
+        "type": "CreatureParameter",
+        "required": true,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "description": "Maximum distance to check for creature. If 0, will find in 100 yards, but it is not recommended",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Dead",
+        "description": "If true, only dead creatures will be returned. If false, only alive creatures will be returned.",
+        "type": "BoolParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Closest {pram3value:choose(0):alive|dead} creature {pram1} in {pram2value:choose(0):100|{pram2}} yards",
+    "help": "Closest {pram3value:choose(0):alive|dead} creature {pram1} in {pram2value:choose(0):100|{pram2}} yards",
+    "types": [
+      "Creature"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 20,
+    "name": "SMART_TARGET_CLOSEST_GAMEOBJECT",
+    "name_readable": "Closest gameobject",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "GameObject",
+        "description": "Gameobject Entry to find",
+        "type": "GameobjectParameter",
+        "required": true,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "description": "Maximum distance to check for gameobject. If 0, will find in 100 yards, but it is not recommended",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Closest gameobject {pram1} in {pram2value:choose(0):100|{pram2}} yards",
+    "help": "Closest gameobject {pram1} in {pram2value:choose(0):100|{pram2}} yards",
+    "types": [
+      "GameObject"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 21,
+    "name": "SMART_TARGET_CLOSEST_PLAYER",
+    "name_readable": "Closest player",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Distance",
+        "description": "Maximum distance to check for player.",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Closest player in {pram1} yards",
+    "help": "Closest player in {pram1} yards",
+    "types": [
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 22,
+    "name": "SMART_TARGET_ACTION_INVOKER_VEHICLE",
+    "name_readable": "Invoker's vehicle",
+    "deprecated": false,
+    "description": "Invoker's vehicle",
+    "help": "Unit's vehicle who caused this event to occur",
+    "types": [
+      "Self",
+      "Creature"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 23,
+    "name": "SMART_TARGET_OWNER_OR_SUMMONER",
+    "name_readable": "Owner or summoner",
+    "deprecated": false,
+    "description": "Owner",
+    "help": "Unit's owner or summoner.",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 24,
+    "name": "SMART_TARGET_THREAT_LIST",
+    "name_readable": "All hostile",
+    "deprecated": false,
+    "description": "Threat list",
+    "help": "All units on creature's threat list",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 25,
+    "name": "SMART_TARGET_NEAR_PLAYER",
+    "name_readable": "Near player",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Mode",
+        "type": "SwitchParameter",
+        "required": false,
+        "defaultVal": 0,
+        "values": {
+          "0": {
+            "name": "with aura"
+          },
+          "1": {
+            "name": "without aura"
+          },
+          "2": {
+            "name": "with incomplete and active quest"
+          },
+          "3": {
+            "name": "with active quest"
+          },
+          "4": {
+            "name": "with inactive quest"
+          },
+          "5": {
+            "name": "with rewarded quest"
+          },
+          "6": {
+            "name": "without quest rewarded"
+          },
+          "7": {
+            "name": "with incomplete quest and without aura"
+          }
+        }
+      },
+      {
+        "name": "Value",
+        "description": "Value depending on mode (either quest ID or aura)",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }/*,
+      {
+        "name": "Aura",
+        "description": "Only used with mode \"with incomplete quest and without aura\" (7)",
+        "type": "SpellParameter",
+        "required": false,
+        "defaultVal": 0
+      }*/
+    ],
+    "description": "Player {pram1value:choose(7):with incomplete quest {pram2value} and without aura|{pram1} {pram2}} in {pram3} yd",
+    "help": "Player with conditions",
+    "types": [
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 26,
+    "name": "SMART_TARGET_NEAR_CREATURE",
+    "name_readable": "Near creature",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Creature",
+        "description": "Creature Entry",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Creature {pram1} in {pram2} yd",
+    "help": "Creature with entry in range",
+    "types": [
+      "Creature"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 27,
+    "name": "SMART_TARGET_FARTHEST_PLAYER",
+    "name_readable": "Farthest attacked player",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Distance",
+        "description": "Maximum distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Farthest player",
+    "help": "Farthest player on threat list",
+    "types": [
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 28,
+    "name": "SMART_TARGET_FARTHEST_UNIT",
+    "name_readable": "Farthest attacked unit",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Creature entry",
+        "description": "NOT USED BY CORE",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "description": "Maximum distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Farthest unit",
+    "help": "Farthest unit on threat list",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 29,
+    "name": "SMART_TARGET_LINKED_CREATURE",
+    "name_readable": "Linked creature",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Linked entry",
+        "description": "Linked entry creature from creature_linked(_template).entry",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Linked creature {pram1}",
+    "help": "Creature linked with table creature_linked(_template).entry",
+    "types": [
+      "Creature"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 30,
+    "name": "SMART_TARGET_VEHICLE_PASSENGER",
+    "name_readable": "Vehicle's passenger",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Seat id",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "Vehicle passenger on seat {pram1}",
+    "help": "Vehicle's passenger",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 31,
+    "name": "SMART_TARGET_SUMMONER",
+    "name_readable": "Summoner",
+    "deprecated": false,
+    "description": "Summoner",
+    "help": "Summoner",
+    "types": [
+      "Creature",
+      "Player"
+    ],
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 32,
+    "name": "SMART_TARGET_SOURCE",
+    "name_readable": "Use source as target",
+    "deprecated": false,
+    "description": "Source",
+    "help": "Source",
+    "is_only_target": true,
+    "uses_target": false,
+    "types": [
+      "Position",
+      "Self",
+      "Creature",
+      "GameObject",
+      "Player"
+    ],
+  },
+  {
+    "id": 33,
+    "name": "SMART_TARGET_STORED_POINT",
+    "name_readable": "Stored point position",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Id",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "description": "{storedPoint}",
+    "help": "storedPoint[{pram1}]",
+    "types": [
+      "Position"
+    ],
+    "is_only_target": true,
+    "uses_target": false
+  },
+  {
+    "id": 34,
+    "name": "SMART_TARGET_HOME_POSITION",
+    "name_readable": "Home position",
+    "deprecated": false,
+    "description": "home",
+    "types": [
+      "Position"
+    ],
+    "help": "home",
+    "is_only_target": true,
+    "uses_target": false
+  },
+  {
+    "id": 35,
+    "name": "SMART_TARGET_RESPAWN_POSITION",
+    "name_readable": "Respawn position",
+    "deprecated": false,
+    "types": [
+      "Position"
+    ],
+    "description": "respawn",
+    "help": "respawn",
+    "is_only_target": true,
+    "uses_target": false
+  },
+  {
+    "id": 36,
+    "name": "SMART_TARGET_SUMMONED_CREATURES",
+    "name_readable": "Summons",
+    "types": ["Creature"],
+    "description": "{pram1value:choose(0):All summons|Summons with entry {pram1}}",
+    "parameters": [
+      {
+        "name": "Entry",
+        "type": "CreatureParameter",
+        "description": "If 0, all summoned creatures"
+      }
+    ],
+    "help": "Creatures summoned by script creature",
+    "is_only_target": false
+  },
+  {
+    "id": 37,
+    "name": "SMART_TARGET_SUMMONED_BY_STORED_PLAYER",
+    "name_readable": "Stored's summons",
+    "types": ["Creature"],
+    "description": "{stored}'s summons with entry {pram2}",
+    "parameters": [
+      {
+        "name": "Stored target",
+        "description": "Stored target id",
+        "type": "Parameter"
+      },
+      {
+        "name": "Entry",
+        "type": "CreatureParameter",
+        "description": "If 0, none creature will match"
+      }
+    ],
+    "help": "Creatures summoned by stored player (yes, only stored players' summons)"
+  },
+
+  {
+    "id": 38,
+    "name": "SMART_TARGET_SPELL_CASTER",
+    "name_readable": "Spell caster",
+    "types": ["Creature", "Player"],
+    "description": "Caster",
+    "help": "Unit casting spell",
+    "usable_with_event_types": [6],
+    "is_only_target": false
+  },
+  {
+    "id": 39,
+    "name": "SMART_TARGET_SPELL_EXPLICIT_TARGET_DEST",
+    "name_readable": "Explicit spell target destination",
+    "types": ["Position"],
+    "description": "Explicit spell destination",
+    "help": "Spell destination (position)",
+    "usable_with_event_types": [6],
+    "is_only_target": true
+  },
+  {
+    "id": 40,
+    "name": "SMART_TARGET_SPELL_EXPLICIT_TARGET_WORLD_OBJECT",
+    "name_readable": "Explicit spell target",
+    "types": ["Creature", "Player"],
+    "description": "Explicit spell target",
+    "usable_with_event_types": [6],
+    "help": "Explicit spell target",
+    "is_only_target": false
+  },
+  {
+    "id": 41,
+    "name": "SMART_TARGET_SPELL_HIT_CREATURE",
+    "name_readable": "Hit creature",
+    "types": ["Creature"],
+    "description": "Hit creature",
+    "help": "Creature hit by effect",
+    "usable_with_event_types": [6],
+    "is_only_target": false
+  },
+  {
+    "id": 42,
+    "name": "SMART_TARGET_SPELL_HIT_DESTINATION_POINT",
+    "name_readable": "Spell hit destination position",
+    "types": ["Position"],
+    "description": "Spell hit destination",
+    "usable_with_event_types": [6],
+    "is_only_target": true
+  },
+  {
+    "id": 43,
+    "name": "SMART_TARGET_SPELL_HIT_PLAYER",
+    "name_readable": "Hit player",
+    "types": ["Player"],
+    "description": "Hit player",
+    "help": "Player hit by effect",
+    "usable_with_event_types": [6],
+    "is_only_target": false
+  },
+  {
+    "id": 44,
+    "name": "SMART_TARGET_SPELL_HIT_UNIT",
+    "name_readable": "Hit unit",
+    "types": ["Player", "Creature"],
+    "description": "Hit unit",
+    "help": "Unit hit by effect",
+    "usable_with_event_types": [6],
+    "is_only_target": false
+  },
+  {
+    "id": 45,
+    "name": "SMART_TARGET_SPELL_ORIGINAL_CASTER",
+    "name_readable": "Original caster",
+    "types": ["Creature", "Player"],
+    "description": "Original caster",
+    "usable_with_event_types": [6],
+    "is_only_target": false
+  },
+  {
+    "id": 46,
+    "name": "SMART_TARGET_AURA_OWNER",
+    "name_readable": "Aura owner",
+    "types": ["Creature", "Player"],
+    "description": "Aura owner",
+    "usable_with_event_types": [10],
+    "is_only_target": false
+  },
+  {
+    "id": 47,
+    "name": "SMART_TARGET_AURA_CASTER",
+    "name_readable": "Aura caster (can be null)",
+    "types": ["Creature", "Player"],
+    "description": "Aura caster",
+    "usable_with_event_types": [10],
+    "is_only_target": false
+  },
+  {
+    "id": 48,
+    "name": "SMART_TARGET_AURA",
+    "name_readable": "Aura",
+    "types": ["Aura"],
+    "description": "Aura",
+    "usable_with_event_types": [10],
+    "is_only_target": false
+  },
+  {
+  "id": 49,
+  "name": "SMART_TARGET_DYNAMIC_OBJECT",
+  "name_readable": "Dynamic Object",
+  "types": ["Position"],
+  "description": "Dynamic object from aura {pram1}",
+  "is_only_target": true,
+  "parameters": [
+    {
+      "name": "Aura",
+      "type": "SpellParameter"
+    }
+  ],
+},
+]

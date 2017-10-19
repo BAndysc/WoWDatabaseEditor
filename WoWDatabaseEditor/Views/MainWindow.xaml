@@ -1,0 +1,60 @@
+﻿<Window x:Class="WoWDatabaseEditor.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:views="clr-namespace:WoWDatabaseEditor.Views"
+        Title="{Binding Title}" Height="695.368" Width="959.421">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Add" Command="{Binding ExecuteCommandNew}"/>
+                <MenuItem Header="_Save" Command="{Binding ActiveDocument.Save}"/>
+                <Separator />
+                <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}"/>
+                <Separator />
+                <MenuItem Header="_Exit" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Undo" Command="{Binding ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z"/>
+                <MenuItem Header="_Redo" Command="{Binding ActiveDocument.Redo}"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Command="{Binding About}"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <avalonDock:DockingManager x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding ActiveDocument,Mode=TwoWay}" DocumentsSource="{Binding Documents}" >
+            <avalonDock:DockingManager.DocumentPaneTemplate><ControlTemplate><ContentControl Content="{Binding Model.Content}"></ContentControl></ControlTemplate></avalonDock:DockingManager.DocumentPaneTemplate>
+            <avalonDock:DockingManager.LayoutItemContainerStyle>
+                <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
+                <Style TargetType="{x:Type avalonDock:LayoutItem}" >
+                    <Setter Property="Title" Value="{Binding Model.Title}" />
+                    <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+                    <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
+                </Style>
+            </avalonDock:DockingManager.LayoutItemContainerStyle>
+
+            <avalonDock:LayoutRoot>
+                <avalonDock:LayoutPanel Orientation="Horizontal">
+
+                    <avalonDock:LayoutDocumentPane>
+                        <avalonDock:LayoutDocument Title="Welcome">
+                            <views:AboutView></views:AboutView>
+                        </avalonDock:LayoutDocument>
+                    </avalonDock:LayoutDocumentPane>
+                    <avalonDock:LayoutAnchorablePane DockWidth="240">
+                        <avalonDock:LayoutAnchorable Title="Solution Explorer">
+                            <ContentControl Content="{Binding SE}"></ContentControl>
+                        </avalonDock:LayoutAnchorable>
+                    </avalonDock:LayoutAnchorablePane>
+                </avalonDock:LayoutPanel>
+            </avalonDock:LayoutRoot>
+        </avalonDock:DockingManager>
+    </DockPanel>
+    <!--<Grid>
+        <ContentControl prism:RegionManager.RegionName="ContentRegion" >
+        </ContentControl>
+    </Grid>-->
+</Window>
+

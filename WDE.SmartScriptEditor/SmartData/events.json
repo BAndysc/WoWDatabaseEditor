@@ -1,0 +1,4449 @@
+[
+  {
+    "id": 0,
+    "name": "SMART_EVENT_UPDATE_IC",
+    "name_readable": "Every X seconds (in combat)",
+    "deprecated": false,
+    "is_timed": true,
+    "parameters": [
+      {
+        "name": "Initial Minimum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Initial Maximum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Maximum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      9
+    ],
+    "description": "Timer between {pram1} and {pram2} secs",
+    "help": "Called every given time, when unit in combat",
+    "is_only_target": false,
+    "uses_target": false,
+    "description_rules": [
+      {
+        "description": "After {pram1} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 9,
+            "compared_any_param": "sourcetype"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "Once [IC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "After {pram1} - {pram2} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "invert": true,
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 9,
+            "compared_any_param": "sourcetype"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram1} seconds [IC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Time = {pram1} seconds [IC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "Time between {pram1} - {pram2} seconds [IC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram1} - {pram2} seconds [IC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram3} seconds ({pram1}s initially) [IC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) [IC]"
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "name": "SMART_EVENT_UPDATE_OOC",
+    "name_readable": "Every X seconds (out of combat)",
+    "deprecated": false,
+    "is_timed": true,
+    "parameters": [
+      {
+        "name": "Initial Minimum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Initial Maximum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Maximum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1,
+      8
+    ],
+    "description": "When out of combat and timer at the begining between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+    "help": "Called every given time, when unit is out of combat",
+    "is_only_target": false,
+    "uses_target": false,
+    "description_rules": [
+      {
+        "description": "After {pram1} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 9,
+            "compared_any_param": "sourcetype"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "Once [OOC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "After {pram1} - {pram2} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "invert": true,
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 9,
+            "compared_any_param": "sourcetype"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram1} seconds [OOC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Time = {pram1} seconds [OOC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "Time between {pram1} - {pram2} seconds [OOC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram1} - {pram2} seconds [OOC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram3} seconds ({pram1}s initially) [OOC]",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) [OOC]"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "SMART_EVENT_HEALT_PCT",
+    "name_readable": "When health between",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "HP Minimum",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "HP Maximum",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When health between {pram1} and {pram2} (check every {pram3} - {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if creature has health in percentage range.",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 3,
+    "name": "SMART_EVENT_MANA_PCT",
+    "name_readable": "When mana between",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Mana Minimum",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Mana Maximum",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When mana between {pram1} and {pram2} (check every {pram3} - {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if creature has mana in percentage range.",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 4,
+    "name": "SMART_EVENT_AGGRO",
+    "name_readable": "On aggro",
+    "tags": "attacked",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On aggro",
+    "help": "Called when creature enters combat",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 5,
+    "name": "SMART_EVENT_KILL",
+    "name_readable": "On kill",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Player only",
+        "description": "If false, only creatures will trigger the event, if true, only player will trigger the event",
+        "type": "BoolParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Creature",
+        "description": "Takes into account only if \"Player only\" is True",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On kill {pram1value:choose(0):{pram2value:choose(0):any creature|creature {pram2}}|player}",
+    "help": "Called when creature kills unit",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 6,
+    "name": "SMART_EVENT_DEATH",
+    "name_readable": "On death",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On death",
+    "help": "Called when creature dies",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 7,
+    "name": "SMART_EVENT_EVADE",
+    "name_readable": "On evade",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On evade",
+    "help": "Called when creature enters evade mode",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 8,
+    "name": "SMART_EVENT_SPELLHIT",
+    "name_readable": "On spell hit",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Spell",
+        "description": "If 0, any spell will trigger the event",
+        "type": "SpellParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "School",
+        "description": "School of spell",
+        "type": "SpellSchoolParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On {pram1value:choose(0):any spell|spell {pram1}}{pram2value:choose(0):| of school {pram2}} hit",
+    "help": "Called when creature is hit by spell",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 9,
+    "name": "SMART_EVENT_RANGE",
+    "name_readable": "Range",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum Distance",
+        "description": "Minimum distance between creature and its victim to trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum Distance",
+        "description": "Maximum distance between creature and its victim to trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Min",
+        "description": "Minimum timer value to check for event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Max",
+        "description": "Maximum timer value to check for event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When victim in range {pram1} - {pram2} yards (check every {pram3} - {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if victim is in given range (you shouldn't use this event)",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 10,
+    "name": "SMART_EVENT_OOC_LOS",
+    "name_readable": "On move in line of sight (out of combat)",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "No Hostile",
+        "description": "If false, only hostile units will trigger the event",
+        "type": "BoolParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Max distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When {pram1value:choose(0):|non }hostile unit in LOS [OOC]",
+    "help": "Called when unit moves in line of sight and script creature is out of combat",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 11,
+    "name": "SMART_EVENT_RESPAWN",
+    "name_readable": "On respawn",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Respawn type",
+        "description": "Respawn type to check",
+        "type": "SwitchParameter",
+        "required": false,
+        "defaultVal": 0,
+        "values": {
+          "0": {
+            "name": "SMART_SCRIPT_RESPAWN_CONDITION_NONE",
+            "description": "Any respawn type"
+          },
+          "1": {
+            "name": "SMART_SCRIPT_RESPAWN_CONDITION_MAP",
+            "description": "Compare map"
+          },
+          "2": {
+            "name": "SMART_SCRIPT_RESPAWN_CONDITION_AREA",
+            "description": "Compare area (zone)"
+          }
+        }
+      },
+      {
+        "name": "Map Id",
+        "description": "Respawn Type must be either SMART_SCRIPT_RESPAWN_CONDITION_NONE or SMART_SCRIPT_RESPAWN_CONDITION_MAP",
+        "type": "ZoneAreaParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Zone",
+        "description": "Respawn Type must be either SMART_SCRIPT_RESPAWN_CONDITION_NONE or SMART_SCRIPT_RESPAWN_CONDITION_AREA",
+        "type": "ZoneAreaParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On respawn {pram2value:choose(0):{pram3value:choose(0):|in zone {pram3}}|on map {pram2}{pram3value:choose(0):| and in zone {pram3}}}",
+    "help": "Called after object respawn (contrary to c++ scripts: also after first spawn!)",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 12,
+    "name": "SMART_EVENT_TARGET_HEALTH_PCT",
+    "name_readable": "When victim's health between",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "HP Minimum",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "HP Maximum",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When victim health between {pram1} - {pram2} (check every {pram3} - {pram4})",
+    "is_timed": true,
+    "help": "Checks every given time interval if victim has health in percentage range",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 13,
+    "name": "SMART_EVENT_VICTIM_CASTING",
+    "name_readable": "When victim is casting",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Repeat Min",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Max",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Spell",
+        "description": "If 0, any spell will trigger the event",
+        "type": "SpellParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When victim is casting {pram3value:choose(0):any |}spell{pram3value:choose(0):| {pram3}} (check every {pram1} - {pram2})",
+    "is_timed": true,
+    "help": "Checks every given time interval if victim is casting spell",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 14,
+    "name": "SMART_EVENT_FRIENDLY_HEALTH",
+    "name_readable": "When nerby unit health between",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "HP Deficit",
+        "description": "Absolute value",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Radius",
+        "description": "Radius to check for friendly creatures",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When friendly unit in range {pram2} yards has lost more than {pram1} hp (check every {pram3} - {pram4})",
+    "is_timed": true,
+    "help": "Every given time interval checks if there is friendly unit nearby that has HP in range and is in range",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 15,
+    "name": "SMART_EVENT_FRIENDLY_IS_CC",
+    "name_readable": "When nerby unit is CC",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Radius",
+        "description": "Radius to check for",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 2,
+        "compare_to_parameter_id": 3,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When friendly unit in range {pram1} yards is either: feared, charmed, stunned, frozen or confused (check every {pram2} - {pram3})",
+    "is_timed": true,
+    "help": "Every given time interval checks if there is friendly unit nerby that is crowd controller (feared, charmed, frozen, has unit state STUNNED or CONFUSED)",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 16,
+    "name": "SMART_EVENT_FRIENDLY_MISSING_BUFF",
+    "name_readable": "When nerby friendly missing buff",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Spell",
+        "description": "Spell id to check",
+        "type": "SpellParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Radius",
+        "description": "Radius to check in",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When friendly unit in range {pram2} yards has not got aura {pram1} (check every {pram3} - {pram4})",
+    "is_timed": true,
+    "help": "Checks every given time interval if there is nearby friendly unit which is missing buff",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 17,
+    "name": "SMART_EVENT_SUMMONED_UNIT",
+    "name_readable": "On creature summon",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Creature",
+        "description": "If 0, any creature will trigger the event",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 2,
+        "compare_to_parameter_id": 3,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On {pram1value:choose(0):any |}unit {pram1value:choose(0):|{pram1} }summon",
+    "help": "Called when script object summnons a creature",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 18,
+    "name": "SMART_EVENT_TARGET_MANA_PCT",
+    "name_readable": "When victim mana between",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum mana",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum mana",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When vicitm has mana between {pram1} - {pram2} (check every {pram3} - {pram4})",
+    "is_timed": true,
+    "help": "Checks every given time interval if unit's victim's mana is in range ",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 19,
+    "name": "SMART_EVENT_ACCEPTED_QUEST",
+    "name_readable": "On quest accept",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Quest",
+        "description": "If 0, any quest will trigger the event",
+        "type": "QuestStarterParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "When player accepts {pram1value:choose(0):any quest|quest {pram1}}",
+    "help": "Called when player accepts a quest",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 20,
+    "name": "SMART_EVENT_REWARD_QUEST",
+    "name_readable": "On quest reward",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Quest",
+        "description": "If 0, any quest will trigger the event",
+        "type": "QuestEnderParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "When player rewards {pram1value:choose(0):any quest|quest {pram1}}",
+    "help": "Called when player rewards a quest",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 21,
+    "name": "SMART_EVENT_REACHED_HOME",
+    "name_readable": "On home reached",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On home reached",
+    "help": "Called when creature reaches its home position (e.g. after evade)",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 22,
+    "name": "SMART_EVENT_RECEIVE_EMOTE",
+    "name_readable": "On emote recevie",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Emote",
+        "type": "TextEmoteParameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On {pram1value:choose(0):any emote|emote {pram1}} received",
+    "help": "Called when player sends emote /slash with creature as the target",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 23,
+    "name": "SMART_EVENT_HAS_AURA",
+    "name_readable": "When has aura",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Spell",
+        "type": "SpellParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Stack amount",
+        "description": "If 0, any amount will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When has{pram2value:choose(0):| {pram2} stacks of} aura {pram1} (check every {pram3} - {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if script creature has aura",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 24,
+    "name": "SMART_EVENT_TARGET_BUFFED",
+    "name_readable": "When target has aura",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Spell",
+        "type": "SpellParameter",
+        "required": true,
+        "defaultVal": 0
+      },
+      {
+        "name": "Minimum stack amount",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When victim has at least {pram2} stacks of aura {pram1} (check every {pram3} - {pram4})",
+    "is_timed": true,
+    "help": "Checks every given time interval if unit's victim has aura",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 25,
+    "name": "SMART_EVENT_RESET",
+    "name_readable": "On reset",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On reset",
+    "help": "Called on: spawn, respawn, entering evade",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 26,
+    "name": "SMART_EVENT_IC_LOS",
+    "name_readable": "On move in line of sight (in combat)",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "No Hostile",
+        "description": "If false, only hostile units will trigger the event",
+        "type": "BoolParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When {pram1value:choose(0):|non }hostile unit in LOS [IC]",
+    "help": "Called when an unit enters script object line of sight. Be careful, script creature needs REACT_AGGRESSIVE or PASSIVE_LOS unit state to trigger this event.",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 27,
+    "name": "SMART_EVENT_PASSENGER_BOARDED",
+    "name_readable": "On passenger boarded",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "parameters": [
+    	{
+    		"name": "Specific seat",
+    		"type": "BoolParameter",
+    		"description": "If true, the event will only trigger if the seat id is equals to event param"
+    	},
+    	{
+    		"name": "Seat ID",
+    		"type": "Parameter",
+    		"description": "If you want to use this parameter, set param 'specific seat' to True"
+    	}
+    ],
+    "description": "On passenger boarded",
+    "description_rules": [
+      {
+        "description": "On passenger boarded on seat {pram2}",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 1,
+            "compared_any_param": "pram1"
+          }
+        ]
+      },
+  	],
+    "help": "Called when passenger boards script vehicle",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 28,
+    "name": "SMART_EVENT_PASSENGER_REMOVED",
+    "name_readable": "On passenger removed",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "parameters": [
+    	{
+    		"name": "Specific seat",
+    		"type": "BoolParameter",
+    		"description": "If true, the event will only trigger if the seat id is equals to event param"
+    	},
+    	{
+    		"name": "Seat ID",
+    		"type": "Parameter",
+    		"description": "If you want to use this parameter, set param 'specific seat' to True"
+    	}
+    ],
+    "description": "On passenger removed",
+    "description_rules": [
+      {
+        "description": "On passenger removed from seat {pram2}",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 1,
+            "compared_any_param": "pram1"
+          }
+        ]
+      },
+  	],
+    "help": "Called when passenger leaves or switches seat on vehicle",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 29,
+    "name": "SMART_EVENT_CHARMED",
+    "name_readable": "On charmed",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On charmed",
+    "help": "Called when creature gets charmed or uncharmed by another unit. E.g. after player enters vehicle with flag VEHICLE_SEAT_FLAG_CAN_CONTROL or by aura SPELL_AURA_MOD_POSSESS, SPELL_AURA_MOD_POSSESS_PET, SPELL_AURA_AOE_CHARM",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 30,
+    "name": "SMART_EVENT_CHARMED_TARGET",
+    "name_readable": "On charmed target [DEPRECATED]",
+    "deprecated": true,
+    "valid_types": [
+      0
+    ],
+    "description": "On charmed target [TBD]",
+    "help": "It doesn't work.",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 31,
+    "name": "SMART_EVENT_SPELLHIT_TARGET",
+    "name_readable": "On spellhit target",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Spell",
+        "type": "SpellParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "School",
+        "description": "If 0, any spell school will trigger the event",
+        "type": "SpellSchoolParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On spell {pram1} {pram2value:choose(0):|of school {pram2}} hit target",
+    "help": "Called when spell casted by script creature hits the target",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 32,
+    "name": "SMART_EVENT_DAMAGED",
+    "name_readable": "On damage take",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum damage",
+        "description": "Minimum damage to trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum damage",
+        "description": "Must be set, or else the event will not trigger.",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On damage{pram1:choose(0):{pram2:choose(0):| between {pram1} - {pram2} HP}| between {pram1} - {pram2} HP} taken",
+    "help": "Called when script creature is damaged",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 33,
+    "name": "SMART_EVENT_DAMAGED_TARGET",
+    "name_readable": "On damage deal",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum damage",
+        "description": "Minimum damage to trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum damage",
+        "description": "Must be set, or else the event will not trigger.",
+        "type": "Parameter",
+        "required": true,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On damage{pram1:choose(0):{pram2:choose(0):| between {pram1} - {pram2} HP}| between {pram1} - {pram2} HP} dealt",
+    "help": "Called when script creature deals the damage",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 34,
+    "name": "SMART_EVENT_MOVEMENTINFORM",
+    "name_readable": "On movement inform",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Movement Type",
+        "type": "SwitchParameter",
+        "required": false,
+        "defaultVal": 0,
+        "values": {
+          "0": {
+            "name": "Any"
+          },
+          "1": {
+            "name": "RANDOM"
+          },
+          "2": {
+            "name": "WAYPOINT"
+          },
+          "3": {
+            "name": "ANIMAL_RANDOM"
+          },
+          "4": {
+            "name": "CONFUSED"
+          },
+          "5": {
+            "name": "CHASE"
+          },
+          "6": {
+            "name": "HOME"
+          },
+          "7": {
+            "name": "FLIGHT"
+          },
+          "8": {
+            "name": "POINT"
+          },
+          "9": {
+            "name": "FLEEING"
+          },
+          "10": {
+            "name": "DISTRACT"
+          },
+          "11": {
+            "name": "ASSISTANCE"
+          },
+          "12": {
+            "name": "ASSISTANCE_DISTRACT"
+          },
+          "13": {
+            "name": "TIMED_FLEEING"
+          },
+          "14": {
+            "name": "FOLLOW"
+          },
+          "15": {
+            "name": "ROTATE"
+          },
+          "16": {
+            "name": "EFFECT"
+          },
+          "18": {
+            "name": "VEHICLE"
+          },
+          "19": {
+            "name": "NULL"
+          },
+          "20": {
+            "name": "SPLINE_CHAIN"
+          }
+        }
+      },
+      {
+        "name": "Point ID",
+        "description": "If 0, any point will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On movement {pram1value:choose(0):|of type {pram1} }inform{pram2value:choose(0):|, point {pram2}}",
+    "help": "Movement generators send events which are handled here. Most of them send the even after they are finished, some (like waypoint generator) sends events more often",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 35,
+    "name": "SMART_EVENT_SUMMON_DESPAWNED",
+    "name_readable": "On summon despawn",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Entry",
+        "description": "If 0, any creature will trigger the event. NOT SURE???",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On summoned creature {pram1value:choose(0):|{pram1} }despawn",
+    "help": "Called when creature summoned by object despawns",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 36,
+    "name": "SMART_EVENT_CORPSE_REMOVED",
+    "name_readable": "On corpse remove",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On corpse removed",
+    "help": "Called when creature corpse is removed from world",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 37,
+    "name": "SMART_EVENT_AI_INIT",
+    "name_readable": "On initialize",
+    "deprecated": false,
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On AI initialize",
+    "help": "Called only once, when the object appears in the world before EVENT_JUST_CREATED",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 38,
+    "name": "SMART_EVENT_DATA_SET",
+    "name_readable": "On data set",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Id",
+        "description": "Variable id",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Value",
+        "description": "Value of variable to trigger",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On {datapram1} set to {pram2}",
+    "help": "Called when objects data is set to a new value",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 39,
+    "name": "SMART_EVENT_WAYPOINT_START",
+    "name_readable": "On waypoints start",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Point Id (Unused)",
+        "description": "Ignored by core",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Path",
+        "description": "Path ID, if 0, any path will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 0,
+        "compare_to_value": 0,
+        "error": "{compared} is not supported by core, value has no effect"
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On {pram2value:choose(0):any path|path {pram2}} started",
+    "help": "Called when creature start waypoint movement. Be careful: it is only triggered by action WP_START_PATH (214), it is NOT triggered by c++ scripts.",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 40,
+    "name": "SMART_EVENT_WAYPOINT_REACHED",
+    "name_readable": "On waypoint reach",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Point ID",
+        "description": "Point ID, if 0, any point will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Path",
+        "description": "Path ID, if 0, any path will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} reached",
+    "help": "Called when creature reaches specific point of the path",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 41,
+    "name": "SMART_EVENT_TRANSPORT_ADDPLAYER",
+    "name_readable": "On player added to the transport",
+    "deprecated": false,
+    "valid_types": [
+      7
+    ],
+    "description": "On player added to transport",
+    "help": "On player added to transport",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 42,
+    "name": "SMART_EVENT_TRANSPORT_ADDCREATURE",
+    "name_readable": "On creature added to transport",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Entry",
+        "description": "If 0, any creature will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      7
+    ],
+    "description": "On creature added to transport",
+    "help": "On creature added to transport",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 43,
+    "name": "SMART_EVENT_TRANSPORT_REMOVE_PLAYER",
+    "name_readable": "On player removed from transport",
+    "deprecated": false,
+    "valid_types": [
+      7
+    ],
+    "description": "On player removed from transport",
+    "help": "On player removed from transport",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 44,
+    "name": "SMART_EVENT_TRANSPORT_RELOCATE",
+    "name_readable": "On player relocate",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Point Id",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      7
+    ],
+    "description": "On player relocate",
+    "help": "On player relocate",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 45,
+    "name": "SMART_EVENT_INSTANCE_PLAYER_ENTER",
+    "name_readable": "On player enter instance",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Team",
+        "description": "If 0, any team",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 2,
+        "compare_to_parameter_id": 3,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      8
+    ],
+    "description": "On player enetered instance",
+    "help": "On player enetered instance",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 46,
+    "name": "SMART_EVENT_AREATRIGGER_ONTRIGGER",
+    "name_readable": "On trigger",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Trigger",
+        "description": "Area trigger ID. If 0, any area trigger will trigger the event. Probably senseless - area trigger script always is bind to one area trigger. Isn't it?",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      2
+    ],
+    "description": "On trigger",
+    "help": "Called when player enters this areatrigger",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 47,
+    "name": "SMART_EVENT_QUEST_ACCEPTED",
+    "name_readable": "On quest accept",
+    "deprecated": false,
+    "valid_types": [
+      5
+    ],
+    "description": "On accept",
+    "help": "Called when player accepts quest",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 48,
+    "name": "SMART_EVENT_QUEST_OBJ_COPLETETION",
+    "name_readable": "On quest objective completion",
+    "deprecated": true,
+    "valid_types": [
+      5
+    ],
+    "description": "When player completed objective",
+    "help": "When player completed objective [NO SUPPORT YET]",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 49,
+    "name": "SMART_EVENT_QUEST_COMPLETION",
+    "name_readable": "On quest complete",
+    "deprecated": false,
+    "valid_types": [
+      5
+    ],
+    "description": "On complete",
+    "help": "When player completed quest",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 50,
+    "name": "SMART_EVENT_QUEST_REWARDED",
+    "name_readable": "On quest reward",
+    "deprecated": false,
+    "valid_types": [
+      5
+    ],
+    "description": "On reward",
+    "help": "When player rewarded quest",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 51,
+    "name": "SMART_EVENT_QUEST_FAIL",
+    "name_readable": "On quest fail",
+    "deprecated": true,
+    "valid_types": [
+      5
+    ],
+    "description": "On fail",
+    "help": "When player failed quest. [NO SUPPORT YET]",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 52,
+    "name": "SMART_EVENT_TEXT_OVER",
+    "name_readable": "On text over",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Group Id",
+        "description": "Group ID from creature_text",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Creature",
+        "description": "Creature who talks, if 0, any creature will trigger the event",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "When text {pram1}{pram2value:choose(0):| said by creature {pram2}} is over",
+    "help": "Called when talk text is over. It only applies if you have set duration in TALK action. It also doesn't matter which creature was talker - this event will be triggered in script where action was. Please note next TALK will override it.",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 53,
+    "name": "SMART_EVENT_RECEIVE_HEAL",
+    "name_readable": "On heal receive",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum heal",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum heal",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On heal between {pram1} - {pram2} HP received",
+    "help": "Called when script creature is healed",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 54,
+    "name": "SMART_EVENT_JUST_SUMMONED",
+    "name_readable": "On self summon",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On just summoned",
+    "help": "Called when script creature is summoned by another unit",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 55,
+    "name": "SMART_EVENT_WAYPOINT_PAUSED",
+    "name_readable": "On waypoints pause",
+    "deprecated": true,
+    "parameters": [
+      {
+        "name": "Point ID",
+        "description": "Point ID, if 0, any point will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Path",
+        "description": "Path ID, if 0, any path will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} paused",
+    "help": "[DEPRECATED] Called when waypoints are paused. Only works with SAI (waypoints) paths",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 56,
+    "name": "SMART_EVENT_WAYPOINT_RESUMED",
+    "name_readable": "On waypoints resume",
+    "deprecated": true,
+    "parameters": [
+      {
+        "name": "Point ID",
+        "description": "Point ID, if 0, any point will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Path",
+        "description": "Path ID, if 0, any path will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} resumed",
+    "help": "[DEPRECATED] Called when waypoints are resumed. Only works with SAI (waypoints) paths",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 57,
+    "name": "SMART_EVENT_WAYPOINT_STOPPED",
+    "name_readable": "On waypoints stopped",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Point ID",
+        "description": "Point ID, if 0, any point will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Path",
+        "description": "Path ID, if 0, any path will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} stopped",
+    "help": "Called when creature waypoints are stopped or when player is too far away from escort creature",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 58,
+    "name": "SMART_EVENT_WAYPOINT_ENDED",
+    "name_readable": "On waypoints finished",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Point ID",
+        "description": "Point ID, if 0, any point will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Path",
+        "description": "Path ID, if 0, any path will trigger the event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} ended",
+    "help": "Called when waypoints path are finished (both waypoints and waypoint_data tables)",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 59,
+    "name": "SMART_EVENT_TIMED_EVENT_TRIGGERED",
+    "name_readable": "On timed event trigger",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "ID",
+        "description": "Timed event ID, which triggers the event. Note: 0 does NOT mean any event",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On timed event {timed1} triggered",
+    "help": "Called when timed event is triggered",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 60,
+    "name": "SMART_EVENT_UPDATE",
+    "name_readable": "Every X seconds",
+    "deprecated": false,
+    "is_timed": true,
+    "parameters": [
+      {
+        "name": "Initial Minimum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Initial Maximum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Maximum",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1,
+      10
+    ],
+    "description": "Every {pram3} and {pram4} ms (for the first time, timer between {pram1} and {pram2} ms)",
+    "help": "Called every x seconds",
+    "is_only_target": false,
+    "uses_target": false,
+    "description_rules": [
+      {
+        "description": "After {pram1} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 9,
+            "compared_any_param": "sourcetype"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "After {pram1} - {pram2} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "invert": true,
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 9,
+            "compared_any_param": "sourcetype"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "Once",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram1} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Time = {pram1} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "Time between {pram1} - {pram2} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram1} - {pram2} seconds",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram3"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram2",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram3} seconds ({pram1}s initially)",
+        "conditions": [
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram1",
+            "compared_to_any_param": "pram2"
+          },
+          {
+            "warning_type": "NOT_SET",
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compared_parameter_id": 0,
+            "compare_to_parameter_id": 0,
+            "compare_to_value": 0,
+            "compared_any_param": "pram3",
+            "compared_to_any_param": "pram4"
+          }
+        ]
+      },
+      {
+        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially)"
+      }
+    ]
+  },
+  {
+    "id": 61,
+    "name": "SMART_EVENT_LINK",
+    "name_readable": "Link",
+    "deprecated": false,
+    "valid_types": [
+      0,
+      1,
+      8,
+      2,
+      5,
+      7,
+      3,
+      4,
+      6,
+      9,
+      10
+    ],
+    "description": "On link",
+    "help": "On link",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 62,
+    "name": "SMART_EVENT_GOSSIP_SELECT",
+    "name_readable": "On gossip select",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Menu ID",
+        "description": "Menu ID (gossip_menu)",
+        "type": "GossipMenuParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Action ID",
+        "description": "Option ID (gossip_menu_option)",
+        "type": "GossipMenuOptionParameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On gossip action {pram2} from menu {pram1} selected",
+    "help": "Called when player selects gossip option from menu",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 63,
+    "name": "SMART_EVENT_JUST_CREATED",
+    "name_readable": "On just created",
+    "deprecated": false,
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On just created",
+    "help": "Called once, after object appears in the world. It is called after EVENT_AI_INITIALIZE and after installing template events",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 64,
+    "name": "SMART_EVENT_GOSSIP_HELLO",
+    "name_readable": "On gossip hello",
+    "deprecated": false,
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "When player opens gossip",
+    "help": "Called when player opens gossip menu",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 65,
+    "name": "SMART_EVENT_FOLLOW_COMPLETED",
+    "name_readable": "On follow comple",
+    "deprecated": true,
+    "valid_types": [
+      0
+    ],
+    "description": "On follow completed",
+    "help": "[DEPRACATED] On follow completed",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 66,
+    "name": "SMART_EVENT_DUMMY_EFFECT",
+    "name_readable": "On dummy effect",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Spell",
+        "type": "SpellParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Effect Index",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      6
+    ],
+    "description": "Spell {pram1} dummy effect",
+    "help": "Spell {pram1} dummy effect",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 67,
+    "name": "SMART_EVENT_IS_BEHIND_TARGET",
+    "name_readable": "When is behind victim",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Repeat Minimum",
+        "description": "Event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+        "type": "FloatParameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When victim is behind me (check every {pram1} - {pram2} secs)",
+    "is_timed": true,
+    "help": "Checks every given time interval if creature is behind its victim",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 68,
+    "name": "SMART_EVENT_GAME_EVENT_START",
+    "name_readable": "On game event start",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Event ID",
+        "description": "From table game_event.Entry",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On game event {pram1} started",
+    "help": "Called when game event is started",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 69,
+    "name": "SMART_EVENT_GAME_EVENT_END",
+    "name_readable": "On game event end",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Event ID",
+        "description": "From table game_event.Entry",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On game event {pram1} ended",
+    "help": "Called when game event is ended",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 70,
+    "name": "SMART_EVENT_GO_STATE_CHANGED",
+    "name_readable": "On loot state changed",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "State",
+        "description": "Gameobject loot state",
+        "type": "SwitchParameter",
+        "required": false,
+        "defaultVal": 0,
+        "values": {
+          "0": {
+            "name": "GO_NOT_READY"
+          },
+          "1": {
+            "name": "GO_READY",
+            "description": "can be ready but despawned, and then not possible activate until spawn"
+          },
+          "2": {
+            "name": "GO_ACTIVATED"
+          },
+          "3": {
+            "name": "GO_JUST_DEACTIVATED"
+          }
+        }
+      }
+    ],
+    "valid_types": [
+      1
+    ],
+    "description": "On loot state changed to {pram1}",
+    "help": "Called when gameobject loot state is changed",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 77,
+    "name": "SMART_EVENT_GO_EVENT_INFORM",
+    "name_readable": "On event inform",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Event ID",
+        "description": "For example, gameobject of type \"gobber\"",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      1
+    ],
+    "description": "On game object event {pram1} triggered",
+    "help": "Called when gameobject event is triggered: e.g. gobber with param eventId (2) or building (33) and param damagedEvent (9), or transport and its path",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 75,
+    "name": "SMART_EVENT_ACTION_DONE",
+    "name_readable": "On action",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Action ID",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On DoAction {action1}",
+    "help": "Called when another object invokes \"DoAction\" on creature",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 76,
+    "name": "SMART_EVENT_ON_SPELLCLICK",
+    "name_readable": "On spellclick",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On spellclick",
+    "help": "Called when player clicks on npc with spellclick flag",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 71,
+    "name": "SMART_EVENT_HAS_RESOURCE",
+    "name_readable": "When has resource",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum",
+        "description": "Minimum amount of resources",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum",
+        "description": "Maximum amount of resources",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When creature has power between {pram1} - {pram2}% (check every {pram3} - {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if npc has resource between",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 72,
+    "name": "SMART_EVENT_SUMMONEROROWNER_HEALTH",
+    "name_readable": "When summoner health",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum HP",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum HP",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When summoner has HP between {pram1} - {pram2}% (check every {pram3} - {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if summoner or owner has health between",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 73,
+    "name": "SMART_EVENT_SUMMONEROROWNER_RESOURCE",
+    "name_readable": "When summoner resource",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Minimum power value",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Maximum power value",
+        "type": "PercentageParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 1,
+        "compare_to_parameter_id": 2,
+        "compare_to_value": 0
+      },
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 3,
+        "compare_to_parameter_id": 4,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When summoner has power between {pram1} - {pram2}% (check every {pram3} - {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if summoner or owner has resources between",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 74,
+    "name": "SMART_EVENT_MISSING_BUFF",
+    "name_readable": "When buff missing",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Aura",
+        "type": "SpellParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      },
+      {
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "conditions": [
+      {
+        "warning_type": "NOT_SET",
+        "compare_type": "LOWER_OR_EQUALS",
+        "type": "CompareValue",
+        "compared_parameter_id": 2,
+        "compare_to_parameter_id": 3,
+        "compare_to_value": 0
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When does not have aura {pram1} (check every {pram2} - {pram3} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if creature is missing buff",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 79,
+    "name": "SMART_EVENT_ON_AREA_CHANGE",
+    "name_readable": "On area change",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Old area ID",
+        "type": "ZoneAreaParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "New area ID",
+        "type": "ZoneAreaParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "In evade mode",
+        "type": "SwitchParameter",
+        "required": false,
+        "defaultVal": 0,
+        "values": {
+          "0": {
+            "name": "Must NOT be in evade mode"
+          },
+          "1": {
+            "name": "Must be in evade mode"
+          },
+          "2": {
+            "name": "Doesn't matter"
+          }
+        }
+      },
+      {
+        "name": "In combat",
+        "type": "SwitchParameter",
+        "required": false,
+        "defaultVal": 0,
+        "values": {
+          "0": { "name": "Must NOT be in combat"},
+          "1": {
+            "name": "Must be in combat"
+          },
+          "2": {
+            "name": "Doesn't matter"
+          }
+        }
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "On area change{pram2value:choose(0):| to {pram2}}{pram1value:choose(0):| from {pram1}}",
+    "help": "Called when creature changes area or zone",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 80,
+    "name": "SMART_EVENT_DISTANCE_CREATURE",
+    "name_readable": "When creature in range",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "GUID",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Creature",
+        "type": "CreatureParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat",
+        "description": "Core will check whether the event should fire every [parameter] milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When creature {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} (check every {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if there is creature in range",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 81,
+    "name": "SMART_EVENT_DISTANCE_GAMEOBJECT",
+    "name_readable": "When gameobject in range",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "GUID",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Gameobject",
+        "type": "GameobjectParameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Distance",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Repeat",
+        "description": "Core will check whether the event should fire every [parameter] milliseconds",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 4000
+      }
+    ],
+    "valid_types": [
+      0
+    ],
+    "description": "When gameobject {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} (check every {pram4} ms)",
+    "is_timed": true,
+    "help": "Checks every given time interval if there is gameobject in range",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 82,
+    "name": "SMART_EVENT_REQUEST_VEHICLE_EXIT",
+    "name_readable": "On vehicle request exit",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "description": "On passenger request vehicle exit",
+    "help": "Called when player clicks red arrow on vehicle to exit",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 83,
+    "name": "SMART_EVENT_INVINCEABILITY_HP_REACHED",
+    "name_readable": "On invinceability health reach",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+    "parameters": [
+      {
+        "name": "ID",
+        "type": "Parameter",
+        "description": "0 matches all invinceabilities (keep in mind action SET_INVINCIBILITY_HP_LEVEL overrides previous invinc)"
+      }
+    ],
+    "description": "On hp invinceability reached{pram1value:choose(0):| with id {pram1}}",
+    "help": "Called when creature is damaged enough to reach its minimum health set by action SMART_ACTION_SET_INVINCIBILITY_HP_LEVEL (42)",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 84,
+    "name": "SMART_EVENT_GRID_ACTIVATED",
+    "name_readable": "On grid activate",
+    "deprecated": false,
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On grid activated",
+    "help": "Called when creature's grid is activated",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 85,
+    "name": "SMART_EVENT_GRID_DEACTIVATED",
+    "name_readable": "On grid deactivate",
+    "deprecated": false,
+    "valid_types": [
+      0,
+      1
+    ],
+    "description": "On grid deactivated",
+    "help": "Called when creature's grid is deactivated (script will pause until player enters nearest area)",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 86,
+    "name": "SMART_EVENT_REPEATED",
+    "name_readable": "Repeated",
+    "deprecated": false,
+    "parameters": [
+      {
+        "name": "Function ID",
+        "type": "Parameter",
+        "required": false,
+        "defaultVal": 0
+      },
+      {
+        "name": "Function ID max",
+        "type": "Parameter",
+        "description": "If > 0, all functions with id between Function ID and Function ID max will trigger the event"
+      }
+    ],
+    "valid_types": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      10,
+    ],
+    "description": "{pram2value:choose(0):On function {function1} |On functions with ID between #{pram1value} - #{pram2value}",
+    "help": "Called by actions SMART_ACTION_REPEAT and SMART_ACTION_REPEAT_RANDOM",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+  	"id": 87,
+  	"name": "SMART_EVENT_SUMMONED_UNIT_DIED",
+  	"name_readable": "On summoned unit died",
+  	"parameters": [
+  		{
+  			"name": "Creature entry",
+  			"type": "CreatureParameter",
+  			"description": "If 0, any creature will trigger the event"
+  		}
+  	],
+  	"valid_types": [0],
+  	"description": "On {pram1value:choose(0):any |}summoned unit {pram1value:choose(0):|{pram1} }death",
+  	"help": "Called when unit summoned by creature script dies"
+  },
+  {
+    "id": 88,
+    "name": "SMART_EVENT_QUEST_REMOVED",
+    "name_readable": "On quest removed",
+    "deprecated": false,
+    "valid_types": [
+      5
+    ],
+    "description": "On remove",
+    "help": "When player removes quest",
+    "is_only_target": false,
+    "uses_target": false
+  },
+  {
+    "id": 89,
+    "name": "SMART_EVENT_SPELL_CAST_RESULT",
+    "name_readable": "On spell cast result",
+    "deprecated": false,
+    "valid_types": [
+      0
+    ],
+  	"parameters": [
+  		{
+  			"name": "Spell ID",
+  			"type": "SpellParameter",
+  			"description": "If 0, any spell will trigger the event"
+  		},
+  		{
+  			"type": "SwitchParameter",
+  			"name": "OK/Failed",
+  			"values": {
+  				"0": {"name": "Ok"},
+  				"1": {"name": "Failed (any reason)"},
+  				"2": {"name": "Failed (with reson)"}
+  			}
+  		},
+  		{
+  			"type": "SwitchParameter",
+  			"name": "Result",
+  			"values": {
+	          "0": { "name": "FAILED_SUCCESS"},
+	          "1": { "name": "FAILED_AFFECTING_COMBAT"},
+	          "2": { "name": "FAILED_ALREADY_AT_FULL_HEALTH"},
+	          "3": { "name": "FAILED_ALREADY_AT_FULL_MANA"},
+	          "4": { "name": "FAILED_ALREADY_AT_FULL_POWER"},
+	          "5": { "name": "FAILED_ALREADY_BEING_TAMED"},
+	          "6": { "name": "FAILED_ALREADY_HAVE_CHARM"},
+	          "7": { "name": "FAILED_ALREADY_HAVE_SUMMON"},
+	          "8": { "name": "FAILED_ALREADY_HAVE_PET"},
+	          "9": { "name": "FAILED_ALREADY_OPEN"},
+	          "10": { "name": "FAILED_AURA_BOUNCED"},
+	          "11": { "name": "FAILED_AUTOTRACK_INTERRUPTED"},
+	          "12": { "name": "FAILED_BAD_IMPLICIT_TARGETS"},
+	          "13": { "name": "FAILED_BAD_TARGETS"},
+	          "14": { "name": "FAILED_CANT_BE_CHARMED"},
+	          "15": { "name": "FAILED_CANT_BE_DISENCHANTED"},
+	          "16": { "name": "FAILED_CANT_BE_DISENCHANTED_SKILL"},
+	          "17": { "name": "FAILED_CANT_BE_MILLED"},
+	          "18": { "name": "FAILED_CANT_BE_PROSPECTED"},
+	          "19": { "name": "FAILED_CANT_CAST_ON_TAPPED"},
+	          "20": { "name": "FAILED_CANT_DUEL_WHILE_INVISIBLE"},
+	          "21": { "name": "FAILED_CANT_DUEL_WHILE_STEALTHED"},
+	          "22": { "name": "FAILED_CANT_STEALTH"},
+	          "23": { "name": "FAILED_CASTER_AURASTATE"},
+	          "24": { "name": "FAILED_CASTER_DEAD"},
+	          "25": { "name": "FAILED_CHARMED"},
+	          "26": { "name": "FAILED_CHEST_IN_USE"},
+	          "27": { "name": "FAILED_CONFUSED"},
+	          "28": { "name": "FAILED_DONT_REPORT"},
+	          "29": { "name": "FAILED_EQUIPPED_ITEM"},
+	          "30": { "name": "FAILED_EQUIPPED_ITEM_CLASS"},
+	          "31": { "name": "FAILED_EQUIPPED_ITEM_CLASS_MAINHAND"},
+	          "32": { "name": "FAILED_EQUIPPED_ITEM_CLASS_OFFHAND"},
+	          "33": { "name": "FAILED_ERROR"},
+	          "34": { "name": "FAILED_FALLING"},
+	          "35": { "name": "FAILED_FIZZLE"},
+	          "36": { "name": "FAILED_FLEEING"},
+	          "37": { "name": "FAILED_FOOD_LOWLEVEL"},
+	          "38": { "name": "FAILED_HIGHLEVEL"},
+	          "39": { "name": "FAILED_HUNGER_SATIATED"},
+	          "40": { "name": "FAILED_IMMUNE"},
+	          "41": { "name": "FAILED_INCORRECT_AREA"},
+	          "42": { "name": "FAILED_INTERRUPTED"},
+	          "43": { "name": "FAILED_INTERRUPTED_COMBAT"},
+	          "44": { "name": "FAILED_ITEM_ALREADY_ENCHANTED"},
+	          "45": { "name": "FAILED_ITEM_GONE"},
+	          "46": { "name": "FAILED_ITEM_NOT_FOUND"},
+	          "47": { "name": "FAILED_ITEM_NOT_READY"},
+	          "48": { "name": "FAILED_LEVEL_REQUIREMENT"},
+	          "49": { "name": "FAILED_LINE_OF_SIGHT"},
+	          "50": { "name": "FAILED_LOWLEVEL"},
+	          "51": { "name": "FAILED_LOW_CASTLEVEL"},
+	          "52": { "name": "FAILED_MAINHAND_EMPTY"},
+	          "53": { "name": "FAILED_MOVING"},
+	          "54": { "name": "FAILED_NEED_AMMO"},
+	          "55": { "name": "FAILED_NEED_AMMO_POUCH"},
+	          "56": { "name": "FAILED_NEED_EXOTIC_AMMO"},
+	          "57": { "name": "FAILED_NEED_MORE_ITEMS"},
+	          "58": { "name": "FAILED_NOPATH"},
+	          "59": { "name": "FAILED_NOT_BEHIND"},
+	          "60": { "name": "FAILED_NOT_FISHABLE"},
+	          "61": { "name": "FAILED_NOT_FLYING"},
+	          "62": { "name": "FAILED_NOT_HERE"},
+	          "63": { "name": "FAILED_NOT_INFRONT"},
+	          "64": { "name": "FAILED_NOT_IN_CONTROL"},
+	          "65": { "name": "FAILED_NOT_KNOWN"},
+	          "66": { "name": "FAILED_NOT_MOUNTED"},
+	          "67": { "name": "FAILED_NOT_ON_TAXI"},
+	          "68": { "name": "FAILED_NOT_ON_TRANSPORT"},
+	          "69": { "name": "FAILED_NOT_READY"},
+	          "70": { "name": "FAILED_NOT_SHAPESHIFT"},
+	          "71": { "name": "FAILED_NOT_STANDING"},
+	          "72": { "name": "FAILED_NOT_TRADEABLE"},
+	          "73": { "name": "FAILED_NOT_TRADING"},
+	          "74": { "name": "FAILED_NOT_UNSHEATHED"},
+	          "75": { "name": "FAILED_NOT_WHILE_GHOST"},
+	          "76": { "name": "FAILED_NOT_WHILE_LOOTING"},
+	          "77": { "name": "FAILED_NO_AMMO"},
+	          "78": { "name": "FAILED_NO_CHARGES_REMAIN"},
+	          "79": { "name": "FAILED_NO_CHAMPION"},
+	          "80": { "name": "FAILED_NO_COMBO_POINTS"},
+	          "81": { "name": "FAILED_NO_DUELING"},
+	          "82": { "name": "FAILED_NO_ENDURANCE"},
+	          "83": { "name": "FAILED_NO_FISH"},
+	          "84": { "name": "FAILED_NO_ITEMS_WHILE_SHAPESHIFTED"},
+	          "85": { "name": "FAILED_NO_MOUNTS_ALLOWED"},
+	          "86": { "name": "FAILED_NO_PET"},
+	          "87": { "name": "FAILED_NO_POWER"},
+	          "88": { "name": "FAILED_NOTHING_TO_DISPEL"},
+	          "89": { "name": "FAILED_NOTHING_TO_STEAL"},
+	          "90": { "name": "FAILED_ONLY_ABOVEWATER"},
+	          "91": { "name": "FAILED_ONLY_DAYTIME"},
+	          "92": { "name": "FAILED_ONLY_INDOORS"},
+	          "93": { "name": "FAILED_ONLY_MOUNTED"},
+	          "94": { "name": "FAILED_ONLY_NIGHTTIME"},
+	          "95": { "name": "FAILED_ONLY_OUTDOORS"},
+	          "96": { "name": "FAILED_ONLY_SHAPESHIFT"},
+	          "97": { "name": "FAILED_ONLY_STEALTHED"},
+	          "98": { "name": "FAILED_ONLY_UNDERWATER"},
+	          "99": { "name": "FAILED_OUT_OF_RANGE"},
+	          "100": { "name": "FAILED_PACIFIED"},
+	          "101": { "name": "FAILED_POSSESSED"},
+	          "102": { "name": "FAILED_REAGENTS"},
+	          "103": { "name": "FAILED_REQUIRES_AREA"},
+	          "104": { "name": "FAILED_REQUIRES_SPELL_FOCUS"},
+	          "105": { "name": "FAILED_ROOTED"},
+	          "106": { "name": "FAILED_SILENCED"},
+	          "107": { "name": "FAILED_SPELL_IN_PROGRESS"},
+	          "108": { "name": "FAILED_SPELL_LEARNED"},
+	          "109": { "name": "FAILED_SPELL_UNAVAILABLE"},
+	          "110": { "name": "FAILED_STUNNED"},
+	          "111": { "name": "FAILED_TARGETS_DEAD"},
+	          "112": { "name": "FAILED_TARGET_AFFECTING_COMBAT"},
+	          "113": { "name": "FAILED_TARGET_AURASTATE"},
+	          "114": { "name": "FAILED_TARGET_DUELING"},
+	          "115": { "name": "FAILED_TARGET_ENEMY"},
+	          "116": { "name": "FAILED_TARGET_ENRAGED"},
+	          "117": { "name": "FAILED_TARGET_FRIENDLY"},
+	          "118": { "name": "FAILED_TARGET_IN_COMBAT"},
+	          "119": { "name": "FAILED_TARGET_IS_PLAYER"},
+	          "120": { "name": "FAILED_TARGET_IS_PLAYER_CONTROLLED"},
+	          "121": { "name": "FAILED_TARGET_NOT_DEAD"},
+	          "122": { "name": "FAILED_TARGET_NOT_IN_PARTY"},
+	          "123": { "name": "FAILED_TARGET_NOT_LOOTED"},
+	          "124": { "name": "FAILED_TARGET_NOT_PLAYER"},
+	          "125": { "name": "FAILED_TARGET_NO_POCKETS"},
+	          "126": { "name": "FAILED_TARGET_NO_WEAPONS"},
+	          "127": { "name": "FAILED_TARGET_NO_RANGED_WEAPONS"},
+	          "128": { "name": "FAILED_TARGET_UNSKINNABLE"},
+	          "129": { "name": "FAILED_THIRST_SATIATED"},
+	          "130": { "name": "FAILED_TOO_CLOSE"},
+	          "131": { "name": "FAILED_TOO_MANY_OF_ITEM"},
+	          "132": { "name": "FAILED_TOTEM_CATEGORY"},
+	          "133": { "name": "FAILED_TOTEMS"},
+	          "134": { "name": "FAILED_TRY_AGAIN"},
+	          "135": { "name": "FAILED_UNIT_NOT_BEHIND"},
+	          "136": { "name": "FAILED_UNIT_NOT_INFRONT"},
+	          "137": { "name": "FAILED_VISION_OBSCURED"},
+	          "138": { "name": "FAILED_WRONG_PET_FOOD"},
+	          "139": { "name": "FAILED_NOT_WHILE_FATIGUED"},
+	          "140": { "name": "FAILED_TARGET_NOT_IN_INSTANCE"},
+	          "141": { "name": "FAILED_NOT_WHILE_TRADING"},
+	          "142": { "name": "FAILED_TARGET_NOT_IN_RAID"},
+	          "143": { "name": "FAILED_TARGET_FREEFORALL"},
+	          "144": { "name": "FAILED_NO_EDIBLE_CORPSES"},
+	          "145": { "name": "FAILED_ONLY_BATTLEGROUNDS"},
+	          "146": { "name": "FAILED_TARGET_NOT_GHOST"},
+	          "147": { "name": "FAILED_TRANSFORM_UNUSABLE"},
+	          "148": { "name": "FAILED_WRONG_WEATHER"},
+	          "149": { "name": "FAILED_DAMAGE_IMMUNE"},
+	          "150": { "name": "FAILED_PREVENTED_BY_MECHANIC"},
+	          "151": { "name": "FAILED_PLAY_TIME"},
+	          "152": { "name": "FAILED_REPUTATION"},
+	          "153": { "name": "FAILED_MIN_SKILL"},
+	          "154": { "name": "FAILED_NOT_IN_RATED_BATTLEGROUND"},
+	          "155": { "name": "FAILED_NOT_ON_SHAPESHIFT"},
+	          "156": { "name": "FAILED_NOT_ON_STEALTHED"},
+	          "157": { "name": "FAILED_NOT_ON_DAMAGE_IMMUNE"},
+	          "158": { "name": "FAILED_NOT_ON_MOUNTED"},
+	          "159": { "name": "FAILED_TOO_SHALLOW"},
+	          "160": { "name": "FAILED_TARGET_NOT_IN_SANCTUARY"},
+	          "161": { "name": "FAILED_TARGET_IS_TRIVIAL"},
+	          "162": { "name": "FAILED_BM_OR_INVISGOD"},
+	          "163": { "name": "FAILED_EXPERT_RIDING_REQUIREMENT"},
+	          "164": { "name": "FAILED_ARTISAN_RIDING_REQUIREMENT"},
+	          "165": { "name": "FAILED_NOT_IDLE"},
+	          "166": { "name": "FAILED_NOT_INACTIVE"},
+	          "167": { "name": "FAILED_PARTIAL_PLAYTIME"},
+	          "168": { "name": "FAILED_NO_PLAYTIME"},
+	          "169": { "name": "FAILED_NOT_IN_BATTLEGROUND"},
+	          "170": { "name": "FAILED_NOT_IN_RAID_INSTANCE"},
+	          "171": { "name": "FAILED_ONLY_IN_ARENA"},
+	          "172": { "name": "FAILED_TARGET_LOCKED_TO_RAID_INSTANCE"},
+	          "173": { "name": "FAILED_ON_USE_ENCHANT"},
+	          "174": { "name": "FAILED_NOT_ON_GROUND"},
+	          "175": { "name": "FAILED_CUSTOM_ERROR"},
+	          "176": { "name": "FAILED_CANT_DO_THAT_RIGHT_NOW"},
+	          "177": { "name": "FAILED_TOO_MANY_SOCKETS"},
+	          "178": { "name": "FAILED_INVALID_GLYPH"},
+	          "179": { "name": "FAILED_UNIQUE_GLYPH"},
+	          "180": { "name": "FAILED_GLYPH_SOCKET_LOCKED"},
+	          "181": { "name": "FAILED_NO_VALID_TARGETS"},
+	          "182": { "name": "FAILED_ITEM_AT_MAX_CHARGES"},
+	          "183": { "name": "FAILED_NOT_IN_BARBERSHOP"},
+	          "184": { "name": "FAILED_FISHING_TOO_LOW"},
+	          "185": { "name": "FAILED_ITEM_ENCHANT_TRADE_WINDOW"},
+	          "186": { "name": "FAILED_SUMMON_PENDING"},
+	          "187": { "name": "FAILED_MAX_SOCKETS"},
+	          "188": { "name": "FAILED_PET_CAN_RENAME"},
+	          "189": { "name": "FAILED_TARGET_CANNOT_BE_RESURRECTED"},
+	          "190": { "name": "FAILED_NO_ACTIONS"},
+	          "191": { "name": "FAILED_CURRENCY_WEIGHT_MISMATCH"},
+	          "192": { "name": "FAILED_WEIGHT_NOT_ENOUGH"},
+	          "193": { "name": "FAILED_WEIGHT_TOO_MUCH"},
+	          "194": { "name": "FAILED_NO_VACANT_SEAT"},
+	          "195": { "name": "FAILED_NO_LIQUID"},
+	          "196": { "name": "FAILED_ONLY_NOT_SWIMMING"},
+	          "197": { "name": "FAILED_BY_NOT_MOVING"},
+	          "198": { "name": "FAILED_IN_COMBAT_RES_LIMIT_REACHED"},
+	          "199": { "name": "FAILED_NOT_IN_ARENA"},
+	          "200": { "name": "FAILED_TARGET_NOT_GROUNDED"},
+	          "201": { "name": "FAILED_EXCEEDED_WEEKLY_USAGE"},
+	          "202": { "name": "FAILED_NOT_IN_LFG_DUNGEON"},
+	          "254": { "name": "FAILED_UNKNOWN"}  				
+  			}
+  		}
+  	],
+    "description": "On {pram1value:choose(0):any spell|spell {pram1}} cast result [wrong sai]",
+    "help": "Called after any spell cast",
+    "is_only_target": false,
+    "uses_target": false,
+    "description_rules": [
+      {
+        "description": "On {pram1value:choose(0):any spell|spell {pram1}} cast result ok",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 0,
+            "compared_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "On {pram1value:choose(0):any spell|spell {pram1}} cast failed",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 1,
+            "compared_any_param": "pram2"
+          }
+        ]
+      },
+      {
+        "description": "On {pram1value:choose(0):any spell|spell {pram1}} cast result {pram3}",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 2,
+            "compared_any_param": "pram2"
+          }
+        ]
+      },      
+  	]
+  },
+  {
+  	"id": 90,
+  	"name": "SMART_EVENT_SPELL_CAST_NO_TARGET",
+  	"name_readable": "On cast result no target",
+  	"parameters": [
+  		{
+  			"type": "SpellParameter",
+  			"name": "Spell Id"
+  		},
+  		{
+  			"type": "SwitchParameter",
+  			"name": "Effect ID",
+  			"values": {
+  				"0": {"name": "EFFECT_0"},
+  				"1": {"name": "EFFECT_1"},
+  				"2": {"name": "EFFECT_2"},
+  			}
+  		}
+  	],
+  	"valid_types": [0],
+  	"help": "When creature casts a spell, but there is no target",
+  	"description": "On {pram1value:choose(0):any spell|spell {pram1}}, {pram2} cast with no target"
+  },
+  {
+  	"id": 91,
+  	"name": "SMART_EVENT_FOREACH_TARGET_LOOP",
+  	"name_readable": "On target foreach loop",
+  	"help": "Invoked for each target found after called action SMART_ACTION_SCRIPT_FOREACH_TARGET (each time action invoker is next unit from targets)",
+  	"parameters": [
+  		{
+  			"type": "Parameter",
+  			"name": "Loop id"
+  		}	
+	],
+	"valid_types": [0, 1, 2, 5, 6, 10],
+	"description": "Foreach target in loop #{pram1}"
+  },
+  {
+  	"id": 92,
+  	"name": "SMART_EVENT_ON_DESPAWN",
+  	"name_readable": "On despawn",
+  	"help": "Called when creature despawns",
+  	"valid_types": [0],
+	"description": "On despawn"
+  },
+  {
+  	"id": 93,
+  	"name": "SMART_EVENT_OWNER_QUEST_UPDATE",
+  	"name_readable": "On owner quest update",
+  	"help": "Called when owner's quest state is changed",
+  	"valid_types": [0],
+  	"parameters": [
+  		{
+  			"name": "Update type",
+  			"type": "SwitchParameter",
+  			"values": {
+			    "0": {"name": "NOTIFY_KILL_CREDIT"},
+			    "1": {"name": "NOTIFY_QUEST_COMPLETE"},
+			    "2": {"name": "NOTIFY_QUEST_REWARD"},
+			    "3": {"name": "NOTIFY_QUEST_ABANDON"},
+			    "4": {"name": "NOTIFY_QUEST_FAILED"},
+			    "5": {"name": "NOTIFY_QUEST_TAKEN"}
+  			}
+  		},
+  		{
+  			"name": "Quest ID",
+  			"type": "QuestParameter",
+  		}
+  	],
+  	"description": "On quest notify",
+  	"description_rules": [
+      {
+        "description": "On owner kill credit",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 0,
+            "compared_any_param": "pram1"
+          }
+        ]
+      },
+      {
+        "description": "On owner quest {pram2} completed",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 1,
+            "compared_any_param": "pram1"
+          }
+        ]
+      },
+      {
+        "description": "On owner quest {pram2} rewarded",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 2,
+            "compared_any_param": "pram1"
+          }
+        ]
+      },
+      {
+        "description": "On owner quest {pram2} abandoned",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 3,
+            "compared_any_param": "pram1"
+          }
+        ]
+      },
+      {
+        "description": "On owner quest {pram2} failed",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 4,
+            "compared_any_param": "pram1"
+          }
+        ]
+      },
+      {
+        "description": "On owner quest {pram2} taken",
+        "conditions": [
+          {
+            "compare_type": "EQUALS",
+            "type": "EQUALS",
+            "compare_to_value": 5,
+            "compared_any_param": "pram1"
+          }
+        ]
+      },
+  	],
+  },
+  {
+  	"id": 94,
+  	"name": "SMART_EVENT_OWNER_KILL_CREDIT",
+  	"name_readable": "On owner kill credit",
+  	"parameters": [
+  		{
+  			"name": "Quest ID",
+  			"type": "QuestParameter"
+  		},
+  		{
+  			"name": "Kill credit",
+  			"type": "CreatureParameter"
+  		}
+  	],
+  	"help": "Called when owner receives kill credit",
+  	"description": "On owner kill credit {pram2} received",
+  	"valid_types": [0]
+  },
+  {
+    "id": 95,
+    "name": "SMART_EVENT_OWNER_SPEED_CHANGE",
+    "name_readable": "On owner speed change",
+    "parameters": [
+      {
+        "type": "SwitchParameter",
+        "name": "Move type",
+        "values": {
+              "0": {"name": "MOVE_WALK"},
+              "1": {"name": "MOVE_RUN"},
+              "2": {"name": "MOVE_RUN_BACK"},
+              "3": {"name": "MOVE_SWIM"},
+              "4": {"name": "MOVE_SWIM_BACK"},
+              "5": {"name": "MOVE_TURN_RATE"},
+              "6": {"name": "MOVE_FLIGHT"},
+              "7": {"name": "MOVE_FLIGHT_BACK"},
+              "8": {"name": "MOVE_PITCH_RATE"},
+              "255": {"name": "any", "description": "Will be triggered by any move type"}
+        }
+      }
+    ],
+    "help": "Called when owner's speed changes",
+    "description": "On owner {pram1value:choose(255):speed changed|speed {pram1} changed}",
+    "valid_types": [0]
+  },
+
+
+  {
+    "id": 96,
+    "name": "SMART_EVENT_SPELL_ON_CAST_START",
+    "name_readable": "On cast start",
+    "help": "Called when cast is being started",
+    "description": "On cast start",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 97,
+    "name": "SMART_EVENT_SPELL_BEFORE_CAST",
+    "name_readable": "Before cast",
+    "help": "Called just before casting",
+    "description": "Before cast",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 98,
+    "name": "SMART_EVENT_SPELL_ON_CAST",
+    "name_readable": "On cast",
+    "help": "Called on cast",
+    "description": "On cast",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 99,
+    "name": "SMART_EVENT_SPELL_AFTER_CAST",
+    "name_readable": "After cast",
+    "help": "Called after cast",
+    "description": "After cast",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 100,
+    "name": "SMART_EVENT_SPELL_ON_CHECK_CAST",
+    "name_readable": "On check cast",
+    "help": "Called after checking whether spell can be casted. You can override spell result here",
+    "description": "On check cast",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 101,
+    "name": "SMART_EVENT_SPELL_ON_EFFECT_LAUNCH",
+    "name_readable": "On effect launch",
+    "help": "Called when effect launches",
+    "description": "On effect launch",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "SpellEffectMaskParameter",
+      }
+    ],
+    "valid_types": [6]
+  },
+
+  {
+    "id": 102,
+    "name": "SMART_EVENT_SPELL_ON_EFFECT_LAUNCH_TARGET",
+    "name_readable": "On effect launch target",
+    "help": "Called when effect launches on target",
+    "description": "On effect launch target",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "SpellEffectMaskParameter",
+      }
+    ],
+    "valid_types": [6]
+  },
+
+  {
+    "id": 103,
+    "name": "SMART_EVENT_SPELL_ON_EFFECT_HIT",
+    "name_readable": "On effect hit",
+    "help": "Called when effect hits",
+    "description": "On effect hit",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "SpellEffectMaskParameter",
+      }
+    ],
+    "valid_types": [6]
+  },
+
+  {
+    "id": 104,
+    "name": "SMART_EVENT_SPELL_ON_EFFECT_HIT_TARGET",
+    "name_readable": "On effect hit target",
+    "help": "Called when effect htis target",
+    "description": "On effect hit target",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "SpellEffectMaskParameter",
+      }
+    ],
+    "valid_types": [6]
+  },
+
+  {
+    "id": 105,
+    "name": "SMART_EVENT_SPELL_BEFORE_HIT",
+    "name_readable": "Before hit",
+    "help": "Called before hit",
+    "description": "Before hit",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 106,
+    "name": "SMART_EVENT_SPELL_ON_HIT",
+    "name_readable": "On hit",
+    "help": "Called on hit",
+    "description": "On hit",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 107,
+    "name": "SMART_EVENT_SPELL_AFTER_HIT",
+    "name_readable": "After hit",
+    "help": "Called after hit",
+    "description": "After hit",
+    "valid_types": [6]
+  },
+
+
+  {
+    "id": 108,
+    "name": "SMART_EVENT_SPELL_OBJECT_AREA_TARGET_SELECT",
+    "name_readable": "On object area target select",
+    "help": "Called when selecting targets for area spells. For each target event OBJECT_AREA_TARGET_SELECT_SINGLE will be called where you will be able to remove object from list.",
+    "description": "On object area target select",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 109,
+    "name": "SMART_EVENT_SPELL_OBJECT_TARGET_SELECT",
+    "name_readable": "On object target select",
+    "help": "Called when selecting target for single target spells. You can remove object in this event",
+    "description": "On object target select",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 110,
+    "name": "SMART_EVENT_SPELL_DESTINATION_TARGET_SELECT",
+    "name_readable": "On destination target select",
+    "help": "Called when selecting destination position for spell. You can override position in this event",
+    "description": "On destination target select",
+    "valid_types": [6]
+  },
+
+  {
+    "id": 111,
+    "name": "SMART_EVENT_SPELL_OBJECT_AREA_TARGET_SELECT_SINGLE",
+    "name_readable": "On single object while area target selection",
+    "help": "Called when selecting targets for area spells. This event is called once for each target. You can remove target with action SPELL_REMOVE_OBJECT. The target is invoker of action",
+    "description": "On single object while area target selection",
+    "valid_types": [6]
+  },
+  {
+    "id": 112,
+    "name": "SMART_EVENT_AURA_CHECK_AREA_TARGET",
+    "name_readable": "On check area target",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On check area target",
+    "help": "Executed when area aura checks if it can be applied on target",
+  },
+  {
+    "id": 113,
+    "name": "SMART_EVENT_AURA_ON_DISPEL",
+    "name_readable": "On dispel",
+    "invoker": "Dispeller",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On dispel",
+    "help": "Executed when aura is dispelled by a unit",
+  },
+  {
+    "id": 114,
+    "name": "SMART_EVENT_AURA_AFTER_DISPEL",
+    "name_readable": "After dispel",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "After dispel",
+    "help": "Executed after aura is dispelled by a unit",
+  },
+  {
+    "id": 115,
+    "name": "SMART_EVENT_AURA_ON_APPLY",
+    "name_readable": "On apply",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      },
+      {
+        "name": "Mode",
+        "type": "AuraEffectModeHandleMaskParameter"
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On apply{pram1value:choose(0):| effects {pram1}}{pram2value:choose(0):| modes: {pram2}}",
+    "help": "Executed when aura effect is applied with specified mode to target. Should be used when effect handler preventing/replacing is needed, do not use this hook for triggering spellcasts/removing auras etc - may be unsafe",
+  },
+  {
+    "id": 116,
+    "name": "SMART_EVENT_AURA_AFTER_APPLY",
+    "name_readable": "After apply",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      },
+      {
+        "name": "Mode",
+        "type": "AuraEffectModeHandleMaskParameter"
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "After apply{pram1value:choose(0):| effects {pram1}}{pram2value:choose(0):| modes: {pram2}}",
+    "help": "Executed after aura effect is applied with specified mode to target",
+  },
+  {
+    "id": 117,
+    "name": "SMART_EVENT_AURA_ON_REMOVE",
+    "name_readable": "On remove",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      },
+      {
+        "name": "Mode",
+        "type": "AuraEffectModeHandleMaskParameter"
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On remove{pram1value:choose(0):| effects {pram1}}{pram2value:choose(0):| modes: {pram2}}",
+    "help": "Executed after aura effect is removed with specified mode from target. Should be used when effect handler preventing/replacing is needed, do not use this hook for triggering spellcasts/removing auras etc - may be unsafe",
+  },
+  {
+    "id": 118,
+    "name": "SMART_EVENT_AURA_AFTER_REMOVE",
+    "name_readable": "After remove",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      },
+      {
+        "name": "Mode",
+        "type": "AuraEffectModeHandleMaskParameter"
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "After remove{pram1value:choose(0):| effects {pram1}}{pram2value:choose(0):| modes: {pram2}}",
+    "help": "Executed when aura effect is removed with specified mode from target",
+  },
+  {
+    "id": 119,
+    "name": "SMART_EVENT_AURA_ON_EFFECT_PERIODIC",
+    "name_readable": "On effect periodic",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On effect periodic {pram1value:choose(0):|effects {pram1}}",
+    "help": "On effect update periodic",
+  },
+  {
+    "id": 120,
+    "name": "SMART_EVENT_AURA_ON_EFFECT_UPDATE_PERIODIC",
+    "name_readable": "On effect update periodic",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On effect update periodic {pram1value:choose(0):|effects {pram1}}",
+    "help": "Executed when periodic aura effect is updated",
+  },
+  {
+    "id": 121,
+    "name": "SMART_EVENT_AURA_DO_EFFECT_CALC_AMOUNT",
+    "name_readable": "Do effect calc amount",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "Do effect calc amount {pram1value:choose(0):|effects {pram1}}",
+    "help": "Executed when aura effect calculates amount",
+  },
+  {
+    "id": 122,
+    "name": "SMART_EVENT_AURA_DO_EFFECT_CALC_PERIODIC",
+    "name_readable": "Do effect calc periodic",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "Do effect calc periodic {pram1value:choose(0):|effects {pram1}}",
+    "help": "Executed when aura effect calculates periodic data",
+  },
+  {
+    "id": 123,
+    "name": "SMART_EVENT_AURA_DO_EFFECT_CALC_SPELL_MOD",
+    "name_readable": "Do effect calc spell mod",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "Do effect calc spell mod {pram1value:choose(0):|effects {pram1}}",
+    "help": "Executed when aura effect calculates spellmod",
+  },
+  {
+    "id": 124,
+    "name": "SMART_EVENT_AURA_ON_EFFECT_ABSORB",
+    "name_readable": "On effect absorb",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On effect absorb {pram1value:choose(0):|effects {pram1}}",
+    "help": "Executed when absorb aura effect is going to reduce damage",
+  },
+  {
+    "id": 125,
+    "name": "SMART_EVENT_AURA_AFTER_EFFECT_ABSORB",
+    "name_readable": "After effect absorb",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "After effect absorb {pram1value:choose(0):|effects {pram1}}",
+    "help": "Executed after absorb aura effect reduced damage to target - absorbAmount is real amount absorbed by aura",
+  },
+  {
+    "id": 126,
+    "name": "SMART_EVENT_AURA_ON_EFFECT_SPLIT",
+    "name_readable": "On effect split",
+    "parameters": [
+      {
+        "name": "Effect mask",
+        "type": "FlagParameter",
+        "values": {
+          "0": {"name": "EFFECT_ANY"},
+          "1": {"name": "EFFECT_0"},
+          "2": {"name": "EFFECT_1"},
+          "4": {"name": "EFFECT_2"}
+        }
+      }
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On effect split {pram1value:choose(0):|effects {pram1}}",
+    "help": "Executed when the caster of some spell with split dmg aura gets damaged through it",
+  },
+  {
+    "id": 127,
+    "name": "SMART_EVENT_AURA_DO_CHECK_PROC",
+    "name_readable": "Do check proc",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "Do check proc",
+    "help": "Executed when aura checks if it can proc",
+  },
+  {
+    "id": 128,
+    "name": "SMART_EVENT_AURA_DO_PREPARE_PROC",
+    "name_readable": "Do prepare proc",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "Do prepare proc",
+    "help": "Executed before aura procs (possibility to prevent charge drop/cooldown)",
+  },
+  {
+    "id": 129,
+    "name": "SMART_EVENT_AURA_ON_PROC",
+    "name_readable": "On proc",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On proc",
+    "help": "Executed when aura procs",
+  },
+  {
+    "id": 130,
+    "name": "SMART_EVENT_AURA_AFTER_PROC",
+    "name_readable": "After proc",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "After proc",
+    "help": "Executed after aura proced",
+  },
+  {
+    "id": 131,
+    "name": "SMART_EVENT_AURA_ON_EFFECT_PROC",
+    "name_readable": "On effect proc",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "On effect proc",
+    "help": "Executed when aura effect procs",
+  },
+  {
+    "id": 132,
+    "name": "SMART_EVENT_AURA_AFTER_EFFECT_PROC",
+    "name_readable": "After effect proc",
+    "parameters": [
+    ],
+    "valid_types": [
+      10
+    ],
+    "description": "After effect proc",
+    "help": "Executed after aura effect proced",
+  },
+  {
+    "id": 133,
+    "name": "SMART_EVENT_SPELL_SUCCESSFUL_CAST",
+    "name_readable": "On successful cast",
+    "parameters": [
+      {
+        "name": "Spell Id",
+        "type": "SpellParameter"
+      }
+    ],
+    "description": "On successful spell {pram1} cast",
+    "help": "Called after spell is successfully casted by creature",
+    "valid_types": [
+      0
+    ],
+  },
+  {
+    "id": 134,
+    "name": "SMART_EVENT_CINEMATIC_FINISHED",
+    "name_readable": "On cinematic finished",
+    "help" : "Either if player force closes cinematic or not",
+    "description": "On cinematic finished",
+    "valid_types": [
+      11
+    ],
+  },
+  {
+    "id": 135,
+    "name": "SMART_EVENT_AURA_REMOVED",
+    "name_readable": "On aura removed",
+    "help": "Called when aura is removed from creature",
+    "description": "On {pram1value:choose(0):any aura|aura from spell {pram1}}{pram2value:choose(0):|, effect {pram2}} is removed{pram3value:choose(0):| (with mode {pram3})}",
+    "parameters": [
+      {
+        "name": "Spell Id",
+        "type": "SpellParameter"
+      },
+      {
+        "name": "Effect mask",
+        "type": "SpellEffectMaskParameter"
+      },
+      {
+        "name": "Mode",
+        "type": "AuraEffectModeHandleMaskParameter"
+      }
+    ],
+    "valid_types": [
+      0
+    ]
+  }
+]

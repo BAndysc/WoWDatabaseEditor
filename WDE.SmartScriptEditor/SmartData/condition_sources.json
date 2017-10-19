@@ -1,0 +1,555 @@
+[
+  {
+    "id": 0,
+    "name": "CONDITION_SOURCE_TYPE_NONE",
+    "description": "Empty condition",
+    "targets": {
+      "0": {
+        "description": "None",
+        "comment": "None"
+      }
+    }
+  },
+  {
+    "id": 1,
+    "name": "CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 2,
+    "name": "CONDITION_SOURCE_TYPE_DISENCHANT_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 3,
+    "name": "CONDITION_SOURCE_TYPE_FISHING_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 4,
+    "name": "CONDITION_SOURCE_TYPE_GAMEOBJECT_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 5,
+    "name": "CONDITION_SOURCE_TYPE_ITEM_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 6,
+    "name": "CONDITION_SOURCE_TYPE_MAIL_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 7,
+    "name": "CONDITION_SOURCE_TYPE_MILLING_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 8,
+    "name": "CONDITION_SOURCE_TYPE_PICKPOCKETING_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 9,
+    "name": "CONDITION_SOURCE_TYPE_PROSPECTING_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 10,
+    "name": "CONDITION_SOURCE_TYPE_REFERENCE_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 11,
+    "name": "CONDITION_SOURCE_TYPE_SKINNING_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 12,
+    "name": "CONDITION_SOURCE_TYPE_SPELL_LOOT_TEMPLATE",
+    "description": "Allow loot item {entry} from {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Loot entry",
+      "description": "_loot_template.entry or reference_loot_template.entry"
+    },
+    "entry": {
+      "type": "ItemParameter",
+      "name": "Item entry",
+      "description": "_loot_template.item or reference_loot_template.item"
+    }
+  },
+  {
+    "id": 13,
+    "name": "CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET",
+    "description": "Cast spell {entry} target",
+    "targets": {
+      "0": {
+        "description": "Potential target of the spell",
+        "comment": "Target"
+      },
+      "1": {
+        "description": "Caster of the spell",
+        "comment": "Caster"
+      }
+    },
+    "group": {
+      "type": "FlagParameter",
+      "name": "Effect mask",
+      "values": {
+        "1": {
+          "name": "EFFECT_0"
+        },
+        "2": {
+          "name": "EFFECT_1"
+        },
+        "4": {
+          "name": "EFFECT_2"
+        }
+      }
+    },
+    "entry": {
+      "type": "SpellParameter",
+      "name": "spell entry"
+    }
+  },
+  {
+    "id": 14,
+    "name": "CONDITION_SOURCE_TYPE_GOSSIP_MENU",
+    "description": "Show text {entry} from gossip {group}",
+    "targets": {
+      "0": {
+        "description": "Player for which gossip text is shown",
+        "comment": "Player"
+      },
+      "1": {
+        "description": "WorldObject providing gossip",
+        "comment": "Object"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Gossip entry",
+      "description": "gossip_menu.entry"
+    },
+    "entry": {
+      "type": "Parameter",
+      "name": "Text id",
+      "description": "gossip_menu.text_id"
+    }
+  },
+  {
+    "id": 15,
+    "name": "CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION",
+    "description": "Show gossip {group} menu option {entry}",
+    "targets": {
+      "0": {
+        "description": "Player for which gossip text is shown",
+        "comment": "Player"
+      },
+      "1": {
+        "description": "WorldObject providing gossip",
+        "comment": "Object"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Gossip entry",
+      "description": "gossip_menu_option.menu_id"
+    },
+    "entry": {
+      "type": "Parameter",
+      "name": "Option id",
+      "description": "gossip_menu_option.id"
+    }
+  },
+  {
+    "id": 16,
+    "name": "CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE",
+    "description": "Allow vehicle {entry}",
+    "targets": {
+      "0": {
+        "description": "Player riding a vehicle",
+        "comment": "Player"
+      },
+      "1": {
+        "description": "Vehicle creature",
+        "comment": "Vehicle"
+      }
+    },
+    "entry": {
+      "type": "CreatureParameter",
+      "name": "Creature entry",
+      "description": "Must be vehicle"
+    }
+  },
+  {
+    "id": 17,
+    "name": "CONDITION_SOURCE_TYPE_SPELL",
+    "description": "Allow cast spell {entry}",
+    "targets": {
+      "0": {
+        "description": "Caster of the spell",
+        "comment": "Caster"
+      },
+      "1": {
+        "description": "Explicit target of the spell (only for spells which take object selected by caster into account)",
+        "comment": "Target"
+      }
+    },
+    "entry": {
+      "type": "SpellParameter",
+      "name": "Spell entry"
+    }
+  },
+  {
+    "id": 18,
+    "name": "CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT",
+    "description": "Allow spellclick on {group}, spell {entry}",
+    "targets": {
+      "0": {
+        "description": "Clicker",
+        "comment": "Clicker"
+      },
+      "1": {
+        "description": "Spellclick target (clickee)",
+        "comment": "Clickee"
+      }
+    },
+    "group": {
+      "type": "CreatureParameter",
+      "name": "creature entry"
+    },
+    "entry": {
+      "type": "SpellParameter",
+      "name": "Spell entry"
+    }
+  },
+  {
+    "id": 19,
+    "name": "CONDITION_SOURCE_TYPE_QUEST_ACCEPT",
+    "description": "Let player accept quest {entry}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "entry": {
+      "type": "QuestParameter",
+      "name": "Quest entry"
+    }
+  },
+  {
+    "id": 20,
+    "name": "CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK",
+    "description": "Show quest {entry} mark",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "entry": {
+      "type": "QuestParameter",
+      "name": "Quest entry"
+    }
+  },
+  {
+    "id": 21,
+    "name": "CONDITION_SOURCE_TYPE_VEHICLE_SPELL",
+    "description": "Show vehicle {group} spell {entry}",
+    "targets": {
+      "0": {
+        "description": "Player for which spell bar is shown",
+        "comment": "Player"
+      },
+      "1": {
+        "description": "Vehicle creature",
+        "comment": "Vehicle"
+      }
+    },
+    "group": {
+      "type": "CreatureParameter",
+      "name": "Creature entry"
+    },
+    "entry": {
+      "type": "SpellParameter",
+      "name": "Spell entry"
+    }
+  },
+  {
+    "id": 23,
+    "name": "CONDITION_SOURCE_TYPE_NPC_VENDOR",
+    "description": "Show item {entry} from vendor {group}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Vendor entry",
+      "description": "npc_vendor.entry"
+    },
+    "entry": {
+      "type": "Parameter",
+      "name": "Item entry",
+      "description": "npc_vendor.item"
+    }
+  },
+  {
+    "id": 27,
+    "name": "CONDITION_SOURCE_TYPE_PHASE_DEFINITION",
+    "description": "Allow phase definition from zone {group}, entry {entry}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "ZoneAreaParameter",
+      "name": "Zone",
+      "description": "phase_definitions.zoneId"
+    },
+    "entry": {
+      "type": "Parameter",
+      "name": "Entry",
+      "description": "phase_definitions.entry"
+    }
+  },
+
+  {
+    "id": 28,
+    "name": "CONDITION_SOURCE_TYPE_SPELL_AREA",
+    "description": "Allow spell_area area {group}, spell {entry}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "ZoneAreaParameter",
+      "name": "Area",
+      "description": "spell_area.area"
+    },
+    "entry": {
+      "type": "SpellParameter",
+      "name": "Spell ID",
+      "description": "spell_area.spell"
+    }
+  },
+
+  {
+    "id": 29,
+    "name": "CONDITION_SOURCE_TYPE_SMART_TARGET",
+    "description": "Limit target id #{group} (sourceType: {sourceId}, entry: {entry})",
+    "targets": {
+      "0": {
+        "description": "Object",
+        "comment": "Object"
+      }
+    },
+    "group": {
+      "type": "Parameter",
+      "name": "Condition ID",
+      "description": "Any positive number, target in SAI will have set this field"
+    },
+    "entry": {
+      "type": "Parameter",
+      "name": "Entry Or Guid",
+      "description": "smart_scripts.entryOrGuid"
+    },
+    "sourceId": {
+      "type": "Parameter",
+      "name": "SourceType",
+      "description": "smart_scripts.script_source_type"
+    }
+  },
+]
