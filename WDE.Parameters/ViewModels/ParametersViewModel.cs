@@ -1,9 +1,7 @@
-﻿using Prism.Commands;
+﻿using Microsoft.Practices.Unity;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using WDE.Parameters.Models;
 
 namespace WDE.Parameters.ViewModels
@@ -12,7 +10,8 @@ namespace WDE.Parameters.ViewModels
     {
         private ParameterSpecModel _selected;
         private bool _hasSelected = true;
-        
+        private readonly IUnityContainer container;
+
         public ObservableCollection<ParameterSpecModel> Parameters { get; } = new ObservableCollection<ParameterSpecModel>();
 
         public ParameterSpecModel Selected
@@ -29,12 +28,10 @@ namespace WDE.Parameters.ViewModels
 
         public Action SaveAction { get; set; }
 
-        public ParametersViewModel()
+        public ParametersViewModel(ParameterFactory factory)
         {
             SaveAction = Save;
-
-            var factory = ParametersModule.FactoryInstance;
-
+            
             foreach (var key in factory.GetKeys())
             {
                 Parameters.Add(factory.GetDefinition(key));

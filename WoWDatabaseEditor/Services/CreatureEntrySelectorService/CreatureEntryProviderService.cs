@@ -94,11 +94,11 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
         protected override IEnumerable<SpellMiniEntry> GetList()
         {
-            var dict = _unity.Resolve<IDbcStore>().SpellStore;
-            List<SpellMiniEntry> spells = new List<SpellMiniEntry>(dict.Count);
+            var spellStore = _unity.Resolve<ISpellStore>();
+            List<SpellMiniEntry> spells = new List<SpellMiniEntry>();
 
-            foreach (var key in dict.Keys)
-                spells.Add(new SpellMiniEntry {Entry = (uint)key, Name=dict[key]});
+            foreach (var spellId in spellStore.Spells)
+                spells.Add(new SpellMiniEntry {Entry = spellId, Name= spellStore.GetName(spellId)});
 
             return spells;
         }

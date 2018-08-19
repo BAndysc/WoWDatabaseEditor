@@ -87,6 +87,7 @@
     <Compile Include="Database\IQuestTemplate.cs" />
     <Compile Include="Database\ISmartScriptLine.cs" />
     <Compile Include="DBC\IDbcStore.cs" />
+    <Compile Include="DBC\ISpellStore.cs" />
     <Compile Include="Events\EventRequestGenerateSql.cs" />
     <Compile Include="Events\EventRequestOpenItem.cs" />
     <Compile Include="History\HistoryHandler.cs" />

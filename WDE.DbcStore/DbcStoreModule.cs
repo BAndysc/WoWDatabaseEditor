@@ -22,10 +22,9 @@ namespace WDE.DbcStore
 
         public void Initialize()
         {
-            Store = new DbcStore(_container);
-            _container.RegisterInstance<IDbcStore>(Store, new ContainerControlledLifetimeManager());
-        }
-
-        public static DbcStore Store;
+            var store = new DbcStore(_container);
+            _container.RegisterInstance<IDbcStore>(store, new ContainerControlledLifetimeManager());
+            _container.RegisterInstance<ISpellStore>(store, new ContainerControlledLifetimeManager());
+        }        
     }
 }

@@ -36,7 +36,7 @@ namespace WDE.Parameters
         public KeyValuePair<ContentControl, Action> GetConfigurationView()
         {
             var view = new ParametersView();
-            var viewModel = new ParametersViewModel();
+            var viewModel = new ParametersViewModel(FactoryInstance);
             view.DataContext = viewModel;
             return new KeyValuePair<ContentControl, Action>(view, viewModel.SaveAction);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,9 +55,10 @@ namespace WDE.SmartScriptEditor
                             return q == null || q.Name == null ? "Quest " + Entry : q.Name;
                         case SmartScriptType.Spell:
                         case SmartScriptType.Aura:
-                            var dict = _unity.Resolve<IDbcStore>().SpellStore;
-                            if (dict.ContainsKey(Entry))
-                                return dict[Entry];
+                            Debug.Assert(Entry >= 0);
+                            var spellStore = _unity.Resolve<ISpellStore>();
+                            if (spellStore.HasSpell((uint)Entry))
+                                return spellStore.GetName((uint)Entry);
                             return (SmartType==SmartScriptType.Aura?"Aura ":"Spell ") + Entry;
                         case SmartScriptType.Timed:
                             return "Timed list " + Entry;

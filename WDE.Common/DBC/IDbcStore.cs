@@ -7,7 +7,6 @@ namespace WDE.Common.DBC
 {
     public interface IDbcStore
     {
-        Dictionary<int, string> SpellStore { get; }
         Dictionary<int, string> SkillStore { get; }
         Dictionary<int, string> LanguageStore { get; }
         Dictionary<int, string> PhaseStore { get; }
@@ -20,6 +19,5 @@ namespace WDE.Common.DBC
         Dictionary<int, string> EmoteStore { get; }
         Dictionary<int, string> AchievementStore { get; }
         Dictionary<int, string> ItemStore { get; }
-        
     }
 }

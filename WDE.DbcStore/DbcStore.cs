@@ -13,11 +13,11 @@ using WDE.DbcStore.Models;
 
 namespace WDE.DbcStore
 {
-    public class DbcStore : IDbcStore
+    public class DbcStore : IDbcStore, ISpellStore
     {
         private IUnityContainer _container;
         
-        public Dictionary<int, string> SpellStore { get; } = new Dictionary<int, string>();
+        private Dictionary<int, string> SpellStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> SkillStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> LanguageStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> PhaseStore { get; } = new Dictionary<int, string>();
@@ -30,6 +30,7 @@ namespace WDE.DbcStore
         public Dictionary<int, string> EmoteStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> AchievementStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> ItemStore { get; } = new Dictionary<int, string>();
+
 
         public DbcStore(IUnityContainer container)
         {
@@ -73,6 +74,30 @@ namespace WDE.DbcStore
                 string name = mReader.StringTable[br.ReadInt32()] ?? filename.Replace(".dbc", "") + " " + id;
                 dictionary[id] = name;
             }
+        }
+
+        public IEnumerable<uint> Spells
+        {
+            get
+            {
+                foreach (var key in SpellStore.Keys)
+                {
+                    // @TODO: get rid of this ugly cast when redesign loading dbc
+                    yield return (uint)key;
+                }
+            }
+        }
+
+        public bool HasSpell(uint entry)
+        {
+            // @TODO: get rid of this ugly cast when redesign loading dbc
+            return SpellStore.ContainsKey((int)entry);
+        }
+
+        public string GetName(uint entry)
+        {
+            // @TODO: get rid of this ugly cast when redesign loading dbc
+            return SpellStore[(int)entry];
         }
     }
 
