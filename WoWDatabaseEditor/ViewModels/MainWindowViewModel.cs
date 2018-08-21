@@ -80,6 +80,7 @@ namespace WoWDatabaseEditor.ViewModels
                 {
                     Windows.Add(new MenuItemViewModel(() => WindowManager.OpenWindow(window)) { Header = window.Name });
                 }
+                ShowAbout();
             });
         }
 
@@ -88,7 +89,8 @@ namespace WoWDatabaseEditor.ViewModels
             DocumentEditor about = new DocumentEditor
             {
                 Title = "About",
-                Content = new AboutView()
+                Content = new AboutView(),
+                CanClose = true,
             };
             WindowManager.OpenDocument(about);
         }

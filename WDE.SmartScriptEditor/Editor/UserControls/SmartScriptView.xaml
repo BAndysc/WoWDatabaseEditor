@@ -8,32 +8,36 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <DockPanel Background="#F5F6FC">
-            <ListBox Background="Transparent" KeyDown="UIElement_OnKeyDown" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedItem}" ScrollViewer.CanContentScroll="False" HorizontalContentAlignment="Stretch" DockPanel.Dock="Top">
-                <ListBox.Template>
-                    <ControlTemplate>
-                        <ItemsPresenter />
-                    </ControlTemplate>
-                </ListBox.Template>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <local:SmartEventView PreviewMouseDown="UIElement_OnMouseDown" EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}" DeleteActionCommand="{Binding DataContext.DeleteAction, ElementName=Rooot}"  AddActionCommand="{Binding DataContext.AddAction, ElementName=Rooot}" EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"></local:SmartEventView>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-            <Button Content="New event" DockPanel.Dock="Top" Command="{Binding AddEvent}" VerticalAlignment="Top">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="OverridesDefaultStyle" Value="True"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Button.Style>
-            </Button>
-            </DockPanel>
+            <Border Padding="7">
+                <DockPanel>
+                    <ListBox Background="Transparent" KeyDown="UIElement_OnKeyDown" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedItem}" ScrollViewer.CanContentScroll="False" HorizontalContentAlignment="Stretch" DockPanel.Dock="Top">
+                        <ListBox.Template>
+                            <ControlTemplate>
+                                <ItemsPresenter />
+                            </ControlTemplate>
+                        </ListBox.Template>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:SmartEventView PreviewMouseDown="UIElement_OnMouseDown" EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}" DeleteActionCommand="{Binding DataContext.DeleteAction, ElementName=Rooot}"  AddActionCommand="{Binding DataContext.AddAction, ElementName=Rooot}" EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"></local:SmartEventView>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Button Margin="4,0,0,0" Content="New event" DockPanel.Dock="Top" Command="{Binding AddEvent}" VerticalAlignment="Top">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </DockPanel>
+            </Border>
+        </DockPanel>
     </ScrollViewer>
 </UserControl>

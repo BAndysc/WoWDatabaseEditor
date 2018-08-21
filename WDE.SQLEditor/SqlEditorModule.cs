@@ -34,6 +34,7 @@ namespace WDE.SQLEditor
                 DocumentEditor editor = new DocumentEditor();
                 editor.Title = "Sql output";
                 editor.Content = view;
+                editor.CanClose = true;
                 editor.Undo = new DelegateCommand(() => { }, ()=>false);
                 editor.Redo = new DelegateCommand(() => { }, () => false);
 

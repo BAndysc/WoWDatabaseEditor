@@ -59,7 +59,7 @@ namespace WoWDatabaseEditor.Managers
                 Title = provider.Name,
                 Content = provider.GetView(),
                 CloseCommand = new ActionCommand(a => { MessageBox.Show("aaaa"); }),
-                CanClose = false
+                CanClose = true
             };
 
             Opened.Add(provider.GetType(), doc);

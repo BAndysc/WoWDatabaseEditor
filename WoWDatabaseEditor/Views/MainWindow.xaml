@@ -76,16 +76,6 @@
                 </Style>
             </avalonDock:DockingManager.LayoutItemContainerStyle>
 
-            <avalonDock:LayoutRoot>
-                <avalonDock:LayoutPanel Orientation="Horizontal">
-
-                    <avalonDock:LayoutDocumentPane>
-                        <avalonDock:LayoutDocument Title="Welcome">
-                            <views:AboutView></views:AboutView>
-                        </avalonDock:LayoutDocument>
-                    </avalonDock:LayoutDocumentPane>
-                </avalonDock:LayoutPanel>
-            </avalonDock:LayoutRoot>
         </avalonDock:DockingManager>
     </DockPanel>
     <!--<Grid>

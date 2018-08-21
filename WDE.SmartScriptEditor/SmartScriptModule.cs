@@ -47,6 +47,7 @@ namespace WDE.SmartScriptEditor
                 editor.Redo = vm.RedoCommand;
                 editor.Save = vm.SaveCommand;
                 editor.History = vm.History;
+                editor.CanClose = true;
 
                 return editor;
             });
