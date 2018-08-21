@@ -100,9 +100,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj">
       <Project>{9D1A4E14-2FE1-403A-A042-ED7E49DB0438}</Project>
       <Name>WDE.Common</Name>
@@ -113,6 +110,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

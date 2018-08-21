@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using MahApps.Metro.Controls;
+using System.Windows;
 using System.Windows.Input;
 using WoWDatabaseEditor.ViewModels;
 using Xceed.Wpf.AvalonDock;
