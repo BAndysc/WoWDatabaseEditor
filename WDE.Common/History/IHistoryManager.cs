@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,5 +19,8 @@ namespace WDE.Common.History
         void Undo();
 
         void AddHandler(HistoryHandler handler);
+
+        ObservableCollection<IHistoryAction> Past { get; }
+        ObservableCollection<IHistoryAction> Future { get; }
     }
 }

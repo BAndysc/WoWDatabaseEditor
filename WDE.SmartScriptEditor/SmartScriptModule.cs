@@ -46,6 +46,7 @@ namespace WDE.SmartScriptEditor
                 editor.Undo = vm.UndoCommand;
                 editor.Redo = vm.RedoCommand;
                 editor.Save = vm.SaveCommand;
+                editor.History = vm.History;
 
                 return editor;
             });

@@ -149,6 +149,12 @@ namespace WDE.SmartScriptEditor
                 _index = index;
             }
 
+            public string GetDescription()
+            {
+                // @Todo: how to localize this?
+                return "Added event " + _smartEvent.Readable;
+            }
+
             public void Redo()
             {
                 _script.Events.Insert(_index, _smartEvent);
@@ -171,6 +177,12 @@ namespace WDE.SmartScriptEditor
                 _param = param;
                 _old = old;
                 _new = @new;
+            }
+
+            public string GetDescription()
+            {
+                // @Todo: how to localize this?
+                return "Changed " + _param.Name + " from " + _old + " to " + _new;
             }
 
             public void Redo()
@@ -203,6 +215,12 @@ namespace WDE.SmartScriptEditor
             _parent = parent;
             _smartAction = smartAction;
             _index = index;
+        }
+
+        public string GetDescription()
+        {
+            // @Todo: how to localize this?
+            return "Added action " + _smartAction.Readable;
         }
 
         public void Redo()

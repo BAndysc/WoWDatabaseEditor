@@ -9,5 +9,7 @@ namespace WDE.Common.History
     {
         void Undo();
         void Redo();
+
+        string GetDescription();
     }
 }

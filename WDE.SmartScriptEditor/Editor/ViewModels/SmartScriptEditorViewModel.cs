@@ -29,6 +29,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public ObservableCollection<SmartEvent> Events => script.Events;
 
+        public IHistoryManager History => _history;
+
         public SmartEvent SelectedItem { get; set; }
 
         public DelegateCommand EditEvent { get; set; }

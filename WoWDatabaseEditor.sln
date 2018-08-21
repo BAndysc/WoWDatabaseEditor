@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.History", "WDE.History\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SQLEditor", "WDE.SQLEditor\WDE.SQLEditor.csproj", "{7E0DE187-A45C-406B-AAAE-608F40237CE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.HistoryWindow", "WDE.HistoryWindow\WDE.HistoryWindow.csproj", "{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,8 +141,23 @@ Global
 		{7E0DE187-A45C-406B-AAAE-608F40237CE6}.Release|x64.Build.0 = Release|Any CPU
 		{7E0DE187-A45C-406B-AAAE-608F40237CE6}.Release|x86.ActiveCfg = Release|x86
 		{7E0DE187-A45C-406B-AAAE-608F40237CE6}.Release|x86.Build.0 = Release|x86
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Debug|x64.Build.0 = Debug|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Debug|x86.Build.0 = Debug|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Release|x64.ActiveCfg = Release|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Release|x64.Build.0 = Release|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Release|x86.ActiveCfg = Release|Any CPU
+		{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}
 	EndGlobalSection
 EndGlobal

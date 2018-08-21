@@ -11,6 +11,8 @@ using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Windows;
+using WoWDatabaseEditor.Events;
 using WoWDatabaseEditor.Services.NewItemService;
 using WoWDatabaseEditor.Views;
 
@@ -18,49 +20,43 @@ namespace WoWDatabaseEditor.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        IUnityContainer container;
+        private readonly IUnityContainer _container;
         private readonly IEventAggregator _eventAggregator;
 
+        public IWindowManager WindowManager { get; private set; }
+        
         private string _title = "Visual Database Editor 2017";
-        private ContentControl _activeDocument;
 
         public string Title
         {
-            get { return _title; }
-            set { SetProperty(ref _title, value); }
+            get => _title;
+            set => SetProperty(ref _title, value);
         }
 
-        private Dictionary<ISolutionItem, ContentControl> documents = new Dictionary<ISolutionItem, ContentControl>();
-
-        public ContentControl SE => container.Resolve<ISolutionExplorer>().GetSolutionExplorerView();
-
-        public ContentControl ActiveDocument
-        {
-            get { return _activeDocument; }
-            set { if (value is DocumentEditor) SetProperty(ref _activeDocument, value); }
-        }
-
+        private readonly Dictionary<ISolutionItem, DocumentEditor> documents = new Dictionary<ISolutionItem, DocumentEditor>();
+        
         public DelegateCommand ExecuteCommandNew { get; private set; }
         public DelegateCommand ExecuteSettings { get; private set; }
         public DelegateCommand About { get; private set; }
 
-        public ObservableCollection<DocumentEditor> Documents { get; private set; }
+        public ObservableCollection<MenuItemViewModel> Windows { get; set; }
 
-        public MainWindowViewModel(IUnityContainer container, IEventAggregator eventAggregator)
+
+        public MainWindowViewModel(IUnityContainer container, IEventAggregator eventAggregator, IWindowManager wndowManager)
         {
-            this.container = container;
+            _container = container;
             _eventAggregator = eventAggregator;
+            WindowManager = wndowManager;
+            
             ExecuteCommandNew = new DelegateCommand(New);
             ExecuteSettings = new DelegateCommand(SettingsShow);
-
-            Documents = new ObservableCollection<DocumentEditor>();
 
             About = new DelegateCommand(ShowAbout);
 
             _eventAggregator.GetEvent<EventRequestOpenItem>().Subscribe(item =>
             {
                 if (documents.ContainsKey(item))
-                    ActiveDocument = documents[item];
+                    WindowManager.ActiveDocument = documents[item];
                 else
                 {
                     var editor = container.Resolve<ISolutionEditorManager>().GetEditor(item);
@@ -68,14 +64,23 @@ namespace WoWDatabaseEditor.ViewModels
                         MessageBox.Show("Editor for " + item.GetType().ToString() + " not registered.");
                     else
                     {
-                        Documents.Add(editor);
+                        WindowManager.OpenDocument(editor);
                         documents[item] = editor;
-                        ActiveDocument = editor;
                     }
                 }
 
             }, true);
-            
+
+            Windows = new ObservableCollection<MenuItemViewModel>();
+
+            _eventAggregator.GetEvent<AllModulesLoaded>().Subscribe(() =>
+            {
+                var windows = container.ResolveAll<IWindowProvider>();
+                foreach (var window in windows)
+                {
+                    Windows.Add(new MenuItemViewModel(() => WindowManager.OpenWindow(window)) { Header = window.Name });
+                }
+            });
         }
 
         private void ShowAbout()
@@ -85,20 +90,19 @@ namespace WoWDatabaseEditor.ViewModels
                 Title = "About",
                 Content = new AboutView()
             };
-            Documents.Add(about);
-            ActiveDocument = about;
+            WindowManager.OpenDocument(about);
         }
 
         private void SettingsShow()
         {
-            container.Resolve<IConfigureService>().ShowSettings();
+            _container.Resolve<IConfigureService>().ShowSettings();
         }
 
         private void New()
         {
-            ISolutionItem item = container.Resolve<INewItemService>().GetNewSolutionItem();
+            ISolutionItem item = _container.Resolve<INewItemService>().GetNewSolutionItem();
             if (item != null)
-                container.Resolve<ISolutionManager>().Items.Add(item);
+                _container.Resolve<ISolutionManager>().Items.Add(item);
         }
 
         public void DocumentClosed(object documentContent)

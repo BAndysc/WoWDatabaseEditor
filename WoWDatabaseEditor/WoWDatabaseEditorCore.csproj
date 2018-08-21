@@ -175,9 +175,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Events\AllModulesLoaded.cs" />
     <Compile Include="Extensions\ColumnDescriptor.cs" />
     <Compile Include="Extensions\GridViewColumns.cs" />
     <Compile Include="Managers\SolutionEditorManager.cs" />
+    <Compile Include="Managers\WindowManager.cs" />
     <Compile Include="Services\ConfigurationService\ConfigureService.cs" />
     <Compile Include="Services\ConfigurationService\ViewModels\ConfigurationWindowViewModel.cs" />
     <Compile Include="Services\ConfigurationService\Views\ConfigurationWindow.xaml.cs">
@@ -200,6 +202,7 @@
     </Compile>
     <Compile Include="Services\NewItemService\NewItemWindowViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\MenuItemViewModel.cs" />
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
@@ -244,6 +247,10 @@
     <ProjectReference Include="..\WDE.DbcStore\WDE.DbcStore.csproj">
       <Project>{A6109F89-0148-4C39-8631-206FFEFBA055}</Project>
       <Name>WDE.DbcStore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WDE.HistoryWindow\WDE.HistoryWindow.csproj">
+      <Project>{cf6d62d2-2332-4223-8499-abf1cedf3fc4}</Project>
+      <Name>WDE.HistoryWindow</Name>
     </ProjectReference>
     <ProjectReference Include="..\WDE.History\WDE.History.csproj">
       <Project>{BC7E0845-C750-4DAF-8869-9170211465E6}</Project>

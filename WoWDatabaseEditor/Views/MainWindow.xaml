@@ -5,33 +5,73 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:views="clr-namespace:WoWDatabaseEditor.Views"
+        xmlns:viewModels="clr-namespace:WoWDatabaseEditor.ViewModels"
+        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         Title="{Binding Title}" Height="695.368" Width="959.421">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_Add" Command="{Binding ExecuteCommandNew}"/>
-                <MenuItem Header="_Save" Command="{Binding ActiveDocument.Save}"/>
+                <MenuItem Header="_Save" Command="{Binding WindowManager.ActiveDocument.Save}"/>
                 <Separator />
                 <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}"/>
                 <Separator />
                 <MenuItem Header="_Exit" />
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Header="_Undo" Command="{Binding ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z"/>
-                <MenuItem Header="_Redo" Command="{Binding ActiveDocument.Redo}"/>
+                <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z"/>
+                <MenuItem Header="_Redo" Command="{Binding WindowManager.ActiveDocument.Redo}"/>
+            </MenuItem>
+            <MenuItem Header="_View" ItemsSource="{Binding Windows}">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Command" Value="{Binding Command}" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+                <MenuItem.ItemTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type viewModels:MenuItemViewModel}" ItemsSource="{Binding Path=MenuItems}">
+                        <TextBlock Text="{Binding Header}"/>
+                    </HierarchicalDataTemplate>
+                </MenuItem.ItemTemplate>
+            </MenuItem>
+            <MenuItem Header="_Window" ItemsSource="{Binding WindowManager.OpenedDocuments}">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Command" Value="{Binding Command}" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+                <MenuItem.ItemTemplate>
+                    <HierarchicalDataTemplate>
+                        <TextBlock Text="{Binding Title}"/>
+                    </HierarchicalDataTemplate>
+                </MenuItem.ItemTemplate>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" Command="{Binding About}"></MenuItem>
             </MenuItem>
         </Menu>
-        <avalonDock:DockingManager x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding ActiveDocument,Mode=TwoWay}" DocumentsSource="{Binding Documents}" >
-            <avalonDock:DockingManager.DocumentPaneTemplate><ControlTemplate><ContentControl Content="{Binding Model.Content}"></ContentControl></ControlTemplate></avalonDock:DockingManager.DocumentPaneTemplate>
+        <avalonDock:DockingManager AnchorablesSource="{Binding WindowManager.OpenedWindows}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
+            diag:PresentationTraceSources.TraceLevel=High}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
+            <avalonDock:DockingManager.DocumentPaneTemplate>
+                <ControlTemplate>
+                    <ContentControl Content="{Binding Model.Content}">
+                    </ContentControl>
+                </ControlTemplate>
+            </avalonDock:DockingManager.DocumentPaneTemplate>
+            <avalonDock:DockingManager.AnchorablePaneTemplate>
+                <ControlTemplate>
+                    <ContentControl Content="{Binding Model.Conent}">
+                        
+                    </ContentControl>
+                </ControlTemplate>
+            </avalonDock:DockingManager.AnchorablePaneTemplate>
             <avalonDock:DockingManager.LayoutItemContainerStyle>
                 <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
                 <Style TargetType="{x:Type avalonDock:LayoutItem}" >
-                    <Setter Property="Title" Value="{Binding Model.Title}" />
-                    <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
-                    <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
+                    <Setter Property="Title" Value="{Binding Model.Title, Mode=TwoWay}" />
+                    <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand, Mode=TwoWay}" />
+                    <Setter Property="CanClose" Value="{Binding Model.CanClose, Mode=TwoWay}" />
+                    <Setter Property="Visibility" Value="{Binding Model.Visibilityt, Mode=TwoWay}"></Setter>
                 </Style>
             </avalonDock:DockingManager.LayoutItemContainerStyle>
 
@@ -43,11 +83,6 @@
                             <views:AboutView></views:AboutView>
                         </avalonDock:LayoutDocument>
                     </avalonDock:LayoutDocumentPane>
-                    <avalonDock:LayoutAnchorablePane DockWidth="240">
-                        <avalonDock:LayoutAnchorable Title="Solution Explorer">
-                            <ContentControl Content="{Binding SE}"></ContentControl>
-                        </avalonDock:LayoutAnchorable>
-                    </avalonDock:LayoutAnchorablePane>
                 </avalonDock:LayoutPanel>
             </avalonDock:LayoutRoot>
         </avalonDock:DockingManager>
