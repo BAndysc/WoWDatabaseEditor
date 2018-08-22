@@ -28,7 +28,7 @@ namespace WoWDatabaseEditor.ViewModels
 
         public IWindowManager WindowManager { get; private set; }
 
-        private string _title = "Visual Database Editor 2017";
+        private string _title = "Visual Database Editor 2018";
 
         public string Title
         {

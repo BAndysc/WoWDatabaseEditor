@@ -196,6 +196,9 @@
     <Page Include="Themes\Controls\Tooltip.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\Controls\Window.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Controls\WindowCommands.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -211,7 +214,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Bootstrapper.cs" />
     <Compile Include="Events\AllModulesLoaded.cs" />
     <Compile Include="Extensions\ColumnDescriptor.cs" />
     <Compile Include="Extensions\GridViewColumns.cs" />
@@ -316,6 +318,12 @@
       <Project>{7E0DE187-A45C-406B-AAAE-608F40237CE6}</Project>
       <Name>WDE.SQLEditor</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

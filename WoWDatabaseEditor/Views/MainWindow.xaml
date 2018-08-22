@@ -1,4 +1,4 @@
-﻿<Window x:Class="WoWDatabaseEditor.Views.MainWindow"
+﻿<Controls:MetroWindow x:Class="WoWDatabaseEditor.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
@@ -8,7 +8,16 @@
         xmlns:views="clr-namespace:WoWDatabaseEditor.Views"
         xmlns:viewModels="clr-namespace:WoWDatabaseEditor.ViewModels"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
-        Title="{Binding Title}" Height="695.368" Width="959.421" Loaded="Window_Loaded" Closed="Window_Closed">
+        Style="{DynamicResource MainWindowStyle}"
+		WindowCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+		WindowMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+		WindowMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+        Title="{Binding Title}" 
+        Height="695.368" 
+        Width="959.421"
+        Icon="/icon.png"
+        Loaded="Window_Loaded"
+        Closed="Window_Closed">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -82,5 +91,5 @@
         <ContentControl prism:RegionManager.RegionName="ContentRegion" >
         </ContentControl>
     </Grid>-->
-</Window>
+</Controls:MetroWindow>
 

@@ -6,5 +6,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Menu.xaml" />
         <ResourceDictionary Source="Tooltip.xaml" />
+        <ResourceDictionary Source="Window.xaml" />
+        <ResourceDictionary Source="WindowCommands.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
