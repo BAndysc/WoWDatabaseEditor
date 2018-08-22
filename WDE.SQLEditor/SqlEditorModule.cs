@@ -22,7 +22,7 @@ namespace WDE.SQLEditor
             {
                 var view = new SqlEditorView();
                 var solutionItem = item as MetaSolutionSQL;
-                var vm = new SqlEditorViewModel(solutionItem.ExportSql);
+                var vm = new SqlEditorViewModel(solutionItem.ExportSql(containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>()));
                 view.DataContext = vm;
 
                 DocumentEditor editor = new DocumentEditor();

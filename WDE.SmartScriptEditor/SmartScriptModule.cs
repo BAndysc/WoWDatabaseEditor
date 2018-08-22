@@ -32,7 +32,8 @@ namespace WDE.SmartScriptEditor
             ISolutionItemNameRegistry nameRegistry = containerProvider.Resolve<ISolutionItemNameRegistry>();
 
             nameRegistry.Register(containerProvider.Resolve<SmartScriptNameProvider>());
-
+            containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>().Register(containerProvider.Resolve<SmartScriptSqlGenerator>());
+            
             containerProvider.Resolve<ISolutionEditorManager>().Register<SmartScriptSolutionItem>(item =>
             {
                 var view = new SmartScriptEditorView();

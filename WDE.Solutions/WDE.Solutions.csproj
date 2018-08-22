@@ -106,10 +106,12 @@
       <DependentUpon>SolutionExplorerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Explorer\Views\TreeViewItemExtensions.cs" />
+    <Compile Include="Manager\SolutionItemSqlGeneratorRegistry.cs" />
     <Compile Include="Manager\SolutionItemNameRegistry.cs" />
     <Compile Include="Manager\SolutionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\FolderNameProvider.cs" />
+    <Compile Include="Providers\FolderSqlProvider.cs" />
     <Compile Include="SolutionExplorer.cs" />
     <Compile Include="SolutionFolderItem.cs" />
     <Compile Include="SolutionFolderItemProvider.cs" />

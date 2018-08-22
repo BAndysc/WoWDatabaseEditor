@@ -29,7 +29,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private SolutionItemViewModel _selected;
         
-        public SolutionExplorerViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionManager solutionManager, IEventAggregator ea, INewItemService newItemService)
+        public SolutionExplorerViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionManager solutionManager, IEventAggregator ea, INewItemService newItemService, ISolutionItemSqlGeneratorRegistry sqlGeneratorRegistry)
         {
             _solutionManager = solutionManager;
             _ea = ea;
@@ -76,7 +76,7 @@ namespace WDE.Solutions.Explorer.ViewModels
             {
                 if (_selected != null)
                 {
-                    MetaSolutionSQL solution = new MetaSolutionSQL(_selected.Item.ExportSql);
+                    MetaSolutionSQL solution = new MetaSolutionSQL(_selected.Item.ExportSql(sqlGeneratorRegistry));
                     _ea.GetEvent<EventRequestOpenItem>().Publish(solution);
                 }
             });

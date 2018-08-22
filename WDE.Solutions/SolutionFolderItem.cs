@@ -36,21 +36,14 @@ namespace WDE.Solutions
 
         public bool IsExportable => true;
 
-        public string ExportSql
-        {
-            get
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var item in Items)
-                    if (item.IsExportable)
-                        sb.AppendLine(item.ExportSql);
-                return sb.ToString();
-            }
-        }
-
         public string GenerateName(ISolutionItemNameRegistry registry)
         {
             return registry.GetName(this);
+        }
+
+        public string ExportSql(ISolutionItemSqlGeneratorRegistry registry)
+        {
+            return registry.GenerateSql(this);
         }
     }
 }

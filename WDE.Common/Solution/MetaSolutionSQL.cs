@@ -23,11 +23,15 @@ namespace WDE.Common.Solution
         public string ExtraId => null;
         
         public bool IsExportable => false;
-        public string ExportSql => _sql;
 
         public string GenerateName(ISolutionItemNameRegistry registry)
         {
             return "meta sql";
+        }
+
+        public string ExportSql(ISolutionItemSqlGeneratorRegistry registry)
+        {
+            return _sql;
         }
     }
 }

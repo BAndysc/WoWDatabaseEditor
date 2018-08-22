@@ -109,10 +109,12 @@
     <Compile Include="Parameters\GenericBaseParameter.cs" />
     <Compile Include="Parameters\IParameterFactory.cs" />
     <Compile Include="Providers\IItemFromListProvider.cs" />
+    <Compile Include="Solution\ISolutionItemSqlGeneratorRegistry.cs" />
     <Compile Include="Solution\ISolutionExplorer.cs" />
     <Compile Include="Solution\ISolutionItem.cs" />
     <Compile Include="Solution\ISolutionItemNameRegistry.cs" />
     <Compile Include="Solution\ISolutionItemProvider.cs" />
+    <Compile Include="Solution\ISolutionItemSqlProvider.cs" />
     <Compile Include="Solution\ISolutionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IConfigureService.cs" />

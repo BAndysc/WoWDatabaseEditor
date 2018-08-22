@@ -139,6 +139,7 @@
     <Compile Include="Models\SmartTarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\SmartScriptNameProvider.cs" />
+    <Compile Include="Providers\SmartScriptSqlGenerator.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

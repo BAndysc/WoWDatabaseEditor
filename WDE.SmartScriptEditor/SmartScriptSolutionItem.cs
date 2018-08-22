@@ -21,22 +21,13 @@ namespace WDE.SmartScriptEditor
 {
     public class SmartScriptSolutionItem : ISolutionItem
     {
-        private readonly IEventAggregator eventAggregator;
-        private readonly ISmartFactory smartFactory;
-        private readonly IDatabaseProvider database;
-        private readonly ISpellStore spellStore;
-
         public int Entry { get; }
         public SmartScriptType SmartType { get; set; }
 
-        public SmartScriptSolutionItem(int entry, SmartScriptType type, IEventAggregator eventAggregator, ISmartFactory smartFactory, IDatabaseProvider database, ISpellStore spellStore)
+        public SmartScriptSolutionItem(int entry, SmartScriptType type)
         {
             Entry = entry;
             SmartType = type;
-            this.eventAggregator = eventAggregator;
-            this.smartFactory = smartFactory;
-            this.database = database;
-            this.spellStore = spellStore;
         }
 
         public bool IsContainer => false;
@@ -47,27 +38,14 @@ namespace WDE.SmartScriptEditor
 
         public bool IsExportable => true;
 
-        public string ExportSql
-        {
-            get
-            {
-                EventRequestGenerateSqlArgs args = new EventRequestGenerateSqlArgs();
-                args.Item = this;
-
-                eventAggregator.GetEvent<EventRequestGenerateSql>().Publish(args);
-
-                if (args.Sql != null)
-                    return args.Sql;
-                    
-                SmartScript script = new SmartScript(this, smartFactory);
-                script.Load(database.GetScriptFor(Entry, SmartType));
-                return new SmartScriptExporter(script, smartFactory).GetSql();
-            }
-        }
-
         public string GenerateName(ISolutionItemNameRegistry registry)
         {
             return registry.GetName(this);
+        }
+
+        public string ExportSql(ISolutionItemSqlGeneratorRegistry registry)
+        {
+            return registry.GenerateSql(this);
         }
     }
 }
