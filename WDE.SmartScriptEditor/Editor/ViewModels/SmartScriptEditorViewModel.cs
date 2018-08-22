@@ -16,6 +16,7 @@ using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 using Prism.Ioc;
 using WDE.Common.Providers;
+using WDE.Common.Solution;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -25,11 +26,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private IItemFromListProvider itemFromListProvider;
         private ISmartFactory smartFactory;
         private ISmartTypeListProvider smartTypeListProvider;
+        private ISolutionItemNameRegistry itemNameRegistry;
 
         private readonly SmartScriptSolutionItem _item;
         private readonly IHistoryManager _history;
 
-        public string Name => _item.Name;
+        public string Name => _item.GenerateName(itemNameRegistry);
 
         private SmartScript script;
 
@@ -56,7 +58,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand DeleteEvent { get; set; }
 
-        public SmartScriptEditorViewModel(SmartScriptSolutionItem item, IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider)
+        public SmartScriptEditorViewModel(SmartScriptSolutionItem item, IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry)
         {
             _item = item;
             _history = history;
@@ -64,6 +66,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.smartFactory = smartFactory;
             this.itemFromListProvider = itemFromListProvider;
             this.smartTypeListProvider = smartTypeListProvider;
+            this.itemNameRegistry = itemNameRegistry;
             var lines = database.GetScriptFor(_item.Entry, _item.SmartType);           
             script = new SmartScript(_item, smartFactory);
             script.Load(lines);

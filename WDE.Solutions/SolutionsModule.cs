@@ -9,7 +9,8 @@ using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Solutions.Manager;
 using Prism.Ioc;
-
+using WDE.Common.Solution;
+using WDE.Solutions.Providers;
 
 namespace WDE.Solutions
 {
@@ -22,6 +23,7 @@ namespace WDE.Solutions
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            containerProvider.Resolve<ISolutionItemNameRegistry>().Register(containerProvider.Resolve<FolderNameProvider>());
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

@@ -20,10 +20,14 @@ namespace WDE.Common.Solution
 
         public bool IsContainer => false;
         public ObservableCollection<ISolutionItem> Items => null;
-        public string Name => "meta sql";
         public string ExtraId => null;
         
         public bool IsExportable => false;
         public string ExportSql => _sql;
+
+        public string GenerateName(ISolutionItemNameRegistry registry)
+        {
+            return "meta sql";
+        }
     }
 }

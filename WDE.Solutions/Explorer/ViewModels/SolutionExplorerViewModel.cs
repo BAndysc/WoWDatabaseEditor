@@ -29,23 +29,23 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private SolutionItemViewModel _selected;
         
-        public SolutionExplorerViewModel(ISolutionManager solutionManager, IEventAggregator ea, INewItemService newItemService)
+        public SolutionExplorerViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionManager solutionManager, IEventAggregator ea, INewItemService newItemService)
         {
             _solutionManager = solutionManager;
             _ea = ea;
 
             _firstGeneration = new ObservableCollection<SolutionItemViewModel>();
-
+            
             foreach (var item in _solutionManager.Items)
             {
-                Root.Add(new SolutionItemViewModel(item));
+                Root.Add(new SolutionItemViewModel(itemNameRegistry, item));
             }
 
             _solutionManager.Items.CollectionChanged += (sender, args) =>
             {
                 foreach (var obj in args.NewItems)
                 {
-                    Root.Add(new SolutionItemViewModel(obj as ISolutionItem));
+                    Root.Add(new SolutionItemViewModel(itemNameRegistry, obj as ISolutionItem));
                 }
             };
 

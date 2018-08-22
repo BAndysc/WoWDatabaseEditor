@@ -111,10 +111,12 @@
     <Compile Include="Providers\IItemFromListProvider.cs" />
     <Compile Include="Solution\ISolutionExplorer.cs" />
     <Compile Include="Solution\ISolutionItem.cs" />
+    <Compile Include="Solution\ISolutionItemNameRegistry.cs" />
     <Compile Include="Solution\ISolutionItemProvider.cs" />
     <Compile Include="Solution\ISolutionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\IConfigureService.cs" />
+    <Compile Include="Solution\ISolutionNameProvider.cs" />
     <Compile Include="Solution\MetaSolutionSQL.cs" />
     <Compile Include="Windows\IWindow.cs" />
   </ItemGroup>

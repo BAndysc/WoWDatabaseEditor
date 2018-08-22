@@ -5,6 +5,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 using Prism.Ioc;
+using WDE.Common.Solution;
 
 namespace WDE.Common
 {
@@ -12,9 +13,7 @@ namespace WDE.Common
     {
         bool IsContainer { get; }
         ObservableCollection<ISolutionItem> Items { get; }
-
-        [JsonIgnore]
-        string Name { get; }
+        
         [JsonIgnore]
         string ExtraId { get; }
         
@@ -22,5 +21,7 @@ namespace WDE.Common
         bool IsExportable { get; }
         [JsonIgnore]
         string ExportSql { get; }
+
+        string GenerateName(ISolutionItemNameRegistry registry);
     }
 }

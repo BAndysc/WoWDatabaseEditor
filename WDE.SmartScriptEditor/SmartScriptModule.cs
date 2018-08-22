@@ -15,6 +15,9 @@ using WDE.SmartScriptEditor.Editor.Views;
 using Prism.Ioc;
 using Prism.Events;
 using WDE.Common.Providers;
+using WDE.Common.DBC;
+using WDE.Common.Solution;
+using WDE.SmartScriptEditor.Providers;
 
 namespace WDE.SmartScriptEditor
 {
@@ -26,15 +29,19 @@ namespace WDE.SmartScriptEditor
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            ISolutionItemNameRegistry nameRegistry = containerProvider.Resolve<ISolutionItemNameRegistry>();
+
+            nameRegistry.Register(containerProvider.Resolve<SmartScriptNameProvider>());
+
             containerProvider.Resolve<ISolutionEditorManager>().Register<SmartScriptSolutionItem>(item =>
             {
                 var view = new SmartScriptEditorView();
                 var solutionItem = item as SmartScriptSolutionItem;
-                var vm = new SmartScriptEditorViewModel(solutionItem, containerProvider.Resolve<IHistoryManager>(), containerProvider.Resolve<IDatabaseProvider>(), containerProvider.Resolve<IEventAggregator>(), containerProvider.Resolve<ISmartFactory>(), containerProvider.Resolve<IItemFromListProvider>(), containerProvider.Resolve<SmartTypeListProvider>());
+                var vm = new SmartScriptEditorViewModel(solutionItem, containerProvider.Resolve<IHistoryManager>(), containerProvider.Resolve<IDatabaseProvider>(), containerProvider.Resolve<IEventAggregator>(), containerProvider.Resolve<ISmartFactory>(), containerProvider.Resolve<IItemFromListProvider>(), containerProvider.Resolve<SmartTypeListProvider>(), nameRegistry);
                 view.DataContext = vm;
 
                 DocumentEditor editor = new DocumentEditor();
-                editor.Title = solutionItem.Name;
+                editor.Title = solutionItem.GenerateName(containerProvider.Resolve<ISolutionItemNameRegistry>());
                 editor.Content = view;
                 editor.Undo = vm.UndoCommand;
                 editor.Redo = vm.RedoCommand;

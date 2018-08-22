@@ -15,6 +15,7 @@ using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 using Prism.Ioc;
 using WDE.SmartScriptEditor.Data;
+using WDE.Common.Solution;
 
 namespace WDE.SmartScriptEditor
 {
@@ -42,42 +43,6 @@ namespace WDE.SmartScriptEditor
 
         public ObservableCollection<ISolutionItem> Items => null;
 
-        public string Name
-        {
-            get
-            {
-                return SmartType.ToString() + " " + Entry.ToString();
-                if (Entry > 0)
-                {
-                    switch (SmartType)
-                    {
-                        case SmartScriptType.Creature:
-                            var cr = database.GetCreatureTemplate((uint) Entry);
-                            return cr == null || cr.Name==null ? "Creature "+Entry : cr.Name;
-                        case SmartScriptType.GameObject:
-                            var g = database.GetGameObjectTemplate((uint)Entry);
-                            return g == null || g.Name == null ? "GameObject " + Entry : g.Name;
-                        case SmartScriptType.AreaTrigger:
-                            return "Areatrigger " + Entry;
-                        case SmartScriptType.Quest:
-                            var q = database.GetQuestTemplate((uint)Entry);
-                            return q == null || q.Name == null ? "Quest " + Entry : q.Name;
-                        case SmartScriptType.Spell:
-                        case SmartScriptType.Aura:
-                            Debug.Assert(Entry >= 0);
-                            if (spellStore.HasSpell((uint)Entry))
-                                return spellStore.GetName((uint)Entry);
-                            return (SmartType==SmartScriptType.Aura?"Aura ":"Spell ") + Entry;
-                        case SmartScriptType.Timed:
-                            return "Timed list " + Entry;
-                        case SmartScriptType.Cinematic:
-                            return "Cinematic " + Entry;
-                    }
-                }
-
-                return "Guid " + Entry;
-            }
-        }
         public string ExtraId => Entry.ToString();
 
         public bool IsExportable => true;
@@ -98,6 +63,11 @@ namespace WDE.SmartScriptEditor
                 script.Load(database.GetScriptFor(Entry, SmartType));
                 return new SmartScriptExporter(script, smartFactory).GetSql();
             }
+        }
+
+        public string GenerateName(ISolutionItemNameRegistry registry)
+        {
+            return registry.GetName(this);
         }
     }
 }

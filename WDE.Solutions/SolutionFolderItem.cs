@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 using WDE.Common;
 using Prism.Ioc;
+using WDE.Common.Solution;
 
 namespace WDE.Solutions
 {
     public class SolutionFolderItem : ISolutionItem
     {
         public string MyName { get; set; }
-
-        public string Name => MyName;
 
         public bool IsContainer => true;
 
@@ -47,6 +46,11 @@ namespace WDE.Solutions
                         sb.AppendLine(item.ExportSql);
                 return sb.ToString();
             }
+        }
+
+        public string GenerateName(ISolutionItemNameRegistry registry)
+        {
+            return registry.GetName(this);
         }
     }
 }
