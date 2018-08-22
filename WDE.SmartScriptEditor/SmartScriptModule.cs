@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using Prism.Modularity;
 using WDE.Common;
 using WDE.Common.Database;
@@ -12,32 +12,25 @@ using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Editor.Views;
+using Prism.Ioc;
+using Prism.Events;
+using WDE.Common.Providers;
 
 namespace WDE.SmartScriptEditor
 {
     public class SmartScriptModule : IModule
     {
-        private readonly IUnityContainer _container;
-
-        public SmartScriptModule(IUnityContainer container)
+        public SmartScriptModule()
         {
-            _container = container;
         }
 
-        public void Initialize()
+        public void OnInitialized(IContainerProvider containerProvider)
         {
-            _container.RegisterType<ISolutionItemProvider, SmartScriptCreatureProvider>("Creature Script");
-            _container.RegisterType<ISolutionItemProvider, SmartScriptGameobjectProvider>("Gameobject Script");
-            _container.RegisterType<ISolutionItemProvider, SmartScriptQuestProvider>("Quest Script");
-            _container.RegisterType<ISolutionItemProvider, SmartScriptAuraProvider>("Aura Script");
-            _container.RegisterType<ISolutionItemProvider, SmartScriptSpellProvider>("Spell Script");
-            _container.RegisterType<ISolutionItemProvider, SmartScriptTimedActionListProvider>("Timed action list Script");
-
-            _container.Resolve<ISolutionEditorManager>().Register<SmartScriptSolutionItem>(item =>
+            containerProvider.Resolve<ISolutionEditorManager>().Register<SmartScriptSolutionItem>(item =>
             {
                 var view = new SmartScriptEditorView();
                 var solutionItem = item as SmartScriptSolutionItem;
-                var vm = new SmartScriptEditorViewModel(solutionItem, _container, _container.Resolve<IHistoryManager>());
+                var vm = new SmartScriptEditorViewModel(solutionItem, containerProvider.Resolve<IHistoryManager>(), containerProvider.Resolve<IDatabaseProvider>(), containerProvider.Resolve<IEventAggregator>(), containerProvider.Resolve<ISmartFactory>(), containerProvider.Resolve<IItemFromListProvider>(), containerProvider.Resolve<SmartTypeListProvider>());
                 view.DataContext = vm;
 
                 DocumentEditor editor = new DocumentEditor();
@@ -53,6 +46,16 @@ namespace WDE.SmartScriptEditor
             });
 
             SmartDataLoader.Load(SmartDataManager.GetInstance(), new SmartDataFileLoader());
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.Register<ISolutionItemProvider, SmartScriptCreatureProvider>("Creature Script");
+            containerRegistry.Register<ISolutionItemProvider, SmartScriptGameobjectProvider>("Gameobject Script");
+            containerRegistry.Register<ISolutionItemProvider, SmartScriptQuestProvider>("Quest Script");
+            containerRegistry.Register<ISolutionItemProvider, SmartScriptAuraProvider>("Aura Script");
+            containerRegistry.Register<ISolutionItemProvider, SmartScriptSpellProvider>("Spell Script");
+            containerRegistry.Register<ISolutionItemProvider, SmartScriptTimedActionListProvider>("Timed action list Script");
         }
     }
 }

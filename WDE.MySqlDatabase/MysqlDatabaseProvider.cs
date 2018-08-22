@@ -38,7 +38,7 @@ namespace WDE.MySqlDatabase
                 {
                     model.Create(DatabaseCreationOptions.IfDatabaseNotExist);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // already exists, its ok
                 }
@@ -46,7 +46,7 @@ namespace WDE.MySqlDatabase
             }
             catch (Exception e)
             {
-                Console.WriteLine("Cannot connect to MySql database. Check your settings.");
+                MessageBox.Show($"Cannot connect to MySql database: {e.Message} Check your settings.");
                 model = null;
             }
         }

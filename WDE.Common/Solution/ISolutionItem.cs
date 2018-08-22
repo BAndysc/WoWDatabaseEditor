@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
-using Microsoft.Practices.Unity;
+
 using Newtonsoft.Json;
+using Prism.Ioc;
 
 namespace WDE.Common
 {
@@ -16,9 +17,7 @@ namespace WDE.Common
         string Name { get; }
         [JsonIgnore]
         string ExtraId { get; }
-
-        void SetUnity(IUnityContainer unity);
-
+        
         [JsonIgnore]
         bool IsExportable { get; }
         [JsonIgnore]

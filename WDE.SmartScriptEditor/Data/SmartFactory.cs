@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.SmartScriptEditor.Models;
+using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Data
 {
+    [Common.Attributes.AutoRegister]
     public class SmartFactory : ISmartFactory
     {
-        private readonly IUnityContainer _container;
-        public SmartFactory(IUnityContainer container)
+        private readonly IParameterFactory _parameterFactory;
+
+        public SmartFactory(IParameterFactory parameterFactory)
         {
-            _container = container;
+            _parameterFactory = parameterFactory;
         }
 
         public SmartEvent EventFactory(int id)
@@ -213,7 +216,7 @@ namespace WDE.SmartScriptEditor.Data
             
             for (int i = 0; i < data.Parameters.Count; ++i)
             {
-                var parameter = _container.Resolve<IParameterFactory>().Factory(data.Parameters[i].Type, data.Parameters[i].Name, data.Parameters[i].DefaultVal);
+                var parameter = _parameterFactory.Factory(data.Parameters[i].Type, data.Parameters[i].Name, data.Parameters[i].DefaultVal);
                 parameter.Description = data.Parameters[i].Description;
                 if (data.Parameters[i].Values != null)
                     parameter.Items = data.Parameters[i].Values;

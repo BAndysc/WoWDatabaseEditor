@@ -3,26 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Editor.Views;
+using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Data
 {
     public class SmartTypeListProvider : ISmartTypeListProvider
     {
-        private IUnityContainer _container;
-
-        public SmartTypeListProvider(IUnityContainer container)
+        public SmartTypeListProvider()
         {
-            _container = container;
         }
 
         public int? Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
         {
             var view = new SmartSelectView();
-            var model = new SmartSelectViewModel(GetFileNameFor(type), type, predicate, _container);
+            var model = new SmartSelectViewModel(GetFileNameFor(type), type, predicate);
             view.DataContext = model;
 
             bool? res = view.ShowDialog();

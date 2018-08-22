@@ -6,22 +6,26 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using Newtonsoft.Json;
 using WDE.Common;
+using Prism.Ioc;
+using Prism.Events;
+using WDE.Common.Events;
+using WDE.Common.Attributes;
 
 namespace WDE.Solutions.Manager
 {
+    [AutoRegister]
     public class SolutionManager : ISolutionManager
     {
-        private IUnityContainer _container;
         private ObservableCollection<ISolutionItem> _items;
         public ObservableCollection<ISolutionItem> Items => _items;
 
-        public SolutionManager(IUnityContainer container)
+        public SolutionManager(IEventAggregator eventAggregator)
         {
-            _container = container;
             _items = new ObservableCollection<ISolutionItem>();
+
             Initialize();
 
             _items.CollectionChanged += ItemsOnCollectionChanged;
@@ -72,7 +76,8 @@ namespace WDE.Solutions.Manager
         {
             if (item.Items != null)
                 item.Items.CollectionChanged += ItemsOnCollectionChanged;
-            item.SetUnity(_container);
+            //@todo fixme
+//            item.SetUnity(_container);
             if (item.Items != null)
             {
                 foreach (var iitem in item.Items)

@@ -4,33 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Microsoft.Practices.Unity;
+
 using Prism.Modularity;
 using WDE.Common;
 using WDE.Common.Parameters;
 using WDE.Parameters.ViewModels;
 using WDE.Parameters.Views;
+using Prism.Ioc;
+using WDE.Common.Database;
 
 namespace WDE.Parameters
 {
     public class ParametersModule : IModule, IConfigurable
     {
         public static ParameterFactory FactoryInstance { get; private set; }
-        private readonly IUnityContainer _container;
 
-        public ParametersModule(IUnityContainer container)
+        public ParametersModule()
         {
-            _container = container;
-        }
-
-        public void Initialize()
-        {
-            FactoryInstance = new ParameterFactory();
-            _container.RegisterInstance<IParameterFactory>(FactoryInstance, new ContainerControlledLifetimeManager());
-
-            new ParameterLoader(_container).Load(FactoryInstance);
-
-            _container.RegisterType<IConfigurable, ParametersModule>("Parameters configuration");
         }
 
         public KeyValuePair<ContentControl, Action> GetConfigurationView()
@@ -44,6 +34,20 @@ namespace WDE.Parameters
         public string GetName()
         {
             return "Parameters browser";
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            FactoryInstance = new ParameterFactory();
+            containerRegistry.RegisterInstance<IParameterFactory>(FactoryInstance);
+
+
+            containerRegistry.Register<IConfigurable, ParametersModule>("Parameters configuration");
+        }
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            new ParameterLoader(containerProvider.Resolve<IDatabaseProvider>()).Load(FactoryInstance);
         }
     }
 }

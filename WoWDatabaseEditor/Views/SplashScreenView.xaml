@@ -1,0 +1,12 @@
+﻿<Window x:Class="WoWDatabaseEditor.Views.SplashScreenView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WoWDatabaseEditor.Views"
+        mc:Ignorable="d"
+        Title="SplashScreenView" Height="150" Width="300" WindowStyle="None" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center">Loading WoW Database Editor :)</Label>
+    </Grid>
+</Window>

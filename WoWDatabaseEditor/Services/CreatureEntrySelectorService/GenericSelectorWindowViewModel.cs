@@ -6,16 +6,16 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
-using Microsoft.Practices.Unity;
+
 using WDE.Common.Database;
 using WoWDatabaseEditor.Extensions;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 {
     
     public class GenericSelectorWindowViewModel<T> : BindableBase
     {
-        private IUnityContainer container;
         private readonly Func<T, uint> _entryGetter;
         private readonly Func<T, string> _index;
         public ObservableCollection<T> RawItems { get; set; }
@@ -34,9 +34,8 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
             set { SetProperty(ref _search, value); _items.View.Refresh();  }
         }
 
-        public GenericSelectorWindowViewModel(IUnityContainer container, IEnumerable<ColumnDescriptor> columns, IEnumerable<T> collection, Func<T, uint> entryGetter, Func<T, string> index)
+        public GenericSelectorWindowViewModel(IEnumerable<ColumnDescriptor> columns, IEnumerable<T> collection, Func<T, uint> entryGetter, Func<T, string> index)
         {
-            this.container = container;
             _entryGetter = entryGetter;
             _index = index;
             RawItems = new ObservableCollection<T>();

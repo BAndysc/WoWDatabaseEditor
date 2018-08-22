@@ -5,21 +5,22 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using Newtonsoft.Json;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using Prism.Ioc;
 
 namespace WDE.Parameters
 {
     public class ParameterLoader
     {
-        private readonly IUnityContainer _container;
+        private readonly IDatabaseProvider database;
 
-        public ParameterLoader(IUnityContainer container)
+        public ParameterLoader(IDatabaseProvider database)
         {
-            _container = container;
+            this.database = database;
         }
 
         public void Load(ParameterFactory factory)
@@ -31,11 +32,11 @@ namespace WDE.Parameters
 
             factory.Register("FloatParameter", (s) => new FloatIntParameter(s));
 
-            factory.Register("CreatureParameter", (s) => new CreatureParameter(s, _container));
+            factory.Register("CreatureParameter", (s) => new CreatureParameter(s, database));
 
-            factory.Register("QuestParameter", (s) => new QuestParameter(s, _container));
+            factory.Register("QuestParameter", (s) => new QuestParameter(s, database));
 
-            factory.Register("GameobjectParameter", (s) => new GameobjectParameter(s, _container));
+            factory.Register("GameobjectParameter", (s) => new GameobjectParameter(s, database));
 
             factory.Register("BoolParameter", (s) => new BoolParameter(s));
         }
@@ -58,39 +59,30 @@ namespace WDE.Parameters
 
     public class CreatureParameter : Parameter
     {
-        private readonly IUnityContainer _container;
-
-        public CreatureParameter(string name, IUnityContainer container) : base(name)
+        public CreatureParameter(string name, IDatabaseProvider database) : base(name)
         {
-            _container = container;
             Items = new Dictionary<int, SelectOption>();
-            foreach (var item in _container.Resolve<IDatabaseProvider>().GetCreatureTemplates())
+            foreach (var item in database.GetCreatureTemplates())
                 Items.Add((int)item.Entry, new SelectOption(item.Name));
         }
     }
 
     public class QuestParameter : Parameter
     {
-        private readonly IUnityContainer _container;
-
-        public QuestParameter(string name, IUnityContainer container) : base(name)
+        public QuestParameter(string name, IDatabaseProvider database) : base(name)
         {
-            _container = container;
             Items = new Dictionary<int, SelectOption>();
-            foreach (var item in _container.Resolve<IDatabaseProvider>().GetQuestTemplates())
+            foreach (var item in database.GetQuestTemplates())
                 Items.Add((int)item.Entry, new SelectOption(item.Name));
         }
     }
 
     public class GameobjectParameter : Parameter
     {
-        private readonly IUnityContainer _container;
-
-        public GameobjectParameter(string name, IUnityContainer container) : base(name)
+        public GameobjectParameter(string name, IDatabaseProvider database) : base(name)
         {
-            _container = container;
             Items = new Dictionary<int, SelectOption>();
-            foreach (var item in _container.Resolve<IDatabaseProvider>().GetGameObjectTemplates())
+            foreach (var item in database.GetGameObjectTemplates())
                 Items.Add((int)item.Entry, new SelectOption(item.Name));
         }
     }

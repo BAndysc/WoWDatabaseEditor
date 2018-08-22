@@ -5,18 +5,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using Microsoft.Practices.Unity;
+
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Solution;
+using Prism.Ioc;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {
     public class SolutionExplorerViewModel : BindableBase
     {
-        private readonly IUnityContainer _unity;
-
         private readonly ISolutionManager _solutionManager;
         private readonly IEventAggregator _ea;
 
@@ -30,9 +29,8 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private SolutionItemViewModel _selected;
         
-        public SolutionExplorerViewModel(IUnityContainer unity, ISolutionManager solutionManager, IEventAggregator ea)
+        public SolutionExplorerViewModel(ISolutionManager solutionManager, IEventAggregator ea, INewItemService newItemService)
         {
-            _unity = unity;
             _solutionManager = solutionManager;
             _ea = ea;
 
@@ -53,11 +51,11 @@ namespace WDE.Solutions.Explorer.ViewModels
 
             AddItem = new DelegateCommand(() =>
             {
-                ISolutionItem item = _unity.Resolve<INewItemService>().GetNewSolutionItem();
+                ISolutionItem item = newItemService.GetNewSolutionItem();
                 if (item != null)
                 {
                     if (_selected == null)
-                        unity.Resolve<ISolutionManager>().Items.Add(item);    
+                        solutionManager.Items.Add(item);    
                     else
                         _selected.Item.Items.Add(item);
                 }

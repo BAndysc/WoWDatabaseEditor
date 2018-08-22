@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Microsoft.Practices.Unity;
+
 using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Events;
@@ -14,13 +14,19 @@ using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.Views;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
+using Prism.Ioc;
+using WDE.Common.Providers;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartScriptEditorViewModel : BindableBase
     {
+        private IDatabaseProvider database;
+        private IItemFromListProvider itemFromListProvider;
+        private ISmartFactory smartFactory;
+        private ISmartTypeListProvider smartTypeListProvider;
+
         private readonly SmartScriptSolutionItem _item;
-        private readonly IUnityContainer _container;
         private readonly IHistoryManager _history;
 
         public string Name => _item.Name;
@@ -50,14 +56,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand DeleteEvent { get; set; }
 
-        public SmartScriptEditorViewModel(SmartScriptSolutionItem item, IUnityContainer container, IHistoryManager history)
+        public SmartScriptEditorViewModel(SmartScriptSolutionItem item, IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider)
         {
             _item = item;
-            _container = container;
             _history = history;
-
-            var lines = _container.Resolve<IDatabaseProvider>().GetScriptFor(_item.Entry, _item.SmartType);           
-            script = new SmartScript(_item, _container);
+            this.database = database;
+            this.smartFactory = smartFactory;
+            this.itemFromListProvider = itemFromListProvider;
+            this.smartTypeListProvider = smartTypeListProvider;
+            var lines = database.GetScriptFor(_item.Entry, _item.SmartType);           
+            script = new SmartScript(_item, smartFactory);
             script.Load(lines);
 
             EditEvent = new DelegateCommand(EditEventCommand);
@@ -80,17 +88,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 UndoCommand.RaiseCanExecuteChanged();
                 RedoCommand.RaiseCanExecuteChanged();
             };
-
-            var ea = container.Resolve<IEventAggregator>();
-
-            ea.GetEvent<EventRequestGenerateSql>().Subscribe((args) =>
+            
+            eventAggregator.GetEvent<EventRequestGenerateSql>().Subscribe((args) =>
             {
                 if (args.Item is SmartScriptSolutionItem)
                 {
                     var itemm = args.Item as SmartScriptSolutionItem;
                     if (itemm.Entry == _item.Entry && itemm.SmartType == _item.SmartType)
                     {
-                        args.Sql = new SmartScriptExporter(script, _container).GetSql();
+                        args.Sql = new SmartScriptExporter(script, smartFactory).GetSql();
                     }
                 }
             });
@@ -121,13 +127,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                 for (int index = 1; index < e.Actions.Count; ++index)
                 {
-                    lines.Add(GenerateSingleSai(eventId, _container.Resolve<ISmartFactory>().EventFactory(61),
+                    lines.Add(GenerateSingleSai(eventId, smartFactory.EventFactory(61),
                         e.Actions[index], (e.Actions.Count - 1 == index ? 0 : eventId + 1)));
                     eventId++;
                 }
             }
 
-            _container.Resolve<IDatabaseProvider>().InstallScriptFor(_item.Entry, _item.SmartType, lines);
+            database.InstallScriptFor(_item.Entry, _item.SmartType, lines);
         }
 
         private AbstractSmartScriptLine GenerateSingleSai(int eventId, SmartEvent ev, SmartAction action, int link = 0, string comment = null)
@@ -182,7 +188,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private void AddActionCommand(SmartEvent obj)
         {
-            int? sourceId = _container.Resolve<ISmartTypeListProvider>().Get(SmartType.SmartSource, data =>
+            int? sourceId = smartTypeListProvider.Get(SmartType.SmartSource, data =>
                 {
                     if (data.IsOnlyTarget)
                         return false;
@@ -194,7 +200,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (!sourceId.HasValue)
                 return;
 
-            int? actionId = _container.Resolve<ISmartTypeListProvider>().Get(SmartType.SmartAction, data =>
+            int? actionId = smartTypeListProvider.Get(SmartType.SmartAction, data =>
             {
                 return data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType);
             });
@@ -208,7 +214,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             if (actionData.UsesTarget)
             {
-                int? targetId = _container.Resolve<ISmartTypeListProvider>().Get(SmartType.SmartTarget, data =>
+                int? targetId = smartTypeListProvider.Get(SmartType.SmartTarget, data =>
                 {
                     return (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
                             actionData.Targets.Intersect(data.Types).Any();
@@ -217,15 +223,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (!targetId.HasValue)
                     return;
 
-                 target = _container.Resolve<ISmartFactory>().TargetFactory(targetId.Value);
+                 target = smartFactory.TargetFactory(targetId.Value);
             }
             else
-                target = _container.Resolve<ISmartFactory>().TargetFactory(0);
+                target = smartFactory.TargetFactory(0);
 
             
-            SmartSource source = _container.Resolve<ISmartFactory>().SourceFactory(sourceId.Value);
+            SmartSource source = smartFactory.SourceFactory(sourceId.Value);
                 
-            SmartAction ev = _container.Resolve<ISmartFactory>().ActionFactory(actionId.Value, source, target);
+            SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
             EditActionCommand(ev);
             obj.Actions.Add(ev);
             
@@ -233,14 +239,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private void AddEventCommand()
         {
-            int? id = _container.Resolve<ISmartTypeListProvider>().Get(SmartType.SmartEvent, data =>
+            int? id = smartTypeListProvider.Get(SmartType.SmartEvent, data =>
             {
                 return data.ValidTypes == null || data.ValidTypes.Contains(script.SourceType);
             });
 
             if (id.HasValue)
             {
-                SmartEvent ev = _container.Resolve<ISmartFactory>().EventFactory(id.Value);
+                SmartEvent ev = smartFactory.EventFactory(id.Value);
                 EditEventCommand(ev);
                 script.Events.Add(ev);
             }
@@ -269,7 +275,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 paramss.Add(new KeyValuePair<Parameter, string>(wrapper, "Target"));
             }
 
-            v.DataContext = new ParametersEditViewModel(_container, obj, paramss);
+            v.DataContext = new ParametersEditViewModel(itemFromListProvider, obj, paramss);
             v.ShowDialog();
         }
 
@@ -291,7 +297,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             for (int i = 0; i < ev.ParametersCount; ++i)
                 paramss.Add(new KeyValuePair<Parameter, string>(ev.GetParameter(i), "Event specific"));
 
-            v.DataContext = new ParametersEditViewModel(_container, ev, paramss);
+            v.DataContext = new ParametersEditViewModel(itemFromListProvider, ev, paramss);
             v.ShowDialog();
         }
     }

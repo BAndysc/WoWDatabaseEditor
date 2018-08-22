@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.Database;
@@ -13,21 +13,29 @@ using WDE.Common.DBC;
 using WDE.Common.Events;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
+using Prism.Ioc;
+using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor
 {
     public class SmartScriptSolutionItem : ISolutionItem
     {
-        private IUnityContainer _unity;
+        private readonly IEventAggregator eventAggregator;
+        private readonly ISmartFactory smartFactory;
+        private readonly IDatabaseProvider database;
+        private readonly ISpellStore spellStore;
 
         public int Entry { get; }
         public SmartScriptType SmartType { get; set; }
 
-        public SmartScriptSolutionItem(int entry, SmartScriptType type, IUnityContainer unity)
+        public SmartScriptSolutionItem(int entry, SmartScriptType type, IEventAggregator eventAggregator, ISmartFactory smartFactory, IDatabaseProvider database, ISpellStore spellStore)
         {
             Entry = entry;
             SmartType = type;
-            _unity = unity;
+            this.eventAggregator = eventAggregator;
+            this.smartFactory = smartFactory;
+            this.database = database;
+            this.spellStore = spellStore;
         }
 
         public bool IsContainer => false;
@@ -38,25 +46,25 @@ namespace WDE.SmartScriptEditor
         {
             get
             {
+                return SmartType.ToString() + " " + Entry.ToString();
                 if (Entry > 0)
                 {
                     switch (SmartType)
                     {
                         case SmartScriptType.Creature:
-                            var cr = _unity.Resolve<IDatabaseProvider>().GetCreatureTemplate((uint) Entry);
+                            var cr = database.GetCreatureTemplate((uint) Entry);
                             return cr == null || cr.Name==null ? "Creature "+Entry : cr.Name;
                         case SmartScriptType.GameObject:
-                            var g = _unity.Resolve<IDatabaseProvider>().GetGameObjectTemplate((uint)Entry);
+                            var g = database.GetGameObjectTemplate((uint)Entry);
                             return g == null || g.Name == null ? "GameObject " + Entry : g.Name;
                         case SmartScriptType.AreaTrigger:
                             return "Areatrigger " + Entry;
                         case SmartScriptType.Quest:
-                            var q = _unity.Resolve<IDatabaseProvider>().GetQuestTemplate((uint)Entry);
+                            var q = database.GetQuestTemplate((uint)Entry);
                             return q == null || q.Name == null ? "Quest " + Entry : q.Name;
                         case SmartScriptType.Spell:
                         case SmartScriptType.Aura:
                             Debug.Assert(Entry >= 0);
-                            var spellStore = _unity.Resolve<ISpellStore>();
                             if (spellStore.HasSpell((uint)Entry))
                                 return spellStore.GetName((uint)Entry);
                             return (SmartType==SmartScriptType.Aura?"Aura ":"Spell ") + Entry;
@@ -71,10 +79,6 @@ namespace WDE.SmartScriptEditor
             }
         }
         public string ExtraId => Entry.ToString();
-        public void SetUnity(IUnityContainer unity)
-        {
-            _unity = unity;
-        }
 
         public bool IsExportable => true;
 
@@ -82,19 +86,17 @@ namespace WDE.SmartScriptEditor
         {
             get
             {
-                var ea = _unity.Resolve<IEventAggregator>();
-
                 EventRequestGenerateSqlArgs args = new EventRequestGenerateSqlArgs();
                 args.Item = this;
 
-                ea.GetEvent<EventRequestGenerateSql>().Publish(args);
+                eventAggregator.GetEvent<EventRequestGenerateSql>().Publish(args);
 
                 if (args.Sql != null)
                     return args.Sql;
                     
-                SmartScript script = new SmartScript(this, _unity);
-                script.Load(_unity.Resolve<IDatabaseProvider>().GetScriptFor(Entry, SmartType));
-                return new SmartScriptExporter(script, _unity).GetSql();
+                SmartScript script = new SmartScript(this, smartFactory);
+                script.Load(database.GetScriptFor(Entry, SmartType));
+                return new SmartScriptExporter(script, smartFactory).GetSql();
             }
         }
     }

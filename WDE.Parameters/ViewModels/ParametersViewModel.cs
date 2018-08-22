@@ -1,8 +1,9 @@
-﻿using Microsoft.Practices.Unity;
+﻿
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using WDE.Parameters.Models;
+using Prism.Ioc;
 
 namespace WDE.Parameters.ViewModels
 {
@@ -10,7 +11,6 @@ namespace WDE.Parameters.ViewModels
     {
         private ParameterSpecModel _selected;
         private bool _hasSelected = true;
-        private readonly IUnityContainer container;
 
         public ObservableCollection<ParameterSpecModel> Parameters { get; } = new ObservableCollection<ParameterSpecModel>();
 

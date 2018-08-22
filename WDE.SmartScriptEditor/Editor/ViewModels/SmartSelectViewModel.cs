@@ -7,16 +7,15 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Data;
-using Microsoft.Practices.Unity;
+
 using WDE.SmartScriptEditor.Data;
+using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartSelectViewModel : BindableBase
     {
         private readonly Func<SmartGenericJsonData, bool> _predicate;
-        private readonly IUnityContainer _container;
-
         private readonly ObservableCollection<SmartItem> _allItems = new ObservableCollection<SmartItem>();
 
         private CollectionViewSource _items;
@@ -37,10 +36,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set { SetProperty(ref _selectedItem, value);  }
         }
 
-        public SmartSelectViewModel(string file, SmartType type, Func<SmartGenericJsonData, bool> predicate, IUnityContainer container)
+        public SmartSelectViewModel(string file, SmartType type, Func<SmartGenericJsonData, bool> predicate)
         {
             _predicate = predicate;
-            _container = container;
             string group = null;
             foreach (string line in File.ReadLines("SmartData/" + file))
             {

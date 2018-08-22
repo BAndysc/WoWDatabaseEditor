@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Unity;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,22 +8,24 @@ using System.Windows.Controls;
 using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Managers
 {
+    [WDE.Common.Attributes.AutoRegister]
     public class SolutionEditorManager : ISolutionEditorManager, IWindowProvider
     {
         private Dictionary<Type, Func<object, DocumentEditor>> _editors;
-        private readonly IUnityContainer _container;
+        private readonly Lazy<ISolutionExplorer> _solutionExplorer;
 
         public bool AllowMultiple => false;
 
         public string Name => "Solution explorer";
 
-        public SolutionEditorManager(IUnityContainer container)
+        public SolutionEditorManager(Lazy<ISolutionExplorer> solutionExplorer)
         {
             _editors = new Dictionary<Type, Func<object, DocumentEditor>>();
-            _container = container;
+            _solutionExplorer = solutionExplorer;
         }
 
         public void Register<T>(Func<object, DocumentEditor> getter) where T : ISolutionItem
@@ -41,7 +43,7 @@ namespace WoWDatabaseEditor.Managers
 
         public ContentControl GetView()
         {
-            return _container.Resolve<ISolutionExplorer>().GetSolutionExplorerView();
+            return _solutionExplorer.Value.GetSolutionExplorerView();
         }
     }
 }

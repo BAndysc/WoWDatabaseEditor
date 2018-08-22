@@ -4,25 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Practices.Unity;
+
 using WDE.Common;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
+    [WDE.Common.Attributes.AutoRegister]
     public class NewItemService : INewItemService
     {
-        private IUnityContainer container;
+        private readonly Lazy<INewItemWindowViewModel> viewModel;
 
-        public NewItemService(IUnityContainer container)
+        public NewItemService(Lazy<INewItemWindowViewModel> newItemWindowViewModel)
         {
-            this.container = container;
+            viewModel = newItemWindowViewModel;
         }
 
         public ISolutionItem GetNewSolutionItem()
         {
-            INewItemWindowViewModel viewModel = container.Resolve<INewItemWindowViewModel>();
-            if (new NewItemWindow(viewModel).ShowDialog().Value)
-                return viewModel.SelectedPrototype.CreateSolutionItem();
+            if (new NewItemWindow(viewModel.Value).ShowDialog().Value)
+                return viewModel.Value.SelectedPrototype.CreateSolutionItem();
             return null;
         }
     }

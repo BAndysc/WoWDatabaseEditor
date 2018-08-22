@@ -3,25 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 {
+    [WDE.Common.Attributes.AutoRegister]
     public class ItemFromListProvider : IItemFromListProvider
     {
-        private IUnityContainer _container;
-
-        public ItemFromListProvider(IUnityContainer container)
+        public ItemFromListProvider()
         {
-            _container = container;
         }
 
         public int? GetItemFromList(Dictionary<int, SelectOption> items, bool flags)
         {
             ItemFromListProviderView view = new ItemFromListProviderView();
-            ItemFromListProviderViewModel vm = new ItemFromListProviderViewModel(_container, items, flags);
+            ItemFromListProviderViewModel vm = new ItemFromListProviderViewModel(items, flags);
             view.DataContext = vm;
             if (view.ShowDialog().Value)
                 return vm.GetEntry();

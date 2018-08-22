@@ -4,8 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using WDE.Common;
+using Prism.Ioc;
 
 namespace WDE.Solutions
 {
@@ -33,10 +34,6 @@ namespace WDE.Solutions
         }
 
         public string ExtraId => null;
-        public void SetUnity(IUnityContainer unity)
-        {
-            
-        }
 
         public bool IsExportable => true;
 

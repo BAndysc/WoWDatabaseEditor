@@ -1,4 +1,4 @@
-﻿using Microsoft.Practices.Unity;
+﻿
 using Prism.Events;
 using Prism.Mvvm;
 using System;
@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WDE.Common.Events;
 using WDE.Common.History;
+using Prism.Ioc;
 
 namespace WDE.HistoryWindow.ViewModels
 {
@@ -21,8 +22,6 @@ namespace WDE.HistoryWindow.ViewModels
 
     internal class HistoryViewModel : BindableBase
     {
-        private readonly IUnityContainer _container;
-
         public ObservableCollection<Valuea> Items { get; set; } = new ObservableCollection<Valuea>();
 
         private string _title;
@@ -32,11 +31,14 @@ namespace WDE.HistoryWindow.ViewModels
             set { SetProperty(ref _title, value); }
         }
 
-        public HistoryViewModel(IUnityContainer container)
+        ~HistoryViewModel()
         {
-            _container = container;
-            
-            _container.Resolve<IEventAggregator>().GetEvent<EventActiveDocumentChanged>().Subscribe(doc =>
+
+        }
+
+        public HistoryViewModel(IEventAggregator eventAggregator)
+        {
+            eventAggregator.GetEvent<EventActiveDocumentChanged>().Subscribe(doc =>
             {
                 if (doc.History == null)
                     return;

@@ -4,27 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Microsoft.Practices.Unity;
+
 using Prism.Modularity;
 using WDE.Common;
 using WDE.Common.DBC;
+using Prism.Ioc;
+using WDE.Common.Parameters;
 
 namespace WDE.DbcStore
 {
     public class DbcStoreModule : IModule
     {
-        private readonly IUnityContainer _container;
+        private readonly IParameterFactory parameterFactory;
 
-        public DbcStoreModule(IUnityContainer container)
+        public DbcStoreModule(IParameterFactory parameterFactory)
         {
-            _container = container;
+            this.parameterFactory = parameterFactory;
+        }
+        
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            var store = new DbcStore(_container);
-            _container.RegisterInstance<IDbcStore>(store, new ContainerControlledLifetimeManager());
-            _container.RegisterInstance<ISpellStore>(store, new ContainerControlledLifetimeManager());
-        }        
+            var store = new DbcStore(parameterFactory);
+            containerRegistry.RegisterInstance<IDbcStore>(store);
+            containerRegistry.RegisterInstance<ISpellStore>(store);
+        }
     }
 }

@@ -3,15 +3,16 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Practices.Unity;
+
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class ParameterEditorViewModel : BindableBase
     {
-        private readonly IUnityContainer _container;
+        private readonly IItemFromListProvider itemFromListProvider;
 
         public Parameter Parameter { get; set; }
 
@@ -19,10 +20,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand SelectItemAction { get; set; }
 
-        public ParameterEditorViewModel(Parameter parameter, string group, IUnityContainer container)
+        public ParameterEditorViewModel(Parameter parameter, string group, IItemFromListProvider itemFromListProvider)
         {
-            _container = container;
             Group = group;
+            this.itemFromListProvider = itemFromListProvider;
             Parameter = parameter;
             SelectItemAction = new DelegateCommand(SelectItem);
         }
@@ -31,7 +32,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             if (Parameter.Items != null)
             {
-                int? val = _container.Resolve<IItemFromListProvider>().GetItemFromList(Parameter.Items, Parameter is FlagParameter);
+                int? val = itemFromListProvider.GetItemFromList(Parameter.Items, Parameter is FlagParameter);
                 if (val.HasValue)
                     Parameter.Value = val.Value;
             }

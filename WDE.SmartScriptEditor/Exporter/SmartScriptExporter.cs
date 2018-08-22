@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
+using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Exporter
 {
@@ -15,14 +16,13 @@ namespace WDE.SmartScriptEditor.Exporter
         private static readonly string SAI_SQL = "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {event_cooldown_min}, {event_cooldown_max}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {action_source_id}, {source_param1}, {source_param2}, {source_param3}, {source_condition_id}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {target_condition_id}, {x}, {y}, {z}, {o}, \"{comment}\")";
 
         private readonly SmartScript _script;
-        private readonly IUnityContainer _container;
-
+        private readonly ISmartFactory smartFactory;
         private StringBuilder _sql = new StringBuilder();
 
-        public SmartScriptExporter(SmartScript script, IUnityContainer container)
+        public SmartScriptExporter(SmartScript script, ISmartFactory smartFactory)
         {
             _script = script;
-            _container = container;
+            this.smartFactory = smartFactory;
         }
 
         public string GetSql()
@@ -62,7 +62,7 @@ namespace WDE.SmartScriptEditor.Exporter
 
                 for (int index = 1; index < e.Actions.Count; ++index)
                 {
-                    lines.Add(GenerateSingleSai(eventId, _container.Resolve<ISmartFactory>().EventFactory(61),
+                    lines.Add(GenerateSingleSai(eventId, smartFactory.EventFactory(61),
                         e.Actions[index], (e.Actions.Count - 1 == index ? 0 : eventId + 1)));
                     eventId++;
                 }

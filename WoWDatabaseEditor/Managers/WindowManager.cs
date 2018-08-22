@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using Microsoft.Expression.Interactivity.Core;
-using Microsoft.Practices.Unity;
+
 using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Managers
 {
+    [WDE.Common.Attributes.AutoRegister]
     public class WindowManager : BindableBase, IWindowManager
     {
-        private readonly IUnityContainer _container;
         private readonly IEventAggregator _eventAggregator;
 
-        public WindowManager(IUnityContainer container, IEventAggregator eventAggregator)
+        public WindowManager(IEventAggregator eventAggregator)
         {
-            _container = container;
             _eventAggregator = eventAggregator;
         }
         

@@ -4,21 +4,19 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Microsoft.Practices.Unity;
+
 using WDE.Common;
 using WDE.SmartScriptEditor;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
+    [WDE.Common.Attributes.AutoRegister]
     public class NewItemWindowViewModel : BindableBase, INewItemWindowViewModel
     {
-        private IUnityContainer container;
-
-        public NewItemWindowViewModel(IUnityContainer container)
+        public NewItemWindowViewModel(IEnumerable<ISolutionItemProvider> items)
         {
-            this.container = container;
             ItemPrototypes = new ObservableCollection<NewItemPrototypeInfo>();
-            var items = container.ResolveAll<ISolutionItemProvider>();
 
             foreach (var item in items)
             {

@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.DBC;
 using WoWDatabaseEditor.Extensions;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 {
+    [WDE.Common.Attributes.AutoRegister]
     public abstract class GenericDatabaseProviderService<T>
     {
-        protected readonly IUnityContainer _unity;
         private readonly Func<T, uint> _entryGetter;
         private readonly Func<T, string> _index;
 
-        protected GenericDatabaseProviderService(IUnityContainer unity, Func<T, uint> entryGetter, Func<T, string> index)
+        protected GenericDatabaseProviderService(Func<T, uint> entryGetter, Func<T, string> index)
         {
-            _unity = unity;
             _entryGetter = entryGetter;
             _index = index;
         }
@@ -36,7 +36,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
                 new ColumnDescriptor { HeaderText = "Name", DisplayMember = "Name" },
             };
             
-            var context = new GenericSelectorWindowViewModel<T>(_unity, columns, GetList(), _entryGetter, _index);
+            var context = new GenericSelectorWindowViewModel<T>(columns, GetList(), _entryGetter, _index);
             window.DataContext = context;
 
             if (window.ShowDialog().Value)
@@ -48,36 +48,45 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
     public class CreatureEntryProviderService :  GenericDatabaseProviderService<ICreatureTemplate>, ICreatureEntryProviderService
     {
-        public CreatureEntryProviderService(IUnityContainer unity) : base(unity, t => t.Entry, t=> t.Name + " "+t.Entry) {  }
+        private readonly IDatabaseProvider database;
+        public CreatureEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t=> t.Name + " "+t.Entry)
+        {
+            this.database = database;
+        }
 
         protected override IEnumerable<ICreatureTemplate> GetList()
         {
-            return _unity.Resolve<IDatabaseProvider>()
-                            .GetCreatureTemplates()
+            return database.GetCreatureTemplates()
                             .OrderBy(template => template.Entry);
         }
     }
 
     public class GameobjectEntryProviderService : GenericDatabaseProviderService<IGameObjectTemplate>, IGameobjectEntryProviderService
     {
-        public GameobjectEntryProviderService(IUnityContainer unity) : base(unity, t => t.Entry, t => t.Name + " " + t.Entry) { }
+        private readonly IDatabaseProvider database;
+        public GameobjectEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry)
+        {
+            this.database = database;
+        }
 
         protected override IEnumerable<IGameObjectTemplate> GetList()
         {
-            return _unity.Resolve<IDatabaseProvider>()
-                            .GetGameObjectTemplates()
+            return database.GetGameObjectTemplates()
                             .OrderBy(template => template.Entry);
         }
     }
 
     public class QuestEntryProviderService : GenericDatabaseProviderService<IQuestTemplate>, IQuestEntryProviderService
     {
-        public QuestEntryProviderService(IUnityContainer unity) : base(unity, t => t.Entry, t => t.Name + " " + t.Entry) { }
+        private readonly IDatabaseProvider database;
+
+        public QuestEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry) {
+            this.database = database;
+        }
 
         protected override IEnumerable<IQuestTemplate> GetList()
         {
-            return _unity.Resolve<IDatabaseProvider>()
-                            .GetQuestTemplates()
+            return database.GetQuestTemplates()
                             .OrderBy(template => template.Entry);
         }
     }
@@ -90,11 +99,14 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
     public class SpellEntryProviderService : GenericDatabaseProviderService<SpellMiniEntry>, ISpellEntryProviderService
     {
-        public SpellEntryProviderService(IUnityContainer unity) : base(unity, t => t.Entry, t => t.Name + " " + t.Entry) { }
+        private readonly ISpellStore spellStore;
+
+        public SpellEntryProviderService(ISpellStore spellStore) : base(t => t.Entry, t => t.Name + " " + t.Entry) {
+            this.spellStore = spellStore;
+        }
 
         protected override IEnumerable<SpellMiniEntry> GetList()
         {
-            var spellStore = _unity.Resolve<ISpellStore>();
             List<SpellMiniEntry> spells = new List<SpellMiniEntry>();
 
             foreach (var spellId in spellStore.Spells)

@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DBFilesClient.NET;
-using Microsoft.Practices.Unity;
+
+using Prism.Ioc;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.DbcStore.DbcReader;
@@ -15,7 +16,7 @@ namespace WDE.DbcStore
 {
     public class DbcStore : IDbcStore, ISpellStore
     {
-        private IUnityContainer _container;
+        private IContainerProvider _container;
         
         private Dictionary<int, string> SpellStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> SkillStore { get; } = new Dictionary<int, string>();
@@ -32,10 +33,8 @@ namespace WDE.DbcStore
         public Dictionary<int, string> ItemStore { get; } = new Dictionary<int, string>();
 
 
-        public DbcStore(IUnityContainer container)
+        public DbcStore(IParameterFactory parameterFactory)
         {
-            _container = container;
-            
             Load("spell.dbc", 20, SpellStore);
             Load("AreaTable.dbc", 10, AreaStore);
             Load("item-sparse.db2", 98, ItemStore);
@@ -49,12 +48,12 @@ namespace WDE.DbcStore
             Load("SkillLine.dbc", 1, SkillStore);
             Load("Languages.dbc", 0, LanguageStore);
 
-            container.Resolve<IParameterFactory>().Register("SpellParameter", (name) => new DbcParameter(name, SpellStore));
-            container.Resolve<IParameterFactory>().Register("EmoteParameter", (name) => new DbcParameter(name, EmoteStore));
-            container.Resolve<IParameterFactory>().Register("SoundParameter", (name) => new DbcParameter(name, SoundStore));
-            container.Resolve<IParameterFactory>().Register("MovieParameter", (name) => new DbcParameter(name, MovieStore));
-            container.Resolve<IParameterFactory>().Register("ZoneParameter", (name) => new DbcParameter(name, AreaStore));
-            container.Resolve<IParameterFactory>().Register("PhaseParameter", (name) => new DbcParameter(name, PhaseStore));
+            parameterFactory.Register("SpellParameter", (name) => new DbcParameter(name, SpellStore));
+            parameterFactory.Register("EmoteParameter", (name) => new DbcParameter(name, EmoteStore));
+            parameterFactory.Register("SoundParameter", (name) => new DbcParameter(name, SoundStore));
+            parameterFactory.Register("MovieParameter", (name) => new DbcParameter(name, MovieStore));
+            parameterFactory.Register("ZoneParameter", (name) => new DbcParameter(name, AreaStore));
+            parameterFactory.Register("PhaseParameter", (name) => new DbcParameter(name, PhaseStore));
         }
         
         private void Load(string filename, int fields_to_skip, Dictionary<int, string> dictionary)

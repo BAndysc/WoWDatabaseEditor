@@ -9,6 +9,7 @@ using WDE.Solutions.Explorer.Views;
 
 namespace WDE.Solutions
 {
+    [WDE.Common.Attributes.AutoRegister]
     public class SolutionExplorer : ISolutionExplorer
     {
         public ContentControl GetSolutionExplorerView()

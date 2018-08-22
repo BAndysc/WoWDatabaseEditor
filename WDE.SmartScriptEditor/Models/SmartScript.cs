@@ -5,9 +5,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
+using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -16,14 +17,14 @@ namespace WDE.SmartScriptEditor.Models
         public readonly ObservableCollection<SmartEvent> Events;
         public readonly int EntryOrGuid;
         public readonly SmartScriptType SourceType;
-        private readonly IUnityContainer _container;
+        private readonly ISmartFactory smartFactory;
 
-        public SmartScript(SmartScriptSolutionItem item, IUnityContainer container)
+        public SmartScript(SmartScriptSolutionItem item, ISmartFactory smartFactory)
         {
             EntryOrGuid = item.Entry;
             SourceType = item.SmartType;
-            _container = container;
             Events = new ObservableCollection<SmartEvent>();
+            this.smartFactory = smartFactory;
         }
 
         public void Load(IEnumerable<ISmartScriptLine> lines)
@@ -47,11 +48,11 @@ namespace WDE.SmartScriptEditor.Models
 
                 if (previousLink != line.Id)
                 {
-                    currentEvent = _container.Resolve<ISmartFactory>().EventFactory(line);
+                    currentEvent = smartFactory.EventFactory(line);
                     Events.Add(currentEvent);
                 }
                 
-                currentEvent.AddAction(_container.Resolve<ISmartFactory>().ActionFactory(line));
+                currentEvent.AddAction(smartFactory.ActionFactory(line));
 
                 previousLink = line.Link;
             }

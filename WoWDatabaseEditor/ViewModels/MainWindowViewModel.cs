@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Practices.Unity;
+
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -15,16 +15,19 @@ using WDE.Common.Windows;
 using WoWDatabaseEditor.Events;
 using WoWDatabaseEditor.Services.NewItemService;
 using WoWDatabaseEditor.Views;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private readonly IUnityContainer _container;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IConfigureService settings;
+        private readonly INewItemService newItemService;
+        private readonly ISolutionManager solutionManager;
 
         public IWindowManager WindowManager { get; private set; }
-        
+
         private string _title = "Visual Database Editor 2017";
 
         public string Title
@@ -34,20 +37,20 @@ namespace WoWDatabaseEditor.ViewModels
         }
 
         private readonly Dictionary<ISolutionItem, DocumentEditor> documents = new Dictionary<ISolutionItem, DocumentEditor>();
-        
+
         public DelegateCommand ExecuteCommandNew { get; private set; }
         public DelegateCommand ExecuteSettings { get; private set; }
         public DelegateCommand About { get; private set; }
 
         public ObservableCollection<MenuItemViewModel> Windows { get; set; }
 
-
-        public MainWindowViewModel(IUnityContainer container, IEventAggregator eventAggregator, IWindowManager wndowManager)
+        public MainWindowViewModel(IEventAggregator eventAggregator, IWindowManager wndowManager, IConfigureService settings, INewItemService newItemService, ISolutionManager solutionManager, Lazy<IEnumerable<IWindowProvider>> tools, ISolutionEditorManager solutionEditorManager)
         {
-            _container = container;
             _eventAggregator = eventAggregator;
             WindowManager = wndowManager;
-            
+            this.settings = settings;
+            this.newItemService = newItemService;
+            this.solutionManager = solutionManager;
             ExecuteCommandNew = new DelegateCommand(New);
             ExecuteSettings = new DelegateCommand(SettingsShow);
 
@@ -59,7 +62,7 @@ namespace WoWDatabaseEditor.ViewModels
                     WindowManager.ActiveDocument = documents[item];
                 else
                 {
-                    var editor = container.Resolve<ISolutionEditorManager>().GetEditor(item);
+                    var editor = solutionEditorManager.GetEditor(item);
                     if (editor == null)
                         MessageBox.Show("Editor for " + item.GetType().ToString() + " not registered.");
                     else
@@ -73,15 +76,11 @@ namespace WoWDatabaseEditor.ViewModels
 
             Windows = new ObservableCollection<MenuItemViewModel>();
 
-            _eventAggregator.GetEvent<AllModulesLoaded>().Subscribe(() =>
+            foreach (var window in tools.Value)
             {
-                var windows = container.ResolveAll<IWindowProvider>();
-                foreach (var window in windows)
-                {
-                    Windows.Add(new MenuItemViewModel(() => WindowManager.OpenWindow(window)) { Header = window.Name });
-                }
-                ShowAbout();
-            });
+                Windows.Add(new MenuItemViewModel(() => WindowManager.OpenWindow(window)) { Header = window.Name });
+            }
+            ShowAbout();
         }
 
         private void ShowAbout()
@@ -97,26 +96,26 @@ namespace WoWDatabaseEditor.ViewModels
 
         private void SettingsShow()
         {
-            _container.Resolve<IConfigureService>().ShowSettings();
+            settings.ShowSettings();
         }
 
         private void New()
         {
-            ISolutionItem item = _container.Resolve<INewItemService>().GetNewSolutionItem();
+            ISolutionItem item = newItemService.GetNewSolutionItem();
             if (item != null)
-                _container.Resolve<ISolutionManager>().Items.Add(item);
+                solutionManager.Items.Add(item);
         }
 
         public void DocumentClosed(object documentContent)
         {
-            foreach (var key in documents.Keys)
-            {
-                if (documents[key] == documentContent)
-                {
-                    documents.Remove(key);
-                    break;
-                }
-            }
+        //    foreach (var key in documents.Keys)
+        //    {
+        //        if (documents[key] == documentContent)
+        //        {
+        //            documents.Remove(key);
+        //            break;
+        //        }
+        //    }
         }
     }
 }

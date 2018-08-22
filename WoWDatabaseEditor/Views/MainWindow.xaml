@@ -8,7 +8,7 @@
         xmlns:views="clr-namespace:WoWDatabaseEditor.Views"
         xmlns:viewModels="clr-namespace:WoWDatabaseEditor.ViewModels"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
-        Title="{Binding Title}" Height="695.368" Width="959.421">
+        Title="{Binding Title}" Height="695.368" Width="959.421" Loaded="Window_Loaded" Closed="Window_Closed">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">

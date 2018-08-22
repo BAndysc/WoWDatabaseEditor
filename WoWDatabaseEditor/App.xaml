@@ -1,7 +1,8 @@
-﻿<Application x:Class="WoWDatabaseEditor.App"
+﻿<unity:PrismApplication  x:Class="WoWDatabaseEditor.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WoWDatabaseEditor">
+             xmlns:local="clr-namespace:WoWDatabaseEditor"
+             xmlns:unity="http://prismlibrary.com/">
     <Application.Resources>
 
         <ResourceDictionary>
@@ -11,4 +12,4 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
-</Application>
+</unity:PrismApplication>

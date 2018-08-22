@@ -3,28 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using Prism.Commands;
 using Prism.Modularity;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
 using WDE.SQLEditor.ViewModels;
 using WDE.SQLEditor.Views;
+using Prism.Ioc;
 
 namespace WDE.SQLEditor
 {
     public class SqlEditorModule : IModule
-    {
-        private IUnityContainer _container;
-
-        public SqlEditorModule(IUnityContainer container)
+    {        
+        public void OnInitialized(IContainerProvider containerProvider)
         {
-            _container = container;
-        }
-        
-        public void Initialize()
-        {
-            _container.Resolve<ISolutionEditorManager>().Register<MetaSolutionSQL>(item =>
+            containerProvider.Resolve<ISolutionEditorManager>().Register<MetaSolutionSQL>(item =>
             {
                 var view = new SqlEditorView();
                 var solutionItem = item as MetaSolutionSQL;
@@ -35,11 +29,15 @@ namespace WDE.SQLEditor
                 editor.Title = "Sql output";
                 editor.Content = view;
                 editor.CanClose = true;
-                editor.Undo = new DelegateCommand(() => { }, ()=>false);
+                editor.Undo = new DelegateCommand(() => { }, () => false);
                 editor.Redo = new DelegateCommand(() => { }, () => false);
 
                 return editor;
             });
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
         }
     }
 }

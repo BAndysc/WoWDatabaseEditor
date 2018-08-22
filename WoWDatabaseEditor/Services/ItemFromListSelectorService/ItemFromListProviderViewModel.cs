@@ -6,16 +6,16 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
-using Microsoft.Practices.Unity;
+
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WoWDatabaseEditor.Extensions;
+using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 {
     public class ItemFromListProviderViewModel : BindableBase
     {
-        private IUnityContainer container;
         private readonly bool _asFlags;
         public ObservableCollection<KeyValuePair<int, CheckableSelectOption>> RawItems { get; set; }
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
@@ -33,9 +33,8 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             set { SetProperty(ref _search, value); _items.View.Refresh(); }
         }
 
-        public ItemFromListProviderViewModel(IUnityContainer container, Dictionary<int, SelectOption> items, bool asFlags)
+        public ItemFromListProviderViewModel(Dictionary<int, SelectOption> items, bool asFlags)
         {
-            this.container = container;
             _asFlags = asFlags;
             RawItems = new ObservableCollection<KeyValuePair<int, CheckableSelectOption>>();
 

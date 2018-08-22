@@ -3,29 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+
 using Prism.Modularity;
 using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Solutions.Manager;
+using Prism.Ioc;
+
 
 namespace WDE.Solutions
 {
     public class SolutionsModule : IModule
     {
-        private readonly IUnityContainer _container;
-
-        public SolutionsModule(IUnityContainer container)
+        public SolutionsModule()
         {
-            this._container = container;
+        }
+        
+
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            _container.RegisterType<ISolutionItemProvider, SolutionFolderItemProvider>("Solution Folder");
-
-            _container.RegisterType<ISolutionManager, SolutionManager>(new ContainerControlledLifetimeManager());
-
+            containerRegistry.Register<ISolutionItemProvider, SolutionFolderItemProvider>("Solution Folder");
+            containerRegistry.RegisterSingleton<ISolutionManager, SolutionManager>();
+            containerRegistry.Register<ISolutionExplorer, SolutionExplorer>();
         }
     }
 }
