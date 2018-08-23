@@ -11,5 +11,18 @@ namespace WDE.SQLEditor.Views
         {
             InitializeComponent();
         }
+
+        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("WDE.SQLEditor.Resources.sql.xshd"))
+            {
+                using (var reader = new System.Xml.XmlTextReader(stream))
+                {
+                    MyAvalonEdit.SyntaxHighlighting =
+                        ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(reader,
+                        ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
+                }
+            }
+        }
     }
 }
