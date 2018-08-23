@@ -192,11 +192,11 @@
                 <attachedCommandBehavior:BehaviorBinding Event="MouseDoubleClick" Command="{Binding RequestOpenItem}" CommandParameter="{Binding ElementName=tv, Path=SelectedItem}"/>
             </attachedCommandBehavior:CommandBehaviorCollection.Behaviors>
 
-            <!--<i:Interaction.Triggers>
+            <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectedItemChanged">
                     <i:InvokeCommandAction Command="{Binding SelectedItemChangedCommand}" CommandParameter="{Binding ElementName=tv, Path=SelectedItem}"/>
                 </i:EventTrigger>
-            </i:Interaction.Triggers>-->
+            </i:Interaction.Triggers>
             <TreeView.ItemContainerStyle>
                 <Style BasedOn="{StaticResource TreeViewFullRow}" TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
