@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WDE.Common;
+using WDE.Common.Attributes;
 
 namespace WDE.Solutions
 {
+    [AutoRegister]
     public class SolutionFolderItemProvider : ISolutionItemProvider
     {
         public string GetName()

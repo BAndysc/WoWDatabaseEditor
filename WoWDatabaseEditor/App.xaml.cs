@@ -46,9 +46,6 @@ namespace WoWDatabaseEditor
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<IWindowManager, WindowManager>();
-            containerRegistry.RegisterSingleton<ISolutionEditorManager, SolutionEditorManager>();
-            containerRegistry.Register<IWindowProvider, SolutionEditorManager>("SolutionExplorer");
         }
 
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
@@ -71,10 +68,47 @@ namespace WoWDatabaseEditor
             moduleCatalog.AddModule(typeof(SolutionsModule));
 
             moduleCatalog.AddModule(typeof(HistoryWindowModule));
-
-            Container.GetContainer().RegisterTypes(AllClasses.FromLoadedAssemblies().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true)), WithMappings.FromMatchingInterface, WithName.Default, t => new ContainerControlledLifetimeManager());
-
+            
+            AutoRegisterClasses();
         }
+
+        /*
+         * Ok, this method is reaaly ugly. Luckily it is also realy low level
+         * so it doesn't affect other parts that much. I don't know how it should be done properly.
+         */
+        private void AutoRegisterClasses()
+        {
+            var defaultRegisters = AllClasses.FromLoadedAssemblies().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));
+
+            HashSet<Type> alreadyInitialized = new HashSet<Type>();
+            foreach (var register in defaultRegisters)
+            {
+                if (register.IsAbstract)
+                    continue;
+
+                var singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
+
+                foreach (var interface_ in register.GetInterfaces())
+                {
+                    string name = null;
+
+                    if (alreadyInitialized.Contains(interface_))
+                        name = register.ToString() + interface_.ToString();
+                    else
+                        alreadyInitialized.Add(interface_);
+
+                    LifetimeManager life = null;
+
+                    if (singleton)
+                        life = new ContainerControlledLifetimeManager();
+                    else
+                        life = new TransientLifetimeManager();
+
+                    Container.GetContainer().RegisterType(interface_, register, name, life);
+                }
+            }
+        }
+
         protected override IModuleCatalog CreateModuleCatalog()
         {
             return new ConfigurationModuleCatalog();

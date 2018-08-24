@@ -12,9 +12,11 @@ using WDE.Parameters.ViewModels;
 using WDE.Parameters.Views;
 using Prism.Ioc;
 using WDE.Common.Database;
+using WDE.Common.Attributes;
 
 namespace WDE.Parameters
 {
+    [AutoRegister]
     public class ParametersModule : IModule, IConfigurable
     {
         public static ParameterFactory FactoryInstance { get; private set; }
@@ -40,9 +42,6 @@ namespace WDE.Parameters
         {
             FactoryInstance = new ParameterFactory();
             containerRegistry.RegisterInstance<IParameterFactory>(FactoryInstance);
-
-
-            containerRegistry.Register<IConfigurable, ParametersModule>("Parameters configuration");
         }
 
         public void OnInitialized(IContainerProvider containerProvider)

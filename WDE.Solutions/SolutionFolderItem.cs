@@ -35,12 +35,7 @@ namespace WDE.Solutions
         public string ExtraId => null;
 
         public bool IsExportable => true;
-
-        public string GenerateName(ISolutionItemNameRegistry registry)
-        {
-            return registry.GetName(this);
-        }
-
+        
         public string ExportSql(ISolutionItemSqlGeneratorRegistry registry)
         {
             return registry.GenerateSql(this);

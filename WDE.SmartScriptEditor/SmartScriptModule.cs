@@ -29,20 +29,17 @@ namespace WDE.SmartScriptEditor
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            ISolutionItemNameRegistry nameRegistry = containerProvider.Resolve<ISolutionItemNameRegistry>();
-
-            nameRegistry.Register(containerProvider.Resolve<SmartScriptNameProvider>());
             containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>().Register(containerProvider.Resolve<SmartScriptSqlGenerator>());
             
             containerProvider.Resolve<ISolutionEditorManager>().Register<SmartScriptSolutionItem>(item =>
             {
                 var view = new SmartScriptEditorView();
                 var solutionItem = item as SmartScriptSolutionItem;
-                var vm = new SmartScriptEditorViewModel(solutionItem, containerProvider.Resolve<IHistoryManager>(), containerProvider.Resolve<IDatabaseProvider>(), containerProvider.Resolve<IEventAggregator>(), containerProvider.Resolve<ISmartFactory>(), containerProvider.Resolve<IItemFromListProvider>(), containerProvider.Resolve<SmartTypeListProvider>(), nameRegistry);
+                var vm = new SmartScriptEditorViewModel(solutionItem, containerProvider.Resolve<IHistoryManager>(), containerProvider.Resolve<IDatabaseProvider>(), containerProvider.Resolve<IEventAggregator>(), containerProvider.Resolve<ISmartFactory>(), containerProvider.Resolve<IItemFromListProvider>(), containerProvider.Resolve<SmartTypeListProvider>(), containerProvider.Resolve<ISolutionItemNameRegistry>());
                 view.DataContext = vm;
 
                 DocumentEditor editor = new DocumentEditor();
-                editor.Title = solutionItem.GenerateName(containerProvider.Resolve<ISolutionItemNameRegistry>());
+                editor.Title = containerProvider.Resolve<ISolutionItemNameRegistry>().GetName(solutionItem);
                 editor.Content = view;
                 editor.Undo = vm.UndoCommand;
                 editor.Redo = vm.RedoCommand;
@@ -58,12 +55,6 @@ namespace WDE.SmartScriptEditor
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.Register<ISolutionItemProvider, SmartScriptCreatureProvider>("Creature Script");
-            containerRegistry.Register<ISolutionItemProvider, SmartScriptGameobjectProvider>("Gameobject Script");
-            containerRegistry.Register<ISolutionItemProvider, SmartScriptQuestProvider>("Quest Script");
-            containerRegistry.Register<ISolutionItemProvider, SmartScriptAuraProvider>("Aura Script");
-            containerRegistry.Register<ISolutionItemProvider, SmartScriptSpellProvider>("Spell Script");
-            containerRegistry.Register<ISolutionItemProvider, SmartScriptTimedActionListProvider>("Timed action list Script");
         }
     }
 }

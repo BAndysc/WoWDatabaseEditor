@@ -14,6 +14,7 @@ using Prism.Ioc;
 using WDE.Common.DBC;
 using WDE.SmartScriptEditor.Data;
 using Prism.Events;
+using WDE.Common.Attributes;
 
 namespace WDE.SmartScriptEditor
 {
@@ -55,6 +56,7 @@ namespace WDE.SmartScriptEditor
         //}
     }
 
+    [AutoRegister]
     public class SmartScriptCreatureProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<ICreatureEntryProviderService> creatureEntryProvider;
@@ -74,6 +76,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
+    [AutoRegister]
     public class SmartScriptGameobjectProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<IGameobjectEntryProviderService> goProvider;
@@ -93,6 +96,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
+    [AutoRegister]
     public class SmartScriptQuestProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<IQuestEntryProviderService> service;
@@ -112,6 +116,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
+    [AutoRegister]
     public class SmartScriptAuraProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<ISpellEntryProviderService> service;
@@ -131,6 +136,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
+    [AutoRegister]
     public class SmartScriptSpellProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<ISpellEntryProviderService> service;
@@ -150,6 +156,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
+    [AutoRegister]
     public class SmartScriptTimedActionListProvider : SmartScriptSolutionItemProvider
     {
         public SmartScriptTimedActionListProvider(Lazy<IEventAggregator> eventAggregator, Lazy<ISmartFactory> smartFactory, Lazy<IDatabaseProvider> database, Lazy<ISpellStore> spellStore)

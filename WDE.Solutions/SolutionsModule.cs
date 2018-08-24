@@ -23,15 +23,11 @@ namespace WDE.Solutions
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<ISolutionItemNameRegistry>().Register(containerProvider.Resolve<FolderNameProvider>());
             containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>().Register(containerProvider.Resolve<FolderSqlProvider>());
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.Register<ISolutionItemProvider, SolutionFolderItemProvider>("Solution Folder");
-            containerRegistry.RegisterSingleton<ISolutionManager, SolutionManager>();
-            containerRegistry.Register<ISolutionExplorer, SolutionExplorer>();
         }
     }
 }

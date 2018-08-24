@@ -14,9 +14,11 @@ using WDE.MySqlDatabase.Data;
 using WDE.MySqlDatabase.ViewModels;
 using WDE.MySqlDatabase.Views;
 using Prism.Ioc;
+using WDE.Common.Attributes;
 
 namespace WDE.MySqlDatabase
 {
+    [AutoRegister, SingleInstance]
     public class MySqlDatabaseModule : IModule, IConfigurable
     {
         public static DbAccess DbAccess { get; set; }
@@ -36,8 +38,6 @@ namespace WDE.MySqlDatabase
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<IDatabaseProvider, MysqlDatabaseProvider>();
-            containerRegistry.Register<IConfigurable, MySqlDatabaseModule>("Database configuration");
         }
 
         public void OnInitialized(IContainerProvider containerProvider)

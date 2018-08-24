@@ -8,7 +8,7 @@ using WoWDatabaseEditor.Services.ConfigurationService.Views;
 
 namespace WoWDatabaseEditor.Services.ConfigurationService
 {
-    [WDE.Common.Attributes.AutoRegister]
+    [WDE.Common.Attributes.AutoRegister, WDE.Common.Attributes.SingleInstance]
     public class ConfigureService : IConfigureService
     {
         public void ShowSettings()

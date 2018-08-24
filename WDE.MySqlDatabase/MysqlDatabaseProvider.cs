@@ -8,12 +8,14 @@ using System.Transactions;
 using System.Windows;
 using MySql.Data.MySqlClient;
 using Shaolinq;
+using WDE.Common.Attributes;
 using WDE.Common.Database;
 using WDE.MySqlDatabase.Models;
 using MySqlConfiguration = Shaolinq.MySql.MySqlConfiguration;
 
 namespace WDE.MySqlDatabase
 {
+    [AutoRegister, SingleInstance]
     public class MysqlDatabaseProvider : IDatabaseProvider
     {
         private TrinityDatabase model;

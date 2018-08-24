@@ -24,7 +24,7 @@ namespace WoWDatabaseEditor.Services.NewItemService
             }
         }
         
-        public ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; set; }
+        public ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; private set; }
 
         private NewItemPrototypeInfo _selectedPrototype;
         public NewItemPrototypeInfo SelectedPrototype

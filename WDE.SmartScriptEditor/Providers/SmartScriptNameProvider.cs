@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.Attributes;
 using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Solution;
 
 namespace WDE.SmartScriptEditor.Providers
 {
+    [AutoRegister]
     public class SmartScriptNameProvider : ISolutionNameProvider<SmartScriptSolutionItem>
     {
         private readonly IDatabaseProvider database;

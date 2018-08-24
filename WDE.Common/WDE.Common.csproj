@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\AutoRegisterAttribute.cs" />
+    <Compile Include="Attributes\SingleInstanceAttribute.cs" />
     <Compile Include="Database\Enums.cs" />
     <Compile Include="Database\ICreatureTemplate.cs" />
     <Compile Include="Database\IDatabaseProvider.cs" />

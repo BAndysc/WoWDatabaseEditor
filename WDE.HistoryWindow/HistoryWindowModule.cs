@@ -12,9 +12,11 @@ using WDE.HistoryWindow.ViewModels;
 using WDE.HistoryWindow.Views;
 using Prism.Ioc;
 using Prism.Events;
+using WDE.Common.Attributes;
 
 namespace WDE.HistoryWindow
 {
+    [AutoRegister, SingleInstance]
     public class HistoryWindowModule : IModule, IWindowProvider
     {
         private IEventAggregator eventAggregator;
@@ -33,7 +35,6 @@ namespace WDE.HistoryWindow
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.Register<IWindowProvider, HistoryWindowModule>("HistoryWindow");
         }
 
         public void OnInitialized(IContainerProvider containerProvider)

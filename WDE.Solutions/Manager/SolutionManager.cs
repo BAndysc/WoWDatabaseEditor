@@ -16,7 +16,7 @@ using WDE.Common.Attributes;
 
 namespace WDE.Solutions.Manager
 {
-    [AutoRegister]
+    [AutoRegister, SingleInstance]
     public class SolutionManager : ISolutionManager
     {
         private ObservableCollection<ISolutionItem> _items;

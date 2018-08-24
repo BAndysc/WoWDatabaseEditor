@@ -31,7 +31,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly SmartScriptSolutionItem _item;
         private readonly IHistoryManager _history;
 
-        public string Name => _item.GenerateName(itemNameRegistry);
+        public string Name => itemNameRegistry.GetName(_item);
 
         private SmartScript script;
 

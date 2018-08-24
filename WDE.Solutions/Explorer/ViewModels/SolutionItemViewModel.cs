@@ -19,7 +19,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         private readonly ObservableCollection<SolutionItemViewModel> _children;
         public ObservableCollection<SolutionItemViewModel> Children => _children;
 
-        public string Name => _item.GenerateName(itemNameRegistry);
+        public string Name => itemNameRegistry.GetName(_item);
         public string ExtraId => _item.ExtraId;
         public bool IsContainer => _item.IsContainer;
         public bool IsExportable => _item.IsExportable;

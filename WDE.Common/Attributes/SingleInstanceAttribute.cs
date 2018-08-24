@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WDE.Common.Solution
+namespace WDE.Common.Attributes
 {
-    public interface ISolutionItemNameRegistry
+    public class SingleInstanceAttribute : Attribute
     {
-        string GetName(ISolutionItem item);
     }
 }

@@ -14,15 +14,27 @@ namespace WDE.Solutions.Manager
     {
         private Dictionary<Type, object> nameProviders = new Dictionary<Type, object>();
 
-        public void Register<T>(ISolutionNameProvider<T> provider) where T : ISolutionItem
+        public SolutionItemNameRegistry(IEnumerable<ISolutionNameProvider> providers)
+        {
+            // handy trick with (dynamic) cast, thanks to this proper Generic method will be called!
+            foreach (var provider in providers)
+                Register((dynamic)provider);
+        }
+
+        private void Register<T>(ISolutionNameProvider<T> provider) where T : ISolutionItem
         {
             nameProviders.Add(typeof(T), provider);
         }
-        
-        public string GetName<T>(T item) where T : ISolutionItem
+
+        private string GetName<T>(T item) where T : ISolutionItem
         {
             var x = nameProviders[item.GetType()] as ISolutionNameProvider<T>;
             return x.GetName(item);
+        }
+
+        public string GetName(ISolutionItem item)
+        {
+            return GetName((dynamic)item);
         }
     }
 }
