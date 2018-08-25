@@ -7,7 +7,7 @@ using System.Windows.Controls;
 
 namespace WDE.Common.Windows
 {
-    public interface IWindowProvider
+    public interface IToolProvider
     {
         bool AllowMultiple { get; }
         string Name { get; }

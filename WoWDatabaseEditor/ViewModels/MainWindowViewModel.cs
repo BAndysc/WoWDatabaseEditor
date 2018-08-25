@@ -44,7 +44,7 @@ namespace WoWDatabaseEditor.ViewModels
 
         public ObservableCollection<MenuItemViewModel> Windows { get; set; }
 
-        public MainWindowViewModel(IEventAggregator eventAggregator, IWindowManager wndowManager, IConfigureService settings, INewItemService newItemService, ISolutionManager solutionManager, Lazy<IEnumerable<IWindowProvider>> tools, ISolutionEditorManager solutionEditorManager)
+        public MainWindowViewModel(IEventAggregator eventAggregator, IWindowManager wndowManager, IConfigureService settings, INewItemService newItemService, ISolutionManager solutionManager, Lazy<IEnumerable<IToolProvider>> tools, ISolutionEditorManager solutionEditorManager)
         {
             _eventAggregator = eventAggregator;
             WindowManager = wndowManager;
@@ -78,7 +78,7 @@ namespace WoWDatabaseEditor.ViewModels
 
             foreach (var window in tools.Value)
             {
-                Windows.Add(new MenuItemViewModel(() => WindowManager.OpenWindow(window)) { Header = window.Name });
+                Windows.Add(new MenuItemViewModel(() => WindowManager.OpenTool(window)) { Header = window.Name });
             }
             ShowAbout();
         }

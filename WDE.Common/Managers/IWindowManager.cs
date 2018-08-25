@@ -10,7 +10,7 @@ namespace WDE.Common.Managers
         ObservableCollection<DocumentEditor> OpenedDocuments { get; }
         void OpenDocument(DocumentEditor editor);
         
-        ObservableCollection<DocumentEditor> OpenedWindows { get; }
-        void OpenWindow(IWindowProvider provider);
+        ObservableCollection<DocumentEditor> OpenedTools { get; }
+        void OpenTool(IToolProvider provider);
     }
 }

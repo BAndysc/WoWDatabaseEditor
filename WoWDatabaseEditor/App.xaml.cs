@@ -52,6 +52,8 @@ namespace WoWDatabaseEditor
         {
             base.RegisterRequiredTypes(containerRegistry);
             containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
+
+            containerRegistry.RegisterSingleton<MainWindow>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

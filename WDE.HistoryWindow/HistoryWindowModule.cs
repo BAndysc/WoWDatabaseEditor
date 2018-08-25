@@ -17,7 +17,7 @@ using WDE.Common.Attributes;
 namespace WDE.HistoryWindow
 {
     [AutoRegister, SingleInstance]
-    public class HistoryWindowModule : IModule, IWindowProvider
+    public class HistoryWindowModule : IModule, IToolProvider
     {
         private IEventAggregator eventAggregator;
 

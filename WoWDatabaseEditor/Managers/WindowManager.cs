@@ -31,9 +31,9 @@ namespace WoWDatabaseEditor.Managers
         }
 
         public ObservableCollection<DocumentEditor> OpenedDocuments { get; } = new ObservableCollection<DocumentEditor>();
-        public ObservableCollection<DocumentEditor> OpenedWindows { get; } = new ObservableCollection<DocumentEditor>();
+        public ObservableCollection<DocumentEditor> OpenedTools { get; } = new ObservableCollection<DocumentEditor>();
         
-        private HashSet<Type> OpenedWindowTypes { get; } = new HashSet<Type>();
+        private HashSet<Type> OpenedToolTypes { get; } = new HashSet<Type>();
         private  Dictionary<Type, DocumentEditor> Opened { get; } = new Dictionary<Type, DocumentEditor>();
         public void OpenDocument(DocumentEditor editor)
         {
@@ -41,17 +41,17 @@ namespace WoWDatabaseEditor.Managers
             ActiveDocument = editor;
         }
 
-        public void OpenWindow(IWindowProvider provider)
+        public void OpenTool(IToolProvider provider)
         {
             if (!provider.AllowMultiple)
             {
-                if (OpenedWindowTypes.Contains(provider.GetType()))
+                if (OpenedToolTypes.Contains(provider.GetType()))
                 {
                     Opened[provider.GetType()].Visibilityt = Visibility.Visible;
                     return;
                 }
 
-                OpenedWindowTypes.Add(provider.GetType());
+                OpenedToolTypes.Add(provider.GetType());
             }
 
             var doc = new DocumentEditor
@@ -63,7 +63,7 @@ namespace WoWDatabaseEditor.Managers
             };
 
             Opened.Add(provider.GetType(), doc);
-            OpenedWindows.Add(doc);
+            OpenedTools.Add(doc);
         }
     }
 }
