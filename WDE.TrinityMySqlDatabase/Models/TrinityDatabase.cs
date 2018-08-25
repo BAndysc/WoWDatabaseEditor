@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shaolinq;
 
-namespace WDE.MySqlDatabase.Models
+namespace WDE.TrinityMySqlDatabase.Models
 {
     [DataAccessModel]
     public abstract class TrinityDatabase : DataAccessModel

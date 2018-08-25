@@ -10,13 +10,13 @@ using MySql.Data.MySqlClient;
 using Shaolinq;
 using WDE.Common.Attributes;
 using WDE.Common.Database;
-using WDE.MySqlDatabase.Models;
+using WDE.TrinityMySqlDatabase.Models;
 using MySqlConfiguration = Shaolinq.MySql.MySqlConfiguration;
 
-namespace WDE.MySqlDatabase
+namespace WDE.TrinityMySqlDatabase
 {
     [AutoRegister, SingleInstance]
-    public class MysqlDatabaseProvider : IDatabaseProvider
+    public class TrinityMysqlDatabaseProvider : IDatabaseProvider
     {
         private TrinityDatabase model;
 
@@ -26,14 +26,14 @@ namespace WDE.MySqlDatabase
 
         private List<MySqlQuestTemplate> QuestTemplateCache;
 
-        public MysqlDatabaseProvider()
+        public TrinityMysqlDatabaseProvider()
         {
             try
             {
-                string Database = MySqlDatabaseModule.DbAccess.DB;
-                string User = MySqlDatabaseModule.DbAccess.User;
-                string Password = MySqlDatabaseModule.DbAccess.Password;
-                string Host = MySqlDatabaseModule.DbAccess.Host;
+                string Database = TrinityMySqlDatabaseModule.DbAccess.DB;
+                string User = TrinityMySqlDatabaseModule.DbAccess.User;
+                string Password = TrinityMySqlDatabaseModule.DbAccess.Password;
+                string Host = TrinityMySqlDatabaseModule.DbAccess.Host;
                 var config = MySqlConfiguration.Create(Database, Host, User, Password);
                 model = DataAccessModel.BuildDataAccessModel<TrinityDatabase>(config);
                 try

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Shaolinq;
 using WDE.Common.Database;
 
-namespace WDE.MySqlDatabase.Models
+namespace WDE.TrinityMySqlDatabase.Models
 {
     [ExcludeFromCodeCoverage]
     [DataAccessObject(Name = "smart_scripts")]

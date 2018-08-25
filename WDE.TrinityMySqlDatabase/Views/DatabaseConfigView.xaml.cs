@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace WDE.MySqlDatabase.Views
+namespace WDE.TrinityMySqlDatabase.Views
 {
     /// <summary>
     /// Interaction logic for DatabaseConfigView

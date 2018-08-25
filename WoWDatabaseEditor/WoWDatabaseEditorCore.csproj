@@ -298,10 +298,6 @@
       <Project>{BC7E0845-C750-4DAF-8869-9170211465E6}</Project>
       <Name>WDE.History</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WDE.MySqlDatabase\WDE.MySqlDatabase.csproj">
-      <Project>{3C445DFF-5CCB-4A19-95D9-F7654C40B774}</Project>
-      <Name>WDE.MySqlDatabase</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj">
       <Project>{3CD1E251-D9BF-4061-A8D5-4AC65106C896}</Project>
       <Name>WDE.Parameters</Name>
@@ -317,6 +313,10 @@
     <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj">
       <Project>{7E0DE187-A45C-406B-AAAE-608F40237CE6}</Project>
       <Name>WDE.SQLEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj">
+      <Project>{c6be1e01-cf2f-4fe5-a67c-ac783eb9d3f7}</Project>
+      <Name>WDE.TrinityMySqlDatabase</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

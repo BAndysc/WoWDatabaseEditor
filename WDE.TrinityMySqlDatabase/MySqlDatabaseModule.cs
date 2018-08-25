@@ -10,16 +10,16 @@ using Newtonsoft.Json;
 using Prism.Modularity;
 using WDE.Common;
 using WDE.Common.Database;
-using WDE.MySqlDatabase.Data;
-using WDE.MySqlDatabase.ViewModels;
-using WDE.MySqlDatabase.Views;
+using WDE.TrinityMySqlDatabase.Data;
+using WDE.TrinityMySqlDatabase.ViewModels;
+using WDE.TrinityMySqlDatabase.Views;
 using Prism.Ioc;
 using WDE.Common.Attributes;
 
-namespace WDE.MySqlDatabase
+namespace WDE.TrinityMySqlDatabase
 {
     [AutoRegister, SingleInstance]
-    public class MySqlDatabaseModule : IModule, IConfigurable
+    public class TrinityMySqlDatabaseModule : IModule, IConfigurable
     {
         public static DbAccess DbAccess { get; set; }
         
@@ -33,7 +33,7 @@ namespace WDE.MySqlDatabase
 
         public string GetName()
         {
-            return "Database";
+            return "TrinityCore Database";
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

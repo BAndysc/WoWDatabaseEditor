@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Shaolinq;
 using WDE.Common.Database;
 
-namespace WDE.MySqlDatabase.Models
+namespace WDE.TrinityMySqlDatabase.Models
 {
     [DataAccessObject(Name="creature_template")]
     public abstract class MySqlCreatureTemplate : DataAccessObject, ICreatureTemplate

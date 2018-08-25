@@ -8,7 +8,7 @@ using System.Linq;
 using System.Windows;
 using Newtonsoft.Json;
 
-namespace WDE.MySqlDatabase.ViewModels
+namespace WDE.TrinityMySqlDatabase.ViewModels
 {
     public class DatabaseConfigViewModel : BindableBase
     {
@@ -47,22 +47,22 @@ namespace WDE.MySqlDatabase.ViewModels
         public DatabaseConfigViewModel()
         {
             SaveAction = Save;
-            Database = MySqlDatabaseModule.DbAccess.DB;
-            User = MySqlDatabaseModule.DbAccess.User;
-            Password = MySqlDatabaseModule.DbAccess.Password;
-            Host = MySqlDatabaseModule.DbAccess.Host;
+            Database = TrinityMySqlDatabaseModule.DbAccess.DB;
+            User = TrinityMySqlDatabaseModule.DbAccess.User;
+            Password = TrinityMySqlDatabaseModule.DbAccess.Password;
+            Host = TrinityMySqlDatabaseModule.DbAccess.Host;
         }
 
         private void Save()
         {
-            MySqlDatabaseModule.DbAccess.DB = Database;
-            MySqlDatabaseModule.DbAccess.User = User;
-            MySqlDatabaseModule.DbAccess.Password = Password;
-            MySqlDatabaseModule.DbAccess.Host = Host;
+            TrinityMySqlDatabaseModule.DbAccess.DB = Database;
+            TrinityMySqlDatabaseModule.DbAccess.User = User;
+            TrinityMySqlDatabaseModule.DbAccess.Password = Password;
+            TrinityMySqlDatabaseModule.DbAccess.Host = Host;
             JsonSerializer ser = new Newtonsoft.Json.JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
             using (StreamWriter file = File.CreateText(@"database.json"))
             {
-                ser.Serialize(file, MySqlDatabaseModule.DbAccess);
+                ser.Serialize(file, TrinityMySqlDatabaseModule.DbAccess);
             }
             MessageBox.Show("Restart the application.");
         }

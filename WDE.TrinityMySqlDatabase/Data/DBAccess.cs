@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WDE.MySqlDatabase.Data
+namespace WDE.TrinityMySqlDatabase.Data
 {
     public class DbAccess
     {

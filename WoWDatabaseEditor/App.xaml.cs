@@ -20,12 +20,12 @@ using WDE.Common.Windows;
 using WDE.DbcStore;
 using WDE.History;
 using WDE.HistoryWindow;
-using WDE.MySqlDatabase;
 using WDE.Parameters;
 using WDE.SmartScriptEditor;
 using WDE.Solutions;
 using WDE.Solutions.Manager;
 using WDE.SQLEditor;
+using WDE.TrinityMySqlDatabase;
 using WoWDatabaseEditor.Events;
 using WoWDatabaseEditor.Managers;
 using WoWDatabaseEditor.Services.ConfigurationService;
@@ -58,7 +58,7 @@ namespace WoWDatabaseEditor
         {
             base.ConfigureModuleCatalog(moduleCatalog);
 
-            moduleCatalog.AddModule(typeof(MySqlDatabaseModule));
+            moduleCatalog.AddModule(typeof(TrinityMySqlDatabaseModule));
 
             moduleCatalog.AddModule(typeof(HistoryModule));
             moduleCatalog.AddModule(typeof(ParametersModule));
