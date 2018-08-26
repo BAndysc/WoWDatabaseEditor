@@ -121,7 +121,7 @@
     <Compile Include="Services\IConfigureService.cs" />
     <Compile Include="Solution\ISolutionNameProvider.cs" />
     <Compile Include="Solution\MetaSolutionSQL.cs" />
-    <Compile Include="Windows\IWindow.cs" />
+    <Compile Include="Windows\ITool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
