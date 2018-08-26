@@ -60,7 +60,7 @@
                 <MenuItem Header="_About" Command="{Binding About}"></MenuItem>
             </MenuItem>
         </Menu>
-        <avalonDock:DockingManager AnchorablesSource="{Binding WindowManager.OpenedWindows}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
+        <avalonDock:DockingManager AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
             <avalonDock:DockingManager.DocumentPaneTemplate>
                 <ControlTemplate>
