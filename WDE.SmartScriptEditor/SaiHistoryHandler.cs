@@ -33,12 +33,15 @@ namespace WDE.SmartScriptEditor
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 foreach (object ev in e.OldItems)
-                    RemoveEvent(ev as SmartEvent);
+                    RemovedEvent(ev as SmartEvent, e.OldStartingIndex);
             }
         }
 
-        private void RemoveEvent(SmartEvent smartEvent)
+        private void UnbindEvent(SmartEvent smartEvent)
         {
+            foreach (var act in smartEvent.Actions)
+                UnbindAction(act);
+
             smartEvent.Actions.CollectionChanged -= Actions_CollectionChanged;
 
             smartEvent.Chance.OnValueChanged -= Parameter_OnValueChanged;
@@ -58,6 +61,13 @@ namespace WDE.SmartScriptEditor
             BindAction(smartAction);
         }
 
+        private void RemovedAction(SmartAction smartAction, SmartEvent parent, int index)
+        {
+            UnbindAction(smartAction);
+
+            PushAction(new ActionRemovedAction(parent, smartAction, index));
+        }
+
         private void BindAction(SmartAction smartAction)
         {
             for (int i = 0; i < smartAction.ParametersCount; ++i)
@@ -73,7 +83,7 @@ namespace WDE.SmartScriptEditor
                 smartAction.Target.Position[i].OnValueChanged += ParameterFloat_OnValueChange;
         }
 
-        private void RemoveAction(SmartAction smartAction)
+        private void UnbindAction(SmartAction smartAction)
         {
             for (int i = 0; i < smartAction.ParametersCount; ++i)
                 smartAction.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
@@ -92,6 +102,12 @@ namespace WDE.SmartScriptEditor
         {
             PushAction(new EventAddedAction(_script, smartEvent, index));
             BindEvent(smartEvent);
+        }
+
+        private void RemovedEvent(SmartEvent smartEvent, int index)
+        {
+            UnbindEvent(smartEvent);
+            PushAction(new EventRemovedAction(_script, smartEvent, index));
         }
 
         private void BindEvent(SmartEvent smartEvent)
@@ -121,7 +137,7 @@ namespace WDE.SmartScriptEditor
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 foreach (object ac in e.OldItems)
-                    RemoveAction(ac as SmartAction);
+                    RemovedAction(ac as SmartAction, (ac as SmartAction).Parent, e.OldStartingIndex);
             }
         }
 
@@ -163,6 +179,36 @@ namespace WDE.SmartScriptEditor
             public void Undo()
             {
                 _script.Events.Remove(_smartEvent);
+            }
+        }
+        
+        private class EventRemovedAction : IHistoryAction
+        {
+            private readonly SmartScript _script;
+            private readonly SmartEvent _smartEvent;
+            private readonly int _index;
+
+            public EventRemovedAction(SmartScript script, SmartEvent smartEvent, int index)
+            {
+                _script = script;
+                _smartEvent = smartEvent;
+                _index = index;
+            }
+
+            public string GetDescription()
+            {
+                // @Todo: how to localize this?
+                return "Removed event " + _smartEvent.Readable;
+            }
+
+            public void Redo()
+            {
+                _script.Events.Remove(_smartEvent);
+            }
+
+            public void Undo()
+            {
+                _script.Events.Insert(_index, _smartEvent);
             }
         }
 
@@ -231,6 +277,36 @@ namespace WDE.SmartScriptEditor
         public void Undo()
         {
             _parent.Actions.Remove(_smartAction);
+        }
+    }
+
+
+    public class ActionRemovedAction : IHistoryAction
+    {
+        private readonly SmartEvent _parent;
+        private readonly SmartAction _smartAction;
+        private readonly int _index;
+
+        public ActionRemovedAction(SmartEvent parent, SmartAction smartAction, int index)
+        {
+            _parent = parent;
+            _smartAction = smartAction;
+            _index = index;
+        }
+
+        public string GetDescription()
+        {
+            return "Removed action " + _smartAction.Readable;
+        }
+
+        public void Redo()
+        {
+            _parent.Actions.Remove(_smartAction);
+        }
+
+        public void Undo()
+        {
+            _parent.Actions.Insert(_index, _smartAction);
         }
     }
 }
