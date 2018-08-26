@@ -8,7 +8,6 @@ namespace WDE.Common.Solution
 {
     public interface ISolutionItemSqlGeneratorRegistry
     {
-        void Register<T>(ISolutionItemSqlProvider<T> provider) where T : ISolutionItem;
-        string GenerateSql<T>(T item) where T : ISolutionItem;
+        string GenerateSql(ISolutionItem item);
     }
 }

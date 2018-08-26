@@ -21,8 +21,7 @@ namespace WDE.SQLEditor
             containerProvider.Resolve<ISolutionEditorManager>().Register<MetaSolutionSQL>(item =>
             {
                 var view = new SqlEditorView();
-                var solutionItem = item as MetaSolutionSQL;
-                var vm = new SqlEditorViewModel(solutionItem.ExportSql(containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>()));
+                var vm = new SqlEditorViewModel(containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>().GenerateSql(item as MetaSolutionSQL));
                 view.DataContext = vm;
 
                 DocumentEditor editor = new DocumentEditor();

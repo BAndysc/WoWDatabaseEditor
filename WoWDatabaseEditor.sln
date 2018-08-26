@@ -9,7 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SmartScriptEditor", "WD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common", "WDE.Common\WDE.Common.csproj", "{9D1A4E14-2FE1-403A-A042-ED7E49DB0438}"
 EndProject
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Solutions", "WDE.Solutions\WDE.Solutions.csproj", "{ACD1C8BC-B91A-40E8-865D-D6826758E7CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Parameters", "WDE.Parameters\WDE.Parameters.csproj", "{3CD1E251-D9BF-4061-A8D5-4AC65106C896}"

@@ -19,7 +19,5 @@ namespace WDE.Common
         
         [JsonIgnore]
         bool IsExportable { get; }
-        
-        string ExportSql(ISolutionItemSqlGeneratorRegistry registry);
     }
 }

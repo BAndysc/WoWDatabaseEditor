@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace WDE.Common.Solution
 {
-    public interface ISolutionItemSqlProvider<T> where T : ISolutionItem
+    public interface ISolutionItemSqlProvider
+    {
+
+    }
+
+    public interface ISolutionItemSqlProvider<T> : ISolutionItemSqlProvider where T : ISolutionItem
     {
         string GenerateSql(T item);
     }

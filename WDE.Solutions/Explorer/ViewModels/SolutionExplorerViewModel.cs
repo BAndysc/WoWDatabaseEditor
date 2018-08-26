@@ -76,7 +76,7 @@ namespace WDE.Solutions.Explorer.ViewModels
             {
                 if (_selected != null)
                 {
-                    MetaSolutionSQL solution = new MetaSolutionSQL(_selected.Item.ExportSql(sqlGeneratorRegistry));
+                    MetaSolutionSQL solution = new MetaSolutionSQL(sqlGeneratorRegistry.GenerateSql(_selected.Item));
                     _ea.GetEvent<EventRequestOpenItem>().Publish(solution);
                 }
             });

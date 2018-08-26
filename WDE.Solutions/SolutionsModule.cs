@@ -23,7 +23,6 @@ namespace WDE.Solutions
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>().Register(containerProvider.Resolve<FolderSqlProvider>());
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

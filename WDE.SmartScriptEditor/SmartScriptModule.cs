@@ -29,8 +29,6 @@ namespace WDE.SmartScriptEditor
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>().Register(containerProvider.Resolve<SmartScriptSqlGenerator>());
-            
             containerProvider.Resolve<ISolutionEditorManager>().Register<SmartScriptSolutionItem>(item =>
             {
                 var view = new SmartScriptEditorView();

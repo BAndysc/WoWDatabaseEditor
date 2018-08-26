@@ -37,10 +37,5 @@ namespace WDE.SmartScriptEditor
         public string ExtraId => Entry.ToString();
 
         public bool IsExportable => true;
-        
-        public string ExportSql(ISolutionItemSqlGeneratorRegistry registry)
-        {
-            return registry.GenerateSql(this);
-        }
     }
 }

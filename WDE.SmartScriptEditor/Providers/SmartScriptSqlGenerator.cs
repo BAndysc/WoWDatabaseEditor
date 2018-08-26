@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.Attributes;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Solution;
@@ -13,7 +14,8 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Providers
 {
-    internal class SmartScriptSqlGenerator : ISolutionItemSqlProvider<SmartScriptSolutionItem>
+    [AutoRegister]
+    public class SmartScriptSqlGenerator : ISolutionItemSqlProvider<SmartScriptSolutionItem>
     {
         private readonly IEventAggregator eventAggregator;
         private readonly Lazy<IDatabaseProvider> database;

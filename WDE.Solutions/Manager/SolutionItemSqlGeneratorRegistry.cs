@@ -12,17 +12,29 @@ namespace WDE.Solutions.Manager
     [AutoRegister]
     public class SolutionItemSqlGeneratorRegistry : ISolutionItemSqlGeneratorRegistry
     {
-        private Dictionary<Type, object> nameProviders = new Dictionary<Type, object>();
+        private Dictionary<Type, object> sqlProviders = new Dictionary<Type, object>();
 
-        public void Register<T>(ISolutionItemSqlProvider<T> provider) where T : ISolutionItem
+        public SolutionItemSqlGeneratorRegistry(IEnumerable<ISolutionItemSqlProvider> providers)
         {
-            nameProviders.Add(typeof(T), provider);
+            // handy trick with (dynamic) cast, thanks to this proper Generic method will be called!
+            foreach (var provider in providers)
+                Register((dynamic)provider);
         }
-        
-        public string GenerateSql<T>(T item) where T : ISolutionItem
+
+        private void Register<T>(ISolutionItemSqlProvider<T> provider) where T : ISolutionItem
         {
-            var x = nameProviders[item.GetType()] as ISolutionItemSqlProvider<T>;
+            sqlProviders.Add(typeof(T), provider);
+        }
+
+        private string GenerateSql<T>(T item) where T : ISolutionItem
+        {
+            var x = sqlProviders[item.GetType()] as ISolutionItemSqlProvider<T>;
             return x.GenerateSql(item);
+        }
+
+        public string GenerateSql(ISolutionItem item)
+        {
+            return GenerateSql((dynamic)item);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Prism.Ioc;
+using WDE.Common.Attributes;
 
 namespace WDE.Common.Solution
 {
@@ -24,14 +25,27 @@ namespace WDE.Common.Solution
         
         public bool IsExportable => false;
 
-        public string GenerateName(ISolutionItemNameRegistry registry)
-        {
-            return "meta sql";
-        }
-
-        public string ExportSql(ISolutionItemSqlGeneratorRegistry registry)
+        internal string GetSql()
         {
             return _sql;
+        }
+    }
+
+    [AutoRegister]
+    public class MetaSolutionSqlNameProvider : ISolutionNameProvider<MetaSolutionSQL>
+    {
+        public string GetName(MetaSolutionSQL item)
+        {
+            return "sql";
+        }
+    }
+
+    [AutoRegister]
+    public class MetaSolutionSQLQueryProvider : ISolutionItemSqlProvider<MetaSolutionSQL>
+    {
+        public string GenerateSql(MetaSolutionSQL item)
+        {
+            return item.GetSql();
         }
     }
 }
