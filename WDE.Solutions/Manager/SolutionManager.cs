@@ -34,13 +34,27 @@ namespace WDE.Solutions.Manager
         private void ItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             var newItems = notifyCollectionChangedEventArgs.NewItems;
+            var oldItems = notifyCollectionChangedEventArgs.OldItems;
 
-            foreach (var varitem in newItems)
+            if (newItems != null)
             {
-                var item = varitem as ISolutionItem;
+                foreach (var varitem in newItems)
+                {
+                    var item = varitem as ISolutionItem;
 
-                if (item.Items != null)
-                    item.Items.CollectionChanged += ItemsOnCollectionChanged;
+                    if (item.Items != null)
+                        item.Items.CollectionChanged += ItemsOnCollectionChanged;
+                }
+            }
+            if (oldItems != null)
+            {
+                foreach (var varitem in oldItems)
+                {
+                    var item = varitem as ISolutionItem;
+
+                    if (item.Items != null)
+                        item.Items.CollectionChanged -= ItemsOnCollectionChanged;
+                }
             }
 
             Save();

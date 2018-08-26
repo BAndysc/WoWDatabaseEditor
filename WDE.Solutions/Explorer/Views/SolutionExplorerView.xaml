@@ -208,6 +208,8 @@
                         <Setter.Value>
                             <ContextMenu>
                                 <MenuItem Header="Add" Command="{Binding PlacementTarget.Tag.DataContext.AddItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"  IsEnabled="{Binding IsContainer}"/>
+                                <MenuItem Header="Remove" Command="{Binding PlacementTarget.Tag.DataContext.RemoveItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <Separator />
                                 <MenuItem Header="Generate SQL" Command="{Binding PlacementTarget.Tag.DataContext.GenerateSQL, RelativeSource={RelativeSource AncestorType=ContextMenu}}"  IsEnabled="{Binding IsExportable}"/>
                             </ContextMenu>
                         </Setter.Value>

@@ -19,11 +19,14 @@ namespace WDE.Solutions.Explorer.ViewModels
         private readonly ObservableCollection<SolutionItemViewModel> _children;
         public ObservableCollection<SolutionItemViewModel> Children => _children;
 
+        private Dictionary<ISolutionItem, SolutionItemViewModel> _itemToViewmodel;
+
         public string Name => itemNameRegistry.GetName(_item);
         public string ExtraId => _item.ExtraId;
         public bool IsContainer => _item.IsContainer;
         public bool IsExportable => _item.IsExportable;
         public ISolutionItem Item => _item;
+        public SolutionItemViewModel Parent => _parent;
 
         private bool _isSelected;
 
@@ -43,20 +46,37 @@ namespace WDE.Solutions.Explorer.ViewModels
             _item = item;
             _parent = parent;
 
+            _itemToViewmodel = new Dictionary<ISolutionItem, SolutionItemViewModel>();
+
             if (item.Items != null)
             {
-                _children = new ObservableCollection<SolutionItemViewModel>(
-               (from child in item.Items
-                select new SolutionItemViewModel(itemNameRegistry, child, this))
-                .ToList());
+                _children = new ObservableCollection<SolutionItemViewModel>();
+
+                foreach (object obj in item.Items)
+                    AddItem(obj as ISolutionItem);
 
                 item.Items.CollectionChanged += (sender, args) =>
                 {
-                    foreach (object t in args.NewItems)
-                        _children.Add(new SolutionItemViewModel(itemNameRegistry, t as ISolutionItem, this));
+                    if (args.NewItems != null)
+                        foreach (object obj in args.NewItems)
+                            AddItem(obj as ISolutionItem);
+
+                    if (args.OldItems != null)
+                        foreach (object obj in args.OldItems)
+                        {
+                            var solutionItem = obj as ISolutionItem;
+                            _children.Remove(_itemToViewmodel[solutionItem]);
+                            _itemToViewmodel.Remove(solutionItem);
+                        }
                 };
             }
+        }
 
+        private void AddItem(ISolutionItem item)
+        {
+            var viewModel = new SolutionItemViewModel(itemNameRegistry, item, this);
+            _children.Add(viewModel);
+            _itemToViewmodel.Add(item, viewModel);
         }
     }
 }
