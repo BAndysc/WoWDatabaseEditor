@@ -17,7 +17,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [PrimaryKey(IsPrimaryKey=true)]
         public abstract int EntryOrGuid { get; set; }
         
-        [PersistedMember(Name = "script_source_type")]
+        [PersistedMember(Name = "source_type")]
         [PrimaryKey(IsPrimaryKey = true)]
         public abstract int ScriptSourceType { get; set; }
 
@@ -51,13 +51,7 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [PersistedMember(Name = "event_param4")]
         public abstract int EventParam4 { get; set; }
-
-        [PersistedMember(Name = "event_cooldown_min")]
-        public abstract int EventCooldownMin { get; set; }
-
-        [PersistedMember(Name = "event_cooldown_max")]
-        public abstract int EventCooldownMax { get; set; }
-
+        
         [PersistedMember(Name = "action_type")]
         public abstract int ActionType { get; set; }
 
@@ -79,21 +73,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         [PersistedMember(Name = "action_param6")]
         public abstract int ActionParam6 { get; set; }
 
-        [PersistedMember(Name = "source_type")]
-        public abstract int SourceType { get; set; }
-
-        [PersistedMember(Name = "source_param1")]
-        public abstract int SourceParam1 { get; set; }
-
-        [PersistedMember(Name = "source_param2")]
-        public abstract int SourceParam2 { get; set; }
-
-        [PersistedMember(Name = "source_param3")]
-        public abstract int SourceParam3 { get; set; }
-
-        [PersistedMember(Name = "source_condition_id")]
-        public abstract int SourceConditionId { get; set; }
-
         [PersistedMember(Name = "target_type")]
         public abstract int TargetType { get; set; }
 
@@ -105,10 +84,7 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [PersistedMember(Name = "target_param3")]
         public abstract int TargetParam3 { get; set; }
-
-        [PersistedMember(Name = "target_condition_id")]
-        public abstract int TargetConditionId { get; set; }
-
+        
         [PersistedMember(Name = "target_x")]
         public abstract float TargetX { get; set; }
 
@@ -124,5 +100,21 @@ namespace WDE.TrinityMySqlDatabase.Models
         [PersistedMember]
         public abstract string Comment { get; set; }
 
+        // those are not used on TC
+        public int SourceType { get => 0; set => throw new NotImplementedException(); }
+
+        public int SourceParam1 { get => 0; set => throw new NotImplementedException(); }
+
+        public int SourceParam2 { get => 0; set => throw new NotImplementedException(); }
+
+        public int SourceParam3 { get => 0; set => throw new NotImplementedException(); }
+
+        public int SourceConditionId { get => 0; set => throw new NotImplementedException(); }
+
+        public int TargetConditionId { get => 0; set => throw new NotImplementedException(); }
+        
+        public int EventCooldownMin { get => 0; set => throw new NotImplementedException(); }
+
+        public int EventCooldownMax { get => 0; set => throw new NotImplementedException(); }
     }
 }

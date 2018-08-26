@@ -205,7 +205,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             int? actionId = smartTypeListProvider.Get(SmartType.SmartAction, data =>
             {
-                return data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType);
+                return (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
+                        (!data.ImplicitSource || sourceId.Value <= 1 /* @todo: remove this const: this is none or self */);
             });
 
             if (!actionId.HasValue)
@@ -215,23 +216,30 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartTarget target = null;
 
-            if (actionData.UsesTarget)
+            if (actionData.UsesTarget && !actionData.TargetIsSource)
             {
                 int? targetId = smartTypeListProvider.Get(SmartType.SmartTarget, data =>
                 {
                     return (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
-                            actionData.Targets.Intersect(data.Types).Any();
+                            (actionData.Targets == null || actionData.Targets.Intersect(data.Types).Any());
                 });
 
                 if (!targetId.HasValue)
                     return;
 
-                 target = smartFactory.TargetFactory(targetId.Value);
+                target = smartFactory.TargetFactory(targetId.Value);
+            }
+            else if (actionData.TargetIsSource)
+            {
+                target = smartFactory.TargetFactory(sourceId.Value);
+                sourceId = 0;
             }
             else
                 target = smartFactory.TargetFactory(0);
 
-            
+            if (actionData.ImplicitSource)
+                sourceId = 0;
+
             SmartSource source = smartFactory.SourceFactory(sourceId.Value);
                 
             SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);

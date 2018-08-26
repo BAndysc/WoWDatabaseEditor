@@ -1,18 +1,15 @@
 Always,CONDITION_NONE
 Logical OR,CONDITION_LOGICAL_OR
 Quest
- Has quest in statue,CONDITION_QUEST_STATE_MASK
  Has quest rewarded,CONDITION_QUESTREWARDED
  Has quest taken,CONDITION_QUESTTAKEN
  Has quest completed,CONDITION_QUEST_COMPLETE
  Has quest never taken,CONDITION_QUEST_NONE
- Has quest status,CONDITION_QUEST_STATUS
- Has daily quest rewarded,CONDITION_DAILY_QUEST_REWARDED
- Has quest objective,CONDITION_QUEST_OBJECTIVE
 Map and area
  Is in map,CONDITION_MAPID
  Is in area,CONDITION_AREAID
  Is in zone,CONDITION_ZONEID
+ Is in terrain swap,CONDITION_TERRAIN_SWAP
 Unit
  Is class,CONDITION_CLASS
  Is race,CONDITION_RACE
@@ -21,18 +18,12 @@ Unit
  Is type,CONDITION_TYPE_MASK
  Is specific guid,CONDITION_OBJECT_ENTRY_GUID
  Is of creature_type,CONDITION_CREATURE_TYPE
- Is in smart phase,CONDITION_SMART_PHASE
- AI data is,CONDITION_AI_GET_DATA
- Special data is,CONDITION_SPECIAL_DATA
 World
  World value is,CONDITION_WORLD_STATE
  Is event active,CONDITION_ACTIVE_EVENT
  Instance has data,CONDITION_INSTANCE_INFO
-Auras; spells
+Auras
  Has aura,CONDITION_AURA
- Has spell,CONDITION_HAS_SPELL
- Has summon,CONDITION_HAS_SUMMON
- Owner has aura,CONDITION_OWNER_AURA
 Player
  Has achievement,CONDITION_ACHIEVEMENT
  Has title,CONDITION_TITLE
@@ -47,9 +38,6 @@ Player
 Distance
  Is near creature,CONDITION_NEAR_CREATURE
  Is near gameobject,CONDITION_NEAR_GAMEOBJECT
- Is NOT near creature,CONDITION_NOT_NEAR_CREATURE
- Is NOT near gameobject,CONDITION_NOT_NEAR_GAMEOBJECT
- Is NOT near creature with aura,CONDITION_TARGET_NO_AURA_IN_RANGE
  Distance to,CONDITION_DISTANCE_TO
 HP
  Is alive,CONDITION_ALIVE

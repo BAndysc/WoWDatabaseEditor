@@ -12,10 +12,10 @@ namespace WDE.TrinityMySqlDatabase.Models
     public abstract class MySqlQuestTemplate : DataAccessObject, IQuestTemplate
     {
         [PrimaryKey]
-        [PersistedMember(Name = "entry")]
+        [PersistedMember(Name = "ID")]
         public abstract uint Entry { get; set; }
 
-        [PersistedMember(Name = "title")]
+        [PersistedMember(Name = "LogTitle")]
         public abstract string Name { get; set; }
     }
 }

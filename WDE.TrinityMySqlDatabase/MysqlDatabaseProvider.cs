@@ -148,16 +148,10 @@ namespace WDE.TrinityMySqlDatabase
                     sqlLine.ActionParam4 = line.ActionParam4;
                     sqlLine.ActionParam5 = line.ActionParam5;
                     sqlLine.ActionParam6 = line.ActionParam6;
-                    sqlLine.SourceType = line.SourceType;
-                    sqlLine.SourceParam1 = line.SourceParam1;
-                    sqlLine.SourceParam2 = line.SourceParam2;
-                    sqlLine.SourceParam3 = line.SourceParam3;
-                    sqlLine.SourceConditionId = line.SourceConditionId;
                     sqlLine.TargetType = line.TargetType;
                     sqlLine.TargetParam1 = line.TargetParam1;
                     sqlLine.TargetParam2 = line.TargetParam2;
                     sqlLine.TargetParam3 = line.TargetParam3;
-                    sqlLine.TargetConditionId = line.TargetConditionId;
                     sqlLine.TargetX = line.TargetX;
                     sqlLine.TargetY = line.TargetY;
                     sqlLine.TargetZ = line.TargetZ;

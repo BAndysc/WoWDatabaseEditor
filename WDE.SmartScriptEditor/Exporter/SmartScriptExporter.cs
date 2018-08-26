@@ -13,7 +13,7 @@ namespace WDE.SmartScriptEditor.Exporter
 {
     public class SmartScriptExporter
     {
-        private static readonly string SAI_SQL = "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {event_cooldown_min}, {event_cooldown_max}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {action_source_id}, {source_param1}, {source_param2}, {source_param3}, {source_condition_id}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {target_condition_id}, {x}, {y}, {z}, {o}, \"{comment}\")";
+        private static readonly string SAI_SQL = "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
 
         private readonly SmartScript _script;
         private readonly ISmartFactory smartFactory;
@@ -45,7 +45,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 return;
 
             _sql.AppendLine(
-                "INSERT INTO smart_scripts (entryorguid, script_source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, event_cooldown_min, event_cooldown_max, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, source_type, source_param1, source_param2, source_param3, source_condition_id, target_type, target_param1, target_param2, target_param3, target_condition_id, target_x, target_y, target_z, target_o, comment) VALUES");
+                "INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES");
 
             int eventId = 0;
             List<string> lines = new List<string>();
@@ -169,7 +169,7 @@ namespace WDE.SmartScriptEditor.Exporter
         private void BuildDelete()
         {
             _sql.AppendLine(
-                $"DELETE FROM smart_scripts WHERE entryOrGuid = {_script.EntryOrGuid} AND script_source_type = {(int)_script.SourceType};");
+                $"DELETE FROM smart_scripts WHERE entryOrGuid = {_script.EntryOrGuid} AND source_type = {(int)_script.SourceType};");
         }
     }
 }

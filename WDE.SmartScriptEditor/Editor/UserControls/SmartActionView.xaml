@@ -16,21 +16,29 @@
                             <DataTrigger Binding="{Binding Id}" Value="187">
                                 <Setter Property="Run.Text" Value="      " />
                             </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Run.Style>
-            </Run><Run>
-                <Run.Style>    
-                    <Style TargetType="{x:Type Run}">
-                        <Setter Property="Run.Text" Value=": " />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Id}" Value="187">
+                            <DataTrigger Binding="{Binding Source.Id}" Value="0">
                                 <Setter Property="Run.Text" Value="" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Run.Style>
-            </Run><Run Text="{Binding Readable, Mode=OneWay}"></Run>
+            </Run>
+            <Run>
+                <Run.Style>    
+                    <Style TargetType="{x:Type Run}">
+                        <Setter Property="Run.Text" Value=": " />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source.Id}" Value="187">
+                                <Setter Property="Run.Text" Value="" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Source.Id}" Value="0">
+                                <Setter Property="Run.Text" Value="" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Run.Style>
+            </Run>
+            <Run Text="{Binding Readable, Mode=OneWay}"></Run>
         </TextBlock>
     </Grid>
 </UserControl>

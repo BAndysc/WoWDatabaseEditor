@@ -160,7 +160,7 @@ namespace WDE.SmartScriptEditor
     public class SmartScriptTimedActionListProvider : SmartScriptSolutionItemProvider
     {
         public SmartScriptTimedActionListProvider(Lazy<IEventAggregator> eventAggregator, Lazy<ISmartFactory> smartFactory, Lazy<IDatabaseProvider> database, Lazy<ISpellStore> spellStore)
-            : base("Timed action list", "Timed action list contains list of actions played in time, this can be used to create RP events, cameras, etc.", "SmartScriptTimedActionListIcon", SmartScriptType.Timed)
+            : base("Timed action list", "Timed action list contains list of actions played in time, this can be used to create RP events, cameras, etc.", "SmartScriptTimedActionListIcon", SmartScriptType.TimedActionList)
         {
         }
 

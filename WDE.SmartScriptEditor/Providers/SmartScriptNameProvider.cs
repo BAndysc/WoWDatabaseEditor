@@ -46,7 +46,7 @@ namespace WDE.SmartScriptEditor.Providers
                         if (spellStore.HasSpell((uint)Entry))
                             return spellStore.GetName((uint)Entry);
                         return (item.SmartType == SmartScriptType.Aura ? "Aura " : "Spell ") + Entry;
-                    case SmartScriptType.Timed:
+                    case SmartScriptType.TimedActionList:
                         return "Timed list " + Entry;
                     case SmartScriptType.Cinematic:
                         return "Cinematic " + Entry;

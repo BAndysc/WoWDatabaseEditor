@@ -1,4 +1,5 @@
 [
+
 	{
 	  "id": -1,
 	  "name": "CONDITION_LOGICAL_OR",
@@ -29,14 +30,9 @@
 	      	"2": {"name": "EFFECT_2"}
 	      },
 	      "description": "Each spell has 'effects', you can see them in Spell Work"
-	    },
-	    {
-	    	"type": "Parameter",
-	    	"name": "Stacks count",
-	    	"description": "If 0, any amount is ok otherwise unit needs 'stack count' or more"
 	    }
 	  ],
-	  "description": "{target} has aura of spell {pram1}, effect {pram2}"
+	  "description": "If {target} has aura of spell {pram1}, effect {pram2}"
 	},
 
 	{
@@ -55,10 +51,10 @@
 	    {
 	      "type": "BoolParameter",
 	      "name": "Check bank",
-	      "description": "true, core will check items in bank too"
+	      "description": "If true, core will check items in bank too"
 	    }
 	  ],
-	  "description": "{target} has {pram2} of item {pram1} in backpack{pram3value:choose(0):| or in bank}"
+	  "description": "If {target} has {pram2} of item {pram1} in backpack{pram3value:choose(0):| or in bank}"
 	},
 
 	{
@@ -71,7 +67,7 @@
 	      "description": "Item id to check (this condition applies only to players!)"
 	    },
 	  ],
-	  "description": "{target} has equiped item {pram1}"
+	  "description": "If {target} has equiped item {pram1}"
 	},
 
 	{
@@ -83,7 +79,7 @@
 	      "name": "Zone"
 	    },
 	  ],
-	  "description": "{target} in zone {pram1}"
+	  "description": "If {target} in zone {pram1}"
 	},
 
 	{
@@ -111,7 +107,7 @@
 	      }
 	    },
 	  ],
-	  "description": "{target} has at least reputation {pram2} to faction {pram1}"
+	  "description": "If {target} has at least reputation {pram2} to faction {pram1}"
 	},
 
 	{
@@ -128,7 +124,7 @@
 	      }
 	    },
 	  ],
-	  "description": "{target} belongs to {pram1}"
+	  "description": "If {target} belongs to {pram1}"
 	},
 
 	{
@@ -145,7 +141,7 @@
 	      "name": "Minimum skill value"
 	    },
 	  ],
-	  "description": "{target} has at least value {pram2} for skill {pram1}"
+	  "description": "If {target} has at least value {pram2} for skill {pram1}"
 	},
 
 	{
@@ -158,7 +154,7 @@
 	      "description": "Quest ID to check"
 	    },
 	  ],
-	  "description": "{target} has quest {pram1} rewarded"
+	  "description": "If {target} has quest {pram1} rewarded"
 	},
 
 	{
@@ -171,7 +167,7 @@
 	      "description": "Quest ID to check"
 	    },
 	  ],
-	  "description": "{target} has quest {pram1} active"
+	  "description": "If {target} has quest {pram1} active"
 	},
 
 	{
@@ -189,7 +185,7 @@
 	      }
 	    },
 	  ],
-	  "description": "{target} has drunk state {pram1}"
+	  "description": "If {target} has drunk state {pram1}"
 	},
 	{
 	  "id": 11,
@@ -204,7 +200,7 @@
 	      "name": "Variable Value"
 	    },
 	  ],
-	  "description": "world variable {pram1} is set to {pram2}"
+	  "description": "If world variable {pram1} is set to {pram2}"
 	},
 
 	{
@@ -216,7 +212,7 @@
 	      "name": "Event"
 	    },
 	  ],
-	  "description": "event {pram1} is active"
+	  "description": "If event {pram1} is active"
 	},
 
 	{
@@ -231,7 +227,7 @@
 	    {
 	      "type": "Parameter",
 	      "name": "Value",
-	      "description": "BOSS_STATE, avaliable values: NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5"
+	      "description": "If BOSS_STATE, avaliable values: NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5"
 	    },
 	    {
 	      "type": "SwitchParameter",
@@ -244,7 +240,7 @@
 	      }
 	    }
 	  ],
-	  "description": "{pram3value:choose(0|1|2|3):instance data {pram1} equals {pram2}|??????|boss {pram1} {pram2value:choose(0|1|2|3|4|5):has not started|is in progress|failed|special state|is to be decided?}|data64[{pram1}] = {pram2}}"
+	  "description": "If {pram3value:choose(0|1|2|3):instance data {pram1} equals {pram2}|??????|boss {pram1} {pram2value:choose(0|1|2|3|4|5):has not started|is in progress|failed|special state|is to be decided?}|data64[{pram1}] = {pram2}}"
 	},
 
 	{
@@ -257,7 +253,7 @@
 	      "description": "Quest ID to check"
 	    },
 	  ],
-	  "description": "{target} has never finished not has active quest {pram1}"
+	  "description": "If {target} has never finished not has active quest {pram1}"
 	},
 
 	{
@@ -270,7 +266,7 @@
 	      "description": "Only for players"
 	    },
 	  ],
-	  "description": "{target} is class {pram1}"
+	  "description": "If {target} is class {pram1}"
 	},
 
 	{
@@ -283,7 +279,7 @@
 	      "description": "Only for players"
 	    },
 	  ],
-	  "description": "{target} is race {pram1}"
+	  "description": "If {target} is race {pram1}"
 	},
 
 	{
@@ -295,7 +291,7 @@
 	      "name": "Achievement"
 	    },
 	  ],
-	  "description": "{target} has achievement {pram1} completed"
+	  "description": "If {target} has achievement {pram1} completed"
 	},
 
 	{
@@ -307,7 +303,7 @@
 	      "name": "Title ID"
 	    },
 	  ],
-	  "description": "{target} has title {pram1}"
+	  "description": "If {target} has title {pram1}"
 	},
 
 	{
@@ -319,7 +315,7 @@
 	      "name": "Spawn mask"
 	    },
 	  ],
-	  "description": "{target} in spawn mask {pram1}"
+	  "description": "If {target} in spawn mask {pram1}"
 	},
 
 	{
@@ -336,7 +332,7 @@
 	      }
 	    },
 	  ],
-	  "description": "{target} is {pram1}"
+	  "description": "If {target} is {pram1}"
 	},
 
 	{
@@ -376,7 +372,7 @@
 	      }
 	    },
 	  ],
-	  "description": "{target} has unit state {pram1}"
+	  "description": "If {target} has unit state {pram1}"
 	},
 
 	{
@@ -388,7 +384,7 @@
 	      "name": "Map"
 	    },
 	  ],
-	  "description": "{target} in map {pram1}"
+	  "description": "If {target} in map {pram1}"
 	},
 
 	{
@@ -400,7 +396,7 @@
 	      "name": "Area"
 	    },
 	  ],
-	  "description": "{target} in area {pram1}"
+	  "description": "If {target} in area {pram1}"
 	},
 
 	{
@@ -413,7 +409,7 @@
 	      "description": "From creature_template.type"
 	    },
 	  ],
-	  "description": "{target} is {pram1}"
+	  "description": "If {target} is {pram1}"
 	},
 
 	{
@@ -426,7 +422,7 @@
 	      "description": "Only for players"
 	    },
 	  ],
-	  "description": "{target} has learned spell {pram1}"
+	  "description": "If {target} has learned spell {pram1}"
 	},
 
 	{
@@ -438,7 +434,7 @@
 	      "name": "Phase"
 	    },
 	  ],
-	  "description": "{target} in phase {pram1}"
+	  "description": "If {target} in phase {pram1}"
 	},
 
 	{
@@ -463,7 +459,7 @@
 	      "description": "Comparison type"
 	    },
 	  ],
-	  "description": "{target}'s level {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+	  "description": "If {target}'s level {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
 	},
 
 	{
@@ -476,7 +472,7 @@
 	      "description": "Quest id which player has to have completed with all objectives, but not yet rewarded"
 	    },
 	  ],
-	  "description": "{target} has completed quest {pram1} (but not yet rewarded)"
+	  "description": "If {target} has completed quest {pram1} (but not yet rewarded)"
 	},
 
 	{
@@ -492,7 +488,7 @@
 	      "name": "Distance"
 	    },
 	  ],
-	  "description": "there is creature {pram1} within range {pram2} yards to {target}"
+	  "description": "If there is creature {pram1} within range {pram2} yards to {target}"
 	},
 
 	{
@@ -508,7 +504,7 @@
 	      "name": "Distance"
 	    },
 	  ],
-	  "description": "there is gameobject {pram1} within range {pram2} yards to {target}"
+	  "description": "If there is gameobject {pram1} within range {pram2} yards to {target}"
 	},
 
 	{
@@ -540,7 +536,7 @@
 	      "name": "Guid from DB"
 	    }
 	  ],
-	  "description": "{target} is {pram1}{pram2value:choose(0):|, entry is {pram2}} and guid is {pram3}"
+	  "description": "If {target} is {pram1}{pram2value:choose(0):|, entry is {pram2}} and guid is {pram3}"
 	},
 
 	{
@@ -564,7 +560,7 @@
 		   },
 		}
 	  ],
-	  "description": "{target} is of type {pram1}"
+	  "description": "If {target} is of type {pram1}"
 	},
 
 	{
@@ -592,7 +588,7 @@
 		  },
 	    },
 	  ],
-	  "description": "{target} {pram2value:choose(0|1|2|3|4|5):is {pram1}|is in party with {pram2}|is in raid or party with {pram2}|is owned by {pram1}|is passenger of {pram1}|is summoned by {pram1}}"
+	  "description": "If {target} {pram2value:choose(0|1|2|3|4|5):is {pram1}|is in party with {pram2}|is in raid or party with {pram2}|is owned by {pram1}|is passenger of {pram1}|is summoned by {pram1}}"
 	},
 
 	{
@@ -622,7 +618,7 @@
 		  }
 	    },
 	  ],
-	  "description": "{target} reaction to {pram1} is {pram2}"
+	  "description": "If {target} reaction to {pram1} is {pram2}"
 	},
 	{
 	  "id": 35,
@@ -652,13 +648,13 @@
 		  },
 	    }
 	  ],
-	  "description": "{target} distance to {pram1} {pram3value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram2} yards"
+	  "description": "If {target} distance to {pram1} {pram3value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram2} yards"
 	},
 
 	{
 	  "id": 36,
 	  "name": "CONDITION_ALIVE",
-	  "description": "{target} is alvie"
+	  "description": "If {target} is alvie"
 	},
 
 	{
@@ -681,7 +677,7 @@
 		  },
 	    },
 	  ],
-	  "description": "{target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+	  "description": "If {target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
 	},
 
 	{
@@ -704,252 +700,20 @@
 		  },
 	    },
 	  ],
-	  "description": "{target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+	  "description": "If {target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}%"
 	},
 
 	{
 	  "id": 39,
-	  "name": "CONDITION_SMART_PHASE",
+	  "name": "CONDITION_TERRAIN_SWAP",
 	  "parameters": [
 	    {
 	      "type": "Parameter",
-	      "name": "Phase ID"
+	      "name": "Terrain Swap",
+	      "description": "To explain"
 	    },
 	  ],
-	  "description": "{target}'s selected unit is in smart phase {pram1}"
-	},
-
-	{
-	  "id": 40,
-	  "name": "CONDITION_NOT_NEAR_CREATURE",
-	  "parameters": [
-	    {
-	      "type": "CreatureParameter",
-	      "name": "Creature"
-	    },
-	    {
-	      "type": "Parameter",
-	      "name": "Distance"
-	    },
-	  ],
-	  "description": "there is NOT creature {pram1} within range {pram2} yards to {target} (must be player)"
-	},
-
-	{
-	  "id": 41,
-	  "name": "CONDITION_NOT_NEAR_GAMEOBJECT",
-	  "parameters": [
-	    {
-	      "type": "GameObjectParameter",
-	      "name": "Gameobject"
-	    },
-	    {
-	      "type": "Parameter",
-	      "name": "Distance"
-	    },
-	  ],
-	  "description": "there is NOT gameobject {pram1} within range {pram2} yards to {target} (must be player)"
-	},
-
-	{
-	  "id": 42,
-	  "name": "CONDITION_TARGET_NO_AURA_IN_RANGE",
-	  "parameters": [
-	    {
-	      "type": "SpellParameter",
-	      "name": "Spell"
-	    },
-	    {
-	      "type": "CreatureParameter",
-	      "name": "Creature"
-	    },
-	    {
-	      "type": "Parameter",
-	      "name": "Distance"
-	    },
-	  ],
-	  "description": "there is NOT creature {pram2} within range {pram3} yards with aura {pram1} to {target} (must be player)"
-	},
-
-
-	{
-	  "id": 43,
-	  "name": "CONDITION_QUEST_STATUS",
-	  "parameters": [
-	    {
-	      "type": "QuestParameter",
-	      "name": "Quest"
-	    },
-	    {
-	      "type": "SwitchParameter",
-	      "name": "State",
-	      "values": {
-	      	"1": {"name": "QUEST_STATUS_COMPLETE"},
-	      	"3": {"name": "QUEST_STATUS_INCOMPLETE"},
-	      	"4": {"name": "QUEST_STATUS_COMPLETE | QUEST_STATUS_INCOMPLETE"},
-	      	"6": {"name": "QUEST_STATUS_REWARDED"},
-	      	"7": {"name": "QUEST_STATUS_REWARDED | QUEST_STATUS_COMPLETE"},
-	      	"10": {"name": "QUEST_STATUS_REWARDED | QUEST_STATUS_COMPLETE | QUEST_STATUS_INCOMPLETE"}
-	      }
-	    }
-	  ],
-	  "description": "{target} (player) has quest {pram1} in state {pram2}"
-	},
-
-	{
-	  "id": 44,
-	  "name": "CONDITION_HAS_SPELL",
-	  "parameters": [
-	    {
-	      "type": "SpellParameter",
-	      "name": "Spell"
-	    }
-	  ],
-	  "description": "{target} has spell {pram1}"
-	},
-
-	{
-	  "id": 45,
-	  "name": "CONDITION_HAS_SUMMON",
-	  "parameters": [
-	    {
-	      "type": "SwitchParameter",
-	      "name": "Summon type",
-	      "values": {
-	      	"1": {"name": "Guardian"},
-	      	"2": {"name": "Minion"},
-	      }
-	    },
-	    {
-	    	"type": "CreatureParameter",
-	    	"name": "Entry"
-	    }
-	  ],
-	  "description": "{target} has NOT {pram1} {pram2}"
-	},
-	{
-	  "id": 46,
-	  "name": "CONDITION_DAILY_QUEST_REWARDED",
-	  "parameters": [
-	    {
-	    	"type": "QuestParameter",
-	    	"name": "Quest"
-	    }
-	  ],
-	  "description": "{target} has daily quest {pram1} rewarded"
-	},
-	{
-	  "id": 100,
-	  "name": "CONDITION_OWNER_AURA",
-	  "parameters": [
-	    {
-	    	"type": "SpellParameter",
-	    	"name": "Spell"
-	    },
-	    {
-	    	"type": "Parameter",
-	    	"name": "Effect index"
-	    },
-	    {
-	    	"type": "Parameter",
-	    	"name": "Stacks"
-	    }
-
-	  ],
-	  "description": "{target} has {pram3value:choose(0):|{pram3} stacks of }aura {pram1} effect {pram2}"
-	},
-
-	{
-	  "id": 101,
-	  "name": "CONDITION_AI_GET_DATA",
-	  "parameters": [
-	    {
-	    	"type": "Parameter",
-	    	"name": "Data"
-	    },
-	    {
-	    	"type": "Parameter",
-	    	"name": "Value"
-	    },
-	    {
-	    	"type": "SwitchParameter",
-	      	"name": "Comparison",
-		  	"values": {
-			    "0": {"name": "equals (=)"},
-				"1": {"name": "higher than (>)"},
-				"2": {"name": "lower than (<)"},
-				"3": {"name": "higher or equals (>=)"},
-				"4": {"name": "lower or equals (<=)"}
-		  	},
-	      	"description": "Comparison type"
-	    },
-	  ],
-	  "description": "{target}'s ⓵ {datapram1} ⓵ {pram3value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram2}"
-	},
-	{
-	  "id": "102",
-	  "name": "CONDITION_SPECIAL_DATA",
-	  "parameters": [
-	    {
-	    	"type": "Parameter",
-	    	"name": "Value"
-	    },
-	    {
-	    	"type": "SwitchParameter",
-	      	"name": "Comparison",
-		  	"values": {
-			    "0": {"name": "equals (=)"},
-				"1": {"name": "higher than (>)"},
-				"2": {"name": "lower than (<)"},
-				"3": {"name": "higher or equals (>=)"},
-				"4": {"name": "lower or equals (<=)"}
-		  	},
-	      	"description": "Comparison type"
-	    },
-	  ],
-	  "description": "{target}'s special data {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
-	},
-	{
-		"id": 103,
-		"name": "CONDITION_QUEST_STATE_MASK",
-		"parameters": [
-			{
-				"type": "QuestParameter",
-				"name": "Quest"
-			},
-			{
-				"type": "FlagParameter",
-				"name": "QuestStatus",
-				"values": {
-					"1": {"name": "none", "description": "Player does not have or had quest at all. He could accept it, but he did not (yet)."},
-					"2": {"name": "complete", "description": "Player fulfilled objectives, but did not hand it in yet."},
-					"8": {"name": "incomplete", "description": "Player did not fulfill objectives yet"},
-					"32": {"name": "failed", "description": "Player failed to fulfill objectives for any reason, e.g. time limit"},
-					"64": {"name": "rewarded", "description": "Player handed quest in and this is sort of a post-quest interaction"},	
-				},
-			},
-		],
-		"description": "{target}'s quest {pram1} in state {pram2}"
-	},
-	{
-		"id":  104,
-		"name": "CONDITION_QUEST_OBJECTIVE",
-		"parameters": [
-			{
-				"type": "QuestParameter",
-				"name": "Quest"
-			},
-			{
-				"type": "CreatureParameter",
-				"name": "Kill credit"
-			},
-			{
-				"type": "Parameter",
-				"name": "Count"
-			}
-		],
-		"description": "{target}'s quest {pram1} kill credit {pram2} is {pram3}"
+	  "description": "If {target} in terrain swap {pram1}"
 	}
 
 ]
-

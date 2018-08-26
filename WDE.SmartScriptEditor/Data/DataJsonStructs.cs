@@ -138,7 +138,7 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "conditions")]
         public IList<SmartConditionalJsonData> Conditions { get; set; }
 
-        [JsonProperty(PropertyName = "valid_types")]
+        [JsonProperty(PropertyName = "valid_types", ItemConverterType = typeof(StringEnumConverter))]
         public IList<SmartScriptType> ValidTypes { get; set; }
 
         [JsonProperty(PropertyName = "description")]
@@ -164,6 +164,12 @@ namespace WDE.SmartScriptEditor.Data
 
         [JsonProperty(PropertyName = "uses_target")]
         public bool UsesTarget { get; set; }
+
+        [JsonProperty(PropertyName = "implicit_source")]
+        public bool ImplicitSource { get; set; }
+
+        [JsonProperty(PropertyName = "target_is_source")]
+        public bool TargetIsSource { get; set; }
 
         [JsonProperty(PropertyName = "is_timed")]
         public bool IsTimed { get; set; }

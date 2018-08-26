@@ -131,7 +131,9 @@ namespace WDE.SmartScriptEditor.Data
 
             SetParameterObjects(target, SmartDataManager.GetInstance().GetRawData(SmartType.SmartTarget, id));
 
-            if (SmartDataManager.GetInstance().GetRawData(SmartType.SmartTarget, id).Types.Contains("Position"))
+            var targetTypes = SmartDataManager.GetInstance().GetRawData(SmartType.SmartTarget, id).Types;
+
+            if (targetTypes != null && targetTypes.Contains("Position"))
                 target.IsPosition = true;
 
             return target;
