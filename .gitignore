@@ -261,4 +261,3 @@ __pycache__/
 *.pyc
 
 # dbc
-WDE.DbcStore/dbc/*

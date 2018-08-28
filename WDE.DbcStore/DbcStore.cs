@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DBFilesClient.NET;
-
 using Prism.Ioc;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
-using WDE.DbcStore.DbcReader;
 using WDE.DbcStore.Models;
 
 namespace WDE.DbcStore
 {
     public class DbcStore : IDbcStore, ISpellStore
-    {
-        private IContainerProvider _container;
-        
+    {        
         private Dictionary<int, string> SpellStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> SkillStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> LanguageStore { get; } = new Dictionary<int, string>();
@@ -32,49 +28,63 @@ namespace WDE.DbcStore
         public Dictionary<int, string> AchievementStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> ItemStore { get; } = new Dictionary<int, string>();
 
-
         public DbcStore(IParameterFactory parameterFactory)
         {
-            Load("spell.dbc", 20, SpellStore);
-            Load("AreaTable.dbc", 10, AreaStore);
-            Load("item-sparse.db2", 98, ItemStore);
-            Load("SoundEntries.dbc", 1, SoundStore);
-            Load("movie.dbc", 0, MovieStore);
-            Load("chrClasses.dbc", 2, ClassStore);
-            Load("chrRaces.dbc", 10, RaceStore);
-            Load("achievement.dbc", 3, AchievementStore);
-            Load("Phase.dbc", 0, PhaseStore);
-            Load("Emotes.dbc", 0, EmoteStore);
-            Load("SkillLine.dbc", 1, SkillStore);
-            Load("Languages.dbc", 0, LanguageStore);
+            // Load("spell.dbc", 20, SpellStore);
+            // Load("AreaTable.dbc", 10, AreaStore);
+            // Load("achievement.dbc", 3, AchievementStore);
+            // Load("chrClasses.dbc", 2, ClassStore);
+            // Load("chrRaces.dbc", 10, RaceStore);
+            // Load("Emotes.dbc", 0, EmoteStore);
+            // Load("item-sparse.db2", 98, ItemStore);
+            // Load("Languages.dbc", 0, LanguageStore);
+            // Load("movie.dbc", 0, MovieStore);
+            // Load("Phase.dbc", 0, PhaseStore);
+            // Load("SoundEntries.dbc", 1, SoundStore);
 
+            WDBXEditor.Storage.Database.LoadDefinitions();
+
+            LoadLegion("spell.db2", 0, 1, SpellStore);
+            LoadLegion("achievement.db2", 12, 1, AchievementStore);
+            LoadLegion("AreaTable.db2", 0, 2, AreaStore);
+            LoadLegion("chrClasses.db2", 19, 1, ClassStore);
+            LoadLegion("chrRaces.db2", 34, 2, RaceStore);
+            LoadLegion("Emotes.db2", 0, 2, EmoteStore);
+            LoadLegion("ItemSparse.db2", 0, 2, ItemStore);
+            LoadLegion("Languages.db2", 1, 0, LanguageStore);
+            // LoadLegion("Phase.db2", 1, 0, PhaseStore); // no names in legion :(
+            LoadLegion("SoundKitName.db2", 0, 1, SoundStore);
+            
             parameterFactory.Register("SpellParameter", (name) => new DbcParameter(name, SpellStore));
             parameterFactory.Register("EmoteParameter", (name) => new DbcParameter(name, EmoteStore));
             parameterFactory.Register("SoundParameter", (name) => new DbcParameter(name, SoundStore));
-            parameterFactory.Register("MovieParameter", (name) => new DbcParameter(name, MovieStore));
             parameterFactory.Register("ZoneParameter", (name) => new DbcParameter(name, AreaStore));
             parameterFactory.Register("PhaseParameter", (name) => new DbcParameter(name, PhaseStore));
         }
         
-        private void Load(string filename, int fields_to_skip, Dictionary<int, string> dictionary)
+        //private void Load(string filename, int fields_to_skip, Dictionary<int, string> dictionary)
+        //{
+        //    IClientDBReader mReader = DBReaderFactory.GetReader("dbc/" + filename);
+
+        //    foreach (var br in mReader.Rows) // Add rows
+        //    {
+        //        int id = br.ReadInt32();
+        //        for (int j = 0; j < fields_to_skip; ++j)
+        //            br.ReadInt32();
+        //        string name = mReader.StringTable[br.ReadInt32()] ?? filename.Replace(".dbc", "") + " " + id;
+        //        dictionary[id] = name;
+        //    }
+        //}
+        
+        private void LoadLegion(string filename, int id, int index, Dictionary<int, string> dictionary)
         {
-            IWowClientDBReader mReader;
-            if (filename.Contains(".dbc"))
-                mReader = new DBCReader("dbc/" + filename);
-            else
-                mReader = new DB2Reader("dbc/" + filename);
+            WDBXEditor.Reader.DBReader r = new WDBXEditor.Reader.DBReader();
+            var dbEntry = r.Read($"dbc/{filename}");
 
-            for (int i = 0; i < mReader.RecordsCount; ++i)
-            {
-                BinaryReader br = mReader[i];
-                int id = br.ReadInt32();
-                for (int j = 0; j < fields_to_skip; ++j)
-                    br.ReadInt32();
-                string name = mReader.StringTable[br.ReadInt32()] ?? filename.Replace(".dbc", "") + " " + id;
-                dictionary[id] = name;
-            }
+            foreach (DataRow row in dbEntry.Data.Rows)
+                dictionary.Add(Convert.ToInt32(row.ItemArray[id].ToString()), row.ItemArray[index].ToString());
         }
-
+        
         public IEnumerable<uint> Spells
         {
             get
