@@ -188,6 +188,7 @@
 
 
         <TreeView x:Name="tv" ItemsSource="{Binding Root}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
+            
             <attachedCommandBehavior:CommandBehaviorCollection.Behaviors>
                 <attachedCommandBehavior:BehaviorBinding Event="MouseDoubleClick" Command="{Binding RequestOpenItem}" CommandParameter="{Binding ElementName=tv, Path=SelectedItem}"/>
             </attachedCommandBehavior:CommandBehaviorCollection.Behaviors>

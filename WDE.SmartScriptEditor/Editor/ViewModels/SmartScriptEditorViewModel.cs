@@ -269,13 +269,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             List<KeyValuePair<Parameter, string>> paramss = new List<KeyValuePair<Parameter, string>>();
            
             for (int i = 0; i < obj.Source.ParametersCount; ++i)
-                paramss.Add(new KeyValuePair<Parameter, string>(obj.Source.GetParameter(i), "Source"));
-
+                if (!obj.Source.GetParameter(i).Name.Equals("empty"))
+                    paramss.Add(new KeyValuePair<Parameter, string>(obj.Source.GetParameter(i), "Source"));
+            
             for (int i = 0; i < obj.ParametersCount; ++i)
-                paramss.Add(new KeyValuePair<Parameter, string>(obj.GetParameter(i), "Action"));
-
+                if (!obj.GetParameter(i).Name.Equals("empty"))
+                    paramss.Add(new KeyValuePair<Parameter, string>(obj.GetParameter(i), "Action"));
+            
             for (int i = 0; i < obj.Target.ParametersCount; ++i)
-                paramss.Add(new KeyValuePair<Parameter, string>(obj.Target.GetParameter(i), "Target"));
+                if (!obj.Target.GetParameter(i).Name.Equals("empty"))
+                    paramss.Add(new KeyValuePair<Parameter, string>(obj.Target.GetParameter(i), "Target"));
 
             for (int i = 0; i < 4; ++i)
             {
@@ -306,7 +309,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             paramss.Add(new KeyValuePair<Parameter, string>(ev.CooldownMin, "General"));
 
             for (int i = 0; i < ev.ParametersCount; ++i)
-                paramss.Add(new KeyValuePair<Parameter, string>(ev.GetParameter(i), "Event specific"));
+                if (!ev.GetParameter(i).Name.Equals("empty"))
+                    paramss.Add(new KeyValuePair<Parameter, string>(ev.GetParameter(i), "Event specific"));
 
             v.DataContext = new ParametersEditViewModel(itemFromListProvider, ev, paramss);
             v.ShowDialog();

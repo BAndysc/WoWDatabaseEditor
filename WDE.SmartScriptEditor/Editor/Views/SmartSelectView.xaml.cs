@@ -30,5 +30,19 @@ namespace WDE.SmartScriptEditor.Editor.Views
             DialogResult = (Items.SelectedItem != null);
             Close();
         }
+
+        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (Items.Items.Count > 0)
+                {
+                    if (Items.SelectedIndex == -1)
+                        Items.SelectedIndex = 0;
+
+                    Control_OnMouseDoubleClick(null, null);
+                }
+            }
+        }
     }
 }

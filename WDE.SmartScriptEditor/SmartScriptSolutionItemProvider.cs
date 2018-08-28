@@ -159,14 +159,19 @@ namespace WDE.SmartScriptEditor
     [AutoRegister]
     public class SmartScriptTimedActionListProvider : SmartScriptSolutionItemProvider
     {
-        public SmartScriptTimedActionListProvider(Lazy<IEventAggregator> eventAggregator, Lazy<ISmartFactory> smartFactory, Lazy<IDatabaseProvider> database, Lazy<ISpellStore> spellStore)
+        private readonly Lazy<ICreatureEntryProviderService> creatureEntryProvider;
+        public SmartScriptTimedActionListProvider(Lazy<ICreatureEntryProviderService> creatureEntryProvider)
             : base("Timed action list", "Timed action list contains list of actions played in time, this can be used to create RP events, cameras, etc.", "SmartScriptTimedActionListIcon", SmartScriptType.TimedActionList)
         {
+            this.creatureEntryProvider = creatureEntryProvider;
         }
 
         public override ISolutionItem CreateSolutionItem()
         {
-            return new SmartScriptSolutionItem(0, SmartScriptType.AreaTrigger);
+            uint? entry = creatureEntryProvider.Value.GetEntryFromService();
+            if (!entry.HasValue)
+                return null;
+            return new SmartScriptSolutionItem((int)entry.Value, SmartScriptType.TimedActionList);
         }
     }
 }

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Helpers"
-             Height="440" Width="637" WindowStartupLocation="CenterScreen">
+             Height="440" Width="637" WindowStartupLocation="CenterScreen" helpers:FocusBehavior.FocusFirst="true">
     <Grid Margin="6">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="{Binding SelectedItem.Help}" TextWrapping="WrapWithOverflow"></TextBlock>
-        <TextBox helpers:FocusBehavior.FocusFirst="true" Grid.Column="1" Text="{Binding SearchBox, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"></TextBox>
+        <TextBox KeyUp="TextBox_KeyUp"  Grid.Column="1" Text="{Binding SearchBox, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"></TextBox>
         <ListView x:Name="Items" MouseDoubleClick="Control_OnMouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled"  SelectedItem="{Binding SelectedItem}" Margin="0,6,0,6" Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding AllItems}">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
