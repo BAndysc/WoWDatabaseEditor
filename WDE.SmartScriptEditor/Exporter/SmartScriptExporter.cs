@@ -50,20 +50,50 @@ namespace WDE.SmartScriptEditor.Exporter
             int eventId = 0;
             List<string> lines = new List<string>();
 
+            bool previousWasWait = false;
+            int nextTriggerId = 1000;
+
+
+            //@todo: don't use hardcoded IDs!!!!
             foreach (SmartEvent e in _script.Events)
             {
                 if (e.Actions.Count == 0)
                     continue;
 
                 e.ActualId = eventId;
-                lines.Add(GenerateSingleSai(eventId, e, e.Actions[0], (e.Actions.Count == 1 ? 0 : eventId + 1)));
 
-                eventId++;
-
-                for (int index = 1; index < e.Actions.Count; ++index)
+                for (int index = 0; index < e.Actions.Count; ++index)
                 {
-                    lines.Add(GenerateSingleSai(eventId, smartFactory.EventFactory(61),
-                        e.Actions[index], (e.Actions.Count - 1 == index ? 0 : eventId + 1)));
+                    SmartEvent actualEvent = e;
+
+                    if (previousWasWait)
+                    {
+                        actualEvent = smartFactory.EventFactory(59);
+                        actualEvent.SetParameter(0, nextTriggerId++);
+                    }
+                    else if (index > 0)
+                        actualEvent = smartFactory.EventFactory(61);
+
+                    int linkTo = (e.Actions.Count - 1 == index ? 0 : eventId + 1);
+
+                    SmartAction actualAction = e.Actions[index];
+
+                    if (actualAction.Id == 9999)
+                    {
+                        linkTo = 0;
+                        SmartAction waitAction = actualAction;
+                        actualAction = smartFactory.ActionFactory(67, smartFactory.SourceFactory(0), smartFactory.TargetFactory(0));
+                        actualAction.SetParameter(0, nextTriggerId);
+                        actualAction.SetParameter(1, waitAction.GetParameter(0).GetValue());
+                        actualAction.SetParameter(2, waitAction.GetParameter(0).GetValue());
+
+                        previousWasWait = true;
+                    }
+                    else
+                        previousWasWait = false;
+
+                    lines.Add(GenerateSingleSai(eventId, actualEvent, actualAction, linkTo));
+
                     eventId++;
                 }
             }

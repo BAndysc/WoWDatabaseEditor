@@ -80,10 +80,10 @@
                 "description": "True - only target will hear the sound, false - everyone in visibility range will hear the sound"
             }
         ],
-        "description": "Play sound {pram1} to {pram2value:choose(0):every player in visibility range of {target}|{target}}",
+        "description": "{target}: Play sound {pram1} to {pram2value:choose(0):every player in visibility range of {target}|{target}}",
         "name_readable": "Sound",
         "uses_target": true,
-        "target_is_source": false,
+        "target_is_source": true,
         "implicit_source": false
     },
     {
@@ -4666,5 +4666,20 @@
         "uses_target": true,
         "target_is_source": true,
         "implicit_source": false
+    },
+    {
+        "id": 9999,
+        "name": "SMART_ACTION_META_WAIT",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Seconds to wait"
+            }
+        ],
+        "description": "       Wait {pram1} seconds",
+        "name_readable": "Wait",
+        "uses_target": false,
+        "target_is_source": false,
+        "implicit_source": true
     }
 ]
