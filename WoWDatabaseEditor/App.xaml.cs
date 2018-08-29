@@ -39,9 +39,15 @@ namespace WoWDatabaseEditor
     /// </summary>
     public partial class App : PrismApplication
     {
+        private SplashScreenView splash;
+
         protected override Window CreateShell()
         {
-            return Container.Resolve<SplashScreenView>();
+            splash = Container.Resolve<SplashScreenView>();
+
+            splash.Show();
+
+            return splash;
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
@@ -123,6 +129,8 @@ namespace WoWDatabaseEditor
 
             var eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+
+            splash.Close();
 
             mainWindow.ShowDialog();
             Current.Shutdown();
