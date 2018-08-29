@@ -13,7 +13,9 @@ using WDE.DbcStore.Models;
 namespace WDE.DbcStore
 {
     public class DbcStore : IDbcStore, ISpellStore
-    {        
+    {
+        private readonly IParameterFactory parameterFactory;
+
         private Dictionary<int, string> SpellStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> SkillStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> LanguageStore { get; } = new Dictionary<int, string>();
@@ -30,18 +32,11 @@ namespace WDE.DbcStore
 
         public DbcStore(IParameterFactory parameterFactory)
         {
-            // Load("spell.dbc", 20, SpellStore);
-            // Load("AreaTable.dbc", 10, AreaStore);
-            // Load("achievement.dbc", 3, AchievementStore);
-            // Load("chrClasses.dbc", 2, ClassStore);
-            // Load("chrRaces.dbc", 10, RaceStore);
-            // Load("Emotes.dbc", 0, EmoteStore);
-            // Load("item-sparse.db2", 98, ItemStore);
-            // Load("Languages.dbc", 0, LanguageStore);
-            // Load("movie.dbc", 0, MovieStore);
-            // Load("Phase.dbc", 0, PhaseStore);
-            // Load("SoundEntries.dbc", 1, SoundStore);
+            this.parameterFactory = parameterFactory;
+        }
 
+        internal void Load()
+        {
             WDBXEditor.Storage.Database.LoadDefinitions();
 
             LoadLegion("spell.db2", 0, 1, SpellStore);
@@ -54,7 +49,7 @@ namespace WDE.DbcStore
             LoadLegion("Languages.db2", 1, 0, LanguageStore);
             // LoadLegion("Phase.db2", 1, 0, PhaseStore); // no names in legion :(
             LoadLegion("SoundKitName.db2", 0, 1, SoundStore);
-            
+
             parameterFactory.Register("SpellParameter", (name) => new DbcParameter(name, SpellStore));
             parameterFactory.Register("EmoteParameter", (name) => new DbcParameter(name, EmoteStore));
             parameterFactory.Register("SoundParameter", (name) => new DbcParameter(name, SoundStore));
@@ -62,24 +57,15 @@ namespace WDE.DbcStore
             parameterFactory.Register("PhaseParameter", (name) => new DbcParameter(name, PhaseStore));
         }
         
-        //private void Load(string filename, int fields_to_skip, Dictionary<int, string> dictionary)
-        //{
-        //    IClientDBReader mReader = DBReaderFactory.GetReader("dbc/" + filename);
-
-        //    foreach (var br in mReader.Rows) // Add rows
-        //    {
-        //        int id = br.ReadInt32();
-        //        for (int j = 0; j < fields_to_skip; ++j)
-        //            br.ReadInt32();
-        //        string name = mReader.StringTable[br.ReadInt32()] ?? filename.Replace(".dbc", "") + " " + id;
-        //        dictionary[id] = name;
-        //    }
-        //}
-        
         private void LoadLegion(string filename, int id, int index, Dictionary<int, string> dictionary)
         {
             WDBXEditor.Reader.DBReader r = new WDBXEditor.Reader.DBReader();
-            var dbEntry = r.Read($"dbc/{filename}");
+            var path = $"{DbcStoreModule.DBCSettings.Path}/{filename}";
+
+            if (!File.Exists(path))
+                return;
+
+            var dbEntry = r.Read(path);
 
             foreach (DataRow row in dbEntry.Data.Rows)
                 dictionary.Add(Convert.ToInt32(row.ItemArray[id].ToString()), row.ItemArray[index].ToString());
