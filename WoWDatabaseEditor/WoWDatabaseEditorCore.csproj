@@ -287,6 +287,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WDE.Blueprints\WDE.Blueprints.csproj">
+      <Project>{4A11961B-85AD-464E-B881-C90F8CAC5647}</Project>
+      <Name>WDE.Blueprints</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj">
       <Project>{9d1a4e14-2fe1-403a-a042-ed7e49db0438}</Project>
       <Name>WDE.Common</Name>

@@ -12,6 +12,7 @@ using Prism.Modularity;
 using Prism.Unity;
 using Unity.Lifetime;
 using Unity.RegistrationByConvention;
+using WDE.Blueprints;
 using WDE.Common;
 using WDE.Common.Attributes;
 using WDE.Common.Managers;
@@ -74,7 +75,8 @@ namespace WoWDatabaseEditor
             moduleCatalog.AddModule(typeof(SmartScriptModule));
             moduleCatalog.AddModule(typeof(SqlEditorModule));
             moduleCatalog.AddModule(typeof(SolutionsModule));
-
+            moduleCatalog.AddModule(typeof(BlueprintsModule));
+            
             moduleCatalog.AddModule(typeof(HistoryWindowModule));
             
             AutoRegisterClasses();
