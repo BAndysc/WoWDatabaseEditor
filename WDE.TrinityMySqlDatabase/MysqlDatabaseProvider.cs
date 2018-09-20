@@ -28,12 +28,12 @@ namespace WDE.TrinityMySqlDatabase
 
         public TrinityMysqlDatabaseProvider()
         {
+            string Database = TrinityMySqlDatabaseModule.DbAccess.DB;
+            string User = TrinityMySqlDatabaseModule.DbAccess.User;
+            string Password = TrinityMySqlDatabaseModule.DbAccess.Password;
+            string Host = TrinityMySqlDatabaseModule.DbAccess.Host;
             try
             {
-                string Database = TrinityMySqlDatabaseModule.DbAccess.DB;
-                string User = TrinityMySqlDatabaseModule.DbAccess.User;
-                string Password = TrinityMySqlDatabaseModule.DbAccess.Password;
-                string Host = TrinityMySqlDatabaseModule.DbAccess.Host;
                 var config = MySqlConfiguration.Create(Database, Host, User, Password);
                 model = DataAccessModel.BuildDataAccessModel<TrinityDatabase>(config);
                 try
@@ -48,7 +48,8 @@ namespace WDE.TrinityMySqlDatabase
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Cannot connect to MySql database: {e.Message} Check your settings.");
+                if (!string.IsNullOrEmpty(Host))
+                    MessageBox.Show($"Cannot connect to MySql database: {e.Message} Check your settings.");
                 model = null;
             }
         }
