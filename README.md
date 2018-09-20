@@ -4,6 +4,7 @@ Editor for Smart Scripts for TrinityCore based servers.
 This project is continuation of [Visual SAI Studio](https://github.com/BandyscLegacy/VisualSAIStudio), but rewritten from scratch. It is still in early stages, but anyone is welcome to help :-) Together we can make great wow emu editor!
 
 Thanks to:
+ * [tgjones](https://github.com/tgjones/gemini) for Gemini Graph Editor
  * WDBXEditor for dbc loading
  * Atlantiss - the editor begin as internal tool
  * TrinityCore, Cmangos and everyone who contributes to WoW Core!

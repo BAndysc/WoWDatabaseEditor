@@ -66,6 +66,25 @@
     <Compile Include="Editor\Views\BlueprintEditorView.xaml.cs">
       <DependentUpon>BlueprintEditorView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GeminiGraphEditor\AnimationHelper.cs" />
+    <Compile Include="GeminiGraphEditor\BezierLine.cs" />
+    <Compile Include="GeminiGraphEditor\ColorToBrushConverter.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectionDragCompletedEventArgs.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectionDragEventArgs.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectionDraggingEventArgs.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectionDragStartedEventArgs.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectionItem.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectionItemsControl.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectorItem.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectorItemDragCompletedEventArgs.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectorItemDraggingEventArgs.cs" />
+    <Compile Include="GeminiGraphEditor\ConnectorItemDragStartedEventArgs.cs" />
+    <Compile Include="GeminiGraphEditor\ElementItem.cs" />
+    <Compile Include="GeminiGraphEditor\ElementItemsControl.cs" />
+    <Compile Include="GeminiGraphEditor\GraphControl.cs" />
+    <Compile Include="GeminiGraphEditor\VisualTreeUtility.cs" />
+    <Compile Include="GeminiGraphEditor\ZoomAndPanControl.cs" />
+    <Compile Include="GeminiGraphEditor\ZoomAndPanControl_IScrollInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\BlueprintItemProvider.cs" />
     <Compile Include="Providers\BlueprintNameProvider.cs" />
@@ -82,6 +101,9 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Editor\Views\BlueprintEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
