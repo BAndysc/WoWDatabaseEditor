@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WDE.Blueprints.Editor"
+             xmlns:local="clr-namespace:WDE.Blueprints.Editor.Views"
              xmlns:controls="clr-namespace:WDE.Blueprints.GeminiGraphEditor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -12,287 +12,23 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/WDE.Blueprints;component/Resources/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <controls:ColorToBrushConverter x:Key="ColorToBrushConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-        <Canvas x:Name="myCanvas">
+    <Canvas x:Name="myCanvas">
+        <Grid Height="{Binding ElementName=myCanvas, Path=ActualHeight}" Width="{Binding ElementName=myCanvas, Path=ActualWidth}">
+            <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
+                <controls:ZoomAndPanControl x:Name="ZoomAndPanControl" Background="#FF262626">
+                    <local:BlueprintGraphControlView x:Name="GraphControl"
+								PreviewMouseWheel="OnGraphControlMouseWheel"
+								PreviewMouseRightButtonDown="OnGraphControlRightMouseButtonDown"
+								PreviewMouseRightButtonUp="OnGraphControlRightMouseButtonUp"
+								PreviewMouseMove="OnGraphControlMouseMove"
+                        />
+                </controls:ZoomAndPanControl>
+            </ScrollViewer>
+        </Grid>
+        <!--<Border x:Name="Picker" Visibility="{Binding GraphViewModel.ShowPicker}" BorderThickness="3" BorderBrush="BlueViolet" Canvas.Left="50" CornerRadius="3">
 
-            <Grid Height="{Binding ElementName=myCanvas, Path=ActualHeight}"
-               Width="{Binding ElementName=myCanvas, Path=ActualWidth}">
-                <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-                    <controls:ZoomAndPanControl x:Name="ZoomAndPanControl" Background="#FF262626">
-                        <controls:GraphControl x:Name="GraphControl" Background="#FF363636"
-									ElementsSource="{Binding GraphViewModel.Elements}" ConnectionsSource="{Binding GraphViewModel.Connections}"
-									Width="20000" Height="20000"
-                                    MouseDown="GraphControl_MouseDown"
-                                    PreviewMouseLeftButtonDown="PreviewMouseLeftButtonDown"
-									PreviewMouseRightButtonDown="OnGraphControlRightMouseButtonDown"
-									PreviewMouseRightButtonUp="OnGraphControlRightMouseButtonUp"
-									PreviewMouseMove="OnGraphControlMouseMove"
-									PreviewMouseWheel="OnGraphControlMouseWheel"
-									SelectionChanged="OnGraphControlSelectionChanged"
-									ConnectionDragStarted="OnGraphControlConnectionDragStarted"
-									ConnectionDragging="OnGraphControlConnectionDragging"
-									ConnectionDragCompleted="OnGraphControlConnectionDragCompleted">
-
-                        <controls:GraphControl.ElementItemContainerStyle>
-                            <Style TargetType="{x:Type controls:ElementItem}" BasedOn="{StaticResource {x:Type controls:ElementItem}}">
-                                <Setter Property="X" Value="{Binding X}" />
-                                <Setter Property="Y" Value="{Binding Y}" />
-                                <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-                            </Style>
-                        </controls:GraphControl.ElementItemContainerStyle>
-                        <controls:GraphControl.ConnectionItemContainerStyle>
-                            <Style TargetType="{x:Type controls:ConnectionItem}" BasedOn="{StaticResource {x:Type controls:ConnectionItem}}">
-                                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-                            </Style>
-                        </controls:GraphControl.ConnectionItemContainerStyle>
-
-
-
-                            <controls:GraphControl.ElementItemTemplate>
-                                <DataTemplate>
-                                    <DataTemplate.Resources>
-                                        <Style TargetType="controls:ConnectorItem">
-                                            <Setter Property="Position" Value="{Binding Position, Mode=OneWayToSource}" />
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="controls:ConnectorItem">
-                                                    <Ellipse Width="10" Height="10" Margin="0,2,0,0" StrokeThickness="1" Stroke="{Binding Color, Converter={StaticResource ColorToBrushConverter}}">
-                                                        <Ellipse.Style>
-                                                                <Style TargetType="Ellipse">
-                                                                    <Setter Property="Fill" Value="#01FFFFFF" />
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding NonEmpty}" Value="True">
-                                                                        <Setter Property="Fill" Value="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" />
-                                                                    </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Ellipse.Style>
-                                                        </Ellipse>
-
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Setter Property="Foreground" Value="White"/>
-                                        </Style>
-                                    </DataTemplate.Resources>
-                                    <Border x:Name="HighlightBorder" 
-									BorderThickness="2" Padding="2" CornerRadius="4">
-                                        <Border CornerRadius="4" Background="#FF0F0F0F">
-                                            <Border.Effect>
-                                                <DropShadowEffect Color="DarkGray" ShadowDepth="0" 
-														  BlurRadius="10" />
-                                            </Border.Effect>
-                                            <StackPanel Orientation="Vertical">
-                                                <Border Padding="5 2 2 2" BorderBrush="DodgerBlue"
-												BorderThickness="0 0 0 0" CornerRadius="2 2 0 0">
-
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding NodeType}" Value="Expression">
-                                                                <Setter Property="Background" Value="#404040" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding NodeType}" Value="Statement">
-                                                                <Setter Property="Background" Value="#00A2E8" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding NodeType}" Value="Event">
-                                                                <Setter Property="Background" Value="#562527" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
-
-                                                <StackPanel Orientation="Horizontal">
-                                                        <TextBlock HorizontalAlignment="Stretch" Text="{Binding Name}" />
-                                                    </StackPanel>
-                                                </Border>
-                                                <Border>
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" MinWidth="50" />
-                                                            <ColumnDefinition Width="*"  MinWidth="50" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <ItemsControl Grid.Column="0" ItemsSource="{Binding InputConnectors}" 
-															  VerticalAlignment="Top" Padding="0 5 5 0">
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate>
-                                                                    <StackPanel Orientation="Horizontal" Height="20">
-                                                                        <controls:ConnectorItem />
-                                                                        <TextBlock Foreground="White" Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
-																		   Margin="3 0 0 0"/>
-                                                                        <Border BorderBrush="BlueViolet" BorderThickness="1">
-                                                                            <Border.Style>
-                                                                                <Style TargetType="Border">
-                                                                                    <Style.Triggers>
-                                                                                        <DataTrigger Binding="{Binding NonEmpty}" Value="True">
-                                                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                                                        </DataTrigger>
-                                                                                        <DataTrigger Binding="{Binding IOType}" Value="Exec">
-                                                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                                                        </DataTrigger>
-                                                                                        <DataTrigger Binding="{Binding IOType}" Value="Vector3">
-                                                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                                                        </DataTrigger>
-                                                                                        <DataTrigger Binding="{Binding IOType}" Value="Bool">
-                                                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                                                        </DataTrigger>
-                                                                                    </Style.Triggers>
-                                                                                </Style>
-                                                                            </Border.Style>
-                                                                            <TextBox Text="{Binding DirectValue, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="Black" Foreground="White" />
-                                                                        </Border>
-                                                                    </StackPanel>
-                                                                </DataTemplate>
-                                                            </ItemsControl.ItemTemplate>
-                                                        </ItemsControl>
-
-                                                        <Border Grid.Column="1" VerticalAlignment="Top">
-                                                            <StackPanel Orientation="Vertical">
-                                                                <ItemsControl Grid.Column="0" ItemsSource="{Binding OutputConnectors}" 
-															  VerticalAlignment="Top" Padding="5 5 0 0">
-                                                                    <ItemsControl.ItemTemplate>
-                                                                        <DataTemplate>
-                                                                            <StackPanel FlowDirection="RightToLeft" Orientation="Horizontal" Height="20">
-                                                                                <controls:ConnectorItem />
-                                                                                <TextBlock Foreground="White"  Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
-																		   Margin="3 0 0 0"/>
-                                                                            </StackPanel>
-                                                                        </DataTemplate>
-                                                                    </ItemsControl.ItemTemplate>
-                                                                </ItemsControl>
-                                                            </StackPanel>
-                                                        </Border>
-                                                    </Grid>
-                                                </Border>
-                                            </StackPanel>
-                                        </Border>
-                                    </Border>
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                            <Setter TargetName="HighlightBorder" Property="BorderBrush" Value="Yellow" />
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </controls:GraphControl.ElementItemTemplate>
-
-                            <controls:GraphControl.ConnectionItemTemplate>
-                                <DataTemplate>
-                                    <controls:BezierLine StrokeThickness="4"
-									X1="{Binding FromPosition.X}" Y1="{Binding FromPosition.Y}"
-									X2="{Binding ToPosition.X}" Y2="{Binding ToPosition.Y}">
-                                        <controls:BezierLine.Style>
-                                            <Style TargetType="controls:BezierLine">
-                                                <Setter Property="Stroke" Value="LightSkyBlue" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Stroke" Value="Red" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </controls:BezierLine.Style>
-                                    </controls:BezierLine>
-                                </DataTemplate>
-                            </controls:GraphControl.ConnectionItemTemplate>
-                        </controls:GraphControl>
-                    </controls:ZoomAndPanControl>
-                </ScrollViewer>
-            </Grid>
-            <!--<Border x:Name="Picker" Visibility="{Binding GraphViewModel.ShowPicker}" BorderThickness="3" BorderBrush="BlueViolet" Canvas.Left="50" CornerRadius="3">
-                <DockPanel Background="Black" Width="200" Height="400">
-                    <TextBlock DockPanel.Dock="Top" Background="BlueViolet" Padding="5" Foreground="White" HorizontalAlignment="Stretch">Select Action</TextBlock>
-                    <Border DockPanel.Dock="Top"  BorderBrush="BlueViolet" BorderThickness="0,0,0,3">
-                        <AdornerDecorator>
-                            <TextBox x:Name="Searcher" PreviewKeyDown="TextBox_KeyDown" Focusable="True" Background="Black" BorderThickness="0" Foreground="LightGray" Padding="3" Text="{Binding NodesModel.SearchBox, UpdateSourceTrigger=PropertyChanged}">
-                                <controls:WatermarkService.Watermark>
-                                    <TextBlock Foreground="LightGray" >Type here to search text</TextBlock>
-                                </controls:WatermarkService.Watermark>
-                            </TextBox>
-                        </AdornerDecorator>
-                    </Border>
-                    <ListView x:Name="ListPicker" ItemsSource="{Binding NodesModel.AllItems}" Background="Black" Foreground="White" BorderThickness="0"
-                          VerticalAlignment="Stretch"
-          ScrollViewer.VerticalScrollBarVisibility="Auto"
-          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.GroupStyle>
-                            <GroupStyle>
-                                <GroupStyle.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Name}" Padding="3" FontWeight="Bold" Foreground="White" Margin="0,5,0,0"/>
-                                    </DataTemplate>
-                                </GroupStyle.HeaderTemplate>
-                            </GroupStyle>
-                        </ListView.GroupStyle>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock PreviewMouseLeftButtonDown="TextBlock_PreviewMouseLeftButtonDown" Text="{Binding Header}" TextWrapping="Wrap">
-                                </TextBlock>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                    <TreeView Background="Black" Foreground="White" BorderThickness="0">
-                    <TreeViewItem Header="Actions" IsExpanded="True">
-                        <TreeViewItem Header="Talk" PreviewMouseLeftButtonDown="TreeViewItem_MouseDown" />
-                        <TreeViewItem Header="Foreach"  PreviewMouseLeftButtonDown="TreeViewItem_MouseDown"/>
-                        <TreeViewItem Header="Branch (If)"  PreviewMouseLeftButtonDown="TreeViewItem_MouseDown"/>
-                    </TreeViewItem>
-                    <TreeViewItem Header="Expressions" IsExpanded="True">
-                        <TreeViewItem Header="Get Entry" PreviewMouseLeftButtonDown="TreeViewItem_MouseDown" />
-                        <TreeViewItem Header="Me"  PreviewMouseLeftButtonDown="TreeViewItem_MouseDown"/>
-                        <TreeViewItem Header="Find Near"  PreviewMouseLeftButtonDown="TreeViewItem_MouseDown"/>
-                        <TreeViewItem Header="Greater (>)"  PreviewMouseLeftButtonDown="TreeViewItem_MouseDown"/>
-                    </TreeViewItem>
-                    <TreeView.Resources>
-                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}"
-                      Color="White" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
-                      Color="BlueViolet" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
-                      Color="White" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
-                      Color="BlueViolet" />
-                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
-                      Color="White" />
-
-                        <Style TargetType="TreeViewItem">
-                            <Setter Property="HeaderTemplate">
-                                <Setter.Value>
-                                    <DataTemplate>
-                                        <Border>
-                                            <TextBlock Text="{Binding}"/>
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="BorderBrush" Value="Transparent"/>
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self},
-                                                  Path=IsMouseOver}" Value="True"/>
-                                                                <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem},
-                                                  Path=IsSelected}" Value="False"/>
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="Background" Value="BlueViolet"/>
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
-                                    </DataTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </TreeView.Resources>
-                </TreeView>-->
-                <!--</DockPanel>
-            </Border>-->
-        </Canvas>
+        </Border>-->
+    </Canvas>
 </UserControl>

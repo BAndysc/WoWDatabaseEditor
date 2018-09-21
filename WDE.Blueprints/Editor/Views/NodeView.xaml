@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="WDE.Blueprints.Editor.Views.NodeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WDE.Blueprints.Editor.Views"
+             xmlns:controls="clr-namespace:WDE.Blueprints.GeminiGraphEditor"
+             xmlns:designTimeVMs="clr-namespace:WDE.Blueprints.Editor.DisignTimeViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance designTimeVMs:ElementViewModel, IsDesignTimeCreatable=True}" >
+    <UserControl.Resources>
+        <Style TargetType="controls:ConnectorItem">
+            <Setter Property="Position" Value="{Binding Position, Mode=OneWayToSource}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="controls:ConnectorItem">
+                        <local:ConnectorView />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </UserControl.Resources>
+    <Border BorderThickness="2" Padding="2" CornerRadius="4">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="BorderBrush" Value="Yellow" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Border CornerRadius="4" Background="#FF0F0F0F">
+            <Border.Effect>
+                <DropShadowEffect Color="DarkGray" ShadowDepth="0" 
+														  BlurRadius="10" />
+            </Border.Effect>
+            <StackPanel Orientation="Vertical">
+                <Border Padding="5 2 2 2" BorderBrush="DodgerBlue" BorderThickness="0 0 0 0" CornerRadius="2 2 0 0">
+
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding NodeType}" Value="Expression">
+                                    <Setter Property="Background" Value="#404040" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding NodeType}" Value="Statement">
+                                    <Setter Property="Background" Value="#00A2E8" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding NodeType}" Value="Event">
+                                    <Setter Property="Background" Value="#562527" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock HorizontalAlignment="Stretch" Text="{Binding Name}" />
+                    </StackPanel>
+                </Border>
+                <Border>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" MinWidth="50" />
+                            <ColumnDefinition Width="*"  MinWidth="50" />
+                        </Grid.ColumnDefinitions>
+                        <ItemsControl Grid.Column="0" ItemsSource="{Binding InputConnectors}" 
+															  VerticalAlignment="Top" Padding="0 5 5 0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Height="20">
+                                        <controls:ConnectorItem />
+                                        <TextBlock Foreground="White" Text="{Binding Name}" FontSize="11" VerticalAlignment="Center" Margin="3 0 0 0"/>
+                                        <Border BorderBrush="BlueViolet" BorderThickness="1">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding NonEmpty}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IOType}" Value="Exec">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IOType}" Value="Vector3">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IOType}" Value="Bool">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBox Text="{Binding DirectValue, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="Black" Foreground="White" />
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Grid.Column="1" VerticalAlignment="Top">
+                            <StackPanel Orientation="Vertical">
+                                <ItemsControl Grid.Column="0" ItemsSource="{Binding OutputConnectors}" 
+															  VerticalAlignment="Top" Padding="5 5 0 0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel FlowDirection="RightToLeft" Orientation="Horizontal" Height="20">
+                                                <controls:ConnectorItem />
+                                                <TextBlock Foreground="White"  Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
+																		   Margin="3 0 0 0"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </Border>
+    </Border>
+</UserControl>

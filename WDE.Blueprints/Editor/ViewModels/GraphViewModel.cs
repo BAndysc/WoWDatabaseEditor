@@ -170,11 +170,6 @@ namespace WDE.Blueprints.Editor.ViewModels
                 Connections.Remove(connection);
             }
         }
-
-        public void OnSelectionChanged()
-        {
-            var selectedElements = SelectedElements.ToList();
-        }
-
+        
     }
 }

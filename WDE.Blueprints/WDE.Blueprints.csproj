@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="BlueprintsModule.cs" />
     <Compile Include="BlueprintSolutionItem.cs" />
+    <Compile Include="Editor\DisignTimeViewModels\ElementViewModel.cs" />
     <Compile Include="Editor\ViewModels\BlueprintEditorViewModel.cs" />
     <Compile Include="Editor\ViewModels\ConnectionViewModel.cs" />
     <Compile Include="Editor\ViewModels\ConnectorDirection.cs" />
@@ -73,6 +74,21 @@
     <Compile Include="Editor\ViewModels\OutputConnectorViewModel.cs" />
     <Compile Include="Editor\Views\BlueprintEditorView.xaml.cs">
       <DependentUpon>BlueprintEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Views\BlueprintGraphControlView.xaml.cs">
+      <DependentUpon>BlueprintGraphControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Views\ConnectionLineView.xaml.cs">
+      <DependentUpon>ConnectionLineView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Views\ConnectorView.xaml.cs">
+      <DependentUpon>ConnectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Views\NodePicker.xaml.cs">
+      <DependentUpon>NodePicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Views\NodeView.xaml.cs">
+      <DependentUpon>NodeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Enums\IOType.cs" />
     <Compile Include="Enums\NodeType.cs" />
@@ -112,6 +128,21 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Editor\Views\BlueprintEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Views\BlueprintGraphControlView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Views\ConnectionLineView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Views\ConnectorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Views\NodePicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Views\NodeView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Generic.xaml">
