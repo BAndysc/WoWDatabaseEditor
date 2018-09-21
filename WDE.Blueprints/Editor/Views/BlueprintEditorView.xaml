@@ -88,9 +88,26 @@
 														  BlurRadius="10" />
                                             </Border.Effect>
                                             <StackPanel Orientation="Vertical">
-                                                <Border Background="{Binding Color}" Padding="5 2 2 2" BorderBrush="DodgerBlue"
+                                                <Border Padding="5 2 2 2" BorderBrush="DodgerBlue"
 												BorderThickness="0 0 0 0" CornerRadius="2 2 0 0">
-                                                    <StackPanel Orientation="Horizontal">
+
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding NodeType}" Value="Expression">
+                                                                <Setter Property="Background" Value="#404040" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding NodeType}" Value="Statement">
+                                                                <Setter Property="Background" Value="#00A2E8" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding NodeType}" Value="Event">
+                                                                <Setter Property="Background" Value="#562527" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+
+                                                <StackPanel Orientation="Horizontal">
                                                         <TextBlock HorizontalAlignment="Stretch" Text="{Binding Name}" />
                                                     </StackPanel>
                                                 </Border>

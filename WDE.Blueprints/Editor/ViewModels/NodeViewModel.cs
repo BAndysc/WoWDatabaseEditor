@@ -10,11 +10,11 @@ namespace WDE.Blueprints.Editor.ViewModels
 {
     public class NodeViewModel : ElementViewModel
     {
-        public NodeViewModel(string name, int inputs, int outputs) : base(name, (Color)ColorConverter.ConvertFromString("#00A2E8"))
+        public NodeViewModel(string name, NodeType node, int inputs, int outputs) : base(name)
         {
             Name = name;
-            
-            nodeType = NodeType.Expression;
+
+            nodeType = node;
 
             for (int i = 0; i < inputs; ++i)
                 AddInputConnector($"Input {i+1}", IOType.Int, Colors.DarkSeaGreen);

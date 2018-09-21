@@ -36,10 +36,7 @@ namespace WDE.Blueprints.Editor.ViewModels
             get { return _name; }
             set { SetProperty(ref _name, value); }
         }
-
-        private Color _color;
-        public Brush Color => new SolidColorBrush(_color);
-
+        
         private bool _isSelected;
         public bool IsSelected
         {
@@ -63,12 +60,11 @@ namespace WDE.Blueprints.Editor.ViewModels
             }
         }
 
-        protected ElementViewModel(string name, Color color)
+        protected ElementViewModel(string name)
         {
             InputConnectors = new ObservableCollection<InputConnectorViewModel>();
             OutputConnectors = new ObservableCollection<OutputConnectorViewModel>();
             Name = name;
-            _color = color;
         }
 
         protected void AddInputConnector(string name, IOType iotype, Color color)

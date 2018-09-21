@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WDE.Blueprints.Editor.ViewModels
 {
-    class BlueprintEditorViewModel
+    public class BlueprintEditorViewModel
     {
         private BlueprintSolutionItem solutionItem;
 
@@ -18,10 +18,10 @@ namespace WDE.Blueprints.Editor.ViewModels
 
             GraphViewModel = new GraphViewModel();
 
-            GraphViewModel.AddElement(new NodeViewModel("Node 1", 0, 3), 10000, 10000);
-            GraphViewModel.AddElement(new NodeViewModel("Node 2", 2, 3), 10100, 10000);
-            GraphViewModel.AddElement(new NodeViewModel("Node 3", 1, 1), 10200, 10000);
-            GraphViewModel.AddElement(new NodeViewModel("Node 4", 4, 1), 10300, 10000);
+            GraphViewModel.AddElement(new NodeViewModel("Node 1", Enums.NodeType.Event, 0, 3), 10000, 10000);
+            GraphViewModel.AddElement(new NodeViewModel("Node 2", Enums.NodeType.Statement, 2, 3), 10100, 10000);
+            GraphViewModel.AddElement(new NodeViewModel("Node 3", Enums.NodeType.Expression, 1, 1), 10200, 10000);
+            GraphViewModel.AddElement(new NodeViewModel("Node 4", Enums.NodeType.Statement, 4, 1), 10300, 10000);
         }
     }
 }
