@@ -18,21 +18,6 @@ namespace WDE.SQLEditor
     {        
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<ISolutionEditorManager>().Register<MetaSolutionSQL>(item =>
-            {
-                var view = new SqlEditorView();
-                var vm = new SqlEditorViewModel(containerProvider.Resolve<ISolutionItemSqlGeneratorRegistry>().GenerateSql(item as MetaSolutionSQL));
-                view.DataContext = vm;
-
-                DocumentEditor editor = new DocumentEditor();
-                editor.Title = "Sql output";
-                editor.Content = view;
-                editor.CanClose = true;
-                editor.Undo = new DelegateCommand(() => { }, () => false);
-                editor.Redo = new DelegateCommand(() => { }, () => false);
-
-                return editor;
-            });
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

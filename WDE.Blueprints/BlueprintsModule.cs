@@ -15,20 +15,6 @@ namespace WDE.Blueprints
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<ISolutionEditorManager>().Register<BlueprintSolutionItem>(item =>
-            {
-                var view = new BlueprintEditorView();
-                var solutionItem = item as BlueprintSolutionItem;
-                var vm = new BlueprintEditorViewModel(solutionItem);
-                view.DataContext = vm;
-
-                DocumentEditor editor = new DocumentEditor();
-                editor.Title = "Blueprints";
-                editor.Content = view;
-                editor.CanClose = true;
-
-                return editor;
-            });
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

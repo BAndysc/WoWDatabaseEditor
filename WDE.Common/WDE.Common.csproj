@@ -105,11 +105,12 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Providers\IEntriesProviderService.cs" />
     <Compile Include="INewItemService.cs" />
-    <Compile Include="Managers\ISolutionEditorManager.cs" />
+    <Compile Include="Solution\ISolutionItemEditorRegistry.cs" />
     <Compile Include="Parameters\BasicParameters.cs" />
     <Compile Include="Parameters\GenericBaseParameter.cs" />
     <Compile Include="Parameters\IParameterFactory.cs" />
     <Compile Include="Providers\IItemFromListProvider.cs" />
+    <Compile Include="Solution\ISolutionItemEditorProvider.cs" />
     <Compile Include="Solution\ISolutionItemSqlGeneratorRegistry.cs" />
     <Compile Include="Solution\ISolutionExplorer.cs" />
     <Compile Include="Solution\ISolutionItem.cs" />

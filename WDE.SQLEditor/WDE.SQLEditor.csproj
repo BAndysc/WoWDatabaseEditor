@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\MetaSqlSolutionItemEditorProvider.cs" />
     <Compile Include="SqlEditorModule.cs" />
     <Compile Include="UserControls\CodeEditor.cs" />
     <Compile Include="ViewModels\SqlEditorViewModel.cs" />

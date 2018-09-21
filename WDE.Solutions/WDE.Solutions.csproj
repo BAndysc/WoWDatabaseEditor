@@ -106,6 +106,7 @@
       <DependentUpon>SolutionExplorerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Explorer\Views\TreeViewItemExtensions.cs" />
+    <Compile Include="Manager\SolutionItemEditorRegistry.cs" />
     <Compile Include="Manager\SolutionItemSqlGeneratorRegistry.cs" />
     <Compile Include="Manager\SolutionItemNameRegistry.cs" />
     <Compile Include="Manager\SolutionManager.cs" />

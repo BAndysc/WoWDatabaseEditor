@@ -96,6 +96,7 @@
     <Compile Include="GeminiGraphEditor\ZoomAndPanControl.cs" />
     <Compile Include="GeminiGraphEditor\ZoomAndPanControl_IScrollInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\BlueprintItemEditorProvider.cs" />
     <Compile Include="Providers\BlueprintItemProvider.cs" />
     <Compile Include="Providers\BlueprintNameProvider.cs" />
   </ItemGroup>

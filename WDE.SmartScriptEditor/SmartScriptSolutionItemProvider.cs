@@ -49,11 +49,6 @@ namespace WDE.SmartScriptEditor
         }
 
         public abstract ISolutionItem CreateSolutionItem();
-
-        //public virtual ISolutionItem CreateSolutionItem()
-        //{
-        //    return new SmartScriptSolutionItem(0, _type, null);
-        //}
     }
 
     [AutoRegister]

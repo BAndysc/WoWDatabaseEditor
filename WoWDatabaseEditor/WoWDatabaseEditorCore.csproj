@@ -221,7 +221,7 @@
     <Compile Include="Events\AllModulesLoaded.cs" />
     <Compile Include="Extensions\ColumnDescriptor.cs" />
     <Compile Include="Extensions\GridViewColumns.cs" />
-    <Compile Include="Managers\SolutionEditorManager.cs" />
+    <Compile Include="Managers\SolutionItemEditorRegistry.cs" />
     <Compile Include="Managers\WindowManager.cs" />
     <Compile Include="Services\ConfigurationService\ConfigureService.cs" />
     <Compile Include="Services\ConfigurationService\ViewModels\ConfigurationWindowViewModel.cs" />

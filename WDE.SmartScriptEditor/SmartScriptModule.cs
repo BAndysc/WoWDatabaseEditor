@@ -29,25 +29,6 @@ namespace WDE.SmartScriptEditor
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<ISolutionEditorManager>().Register<SmartScriptSolutionItem>(item =>
-            {
-                var view = new SmartScriptEditorView();
-                var solutionItem = item as SmartScriptSolutionItem;
-                var vm = new SmartScriptEditorViewModel(solutionItem, containerProvider.Resolve<IHistoryManager>(), containerProvider.Resolve<IDatabaseProvider>(), containerProvider.Resolve<IEventAggregator>(), containerProvider.Resolve<ISmartFactory>(), containerProvider.Resolve<IItemFromListProvider>(), containerProvider.Resolve<SmartTypeListProvider>(), containerProvider.Resolve<ISolutionItemNameRegistry>());
-                view.DataContext = vm;
-
-                DocumentEditor editor = new DocumentEditor();
-                editor.Title = containerProvider.Resolve<ISolutionItemNameRegistry>().GetName(solutionItem);
-                editor.Content = view;
-                editor.Undo = vm.UndoCommand;
-                editor.Redo = vm.RedoCommand;
-                editor.Save = vm.SaveCommand;
-                editor.History = vm.History;
-                editor.CanClose = true;
-
-                return editor;
-            });
-
             SmartDataLoader.Load(SmartDataManager.GetInstance(), new SmartDataFileLoader());
         }
 

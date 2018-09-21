@@ -16,6 +16,7 @@ using WoWDatabaseEditor.Events;
 using WoWDatabaseEditor.Services.NewItemService;
 using WoWDatabaseEditor.Views;
 using Prism.Ioc;
+using WDE.Common.Solution;
 
 namespace WoWDatabaseEditor.ViewModels
 {
@@ -44,7 +45,7 @@ namespace WoWDatabaseEditor.ViewModels
 
         public ObservableCollection<MenuItemViewModel> Windows { get; set; }
 
-        public MainWindowViewModel(IEventAggregator eventAggregator, IWindowManager wndowManager, IConfigureService settings, INewItemService newItemService, ISolutionManager solutionManager, Lazy<IEnumerable<IToolProvider>> tools, ISolutionEditorManager solutionEditorManager)
+        public MainWindowViewModel(IEventAggregator eventAggregator, IWindowManager wndowManager, IConfigureService settings, INewItemService newItemService, ISolutionManager solutionManager, Lazy<IEnumerable<IToolProvider>> tools, ISolutionItemEditorRegistry solutionEditorManager)
         {
             _eventAggregator = eventAggregator;
             WindowManager = wndowManager;
