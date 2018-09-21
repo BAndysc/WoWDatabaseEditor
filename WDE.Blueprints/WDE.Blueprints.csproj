@@ -63,9 +63,19 @@
     <Compile Include="BlueprintsModule.cs" />
     <Compile Include="BlueprintSolutionItem.cs" />
     <Compile Include="Editor\ViewModels\BlueprintEditorViewModel.cs" />
+    <Compile Include="Editor\ViewModels\ConnectionViewModel.cs" />
+    <Compile Include="Editor\ViewModels\ConnectorDirection.cs" />
+    <Compile Include="Editor\ViewModels\ConnectorViewModel.cs" />
+    <Compile Include="Editor\ViewModels\ElementViewModel.cs" />
+    <Compile Include="Editor\ViewModels\GraphViewModel.cs" />
+    <Compile Include="Editor\ViewModels\InputConnectorViewModel.cs" />
+    <Compile Include="Editor\ViewModels\NodeViewModel.cs" />
+    <Compile Include="Editor\ViewModels\OutputConnectorViewModel.cs" />
     <Compile Include="Editor\Views\BlueprintEditorView.xaml.cs">
       <DependentUpon>BlueprintEditorView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Enums\IOType.cs" />
+    <Compile Include="Enums\NodeType.cs" />
     <Compile Include="GeminiGraphEditor\AnimationHelper.cs" />
     <Compile Include="GeminiGraphEditor\BezierLine.cs" />
     <Compile Include="GeminiGraphEditor\ColorToBrushConverter.cs" />

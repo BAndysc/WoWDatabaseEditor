@@ -2,33 +2,33 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:WDE.Blueprints.GeminiGraphEditor">
-	
-	<Style TargetType="local:ElementItem">
+
+    <Style TargetType="{x:Type local:ElementItem}">
 		<Setter Property="Canvas.Left" Value="{Binding X, RelativeSource={RelativeSource Self}, Mode=TwoWay}" />
 		<Setter Property="Canvas.Top" Value="{Binding Y, RelativeSource={RelativeSource Self}, Mode=TwoWay}" />
 		<Setter Property="Canvas.ZIndex" Value="{Binding ZIndex, RelativeSource={RelativeSource Self}, Mode=TwoWay}" />
 		<Setter Property="Template">
 			<Setter.Value>
-				<ControlTemplate TargetType="local:ElementItem">
+                <ControlTemplate TargetType="{x:Type local:ElementItem}">
 					<ContentPresenter />
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
 	</Style>
-    <Style TargetType="local:ConnectionItem">
+    <Style TargetType="{x:Type local:ConnectionItem}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="local:ConnectionItem">
+                <ControlTemplate TargetType="{x:Type local:ConnectionItem}">
                     <ContentPresenter />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    
-    <Style TargetType="local:GraphControl">
+
+    <Style TargetType="{x:Type local:GraphControl}">
 		<Setter Property="Template">
 			<Setter.Value>
-				<ControlTemplate TargetType="local:GraphControl">
+                <ControlTemplate TargetType="{x:Type local:GraphControl}">
 					<Border Background="{TemplateBinding Background}"
 							BorderBrush="{TemplateBinding BorderBrush}"
 							BorderThickness="{TemplateBinding BorderThickness}">
