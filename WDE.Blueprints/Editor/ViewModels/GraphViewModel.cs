@@ -69,11 +69,16 @@ namespace WDE.Blueprints.Editor.ViewModels
         public void OnConnectionDragging(Point currentDragPoint, ConnectionViewModel connection)
         {
             // If current drag point is close to an input connector, show its snapped position.
-            var nearbyConnector = FindNearbyInputConnector(connection, currentDragPoint);
+            ConnectorViewModel nearbyConnector = null;
+
+            if (connectingTo)
+                nearbyConnector = FindNearbyInputConnector(connection, currentDragPoint);
+            else
+                nearbyConnector = FindNearbyOutputConnector(connection, currentDragPoint); 
 
             Point pnt = (nearbyConnector != null)
-                ? nearbyConnector.Position
-                : currentDragPoint;
+                    ? nearbyConnector.Position
+                    : currentDragPoint;
 
             if (connectingTo)
                 connection.ToPosition = pnt;
@@ -133,7 +138,7 @@ namespace WDE.Blueprints.Editor.ViewModels
 
         private InputConnectorViewModel FindNearbyInputConnector(ConnectionViewModel connection, Point mousePosition)
         {
-            return Elements.SelectMany(x => x.InputConnectors).Where(x => x.IOType == (connection.To == null ? connection.From.IOType : connection.To.IOType))//.Union(Elements.Select(x => x.ThisConnection))
+            return Elements.SelectMany(x => x.InputConnectors).Where(x => x.IOType == (connection.To == null ? connection.From.IOType : connection.To.IOType))
                 .FirstOrDefault(x => AreClose(x.Position, mousePosition, 10));
         }
 

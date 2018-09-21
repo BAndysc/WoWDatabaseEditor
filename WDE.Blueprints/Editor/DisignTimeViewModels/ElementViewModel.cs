@@ -14,6 +14,8 @@ namespace WDE.Blueprints.Editor.DisignTimeViewModels
 
         public string Name => "Node name";
 
+        public bool IsSelected => true;
+
         public IEnumerable<Connector> InputConnectors => new[]
         {
             new Connector("Input 1", IOType.Exec),
