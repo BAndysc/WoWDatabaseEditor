@@ -9,20 +9,29 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance designTimeVMs:ConnectorViewModel, IsDesignTimeCreatable=True}" >
-    <UserControl.Resources>
-        <controls:ColorToBrushConverter x:Key="ColorToBrushConverter" />
-    </UserControl.Resources>
-    
-    <Ellipse Width="10" Height="10" Margin="0,2,0,0" StrokeThickness="1" Stroke="{Binding Color, Converter={StaticResource ColorToBrushConverter}}">
-        <Ellipse.Style>
-            <Style TargetType="Ellipse">
-                <Setter Property="Fill" Value="#01FFFFFF" />
+
+    <ContentControl Content="{Binding}">
+        <ContentControl.Style>
+            <Style TargetType="ContentControl">
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <local:EllipseConnectorView />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding NonEmpty}" Value="True">
-                        <Setter Property="Fill" Value="{Binding Color, Converter={StaticResource ColorToBrushConverter}}" />
+                    <DataTrigger Binding="{Binding IOType}" Value="Exec">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <local:TriangleConnectorView />
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-        </Ellipse.Style>
-    </Ellipse>
+        </ContentControl.Style>
+    </ContentControl>
 </UserControl>

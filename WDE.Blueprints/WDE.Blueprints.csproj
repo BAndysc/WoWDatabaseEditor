@@ -84,11 +84,17 @@
     <Compile Include="Editor\Views\ConnectorView.xaml.cs">
       <DependentUpon>ConnectorView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Views\ConnectorViews\EllipseConnectorView.xaml.cs">
+      <DependentUpon>EllipseConnectorView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Views\NodePicker.xaml.cs">
       <DependentUpon>NodePicker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Editor\Views\NodeView.xaml.cs">
       <DependentUpon>NodeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor\Views\ConnectorViews\TriangleConnectorView.xaml.cs">
+      <DependentUpon>TriangleConnectorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Enums\IOType.cs" />
     <Compile Include="Enums\NodeType.cs" />
@@ -139,10 +145,16 @@
     <Page Include="Editor\Views\ConnectorView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Editor\Views\ConnectorViews\EllipseConnectorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Editor\Views\NodePicker.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Editor\Views\NodeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Views\ConnectorViews\TriangleConnectorView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Generic.xaml">

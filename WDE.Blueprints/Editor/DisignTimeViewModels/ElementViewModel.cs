@@ -16,15 +16,15 @@ namespace WDE.Blueprints.Editor.DisignTimeViewModels
 
         public IEnumerable<Connector> InputConnectors => new[]
         {
-            new Connector("Input 1"),
-            new Connector("Input 2 (non empty)", true),
+            new Connector("Input 1", IOType.Exec),
+            new Connector("Input 2 (non empty)", IOType.Int, true),
             new Connector("Input 3"),
         };
 
         public IEnumerable<Connector> OutputConnectors => new[]
         {
-            new Connector("Output 1 (non empty)", true),
-            new Connector("Output 2 (non empty)", true),
+            new Connector("Output 1 (non empty)", IOType.Exec, true),
+            new Connector("Output 2 (non empty)", IOType.Int, true),
             new Connector("Output 3"),
             new Connector("Output 4"),
             new Connector("Output 5")
@@ -34,7 +34,7 @@ namespace WDE.Blueprints.Editor.DisignTimeViewModels
 
     internal class ConnectorViewModel : Connector
     {
-        public ConnectorViewModel() : base("", false) { }
+        public ConnectorViewModel() : base("", IOType.Int, false) { }
     }
 
     internal class Connector
@@ -45,9 +45,12 @@ namespace WDE.Blueprints.Editor.DisignTimeViewModels
 
         public Color Color { get; }
 
-        public Connector(string name, bool nonEmpty = false)
+        public IOType IOType { get; }
+
+        public Connector(string name, IOType iotype = IOType.Int, bool nonEmpty = false)
         {
             Name = name;
+            IOType = iotype;
             NonEmpty = nonEmpty;
             Color = Colors.DarkSeaGreen;
         }

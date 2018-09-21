@@ -107,11 +107,11 @@
 															  VerticalAlignment="Top" Padding="5 5 0 0">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <StackPanel FlowDirection="RightToLeft" Orientation="Horizontal" Height="20">
-                                                <controls:ConnectorItem />
-                                                <TextBlock Foreground="White"  Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
-																		   Margin="3 0 0 0"/>
-                                            </StackPanel>
+                                            <DockPanel Height="20">
+                                                <controls:ConnectorItem DockPanel.Dock="Right" />
+                                                <TextBlock DockPanel.Dock="Right" Foreground="White"  Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
+																		   Margin="0 0 3 0" HorizontalAlignment="Right"/>
+                                            </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
