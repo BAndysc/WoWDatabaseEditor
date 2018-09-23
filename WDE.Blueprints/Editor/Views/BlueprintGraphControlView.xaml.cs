@@ -31,7 +31,7 @@ namespace WDE.Blueprints.Editor.Views
 
         private GraphViewModel ViewModel
         {
-            get { return ((BlueprintEditorViewModel)DataContext).GraphViewModel; }
+            get { return (GraphViewModel)DataContext; }
         }
 
         private void OnGraphControlConnectionDragStarted(object sender, ConnectionDragStartedEventArgs e)
