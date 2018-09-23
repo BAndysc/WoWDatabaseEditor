@@ -4,45 +4,51 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WDE.Blueprints.Editor.Views"
+             xmlns:utils="clr-namespace:WDE.Blueprints.Utils"
+             xmlns:designTimeVMs="clr-namespace:WDE.Blueprints.Editor.DisignTimeViewModels"
+             d:DataContext="{d:DesignInstance designTimeVMs:NodePickerViewModel, IsDesignTimeCreatable=True}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-<!--        <DockPanel Background="Black" Width="200" Height="400">
-            <TextBlock DockPanel.Dock="Top" Background="BlueViolet" Padding="5" Foreground="White" HorizontalAlignment="Stretch">Select Action</TextBlock>
-            <Border DockPanel.Dock="Top"  BorderBrush="BlueViolet" BorderThickness="0,0,0,3">
-                <AdornerDecorator>
-                    <TextBox x:Name="Searcher" PreviewKeyDown="TextBox_KeyDown" Focusable="True" Background="Black" BorderThickness="0" Foreground="LightGray" Padding="3" Text="{Binding NodesModel.SearchBox, UpdateSourceTrigger=PropertyChanged}">
-                        <controls:WatermarkService.Watermark>
-                            <TextBlock Foreground="LightGray" >Type here to search text</TextBlock>
-                        </controls:WatermarkService.Watermark>
-                    </TextBox>
-                </AdornerDecorator>
-            </Border>
-            <ListView x:Name="ListPicker" ItemsSource="{Binding NodesModel.AllItems}" Background="Black" Foreground="White" BorderThickness="0"
+             d:DesignHeight="399.4" d:DesignWidth="678.4">
+
+
+    <UserControl.Resources>
+    </UserControl.Resources>
+
+    <DockPanel Background="Black" Width="200" Height="300">
+        <TextBlock DockPanel.Dock="Top" Background="BlueViolet" Padding="5" Foreground="White" HorizontalAlignment="Stretch">Select Action</TextBlock>
+        <Border DockPanel.Dock="Top"  BorderBrush="BlueViolet" BorderThickness="0,0,0,3">
+            <AdornerDecorator>
+                <TextBox x:Name="Searcher" PreviewKeyDown="TextBox_KeyDown" Focusable="True" Background="Black" BorderThickness="0" Foreground="LightGray" Padding="3" Text="{Binding NodesModel.SearchBox, UpdateSourceTrigger=PropertyChanged}">
+                    <utils:WatermarkService.Watermark>
+                        <TextBlock Foreground="LightGray" >Type here to search text</TextBlock>
+                    </utils:WatermarkService.Watermark>
+                </TextBox>
+            </AdornerDecorator>
+        </Border>
+        <ListView x:Name="ListPicker" ItemsSource="{Binding AllItems}" Background="Black" Foreground="White" BorderThickness="0"
                           VerticalAlignment="Stretch"
           ScrollViewer.VerticalScrollBarVisibility="Auto"
           ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" Padding="3" FontWeight="Bold" Foreground="White" Margin="0,5,0,0"/>
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
-                    </GroupStyle>
-                </ListView.GroupStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock PreviewMouseLeftButtonDown="TextBlock_PreviewMouseLeftButtonDown" Text="{Binding Header}" TextWrapping="Wrap">
-                        </TextBlock>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </DockPanel> -->
-    </Grid>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" Padding="3" FontWeight="Bold" Foreground="White" Margin="0,5,0,0"/>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock PreviewMouseLeftButtonDown="TextBlock_PreviewMouseLeftButtonDown" Text="{Binding Header}" TextWrapping="Wrap">
+                    </TextBlock>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </DockPanel>
 </UserControl>

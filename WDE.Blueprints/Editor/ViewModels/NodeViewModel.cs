@@ -17,10 +17,10 @@ namespace WDE.Blueprints.Editor.ViewModels
             nodeType = node;
 
             for (int i = 0; i < inputs; ++i)
-                AddInputConnector($"Input {i+1}", IOType.Int, Colors.DarkSeaGreen);
+                AddInputConnector($"Input {i+1}", i == 0 ? IOType.Exec : IOType.Int, Colors.DarkSeaGreen);
             for (int i = 0; i < outputs; ++i)
 
-                AddOutputConnector($"Ooutput {i+1}", IOType.Int, Colors.DarkSeaGreen);
+                AddOutputConnector($"Ooutput {i+1}", i == 0 ? IOType.Exec : IOType.Int, Colors.DarkSeaGreen);
         }
 
         private NodeType nodeType;

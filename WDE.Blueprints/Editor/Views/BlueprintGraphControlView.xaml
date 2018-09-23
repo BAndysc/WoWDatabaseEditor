@@ -15,7 +15,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <controls:GraphControl x:Name="GraphControl" Background="#FF363636"
-								ElementsSource="{Binding GraphViewModel.Elements}" ConnectionsSource="{Binding GraphViewModel.Connections}"
+								ElementsSource="{Binding Elements}" ConnectionsSource="{Binding Connections}"
 								Width="20000" Height="20000"                           
 								ConnectionDragStarted="OnGraphControlConnectionDragStarted"
 								ConnectionDragging="OnGraphControlConnectionDragging"

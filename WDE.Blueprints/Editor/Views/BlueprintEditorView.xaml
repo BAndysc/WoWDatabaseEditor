@@ -18,7 +18,7 @@
         <Grid Height="{Binding ElementName=myCanvas, Path=ActualHeight}" Width="{Binding ElementName=myCanvas, Path=ActualWidth}">
             <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
                 <controls:ZoomAndPanControl x:Name="ZoomAndPanControl" Background="#FF262626">
-                    <local:BlueprintGraphControlView x:Name="GraphControl"
+                    <local:BlueprintGraphControlView x:Name="GraphControl" DataContext="{Binding GraphViewModel}"
 								PreviewMouseWheel="OnGraphControlMouseWheel"
 								PreviewMouseRightButtonDown="OnGraphControlRightMouseButtonDown"
 								PreviewMouseRightButtonUp="OnGraphControlRightMouseButtonUp"

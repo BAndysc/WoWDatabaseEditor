@@ -63,6 +63,7 @@
     <Compile Include="BlueprintsModule.cs" />
     <Compile Include="BlueprintSolutionItem.cs" />
     <Compile Include="Editor\DisignTimeViewModels\ElementViewModel.cs" />
+    <Compile Include="Editor\DisignTimeViewModels\NodePickerViewModel.cs" />
     <Compile Include="Editor\ViewModels\BlueprintEditorViewModel.cs" />
     <Compile Include="Editor\ViewModels\ConnectionViewModel.cs" />
     <Compile Include="Editor\ViewModels\ConnectorDirection.cs" />
@@ -121,6 +122,8 @@
     <Compile Include="Providers\BlueprintItemEditorProvider.cs" />
     <Compile Include="Providers\BlueprintItemProvider.cs" />
     <Compile Include="Providers\BlueprintNameProvider.cs" />
+    <Compile Include="Utils\WatermarkAdorner.cs" />
+    <Compile Include="Utils\WatermarkService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj">
@@ -163,6 +166,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Resources\ScrollBarStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
