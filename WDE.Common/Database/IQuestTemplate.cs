@@ -7,7 +7,12 @@ namespace WDE.Common.Database
 {
     public interface IQuestTemplate
     {
-        uint Entry { get; set; }
-        string Name { get; set; }
+        uint Entry { get; }
+        string Name { get; }
+
+        uint PrevQuestId { get; }
+        uint NextQuestId { get; }
+        uint ExclusiveGroup { get; }
+        uint NextQuestInChain { get; }
     }
 }

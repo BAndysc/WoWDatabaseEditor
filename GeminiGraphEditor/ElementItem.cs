@@ -103,8 +103,8 @@ namespace GeminiGraphEditor
 
                 X = _startX + delta.X;// delta.X;
                 Y = _startY + delta.Y;//
-
-                X -= X % 25;
+                
+                X -= (X + ActualWidth / 2) % 25;
                 Y -= Y % 25;
 
                 // _lastMousePosition = newMousePosition;

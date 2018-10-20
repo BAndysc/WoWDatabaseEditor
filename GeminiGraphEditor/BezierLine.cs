@@ -59,23 +59,21 @@ namespace GeminiGraphEditor
             get { return _geometry; }
         }
 
-        protected override Size MeasureOverride(Size constraint)
+        protected virtual PathSegmentCollection GetSegments()
         {
-            var rx1 = X1;// + 15;
-            var rx2 = X2;// - 15;
-            var midX = rx1 + ((rx2 - rx1) / 2);
-            var midY = Y1 + ((Y2 - Y1) / 2);
-
             PathSegmentCollection segments;
 
-            if (rx1 > rx2 - 30)
+            var midX = X1 + ((X2 - X1) / 2);
+            var midY = Y1 + ((Y2 - Y1) / 2);
+
+            if (X1 > X2 - 30)
             {
-                double diff = Math.Max((rx1 - rx2) / 3, 70);
+                double diff = Math.Max((X1 - X2) / 3, 70);
                 segments = new PathSegmentCollection
                 {
                     new BezierSegment
                     {
-                        Point1 = new Point(rx1 + diff, Y1),
+                        Point1 = new Point(X1 + diff, Y1),
                         Point2 = new Point(midX, midY),
                         Point3 = new Point(midX, midY),
                         IsStroked = true
@@ -83,8 +81,8 @@ namespace GeminiGraphEditor
                     new BezierSegment
                     {
                         Point1 = new Point(midX, midY),
-                        Point2 = new Point(rx2-diff, Y2),
-                        Point3 = new Point(rx2, Y2),
+                        Point2 = new Point(X2-diff, Y2),
+                        Point3 = new Point(X1, Y2),
                         IsStroked = true
                     },
                 };
@@ -97,11 +95,17 @@ namespace GeminiGraphEditor
                     {
                         Point1 = new Point(midX, Y1),
                         Point2 = new Point(midX, Y2),
-                        Point3 = new Point(rx2, Y2),
+                        Point3 = new Point(X2, Y2),
                         IsStroked = true
                     }
                 };
             }
+            return segments;
+        }
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            var segments = GetSegments();
 
             _geometry = new PathGeometry
             {
@@ -110,13 +114,40 @@ namespace GeminiGraphEditor
                     new PathFigure
                     {
                         IsFilled = false,
-                        StartPoint = new Point(rx1, Y1),
+                        StartPoint = new Point(X1, Y1),
                         Segments = segments
                     }
                 }
             };
 
             return base.MeasureOverride(constraint);
+        }
+    }
+
+    public class VerticalBezierLine : BezierLine
+    {
+        protected override PathSegmentCollection GetSegments()
+        {
+            var midX = X1 + ((X2 - X1) / 2);
+            var midY = Y1 + ((Y2 - Y1) / 2);
+
+            return new PathSegmentCollection
+                {
+                    new BezierSegment
+                    {
+                        Point1 = new Point(X1, Y1 + 30),
+                        Point2 = new Point(midX, midY),
+                        Point3 = new Point(midX, midY),
+                        IsStroked = true
+                    },
+                    new BezierSegment
+                    {
+                        Point1 = new Point(midX, midY),
+                        Point2 = new Point(X2, Y2 - 30),
+                        Point3 = new Point(X2, Y2),
+                        IsStroked = true
+                    },
+                };
         }
     }
 }
