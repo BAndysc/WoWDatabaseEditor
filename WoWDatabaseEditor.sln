@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.TrinityMySqlDatabase", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Blueprints", "WDE.Blueprints\WDE.Blueprints.csproj", "{4A11961B-85AD-464E-B881-C90F8CAC5647}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeminiGraphEditor", "GeminiGraphEditor\GeminiGraphEditor.csproj", "{99F6C079-A4C1-4167-992C-B02EBAA70219}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +169,18 @@ Global
 		{4A11961B-85AD-464E-B881-C90F8CAC5647}.Release|x64.Build.0 = Release|Any CPU
 		{4A11961B-85AD-464E-B881-C90F8CAC5647}.Release|x86.ActiveCfg = Release|Any CPU
 		{4A11961B-85AD-464E-B881-C90F8CAC5647}.Release|x86.Build.0 = Release|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Debug|x64.Build.0 = Debug|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Debug|x86.Build.0 = Debug|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Release|x64.ActiveCfg = Release|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Release|x64.Build.0 = Release|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Release|x86.ActiveCfg = Release|Any CPU
+		{99F6C079-A4C1-4167-992C-B02EBAA70219}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

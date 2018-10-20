@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WDE.Blueprints.Editor.Views"
-             xmlns:controls="clr-namespace:WDE.Blueprints.GeminiGraphEditor"
+             xmlns:controls="clr-namespace:GeminiGraphEditor;assembly=GeminiGraphEditor"
              xmlns:designTimeVMs="clr-namespace:WDE.Blueprints.Editor.DisignTimeViewModels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance designTimeVMs:ElementViewModel, IsDesignTimeCreatable=True}" >

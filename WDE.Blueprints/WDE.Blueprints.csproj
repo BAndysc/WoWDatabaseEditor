@@ -11,6 +11,7 @@
     <AssemblyName>WDE.Blueprints</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,6 +33,9 @@
   <ItemGroup>
     <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.2.0.3\lib\net45\CommonServiceLocator.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -55,24 +59,27 @@
       <HintPath>..\packages\Unity.Abstractions.3.3.0\lib\net45\Unity.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Container, Version=5.8.6.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Unity.Container.5.8.6\lib\net45\Unity.Container.dll</HintPath>
+      <HintPath>..\packages\Unity.Container.5.8.6\lib\net46\Unity.Container.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlueprintsModule.cs" />
     <Compile Include="BlueprintSolutionItem.cs" />
+    <Compile Include="Data\InputOutputData.cs" />
+    <Compile Include="Data\NodeDefinition.cs" />
     <Compile Include="Editor\DisignTimeViewModels\ElementViewModel.cs" />
     <Compile Include="Editor\DisignTimeViewModels\NodePickerViewModel.cs" />
     <Compile Include="Editor\ViewModels\BlueprintEditorViewModel.cs" />
-    <Compile Include="Editor\ViewModels\ConnectionViewModel.cs" />
-    <Compile Include="Editor\ViewModels\ConnectorDirection.cs" />
-    <Compile Include="Editor\ViewModels\ConnectorViewModel.cs" />
-    <Compile Include="Editor\ViewModels\ElementViewModel.cs" />
-    <Compile Include="Editor\ViewModels\GraphViewModel.cs" />
-    <Compile Include="Editor\ViewModels\InputConnectorViewModel.cs" />
-    <Compile Include="Editor\ViewModels\NodeViewModel.cs" />
-    <Compile Include="Editor\ViewModels\OutputConnectorViewModel.cs" />
+    <Compile Include="Editor\ViewModels\Graph\ConnectionViewModel.cs" />
+    <Compile Include="Editor\ViewModels\Graph\ConnectorDirection.cs" />
+    <Compile Include="Editor\ViewModels\Graph\ConnectorViewModel.cs" />
+    <Compile Include="Editor\ViewModels\Graph\ElementViewModel.cs" />
+    <Compile Include="Editor\ViewModels\Graph\GraphViewModel.cs" />
+    <Compile Include="Editor\ViewModels\Graph\InputConnectorViewModel.cs" />
+    <Compile Include="Editor\ViewModels\Graph\NodeViewModel.cs" />
+    <Compile Include="Editor\ViewModels\Graph\OutputConnectorViewModel.cs" />
+    <Compile Include="Editor\ViewModels\NodesViewModel.cs" />
     <Compile Include="Editor\Views\BlueprintEditorView.xaml.cs">
       <DependentUpon>BlueprintEditorView.xaml</DependentUpon>
     </Compile>
@@ -91,6 +98,9 @@
     <Compile Include="Editor\Views\NodePicker.xaml.cs">
       <DependentUpon>NodePicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Editor\Views\NodePickerWindow.xaml.cs">
+      <DependentUpon>NodePickerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Editor\Views\NodeView.xaml.cs">
       <DependentUpon>NodeView.xaml</DependentUpon>
     </Compile>
@@ -99,33 +109,23 @@
     </Compile>
     <Compile Include="Enums\IOType.cs" />
     <Compile Include="Enums\NodeType.cs" />
-    <Compile Include="GeminiGraphEditor\AnimationHelper.cs" />
-    <Compile Include="GeminiGraphEditor\BezierLine.cs" />
-    <Compile Include="GeminiGraphEditor\ColorToBrushConverter.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectionDragCompletedEventArgs.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectionDragEventArgs.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectionDraggingEventArgs.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectionDragStartedEventArgs.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectionItem.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectionItemsControl.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectorItem.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectorItemDragCompletedEventArgs.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectorItemDraggingEventArgs.cs" />
-    <Compile Include="GeminiGraphEditor\ConnectorItemDragStartedEventArgs.cs" />
-    <Compile Include="GeminiGraphEditor\ElementItem.cs" />
-    <Compile Include="GeminiGraphEditor\ElementItemsControl.cs" />
-    <Compile Include="GeminiGraphEditor\GraphControl.cs" />
-    <Compile Include="GeminiGraphEditor\VisualTreeUtility.cs" />
-    <Compile Include="GeminiGraphEditor\ZoomAndPanControl.cs" />
-    <Compile Include="GeminiGraphEditor\ZoomAndPanControl_IScrollInfo.cs" />
+    <Compile Include="Managers\BlueprintDataProvider.cs" />
+    <Compile Include="Managers\BlueprintDefinitionsRegistry.cs" />
+    <Compile Include="Managers\IBlueprintDataProvider.cs" />
+    <Compile Include="Managers\IBlueprintDefinitionsRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\BlueprintItemEditorProvider.cs" />
     <Compile Include="Providers\BlueprintItemProvider.cs" />
     <Compile Include="Providers\BlueprintNameProvider.cs" />
     <Compile Include="Utils\WatermarkAdorner.cs" />
     <Compile Include="Utils\WatermarkService.cs" />
+    <Compile Include="Utils\WindowExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GeminiGraphEditor\GeminiGraphEditor.csproj">
+      <Project>{99f6c079-a4c1-4167-992c-b02ebaa70219}</Project>
+      <Name>GeminiGraphEditor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj">
       <Project>{9d1a4e14-2fe1-403a-a042-ed7e49db0438}</Project>
       <Name>WDE.Common</Name>
@@ -133,6 +133,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="BlueprintData\nodes.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +155,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Editor\Views\NodePicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Editor\Views\NodePickerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Editor\Views\NodeView.xaml">

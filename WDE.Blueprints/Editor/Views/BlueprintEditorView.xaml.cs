@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WDE.Blueprints.Editor.ViewModels;
-using WDE.Blueprints.GeminiGraphEditor;
+using GeminiGraphEditor;
 
 namespace WDE.Blueprints.Editor.Views
 {
@@ -22,18 +23,18 @@ namespace WDE.Blueprints.Editor.Views
     /// </summary>
     public partial class BlueprintEditorView : UserControl
     {
+        private Point _originalContentMouseDownPoint;
+
+        private BlueprintEditorViewModel ViewModel
+        {
+            get { return (BlueprintEditorViewModel)DataContext; }
+        }
+        
         public BlueprintEditorView()
         {
             InitializeComponent();
         }
-
-        private Point _originalContentMouseDownPoint;
-
-        private GraphViewModel ViewModel
-        {
-            get { return ((BlueprintEditorViewModel)DataContext).GraphViewModel; }
-        }
-        
+                
         private void OnGraphControlMouseWheel(object sender, MouseWheelEventArgs e)
         {
             ZoomAndPanControl.ZoomAboutPoint(

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WDE.Blueprints.Editor.ViewModels;
-using WDE.Blueprints.GeminiGraphEditor;
+using GeminiGraphEditor;
 
 namespace WDE.Blueprints.Editor.Views
 {

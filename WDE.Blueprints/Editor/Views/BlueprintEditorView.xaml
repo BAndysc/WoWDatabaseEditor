@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WDE.Blueprints.Editor.Views"
-             xmlns:controls="clr-namespace:WDE.Blueprints.GeminiGraphEditor"
+             xmlns:controls="clr-namespace:GeminiGraphEditor;assembly=GeminiGraphEditor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -12,6 +12,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/WDE.Blueprints;component/Resources/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Canvas x:Name="myCanvas">
@@ -27,8 +28,5 @@
                 </controls:ZoomAndPanControl>
             </ScrollViewer>
         </Grid>
-        <!--<Border x:Name="Picker" Visibility="{Binding GraphViewModel.ShowPicker}" BorderThickness="3" BorderBrush="BlueViolet" Canvas.Left="50" CornerRadius="3">
-
-        </Border>-->
     </Canvas>
 </UserControl>

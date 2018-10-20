@@ -1,0 +1,459 @@
+[
+	{
+		"node_type": "event",
+		"id": "just_created",
+		"header": "Just created"
+	},
+	{
+		"node_type": "event",
+		"id": "reached_poInt",
+		"header": "Reached poInt",
+		"outputs": [
+			{
+				"name": "Point Id",
+				"description": "Point ID set in action",
+				"type": "Int"
+			}
+		]
+	},
+	{
+		"node_type": "event",
+		"id": "home_reached",
+		"header": "Home reached"
+	},
+	{
+		"node_type": "event",
+		"id": "spell_hit",
+		"header": "Spell hit",
+		"outputs": [
+			{
+				"name": "Spell id",
+				"description": "ID of spell that hit the creature",
+				"type": "Int"
+			},
+			{
+				"name": "Caster",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "event",
+		"id": "aura_removed",
+		"header": "Aura removed",
+		"outputs": [
+			{
+				"name": "Spell id",
+				"description": "ID of aura that was removed",
+				"type": "Int"
+			}
+		]
+	},
+	{
+		"node_type": "event",
+		"id": "timed_event",
+		"header": "Timed event",
+		"outputs": [
+			{
+				"name": "Event id",
+				"type": "Int"
+			}
+		]
+	},
+	{
+		"node_type": "expression",
+		"id": "me",
+		"header": "Me",
+		"outputs": [
+			{
+				"name": "Me",
+				"description": "Creature from script",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "expression",
+		"id": "closest_gameobject",
+		"header": "Closest gameobject",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			},
+			{
+				"name": "Entry",
+				"type": "Int"
+			},
+			{
+				"name": "Distance",
+				"type": "Float"
+			}
+		],
+		"outputs": [
+			{
+				"name": "Gameobject",
+				"description": "Closest found gameobject",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "expression",
+		"id": "get_position",
+		"header": "Get position",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			}
+		],
+		"outputs": [
+			{
+				"name": "Position",
+				"description": "Position of provided object",
+				"type": "Vector3"
+			}
+		]
+	},
+	{
+		"node_type": "expression",
+		"id": "equals",
+		"header": "Equals (=)",
+		"inputs": [
+			{
+				"name": "a",
+				"type": "int"
+			},
+			{
+				"name": "b",
+				"type": "int"
+			}
+		],
+		"outputs": [
+			{
+				"name": "Result",
+				"type": "Bool"
+			}
+		]
+	},
+	{
+		"node_type": "expression",
+		"id": "direction_vector",
+		"header": "Get direction vector",
+		"inputs": [
+			{
+				"name": "From",
+				"type": "Vector3"
+			},
+			{
+				"name": "To",
+				"type": "Vector3"
+			}
+		],
+		"outputs": [
+			{
+				"name": "Direction",
+				"type": "Vector3"
+			}
+		]
+	},
+	{
+		"node_type": "expression",
+		"id": "add_vector",
+		"header": "Add vectors",
+		"inputs": [
+			{
+				"name": "a",
+				"type": "Vector3"
+			},
+			{
+				"name": "b",
+				"type": "Vector3"
+			}
+		],
+		"outputs": [
+			{
+				"name": "c",
+				"type": "Vector3"
+			}
+		]
+	},
+	{
+		"node_type": "expression",
+		"id": "mul_vector_by_scalar",
+		"header": "Scale vector",
+		"inputs": [
+			{
+				"name": "a",
+				"type": "Vector3"
+			},
+			{
+				"name": "scale",
+				"type": "float"
+			}
+		],
+		"outputs": [
+			{
+				"name": "c",
+				"type": "Vector3"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "move_to",
+		"tags": "move go movement walk run",
+		"header": "Move to",
+		"inputs": [
+			{
+				"name": "Source",
+				"description": "Object which will go to the position",
+				"type": "Object"
+			},
+			{
+				"name": "Destination",
+				"description": "Point to which npc will go",
+				"type": "Vector3"
+			},
+			{
+				"name": "Id",
+				"description": "Id which will be fired for event MOVEMENT_INFORM",
+				"type": "Int"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "set_emotestate",
+		"header": "Set emotestate",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			},
+			{
+				"name": "Emote",
+				"type": "int"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "play_emote",
+		"header": "Play emote",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			},
+			{
+				"name": "Emote",
+				"type": "int"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "wait",
+		"header": "Wait",
+		"inputs": [
+			{
+				"name": "Seconds",
+				"type": "float"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "set_run",
+		"header": "Set run",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "set_walk",
+		"header": "Set walk",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "go_home",
+		"header": "Go home",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "talk",
+		"header": "Talk",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			},
+			{
+				"name": "Text Id",
+				"type": "int"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "cast",
+		"header": "Cast",
+		"inputs": [
+			{
+				"name": "Caster",
+				"type": "Object"
+			},
+			{
+				"name": "Spell id",
+				"type": "int"
+			},
+			{
+				"name": "Target",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "give_killcredit",
+		"header": "Give killcredit",
+		"inputs": [
+			{
+				"name": "Whom",
+				"type": "Object"
+			},
+			{
+				"name": "Kill credit",
+				"type": "int"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "remove_auras",
+		"header": "Remove all auras",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "stop_moving",
+		"header": "Stop moving",
+		"inputs": [
+			{
+				"name": "Source",
+				"type": "Object"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "create_timed",
+		"header": "Create timed",
+		"inputs": [
+			{
+				"name": "Id",
+				"type": "int"
+			},
+			{
+				"name": "Time",
+				"type": "float"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "if",
+		"header": "If",
+		"inputs": [
+			{
+				"name": "Condition",
+				"type": "Bool"
+			}
+		],
+		"outputs": [
+			{
+				"name": "On true",
+				"type": "Exec"
+			},	
+			{
+				"name": "On false",
+				"type": "Exec"
+			}
+		]
+	},
+	{
+		"node_type": "statement",
+		"id": "func_",
+		"header": "GoNextToPosition",
+		"inputs": [
+			{
+				"name": "Source",
+				"description": "Object which will go to the position",
+				"type": "Object"
+			},
+			{
+				"name": "Destination",
+				"description": "Point to which npc will go",
+				"type": "Vector3"
+			},
+			{
+				"name": "Distance",
+				"type": "Float"
+			},
+			{
+				"name": "Id",
+				"description": "Id which will be fired for event MOVEMENT_INFORM",
+				"type": "Int"
+			}
+		]
+	},
+	{
+		"node_type": "event",
+		"id": "func_",
+		"header": "def GoNextToPosition:",
+		"outputs": [
+			{
+				"name": "Source",
+				"description": "Object which will go to the position",
+				"type": "Object"
+			},
+			{
+				"name": "Destination",
+				"description": "Point to which npc will go",
+				"type": "Vector3"
+			},
+			{
+				"name": "Distance",
+				"type": "Float"
+			},
+			{
+				"name": "Id",
+				"description": "Id which will be fired for event MOVEMENT_INFORM",
+				"type": "Int"
+			}
+		]
+	}
+]
