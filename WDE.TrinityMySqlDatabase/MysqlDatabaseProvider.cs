@@ -95,7 +95,7 @@ namespace WDE.TrinityMySqlDatabase
             if (model == null)
                 return new List<IQuestTemplate>();
             if (QuestTemplateCache == null)
-                QuestTemplateCache = (from t in model.QuestTemplate join addon in model.QuestTemplateAddon on t.Entry equals addon.QuestId orderby t.Entry select t.SetAddon(addon)).ToList();
+                QuestTemplateCache = (from t in model.QuestTemplate join addon in model.QuestTemplateAddon on t.Entry equals addon.QuestId into adn from subaddon in adn.DefaultIfEmpty() orderby t.Entry select t.SetAddon(subaddon)).ToList();
             return QuestTemplateCache;
         }
 
