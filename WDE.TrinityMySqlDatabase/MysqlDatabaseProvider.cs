@@ -95,7 +95,7 @@ namespace WDE.TrinityMySqlDatabase
             if (model == null)
                 return new List<IQuestTemplate>();
             if (QuestTemplateCache == null)
-                QuestTemplateCache = (from t in model.QuestTemplate orderby t.Entry select t).ToList();
+                QuestTemplateCache = (from t in model.QuestTemplate join addon in model.QuestTemplateAddon on t.Entry equals addon.QuestId orderby t.Entry select t.SetAddon(addon)).ToList();
             return QuestTemplateCache;
         }
 
@@ -114,7 +114,8 @@ namespace WDE.TrinityMySqlDatabase
                 return null;
             if (model.QuestTemplate.Count(x => x.Entry == entry) == 0)
                 return null;
-            return model.QuestTemplate.GetReference(entry);
+            var addon = model.QuestTemplateAddon.GetReference(entry);
+            return model.QuestTemplate.GetReference(entry).SetAddon(addon);
         }
 
         public void InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)

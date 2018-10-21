@@ -12,16 +12,15 @@ namespace WDE.TrinityMySqlDatabase.Models
     {
         [PrimaryKey]
         [PersistedMember(Name = "ID")]
-        public abstract uint Entry { get; set; }
+        public abstract uint QuestId { get; set; }
 
         [PersistedMember(Name = "PrevQuestId")]
-        public abstract uint PrevQuestId { get; set; }
+        public abstract int PrevQuestId { get; set; }
 
         [PersistedMember(Name = "NextQuestId")]
-        public abstract uint NextQuestId { get; set; }
+        public abstract int NextQuestId { get; set; }
 
         [PersistedMember(Name = "ExclusiveGroup")]
-        public abstract uint ExclusiveGroup { get; set; }
-        
+        public abstract int ExclusiveGroup { get; set; }
     }
 }

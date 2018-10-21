@@ -10,9 +10,9 @@ namespace WDE.Common.Database
         uint Entry { get; }
         string Name { get; }
 
-        uint PrevQuestId { get; }
-        uint NextQuestId { get; }
-        uint ExclusiveGroup { get; }
-        uint NextQuestInChain { get; }
+        int PrevQuestId { get; }
+        int NextQuestId { get; }
+        int ExclusiveGroup { get; }
+        int NextQuestInChain { get; }
     }
 }

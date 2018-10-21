@@ -18,16 +18,21 @@ namespace WDE.TrinityMySqlDatabase.Models
         [PersistedMember(Name = "LogTitle")]
         public abstract string Name { get; set; }
 
+        public int PrevQuestId => addon.PrevQuestId;
 
-        [RelatedDataAccessObjects]
-        public abstract RelatedDataAccessObjects<MySqlQuestTemplateAddon> MySqlQuestTemplateAddons { get; }
+        public int NextQuestId => addon.NextQuestId;
 
-        public uint PrevQuestId => MySqlQuestTemplateAddons.FirstOrDefault().PrevQuestId;
-            
-        public uint NextQuestId => MySqlQuestTemplateAddons.FirstOrDefault().NextQuestId;
+        public int ExclusiveGroup => addon.ExclusiveGroup;
 
-        public uint ExclusiveGroup => MySqlQuestTemplateAddons.FirstOrDefault().ExclusiveGroup;
+        public int NextQuestInChain => 0;
+        
 
-        public uint NextQuestInChain => 0;
+        private MySqlQuestTemplateAddon addon;
+
+        public MySqlQuestTemplate SetAddon(MySqlQuestTemplateAddon addon)
+        {
+            this.addon = addon;
+            return this;
+        }
     }
 }
