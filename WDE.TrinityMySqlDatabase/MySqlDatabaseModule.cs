@@ -15,44 +15,19 @@ using WDE.TrinityMySqlDatabase.ViewModels;
 using WDE.TrinityMySqlDatabase.Views;
 using Prism.Ioc;
 using WDE.Common.Attributes;
+using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase
 {
     [AutoRegister, SingleInstance]
-    public class TrinityMySqlDatabaseModule : IModule, IConfigurable
+    public class TrinityMySqlDatabaseModule : IModule
     {
-        public static DbAccess DbAccess { get; set; }
-        
-        public KeyValuePair<ContentControl, Action> GetConfigurationView()
-        {
-            var view = new DatabaseConfigView();
-            var viewModel = new DatabaseConfigViewModel();
-            view.DataContext = viewModel;
-            return new KeyValuePair<ContentControl, Action>(view, viewModel.SaveAction);
-        }
-
-        public string GetName()
-        {
-            return "TrinityCore Database";
-        }
-
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
         }
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            if (System.IO.File.Exists("database.json"))
-            {
-                JsonSerializer ser = new Newtonsoft.Json.JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
-                using (StreamReader re = new StreamReader("database.json"))
-                {
-                    JsonTextReader reader = new JsonTextReader(re);
-                    DbAccess = ser.Deserialize<DbAccess>(reader);
-                }
-            }
-            else
-                DbAccess = new DbAccess();
         }
     }
 }

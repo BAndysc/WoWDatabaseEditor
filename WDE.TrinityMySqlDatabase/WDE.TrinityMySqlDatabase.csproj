@@ -126,6 +126,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\MySqlCreatureTemplate.cs" />
     <Compile Include="Models\TrinityDatabase.cs" />
+    <Compile Include="Providers\ConnectionSettingsProvider.cs" />
+    <Compile Include="Providers\IConnectionSettingsProvider.cs" />
+    <Compile Include="MySqlDatabaseConfiguration.cs" />
     <Compile Include="ViewModels\DatabaseConfigViewModel.cs" />
     <Compile Include="Views\DatabaseConfigView.xaml.cs">
       <DependentUpon>DatabaseConfigView.xaml</DependentUpon>

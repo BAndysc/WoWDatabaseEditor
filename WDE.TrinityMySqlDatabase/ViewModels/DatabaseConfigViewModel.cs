@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using Newtonsoft.Json;
+using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase.ViewModels
 {
@@ -18,6 +19,7 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
         private string _user;
         private string _pass;
         private string _database;
+        private readonly IConnectionSettingsProvider settings;
 
         public string Host
         {
@@ -44,27 +46,19 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
         }
 
 
-        public DatabaseConfigViewModel()
+        public DatabaseConfigViewModel(IConnectionSettingsProvider settings)
         {
             SaveAction = Save;
-            Database = TrinityMySqlDatabaseModule.DbAccess.DB;
-            User = TrinityMySqlDatabaseModule.DbAccess.User;
-            Password = TrinityMySqlDatabaseModule.DbAccess.Password;
-            Host = TrinityMySqlDatabaseModule.DbAccess.Host;
+            Database = settings.GetSettings().DB;
+            User = settings.GetSettings().User;
+            Password = settings.GetSettings().Password;
+            Host = settings.GetSettings().Host;
+            this.settings = settings;
         }
 
         private void Save()
         {
-            TrinityMySqlDatabaseModule.DbAccess.DB = Database;
-            TrinityMySqlDatabaseModule.DbAccess.User = User;
-            TrinityMySqlDatabaseModule.DbAccess.Password = Password;
-            TrinityMySqlDatabaseModule.DbAccess.Host = Host;
-            JsonSerializer ser = new Newtonsoft.Json.JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
-            using (StreamWriter file = File.CreateText(@"database.json"))
-            {
-                ser.Serialize(file, TrinityMySqlDatabaseModule.DbAccess);
-            }
-            MessageBox.Show("Restart the application.");
+            settings.UpdateSettings(User, Password, Host, Database);
         }
     }
 }
