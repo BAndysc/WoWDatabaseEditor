@@ -29,7 +29,6 @@ namespace WDE.SmartScriptEditor
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            SmartDataLoader.Load(SmartDataManager.GetInstance(), new SmartDataFileLoader());
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

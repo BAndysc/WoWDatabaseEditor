@@ -36,7 +36,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set { SetProperty(ref _selectedItem, value);  }
         }
 
-        public SmartSelectViewModel(string file, SmartType type, Func<SmartGenericJsonData, bool> predicate)
+        public SmartSelectViewModel(string file, SmartType type, Func<SmartGenericJsonData, bool> predicate, ISmartDataManager smartDataManager)
         {
             _predicate = predicate;
             string group = null;
@@ -44,11 +44,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 if (line.IndexOf(" ", StringComparison.Ordinal) == 0)
                 {
-                    if (!SmartDataManager.GetInstance().Contains(type, line.Trim()))
+                    if (!smartDataManager.Contains(type, line.Trim()))
                         continue;
 
                     SmartItem i = new SmartItem();
-                    var data = SmartDataManager.GetInstance().GetDataByName(type, line.Trim());
+                    var data = smartDataManager.GetDataByName(type, line.Trim());
 
                     i.Group = group;
                     i.Name = data.NameReadable;

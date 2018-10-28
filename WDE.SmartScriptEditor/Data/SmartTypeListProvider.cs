@@ -13,14 +13,17 @@ namespace WDE.SmartScriptEditor.Data
 {
     public class SmartTypeListProvider : ISmartTypeListProvider
     {
-        public SmartTypeListProvider()
+        private readonly ISmartDataManager smartDataManager;
+
+        public SmartTypeListProvider(ISmartDataManager smartDataManager)
         {
+            this.smartDataManager = smartDataManager;
         }
 
         public int? Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
         {
             var view = new SmartSelectView();
-            var model = new SmartSelectViewModel(GetFileNameFor(type), type, predicate);
+            var model = new SmartSelectViewModel(GetFileNameFor(type), type, predicate, smartDataManager);
             view.DataContext = model;
 
             bool? res = view.ShowDialog();

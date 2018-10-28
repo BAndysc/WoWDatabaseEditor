@@ -15,19 +15,21 @@ namespace WDE.SmartScriptEditor.Data
     public class SmartFactory : ISmartFactory
     {
         private readonly IParameterFactory _parameterFactory;
+        private readonly ISmartDataManager smartDataManager;
 
-        public SmartFactory(IParameterFactory parameterFactory)
+        public SmartFactory(IParameterFactory parameterFactory, ISmartDataManager smartDataManager)
         {
             _parameterFactory = parameterFactory;
+            this.smartDataManager = smartDataManager;
         }
 
         public SmartEvent EventFactory(int id)
         {
-            if (!SmartDataManager.GetInstance().Contains(SmartType.SmartEvent, id))
+            if (!smartDataManager.Contains(SmartType.SmartEvent, id))
                 throw new NullReferenceException("No data for event id " + id);
 
             SmartEvent ev = new SmartEvent(id);
-            var raw = SmartDataManager.GetInstance().GetRawData(SmartType.SmartEvent, id);
+            var raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
             ev.Chance.SetValue(100);
             SetParameterObjects(ev, raw);
 
@@ -78,12 +80,12 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartAction ActionFactory(int id, SmartSource source, SmartTarget target)
         {
-            if (!SmartDataManager.GetInstance().Contains(SmartType.SmartAction, id))
+            if (!smartDataManager.Contains(SmartType.SmartAction, id))
                 throw new NullReferenceException("No data for action id " + id);
 
             SmartAction action = new SmartAction(id, source, target);
 
-            SetParameterObjects(action, SmartDataManager.GetInstance().GetRawData(SmartType.SmartAction, id));
+            SetParameterObjects(action, smartDataManager.GetRawData(SmartType.SmartAction, id));
 
             return action;
         }
@@ -124,14 +126,14 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartTarget TargetFactory(int id)
         {
-            if (!SmartDataManager.GetInstance().Contains(SmartType.SmartTarget, id))
+            if (!smartDataManager.Contains(SmartType.SmartTarget, id))
                 throw new NullReferenceException("No data for target id " + id);
 
             SmartTarget target = new SmartTarget(id);
 
-            SetParameterObjects(target, SmartDataManager.GetInstance().GetRawData(SmartType.SmartTarget, id));
+            SetParameterObjects(target, smartDataManager.GetRawData(SmartType.SmartTarget, id));
 
-            var targetTypes = SmartDataManager.GetInstance().GetRawData(SmartType.SmartTarget, id).Types;
+            var targetTypes = smartDataManager.GetRawData(SmartType.SmartTarget, id).Types;
 
             if (targetTypes != null && targetTypes.Contains("Position"))
                 target.IsPosition = true;
@@ -173,12 +175,12 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartSource SourceFactory(int id)
         {
-            if (!SmartDataManager.GetInstance().Contains(SmartType.SmartSource, id))
+            if (!smartDataManager.Contains(SmartType.SmartSource, id))
                 throw new NullReferenceException("No data for source id " + id);
 
             SmartSource source = new SmartSource(id);
 
-            SetParameterObjects(source, SmartDataManager.GetInstance().GetRawData(SmartType.SmartSource, id));
+            SetParameterObjects(source, smartDataManager.GetRawData(SmartType.SmartSource, id));
 
             return source;
         }

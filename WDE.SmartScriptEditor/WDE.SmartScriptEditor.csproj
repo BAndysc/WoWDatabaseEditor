@@ -93,9 +93,9 @@
     <Compile Include="Data\DataJsonStructs.cs" />
     <Compile Include="Data\ISmartDataProvider.cs" />
     <Compile Include="Data\ISmartFactory.cs" />
-    <Compile Include="Data\SmartDataFileLoader.cs" />
-    <Compile Include="Data\SmartDataLoader.cs" />
+    <Compile Include="Data\SmartDataJsonProvider.cs" />
     <Compile Include="Data\SmartDataManager.cs" />
+    <Compile Include="Data\SmartDataProvider.cs" />
     <Compile Include="Data\SmartFactory.cs" />
     <Compile Include="Editor\Helpers\BoolToVisibilityConverter.cs" />
     <Compile Include="Editor\Helpers\FocusBehavior.cs" />

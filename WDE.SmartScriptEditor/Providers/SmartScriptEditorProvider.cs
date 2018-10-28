@@ -23,6 +23,7 @@ namespace WDE.SmartScriptEditor.Providers
         private readonly IHistoryManager historyManager;
         private readonly IDatabaseProvider databaseProvider;
         private readonly IEventAggregator eventAggregator;
+        private readonly ISmartDataManager smartDataManager;
         private readonly ISmartFactory smartFactory;
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly SmartTypeListProvider smartTypeListProvider;
@@ -32,15 +33,17 @@ namespace WDE.SmartScriptEditor.Providers
             IHistoryManager historyManager,
             IDatabaseProvider databaseProvider,
             IEventAggregator eventAggregator,
+            ISmartDataManager smartDataManager,
             ISmartFactory smartFactory,
             IItemFromListProvider itemFromListProvider,
-            SmartTypeListProvider smartTypeListProvider            
+            SmartTypeListProvider smartTypeListProvider         
             )
         {
             this.solutionItemNameRegistry = solutionItemNameRegistry;
             this.historyManager = historyManager;
             this.databaseProvider = databaseProvider;
             this.eventAggregator = eventAggregator;
+            this.smartDataManager = smartDataManager;
             this.smartFactory = smartFactory;
             this.itemFromListProvider = itemFromListProvider;
             this.smartTypeListProvider = smartTypeListProvider;
@@ -50,7 +53,7 @@ namespace WDE.SmartScriptEditor.Providers
         {
             var view = new SmartScriptEditorView();
             var solutionItem = item as SmartScriptSolutionItem;
-            var vm = new SmartScriptEditorViewModel(solutionItem, historyManager, databaseProvider, eventAggregator, smartFactory, itemFromListProvider, smartTypeListProvider, solutionItemNameRegistry);
+            var vm = new SmartScriptEditorViewModel(solutionItem, historyManager, databaseProvider, eventAggregator, smartDataManager, smartFactory, itemFromListProvider, smartTypeListProvider, solutionItemNameRegistry);
             view.DataContext = vm;
 
             DocumentEditor editor = new DocumentEditor

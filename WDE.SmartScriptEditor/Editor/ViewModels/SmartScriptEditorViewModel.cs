@@ -23,6 +23,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     public class SmartScriptEditorViewModel : BindableBase
     {
         private IDatabaseProvider database;
+        private readonly ISmartDataManager smartDataManager;
         private IItemFromListProvider itemFromListProvider;
         private ISmartFactory smartFactory;
         private ISmartTypeListProvider smartTypeListProvider;
@@ -58,11 +59,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand DeleteEvent { get; set; }
 
-        public SmartScriptEditorViewModel(SmartScriptSolutionItem item, IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry)
+        public SmartScriptEditorViewModel(SmartScriptSolutionItem item, IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry)
         {
             _item = item;
             _history = history;
             this.database = database;
+            this.smartDataManager = smartDataManager;
             this.smartFactory = smartFactory;
             this.itemFromListProvider = itemFromListProvider;
             this.smartTypeListProvider = smartTypeListProvider;
@@ -212,7 +214,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (!actionId.HasValue)
                 return;
 
-            var actionData = SmartDataManager.GetInstance().GetRawData(SmartType.SmartAction, actionId.Value);
+            var actionData = smartDataManager.GetRawData(SmartType.SmartAction, actionId.Value);
 
             SmartTarget target = null;
 

@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.Attributes;
 
 namespace WDE.SmartScriptEditor.Data
 {
-    public class SmartDataFileLoader : ISmartDataProvider
+    [AutoRegister]
+    public class SmartDataJsonProvider : ISmartDataJsonProvider
     {
         public string GetActionsJson()
         {

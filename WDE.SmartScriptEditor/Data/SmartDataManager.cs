@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.Attributes;
 using WDE.Common.Database;
 
 namespace WDE.SmartScriptEditor.Data
@@ -18,10 +19,35 @@ namespace WDE.SmartScriptEditor.Data
         SmartSource = 5,
     }
 
-    public class SmartDataManager
+    public interface ISmartDataManager
+    {
+        bool Contains(SmartType type, int id);
+
+        bool Contains(SmartType type, string id);
+        
+        SmartGenericJsonData GetRawData(SmartType type, int id);
+
+        SmartGenericJsonData GetDataByName(SmartType type, string name);
+    }
+
+    [SingleInstance, AutoRegister]
+    public class SmartDataManager : ISmartDataManager
     {
         private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> _smartIdData = new Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>>();
         private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> _smartNameData = new Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>>();
+
+        public SmartDataManager(SmartDataProvider provider)
+        {
+            Load(SmartType.SmartEvent, provider.GetEvents());
+            Load(SmartType.SmartAction, provider.GetActions());
+            Load(SmartType.SmartTarget, provider.GetTargets());
+        }
+
+        private void Load(SmartType type, IEnumerable<SmartGenericJsonData> data)
+        {
+            foreach (var d in data)
+                Add(type, d);
+        }
 
         public bool Contains(SmartType type, int id)
         {
@@ -58,7 +84,7 @@ namespace WDE.SmartScriptEditor.Data
                 throw new SmartDataWithSuchIdExists();
         }
 
-        public void Add(SmartType type, SmartGenericJsonData data)
+        private void Add(SmartType type, SmartGenericJsonData data)
         {
             if (type == SmartType.SmartSource)
                 ActualAdd(SmartType.SmartTarget, data);
@@ -82,12 +108,6 @@ namespace WDE.SmartScriptEditor.Data
                 throw new NullReferenceException();
 
             return _smartNameData[type][name];
-        }
-        
-        private static SmartDataManager _instance;
-        public static SmartDataManager GetInstance()
-        {
-            return _instance ?? (_instance = new SmartDataManager());
         }
     }
 
