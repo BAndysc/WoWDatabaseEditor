@@ -85,6 +85,9 @@
     <Reference Include="MySql.Data, Version=6.10.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>..\packages\MySql.Data.6.10.8\lib\net452\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Platform, Version=1.2.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Platform.NET.1.2.5\lib\net452\Platform.dll</HintPath>
     </Reference>
@@ -105,6 +108,9 @@
     </Reference>
     <Reference Include="Shaolinq.MySql, Version=1.8.10.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Shaolinq.MySql.1.8.10\lib\net452\Shaolinq.MySql.dll</HintPath>
+    </Reference>
+    <Reference Include="SmartFormat, Version=2.3.0.0, Culture=neutral, PublicKeyToken=568866805651201f, processorArchitecture=MSIL">
+      <HintPath>..\packages\SmartFormat.NET.2.3.0\lib\net45\SmartFormat.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel" />
@@ -283,48 +289,14 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WDE.Blueprints\WDE.Blueprints.csproj">
-      <Project>{4A11961B-85AD-464E-B881-C90F8CAC5647}</Project>
-      <Name>WDE.Blueprints</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj">
       <Project>{9d1a4e14-2fe1-403a-a042-ed7e49db0438}</Project>
       <Name>WDE.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WDE.DbcStore\WDE.DbcStore.csproj">
-      <Project>{A6109F89-0148-4C39-8631-206FFEFBA055}</Project>
-      <Name>WDE.DbcStore</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WDE.HistoryWindow\WDE.HistoryWindow.csproj">
-      <Project>{cf6d62d2-2332-4223-8499-abf1cedf3fc4}</Project>
-      <Name>WDE.HistoryWindow</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WDE.History\WDE.History.csproj">
-      <Project>{BC7E0845-C750-4DAF-8869-9170211465E6}</Project>
-      <Name>WDE.History</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj">
-      <Project>{3CD1E251-D9BF-4061-A8D5-4AC65106C896}</Project>
-      <Name>WDE.Parameters</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj">
-      <Project>{b060c7f1-97b0-4a26-b7a8-e47c9af08d07}</Project>
-      <Name>WDE.SmartScriptEditor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj">
-      <Project>{acd1c8bc-b91a-40e8-865d-d6826758e7cc}</Project>
-      <Name>WDE.Solutions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj">
-      <Project>{7E0DE187-A45C-406B-AAAE-608F40237CE6}</Project>
-      <Name>WDE.SQLEditor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj">
-      <Project>{c6be1e01-cf2f-4fe5-a67c-ac783eb9d3f7}</Project>
-      <Name>WDE.TrinityMySqlDatabase</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

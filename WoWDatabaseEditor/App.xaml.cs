@@ -2,35 +2,19 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-
 using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
 using Unity.Lifetime;
 using Unity.RegistrationByConvention;
-using WDE.Blueprints;
-using WDE.Common;
 using WDE.Common.Attributes;
-using WDE.Common.Managers;
-using WDE.Common.Services;
-using WDE.Common.Windows;
-using WDE.DbcStore;
-using WDE.History;
-using WDE.HistoryWindow;
-using WDE.Parameters;
-using WDE.SmartScriptEditor;
-using WDE.Solutions;
-using WDE.Solutions.Manager;
-using WDE.SQLEditor;
-using WDE.TrinityMySqlDatabase;
 using WoWDatabaseEditor.Events;
-using WoWDatabaseEditor.Managers;
-using WoWDatabaseEditor.Services.ConfigurationService;
-using WoWDatabaseEditor.Services.NewItemService;
 using WoWDatabaseEditor.Views;
 
 namespace WoWDatabaseEditor
@@ -67,28 +51,26 @@ namespace WoWDatabaseEditor
         {
             base.ConfigureModuleCatalog(moduleCatalog);
 
-            moduleCatalog.AddModule(typeof(TrinityMySqlDatabaseModule));
+            List<Assembly> allAssemblies = GetDlls().Select(path => Assembly.LoadFile(path)).ToList();
+            
+            AutoRegisterClasses(allAssemblies);
 
-            moduleCatalog.AddModule(typeof(HistoryModule));
-            moduleCatalog.AddModule(typeof(ParametersModule));
-            moduleCatalog.AddModule(typeof(DbcStoreModule));
-            moduleCatalog.AddModule(typeof(SmartScriptModule));
-            moduleCatalog.AddModule(typeof(SqlEditorModule));
-            moduleCatalog.AddModule(typeof(SolutionsModule));
-            moduleCatalog.AddModule(typeof(BlueprintsModule));
-            
-            moduleCatalog.AddModule(typeof(HistoryWindowModule));
-            
-            AutoRegisterClasses();
+            AddMoulesFromLoadedAssemblies(moduleCatalog, allAssemblies);
+        }
+        
+        private IEnumerable<string> GetDlls()
+        {
+            string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            return Directory.GetFiles(path, "*.dll");
         }
 
-        /*
+        /* 
          * Ok, this method is reaaly ugly. Luckily it is also realy low level
          * so it doesn't affect other parts that much. I don't know how it should be done properly.
          */
-        private void AutoRegisterClasses()
+        private void AutoRegisterClasses(List<Assembly> allAssemblies)
         {
-            var defaultRegisters = AllClasses.FromLoadedAssemblies().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));
+            var defaultRegisters = AllClasses.FromLoadedAssemblies().Union(AllClasses.FromAssemblies(allAssemblies)).Distinct().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));
 
             HashSet<Type> alreadyInitialized = new HashSet<Type>();
             foreach (var register in defaultRegisters)
@@ -98,7 +80,7 @@ namespace WoWDatabaseEditor
 
                 var singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
 
-                foreach (var interface_ in register.GetInterfaces())
+                foreach (var interface_ in register.GetInterfaces().Union(new[] { register }))
                 {
                     string name = null;
 
@@ -117,6 +99,18 @@ namespace WoWDatabaseEditor
                     Container.GetContainer().RegisterType(interface_, register, name, life);
                 }
             }
+        }
+
+        private void AddMoulesFromLoadedAssemblies(IModuleCatalog moduleCatalog, List<Assembly> allAssemblies)
+        {
+            var modules = AllClasses.FromLoadedAssemblies().Union(AllClasses.FromAssemblies(allAssemblies)).Where(t => t.GetInterfaces().Contains(typeof(IModule)));
+
+            modules.Select(module => new ModuleInfo()
+            {
+                ModuleName = module.Name,
+                ModuleType = module.AssemblyQualifiedName,
+                Ref = "file://" + module.Assembly.Location
+            }).ToList().ForEach(moduleCatalog.AddModule);
         }
 
         protected override IModuleCatalog CreateModuleCatalog()

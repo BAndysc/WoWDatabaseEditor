@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 
 using WDE.Common;
-using WDE.SmartScriptEditor;
 using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.NewItemService
