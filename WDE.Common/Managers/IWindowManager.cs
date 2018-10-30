@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
+using WDE.Common.Attributes;
 using WDE.Common.Windows;
 
 namespace WDE.Common.Managers
 {
+    [UniqueProvider]
     public interface IWindowManager
     {
         DocumentEditor ActiveDocument { get; set; }

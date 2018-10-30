@@ -52,7 +52,15 @@ namespace WoWDatabaseEditor
             base.ConfigureModuleCatalog(moduleCatalog);
 
             List<Assembly> allAssemblies = GetDlls().Select(path => Assembly.LoadFile(path)).ToList();
-            
+
+            var conflicts = DetectConflicts(allAssemblies);
+
+            foreach (var conflict in conflicts)
+            {
+                MessageBox.Show($"Module {conflict.ConflictingAssembly.GetName().Name} conflicts with module {conflict.FirstAssembly.GetName().Name}. They provide same functionality. This is not allowed. Disablig {conflict.ConflictingAssembly.GetName().Name}");
+                allAssemblies.Remove(conflict.ConflictingAssembly);
+            }
+
             AutoRegisterClasses(allAssemblies);
 
             AddMoulesFromLoadedAssemblies(moduleCatalog, allAssemblies);
@@ -64,13 +72,46 @@ namespace WoWDatabaseEditor
             return Directory.GetFiles(path, "*.dll");
         }
 
+        private class Conflict
+        {
+            public Assembly ConflictingAssembly;
+            public Assembly FirstAssembly;
+        }
+
+        private IList<Conflict> DetectConflicts(List<Assembly> allAssemblies)
+        {
+            Dictionary<Assembly, IList<Type>> providedInterfaces = new Dictionary<Assembly, IList<Type>>();
+
+            List<Conflict> conflictingAssemblies = new List<Conflict>();
+
+            foreach (var assembly in allAssemblies)
+            {
+                var implementedInterfaces = AllClasses.FromAssemblies(assembly).Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true)).SelectMany(t => t.GetInterfaces()).Where(t => t.IsDefined(typeof(UniqueProviderAttribute))).ToList();
+
+                if (implementedInterfaces.Count == 0)
+                    continue;
+
+                foreach (var otherAssembly in providedInterfaces)
+                {
+                    var intersection = otherAssembly.Value.Intersect(implementedInterfaces).ToList();
+
+                    if (intersection.Count > 0)
+                        conflictingAssemblies.Add(new Conflict { ConflictingAssembly = assembly, FirstAssembly = otherAssembly.Key });
+                }
+
+                providedInterfaces.Add(assembly, implementedInterfaces.ToList());
+            }
+
+            return conflictingAssemblies;
+        }
+
         /* 
          * Ok, this method is reaaly ugly. Luckily it is also realy low level
          * so it doesn't affect other parts that much. I don't know how it should be done properly.
          */
         private void AutoRegisterClasses(List<Assembly> allAssemblies)
         {
-            var defaultRegisters = AllClasses.FromLoadedAssemblies().Union(AllClasses.FromAssemblies(allAssemblies)).Distinct().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));
+            var defaultRegisters = AllClasses.FromAssemblies(GetType().Assembly).Union(AllClasses.FromAssemblies(allAssemblies)).Distinct().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));
 
             HashSet<Type> alreadyInitialized = new HashSet<Type>();
             foreach (var register in defaultRegisters)
@@ -103,7 +144,7 @@ namespace WoWDatabaseEditor
 
         private void AddMoulesFromLoadedAssemblies(IModuleCatalog moduleCatalog, List<Assembly> allAssemblies)
         {
-            var modules = AllClasses.FromLoadedAssemblies().Union(AllClasses.FromAssemblies(allAssemblies)).Where(t => t.GetInterfaces().Contains(typeof(IModule)));
+            var modules = AllClasses.FromAssemblies(GetType().Assembly).Union(AllClasses.FromAssemblies(allAssemblies)).Where(t => t.GetInterfaces().Contains(typeof(IModule)));
 
             modules.Select(module => new ModuleInfo()
             {

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.Attributes;
 
 namespace WDE.Common.DBC
 {
+    [UniqueProvider]
     public interface IDbcStore
     {
         Dictionary<int, string> SkillStore { get; }
