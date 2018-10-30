@@ -48,14 +48,45 @@ namespace WDE.SmartScriptEditor.Models
 
                 if (previousLink != line.Id)
                 {
-                    currentEvent = smartFactory.EventFactory(line);
-                    Events.Add(currentEvent);
+                    currentEvent = SafeEventFactory(line);
+                    if (currentEvent != null)
+                        Events.Add(currentEvent);
+                    else
+                        continue;
                 }
-                
-                currentEvent.AddAction(smartFactory.ActionFactory(line));
+
+                var action = SafeActionFactory(line);
+                if (action != null)
+                    currentEvent.AddAction(action);
 
                 previousLink = line.Link;
             }
+        }
+
+        private SmartAction SafeActionFactory(ISmartScriptLine line)
+        {
+            try
+            {
+               return smartFactory.ActionFactory(line);
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show($"Action {line.ActionType} unknown, skipping action");
+            }
+            return null;
+        }
+
+        private SmartEvent SafeEventFactory(ISmartScriptLine line)
+        {
+            try
+            {
+                return smartFactory.EventFactory(line);
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show($"Event {line.EventType} unknown, skipping action");
+            }
+            return null;
         }
     }
 
