@@ -26,7 +26,8 @@ namespace WDE.TrinityMySqlDatabase.Providers
                     DbAccess = ser.Deserialize<DbAccess>(reader);
                 }
             }
-            else
+
+            if (DbAccess == null)
                 DbAccess = new DbAccess();
         }
 
