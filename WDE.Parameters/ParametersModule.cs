@@ -17,36 +17,19 @@ using WDE.Common.Attributes;
 namespace WDE.Parameters
 {
     [AutoRegister]
-    public class ParametersModule : IModule, IConfigurable
+    public class ParametersModule : IModule
     {
-        public static ParameterFactory FactoryInstance { get; private set; }
-
         public ParametersModule()
         {
         }
-
-        public KeyValuePair<ContentControl, Action> GetConfigurationView()
-        {
-            var view = new ParametersView();
-            var viewModel = new ParametersViewModel(FactoryInstance);
-            view.DataContext = viewModel;
-            return new KeyValuePair<ContentControl, Action>(view, viewModel.SaveAction);
-        }
-
-        public string GetName()
-        {
-            return "Parameters browser";
-        }
-
+        
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            FactoryInstance = new ParameterFactory();
-            containerRegistry.RegisterInstance<IParameterFactory>(FactoryInstance);
         }
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            new ParameterLoader(containerProvider.Resolve<IDatabaseProvider>()).Load(FactoryInstance);
+            new ParameterLoader(containerProvider.Resolve<IDatabaseProvider>()).Load(containerProvider.Resolve<ParameterFactory>());
         }
     }
 }

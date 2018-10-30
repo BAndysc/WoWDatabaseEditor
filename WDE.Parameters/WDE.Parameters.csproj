@@ -97,6 +97,7 @@
   <ItemGroup>
     <Compile Include="Models\ParameterSpecModel.cs" />
     <Compile Include="ParameterLoader.cs" />
+    <Compile Include="ParametersConfiguration.cs" />
     <Compile Include="ViewModels\ParametersViewModel.cs" />
     <Compile Include="Views\ParametersView.xaml.cs">
       <DependentUpon>ParametersView.xaml</DependentUpon>

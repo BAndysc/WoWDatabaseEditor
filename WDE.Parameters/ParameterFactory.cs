@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.Attributes;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 
 namespace WDE.Parameters
 {
+    [AutoRegister, SingleInstance]
     public class ParameterFactory : IParameterFactory
     {
         private readonly Dictionary<string, ParameterSpecModel> _data = new Dictionary<string, ParameterSpecModel>();
