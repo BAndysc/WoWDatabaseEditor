@@ -3,9 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WDE.DbcStore.Views"
-             mc:Ignorable="d" 
-             xmlns:prism="http://prismlibrary.com/">
+             mc:Ignorable="d" >
     <Grid>
         <Grid.Resources >
             <Style TargetType="TextBox" >
@@ -19,9 +17,13 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Label Content="Path to legion DBC (.db2)" VerticalContentAlignment="Center"/>
         <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Padding="5" Name="Path" />
         <Button Grid.Column="2" Grid.Row="0" Click="ShowFolderBrowse"  Padding="5" VerticalAlignment="Center">...</Button>
+
+        <Label Content="Skip loading dbc" VerticalContentAlignment="Center" Grid.Row="1"/>
+        <CheckBox Grid.Column="1" IsChecked="{Binding SkipLoading}" Padding="0" Margin="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
 </UserControl>

@@ -97,9 +97,12 @@
   <ItemGroup>
     <Compile Include="Data\DBCSettings.cs" />
     <Compile Include="DbcStore.cs" />
+    <Compile Include="DbcStoreConfiguration.cs" />
     <Compile Include="DbcStoreModule.cs" />
     <Compile Include="Models\SpellEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\DbcSettingsProvider.cs" />
+    <Compile Include="Providers\IDbcSettingsProvider.cs" />
     <Compile Include="Reader\BitStream.cs" />
     <Compile Include="Reader\ColumnStructureEntry.cs" />
     <Compile Include="Reader\Constants.cs" />

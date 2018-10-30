@@ -7,36 +7,41 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using WDE.DbcStore.Providers;
 
 namespace WDE.DbcStore.ViewModels
 {
     public class DBCConfigViewModel : BindableBase
     {
+        private readonly IDbcSettingsProvider dbcSettings;
+
         public Action SaveAction { get; set; }
-
+        
         private string _path;
-
         public string Path
         {
             get { return _path; }
             set { SetProperty(ref _path, value); }
         }
-        
-        public DBCConfigViewModel()
+
+        private bool _skipLoading;
+        public bool SkipLoading
+        {
+            get { return _skipLoading; }
+            set { SetProperty(ref _skipLoading, value); }
+        }
+
+        public DBCConfigViewModel(IDbcSettingsProvider dbcSettings)
         {
             SaveAction = Save;
-            Path = DbcStoreModule.DBCSettings.Path;
+            Path = dbcSettings.GetSettings().Path;
+            SkipLoading = dbcSettings.GetSettings().SkipLoading;
+            this.dbcSettings = dbcSettings;
         }
 
         private void Save()
         {
-            DbcStoreModule.DBCSettings.Path = Path;
-            JsonSerializer ser = new JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
-            using (StreamWriter file = File.CreateText(@"dbc.json"))
-            {
-                ser.Serialize(file, DbcStoreModule.DBCSettings);
-            }
-            MessageBox.Show("Restart the application.");
+            dbcSettings.UpdateSettings(new Data.DBCSettings() { Path = Path, SkipLoading = SkipLoading });
         }
     }
 }

@@ -8,6 +8,7 @@ namespace WDE.DbcStore.Data
 {
     public class DBCSettings
     {
+        public bool SkipLoading;
         public string Path;
     }
 }

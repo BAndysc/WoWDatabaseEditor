@@ -6,15 +6,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Prism.Ioc;
+using WDE.Common.Attributes;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.DbcStore.Models;
+using WDE.DbcStore.Providers;
 
 namespace WDE.DbcStore
 {
+    [AutoRegister, SingleInstance]
     public class DbcStore : IDbcStore, ISpellStore
     {
         private readonly IParameterFactory parameterFactory;
+        private readonly IDbcSettingsProvider dbcSettingsProvider;
 
         private Dictionary<int, string> SpellStore { get; } = new Dictionary<int, string>();
         public Dictionary<int, string> SkillStore { get; } = new Dictionary<int, string>();
@@ -33,10 +37,16 @@ namespace WDE.DbcStore
         public DbcStore(IParameterFactory parameterFactory)
         {
             this.parameterFactory = parameterFactory;
+            this.dbcSettingsProvider = new DbcSettingsProvider();
+
+            Load();
         }
 
         internal void Load()
         {
+            if (dbcSettingsProvider.GetSettings().SkipLoading)
+                return;
+
             WDBXEditor.Storage.Database.LoadDefinitions();
 
             LoadLegion("spell.db2", 0, 1, SpellStore);
@@ -60,7 +70,7 @@ namespace WDE.DbcStore
         private void LoadLegion(string filename, int id, int index, Dictionary<int, string> dictionary)
         {
             WDBXEditor.Reader.DBReader r = new WDBXEditor.Reader.DBReader();
-            var path = $"{DbcStoreModule.DBCSettings.Path}/{filename}";
+            var path = $"{dbcSettingsProvider.GetSettings().Path}/{filename}";
 
             if (!File.Exists(path))
                 return;
