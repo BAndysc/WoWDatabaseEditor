@@ -51,11 +51,22 @@ namespace WDE.Parameters
 
         public IEnumerable<string> GetKeys()
         {
-            return _data.Keys;
+            return _data.Keys.Union(_dynamics.Keys);
         }
-
+        
         public ParameterSpecModel GetDefinition(string key)
         {
+            if (_dynamics.ContainsKey(key))
+            {
+                var param = _dynamics[key](key);
+                return new ParameterSpecModel()
+                {
+                    IsFlag = param is FlagParameter,
+                    Key = key,
+                    Name = key,
+                    Values = param.Items
+                };
+            }
             return _data[key];
         }
 
