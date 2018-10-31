@@ -41,7 +41,6 @@ namespace WDE.Parameters.ViewModels
 
         private void Save()
         {
-            throw new NotImplementedException();
         }
     }
 }
