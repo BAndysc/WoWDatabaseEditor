@@ -8,7 +8,7 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TabControl ItemsSource="{Binding ContainerTabItems}" SelectedItem="{Binding SelectedTabItem}">
+        <TabControl ItemsSource="{Binding ContainerTabItems}" SelectedItem="{Binding SelectedTabItem}" TabStripPlacement="Left">
             <TabControl.ItemTemplate>
                 <!-- this is the header template-->
                 <DataTemplate>

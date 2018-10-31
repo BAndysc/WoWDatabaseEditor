@@ -176,9 +176,19 @@
     </ApplicationDefinition>
     <Compile Include="Extensions\FocusBehavior.cs" />
     <Compile Include="MainModule.cs" />
+    <Compile Include="ModulesManagement\Configuration\ModulesConfiguration.cs" />
+    <Compile Include="ModulesManagement\Configuration\ViewModels\ModulesConfigViewModel.cs" />
+    <Compile Include="ModulesManagement\Configuration\Views\ModulesConfigView.xaml.cs">
+      <DependentUpon>ModulesConfigView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ModulesManagement\IModulesManager.cs" />
+    <Compile Include="ModulesManagement\ModulesManager.cs" />
     <Compile Include="Views\SplashScreenView.xaml.cs">
       <DependentUpon>SplashScreenView.xaml</DependentUpon>
     </Compile>
+    <Page Include="ModulesManagement\Configuration\Views\ModulesConfigView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Services\ConfigurationService\Views\ConfigurationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -310,6 +320,7 @@
   <ItemGroup>
     <Resource Include="Icon.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

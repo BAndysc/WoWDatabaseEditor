@@ -15,6 +15,7 @@ using Unity.Lifetime;
 using Unity.RegistrationByConvention;
 using WDE.Module.Attributes;
 using WoWDatabaseEditor.Events;
+using WoWDatabaseEditor.ModulesManagement;
 using WoWDatabaseEditor.Views;
 
 namespace WoWDatabaseEditor
@@ -25,6 +26,8 @@ namespace WoWDatabaseEditor
     public partial class App : PrismApplication
     {
         private SplashScreenView splash;
+
+        private IModulesManager modulesManager;
 
         protected override Window CreateShell()
         {
@@ -38,6 +41,8 @@ namespace WoWDatabaseEditor
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance<IContainerProvider>(Container);
+            modulesManager = new ModulesManager();
+            containerRegistry.RegisterInstance<IModulesManager>(modulesManager);
         }
 
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
@@ -60,6 +65,7 @@ namespace WoWDatabaseEditor
             foreach (var conflict in conflicts)
             {
                 MessageBox.Show($"Module {conflict.ConflictingAssembly.GetName().Name} conflicts with module {conflict.FirstAssembly.GetName().Name}. They provide same functionality. This is not allowed. Disablig {conflict.ConflictingAssembly.GetName().Name}");
+                modulesManager.AddConflicted(conflict.ConflictingAssembly, conflict.FirstAssembly);
                 allAssemblies.Remove(conflict.ConflictingAssembly);
             }
             
@@ -108,6 +114,9 @@ namespace WoWDatabaseEditor
         private void AddMoulesFromLoadedAssemblies(IModuleCatalog moduleCatalog, List<Assembly> allAssemblies)
         {
             var modules = AllClasses.FromAssemblies(allAssemblies).Where(t => t.GetInterfaces().Contains(typeof(IModule)));
+
+            foreach (var module in modules)
+                modulesManager.AddModule(module.Assembly);
 
             modules.Select(module => new ModuleInfo()
             {
