@@ -17,19 +17,23 @@ using System.IO;
 using WDE.DbcStore.Views;
 using WDE.DbcStore.ViewModels;
 using WDE.Module;
+using Prism.Events;
+using WDE.Common.Events;
 
 namespace WDE.DbcStore
 {
     [AutoRegister]
     public class DbcStoreModule : ModuleBase
     {        
-        public DbcStoreModule(IParameterFactory parameterFactory)
+        public DbcStoreModule()
         {
         }
 
         public override void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<DbcStore>().Load();
+            containerProvider.Resolve<IEventAggregator>().GetEvent<AllModulesLoaded>().Subscribe(() => {
+                containerProvider.Resolve<DbcStore>().Load();
+            });
         }
     }
 }

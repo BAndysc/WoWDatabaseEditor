@@ -113,8 +113,7 @@ namespace WoWDatabaseEditor
             {
                 ModuleName = module.Name,
                 ModuleType = module.AssemblyQualifiedName,
-                Ref = "file://" + module.Assembly.Location,
-                DependsOn = new System.Collections.ObjectModel.Collection<string>(module.Name.ToLower().Contains("dbc") ? new List<string>() { "ParametersModule"} : new List<string>() {})
+                Ref = "file://" + module.Assembly.Location
             }).ToList().ForEach(moduleCatalog.AddModule);
         }
 
