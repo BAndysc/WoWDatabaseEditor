@@ -13,6 +13,7 @@ using WDE.Common.Solution;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Editor.Views;
+using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Providers
 {
@@ -20,45 +21,24 @@ namespace WDE.SmartScriptEditor.Providers
     public class SmartScriptEditorProvider : ISolutionItemEditorProvider<SmartScriptSolutionItem>
     {
         private readonly ISolutionItemNameRegistry solutionItemNameRegistry;
-        private readonly IHistoryManager historyManager;
-        private readonly IDatabaseProvider databaseProvider;
-        private readonly IEventAggregator eventAggregator;
-        private readonly ISmartDataManager smartDataManager;
-        private readonly ISmartFactory smartFactory;
-        private readonly IItemFromListProvider itemFromListProvider;
-        private readonly SmartTypeListProvider smartTypeListProvider;
+        private readonly IContainerProvider containerProvider;
 
-        public SmartScriptEditorProvider(
-            ISolutionItemNameRegistry solutionItemNameRegistry,
-            IHistoryManager historyManager,
-            IDatabaseProvider databaseProvider,
-            IEventAggregator eventAggregator,
-            ISmartDataManager smartDataManager,
-            ISmartFactory smartFactory,
-            IItemFromListProvider itemFromListProvider,
-            SmartTypeListProvider smartTypeListProvider         
-            )
+        public SmartScriptEditorProvider(ISolutionItemNameRegistry solutionItemNameRegistry, IContainerProvider containerProvider)
         {
             this.solutionItemNameRegistry = solutionItemNameRegistry;
-            this.historyManager = historyManager;
-            this.databaseProvider = databaseProvider;
-            this.eventAggregator = eventAggregator;
-            this.smartDataManager = smartDataManager;
-            this.smartFactory = smartFactory;
-            this.itemFromListProvider = itemFromListProvider;
-            this.smartTypeListProvider = smartTypeListProvider;
+            this.containerProvider = containerProvider;
         }
 
         public DocumentEditor GetEditor(SmartScriptSolutionItem item)
         {
             var view = new SmartScriptEditorView();
-            var solutionItem = item as SmartScriptSolutionItem;
-            var vm = new SmartScriptEditorViewModel(solutionItem, historyManager, databaseProvider, eventAggregator, smartDataManager, smartFactory, itemFromListProvider, smartTypeListProvider, solutionItemNameRegistry);
+            var vm = containerProvider.Resolve<SmartScriptEditorViewModel>();
+            vm.SetSolutionItem(item);
             view.DataContext = vm;
 
             DocumentEditor editor = new DocumentEditor
             {
-                Title = solutionItemNameRegistry.GetName(solutionItem),
+                Title = solutionItemNameRegistry.GetName(item),
                 Content = view,
                 Undo = vm.UndoCommand,
                 Redo = vm.RedoCommand,

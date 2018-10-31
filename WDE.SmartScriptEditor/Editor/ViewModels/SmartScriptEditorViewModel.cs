@@ -17,20 +17,21 @@ using WDE.SmartScriptEditor.Models;
 using Prism.Ioc;
 using WDE.Common.Providers;
 using WDE.Common.Solution;
+using System.Diagnostics;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartScriptEditorViewModel : BindableBase
     {
-        private IDatabaseProvider database;
+        private readonly IDatabaseProvider database;
+        private readonly IHistoryManager history;
         private readonly ISmartDataManager smartDataManager;
-        private IItemFromListProvider itemFromListProvider;
-        private ISmartFactory smartFactory;
-        private ISmartTypeListProvider smartTypeListProvider;
-        private ISolutionItemNameRegistry itemNameRegistry;
+        private readonly IItemFromListProvider itemFromListProvider;
+        private readonly ISmartFactory smartFactory;
+        private readonly ISmartTypeListProvider smartTypeListProvider;
+        private readonly ISolutionItemNameRegistry itemNameRegistry;
 
-        private readonly SmartScriptSolutionItem _item;
-        private readonly IHistoryManager _history;
+        private SmartScriptSolutionItem _item;
 
         public string Name => itemNameRegistry.GetName(_item);
 
@@ -38,7 +39,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public ObservableCollection<SmartEvent> Events => script.Events;
 
-        public IHistoryManager History => _history;
+        public IHistoryManager History => history;
 
         public SmartEvent SelectedItem { get; set; }
 
@@ -59,20 +60,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand DeleteEvent { get; set; }
 
-        public SmartScriptEditorViewModel(SmartScriptSolutionItem item, IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry)
+        public SmartScriptEditorViewModel(IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry)
         {
-            _item = item;
-            _history = history;
+            this.history = history;
             this.database = database;
             this.smartDataManager = smartDataManager;
             this.smartFactory = smartFactory;
             this.itemFromListProvider = itemFromListProvider;
             this.smartTypeListProvider = smartTypeListProvider;
             this.itemNameRegistry = itemNameRegistry;
-            var lines = database.GetScriptFor(_item.Entry, _item.SmartType);           
-            script = new SmartScript(_item, smartFactory);
-            script.Load(lines);
-
+            
             EditEvent = new DelegateCommand(EditEventCommand);
             EditAction = new DelegateCommand<SmartAction>(EditActionCommand);
             AddEvent = new DelegateCommand(AddEventCommand);
@@ -82,13 +79,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             DeleteAction = new DelegateCommand<SmartAction>(DeleteActionCommand);
             DeleteEvent = new DelegateCommand(DeleteEventCommand);
-
-            _history.AddHandler(new SaiHistoryHandler(script));
-
+            
             UndoCommand = new DelegateCommand(history.Undo, () => history.CanUndo);
             RedoCommand = new DelegateCommand(history.Redo, () => history.CanRedo);
 
-            _history.PropertyChanged += (sender, args) =>
+            this.history.PropertyChanged += (sender, args) =>
             {
                 UndoCommand.RaiseCanExecuteChanged();
                 RedoCommand.RaiseCanExecuteChanged();
@@ -105,6 +100,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     }
                 }
             });
+        }
+
+        internal void SetSolutionItem(SmartScriptSolutionItem item)
+        {
+            Debug.Assert(_item == null);
+            _item = item;
+
+            var lines = database.GetScriptFor(_item.Entry, _item.SmartType);
+            script = new SmartScript(_item, smartFactory);
+            script.Load(lines);
+
+            history.AddHandler(new SaiHistoryHandler(script));
         }
 
         private void DeleteEventCommand()
