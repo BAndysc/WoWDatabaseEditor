@@ -8,17 +8,11 @@ using System.Threading.Tasks;
 using WDE.Blueprints.Editor.ViewModels;
 using WDE.Blueprints.Editor.Views;
 using WDE.Common.Managers;
+using WDE.Module;
 
 namespace WDE.Blueprints
 {
-    public class BlueprintsModule : IModule
+    public class BlueprintsModule : ModuleBase
     {
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-        }
     }
 }

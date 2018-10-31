@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WDE.Common.Attributes
+namespace WDE.Module.Attributes
 {
     public class UniqueProviderAttribute : Attribute
+    {
+    }
+
+    public class NonUniqueProviderAttribute : Attribute
     {
     }
 }

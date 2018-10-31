@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using WDE.Blueprints.Data;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 
 namespace WDE.Blueprints.Managers
 {

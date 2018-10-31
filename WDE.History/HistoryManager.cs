@@ -10,7 +10,7 @@ using WDE.Common.History;
 
 namespace WDE.History
 {
-    [WDE.Common.Attributes.AutoRegister]
+    [WDE.Module.Attributes.AutoRegister]
     public class HistoryManager : IHistoryManager, INotifyPropertyChanged
     {
         private readonly Stack<IHistoryAction> _history;

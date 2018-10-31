@@ -11,21 +11,13 @@ using WDE.Solutions.Manager;
 using Prism.Ioc;
 using WDE.Common.Solution;
 using WDE.Solutions.Providers;
+using WDE.Module;
 
 namespace WDE.Solutions
 {
-    public class SolutionsModule : IModule
+    public class SolutionsModule : ModuleBase
     {
         public SolutionsModule()
-        {
-        }
-        
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
         }
     }

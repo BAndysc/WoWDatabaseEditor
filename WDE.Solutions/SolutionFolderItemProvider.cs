@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WDE.Common;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 
 namespace WDE.Solutions
 {

@@ -18,21 +18,15 @@ using WDE.Common.Providers;
 using WDE.Common.DBC;
 using WDE.Common.Solution;
 using WDE.SmartScriptEditor.Providers;
+using WDE.Module;
 
 namespace WDE.SmartScriptEditor
 {
-    public class SmartScriptModule : IModule
+    public class SmartScriptModule : ModuleBase
     {
         public SmartScriptModule()
         {
         }
 
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-        }
     }
 }

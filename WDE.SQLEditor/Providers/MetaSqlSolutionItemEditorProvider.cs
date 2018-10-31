@@ -1,6 +1,6 @@
 ﻿using Prism.Commands;
 using System;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
 using WDE.SQLEditor.ViewModels;

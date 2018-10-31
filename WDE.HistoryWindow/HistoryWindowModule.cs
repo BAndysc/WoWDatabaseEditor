@@ -12,12 +12,13 @@ using WDE.HistoryWindow.ViewModels;
 using WDE.HistoryWindow.Views;
 using Prism.Ioc;
 using Prism.Events;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
+using WDE.Module;
 
 namespace WDE.HistoryWindow
 {
     [AutoRegister, SingleInstance]
-    public class HistoryWindowModule : IModule, IToolProvider
+    public class HistoryWindowModule : ModuleBase, IToolProvider
     {
         private IEventAggregator eventAggregator;
 
@@ -31,14 +32,6 @@ namespace WDE.HistoryWindow
             var view = new HistoryView();
             view.DataContext = new HistoryViewModel(eventAggregator);
             return view;
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-        }
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
         }
 
         public bool AllowMultiple => false;

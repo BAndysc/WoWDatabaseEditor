@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Prism.Ioc;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.DbcStore.Models;

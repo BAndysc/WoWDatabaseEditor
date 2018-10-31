@@ -10,7 +10,7 @@ using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 {
-    [WDE.Common.Attributes.AutoRegister]
+    [WDE.Module.Attributes.AutoRegister]
     public class ItemFromListProvider : IItemFromListProvider
     {
         public ItemFromListProvider()

@@ -11,17 +11,11 @@ using WDE.Common.Solution;
 using WDE.SQLEditor.ViewModels;
 using WDE.SQLEditor.Views;
 using Prism.Ioc;
+using WDE.Module;
 
 namespace WDE.SQLEditor
 {
-    public class SqlEditorModule : IModule
+    public class SqlEditorModule : ModuleBase
     {        
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-        }
     }
 }

@@ -12,7 +12,7 @@ using WDE.Common;
 using Prism.Ioc;
 using Prism.Events;
 using WDE.Common.Events;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 
 namespace WDE.Solutions.Manager
 {

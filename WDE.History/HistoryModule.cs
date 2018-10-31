@@ -5,17 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Prism.Ioc;
 using Prism.Modularity;
+using WDE.Module;
 
 namespace WDE.History
 {
-    public class HistoryModule : IModule
+    public class HistoryModule : ModuleBase
     {
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-        }
 
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-        }
     }
 }

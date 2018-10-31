@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using WDE.Common;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.DbcStore.Providers;
 using WDE.DbcStore.ViewModels;
 using WDE.DbcStore.Views;

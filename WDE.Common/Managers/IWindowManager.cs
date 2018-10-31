@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.Common.Windows;
 
 namespace WDE.Common.Managers

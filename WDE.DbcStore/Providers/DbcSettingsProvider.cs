@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.DbcStore.Data;
 
 namespace WDE.DbcStore.Providers

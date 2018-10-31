@@ -8,7 +8,7 @@ using System.Transactions;
 using System.Windows;
 using MySql.Data.MySqlClient;
 using Shaolinq;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.Common.Database;
 using WDE.TrinityMySqlDatabase.Models;
 using WDE.TrinityMySqlDatabase.Providers;

@@ -14,7 +14,7 @@ using Prism.Ioc;
 using WDE.Common.DBC;
 using WDE.SmartScriptEditor.Data;
 using Prism.Events;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor
 {

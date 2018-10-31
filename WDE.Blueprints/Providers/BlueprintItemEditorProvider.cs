@@ -2,7 +2,7 @@
 using WDE.Blueprints.Editor.ViewModels;
 using WDE.Blueprints.Editor.Views;
 using WDE.Blueprints.Managers;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
 

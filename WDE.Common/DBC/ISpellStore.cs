@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 
 namespace WDE.Common.DBC
 {

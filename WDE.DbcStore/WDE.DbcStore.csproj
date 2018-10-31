@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -140,6 +140,10 @@
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj">
       <Project>{9D1A4E14-2FE1-403A-A042-ED7E49DB0438}</Project>
       <Name>WDE.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WDE.Module\WDE.Module.csproj">
+      <Project>{034d29b2-faaa-4fea-a77e-5532aa2b0fb1}</Project>
+      <Name>WDE.Module</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

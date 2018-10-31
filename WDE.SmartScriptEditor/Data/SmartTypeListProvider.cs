@@ -8,9 +8,11 @@ using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Editor.Views;
 using Prism.Ioc;
+using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor.Data
 {
+    [AutoRegister]
     public class SmartTypeListProvider : ISmartTypeListProvider
     {
         private readonly ISmartDataManager smartDataManager;

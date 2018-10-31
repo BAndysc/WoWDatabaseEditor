@@ -12,7 +12,7 @@ using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 {
-    [WDE.Common.Attributes.AutoRegister]
+    [WDE.Module.Attributes.AutoRegister]
     public abstract class GenericDatabaseProviderService<T>
     {
         private readonly Func<T, uint> _entryGetter;

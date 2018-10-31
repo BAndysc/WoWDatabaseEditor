@@ -12,22 +12,19 @@ using WDE.Parameters.ViewModels;
 using WDE.Parameters.Views;
 using Prism.Ioc;
 using WDE.Common.Database;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
+using WDE.Module;
 
 namespace WDE.Parameters
 {
     [AutoRegister]
-    public class ParametersModule : IModule
+    public class ParametersModule : ModuleBase
     {
         public ParametersModule()
         {
         }
-        
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-        }
 
-        public void OnInitialized(IContainerProvider containerProvider)
+        public override void OnInitialized(IContainerProvider containerProvider)
         {
             new ParameterLoader(containerProvider.Resolve<IDatabaseProvider>()).Load(containerProvider.Resolve<ParameterFactory>());
         }

@@ -14,20 +14,14 @@ using WDE.TrinityMySqlDatabase.Data;
 using WDE.TrinityMySqlDatabase.ViewModels;
 using WDE.TrinityMySqlDatabase.Views;
 using Prism.Ioc;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.TrinityMySqlDatabase.Providers;
+using WDE.Module;
 
 namespace WDE.TrinityMySqlDatabase
 {
     [AutoRegister, SingleInstance]
-    public class TrinityMySqlDatabaseModule : IModule
+    public class TrinityMySqlDatabaseModule : ModuleBase
     {
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-        }
-
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-        }
     }
 }

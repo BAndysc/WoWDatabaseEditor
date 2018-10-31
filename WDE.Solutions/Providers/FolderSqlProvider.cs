@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.Common.Solution;
 
 namespace WDE.Solutions.Providers

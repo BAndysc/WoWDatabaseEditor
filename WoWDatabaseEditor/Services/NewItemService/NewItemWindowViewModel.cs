@@ -10,7 +10,7 @@ using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
-    [WDE.Common.Attributes.AutoRegister]
+    [WDE.Module.Attributes.AutoRegister]
     public class NewItemWindowViewModel : BindableBase, INewItemWindowViewModel
     {
         public NewItemWindowViewModel(IEnumerable<ISolutionItemProvider> items)

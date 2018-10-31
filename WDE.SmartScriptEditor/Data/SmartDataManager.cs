@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.Common.Database;
 
 namespace WDE.SmartScriptEditor.Data

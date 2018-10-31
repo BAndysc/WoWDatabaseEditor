@@ -13,7 +13,7 @@ using Prism.Modularity;
 using Prism.Unity;
 using Unity.Lifetime;
 using Unity.RegistrationByConvention;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WoWDatabaseEditor.Events;
 using WoWDatabaseEditor.Views;
 
@@ -37,6 +37,7 @@ namespace WoWDatabaseEditor
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterInstance<IContainerProvider>(Container);
         }
 
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
@@ -50,6 +51,7 @@ namespace WoWDatabaseEditor
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             base.ConfigureModuleCatalog(moduleCatalog);
+            moduleCatalog.AddModule(typeof(MainModule));
 
             List<Assembly> allAssemblies = GetDlls().Select(path => Assembly.LoadFile(path)).ToList();
 
@@ -60,9 +62,7 @@ namespace WoWDatabaseEditor
                 MessageBox.Show($"Module {conflict.ConflictingAssembly.GetName().Name} conflicts with module {conflict.FirstAssembly.GetName().Name}. They provide same functionality. This is not allowed. Disablig {conflict.ConflictingAssembly.GetName().Name}");
                 allAssemblies.Remove(conflict.ConflictingAssembly);
             }
-
-            AutoRegisterClasses(allAssemblies);
-
+            
             AddMoulesFromLoadedAssemblies(moduleCatalog, allAssemblies);
         }
         
@@ -105,52 +105,16 @@ namespace WoWDatabaseEditor
             return conflictingAssemblies;
         }
 
-        /* 
-         * Ok, this method is reaaly ugly. Luckily it is also realy low level
-         * so it doesn't affect other parts that much. I don't know how it should be done properly.
-         */
-        private void AutoRegisterClasses(List<Assembly> allAssemblies)
-        {
-            var defaultRegisters = AllClasses.FromAssemblies(GetType().Assembly).Union(AllClasses.FromAssemblies(allAssemblies)).Distinct().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));
-
-            HashSet<Type> alreadyInitialized = new HashSet<Type>();
-            foreach (var register in defaultRegisters)
-            {
-                if (register.IsAbstract)
-                    continue;
-
-                var singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
-
-                foreach (var interface_ in register.GetInterfaces().Union(new[] { register }))
-                {
-                    string name = null;
-
-                    if (alreadyInitialized.Contains(interface_))
-                        name = register.ToString() + interface_.ToString();
-                    else
-                        alreadyInitialized.Add(interface_);
-
-                    LifetimeManager life = null;
-
-                    if (singleton)
-                        life = new ContainerControlledLifetimeManager();
-                    else
-                        life = new TransientLifetimeManager();
-
-                    Container.GetContainer().RegisterType(interface_, register, name, life);
-                }
-            }
-        }
-
         private void AddMoulesFromLoadedAssemblies(IModuleCatalog moduleCatalog, List<Assembly> allAssemblies)
         {
-            var modules = AllClasses.FromAssemblies(GetType().Assembly).Union(AllClasses.FromAssemblies(allAssemblies)).Where(t => t.GetInterfaces().Contains(typeof(IModule)));
+            var modules = AllClasses.FromAssemblies(allAssemblies).Where(t => t.GetInterfaces().Contains(typeof(IModule)));
 
             modules.Select(module => new ModuleInfo()
             {
                 ModuleName = module.Name,
                 ModuleType = module.AssemblyQualifiedName,
-                Ref = "file://" + module.Assembly.Location
+                Ref = "file://" + module.Assembly.Location,
+                DependsOn = new System.Collections.ObjectModel.Collection<string>(module.Name.ToLower().Contains("dbc") ? new List<string>() { "ParametersModule"} : new List<string>() {})
             }).ToList().ForEach(moduleCatalog.AddModule);
         }
 

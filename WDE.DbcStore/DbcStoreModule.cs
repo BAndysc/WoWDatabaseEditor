@@ -10,29 +10,26 @@ using WDE.Common;
 using WDE.Common.DBC;
 using Prism.Ioc;
 using WDE.Common.Parameters;
-using WDE.Common.Attributes;
+using WDE.Module.Attributes;
 using WDE.DbcStore.Data;
 using Newtonsoft.Json;
 using System.IO;
 using WDE.DbcStore.Views;
 using WDE.DbcStore.ViewModels;
+using WDE.Module;
 
 namespace WDE.DbcStore
 {
     [AutoRegister]
-    public class DbcStoreModule : IModule
+    public class DbcStoreModule : ModuleBase
     {        
         public DbcStoreModule(IParameterFactory parameterFactory)
         {
         }
 
-        public void OnInitialized(IContainerProvider containerProvider)
+        public override void OnInitialized(IContainerProvider containerProvider)
         {
             containerProvider.Resolve<DbcStore>().Load();
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
         }
     }
 }
