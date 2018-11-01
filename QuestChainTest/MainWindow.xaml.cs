@@ -18,6 +18,7 @@ using WDE.QuestChainEditor.Exporter;
 using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.Providers;
 using WDE.TrinityMySqlDatabase;
+using WDE.TrinityMySqlDatabase.Providers;
 
 namespace QuestChainTest
 {
@@ -35,7 +36,7 @@ namespace QuestChainTest
             
             new TrinityMySqlDatabaseModule().OnInitialized(null);
 
-            var db = new TrinityMysqlDatabaseProvider();
+            var db = new TrinityMysqlDatabaseProvider(new ConnectionSettingsProvider());
 
             View.DataContext = new QuestChainEditorViewModel(new QuestPicker(new DatabaseQuestsProvider(db)), quests);
 
