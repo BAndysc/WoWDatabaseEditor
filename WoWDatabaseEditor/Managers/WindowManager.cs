@@ -10,6 +10,10 @@ using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
 using Prism.Ioc;
+using Prism.Commands;
+using System.Windows.Controls;
+using System.Windows.Input;
+using WoWDatabaseEditor.Managers.ViewModels;
 
 namespace WoWDatabaseEditor.Managers
 {
@@ -23,48 +27,51 @@ namespace WoWDatabaseEditor.Managers
             _eventAggregator = eventAggregator;
         }
         
-        private Document _activeDocument;
-        public Document ActiveDocument
+        private IDocument _activeDocument;
+        public IDocument ActiveDocument
         {
             get => _activeDocument;
-            set { SetProperty(ref _activeDocument, value); _eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value); }
+            set {
+                if (value == null && OpenedDocuments.Contains(_activeDocument))
+                    return;
+                SetProperty(ref _activeDocument, value);
+                _eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
+            }
         }
 
-        public ObservableCollection<Document> OpenedDocuments { get; } = new ObservableCollection<Document>();
-        public ObservableCollection<Document> OpenedTools { get; } = new ObservableCollection<Document>();
-        
-        private HashSet<Type> OpenedToolTypes { get; } = new HashSet<Type>();
-        private  Dictionary<Type, Document> Opened { get; } = new Dictionary<Type, Document>();
-        public void OpenDocument(Document editor)
+        public ObservableCollection<IDocument> OpenedDocuments { get; } = new ObservableCollection<IDocument>();
+        public ObservableCollection<ITool> OpenedTools { get; } = new ObservableCollection<ITool>();         
+        private Dictionary<Type, ToolWindow> Opened { get; } = new Dictionary<Type, ToolWindow>();
+
+        public void OpenDocument(IDocument editor)
         {
-            OpenedDocuments.Add(editor);
-            ActiveDocument = editor;
+            var document = new DocumentDecorator(editor, doc =>
+            {
+                OpenedDocuments.Remove(doc);
+                if (ActiveDocument == doc)
+                    ActiveDocument = null;
+            });
+            OpenedDocuments.Add(document);
+            ActiveDocument = document;
         }
 
         public void OpenTool(IToolProvider provider)
         {
             if (!provider.AllowMultiple)
             {
-                if (OpenedToolTypes.Contains(provider.GetType()))
+                if (Opened.ContainsKey(provider.GetType()))
                 {
-                    //todo
-                    //Opened[provider.GetType()].Visibilityt = Visibility.Visible;
+                    Opened[provider.GetType()].Visibility = Visibility.Visible;
                     return;
                 }
-
-                OpenedToolTypes.Add(provider.GetType());
             }
 
-            var doc = new Document
-            {
-                Title = provider.Name,
-                Content = provider.GetView(),
-                CloseCommand = new ActionCommand(a => { MessageBox.Show("aaaa"); }),
-                CanClose = true
-            };
+            var toolWindow = new ToolWindow(provider.Name, provider.GetView());
+            
+            if (!provider.AllowMultiple)
+                Opened.Add(provider.GetType(), toolWindow);
 
-            Opened.Add(provider.GetType(), doc);
-            OpenedTools.Add(doc);
+            OpenedTools.Add(toolWindow);
         }
     }
 }

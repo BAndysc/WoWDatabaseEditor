@@ -6,6 +6,7 @@
         prism:ViewModelLocator.AutoWireViewModel="True"
         xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:views="clr-namespace:WoWDatabaseEditor.Views"
+        xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
         xmlns:viewModels="clr-namespace:WoWDatabaseEditor.ViewModels"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         Style="{DynamicResource MainWindowStyle}"
@@ -19,6 +20,9 @@
         Icon="/icon.png"
         Loaded="Window_Loaded"
         Closed="Window_Closed">
+    <Window.Resources>
+        <helpers:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -62,7 +66,7 @@
             </MenuItem>
         </Menu>
         <avalonDock:DockingManager AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
-            diag:PresentationTraceSources.TraceLevel=High}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
+            diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
 
             <avalonDock:DockingManager.LayoutItemTemplateSelector>
                 <views:PaneDocumentTemplateSelector>
@@ -77,10 +81,10 @@
             <avalonDock:DockingManager.LayoutItemContainerStyle>
                 <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
                 <Style TargetType="{x:Type avalonDock:LayoutItem}" >
-                    <Setter Property="Title" Value="{Binding Model.Title, Mode=TwoWay}" />
-                    <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand, Mode=TwoWay}" />
-                    <Setter Property="CanClose" Value="{Binding Model.CanClose, Mode=TwoWay}" />
-                    <Setter Property="Visibility" Value="{Binding Model.Visibilityt, Mode=TwoWay}"></Setter>
+                    <Setter Property="Title" Value="{Binding Model.Title}" />
+                    <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+                    <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
+                    <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}"></Setter>
                 </Style>
             </avalonDock:DockingManager.LayoutItemContainerStyle>
         </avalonDock:DockingManager>

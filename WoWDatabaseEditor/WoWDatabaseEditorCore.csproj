@@ -176,6 +176,8 @@
     </ApplicationDefinition>
     <Compile Include="Extensions\FocusBehavior.cs" />
     <Compile Include="MainModule.cs" />
+    <Compile Include="Managers\ViewModels\DocumentDecorator.cs" />
+    <Compile Include="Managers\ViewModels\ToolWindow.cs" />
     <Compile Include="ModulesManagement\Configuration\ModulesConfiguration.cs" />
     <Compile Include="ModulesManagement\Configuration\ViewModels\ModulesConfigViewModel.cs" />
     <Compile Include="ModulesManagement\Configuration\Views\ModulesConfigView.xaml.cs">
@@ -183,6 +185,7 @@
     </Compile>
     <Compile Include="ModulesManagement\IModulesManager.cs" />
     <Compile Include="ModulesManagement\ModulesManager.cs" />
+    <Compile Include="Views\Helpers\ActiveDocumentConverter.cs" />
     <Compile Include="Views\PaneDocumentTemplateSelector.cs" />
     <Compile Include="Views\SplashScreenView.xaml.cs">
       <DependentUpon>SplashScreenView.xaml</DependentUpon>
