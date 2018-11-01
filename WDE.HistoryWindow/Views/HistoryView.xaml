@@ -23,7 +23,7 @@
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock" BasedOn="{StaticResource firstStyle}">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Aaaa}" Value="true">
+                                        <DataTrigger Binding="{Binding IsFromFuture}" Value="true">
                                             <Setter Property="Foreground" Value="Gray"/>
                                         </DataTrigger>
                                     </Style.Triggers>

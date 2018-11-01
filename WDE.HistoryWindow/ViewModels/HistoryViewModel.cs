@@ -11,18 +11,21 @@ using System.Threading.Tasks;
 using WDE.Common.Events;
 using WDE.Common.History;
 using Prism.Ioc;
+using WDE.Common.Managers;
 
 namespace WDE.HistoryWindow.ViewModels
 {
-    internal class Valuea
+    internal class HistoryEvent
     {
         public string Name { get; set; }
-        public bool Aaaa { get; set; }
+        public bool IsFromFuture { get; set; }
     }
 
     internal class HistoryViewModel : BindableBase
     {
-        public ObservableCollection<Valuea> Items { get; set; } = new ObservableCollection<Valuea>();
+        public ObservableCollection<HistoryEvent> Items { get; set; } = new ObservableCollection<HistoryEvent>();
+
+        private IDocument previousDocument;
 
         private string _title;
         public string Title
@@ -31,56 +34,43 @@ namespace WDE.HistoryWindow.ViewModels
             set { SetProperty(ref _title, value); }
         }
 
-        ~HistoryViewModel()
-        {
-
-        }
-
         public HistoryViewModel(IEventAggregator eventAggregator)
         {
             eventAggregator.GetEvent<EventActiveDocumentChanged>().Subscribe(doc =>
             {
-                if (doc.History == null)
+                Items.Clear();
+
+                if (previousDocument != null)
+                {
+                    previousDocument.History.Past.CollectionChanged -= HistoryCollectionChanged;
+                    previousDocument.History.Future.CollectionChanged -= HistoryCollectionChanged;
+                    previousDocument = null;
+                }
+
+                if (doc == null || doc.History == null)
                     return;
 
-                doc.History.Past.CollectionChanged += (sender, e) =>
-                {
-                    Items.Clear();
-                    foreach (var past in doc.History.Past)
-                    {
-                        Items.Add(new Valuea() { Name = past.GetDescription(), Aaaa = false });
-                    }
+                previousDocument = doc;
 
-                    foreach (var past in doc.History.Future)
-                    {
-                        Items.Add(new Valuea() { Name = past.GetDescription(), Aaaa = true });
-                    }
-                };
-                doc.History.Future.CollectionChanged += (sender, e) =>
-                {
-                    Items.Clear();
-                    foreach (var past in doc.History.Past)
-                    {
-                        Items.Add(new Valuea() { Name = past.GetDescription(), Aaaa = false });
-                    }
+                doc.History.Past.CollectionChanged += HistoryCollectionChanged;
+                doc.History.Future.CollectionChanged += HistoryCollectionChanged;
 
-                    foreach (var past in doc.History.Future)
-                    {
-                        Items.Add(new Valuea() { Name = past.GetDescription(), Aaaa = true });
-                    }
-                };
-
-                Items.Clear();
-                foreach (var past in doc.History.Past)
-                {
-                    Items.Add(new Valuea() { Name = past.GetDescription(), Aaaa = false });
-                }
-
-                foreach (var past in doc.History.Future)
-                {
-                    Items.Add(new Valuea() { Name = past.GetDescription(), Aaaa = true });
-                }
+                HistoryCollectionChanged(null, null);
             });
+        }
+
+        private void HistoryCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            Items.Clear();
+            foreach (var past in previousDocument.History.Past)
+            {
+                Items.Add(new HistoryEvent() { Name = past.GetDescription(), IsFromFuture = false });
+            }
+
+            foreach (var past in previousDocument.History.Future)
+            {
+                Items.Add(new HistoryEvent() { Name = past.GetDescription(), IsFromFuture = true });
+            }
         }
     }
 }
