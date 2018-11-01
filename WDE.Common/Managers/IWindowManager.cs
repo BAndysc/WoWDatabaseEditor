@@ -7,12 +7,12 @@ namespace WDE.Common.Managers
     [UniqueProvider]
     public interface IWindowManager
     {
-        DocumentEditor ActiveDocument { get; set; }
+        Document ActiveDocument { get; set; }
         
-        ObservableCollection<DocumentEditor> OpenedDocuments { get; }
-        void OpenDocument(DocumentEditor editor);
+        ObservableCollection<Document> OpenedDocuments { get; }
+        void OpenDocument(Document editor);
         
-        ObservableCollection<DocumentEditor> OpenedTools { get; }
+        ObservableCollection<Document> OpenedTools { get; }
         void OpenTool(IToolProvider provider);
     }
 }

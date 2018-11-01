@@ -18,13 +18,13 @@ namespace WDE.SQLEditor.Providers
             this.sqlGeneratorsRegistry = sqlGeneratorsRegistry;
         }
 
-        public DocumentEditor GetEditor(MetaSolutionSQL item)
+        public Document GetEditor(MetaSolutionSQL item)
         {
             var view = new SqlEditorView();
             var vm = new SqlEditorViewModel(sqlGeneratorsRegistry.Value.GenerateSql(item as MetaSolutionSQL));
             view.DataContext = vm;
 
-            DocumentEditor editor = new DocumentEditor();
+            Document editor = new Document();
             editor.Title = "Sql output";
             editor.Content = view;
             editor.CanClose = true;

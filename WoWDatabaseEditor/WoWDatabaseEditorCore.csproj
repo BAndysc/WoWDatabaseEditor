@@ -183,6 +183,7 @@
     </Compile>
     <Compile Include="ModulesManagement\IModulesManager.cs" />
     <Compile Include="ModulesManagement\ModulesManager.cs" />
+    <Compile Include="Views\PaneDocumentTemplateSelector.cs" />
     <Compile Include="Views\SplashScreenView.xaml.cs">
       <DependentUpon>SplashScreenView.xaml</DependentUpon>
     </Compile>

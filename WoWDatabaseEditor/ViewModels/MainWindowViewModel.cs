@@ -37,7 +37,7 @@ namespace WoWDatabaseEditor.ViewModels
             set => SetProperty(ref _title, value);
         }
 
-        private readonly Dictionary<ISolutionItem, DocumentEditor> documents = new Dictionary<ISolutionItem, DocumentEditor>();
+        private readonly Dictionary<ISolutionItem, Document> documents = new Dictionary<ISolutionItem, Document>();
 
         public DelegateCommand ExecuteCommandNew { get; private set; }
         public DelegateCommand ExecuteSettings { get; private set; }
@@ -86,11 +86,12 @@ namespace WoWDatabaseEditor.ViewModels
 
         private void ShowAbout()
         {
-            DocumentEditor about = new DocumentEditor
+            Document about = new Document
             {
                 Title = "About",
                 Content = new AboutView(),
                 CanClose = true,
+//                CloseCommand = new DelegateCommand(() => { })
             };
             WindowManager.OpenDocument(about);
         }
@@ -105,18 +106,6 @@ namespace WoWDatabaseEditor.ViewModels
             ISolutionItem item = newItemService.GetNewSolutionItem();
             if (item != null)
                 solutionManager.Items.Add(item);
-        }
-
-        public void DocumentClosed(object documentContent)
-        {
-        //    foreach (var key in documents.Keys)
-        //    {
-        //        if (documents[key] == documentContent)
-        //        {
-        //            documents.Remove(key);
-        //            break;
-        //        }
-        //    }
         }
     }
 }

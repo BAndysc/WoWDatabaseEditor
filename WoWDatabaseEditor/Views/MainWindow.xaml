@@ -63,19 +63,17 @@
         </Menu>
         <avalonDock:DockingManager AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
-            <avalonDock:DockingManager.DocumentPaneTemplate>
-                <ControlTemplate>
-                    <ContentControl Content="{Binding Model.Content}">
-                    </ContentControl>
-                </ControlTemplate>
-            </avalonDock:DockingManager.DocumentPaneTemplate>
-            <avalonDock:DockingManager.AnchorablePaneTemplate>
-                <ControlTemplate>
-                    <ContentControl Content="{Binding Model.Conent}">
-                        
-                    </ContentControl>
-                </ControlTemplate>
-            </avalonDock:DockingManager.AnchorablePaneTemplate>
+
+            <avalonDock:DockingManager.LayoutItemTemplateSelector>
+                <views:PaneDocumentTemplateSelector>
+                    <views:PaneDocumentTemplateSelector.DocumentTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding Content}">
+                            </ContentControl>
+                        </DataTemplate>
+                    </views:PaneDocumentTemplateSelector.DocumentTemplate>
+                </views:PaneDocumentTemplateSelector>
+            </avalonDock:DockingManager.LayoutItemTemplateSelector>
             <avalonDock:DockingManager.LayoutItemContainerStyle>
                 <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
                 <Style TargetType="{x:Type avalonDock:LayoutItem}" >
@@ -85,7 +83,6 @@
                     <Setter Property="Visibility" Value="{Binding Model.Visibilityt, Mode=TwoWay}"></Setter>
                 </Style>
             </avalonDock:DockingManager.LayoutItemContainerStyle>
-
         </avalonDock:DockingManager>
     </DockPanel>
     <!--<Grid>

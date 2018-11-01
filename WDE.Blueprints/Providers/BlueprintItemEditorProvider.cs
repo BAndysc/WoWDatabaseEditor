@@ -18,13 +18,13 @@ namespace WDE.Blueprints.Providers
             this.blueprintDefinitionsRegistry = blueprintDefinitionsRegistry;
         }
 
-        public DocumentEditor GetEditor(BlueprintSolutionItem item)
+        public Document GetEditor(BlueprintSolutionItem item)
         {
             var view = new BlueprintEditorView();
             var vm = new BlueprintEditorViewModel(item, new NodesViewModel(blueprintDefinitionsRegistry));
             view.DataContext = vm;
 
-            DocumentEditor editor = new DocumentEditor
+            Document editor = new Document
             {
                 Title = "Blueprints",
                 Content = view,

@@ -98,7 +98,8 @@
     <Compile Include="History\IHistoryAction.cs" />
     <Compile Include="History\IHistoryManager.cs" />
     <Compile Include="IConfigurable.cs" />
-    <Compile Include="Managers\DocumentEditor.cs" />
+    <Compile Include="Managers\Document.cs" />
+    <Compile Include="Managers\IDocument.cs" />
     <Compile Include="Managers\IWindowManager.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Providers\IEntriesProviderService.cs" />

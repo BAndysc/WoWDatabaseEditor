@@ -10,6 +10,6 @@ namespace WDE.Common.Solution
     [UniqueProvider]
     public interface ISolutionItemEditorRegistry
     {
-        DocumentEditor GetEditor(ISolutionItem item);
+        Document GetEditor(ISolutionItem item);
     }
 }

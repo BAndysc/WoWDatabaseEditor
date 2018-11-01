@@ -23,19 +23,19 @@ namespace WoWDatabaseEditor.Managers
             _eventAggregator = eventAggregator;
         }
         
-        private DocumentEditor _activeDocument;
-        public DocumentEditor ActiveDocument
+        private Document _activeDocument;
+        public Document ActiveDocument
         {
             get => _activeDocument;
             set { SetProperty(ref _activeDocument, value); _eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value); }
         }
 
-        public ObservableCollection<DocumentEditor> OpenedDocuments { get; } = new ObservableCollection<DocumentEditor>();
-        public ObservableCollection<DocumentEditor> OpenedTools { get; } = new ObservableCollection<DocumentEditor>();
+        public ObservableCollection<Document> OpenedDocuments { get; } = new ObservableCollection<Document>();
+        public ObservableCollection<Document> OpenedTools { get; } = new ObservableCollection<Document>();
         
         private HashSet<Type> OpenedToolTypes { get; } = new HashSet<Type>();
-        private  Dictionary<Type, DocumentEditor> Opened { get; } = new Dictionary<Type, DocumentEditor>();
-        public void OpenDocument(DocumentEditor editor)
+        private  Dictionary<Type, Document> Opened { get; } = new Dictionary<Type, Document>();
+        public void OpenDocument(Document editor)
         {
             OpenedDocuments.Add(editor);
             ActiveDocument = editor;
@@ -47,14 +47,15 @@ namespace WoWDatabaseEditor.Managers
             {
                 if (OpenedToolTypes.Contains(provider.GetType()))
                 {
-                    Opened[provider.GetType()].Visibilityt = Visibility.Visible;
+                    //todo
+                    //Opened[provider.GetType()].Visibilityt = Visibility.Visible;
                     return;
                 }
 
                 OpenedToolTypes.Add(provider.GetType());
             }
 
-            var doc = new DocumentEditor
+            var doc = new Document
             {
                 Title = provider.Name,
                 Content = provider.GetView(),

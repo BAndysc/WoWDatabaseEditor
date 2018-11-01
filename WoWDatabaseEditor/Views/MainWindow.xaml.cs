@@ -33,10 +33,6 @@ namespace WoWDatabaseEditor.Views
         private void DockingManager_OnDocumentClosed(object sender, DocumentClosedEventArgs e)
         {
             DocumentClosedCommand?.Execute(e.Document.Content);
-            if (this.DataContext is MainWindowViewModel)
-            {
-                (this.DataContext as MainWindowViewModel).DocumentClosed(e.Document.Content);
-            }
         }
 
         private void Window_Closed(object sender, System.EventArgs e)

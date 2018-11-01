@@ -29,14 +29,14 @@ namespace WDE.SmartScriptEditor.Providers
             this.containerProvider = containerProvider;
         }
 
-        public DocumentEditor GetEditor(SmartScriptSolutionItem item)
+        public Document GetEditor(SmartScriptSolutionItem item)
         {
             var view = new SmartScriptEditorView();
             var vm = containerProvider.Resolve<SmartScriptEditorViewModel>();
             vm.SetSolutionItem(item);
             view.DataContext = vm;
 
-            DocumentEditor editor = new DocumentEditor
+            Document editor = new Document
             {
                 Title = solutionItemNameRegistry.GetName(item),
                 Content = view,

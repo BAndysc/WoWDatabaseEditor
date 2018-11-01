@@ -8,7 +8,7 @@ using WDE.Common.Managers;
 
 namespace WDE.Common.Events
 {
-    public class EventActiveDocumentChanged : PubSubEvent<DocumentEditor>
+    public class EventActiveDocumentChanged : PubSubEvent<Document>
     {
     }
 }
