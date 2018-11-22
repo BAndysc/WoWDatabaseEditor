@@ -9,5 +9,6 @@ Thanks to:
  * Atlantiss - the editor begin as internal tool
  * TrinityCore, Cmangos and everyone who contributes to WoW Core!
 
+![darktheme](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/darktheme.png)
 ![screenshot2](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/blueprints_screenshot.png)
 ![screenshot](https://github.com/BAndysc/WoWDatabaseEditor/blob/d012bc3ffcac3b12328033b29ebf0d8b49df34eb/Examples/screenshot.png?raw=true)
