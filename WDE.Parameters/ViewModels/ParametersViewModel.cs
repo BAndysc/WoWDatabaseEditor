@@ -36,7 +36,8 @@ namespace WDE.Parameters.ViewModels
             {
                 Parameters.Add(factory.GetDefinition(key));
             }
-            Selected = Parameters[0];
+            if (Parameters.Count > 0)
+                Selected = Parameters[0];
         }
 
         private void Save()

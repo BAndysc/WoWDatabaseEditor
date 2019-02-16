@@ -6,9 +6,9 @@
              xmlns:local="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Background="#E9EFFB">
+    <Grid Background="{DynamicResource SmartScripts.Action.Background}">
         <TextBlock Padding="2" TextWrapping="WrapWithOverflow">
-            <Run Foreground="#267171">
+            <Run Foreground="{DynamicResource SmartScripts.Source.Foreground}">
                 <Run.Style>    
                     <Style TargetType="{x:Type Run}">
                         <Setter Property="Run.Text" Value="{Binding Source.Readable, Mode=OneWay}" />
@@ -23,7 +23,7 @@
                     </Style>
                 </Run.Style>
             </Run>
-            <Run>
+            <Run Foreground="{DynamicResource SmartScripts.Action.Foreground}">
                 <Run.Style>    
                     <Style TargetType="{x:Type Run}">
                         <Setter Property="Run.Text" Value=": " />
@@ -38,7 +38,7 @@
                     </Style>
                 </Run.Style>
             </Run>
-            <Run Text="{Binding Readable, Mode=OneWay}"></Run>
+            <Run Text="{Binding Readable, Mode=OneWay}" Foreground="{DynamicResource SmartScripts.Action.Foreground}"></Run>
         </TextBlock>
     </Grid>
 </UserControl>

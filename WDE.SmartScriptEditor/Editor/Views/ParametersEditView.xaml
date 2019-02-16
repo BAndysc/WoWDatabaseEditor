@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
-             xmlns:views="clr-namespace:WDE.SmartScriptEditor.Editor.Views" Height="485.361" Width="455.457" WindowStartupLocation="CenterScreen">
+             xmlns:views="clr-namespace:WDE.SmartScriptEditor.Editor.Views" Height="485.361" Width="455.457" WindowStartupLocation="CenterScreen"
+             Background="{DynamicResource SmartScripts.Background}">
     <Grid Margin="6">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>

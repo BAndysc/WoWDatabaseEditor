@@ -138,7 +138,8 @@
                                     <Condition Property="IsSelected" Value="true"/>
                                     <Condition Property="IsSelectionActive" Value="false"/>
                                 </MultiTrigger.Conditions>
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#3399FF" /> 
+                                <!--{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>-->
                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
                             </MultiTrigger>
                             <Trigger Property="IsEnabled" Value="false">
@@ -220,7 +221,8 @@
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding ExtraId}" FontFamily="Consolas" Background="#FFE4E4E4" Margin="0,0,7,0" />
+                        <TextBlock Text="{Binding ExtraId}" FontFamily="Consolas" Background="{DynamicResource ContentSpecialBackground}" Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
+                        </TextBlock>
                         <TextBlock Text="{Binding Name}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>

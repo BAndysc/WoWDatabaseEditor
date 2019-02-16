@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WoWDatabaseEditor.Views"
         mc:Ignorable="d"
-        Title="SplashScreenView" Height="150" Width="300" WindowStyle="None" WindowStartupLocation="CenterScreen">
+        Title="SplashScreenView" Height="150" Width="300" WindowStyle="None" WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource MenuDefaultBackground}">
     <Grid>
         <Label HorizontalAlignment="Center" VerticalAlignment="Center">Loading WoW Database Editor :)</Label>
     </Grid>

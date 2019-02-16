@@ -79,7 +79,21 @@ namespace WoWDatabaseEditor.Extensions
 
         public static readonly DependencyProperty CheckboxMemberProperty =
            DependencyProperty.RegisterAttached("CheckboxMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
-        
+
+        [AttachedPropertyBrowsableForType(typeof(GridView))]
+        public static string GetColumnHeadStyleName(DependencyObject obj)
+        {
+            return (string)obj.GetValue(ColumnHeadStyleNameProperty);
+        }
+
+        public static void SetColumnHeadStyleName(DependencyObject obj, string value)
+        {
+            obj.SetValue(ColumnHeadStyleNameProperty, value);
+        }
+
+        public static readonly DependencyProperty ColumnHeadStyleNameProperty =
+            DependencyProperty.RegisterAttached("ColumnHeadStyleName", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
+
         private static void ColumnsSourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             GridView gridView = obj as GridView;
@@ -214,6 +228,7 @@ namespace WoWDatabaseEditor.Extensions
             string headerTextMember = GetHeaderTextMember(gridView);
             string displayMemberMember = GetDisplayMemberMember(gridView);
             bool checkbox = (columnSource as ColumnDescriptor).CheckboxMember;
+            string styleString = GetColumnHeadStyleName(gridView);
             column.Width = 90;
             if (!string.IsNullOrEmpty(headerTextMember))
             {
@@ -235,6 +250,16 @@ namespace WoWDatabaseEditor.Extensions
                 column.CellTemplate = XamlReader.Load(xmlReader) as DataTemplate;
                 column.Width = 24;
             }
+
+            if(!string.IsNullOrEmpty(styleString))
+            {
+                Style style = Application.Current.FindResource(styleString) as Style;
+                if (style != null)
+                    column.HeaderContainerStyle = style;
+            }
+
+            // Set Widht to NaN in order to stretch it to match conent
+            column.Width = double.NaN;
             return column;
         }
 

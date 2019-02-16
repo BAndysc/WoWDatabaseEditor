@@ -6,14 +6,6 @@
              xmlns:local="clr-namespace:WDE.HistoryWindow.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <Style TargetType="TextBlock" x:Key="firstStyle">
-            <Setter Property="Foreground" Value="Black"/>
-        </Style>
-        <Style TargetType="TextBlock" x:Key="secondStyle">
-            <Setter Property="Foreground" Value="Gray"/>
-        </Style>
-    </UserControl.Resources>
     <Grid>
         <ListView ItemsSource="{Binding Items}">
             <ListView.ItemTemplate>
@@ -21,7 +13,8 @@
                     <WrapPanel>
                         <TextBlock Text="{Binding Name}"  >
                             <TextBlock.Style>
-                                <Style TargetType="TextBlock" BasedOn="{StaticResource firstStyle}">
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{DynamicResource BaseForeground}"></Setter>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsFromFuture}" Value="true">
                                             <Setter Property="Foreground" Value="Gray"/>

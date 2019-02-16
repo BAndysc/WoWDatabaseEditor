@@ -3,22 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:extensions="clr-namespace:WoWDatabaseEditor.Extensions"
-             prism:ViewModelLocator.AutoWireViewModel="True" Height="362.653" Width="473.962" WindowStartupLocation="CenterScreen"  extensions:FocusBehavior.FocusFirst="true">
-    <Grid Margin="6">
+             prism:ViewModelLocator.AutoWireViewModel="True" Height="362.653" Width="473.962" WindowStartupLocation="CenterScreen"  extensions:FocusBehavior.FocusFirst="true"
+             Background="{DynamicResource MenuDefaultBackground}">
+
+  <Grid Margin="6" Background="{DynamicResource MenuDefaultBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBox Margin="0,0,0,6" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-        <ListView VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" SelectedItem="{Binding SelectedItem}" ItemsSource="{Binding AllItems}" Grid.Row="1" Margin="0,0,0,6" MouseDoubleClick="ListView_MouseDoubleClick">
+        <ListView VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" SelectedItem="{Binding SelectedItem}" ItemsSource="{Binding AllItems}" Grid.Row="1" Margin="0,0,0,6" MouseDoubleClick="ListView_MouseDoubleClick" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
             <ListView.View>
                 <GridView extensions:GridViewColumns.HeaderTextMember="HeaderText"
                       extensions:GridViewColumns.DisplayMemberMember="DisplayMember"
-                      extensions:GridViewColumns.ColumnsSource="{Binding Columns}"/>
+                      extensions:GridViewColumns.ColumnsSource="{Binding Columns}"
+                      extensions:GridViewColumns.ColumnHeadStyleName="GridColumnHeaderStyle"
+                      ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}"/>
             </ListView.View>
         </ListView>
         <Button Grid.Row="2" HorizontalAlignment="Right" VerticalContentAlignment="Stretch" Content="Ok" Width="63" Click="Button_Click"></Button>
-
     </Grid>
 </Window>

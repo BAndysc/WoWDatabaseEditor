@@ -22,15 +22,15 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Border BorderThickness="1" BorderBrush="#BFCCE0">
-                <TextBlock Background="#F5F8FF" TextWrapping="WrapWithOverflow" Text="{Binding Readable}" Padding="3"></TextBlock>
+            <Border BorderThickness="1" BorderBrush="{DynamicResource SmartScripts.Event.Border}">
+                <TextBlock Background="{DynamicResource SmartScripts.Event.Background}" Foreground="{DynamicResource SmartScripts.Event.Foreground}" TextWrapping="WrapWithOverflow" Text="{Binding Readable}" Padding="3"></TextBlock>
             </Border>
-            <Canvas Background="#BFCCE0" Margin="20,0,0,0" Grid.Row="1"></Canvas>
+            <Canvas Background="{DynamicResource SmartScripts.Condition.Background}" Margin="20,0,0,0" Grid.Row="1"></Canvas>
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions><RowDefinition Height="Auto"></RowDefinition><RowDefinition Height="Auto"></RowDefinition></Grid.RowDefinitions>
             <local:SmartActionsView x:Name="ActionsVieww" Margin="0,1,0,1"></local:SmartActionsView>
-            <StackPanel Grid.Row="1" Background="#F5F6FC" Height="20" x:Name="actGrid">
+            <StackPanel Grid.Row="1" Background="{DynamicResource SmartScripts.Actions.Background}" Height="20" x:Name="actGrid">
                 <Button BorderThickness="0" Background="#E9EFFB" Foreground="#BFCCDE" Content="Add action" Click="ButtonBase_OnClick" Visibility="{Binding Path=IsMouseOver, ElementName=actGrid, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Button.Style>
                         <Style TargetType="Button">

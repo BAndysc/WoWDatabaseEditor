@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Helpers"
-             Height="440" Width="637" WindowStartupLocation="CenterScreen" helpers:FocusBehavior.FocusFirst="true">
+             Height="440" Width="637" WindowStartupLocation="CenterScreen" helpers:FocusBehavior.FocusFirst="true"
+             Background="{DynamicResource SmartScripts.Background}">
     <Grid Margin="6">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -34,7 +35,7 @@
             </ListView.GroupStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" Width="140">
+                    <TextBlock Text="{Binding Name}" Width="140" Foreground="{DynamicResource SmartScripts.Event.Foreground}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>

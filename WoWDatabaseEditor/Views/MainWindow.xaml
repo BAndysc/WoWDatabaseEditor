@@ -28,16 +28,16 @@
             <StackPanel Name="menuHolder" Orientation="Horizontal">
                 <Menu DockPanel.Dock="Top" Margin="2">
                     <MenuItem Header="_File">
-                        <MenuItem Header="_Add" Command="{Binding ExecuteCommandNew}"/>
-                        <MenuItem Header="_Save" Command="{Binding WindowManager.ActiveDocument.Save}"/>
+                        <MenuItem Header="_Add" Command="{Binding ExecuteCommandNew}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Save" Command="{Binding WindowManager.ActiveDocument.Save}" Foreground="{DynamicResource MenuDefaultText}"/>
                         <Separator />
-                        <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}"/>
+                        <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}" Foreground="{DynamicResource MenuDefaultText}"/>
                         <Separator />
-                        <MenuItem Header="_Exit" />
+                        <MenuItem Header="_Exit"  Foreground="{DynamicResource MenuDefaultText}"/>
                     </MenuItem>
                     <MenuItem Header="_Edit">
-                        <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z"/>
-                        <MenuItem Header="_Redo" Command="{Binding WindowManager.ActiveDocument.Redo}"/>
+                        <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Redo" Command="{Binding WindowManager.ActiveDocument.Redo}" Foreground="{DynamicResource MenuDefaultText}"/>
                     </MenuItem>
                     <MenuItem Header="_View" ItemsSource="{Binding Windows}">
                         <MenuItem.ItemContainerStyle>
@@ -63,7 +63,7 @@
                             </HierarchicalDataTemplate>
                         </MenuItem.ItemTemplate>
                     </MenuItem>
-                    <MenuItem Header="_Help">
+                    <MenuItem Header="_Help" Foreground="{DynamicResource MenuDefaultText}">
                         <MenuItem Header="_About" Command="{Binding About}"></MenuItem>
                     </MenuItem>
                 </Menu>

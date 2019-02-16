@@ -8,10 +8,10 @@
              prism:ViewModelLocator.AutoWireViewModel="True" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ListView ItemsSource="{Binding Items}" BorderThickness="0">
+        <ListView ItemsSource="{Binding Items}" BorderThickness="0" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
             <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Enabled" >
+                <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}">
+                    <GridViewColumn Header="Enabled">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding IsEnabled}"/>
