@@ -79,7 +79,11 @@ namespace WoWDatabaseEditor.ViewModels
 
             foreach (var window in tools.Value)
             {
-                Windows.Add(new MenuItemViewModel(() => WindowManager.OpenTool(window)) { Header = window.Name });
+                MenuItemViewModel model = new MenuItemViewModel(() => WindowManager.OpenTool(window)) { Header = window.Name };
+                Windows.Add(model);
+                //@todo: fix loading solution explorer window on start
+                if (model.Header.Equals("Solution explorer"))
+                    model.Command.Execute(null);
             }
             ShowAbout();
         }
