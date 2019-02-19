@@ -28,7 +28,7 @@
             <StackPanel Name="menuHolder" Orientation="Horizontal">
                 <Menu DockPanel.Dock="Top" Margin="2">
                     <MenuItem Header="_File">
-                        <MenuItem Header="_Add" Command="{Binding ExecuteCommandNew}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Load" Command="{Binding ExecuteCommandNew}" Foreground="{DynamicResource MenuDefaultText}"/>
                         <MenuItem Header="_Save" Command="{Binding WindowManager.ActiveDocument.Save}" Foreground="{DynamicResource MenuDefaultText}"/>
                         <Separator />
                         <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}" Foreground="{DynamicResource MenuDefaultText}"/>
