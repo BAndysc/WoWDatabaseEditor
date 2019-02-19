@@ -4,10 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
+             xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ListBox KeyDown="ActionList_OnKeyDown" ItemsSource="{Binding Actions}" x:Name="ActionList" IsSynchronizedWithCurrentItem="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"  HorizontalContentAlignment="Stretch" >
+        <ListBox KeyDown="ActionList_OnKeyDown" ItemsSource="{Binding Actions}" x:Name="ActionList" IsSynchronizedWithCurrentItem="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollBarVisibility="Disabled"  HorizontalContentAlignment="Stretch" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
             <ListBox.Template>
                 <ControlTemplate>
                     <ItemsPresenter />
