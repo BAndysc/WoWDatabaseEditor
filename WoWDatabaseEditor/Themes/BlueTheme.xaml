@@ -8,6 +8,31 @@
         <ResourceDictionary Source="Controls/Merged.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F2F2F2" />
+
+    <Style x:Key="GridViewColumnHeader" TargetType="{x:Type GridViewColumnHeader}">
+        
+    </Style>
+
+    <!-- Style used by code call in GridViewColumns.cs line 329 -->
+    <Style x:Key="GridColumnHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
+        
+    </Style>
+
+    <!-- SmartScripts -->
+    <SolidColorBrush x:Key="SmartScripts.Background" Color="#F5F6FC"/>
+    <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#267171"/>
+    <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="#F5F6FC"/>
+    <SolidColorBrush x:Key="SmartScripts.Action.Background" Color="#E9EFFB"/>
+    <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="#000000"/>
+    <SolidColorBrush x:Key="SmartScripts.Event.Background" Color="#F5F8FF"/>
+    <SolidColorBrush x:Key="SmartScripts.Event.Foreground" Color="#000000"/>
+    <SolidColorBrush x:Key="SmartScripts.Event.Border" Color="#BFCCE0"/>
+    <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0"/>
+    <!-- Content -->
+    <SolidColorBrush x:Key="ContentSpecialBackground" Color="#FFD8D8DC" />
+    <SolidColorBrush x:Key="ContentSpecialForeground" Color="#FF252529" />
+        
     <!-- Menu -->
     <SolidColorBrush x:Key="MenuDefaultBackground" Color="#D6DBE9" />
     <SolidColorBrush x:Key="MenuDefaultText" Color="#1B293E" />

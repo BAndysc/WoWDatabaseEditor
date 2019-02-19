@@ -1,11 +1,12 @@
-﻿using System.Windows;
+﻿using MahApps.Metro.Controls;
+using System.Windows;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
     /// <summary>
     /// Interaction logic for NewItemWindow.xaml
     /// </summary>
-    public partial class NewItemWindow : Window
+    public partial class NewItemWindow : MetroWindow
     {
         public NewItemWindow(INewItemWindowViewModel viewModel)
         {

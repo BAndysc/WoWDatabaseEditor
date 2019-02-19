@@ -1,7 +1,12 @@
-﻿<Window x:Class="WoWDatabaseEditor.Services.NewItemService.NewItemWindow"
+﻿<Metro:MetroWindow x:Class="WoWDatabaseEditor.Services.NewItemService.NewItemWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Metro="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:prism="http://prismlibrary.com/"
+             Style="{DynamicResource MainWindowStyle}"
+		WindowCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+		WindowMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+		WindowMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}"
             Title="New item" Height="430" Width="600" WindowStartupLocation="CenterScreen" Margin="0,9,0,0">
     <DockPanel Margin="10">
         <WrapPanel FlowDirection="RightToLeft" DockPanel.Dock="Bottom" Margin="0,10,0,0">
@@ -29,4 +34,4 @@
         </ListView>
 
     </DockPanel>
-</Window>
+</Metro:MetroWindow>

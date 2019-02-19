@@ -4,11 +4,6 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <Grid>
-        <Grid.Resources >
-            <Style TargetType="TextBox" >
-                <Setter Property="Margin" Value="5,5,5,5" />
-            </Style>
-        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
@@ -23,9 +18,9 @@
         <Label Content="User" Grid.Row="1" />
         <Label Content="Password" Grid.Row="2" />
         <Label Content="Database" Grid.Row="3" />
-        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Host}" />
-        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding User}" />
-        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Password}" />
-        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Database}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding User}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding Password}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Database}" />
     </Grid>
 </UserControl>

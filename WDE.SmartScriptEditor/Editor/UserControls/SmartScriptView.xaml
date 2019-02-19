@@ -7,7 +7,7 @@
              mc:Ignorable="d" x:Name="Rooot"
              d:DesignHeight="300" d:DesignWidth="300">
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-        <DockPanel Background="#F5F6FC">
+        <DockPanel Background="{DynamicResource SmartScripts.Background}">
             <Border Padding="7">
                 <DockPanel>
                     <ListBox Background="Transparent" KeyDown="UIElement_OnKeyDown" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedItem}" ScrollViewer.CanContentScroll="False" HorizontalContentAlignment="Stretch" DockPanel.Dock="Top">

@@ -27,9 +27,9 @@
             <Label Content="Is flag" Grid.Row="2"/>
             <TextBox Text="{Binding Selected.Name}" Grid.Row="1" Grid.Column="1"/>
             <CheckBox IsChecked="{Binding Selected.IsFlag}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <ListView Grid.ColumnSpan="2" Grid.Row="3" ItemsSource="{Binding Selected.Values}">
+            <ListView Grid.ColumnSpan="2" Grid.Row="3" ItemsSource="{Binding Selected.Values}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
                 <ListView.View>
-                    <GridView>
+                    <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}">
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Key}" Width="70px" />
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Value.Name}" Width="120px" />
                         <GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Value.Description}" Width="200px"/>

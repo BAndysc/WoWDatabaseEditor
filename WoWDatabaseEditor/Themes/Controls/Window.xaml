@@ -12,6 +12,7 @@
         <Setter Property="TitleCaps" Value="False" />
         <Setter Property="GlowBrush" Value="{DynamicResource MainWindowActiveBorder}" />
         <Setter Property="NonActiveGlowBrush" Value="{DynamicResource MainWindowInactiveBorder}" />
+        <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
 
         <Style.Triggers>
             <Trigger Property="IsActive" Value="False">
