@@ -37,5 +37,7 @@ namespace WDE.HistoryWindow
         public bool AllowMultiple => false;
 
         public string Name => "History view";
+
+        public bool CanOpenOnStart => false;
     }
 }

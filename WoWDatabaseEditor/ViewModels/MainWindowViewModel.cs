@@ -81,8 +81,7 @@ namespace WoWDatabaseEditor.ViewModels
             {
                 MenuItemViewModel model = new MenuItemViewModel(() => WindowManager.OpenTool(window)) { Header = window.Name };
                 Windows.Add(model);
-                //@todo: fix loading solution explorer window on start
-                if (model.Header.Equals("Solution explorer"))
+                if (window.CanOpenOnStart)
                     model.Command.Execute(null);
             }
             ShowAbout();

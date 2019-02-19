@@ -14,5 +14,7 @@ namespace WDE.Common.Windows
         bool AllowMultiple { get; }
         string Name { get; }
         ContentControl GetView();
+
+        bool CanOpenOnStart  { get; }
     }
 }

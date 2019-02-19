@@ -18,6 +18,8 @@ namespace WDE.Solutions
 
         public string Name => "Solution explorer";
 
+        public bool CanOpenOnStart => true;
+
         public ContentControl GetSolutionExplorerView()
         {
             return new SolutionExplorerView();
