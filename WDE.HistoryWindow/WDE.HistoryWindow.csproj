@@ -73,11 +73,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WDE.Common\WDE.Common.csproj">
+    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj">
       <Project>{9D1A4E14-2FE1-403A-A042-ED7E49DB0438}</Project>
       <Name>WDE.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WDE.Module\WDE.Module.csproj">
+    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj">
       <Project>{034d29b2-faaa-4fea-a77e-5532aa2b0fb1}</Project>
       <Name>WDE.Module</Name>
     </ProjectReference>

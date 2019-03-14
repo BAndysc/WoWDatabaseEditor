@@ -7,21 +7,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWDatabaseEditorCore", "Wo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SmartScriptEditor", "WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj", "{B060C7F1-97B0-4A26-B7A8-E47C9AF08D07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common", "WDE.Common\WDE.Common.csproj", "{9D1A4E14-2FE1-403A-A042-ED7E49DB0438}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common", "WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj", "{9D1A4E14-2FE1-403A-A042-ED7E49DB0438}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Solutions", "WDE.Solutions\WDE.Solutions.csproj", "{ACD1C8BC-B91A-40E8-865D-D6826758E7CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Parameters", "WDE.Parameters\WDE.Parameters.csproj", "{3CD1E251-D9BF-4061-A8D5-4AC65106C896}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DbcStore", "WDE.DbcStore\WDE.DbcStore.csproj", "{A6109F89-0148-4C39-8631-206FFEFBA055}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DbcStore", "WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj", "{A6109F89-0148-4C39-8631-206FFEFBA055}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.History", "WDE.History\WDE.History.csproj", "{BC7E0845-C750-4DAF-8869-9170211465E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.History", "WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj", "{BC7E0845-C750-4DAF-8869-9170211465E6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SQLEditor", "WDE.SQLEditor\WDE.SQLEditor.csproj", "{7E0DE187-A45C-406B-AAAE-608F40237CE6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.HistoryWindow", "WDE.HistoryWindow\WDE.HistoryWindow.csproj", "{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.TrinityMySqlDatabase", "WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj", "{C6BE1E01-CF2F-4FE5-A67C-AC783EB9D3F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.TrinityMySqlDatabase", "WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj", "{C6BE1E01-CF2F-4FE5-A67C-AC783EB9D3F7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Blueprints", "WDE.Blueprints\WDE.Blueprints.csproj", "{4A11961B-85AD-464E-B881-C90F8CAC5647}"
 EndProject
@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.QuestChainEditor", "WDE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuestChainTest", "QuestChainTest\QuestChainTest.csproj", "{8F5E8C3A-422A-47C6-AFC3-4A62997E5D27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Module", "WDE.Module\WDE.Module.csproj", "{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Module", "WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj", "{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.ThemeChanger", "WDE.ThemeChanger\WDE.ThemeChanger.csproj", "{11BFD551-37B0-45A1-9890-CB5481B64E7E}"
 EndProject
