@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="WDE.TrinityMySqlDatabase.Views.DatabaseConfigView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Content="Host" />
+        <Label Content="User" Grid.Row="1" />
+        <Label Content="Password" Grid.Row="2" />
+        <Label Content="Database" Grid.Row="3" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding User}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding Password}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Database}" />
+    </Grid>
+</UserControl>
