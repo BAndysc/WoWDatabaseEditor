@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using WDE.SmartScriptEditor.Editor.ViewModels;
+using WDE.SmartScriptEditor.Editor.Helpers;
+
 namespace WDE.SmartScriptEditor.Editor.UserControls
 {
     /// <summary>
@@ -25,6 +28,8 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             "DeleteEventCommand",
             typeof(ICommand),
             typeof(SmartScriptView));
+
+        private SmartScriptDrawer saiDrawer;
 
         public ICommand DeleteEventCommand
         {
@@ -53,6 +58,17 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             {
                 DeleteEventCommand?.Execute(this);
             }
+        }
+
+        protected override void OnRender(DrawingContext context)
+        {
+            if (saiDrawer == null)
+            {
+                SmartScriptEditorViewModel model = DataContext as SmartScriptEditorViewModel;
+                saiDrawer = new SmartScriptDrawer(model.Events, scriptArea, model);
+            }
+            
+            saiDrawer.Draw();
         }
     }
 }

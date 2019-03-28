@@ -42,6 +42,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public IHistoryManager History => history;
 
         public SmartEvent SelectedItem { get; set; }
+        public SmartAction SelectedAction { get; set; }
 
         public DelegateCommand EditEvent { get; set; }
 

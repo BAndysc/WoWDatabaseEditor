@@ -103,6 +103,9 @@
     <Compile Include="Editor\Helpers\BoolToVisibilityConverter.cs" />
     <Compile Include="Editor\Helpers\FocusBehavior.cs" />
     <Compile Include="Editor\Helpers\IsNullConverter.cs" />
+    <Compile Include="Editor\Helpers\SmartActionVisual.cs" />
+    <Compile Include="Editor\Helpers\SmartEventVisual.cs" />
+    <Compile Include="Editor\Helpers\SmartScriptDrawer.cs" />
     <Compile Include="Editor\ViewModels\ParameterEditorViewModel.cs" />
     <Compile Include="Editor\UserControls\SmartActionsView.xaml.cs">
       <DependentUpon>SmartActionsView.xaml</DependentUpon>
