@@ -12,7 +12,7 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
     //
     // Summary:
     //     Object used to visualize SmartEvent object at smart script canvas
-    class SmartEventVisual
+    class SmartEventVisual : INotifiableSmartElement
     {
         public SmartScriptDrawer parent { get; private set; }
         public Rectangle rectangle { get; private set; }
@@ -113,11 +113,16 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
                 canvas.Children.Add(actionVisual.actionDesc);
             }
 
+            SmartScriptButton button = new SmartScriptButton(actionX, actionY, "Add action", this);
+            canvas.Children.Add(button.rectangle);
+            canvas.Children.Add(button.buttonText);
+            actionY += actionHeight;
+
             if ((actionY - actionPadding) > (rectangle.Height + position.Y))
-                condRecHeight = actionY - (int)rectangle.Height;
+                condRecHeight = actionY - (int)(rectangle.Height + position.Y);
         }
 
-        public void OnMouseLeftClick(object sender, MouseButtonEventArgs e)
+        private void OnMouseLeftClick(object sender, MouseButtonEventArgs e)
         {
             InvokeEventSelection();
 
@@ -139,7 +144,10 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             parent.Draw();
         }
 
-
+        public void NotifyElementAboutEvent()
+        {
+            parent.dataContext.AddAction.Execute(smartEvent);
+        }
 
         public int GetOverallHeigh()
         {

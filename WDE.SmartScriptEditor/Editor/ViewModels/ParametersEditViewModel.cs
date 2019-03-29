@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
+using System.Collections.Specialized;
 
 using WDE.Common.Parameters;
 using WDE.SmartScriptEditor.Models;

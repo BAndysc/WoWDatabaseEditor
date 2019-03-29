@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -13,20 +14,19 @@ using WDE.SmartScriptEditor.Editor.ViewModels;
 
 namespace WDE.SmartScriptEditor.Editor.Helpers
 {
-    public class SmartScriptDrawer
+    public class SmartScriptDrawer : INotifiableSmartElement
     {
-        private ObservableCollection<SmartEvent> events;
         private Canvas canvas;
         public SmartScriptEditorViewModel dataContext { get; private set; }
 
         private static readonly int eventPadding = 10;
 
-        public SmartScriptDrawer(ObservableCollection<SmartEvent> source, Canvas c, SmartScriptEditorViewModel model)
+        public SmartScriptDrawer(Canvas c, SmartScriptEditorViewModel model)
         {
-            events = source;
             canvas = c;
             dataContext = model;
             canvas.MouseLeftButtonDown += OnMouseLeftClick;
+            RegisterCollectionChangeHandler();
         }
 
         public void Draw()
@@ -37,11 +37,15 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             int eventPosX = 10;
             int eventPosY = 10;
 
-            foreach (var e in events)
+            foreach (var e in dataContext.Events)
             {
                 int eventHeight = DrawEvent(e, eventPosX, eventPosY);
                 eventPosY += eventHeight + eventPadding;
             }
+
+            SmartScriptButton scriptButton = new SmartScriptButton(eventPosX, eventPosY, "Add Event", this, true);
+            canvas.Children.Add(scriptButton.rectangle);
+            canvas.Children.Add(scriptButton.buttonText);
         }
 
         private int DrawEvent(SmartEvent e, int x, int y)
@@ -61,7 +65,20 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             return eventVisual.GetOverallHeigh();
         }
 
-        public void OnMouseLeftClick(object sender, MouseButtonEventArgs e)
+        private void RegisterCollectionChangeHandler()
+        {
+            foreach (var e in dataContext.Events)
+                e.Actions.CollectionChanged += OnEventsCollectionChange;
+
+            dataContext.Events.CollectionChanged += OnEventsCollectionChange;
+        }
+
+        public void NotifyElementAboutEvent()
+        {
+            dataContext.AddEvent.Execute();
+        }
+
+        private void OnMouseLeftClick(object sender, MouseButtonEventArgs e)
         {
             if (!(e.OriginalSource is Canvas))
                 return;
@@ -72,6 +89,20 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
                 dataContext.SelectedAction = null;
                 Draw();
             }
+        }
+
+        private void OnEventsCollectionChange(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (var elem in e.NewItems)
+                {
+                    if (elem is SmartEvent)
+                        ((SmartEvent)elem).Actions.CollectionChanged += OnEventsCollectionChange;
+                }
+            }
+
+            Draw();
         }
     }
 }

@@ -65,7 +65,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             if (saiDrawer == null)
             {
                 SmartScriptEditorViewModel model = DataContext as SmartScriptEditorViewModel;
-                saiDrawer = new SmartScriptDrawer(model.Events, scriptArea, model);
+                saiDrawer = new SmartScriptDrawer(scriptArea, model);
             }
             
             saiDrawer.Draw();

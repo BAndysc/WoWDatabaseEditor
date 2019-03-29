@@ -58,7 +58,7 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             rectangle.MouseLeftButtonDown += OnMouseLeftClick;
         }
 
-        public void OnMouseLeftClick(object sender, MouseButtonEventArgs e)
+        private void OnMouseLeftClick(object sender, MouseButtonEventArgs e)
         {
             parent.InvokeActionSelection(smartAction);
 
