@@ -111,7 +111,9 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
                 condDesc.Text = "";
 
             condDesc.Measure(new Size(condDesc.Width, eventWidth));
-            condRecHeight = (int)condDesc.DesiredSize.Height + 10;
+            int newHeight = (int)condDesc.DesiredSize.Height + 10;
+            if (condRecHeight < newHeight)
+                condRecHeight = newHeight;
         }
 
         public void DrawActions(Canvas canvas)
@@ -138,7 +140,7 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             canvas.Children.Add(button.buttonText);
             actionY += actionHeight;
 
-            if ((actionY - actionPadding) > (rectangle.Height + position.Y))
+            if (actionY > (rectangle.Height + position.Y))
                 condRecHeight = actionY - (int)(rectangle.Height + position.Y);
         }
 
