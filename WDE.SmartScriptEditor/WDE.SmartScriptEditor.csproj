@@ -58,6 +58,9 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="ParallelExtensionsExtras, Version=1.2.3.0, Culture=neutral, PublicKeyToken=665f4d61f853b5a9, processorArchitecture=MSIL">
+      <HintPath>..\packages\ParallelExtensionsExtras.1.2.0.0\lib\net40\ParallelExtensionsExtras.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Prism, Version=7.1.0.172, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
@@ -161,6 +164,10 @@
     <Compile Include="Data\SmartTypeListProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj">
+      <Project>{251e4d3d-b82c-4f6f-9337-49837e34c307}</Project>
+      <Name>WDE.Conditions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj">
       <Project>{9d1a4e14-2fe1-403a-a042-ed7e49db0438}</Project>
       <Name>WDE.Common</Name>

@@ -18,6 +18,7 @@ using Prism.Ioc;
 using WDE.Common.Providers;
 using WDE.Common.Solution;
 using System.Diagnostics;
+using WDE.Conditions.Data;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -30,6 +31,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ISmartFactory smartFactory;
         private readonly ISmartTypeListProvider smartTypeListProvider;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
+        private readonly IConditionDataManager conditionDataManager;
 
         private SmartScriptSolutionItem _item;
 
@@ -61,7 +63,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand DeleteEvent { get; set; }
 
-        public SmartScriptEditorViewModel(IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry)
+        public SmartScriptEditorViewModel(IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry, IConditionDataManager conditionDataManager)
         {
             this.history = history;
             this.database = database;
@@ -70,7 +72,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.itemFromListProvider = itemFromListProvider;
             this.smartTypeListProvider = smartTypeListProvider;
             this.itemNameRegistry = itemNameRegistry;
-            
+            this.conditionDataManager = conditionDataManager;
+
             EditEvent = new DelegateCommand(EditEventCommand);
             EditAction = new DelegateCommand<SmartAction>(EditActionCommand);
             AddEvent = new DelegateCommand(AddEventCommand);
@@ -109,8 +112,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             _item = item;
 
             var lines = database.GetScriptFor(_item.Entry, _item.SmartType);
-            script = new SmartScript(_item, smartFactory);
-            script.Load(lines);
+            var conditions = database.GetConditionsFor(22, _item.Entry, (int)_item.SmartType); // WARNING: hardcoded id for CONDITION_SOURCE_TYPE_SMART_EVENT
+            script = new SmartScript(_item, smartFactory, conditionDataManager);
+            script.Load(lines, conditions);
 
             history.AddHandler(new SaiHistoryHandler(script));
         }

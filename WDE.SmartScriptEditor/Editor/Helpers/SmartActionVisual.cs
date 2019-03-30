@@ -21,7 +21,7 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
         private SmartAction smartAction;
         private SmartEventVisual parent;
 
-        public static readonly int actionWidth = 500;
+        public static readonly int actionWidth = 520;
 
         public SmartActionVisual(SmartEventVisual p, SmartAction sa)
         {
@@ -71,7 +71,7 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             actionDesc = new TextBlock();
             actionDesc.Text = smartAction.Readable;
             actionDesc.Foreground = Brushes.Black;
-            actionDesc.Width = actionDesc.MaxWidth = 400;
+            actionDesc.Width = actionDesc.MaxWidth = actionWidth - 2;
             Canvas.SetLeft(actionDesc, x + 4);
             Canvas.SetTop(actionDesc, y + 3);
             actionDesc.MouseLeftButtonDown += OnMouseLeftClick;

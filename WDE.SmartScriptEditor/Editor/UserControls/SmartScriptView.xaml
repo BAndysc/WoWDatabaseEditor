@@ -8,7 +8,7 @@
              mc:Ignorable="d" x:Name="Rooot"
              d:DesignHeight="300"  d:DesignWidth="300">
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-        <Canvas Name="scriptArea" Background="{DynamicResource SmartScripts.Background}" ScrollViewer.CanContentScroll="True">
+        <Canvas Name="scriptArea" Background="{DynamicResource SmartScripts.Background}">
 
         </Canvas>
     </ScrollViewer>

@@ -11,6 +11,7 @@ using System.Windows.Input;
 
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.Editor.ViewModels;
+using WDE.SmartScriptEditor.Editor.UserControls;
 
 namespace WDE.SmartScriptEditor.Editor.Helpers
 {
@@ -18,15 +19,17 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
     {
         private Canvas canvas;
         public SmartScriptEditorViewModel dataContext { get; private set; }
+        private readonly SmartScriptView view;
 
         private static readonly int eventPadding = 10;
 
-        public SmartScriptDrawer(Canvas c, SmartScriptEditorViewModel model)
+        public SmartScriptDrawer(Canvas c, SmartScriptEditorViewModel model, SmartScriptView v)
         {
             canvas = c;
             dataContext = model;
             canvas.MouseLeftButtonDown += OnMouseLeftClick;
             RegisterCollectionChangeHandler();
+            view = v;
         }
 
         public void Draw()
@@ -46,6 +49,12 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             SmartScriptButton scriptButton = new SmartScriptButton(eventPosX, eventPosY, "Add Event", this, true);
             canvas.Children.Add(scriptButton.rectangle);
             canvas.Children.Add(scriptButton.buttonText);
+
+            int newCanvasH = eventPosY + 40;
+            if (view.ActualHeight < newCanvasH)
+                canvas.Height = newCanvasH;
+            else if (view.ActualHeight > newCanvasH)
+                canvas.Height = view.ActualHeight;
         }
 
         private int DrawEvent(SmartEvent e, int x, int y)
@@ -61,6 +70,7 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             canvas.Children.Add(eventVisual.rectangle);
             canvas.Children.Add(eventVisual.eventDesc);
             canvas.Children.Add(eventVisual.condRec);
+            canvas.Children.Add(eventVisual.condDesc);
 
             return eventVisual.GetOverallHeigh();
         }

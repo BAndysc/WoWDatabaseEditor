@@ -14,8 +14,8 @@ namespace WDE.SmartScriptEditor.Data
         SmartEvent = 0,
         SmartAction = 1,
         SmartTarget = 2,
-        SmartCondition = 3,
-        SmartConditionSource = 4,
+        //SmartCondition = 3,
+        //SmartConditionSource = 4,
         SmartSource = 5,
     }
 

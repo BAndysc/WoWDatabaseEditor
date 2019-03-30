@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
 using Prism.Ioc;
+using WDE.Conditions.Model;
+using WDE.Conditions.Data;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -18,16 +20,18 @@ namespace WDE.SmartScriptEditor.Models
         public readonly int EntryOrGuid;
         public readonly SmartScriptType SourceType;
         private readonly ISmartFactory smartFactory;
+        private readonly IConditionDataManager conditionDataManager;
 
-        public SmartScript(SmartScriptSolutionItem item, ISmartFactory smartFactory)
+        public SmartScript(SmartScriptSolutionItem item, ISmartFactory smartFactory, IConditionDataManager conditionDataManager)
         {
             EntryOrGuid = item.Entry;
             SourceType = item.SmartType;
             Events = new ObservableCollection<SmartEvent>();
             this.smartFactory = smartFactory;
+            this.conditionDataManager = conditionDataManager;
         }
 
-        public void Load(IEnumerable<ISmartScriptLine> lines)
+        public void Load(IEnumerable<ISmartScriptLine> lines, IEnumerable<IConditionLine> conditions)
         {
             int? entry = null;
             SmartScriptType? source = null;
@@ -50,7 +54,11 @@ namespace WDE.SmartScriptEditor.Models
                 {
                     currentEvent = SafeEventFactory(line);
                     if (currentEvent != null)
+                    {
+                        SetConditionsForEvent(currentEvent, conditions);
+                        currentEvent.conditionDataManager = conditionDataManager;
                         Events.Add(currentEvent);
+                    }   
                     else
                         continue;
                 }
@@ -87,6 +95,24 @@ namespace WDE.SmartScriptEditor.Models
                 System.Windows.MessageBox.Show($"Event {line.EventType} unknown, skipping action");
             }
             return null;
+        }
+
+        private void SetConditionsForEvent(SmartEvent smartEvent, IEnumerable<IConditionLine> conditions)
+        {
+            foreach (var condition in conditions)
+            {
+                if (condition.SourceGroup - 1 == smartEvent.ActualId)
+                {
+                    Condition cond = new Condition();
+                    cond.Type = condition.ConditionType;
+                    cond.Target = condition.ConditionTarget;
+                    cond.Value1 = condition.ConditionValue1;
+                    cond.Value2 = condition.ConditionValue2;
+                    cond.Value3 = condition.ConditionValue3;
+                    cond.Negative = condition.NegativeCondition > 0 ? true : false;
+                    smartEvent.AddCondition(condition.ElseGroup, cond);
+                }
+            }
         }
     }
 

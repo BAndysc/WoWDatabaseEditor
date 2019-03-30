@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using SmartFormat;
 using WDE.Common.Parameters;
+using WDE.Conditions.Data;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -16,6 +18,7 @@ namespace WDE.SmartScriptEditor.Models
         public static readonly int SmartEventParamsCount = 4;
 
         private ObservableCollection<SmartAction> _actions;
+        private ObservableConcurrentDictionary<int, ObservableCollection<Conditions.Model.Condition>> _conditions;
         private Parameter _flags;
         private Parameter _chance;
         private Parameter _phases;
@@ -87,6 +90,7 @@ namespace WDE.SmartScriptEditor.Models
         public SmartEvent(int id) : base(SmartEventParamsCount, id)
         {
             _actions = new ObservableCollection<SmartAction>();
+            _conditions = new ObservableConcurrentDictionary<int, ObservableCollection<Conditions.Model.Condition>>();
 
             _actions.CollectionChanged += (sender, args) =>
             {
@@ -155,5 +159,62 @@ namespace WDE.SmartScriptEditor.Models
         }
 
         public override int ParametersCount => 4;
+
+        public ObservableConcurrentDictionary<int, ObservableCollection<Conditions.Model.Condition>> Conditions => _conditions;
+        public IConditionDataManager conditionDataManager { private get; set; }
+
+        public void AddCondition(int elseGroup, Conditions.Model.Condition cond)
+        {
+            if (!_conditions.ContainsKey(elseGroup))
+                _conditions.Add(elseGroup, new ObservableCollection<Conditions.Model.Condition>());
+
+            _conditions[elseGroup].Add(cond);
+        }
+
+        public bool HasConditions()
+        {
+            return _conditions.Keys.Count > 0;
+        }
+
+        public string BuildConditionBlockDescription()
+        {
+            string result = "";
+
+            int counter = 0;
+            foreach (var key in _conditions.Keys)
+            {
+                if (_conditions.Keys.Count > 1 && counter != 0)
+                    result += Environment.NewLine + "or" + Environment.NewLine;
+
+                foreach (var cond in _conditions[key])
+                {
+                    string condOut = "";
+                    if (cond.Negative)
+                        condOut += "!";
+
+                    condOut = "If ";
+                    condOut += conditionDataManager.GetConditionData(cond.Type).Description;
+
+                    result += Smart.Format(condOut, new
+                    {
+                        target = cond.Target == 1 ? "Object" : "Invoker",
+                        pram1value = cond.Value1,
+                        pram2value = cond.Value2,
+                        pram3value = cond.Value3,
+                        pram1 = cond.Value1,
+                        pram2 = cond.Value2,
+                        pram3 = cond.Value3
+
+                    });
+
+                    if (_conditions[key].Count > 1)
+                        result += Environment.NewLine;
+                }
+
+                ++counter;
+            }
+
+            return result;
+        }
     }
 }

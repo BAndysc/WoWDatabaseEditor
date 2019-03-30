@@ -11,6 +11,7 @@ using WDE.Common.Solution;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
+using WDE.Conditions.Data;
 
 namespace WDE.SmartScriptEditor.Providers
 {
@@ -20,12 +21,14 @@ namespace WDE.SmartScriptEditor.Providers
         private readonly IEventAggregator eventAggregator;
         private readonly Lazy<IDatabaseProvider> database;
         private readonly Lazy<ISmartFactory> smartFactory;
+        private readonly Lazy<IConditionDataManager> conditionDataManager;
 
-        public SmartScriptSqlGenerator(IEventAggregator eventAggregator, Lazy<IDatabaseProvider> database, Lazy<ISmartFactory> smartFactory)
+        public SmartScriptSqlGenerator(IEventAggregator eventAggregator, Lazy<IDatabaseProvider> database, Lazy<ISmartFactory> smartFactory, Lazy<IConditionDataManager> conditionDataManager)
         {
             this.eventAggregator = eventAggregator;
             this.database = database;
             this.smartFactory = smartFactory;
+            this.conditionDataManager = conditionDataManager;
         }
 
         public string GenerateSql(SmartScriptSolutionItem item)
@@ -38,8 +41,8 @@ namespace WDE.SmartScriptEditor.Providers
             if (args.Sql != null)
                 return args.Sql;
 
-            SmartScript script = new SmartScript(item, smartFactory.Value);
-            script.Load(database.Value.GetScriptFor(item.Entry, item.SmartType));
+            SmartScript script = new SmartScript(item, smartFactory.Value, conditionDataManager.Value);
+            script.Load(database.Value.GetScriptFor(item.Entry, item.SmartType), database.Value.GetConditionsFor(22, item.Entry, (int)item.SmartType));
             return new SmartScriptExporter(script, smartFactory.Value).GetSql();
         }
     }

@@ -58,6 +58,7 @@ namespace WDE.SmartScriptEditor.Data
             for (int i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
                 ev.SetParameter(i, GetEventParameter(line, i));
 
+            ev.ActualId = line.Id;
             return ev;
         }
 

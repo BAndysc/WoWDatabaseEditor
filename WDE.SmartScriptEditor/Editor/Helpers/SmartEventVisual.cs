@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
         public Rectangle rectangle { get; private set; }
         public Rectangle condRec { get; private set; }
         public TextBlock eventDesc { get; private set; }
-        //public TextBlock condDesc { get; private set; }
+        public TextBlock condDesc { get; private set; }
         public bool isSelected { get; set; }
         
         private SmartEvent smartEvent;
@@ -81,6 +81,8 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
 
         public void InitConditions()
         {
+            InitConditionDescription((int)position.X + 22, (int)(position.Y + rectangle.Height + 2));
+
             // Create block for condition
             condRec = new Rectangle();
             Canvas.SetLeft(condRec, position.X + 20);
@@ -92,6 +94,24 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
 
             condRec.Width = eventWidth - 20;
             condRec.Height = condRecHeight;
+        }
+
+        private void InitConditionDescription(int x, int y)
+        {
+            condDesc = new TextBlock();
+            Canvas.SetLeft(condDesc, x);
+            Canvas.SetTop(condDesc, y);
+            condDesc.TextWrapping = TextWrapping.Wrap;
+            condDesc.Foreground = Brushes.Black;
+            
+            condDesc.Width = condDesc.MaxWidth = eventWidth - 24;
+            if (smartEvent.HasConditions())
+                condDesc.Text = smartEvent.BuildConditionBlockDescription();
+            else
+                condDesc.Text = "";
+
+            condDesc.Measure(new Size(condDesc.Width, eventWidth));
+            condRecHeight = (int)condDesc.DesiredSize.Height + 10;
         }
 
         public void DrawActions(Canvas canvas)
