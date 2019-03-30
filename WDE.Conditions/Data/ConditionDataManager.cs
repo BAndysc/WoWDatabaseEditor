@@ -31,7 +31,7 @@ namespace WDE.Conditions.Data
         Dictionary<int, ConditionSourcesJsonData> _conditionSourceData = new Dictionary<int, ConditionSourcesJsonData>();
         Dictionary<string, ConditionSourcesJsonData> _conditionSourceDataByName = new Dictionary<string, ConditionSourcesJsonData>();
 
-        public ConditionDataManager(ConditionDataProvider provider)
+        public ConditionDataManager(IConditionDataProvider provider)
         {
             LoadConditions(provider.GetConditions());
             LoadConditionSources(provider.GetConditionSources());
