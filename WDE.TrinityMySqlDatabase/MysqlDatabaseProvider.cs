@@ -166,5 +166,13 @@ namespace WDE.TrinityMySqlDatabase
                 scope.Complete();
             }
         }
+
+        public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
+        {
+            if (model == null)
+                return new List<IConditionLine>();
+
+            return model.Conditions.Where((line) => line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId);
+        }
     }
 }

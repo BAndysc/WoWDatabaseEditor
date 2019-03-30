@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\Enums.cs" />
+    <Compile Include="Database\IConditionLine.cs" />
     <Compile Include="Database\ICreatureTemplate.cs" />
     <Compile Include="Database\IDatabaseProvider.cs" />
     <Compile Include="Database\IGameObjectTemplate.cs" />

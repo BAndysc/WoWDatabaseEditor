@@ -24,5 +24,8 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [DataAccessObjects]
         public abstract DataAccessObjects<MySqlQuestTemplateAddon> QuestTemplateAddon { get; }
+
+        [DataAccessObjects]
+        public abstract DataAccessObjects<MySqlConditionLine> Conditions { get; }
     }
 }

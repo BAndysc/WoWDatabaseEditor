@@ -117,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\DBAccess.cs" />
+    <Compile Include="Models\MySqlConditionLine.cs" />
     <Compile Include="Models\MySqlGameObjectTemplate.cs" />
     <Compile Include="Models\MySqlQuestTemplate.cs" />
     <Compile Include="Models\MySqlQuestTemplateAddon.cs" />

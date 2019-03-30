@@ -21,5 +21,7 @@ namespace WDE.Common.Database
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
 
         void InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script);
+
+        IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId);
     }
 }
