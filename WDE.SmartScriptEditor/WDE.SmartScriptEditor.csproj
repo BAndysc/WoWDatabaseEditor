@@ -112,15 +112,6 @@
     <Compile Include="Editor\Helpers\SmartScriptButton.cs" />
     <Compile Include="Editor\Helpers\SmartScriptDrawer.cs" />
     <Compile Include="Editor\ViewModels\ParameterEditorViewModel.cs" />
-    <Compile Include="Editor\UserControls\SmartActionsView.xaml.cs">
-      <DependentUpon>SmartActionsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Editor\UserControls\SmartActionView.xaml.cs">
-      <DependentUpon>SmartActionView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Editor\UserControls\SmartEventView.xaml.cs">
-      <DependentUpon>SmartEventView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Editor\UserControls\SmartScriptView.xaml.cs">
       <DependentUpon>SmartScriptView.xaml</DependentUpon>
     </Compile>
@@ -218,18 +209,6 @@
     <Resource Include="Resources\SmartScriptTimedActionListIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Editor\UserControls\SmartActionsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Editor\UserControls\SmartActionView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Editor\UserControls\SmartEventView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Editor\UserControls\SmartScriptView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

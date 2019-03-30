@@ -63,6 +63,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand DeleteEvent { get; set; }
 
+        public DelegateCommand DeleteEventOrAction { get; set; }
+
         public SmartScriptEditorViewModel(IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry, IConditionDataManager conditionDataManager)
         {
             this.history = history;
@@ -86,6 +88,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             UndoCommand = new DelegateCommand(history.Undo, () => history.CanUndo);
             RedoCommand = new DelegateCommand(history.Redo, () => history.CanRedo);
+
+            DeleteEventOrAction = new DelegateCommand(DeleteEventOrActionCommand);
 
             this.history.PropertyChanged += (sender, args) =>
             {
@@ -328,6 +332,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             v.DataContext = new ParametersEditViewModel(itemFromListProvider, ev, paramss);
             v.ShowDialog();
+        }
+
+        private void DeleteEventOrActionCommand()
+        {
+            if (SelectedAction != null)
+                DeleteActionCommand(SelectedAction);
+            else if (SelectedItem != null)
+                DeleteEventCommand();
         }
     }
 }
