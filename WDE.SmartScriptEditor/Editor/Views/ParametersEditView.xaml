@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
-             xmlns:views="clr-namespace:WDE.SmartScriptEditor.Editor.Views" Height="485.361" Width="455.457" WindowStartupLocation="CenterScreen"
+             xmlns:views="clr-namespace:WDE.SmartScriptEditor.Editor.Views" Height="500" Width="455.457" WindowStartupLocation="CenterScreen"
              Background="{DynamicResource SmartScripts.Background}">
     <Grid Margin="6">
         <Grid.RowDefinitions>
@@ -13,44 +13,48 @@
         </Grid.RowDefinitions>
         <TextBlock Text="{Binding Readable}" Margin="0,0,0,10"></TextBlock>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding AllItems}">
+            <DockPanel>
+                <ItemsControl ItemsSource="{Binding AllItems}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" DockPanel.Dock="Top">
 
-                <ItemsControl.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.ContainerStyle>
-                            <Style TargetType="GroupItem">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="GroupItem">
-                                            <GroupBox Header="{Binding Path=Name}" >
-                                                <ItemsPresenter />
-                                            </GroupBox>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </GroupStyle.ContainerStyle>
-                    </GroupStyle>
-                </ItemsControl.GroupStyle>
-
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <views:ParameterEditorView Margin="0,0,0,5">
-                            <views:ParameterEditorView.Style>
-                                <Style TargetType="views:ParameterEditorView">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Parameter.Name}" Value="empty">
-                                            <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                        </DataTrigger>
-                                    </Style.Triggers>   
+                    <ItemsControl.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="GroupItem">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="GroupItem">
+                                                <GroupBox Header="{Binding Path=Name}" >
+                                                    <ItemsPresenter />
+                                                </GroupBox>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
                                 </Style>
-                            </views:ParameterEditorView.Style>
-                        </views:ParameterEditorView>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </ItemsControl.GroupStyle>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <views:ParameterEditorView Margin="0,0,0,5">
+                                <views:ParameterEditorView.Style>
+                                    <Style TargetType="views:ParameterEditorView">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Parameter.Name}" Value="empty">
+                                                <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </views:ParameterEditorView.Style>
+                            </views:ParameterEditorView>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Text="Conditions:" DockPanel.Dock="Top" Margin="10, 10, 10, 10"/>
+                <Button Name="editConditionsButton" Button.Content="Edit conditions" DockPanel.Dock="Top" MaxHeight="30" Click="editConditionsButton_Click"/>
+            </DockPanel>
         </ScrollViewer>
-        <WrapPanel Grid.Row="2" Margin="0,10,0,0" HorizontalAlignment="Right">
+        <WrapPanel Grid.Row="3" Margin="0,10,0,0" HorizontalAlignment="Right">
             <Button Click="ButtonBase_OnClick" Content="  Ok  "></Button>
         </WrapPanel>
     </Grid>

@@ -14,11 +14,11 @@ using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.Views;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
-using Prism.Ioc;
 using WDE.Common.Providers;
 using WDE.Common.Solution;
 using System.Diagnostics;
 using WDE.Conditions.Data;
+using WDE.Conditions.Model;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -116,7 +116,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             _item = item;
 
             var lines = database.GetScriptFor(_item.Entry, _item.SmartType);
-            var conditions = database.GetConditionsFor(22, _item.Entry, (int)_item.SmartType); // WARNING: hardcoded id for CONDITION_SOURCE_TYPE_SMART_EVENT
+            var conditions = database.GetConditionsFor(Condition.CONDITION_SOURCE_SMART_EVENT, _item.Entry, (int)_item.SmartType);
             script = new SmartScript(_item, smartFactory, conditionDataManager);
             script.Load(lines, conditions);
 
@@ -307,7 +307,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 paramss.Add(new KeyValuePair<Parameter, string>(wrapper, "Target"));
             }
 
-            v.DataContext = new ParametersEditViewModel(itemFromListProvider, obj, paramss);
+            v.DataContext = new ParametersEditViewModel(itemFromListProvider, obj, paramss, null, conditionDataManager);
             v.ShowDialog();
         }
 
@@ -330,7 +330,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (!ev.GetParameter(i).Name.Equals("empty"))
                     paramss.Add(new KeyValuePair<Parameter, string>(ev.GetParameter(i), "Event specific"));
 
-            v.DataContext = new ParametersEditViewModel(itemFromListProvider, ev, paramss);
+            v.DataContext = new ParametersEditViewModel(itemFromListProvider, ev, paramss, ev.Conditions, conditionDataManager);
             v.ShowDialog();
         }
 

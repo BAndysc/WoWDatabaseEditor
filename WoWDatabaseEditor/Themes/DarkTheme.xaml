@@ -43,7 +43,7 @@
          Background="White"
          BorderThickness="1" />
       <Border Grid.Column="0" CornerRadius="2,0,0,2" Margin="1" 
-         Background="#2D2D30" 
+         Background="#737373" 
          BorderThickness="0,0,1,0" />
       <Path x:Name="Arrow" Grid.Column="1" HorizontalAlignment="Center"
          VerticalAlignment="Center"
@@ -438,6 +438,10 @@
             <Trigger Property="IsMouseOver" Value="True">
               <Setter TargetName="Border" Property="BorderThickness" Value="2" />
               <Setter TargetName="Border" Property="BorderBrush" Value="Gray" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+              <Setter TargetName="Border" Property="BorderBrush" Value="#b3b3b3" />
+              <Setter TargetName="Border" Property="BorderThickness" Value="2" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>

@@ -1,8 +1,8 @@
-﻿<UserControl x:Class="WDE.SmartScriptEditor.Editor.Views.ParameterEditorView"
+﻿<UserControl x:Class="WDE.Conditions.Views.ParameterEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/" 
-             xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Helpers"
+             xmlns:helpers="clr-namespace:WDE.Conditions.Helpers"
              Background="{DynamicResource SmartScripts.Background}">
     <Grid>
         <Grid.Resources>

@@ -13,10 +13,17 @@ namespace WDE.Conditions.Data
         DataConditionSource = 2,
     }
 
+    public enum ConditionTargets
+    {
+        Invoker = 0,
+        Object = 1,
+    }
+
     public interface IConditionDataManager
     {
         ConditionJsonData GetConditionData(int id);
         ConditionJsonData GetConditionData(string name);
+        IEnumerable<ConditionJsonData> GetConditions();
 
         ConditionSourcesJsonData GetConditionSourceData(int id);
         ConditionSourcesJsonData GetConditionSourceData(string name);
@@ -25,6 +32,8 @@ namespace WDE.Conditions.Data
     [SingleInstance, AutoRegister]
     public class ConditionDataManager : IConditionDataManager
     {
+        private readonly IConditionDataProvider provider;
+
         Dictionary<int, ConditionJsonData> _conditionData = new Dictionary<int, ConditionJsonData>();
         Dictionary<string, ConditionJsonData> _conditionDataByName = new Dictionary<string, ConditionJsonData>();
 
@@ -33,6 +42,7 @@ namespace WDE.Conditions.Data
 
         public ConditionDataManager(IConditionDataProvider provider)
         {
+            this.provider = provider;
             LoadConditions(provider.GetConditions());
             LoadConditionSources(provider.GetConditionSources());
         }
@@ -69,6 +79,11 @@ namespace WDE.Conditions.Data
                 throw new NullReferenceException();
 
             return _conditionDataByName[name];
+        }
+
+        public IEnumerable<ConditionJsonData> GetConditions()
+        {
+            return provider.GetConditions();
         }
 
         public ConditionSourcesJsonData GetConditionSourceData(int id)

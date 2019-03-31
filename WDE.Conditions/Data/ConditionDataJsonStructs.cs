@@ -74,6 +74,11 @@ namespace WDE.Conditions.Data
 
         [JsonProperty(PropertyName = "sourceId")]
         public ConditionSourceParamsJsonData SourceId;
+
+        public override string ToString()
+        {
+            return Name + "(" + Id + ")";
+        }
     }
 
     [ExcludeFromCodeCoverage]
@@ -90,5 +95,10 @@ namespace WDE.Conditions.Data
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
+
+        public override string ToString()
+        {
+            return Name + "(" + Id + ")";
+        }
     }
 }

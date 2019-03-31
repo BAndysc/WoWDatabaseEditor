@@ -102,16 +102,7 @@ namespace WDE.SmartScriptEditor.Models
             foreach (var condition in conditions)
             {
                 if (condition.SourceGroup - 1 == smartEvent.ActualId)
-                {
-                    Condition cond = new Condition();
-                    cond.Type = condition.ConditionType;
-                    cond.Target = condition.ConditionTarget;
-                    cond.Value1 = condition.ConditionValue1;
-                    cond.Value2 = condition.ConditionValue2;
-                    cond.Value3 = condition.ConditionValue3;
-                    cond.Negative = condition.NegativeCondition > 0 ? true : false;
-                    smartEvent.AddCondition(condition.ElseGroup, cond);
-                }
+                    smartEvent.AddCondition(new Condition(condition, conditionDataManager));
             }
         }
     }
