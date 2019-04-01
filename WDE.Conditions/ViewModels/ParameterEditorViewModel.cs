@@ -11,17 +11,23 @@ namespace WDE.Conditions.ViewModels
     {
         private readonly IItemFromListProvider itemFromListProvider;
 
+        private bool readOnly;
+
         public Parameter Parameter { get; set; }
 
         public DelegateCommand SelectItemAction { get; set; }
 
-        public ParameterEditorViewModel(ConditionParameterJsonData param, IItemFromListProvider itemFromListProvider)
+        public bool IsReadOnly => readOnly;
+
+        public ParameterEditorViewModel(ConditionParameterJsonData param, IItemFromListProvider itemFromListProvider, IParameterFactory parameterFactory)
         {
             this.itemFromListProvider = itemFromListProvider;
 
-            Parameter = new Parameter(param.Name);
+            Parameter = parameterFactory.Factory(param.Type, param.Name);
             Parameter.Items = param.Values;
             Parameter.Description = param.Description;
+
+            readOnly = Parameter.Items != null && Parameter.Items.Count > 0;
 
             SelectItemAction = new DelegateCommand(SelectItem);
         }

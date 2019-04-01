@@ -32,6 +32,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ISmartTypeListProvider smartTypeListProvider;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
         private readonly IConditionDataManager conditionDataManager;
+        private readonly IParameterFactory parameterFactory;
 
         private SmartScriptSolutionItem _item;
 
@@ -65,7 +66,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand DeleteEventOrAction { get; set; }
 
-        public SmartScriptEditorViewModel(IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry, IConditionDataManager conditionDataManager)
+        public SmartScriptEditorViewModel(IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry, IConditionDataManager conditionDataManager, IParameterFactory parameterFactory)
         {
             this.history = history;
             this.database = database;
@@ -75,6 +76,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.smartTypeListProvider = smartTypeListProvider;
             this.itemNameRegistry = itemNameRegistry;
             this.conditionDataManager = conditionDataManager;
+            this.parameterFactory = parameterFactory;
 
             EditEvent = new DelegateCommand(EditEventCommand);
             EditAction = new DelegateCommand<SmartAction>(EditActionCommand);
@@ -283,7 +285,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private void EditActionCommand(SmartAction obj)
         {
-            ParametersEditView v = new ParametersEditView();
+            ParametersEditView v = new ParametersEditView(parameterFactory);
             List<KeyValuePair<Parameter, string>> paramss = new List<KeyValuePair<Parameter, string>>();
            
             for (int i = 0; i < obj.Source.ParametersCount; ++i)
@@ -318,7 +320,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private void EditEventCommand(SmartEvent ev)
         {
-            ParametersEditView v = new ParametersEditView();
+            ParametersEditView v = new ParametersEditView(parameterFactory);
             List<KeyValuePair<Parameter, string>> paramss = new List<KeyValuePair<Parameter, string>>();
             paramss.Add(new KeyValuePair<Parameter, string>(ev.Chance, "General"));
             paramss.Add(new KeyValuePair<Parameter, string>(ev.Flags, "General"));

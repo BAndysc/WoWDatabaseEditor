@@ -14,7 +14,7 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Label HorizontalAlignment="Right" Content="{Binding Parameter.Name, Mode=OneWay}"/>
-        <TextBox Grid.Column="1" VerticalContentAlignment="Center" FontFamily="Consolas">
+        <TextBox Grid.Column="1" VerticalContentAlignment="Center" FontFamily="Consolas" IsReadOnly="{Binding IsReadOnly}">
             <TextBox.Style>
                 <Style TargetType="{x:Type TextBox}">
                     <Setter Property="Text" Value="{Binding Parameter.String, Mode=OneWay}"></Setter>

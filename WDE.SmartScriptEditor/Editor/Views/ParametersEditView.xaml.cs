@@ -2,6 +2,7 @@
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.Conditions.Views;
 using WDE.Conditions.ViewModels;
+using WDE.Common.Parameters;
 
 namespace WDE.SmartScriptEditor.Editor.Views
 {
@@ -10,9 +11,12 @@ namespace WDE.SmartScriptEditor.Editor.Views
     /// </summary>
     public partial class ParametersEditView : Window
     {
-        public ParametersEditView()
+        private readonly IParameterFactory parameterFactory;
+
+        public ParametersEditView(IParameterFactory parameterFactory)
         {
             InitializeComponent();
+            this.parameterFactory = parameterFactory;
         }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
@@ -27,7 +31,7 @@ namespace WDE.SmartScriptEditor.Editor.Views
             if (model._conditions != null)
             {
                 ConditionsEditView view = new ConditionsEditView();
-                ConditionsEditViewModel viewModel = new ConditionsEditViewModel(model._conditions, model.conditionDataManager, model.itemFromListProvider);
+                ConditionsEditViewModel viewModel = new ConditionsEditViewModel(model._conditions, model.conditionDataManager, model.itemFromListProvider, parameterFactory);
                 view.DataContext = viewModel;
                 view.ShowDialog();
             }

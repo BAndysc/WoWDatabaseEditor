@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using WDE.Conditions.Model;
 using WDE.Conditions.Data;
 using WDE.Common.Providers;
+using WDE.Common.Parameters;
 
 namespace WDE.Conditions.ViewModels
 {
@@ -16,6 +17,7 @@ namespace WDE.Conditions.ViewModels
     {
         private readonly IConditionDataManager conditionDataManager;
         private readonly IItemFromListProvider itemFromListProvider;
+        private readonly IParameterFactory parameterFactory;
         private readonly IEnumerable<ConditionJsonData> _conditionTypes;
 
         private Condition currentElement;
@@ -27,12 +29,13 @@ namespace WDE.Conditions.ViewModels
         public DelegateCommand DeleteCondition { get; set; }
         public DelegateCommand<Condition> ChangeCurrent { get; set; }
 
-        public ConditionsEditViewModel(ObservableCollection<Condition> conditions, IConditionDataManager conditionDataManager, IItemFromListProvider itemFromListProvider)
+        public ConditionsEditViewModel(ObservableCollection<Condition> conditions, IConditionDataManager conditionDataManager, IItemFromListProvider itemFromListProvider, IParameterFactory parameterFactory)
         {
             _conditions = conditions;
             this.conditionDataManager = conditionDataManager;
             this.itemFromListProvider = itemFromListProvider;
             _conditionTypes = conditionDataManager.GetConditions();
+            this.parameterFactory = parameterFactory;
 
             if (_conditions.Count > 0)
                 CurrentElement = _conditions[0];
@@ -64,8 +67,12 @@ namespace WDE.Conditions.ViewModels
             set
             {
                 condTypeIndex = value;
-                currentElement.Type = GetTypeIdForIndex(condTypeIndex);
-                Parameters = GetParameters(currentElement.ConditionType);
+                if (currentElement != null)
+                {
+                    currentElement.Type = GetTypeIdForIndex(condTypeIndex);
+                    Parameters = GetParameters(currentElement.ConditionType);
+                }
+                
                 RaisePropertyChanged("CurrentTypeIndex");
             }
         }
@@ -131,7 +138,7 @@ namespace WDE.Conditions.ViewModels
             if (data.Parameters != null)
             {
                 foreach (var conditionParam in data.Parameters)
-                    list.Add(new ParameterEditorViewModel(conditionParam, itemFromListProvider));
+                    list.Add(new ParameterEditorViewModel(conditionParam, itemFromListProvider, parameterFactory));
             }
 
             return list;
