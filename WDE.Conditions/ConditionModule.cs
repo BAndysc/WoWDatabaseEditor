@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Prism.Ioc;
 using WDE.Module;
+using WDE.Module.Attributes;
+using WDE.Conditions.Providers;
+using WDE.Common.Database;
 
 namespace WDE.Conditions
 {

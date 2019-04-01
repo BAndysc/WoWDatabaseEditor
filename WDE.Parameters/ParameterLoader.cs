@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
-using Prism.Ioc;
 
 namespace WDE.Parameters
 {

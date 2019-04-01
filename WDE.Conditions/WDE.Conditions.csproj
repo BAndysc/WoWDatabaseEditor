@@ -71,8 +71,8 @@
     <Compile Include="Data\ConditionDataJsonProvider.cs" />
     <Compile Include="Data\ConditionDataJsonStructs.cs" />
     <Compile Include="Data\ConditionDataManager.cs" />
-    <Compile Include="Data\ConditionDataProvider.cs" />
-    <Compile Include="Data\IConditionDataProvider.cs" />
+    <Compile Include="Providers\ConditionDataProvider.cs" />
+    <Compile Include="Providers\IConditionDataProvider.cs" />
     <Compile Include="Helpers\IsNullConverter.cs" />
     <Compile Include="Model\Condition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -88,6 +88,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Providers\ConditionsEditViewProvider.cs" />
+    <Compile Include="Providers\IConditionsEditViewProvider.cs" />
     <Compile Include="UserControls\ConditionListView.xaml.cs">
       <DependentUpon>ConditionListView.xaml</DependentUpon>
     </Compile>
