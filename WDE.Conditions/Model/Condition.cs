@@ -85,24 +85,34 @@ namespace WDE.Conditions.Model
             get { return ConditionTarget > 0 ? "Object" : "Invoker"; }
         }
 
-        public bool HasConditionValue1
+        public int ConditionValueOne
         {
-            get { return conditionDataManager.GetConditionData(ConditionType).Parameters.Count >= 1; }
+            get { return ConditionValue1; }
+            set
+            {
+                ConditionValue1 = value;
+                RaisePropertyChanged("ConditionValueOne");
+            }
         }
 
-        public bool HasConditionValue2
+        public int ConditionValueTwo
         {
-            get { return conditionDataManager.GetConditionData(ConditionType).Parameters.Count >= 2; }
+            get { return ConditionValue2; }
+            set
+            {
+                ConditionValue2 = value;
+                RaisePropertyChanged("ConditionValueTwo");
+            }
         }
 
-        public bool HasConditionValue3
+        public int ConditionValueThree
         {
-            get { return conditionDataManager.GetConditionData(ConditionType).Parameters.Count >= 3; }
-        }
-
-        public string ConditionValueOneName
-        {
-            get { return ""; }
+            get { return ConditionValue3; }
+            set
+            {
+                ConditionValue3 = value;
+                RaisePropertyChanged("ConditionValueThree");
+            }
         }
 
         public bool IsNegative

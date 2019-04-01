@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Prism.Mvvm;
 using Prism.Commands;
 using System.Collections.ObjectModel;
@@ -27,7 +25,6 @@ namespace WDE.Conditions.ViewModels
 
         public DelegateCommand AddCondition { get; set; }
         public DelegateCommand DeleteCondition { get; set; }
-        public DelegateCommand<Condition> ChangeCurrent { get; set; }
 
         public ConditionsEditViewModel(ObservableCollection<Condition> conditions, IConditionDataManager conditionDataManager, IItemFromListProvider itemFromListProvider, IParameterFactory parameterFactory)
         {
@@ -42,7 +39,6 @@ namespace WDE.Conditions.ViewModels
 
             AddCondition = new DelegateCommand(AddConditionCommand);
             DeleteCondition = new DelegateCommand(DeleteConditionCommand);
-            ChangeCurrent = new DelegateCommand<Condition>(ChangeCurrentElementCommand);
         }
 
         public ObservableCollection<Condition> Conditions => _conditions;
@@ -103,11 +99,6 @@ namespace WDE.Conditions.ViewModels
             }
         }
 
-        private void ChangeCurrentElementCommand(Condition cond)
-        {
-            CurrentElement = cond;
-        }
-
         private int GetTypeIdForIndex(int val)
         {
             List<ConditionJsonData> list = _conditionTypes.ToList();
@@ -137,8 +128,9 @@ namespace WDE.Conditions.ViewModels
 
             if (data.Parameters != null)
             {
+                int index = 0;
                 foreach (var conditionParam in data.Parameters)
-                    list.Add(new ParameterEditorViewModel(conditionParam, itemFromListProvider, parameterFactory));
+                    list.Add(new ParameterEditorViewModel(conditionParam, itemFromListProvider, parameterFactory, currentElement, index++));
             }
 
             return list;

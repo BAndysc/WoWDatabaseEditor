@@ -20,15 +20,15 @@
         </Grid.ColumnDefinitions>
         <Button Grid.Row="0" Grid.Column="1" Content="Add condition" Command="{Binding AddCondition}" Margin="5, 0, 5, 0" HorizontalAlignment="Stretch" />
         <Button Grid.Row="0" Grid.Column="2"  Content="Delete condition" Command="{Binding DeleteCondition}" Margin="5, 0, 5, 0" HorizontalAlignment="Stretch" />
-        <ListView Name="ConditionList" Grid.Row="2" Grid.ColumnSpan="4" ItemsSource="{Binding Conditions}" ItemContainerStyle="{DynamicResource ListViewItemStyle}" SelectionChanged="ConditionList_SelectionChanged">
+        <ListView Name="ConditionList" Grid.Row="2" Grid.ColumnSpan="4" ItemsSource="{Binding Conditions}" ItemContainerStyle="{DynamicResource ListViewItemStyle}" SelectedItem="{Binding CurrentElement, Mode=TwoWay}" >
             <ListView.View>
                 <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}">
                     <GridViewColumn Header="ElseGroup" DisplayMemberBinding="{Binding Path=Group, UpdateSourceTrigger=PropertyChanged}" Width="70px" />
                     <GridViewColumn Header="Condition" DisplayMemberBinding="{Binding Path=ReadableType, UpdateSourceTrigger=PropertyChanged}" Width="270px" />
                     <GridViewColumn Header="Target" DisplayMemberBinding="{Binding Path=ReadableTarget, UpdateSourceTrigger=PropertyChanged}" Width="70px"/>
-                    <GridViewColumn Header="Value1" DisplayMemberBinding="{Binding Path=ConditionValue1}" Width="100px"/>
-                    <GridViewColumn Header="Value2" DisplayMemberBinding="{Binding Path=ConditionValue2}" Width="100px"/>
-                    <GridViewColumn Header="Value3" DisplayMemberBinding="{Binding Path=ConditionValue3}" Width="100px"/>
+                    <GridViewColumn Header="Value1" DisplayMemberBinding="{Binding Path=ConditionValueOne}" Width="100px"/>
+                    <GridViewColumn Header="Value2" DisplayMemberBinding="{Binding Path=ConditionValueTwo}" Width="100px"/>
+                    <GridViewColumn Header="Value3" DisplayMemberBinding="{Binding Path=ConditionValueThree}" Width="100px"/>
                     <GridViewColumn Header="Negative" DisplayMemberBinding="{Binding Path=IsNegative, UpdateSourceTrigger=PropertyChanged}" Width="70px"/>
                 </GridView>
             </ListView.View>

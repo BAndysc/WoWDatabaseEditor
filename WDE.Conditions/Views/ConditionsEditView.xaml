@@ -76,7 +76,7 @@
         <CheckBox Grid.Row="11" Grid.Column="1" IsChecked="{Binding CurrentElement.IsNegative, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
         <TextBlock Grid.Row="13" Grid.Column="0" Text="ElseGroup" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
         <TextBox Grid.Row="13" Grid.Column="1" Text="{Binding Path=CurrentElement.Group, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="TextBox_PreviewTextInput" />
-        <userControls:ConditionListView Grid.Row="15" Grid.ColumnSpan="2" SelectionChangedCommand="{Binding ChangeCurrent}" />
+        <userControls:ConditionListView Grid.Row="15" Grid.ColumnSpan="2" />
         <Button Grid.Row="16" Grid.Column="1" Content="  OK  " HorizontalAlignment="Right" Margin="0, 5, 0, 5" VerticalContentAlignment="Center" Click="Button_Click_Close"/>
     </Grid>
 </Window>
