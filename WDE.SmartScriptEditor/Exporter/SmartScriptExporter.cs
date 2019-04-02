@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
-using Prism.Ioc;
+using WDE.Conditions.Model;
 
 namespace WDE.SmartScriptEditor.Exporter
 {
     public class SmartScriptExporter
     {
         private static readonly string SAI_SQL = "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
+        private static readonly string CONDITION_SQL = "({source}, {source_group}, {source_entry}, {source_id}, {else_group}, {condition_type}, {condition_target}, {value1}, {value2}, {value3}, {negative}, \"{comment}\")";
 
         private readonly SmartScript _script;
         private readonly ISmartFactory smartFactory;
@@ -28,6 +29,7 @@ namespace WDE.SmartScriptEditor.Exporter
         public string GetSql()
         {
             BuildHeader();
+            BuildConditionsBlock();
             return _sql.ToString();
         }
 
@@ -200,6 +202,56 @@ namespace WDE.SmartScriptEditor.Exporter
         {
             _sql.AppendLine(
                 $"DELETE FROM smart_scripts WHERE entryOrGuid = {_script.EntryOrGuid} AND source_type = {(int)_script.SourceType};");
+        }
+
+        private void BuildConditionsBlock()
+        {
+            _sql.AppendLine("");
+            _sql.AppendLine($"DELETE FROM conditions WHERE SourceTypeOrReferenceId = {Condition.CONDITION_SOURCE_SMART_EVENT} AND SourceEntry = @ENTRY;");
+
+            List<string> lines = new List<string>();
+            foreach(SmartEvent e in _script.Events)
+            {
+                if (e.Conditions.Count == 0)
+                    continue;
+
+                foreach (Condition cond in e.Conditions)
+                    lines.Add(BuildSingleConditionLine(e, cond));
+            }
+
+            if (lines.Count > 0)
+            {
+                _sql.AppendLine("INSERT INTO conditions(SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget, ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition, Comment) VALUES");
+                _sql.Append(string.Join(",\n", lines));
+                _sql.AppendLine(";");
+            }
+        }
+
+        private string BuildSingleConditionLine(SmartEvent e, Condition cond)
+        {
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
+            object data = new
+            {
+                source = Condition.CONDITION_SOURCE_SMART_EVENT,
+                source_group = (e.ActualId + 1),
+                source_entry = "@ENTRY",
+                source_id = ((int)_script.SourceType).ToString(),
+                
+                else_group = cond.ElseGroup,
+                condition_type = cond.ConditionType,
+                condition_target = cond.ConditionTarget,
+                value1 = cond.ConditionValue1,
+                value2 = cond.ConditionValue2,
+                value3 = cond.ConditionValue3,
+                negative = cond.NegativeCondition,
+                comment = cond.Comment
+            };
+
+            return SmartFormat.Smart.Format(CONDITION_SQL, data);
         }
     }
 }

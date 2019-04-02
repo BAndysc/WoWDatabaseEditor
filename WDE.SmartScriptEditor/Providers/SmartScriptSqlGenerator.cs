@@ -12,6 +12,7 @@ using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 using WDE.Conditions.Data;
+using WDE.Conditions.Model;
 
 namespace WDE.SmartScriptEditor.Providers
 {
@@ -42,7 +43,7 @@ namespace WDE.SmartScriptEditor.Providers
                 return args.Sql;
 
             SmartScript script = new SmartScript(item, smartFactory.Value, conditionDataManager.Value);
-            script.Load(database.Value.GetScriptFor(item.Entry, item.SmartType), database.Value.GetConditionsFor(22, item.Entry, (int)item.SmartType));
+            script.Load(database.Value.GetScriptFor(item.Entry, item.SmartType), database.Value.GetConditionsFor(Condition.CONDITION_SOURCE_SMART_EVENT, item.Entry, (int)item.SmartType));
             return new SmartScriptExporter(script, smartFactory.Value).GetSql();
         }
     }
