@@ -314,6 +314,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 paramss.Add(new KeyValuePair<Parameter, string>(wrapper, "Target"));
             }
 
+            // Hide Conditions stuff for SmartAction, because there is no ConditionType for these
+            v.conditionsTextBlock.Visibility = System.Windows.Visibility.Hidden;
+            v.editConditionsButton.Visibility = System.Windows.Visibility.Hidden;
             v.DataContext = new ParametersEditViewModel(itemFromListProvider, obj, paramss, null, conditionDataManager);
             v.ShowDialog();
         }

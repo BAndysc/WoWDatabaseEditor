@@ -50,7 +50,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <TextBlock Text="Conditions:" DockPanel.Dock="Top" Margin="10, 10, 10, 10"/>
+                <TextBlock Name="conditionsTextBlock" Text="Conditions:" DockPanel.Dock="Top" Margin="10, 10, 10, 10"/>
                 <Button Name="editConditionsButton" Button.Content="Edit conditions" DockPanel.Dock="Top" MaxHeight="30" Click="editConditionsButton_Click"/>
             </DockPanel>
         </ScrollViewer>
