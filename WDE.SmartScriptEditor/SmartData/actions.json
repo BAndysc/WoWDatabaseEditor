@@ -21,6 +21,11 @@
                 "type": "Parameter",
                 "name": "Delay",
                 "description": "Duration to wait before TEXT_OVER event is triggered"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "UseTalkTarget",
+                "description": "Talker will target {target}"
             }
         ],
         "description": "{target}: Talk {pram1}",
@@ -78,6 +83,10 @@
                 "type": "BoolParameter",
                 "name": "Only to self",
                 "description": "True - only target will hear the sound, false - everyone in visibility range will hear the sound"
+            },
+            {
+                "type": "Paramter",
+                "name": "Distance"
             }
         ],
         "description": "{target}: Play sound {pram1} to {pram2value:choose(0):every player in visibility range of {target}|{target}}",
@@ -120,15 +129,20 @@
     },
     {
         "id": 7,
-        "name": "SMART_ACTION_ADD_QUEST",
+        "name": "SMART_ACTION_OFFER_QUEST",
         "parameters": [
             {
                 "type": "QuestParameter",
                 "name": "Quest ID",
                 "description": "Add quest, only for players"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "DirectAdd",
+                "description": "True - quest is added to questlog instantly, false - Quest Window pops up"
             }
         ],
-        "description": "{target}: Add quest {pram1}",
+        "description": "{target}: Offer/Add quest {pram1}",
         "name_readable": "Add quest",
         "uses_target": true,
         "target_is_source": true,
@@ -222,6 +236,14 @@
             {
                 "type": "CastFlagsParameter",
                 "name": "Cast Flags"
+            },
+            {
+                "type": "TriggerFlagParameter",
+                "name": "Trigger Flags"
+            },
+            {
+                "type": "Parameter",
+                "name": "TargetsLimit"
             }
         ],
         "description": "Self: Cast spell {pram1} on {target}",
@@ -323,11 +345,16 @@
         "parameters": [
             {
                 "type": "Parameter",
-                "name": "Phase ID",
-                "description": "This is actual unit phase"
+                "name": "PhaseGroup",
+                "description": "This is actual unit phasegroup"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Apply",
+                "description": "true - PhaseGroup {pram1} is applied, false - true - PhaseGroup {pram1} is removed"
             }
         ],
-        "description": "{target}: Set phase {pram1}",
+        "description": "{target}: Set/Remove phasegroup {pram1}",
         "name_readable": "Set ingame phase group",
         "uses_target": true,
         "target_is_source": true,
@@ -737,6 +764,11 @@
                 "type": "SpellParameter",
                 "name": "Spell",
                 "description": "Spell id to remove aura, if 0, all auras will be removed"
+            },
+            {
+                "type": "Parameter",
+                "name": "Charges",
+                "description": "If 0 all charges are removed"
             }
         ],
         "description": "{target}: {pram1value:choose(0):Remove all auras|Remove aura due to spell {pram1}}",
@@ -760,7 +792,7 @@
                 "description": "0 = default"
             },
             {
-                "type": "Parameter",
+                "type": "CreatureParameter",
                 "name": "EndCreatureEntry"
             },
             {
@@ -879,6 +911,18 @@
             {
                 "type": "Parameter",
                 "name": "Data"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "values": {
+                    "0": {
+                        "name": "SetData"
+                    },
+                    "1": {
+                        "name": "SetBossState"
+                    }
+                }
             }
         ],
         "description": "Set instance data #{pram1} to {pram2}",
@@ -894,13 +938,9 @@
             {
                 "type": "Parameter",
                 "name": "Field"
-            },
-            {
-                "type": "Parameter",
-                "name": "Data"
             }
         ],
-        "description": "Set instance data64 #{pram1} to {pram2}",
+        "description": "Set instance data64 #{pram1} to {target} guid",
         "name_readable": "Set instance guid",
         "uses_target": false,
         "target_is_source": false,
@@ -913,6 +953,10 @@
             {
                 "type": "CreatureParameter",
                 "name": "Entry"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "UpdateLevel"
             }
         ],
         "description": "{target}: Update template as if it was creature {pram1}",
@@ -946,6 +990,10 @@
             {
                 "type": "Parameter",
                 "name": "Radius"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "WithEmote"
             }
         ],
         "description": "Self: Call for help within {pram1} yards",
@@ -987,6 +1035,10 @@
             {
                 "type": "Parameter",
                 "name": "Delay"
+            },
+            {
+                "type": "Parameter",
+                "name": "ForeRespawnTimer"
             }
         ],
         "description": "{target}: Despawn {pram1value:choose(0):instantly|in {pram1} ms}",
@@ -1038,11 +1090,15 @@
         "name": "SMART_ACTION_SET_INGAME_PHASE_ID",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "PhaseParameter",
                 "name": "Phase ID"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Apply"
             }
         ],
-        "description": "{target}: Set phase id to {pram1}",
+        "description": "{target}: {pram2value:choose(0):Remove phase id {pram1}|Add phase id to {pram1}}",
         "name_readable": "Set ingame phase mask",
         "uses_target": true,
         "target_is_source": true,
@@ -1068,21 +1124,6 @@
         "implicit_source": false
     },
     {
-        "id": 46,
-        "name": "SMART_ACTION_MOVE_FORWARD",
-        "parameters": [
-            {
-                "type": "Parameter",
-                "name": "Distance"
-            }
-        ],
-        "description": "Self: Move forward {pram1} yards",
-        "name_readable": "Move forward",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true
-    },
-    {
         "id": 47,
         "name": "SMART_ACTION_SET_VISIBILITY",
         "parameters": [
@@ -1100,6 +1141,12 @@
     {
         "id": 48,
         "name": "SMART_ACTION_SET_ACTIVE",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Active"
+            }
+        ],
         "description": "Self: Set active (are you sure?)",
         "name_readable": "Set active",
         "uses_target": false,
@@ -1127,6 +1174,18 @@
                 "type": "Parameter",
                 "name": "Despawn Time",
                 "description": "In ms"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "values": {
+                    "0": {
+                        "name": "GO_SUMMON_TIMED_OR_CORPSE_DESPAWN"
+                    },
+                    "1": {
+                        "name": "GO_SUMMON_TIMED_DESPAWN"
+                    }
+                }
             }
         ],
         "description": "{target}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
@@ -1344,16 +1403,16 @@
     },
     {
         "id": 60,
-        "name": "SMART_ACTION_SET_FLY",
+        "name": "SMART_ACTION_SET_DISABLE_GRAVITY",
         "parameters": [
             {
                 "type": "BoolParameter",
-                "name": "Enable",
-                "description": "If true, flight will be enabled"
+                "name": "Disable",
+                "description": "If true, gravity is disabled"
             }
         ],
-        "description": "Self: {pram1value:choose(0):Disable|Enable} flight",
-        "name_readable": "Set fly",
+        "description": "Self: {pram1value:choose(0):Disable|Enable} gravity",
+        "name_readable": "Disable Gravity",
         "uses_target": false,
         "target_is_source": false,
         "implicit_source": true
@@ -1507,6 +1566,19 @@
             {
                 "type": "Parameter",
                 "name": "PointId"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "IsTransport"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Disable Pathfinding"
+            },
+            {
+                "type": "Parameter",
+                "name": "Contact Distance",
+                "description": "If >= 0 contact distance + combatreach"
             }
         ],
         "description": "Self: Move to {targetid:choose(8):position {targetcoords}|{target}} (point id {pram1})",
@@ -1517,9 +1589,16 @@
     },
     {
         "id": 70,
-        "name": "SMART_ACTION_RESPAWN_TARGET",
-        "description": "{target}: Respawn",
-        "name_readable": "Respawn",
+        "name": "SMART_ACTION_ENABLE_TEMP_GOBJ",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Duration",
+                "description": "in ms"
+            }
+        ],
+        "description": "{target}: enabled for {pram1} ms",
+        "name_readable": "Enable Temp Gobject",
         "uses_target": true,
         "target_is_source": true,
         "implicit_source": false
@@ -2014,15 +2093,24 @@
     },
     {
         "id": 85,
-        "name": "SMART_ACTION_INVOKER_CAST",
+        "name": "SMART_ACTION_SELF_CAST",
         "parameters": [
             {
                 "type": "SpellParameter",
-                "name": "Spell"
+                "name": "Spell",
+                "description": "Spell id to cast"
             },
             {
                 "type": "CastFlagsParameter",
                 "name": "Cast Flags"
+            },
+            {
+                "type": "TriggerFlagParameter",
+                "name": "Trigger Flags"
+            },
+            {
+                "type": "Parameter",
+                "name": "TargetsLimit"
             }
         ],
         "description": "Invoker: Cast spell {pram1} to {target}",
@@ -2227,10 +2315,29 @@
         "parameters": [
             {
                 "type": "Parameter",
-                "name": "Bytes"
+                "name": "Value"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "required": true,
+                "values": {
+                    "0": {
+                        "name": "UNIT_BYTES_1_OFFSET_STAND_STATE"
+                    },
+                    "1": {
+                        "name": "UNIT_BYTES_1_OFFSET_PET_TALENTS"
+                    },
+                    "2": {
+                        "name": "UNIT_BYTES_1_OFFSET_VIS_FLAG"
+                    },
+                    "3": {
+                        "name": "UNIT_BYTES_1_OFFSET_ANIM_TIER"
+                    }
+                }
             }
         ],
-        "description": "{target}: Set UNIT_FIELD_BYTES_1 to {pram1}",
+        "description": "{target}: Set UNIT_FIELD_BYTES_1 with Type {pram2} to {pram1}",
         "name_readable": "Set UNIT_FIELD_BYTES_1",
         "uses_target": true,
         "target_is_source": true,
@@ -2243,9 +2350,28 @@
             {
                 "type": "Parameter",
                 "name": "Bytes"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "required": true,
+                "values": {
+                    "0": {
+                        "name": "UNIT_BYTES_1_OFFSET_STAND_STATE"
+                    },
+                    "1": {
+                        "name": "UNIT_BYTES_1_OFFSET_PET_TALENTS"
+                    },
+                    "2": {
+                        "name": "UNIT_BYTES_1_OFFSET_VIS_FLAG"
+                    },
+                    "3": {
+                        "name": "UNIT_BYTES_1_OFFSET_ANIM_TIER"
+                    }
+                }
             }
         ],
-        "description": "{target}: Remove {pram1} bytes from UNIT_FIELD_BYTES_1",
+        "description": "{target}: Remove {pram1} bytes from UNIT_FIELD_BYTES_1 with Type {pram2}",
         "name_readable": "Remove UNIT_FIELD_BYTES_1",
         "uses_target": true,
         "target_is_source": true,
@@ -2254,7 +2380,21 @@
     {
         "id": 92,
         "name": "SMART_ACTION_INTERRUPT_SPELL",
-        "description": "{target}: Interrupt casted spell",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "With Delay"
+            },
+            {
+                "type": "SpellParameter",
+                "name": "Spell ID"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Instant"
+            }
+        ],
+        "description": "{target}: Interrupt casted spell {pram2}",
         "name_readable": "Interrupt spell",
         "uses_target": true,
         "target_is_source": true,
@@ -2518,8 +2658,14 @@
     {
         "id": 103,
         "name": "SMART_ACTION_SET_ROOT",
-        "description": "{target}: Set rooted",
-        "name_readable": "Set rooted",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "SetRoot"
+            }
+        ],
+        "description": "{target}: {pram1value:choose(0):Remove|Set} rooted",
+        "name_readable": "Set/Remove rooted",
         "uses_target": true,
         "target_is_source": true,
         "implicit_source": false
@@ -2717,6 +2863,10 @@
                         "name": "POWER_ALTERNATE_POWER"
                     }
                 }
+            },
+            {
+                "type": "Parameter",
+                "name": "New Power"
             }
         ],
         "description": "{target}: Set power type to {pram1}",
@@ -2928,15 +3078,15 @@
                 "name": "SoundId 4"
             },
             {
-                "type": "Parameter",
-                "name": "SoundId 5"
+                "type": "BoolParameter",
+                "name": "OnlySelf"
             },
             {
                 "type": "BoolParameter",
-                "name": "OnlySelf"
+                "name": "DistanceSound"
             }
         ],
-        "description": "Plays randomly one of: {pram1}, {pram2}, {pram3}, {pram4}, {pram5} {pram6value:choose(0):of all|only self}",
+        "description": "Plays randomly one of: {pram1}, {pram2}, {pram3}, {pram4} {pram6value:choose(0):of all|only self}",
         "name_readable": "Play random sound",
         "uses_target": false,
         "target_is_source": false,
@@ -2978,8 +3128,25 @@
         "name": "SMART_ACTION_GO_SET_GO_STATE",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "State"
+                "type": "SwitchParameter",
+                "name": "State",
+                "values": {
+                    "0": {
+                        "name": "GO_STATE_ACTIVE"
+                    },
+                    "1": {
+                        "name": "GO_STATE_READY"
+                    },
+                    "2": {
+                        "name": "GO_STATE_ACTIVE_ALTERNATIVE"
+                    },
+                    "24": {
+                        "name": "GO_STATE_TRANSPORT_ACTIVE"
+                    },
+                    "25": {
+                        "name": "GO_STATE_TRANSPORT_STOPPED"
+                    }
+                }
             }
         ],
         "description": "{target} state set to {pram1}",
@@ -4549,6 +4716,10 @@
             {
                 "type": "Parameter",
                 "name": "EquipmentId"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Force"
             }
         ],
         "description": "{target}: uses EquipmentId {pram1}",
@@ -4663,6 +4834,163 @@
         ],
         "description": "{target}: Stops playing scene with Id: {pram1}",
         "name_readable": "Cancel scene",
+        "uses_target": true,
+        "target_is_source": true,
+        "implicit_source": false
+    },
+    {
+        "id": 131,
+        "name": "SMART_ACTION_SPAWN_SPAWNGROUP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "GroupID"
+            },
+            {
+                "type": "Parameter",
+                "name": "minDelay"
+            },
+            {
+                "type": "Parameter",
+                "name": "maxDelay"
+            },
+            {
+                "type": "Parameter",
+                "name": "spawnflags"
+            }
+        ],
+        "description": "Spawns spawngroup with Id: {pram1}",
+        "name_readable": "Spawn Spawngroup",
+        "uses_target": false,
+        "target_is_source": false,
+        "implicit_source": true
+    },
+    {
+        "id": 132,
+        "name": "SMART_ACTION_DESPAWN_SPAWNGROUP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "GroupID"
+            },
+            {
+                "type": "Parameter",
+                "name": "minDelay"
+            },
+            {
+                "type": "Parameter",
+                "name": "maxDelay"
+            },
+            {
+                "type": "Parameter",
+                "name": "spawnflags"
+            }
+        ],
+        "description": "Despawns spawngroup with Id: {pram1}",
+        "name_readable": "Despawn Spawngroup",
+        "uses_target": false,
+        "target_is_source": false,
+        "implicit_source": true
+    },
+    {
+        "id": 133,
+        "name": "SMART_ACTION_RESPAWN_BY_SPAWNID",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "SpawnType",
+                "values": {
+                    "0": { "name": "NPC" },
+                    "1": { "name": "GameObject" }
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "SpawnId (DB GUID)"
+            }
+        ],
+        "description": "Use to respawn npcs and gobs, the target in this case is always=1 and only a single unit could be a target via the spawnId (action_param1, action_param2)",
+        "name_readable": "Respawn by SpawnID",
+        "uses_target": false,
+        "target_is_source": false,
+        "implicit_source": true
+    },
+    {
+        "id": 134,
+        "name": "SMART_ACTION_INVOKER_CAST",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "SpellID"
+            },
+            {
+                "type": "CastFlagsParameter",
+                "name": "CastFlags"
+            },
+            {
+                "type": "Parameter",
+                "name": "triggeredFlags"
+            }
+        ],
+        "description": "if avaliable, last used invoker will cast spellId: {pram1} with castFlags on {target}",
+        "name_readable": "Invoker Cast",
+        "uses_target": true,
+        "target_is_source": true,
+        "implicit_source": false
+    },
+    {
+        "id": 135,
+        "name": "SMART_ACTION_PLAY_CINEMATIC",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Entry"
+            },
+            {
+                "type": "Parameter",
+                "name": "Cinematic"
+            }
+        ],
+        "description": "{target}: Plays Cinematic with Entry: {pram1} and Cinematic {pram2}",
+        "name_readable": "Play Cinematic",
+        "uses_target": true,
+        "target_is_source": true,
+        "implicit_source": false
+    },
+    {
+        "id": 136,
+        "name": "SMART_ACTION_SET_MOVEMENT_SPEED",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "MovementType"
+            },
+            {
+                "type": "Parameter",
+                "name": "SpeedInteger"
+            },
+            {
+                "type": "Parameter",
+                "name": "SpeedFraction"
+            }
+        ],
+        "description": "{target}: Changes movement speed",
+        "name_readable": "Set Movement speed",
+        "uses_target": true,
+        "target_is_source": true,
+        "implicit_source": false
+    },
+    {
+        "id": 137,
+        "name": "SMART_ACTION_PLAY_SPELL_VISUAL_KIT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "SpellVisualKitId"
+            }
+        ],
+        "description": "{target}: Plays SpellVisual with SpellVisualKitId: {pram1}",
+        "name_readable": "Play Spellvisual kit",
         "uses_target": true,
         "target_is_source": true,
         "implicit_source": false
