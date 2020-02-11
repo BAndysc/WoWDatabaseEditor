@@ -28,7 +28,7 @@
                 "description": "Talker will target {target}"
             }
         ],
-        "description": "{target}: Talk {pram1}",
+        "description": "{targetid:choose(0):Self: Talk {pram1} to invoker|{pram3value:choose(0):{target}: Talk {pram1} to invoker|Self: Talk {pram1} to {target}}}",
         "name_readable": "Talk",
         "uses_target": true,
         "target_is_source": true,
@@ -85,11 +85,11 @@
                 "description": "True - only target will hear the sound, false - everyone in visibility range will hear the sound"
             },
             {
-                "type": "Paramter",
+                "type": "BoolParameter",
                 "name": "Distance"
             }
         ],
-        "description": "{target}: Play sound {pram1} to {pram2value:choose(0):every player in visibility range of {target}|{target}}",
+        "description": "{target}: Play {pram2value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {target}|{target}",
         "name_readable": "Sound",
         "uses_target": true,
         "target_is_source": true,
@@ -142,7 +142,7 @@
                 "description": "True - quest is added to questlog instantly, false - Quest Window pops up"
             }
         ],
-        "description": "{target}: Offer/Add quest {pram1}",
+        "description": "{target}: {pram2value:choose(0):Add quest {pram1} to quest log|Offer quest {pram1}}",
         "name_readable": "Add quest",
         "uses_target": true,
         "target_is_source": true,
@@ -246,7 +246,7 @@
                 "name": "TargetsLimit"
             }
         ],
-        "description": "Self: Cast spell {pram1} on {target}",
+        "description": "Self: Cast spell {pram1} on{pram4value:choose(0):| random {pram4}} {target}",
         "name_readable": "Cast",
         "uses_target": true,
         "target_is_source": false,
@@ -354,7 +354,7 @@
                 "description": "true - PhaseGroup {pram1} is applied, false - true - PhaseGroup {pram1} is removed"
             }
         ],
-        "description": "{target}: Set/Remove phasegroup {pram1}",
+        "description": "{target}: {pram2value:choose(0):Remove|Add} phasegroup {pram1}",
         "name_readable": "Set ingame phase group",
         "uses_target": true,
         "target_is_source": true,
@@ -771,7 +771,7 @@
                 "description": "If 0 all charges are removed"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Remove all auras|Remove aura due to spell {pram1}}",
+        "description": "{target}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
         "name_readable": "Remove aura",
         "uses_target": true,
         "target_is_source": true,
@@ -925,7 +925,7 @@
                 }
             }
         ],
-        "description": "Set instance data #{pram1} to {pram2}",
+        "description": "Set {pram3value:choose(0):instance data|boss state} #{pram1} to {pram2}",
         "name_readable": "Set instance data",
         "uses_target": false,
         "target_is_source": false,
@@ -940,7 +940,7 @@
                 "name": "Field"
             }
         ],
-        "description": "Set instance data64 #{pram1} to {target} guid",
+        "description": "Set instance target (guid) #{pram1} to {target}",
         "name_readable": "Set instance guid",
         "uses_target": false,
         "target_is_source": false,
@@ -959,7 +959,7 @@
                 "name": "UpdateLevel"
             }
         ],
-        "description": "{target}: Update template as if it was creature {pram1}",
+        "description": "{target}: Update template{pram2value:choose(0):| and level} as if it was creature {pram1}",
         "name_readable": "Update NPC template",
         "uses_target": true,
         "target_is_source": true,
@@ -996,11 +996,11 @@
                 "name": "WithEmote"
             }
         ],
-        "description": "Self: Call for help within {pram1} yards",
+        "description": "{target}: Call for help within {pram1} yards{pram2value:choose(0):| with emote}",
         "name_readable": "Call for help",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true
+        "uses_target": true,
+        "target_is_source": true,
+        "implicit_source": false
     },
     {
         "id": 40,
@@ -1041,7 +1041,7 @@
                 "name": "ForeRespawnTimer"
             }
         ],
-        "description": "{target}: Despawn {pram1value:choose(0):instantly|in {pram1} ms}",
+        "description": "{target}: Despawn {pram1value:choose(0):instantly|in {pram1} ms}{pram2value:choose(0):| respawn in {pram2} seconds}",
         "name_readable": "Force despawn",
         "uses_target": true,
         "target_is_source": true,
@@ -1099,7 +1099,7 @@
             }
         ],
         "description": "{target}: {pram2value:choose(0):Remove phase id {pram1}|Add phase id to {pram1}}",
-        "name_readable": "Set ingame phase mask",
+        "name_readable": "Add/Remove phase id",
         "uses_target": true,
         "target_is_source": true,
         "implicit_source": false
@@ -1147,11 +1147,11 @@
                 "name": "Active"
             }
         ],
-        "description": "Self: Set active (are you sure?)",
+        "description": "{target}: {pram1value:choose(0):Disable active|Set active}",
         "name_readable": "Set active",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true
+        "uses_target": true,
+        "target_is_source": true,
+        "implicit_source": false
     },
     {
         "id": 49,
@@ -1411,7 +1411,7 @@
                 "description": "If true, gravity is disabled"
             }
         ],
-        "description": "Self: {pram1value:choose(0):Disable|Enable} gravity",
+        "description": "Self: {pram1value:choose(0):Enable|Disable} gravity",
         "name_readable": "Disable Gravity",
         "uses_target": false,
         "target_is_source": false,
@@ -1578,10 +1578,10 @@
             {
                 "type": "Parameter",
                 "name": "Contact Distance",
-                "description": "If >= 0 contact distance + combatreach"
+                "description": "If > 0 contact distance + combatreach"
             }
         ],
-        "description": "Self: Move to {targetid:choose(8):position {targetcoords}|{target}} (point id {pram1})",
+        "description": "Self: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target} with offset {targetcoords}{pram4value:choose(0):| in {pram4} yd distance}} (point id {pram1}){pram3value:choose(0):| without pathfinding}",
         "name_readable": "Move to position",
         "uses_target": true,
         "target_is_source": false,
@@ -2113,7 +2113,7 @@
                 "name": "TargetsLimit"
             }
         ],
-        "description": "Invoker: Cast spell {pram1} to {target}",
+        "description": "{pram4value:choose(0):| Random {pram4}} {target}: Cast spell {pram1} on self",
         "name_readable": "Invoker cast",
         "uses_target": true,
         "target_is_source": false,
@@ -2869,7 +2869,7 @@
                 "name": "New Power"
             }
         ],
-        "description": "{target}: Set power type to {pram1}",
+        "description": "{target}: Set power type to {pram1} with value {pram2}",
         "name_readable": "Set power",
         "uses_target": true,
         "target_is_source": true,
@@ -3086,11 +3086,11 @@
                 "name": "DistanceSound"
             }
         ],
-        "description": "Plays randomly one of: {pram1}, {pram2}, {pram3}, {pram4} {pram6value:choose(0):of all|only self}",
+        "description": "{target}: Play random {pram6value:choose(0):direct|distance} sound one of: {pram1}, {pram2}, {pram3}, {pram4} {pram6value:choose(0):of all|only self}",
         "name_readable": "Play random sound",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true
+        "uses_target": true,
+        "target_is_source": true,
+        "implicit_source": false
     },
     {
         "id": 116,
@@ -4722,7 +4722,7 @@
                 "name": "Force"
             }
         ],
-        "description": "{target}: uses EquipmentId {pram1}",
+        "description": "{target}: {pram2value:choose(0):Load|Force load} EquipmentId {pram1}",
         "name_readable": "Load equipement",
         "uses_target": true,
         "target_is_source": true,
@@ -4855,11 +4855,17 @@
                 "name": "maxDelay"
             },
             {
-                "type": "Parameter",
-                "name": "spawnflags"
+                "type": "FlagParameter",
+                "name": "Spawnflags",
+                "values": {
+                    "0": { "name": "SMARTAI_SPAWN_FLAG_NONE" },
+                    "1": { "name": "SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN" },
+                    "2": { "name": "SMARTAI_SPAWN_FLAG_FORCE_SPAWN" },
+                    "4": { "name": "SMARTAI_SPAWN_FLAG_NOSAVE_RESPAWN" }
+                }
             }
         ],
-        "description": "Spawns spawngroup with Id: {pram1}",
+        "description": "Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
         "name_readable": "Spawn Spawngroup",
         "uses_target": false,
         "target_is_source": false,
@@ -4882,11 +4888,17 @@
                 "name": "maxDelay"
             },
             {
-                "type": "Parameter",
-                "name": "spawnflags"
+                "type": "FlagParameter",
+                "name": "Spawnflags",
+                "values": {
+                    "0": { "name": "SMARTAI_SPAWN_FLAG_NONE" },
+                    "1": { "name": "SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN" },
+                    "2": { "name": "SMARTAI_SPAWN_FLAG_FORCE_SPAWN" },
+                    "4": { "name": "SMARTAI_SPAWN_FLAG_NOSAVE_RESPAWN" }
+                }
             }
         ],
-        "description": "Despawns spawngroup with Id: {pram1}",
+        "description": "Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
         "name_readable": "Despawn Spawngroup",
         "uses_target": false,
         "target_is_source": false,
@@ -4909,7 +4921,7 @@
                 "name": "SpawnId (DB GUID)"
             }
         ],
-        "description": "Use to respawn npcs and gobs, the target in this case is always=1 and only a single unit could be a target via the spawnId (action_param1, action_param2)",
+        "description": "Respawn {pram1} with guid {pram2}",
         "name_readable": "Respawn by SpawnID",
         "uses_target": false,
         "target_is_source": false,
@@ -4932,11 +4944,11 @@
                 "name": "triggeredFlags"
             }
         ],
-        "description": "if avaliable, last used invoker will cast spellId: {pram1} with castFlags on {target}",
+        "description": "Invoker: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}",
         "name_readable": "Invoker Cast",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": false,
+        "implicit_source": true
     },
     {
         "id": 135,
@@ -4945,13 +4957,9 @@
             {
                 "type": "Parameter",
                 "name": "Entry"
-            },
-            {
-                "type": "Parameter",
-                "name": "Cinematic"
             }
         ],
-        "description": "{target}: Plays Cinematic with Entry: {pram1} and Cinematic {pram2}",
+        "description": "{target}: Plays Cinematic with Entry: {pram1}",
         "name_readable": "Play Cinematic",
         "uses_target": true,
         "target_is_source": true,
@@ -4962,8 +4970,19 @@
         "name": "SMART_ACTION_SET_MOVEMENT_SPEED",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "MovementType"
+                "type": "SwitchParameter",
+                "name": "MovementType",
+                "values": {
+                    "0": { "name": "MOVE_WALK" },
+                    "1": { "name": "MOVE_RUN" },
+                    "2": { "name": "MOVE_RUN_BACK" },
+                    "3": { "name": "MOVE_SWIM" },
+                    "4": { "name": "MOVE_SWIM_BACK" },
+                    "5": { "name": "MOVE_TURN_RATE" },
+                    "6": { "name": "MOVE_FLIGHT" },
+                    "7": { "name": "MOVE_FLIGHT_BACK" },
+                    "8": { "name": "MOVE_PITCH_RATE" }
+                }
             },
             {
                 "type": "Parameter",
@@ -4974,7 +4993,7 @@
                 "name": "SpeedFraction"
             }
         ],
-        "description": "{target}: Changes movement speed",
+        "description": "{target}: Set movement {pram1} speed to {pram2value}.{pram3.value}",
         "name_readable": "Set Movement speed",
         "uses_target": true,
         "target_is_source": true,
@@ -4987,9 +5006,17 @@
             {
                 "type": "Parameter",
                 "name": "SpellVisualKitId"
+            },
+            {
+                "type": "Parameter",
+                "name": "KitType"
+            },
+            {
+                "type": "Parameter",
+                "name": "Duration"
             }
         ],
-        "description": "{target}: Plays SpellVisual with SpellVisualKitId: {pram1}",
+        "description": "{target}: Plays SpellVisual with SpellVisualKitId: {pram1}, KitType: {pram2} for {pram3} ms",
         "name_readable": "Play Spellvisual kit",
         "uses_target": true,
         "target_is_source": true,

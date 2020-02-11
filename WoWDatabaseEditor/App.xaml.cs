@@ -5,7 +5,6 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using Prism.Events;
@@ -26,15 +25,6 @@ namespace WoWDatabaseEditor
     /// </summary>
     public partial class App : PrismApplication
     {
-        [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
-
         private SplashScreenView splash;
 
         private IModulesManager modulesManager;
@@ -153,15 +143,6 @@ namespace WoWDatabaseEditor
 
             mainWindow.ShowDialog();
             Current.Shutdown();
-        }
-        public override void Initialize()
-        {
-#if DEBUG
-            ShowWindow(GetConsoleWindow(), SW_SHOW);
-#else
-            ShowWindow(GetConsoleWindow(), SW_HIDE);
-#endif
-            base.Initialize();
         }
     }
 }
