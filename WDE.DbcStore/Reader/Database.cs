@@ -15,7 +15,7 @@ namespace WDBXEditor.Storage
 	{
 		public static Definition Definitions { get; set; } = new Definition();
 		public static List<DBEntry> Entries { get; set; } = new List<DBEntry>();
-        public static int BuildNumber { get; set; } = 26972;
+        public static int BuildNumber { get; set; }
 
 
         internal enum ErrorType

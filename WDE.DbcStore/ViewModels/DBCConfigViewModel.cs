@@ -31,17 +31,25 @@ namespace WDE.DbcStore.ViewModels
             set { SetProperty(ref _skipLoading, value); }
         }
 
+        private DBCVersions _dbcVersion;
+        public DBCVersions DBCVersion
+        {
+            get { return _dbcVersion; }
+            set { SetProperty(ref _dbcVersion, value); }
+        }
+
         public DBCConfigViewModel(IDbcSettingsProvider dbcSettings)
         {
             SaveAction = Save;
             Path = dbcSettings.GetSettings().Path;
             SkipLoading = dbcSettings.GetSettings().SkipLoading;
+            DBCVersion = dbcSettings.GetSettings().DBCVersion;
             this.dbcSettings = dbcSettings;
         }
 
         private void Save()
         {
-            dbcSettings.UpdateSettings(new Data.DBCSettings() { Path = Path, SkipLoading = SkipLoading });
+            dbcSettings.UpdateSettings(new Data.DBCSettings() { Path = Path, SkipLoading = SkipLoading, DBCVersion = DBCVersion });
         }
     }
 }

@@ -10,5 +10,6 @@ namespace WDE.DbcStore.Data
     {
         public bool SkipLoading;
         public string Path;
+        public DBCVersions DBCVersion;
     }
 }
