@@ -12,7 +12,16 @@ This application is splited into few repositories, at the moment:
  
 **Remember to clone this repo with submodules or else it won't compile!**
 
-Thanks to:
+If folder `WoWDatabaseEditor.Common` is empty, you don't have submodules. To download submodules, use commands:
+
+```
+git submodule init
+git submodule update
+```
+
+Later, `git submodule update` is enough to update sub repo
+
+## Thanks to:
  * [tgjones](https://github.com/tgjones/gemini) for Gemini Graph Editor
  * WDBXEditor for dbc loading
  * Atlantiss - the editor begin as internal tool
