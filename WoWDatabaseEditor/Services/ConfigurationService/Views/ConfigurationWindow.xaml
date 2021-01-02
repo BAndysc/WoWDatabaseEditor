@@ -4,11 +4,14 @@
              xmlns:Metro="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:prism="http://prismlibrary.com/"             
              Style="{DynamicResource MainWindowStyle}"
-		     WindowCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
-		     WindowMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
-		     WindowMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}"
              Title="Settings"
              prism:ViewModelLocator.AutoWireViewModel="True" Height="350" Width="550" WindowStartupLocation="CenterOwner">
+    <Metro:MetroWindow.WindowButtonCommands>
+        <Metro:WindowButtonCommands
+            LightCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+            LightMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+            LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
+    </Metro:MetroWindow.WindowButtonCommands>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition/>

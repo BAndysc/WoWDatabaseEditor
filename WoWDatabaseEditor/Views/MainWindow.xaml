@@ -10,16 +10,20 @@
         xmlns:viewModels="clr-namespace:WoWDatabaseEditor.ViewModels"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
         Style="{DynamicResource MainWindowStyle}"
-		WindowCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
-		WindowMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
-		WindowMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}"
         Title="{Binding Title}"
         WindowStartupLocation="CenterScreen"
         Height="695.368" 
         Width="959.421"
         Icon="/icon.png"
         Loaded="Window_Loaded"
-        Closed="Window_Closed">
+        Closed="Window_Closed"
+        >
+    <Controls:MetroWindow.WindowButtonCommands>
+        <Controls:WindowButtonCommands
+            LightCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+            LightMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+            LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
+    </Controls:MetroWindow.WindowButtonCommands>
     <Window.Resources>
         <helpers:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
     </Window.Resources>

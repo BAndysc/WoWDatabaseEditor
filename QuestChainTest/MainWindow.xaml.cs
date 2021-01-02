@@ -38,7 +38,9 @@ namespace QuestChainTest
 
             var db = new TrinityMysqlDatabaseProvider(new ConnectionSettingsProvider());
 
-            View.DataContext = new QuestChainEditorViewModel(new QuestPicker(new DatabaseQuestsProvider(db)), quests);
+            var exampleQuestProvider = new ExampleQuestsProvider();
+
+            View.DataContext = new QuestChainEditorViewModel(new QuestPicker(exampleQuestProvider), quests);
 
             quests.OnAddedQuest += (sender, quest) =>
             {

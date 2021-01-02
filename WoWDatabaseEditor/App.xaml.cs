@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Runtime.Loader;
 using System.Windows;
 using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
-using Unity.Lifetime;
+using Unity;
 using Unity.RegistrationByConvention;
 using WDE.Module.Attributes;
 using WoWDatabaseEditor.Events;
@@ -28,6 +26,49 @@ namespace WoWDatabaseEditor
         private SplashScreenView splash;
 
         private IModulesManager modulesManager;
+
+        protected override IContainerExtension CreateContainerExtension()
+        {
+            return new UnityContainerExtension(new UnityContainer().AddExtension(new Diagnostic()));
+        }
+
+        public App()
+        {
+            /*
+             * .net core (and .net 5) changed the way assembly and type resolving work.
+             * Preferred way to implement "plugins" is using custom AssemblyLoadContext per plugin
+             * however, current Prism implementation is not AssemblyLoadContext friendly
+             * Therefore this workaround make assembly loading work more or less like in .net framework
+             * All assemblies are loaded to the default context and any type can be found via Type.GetType()
+             *
+             * The disadvantage is that assemblies cannot conflict with each other. If using AssemblyLoadContext
+             * there would be no problem with for instance different versions of a package.
+             */
+            string executingAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                if (args.Name.EndsWith("resources") || args.RequestingAssembly == null)
+                    return null;
+                
+                var name = new AssemblyName(args.Name);
+
+                var requestingAssemblyPath = executingAssemblyLocation + "/" + args.RequestingAssembly.GetName().Name + ".dll";
+                
+                if (!File.Exists(requestingAssemblyPath))
+                    return null;
+                
+                var dependencyPathResolver = new AssemblyDependencyResolver(requestingAssemblyPath);
+                var path = dependencyPathResolver.ResolveAssemblyToPath(name);
+                
+                if (path == null)
+                    return null;
+                
+                if (AssemblyLoadContext.Default.Assemblies.FirstOrDefault(t => t.GetName() == name) != null)
+                    return AssemblyLoadContext.Default.Assemblies.FirstOrDefault(t => t.GetName() == name);
+                
+                return AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+            };
+        }
 
         protected override Window CreateShell()
         {
@@ -58,7 +99,7 @@ namespace WoWDatabaseEditor
             base.ConfigureModuleCatalog(moduleCatalog);
             moduleCatalog.AddModule(typeof(MainModule));
 
-            List<Assembly> allAssemblies = GetDlls().Select(path => Assembly.LoadFile(path)).ToList();
+            List<Assembly> allAssemblies = GetPluginDlls().Select(AssemblyLoadContext.Default.LoadFromAssemblyPath).ToList();
 
             var conflicts = DetectConflicts(allAssemblies);
 
@@ -72,10 +113,10 @@ namespace WoWDatabaseEditor
             AddMoulesFromLoadedAssemblies(moduleCatalog, allAssemblies);
         }
         
-        private IEnumerable<string> GetDlls()
+        private IEnumerable<string> GetPluginDlls()
         {
             string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            return Directory.GetFiles(path, "*.dll");
+            return Directory.GetFiles(path, "WDE*.dll");
         }
 
         private class Conflict
@@ -92,9 +133,13 @@ namespace WoWDatabaseEditor
 
             foreach (var assembly in allAssemblies)
             {
-                var implementedInterfaces = AllClasses.FromAssemblies(assembly).Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true)).SelectMany(t => t.GetInterfaces()).Where(t => t.IsDefined(typeof(UniqueProviderAttribute))).ToList();
+                var implementedInterfaces = AllClasses.FromAssemblies(assembly)
+                    .Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true))
+                    .SelectMany(t => t.GetInterfaces())
+                    .Where(t => t.IsDefined(typeof(UniqueProviderAttribute)))
+                    .ToList();
 
-                if (implementedInterfaces.Count == 0)
+                if (!implementedInterfaces.Any())
                     continue;
 
                 foreach (var otherAssembly in providedInterfaces)
@@ -113,7 +158,7 @@ namespace WoWDatabaseEditor
 
         private void AddMoulesFromLoadedAssemblies(IModuleCatalog moduleCatalog, List<Assembly> allAssemblies)
         {
-            var modules = AllClasses.FromAssemblies(allAssemblies).Where(t => t.GetInterfaces().Contains(typeof(IModule)));
+            var modules = AllClasses.FromAssemblies(allAssemblies).Where(t => t.GetInterfaces().Contains(typeof(IModule))).ToList();
 
             foreach (var module in modules)
                 modulesManager.AddModule(module.Assembly);
@@ -123,7 +168,7 @@ namespace WoWDatabaseEditor
                 ModuleName = module.Name,
                 ModuleType = module.AssemblyQualifiedName,
                 Ref = "file://" + module.Assembly.Location
-            }).ToList().ForEach(moduleCatalog.AddModule);
+            }).ToList().ForEach(info => moduleCatalog.AddModule(info));
         }
 
         protected override IModuleCatalog CreateModuleCatalog()

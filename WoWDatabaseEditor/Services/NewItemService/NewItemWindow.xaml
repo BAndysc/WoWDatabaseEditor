@@ -4,10 +4,13 @@
              xmlns:Metro="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:prism="http://prismlibrary.com/"
              Style="{DynamicResource MainWindowStyle}"
-		WindowCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
-		WindowMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
-		WindowMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}"
             Title="New item" Height="430" Width="600" WindowStartupLocation="CenterScreen" Margin="0,9,0,0">
+    <Metro:MetroWindow.WindowButtonCommands>
+        <Metro:WindowButtonCommands
+            LightCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+            LightMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+            LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
+    </Metro:MetroWindow.WindowButtonCommands>
     <DockPanel Margin="10">
         <WrapPanel FlowDirection="RightToLeft" DockPanel.Dock="Bottom" Margin="0,10,0,0">
             <Button Content="Cancel" IsCancel="True" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="0,0,19,0"/>

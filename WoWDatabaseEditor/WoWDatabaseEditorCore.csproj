@@ -1,61 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{99C9E82C-C594-446D-AA59-8FFBC43AD226}</ProjectGuid>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WoWDatabaseEditor</RootNamespace>
     <AssemblyName>WoWDatabaseEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>..\bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -64,183 +28,11 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Configuration.Install" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Drawing.Design" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Extensions\FocusBehavior.cs" />
-    <Compile Include="MainModule.cs" />
-    <Compile Include="Managers\ViewModels\DocumentDecorator.cs" />
-    <Compile Include="Managers\ViewModels\ToolWindow.cs" />
-    <Compile Include="ModulesManagement\Configuration\ModulesConfiguration.cs" />
-    <Compile Include="ModulesManagement\Configuration\ViewModels\ModulesConfigViewModel.cs" />
-    <Compile Include="ModulesManagement\Configuration\Views\ModulesConfigView.xaml.cs">
-      <DependentUpon>ModulesConfigView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ModulesManagement\IModulesManager.cs" />
-    <Compile Include="ModulesManagement\ModulesManager.cs" />
-    <Compile Include="Themes\DarkTheme.xaml.cs">
-      <DependentUpon>DarkTheme.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Helpers\ActiveDocumentConverter.cs" />
-    <Compile Include="Views\PaneDocumentTemplateSelector.cs" />
-    <Compile Include="Views\SplashScreenView.xaml.cs">
-      <DependentUpon>SplashScreenView.xaml</DependentUpon>
-    </Compile>
-    <Page Include="ModulesManagement\Configuration\Views\ModulesConfigView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Services\ConfigurationService\Views\ConfigurationWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Services\CreatureEntrySelectorService\CreatureEntrySelectorWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Services\ItemFromListSelectorService\ItemFromListProviderView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Services\NewItemService\NewItemWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\BlueTheme.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Controls\Menu.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Controls\Merged.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Controls\Tooltip.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Controls\Window.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Controls\WindowCommands.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\DarkTheme.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\AboutView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Events\AllModulesLoaded.cs" />
-    <Compile Include="Extensions\ColumnDescriptor.cs" />
-    <Compile Include="Extensions\GridViewColumns.cs" />
-    <Compile Include="Managers\WindowManager.cs" />
-    <Compile Include="Services\ConfigurationService\ConfigureService.cs" />
-    <Compile Include="Services\ConfigurationService\ViewModels\ConfigurationWindowViewModel.cs" />
-    <Compile Include="Services\ConfigurationService\Views\ConfigurationWindow.xaml.cs">
-      <DependentUpon>ConfigurationWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Services\CreatureEntrySelectorService\CreatureEntryProviderService.cs" />
-    <Compile Include="Services\CreatureEntrySelectorService\CreatureEntrySelectorWindow.xaml.cs">
-      <DependentUpon>CreatureEntrySelectorWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Services\CreatureEntrySelectorService\GenericSelectorWindowViewModel.cs" />
-    <Compile Include="Services\ItemFromListSelectorService\ItemFromListProvider.cs" />
-    <Compile Include="Services\ItemFromListSelectorService\ItemFromListProviderView.xaml.cs">
-      <DependentUpon>ItemFromListProviderView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Services\ItemFromListSelectorService\ItemFromListProviderViewModel.cs" />
-    <Compile Include="Services\NewItemService\INewItemWindowViewModel.cs" />
-    <Compile Include="Services\NewItemService\NewItemService.cs" />
-    <Compile Include="Services\NewItemService\NewItemWindow.xaml.cs">
-      <DependentUpon>NewItemWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Services\NewItemService\NewItemWindowViewModel.cs" />
-    <Compile Include="ViewModels\MainWindowViewModel.cs" />
-    <Compile Include="ViewModels\MenuItemViewModel.cs" />
-    <Compile Include="Views\AboutView.xaml.cs">
-      <DependentUpon>AboutView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Views\SplashScreenView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="app.manifest" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj">
-      <Project>{9d1a4e14-2fe1-403a-a042-ed7e49db0438}</Project>
-      <Name>WDE.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj">
-      <Project>{034d29b2-faaa-4fea-a77e-5532aa2b0fb1}</Project>
-      <Name>WDE.Module</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icon.ico" />
@@ -256,43 +48,50 @@
       <Version>2.0.0</Version>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator">
-      <Version>2.0.4</Version>
+      <Version>2.0.5</Version>
     </PackageReference>
     <PackageReference Include="Extended.Wpf.Toolkit">
-      <Version>3.4.0</Version>
+      <Version>4.0.1</Version>
     </PackageReference>
     <PackageReference Include="gong-wpf-dragdrop">
-      <Version>1.1.0</Version>
+      <Version>2.3.2</Version>
     </PackageReference>
     <PackageReference Include="Google.Protobuf">
-      <Version>3.6.1</Version>
+      <Version>3.14.0</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro">
-      <Version>1.6.5</Version>
+      <Version>2.4.3</Version>
     </PackageReference>
+    <PackageReference Include="McMaster.NETCore.Plugins">
+      <Version>1.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="MySql.Data">
-      <Version>6.10.8</Version>
+      <Version>8.0.22</Version>
     </PackageReference>
     <PackageReference Include="Platform.Xml.Serialization">
       <Version>1.2.5</Version>
     </PackageReference>
     <PackageReference Include="Prism.Unity">
-      <Version>7.1.0.172-pre</Version>
+      <Version>8.0.0.1909</Version>
     </PackageReference>
     <PackageReference Include="Prism.Wpf">
-      <Version>7.1.0.172-pre</Version>
+      <Version>8.0.0.1909</Version>
     </PackageReference>
     <PackageReference Include="Shaolinq.MySql">
-      <Version>1.8.10</Version>
+      <Version>1.9.5</Version>
     </PackageReference>
     <PackageReference Include="SmartFormat.NET">
-      <Version>2.3.0</Version>
+      <Version>2.5.3</Version>
     </PackageReference>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.Management" Version="5.0.0" />
     <PackageReference Include="Unity.Abstractions">
-      <Version>3.3.1</Version>
+      <Version>5.11.6</Version>
     </PackageReference>
     <PackageReference Include="Unity.RegistrationByConvention">
-      <Version>2.1.5</Version>
+      <Version>5.11.1</Version>
     </PackageReference>
     <PackageReference Include="Unofficial.Blend.Interactivity">
       <Version>1.0.0</Version>
@@ -301,12 +100,4 @@
       <Version>2.9.0.1</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

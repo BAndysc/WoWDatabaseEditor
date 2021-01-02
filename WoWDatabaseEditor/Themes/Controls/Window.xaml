@@ -9,7 +9,7 @@
         <Setter Property="WindowTitleBrush" Value="{DynamicResource MainWindowCaptionActiveBackground}" />
         <Setter Property="TitleForeground" Value="{DynamicResource MainWindowCaptionActiveText}" />
         <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource MainWindowCaptionInactiveBackground}" />
-        <Setter Property="TitleCaps" Value="False" />
+        <Setter Property="TitleCharacterCasing" Value="Normal" />
         <Setter Property="GlowBrush" Value="{DynamicResource MainWindowActiveBorder}" />
         <Setter Property="NonActiveGlowBrush" Value="{DynamicResource MainWindowInactiveBorder}" />
         <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
