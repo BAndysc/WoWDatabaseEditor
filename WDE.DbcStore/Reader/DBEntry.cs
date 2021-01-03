@@ -205,7 +205,7 @@ namespace WDBXEditor.Storage
 				return;
 
 			using (FileStream fs = new FileStream(Path.Combine(TEMP_FOLDER, Tag + ".cache"), FileMode.Open))
-			using (var mmf = MemoryMappedFile.CreateFromFile(fs, Tag, fs.Length, MemoryMappedFileAccess.ReadWrite, null, HandleInheritability.None, false))
+			using (var mmf = MemoryMappedFile.CreateFromFile(fs, Tag, fs.Length, MemoryMappedFileAccess.ReadWrite, HandleInheritability.None, false))
 			using (var stream = mmf.CreateViewStream(0, fs.Length, MemoryMappedFileAccess.Read))
 			{
 				var formatter = new BinaryFormatter();
