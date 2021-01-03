@@ -27,7 +27,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public int NextQuestInChain => 0;
         
 
-        private MySqlQuestTemplateAddon addon;
+        private MySqlQuestTemplateAddon? addon;
 
         public MySqlQuestTemplate SetAddon(MySqlQuestTemplateAddon addon)
         {

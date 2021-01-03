@@ -15,31 +15,31 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
     {
         public Action SaveAction { get; set; }
 
-        private string _host;
-        private string _user;
-        private string _pass;
-        private string _database;
+        private string? _host;
+        private string? _user;
+        private string? _pass;
+        private string? _database;
         private readonly IConnectionSettingsProvider settings;
 
-        public string Host
+        public string? Host
         {
             get { return _host; }
             set { SetProperty(ref _host, value); }
         }
 
-        public string User
+        public string? User
         {
             get { return _user; }
             set { SetProperty(ref _user, value); }
         }
 
-        public string Password
+        public string? Password
         {
             get { return _pass; }
             set { SetProperty(ref _pass, value); }
         }
 
-        public string Database
+        public string? Database
         {
             get { return _database; }
             set { SetProperty(ref _database, value); }

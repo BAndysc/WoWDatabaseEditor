@@ -17,23 +17,26 @@ namespace WDE.TrinityMySqlDatabase.Providers
 
         public ConnectionSettingsProvider()
         {
+            DbAccess? access = null;
             if (System.IO.File.Exists("database.json"))
             {
                 JsonSerializer ser = new Newtonsoft.Json.JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
                 using (StreamReader re = new StreamReader("database.json"))
                 {
                     JsonTextReader reader = new JsonTextReader(re);
-                    DbAccess = ser.Deserialize<DbAccess>(reader);
+                    access = ser.Deserialize<DbAccess>(reader);
                 }
             }
 
-            if (DbAccess == null)
-                DbAccess = new DbAccess();
+            if (access == null)
+                access = new DbAccess();
+
+            DbAccess = access;
         }
 
         public DbAccess GetSettings() => DbAccess;
 
-        public void UpdateSettings(string user, string password, string host, string database)
+        public void UpdateSettings(string? user, string? password, string? host, string? database)
         {
             DbAccess.DB = database;
             DbAccess.User = user;

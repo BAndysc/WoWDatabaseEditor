@@ -19,20 +19,20 @@ namespace WDE.TrinityMySqlDatabase
     [AutoRegister, SingleInstance]
     public class TrinityMysqlDatabaseProvider : IDatabaseProvider
     {
-        private TrinityDatabase model;
+        private TrinityDatabase? model;
 
-        private List<MySqlCreatureTemplate> CreatureTemplateCache;
+        private List<MySqlCreatureTemplate>? CreatureTemplateCache;
 
-        private List<MySqlGameObjectTemplate> GameObjectTemplateCache;
+        private List<MySqlGameObjectTemplate>? GameObjectTemplateCache;
 
-        private List<MySqlQuestTemplate> QuestTemplateCache;
+        private List<MySqlQuestTemplate>? QuestTemplateCache;
 
         public TrinityMysqlDatabaseProvider(IConnectionSettingsProvider settings)
         {
-            string Database = settings.GetSettings().DB;
-            string User = settings.GetSettings().User;
-            string Password = settings.GetSettings().Password;
-            string Host = settings.GetSettings().Host;
+            string? Database = settings.GetSettings().DB;
+            string? User = settings.GetSettings().User;
+            string? Password = settings.GetSettings().Password;
+            string? Host = settings.GetSettings().Host;
             try
             {
                 var config = MySqlConfiguration.Create(Database, Host, User, Password);
@@ -55,7 +55,7 @@ namespace WDE.TrinityMySqlDatabase
             }
         }
 
-        public ICreatureTemplate GetCreatureTemplate(uint entry)
+        public ICreatureTemplate? GetCreatureTemplate(uint entry)
         {
             if (model == null)
                 return null;
@@ -100,7 +100,7 @@ namespace WDE.TrinityMySqlDatabase
             return QuestTemplateCache;
         }
 
-        public IGameObjectTemplate GetGameObjectTemplate(uint entry)
+        public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
         {
             if (model == null)
                 return null;
@@ -109,7 +109,7 @@ namespace WDE.TrinityMySqlDatabase
             return model.GameObjectTemplate.GetReference(entry);
         }
 
-        public IQuestTemplate GetQuestTemplate(uint entry)
+        public IQuestTemplate? GetQuestTemplate(uint entry)
         {
             if (model == null)
                 return null;
