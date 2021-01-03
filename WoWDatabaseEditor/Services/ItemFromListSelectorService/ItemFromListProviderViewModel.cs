@@ -26,7 +26,7 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 
         public KeyValuePair<int, CheckableSelectOption>? SelectedItem { get; set; }
 
-        private string _search;
+        private string _search = "";
         public string SearchText
         {
             get { return _search; }
@@ -43,13 +43,13 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
-                new ColumnDescriptor { HeaderText = "Key", DisplayMember = "Key"},
-                new ColumnDescriptor { HeaderText = "Name", DisplayMember = "Value.Name" },
-                new ColumnDescriptor { HeaderText = "Description", DisplayMember = "Value.Description" },
+                new ColumnDescriptor(headerText: "Key", displayMember: "Key"),
+                new ColumnDescriptor(headerText: "Name", displayMember: "Value.Name"),
+                new ColumnDescriptor(headerText: "Description", displayMember: "Value.Description"),
             };
 
             if (asFlags)
-                Columns.Insert(0, new ColumnDescriptor(){HeaderText = "", DisplayMember= "Value.IsChecked", CheckboxMember = true});
+                Columns.Insert(0, new ColumnDescriptor(headerText: "", displayMember: "Value.IsChecked", checkboxMember: true));
 
             _items = new CollectionViewSource();
             _items.Source = RawItems;
@@ -59,7 +59,7 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
         private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
         {
             KeyValuePair<int, CheckableSelectOption>? model = filterEventArgs.Item as KeyValuePair<int, CheckableSelectOption>?;
-            filterEventArgs.Accepted = string.IsNullOrEmpty(SearchText) || model.Value.Value.Name.ToLower().Contains(SearchText.ToLower());
+            filterEventArgs.Accepted = string.IsNullOrEmpty(SearchText) || model != null && model.Value.Value.Name.ToLower().Contains(SearchText.ToLower());
         }
 
         public int GetEntry()

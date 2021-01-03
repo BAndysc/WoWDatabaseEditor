@@ -15,13 +15,20 @@ namespace WoWDatabaseEditor.Services.ConfigurationService.ViewModels
     {
         public class ContainerTab
         {
-            public string Header { get; set; }
-            public ContentControl Control { get; set; }
-            public Action Save { get; set; }
+            public ContainerTab(string header, ContentControl control, Action save)
+            {
+                Header = header;
+                Control = control;
+                Save = save;
+            }
+
+            public string Header { get; }
+            public ContentControl Control { get; }
+            public Action Save { get; }
         }
 
         public ObservableCollection<ContainerTab> ContainerTabItems { get; set; }
-        public ContainerTab SelectedTabItem { get; set; }
+        public ContainerTab? SelectedTabItem { get; set; }
         public DelegateCommand SaveAction { get; private set; }
 
         public ConfigurationWindowViewModel(IEnumerable<IConfigurable> configs)
@@ -31,12 +38,12 @@ namespace WoWDatabaseEditor.Services.ConfigurationService.ViewModels
             foreach (var config in configs)
             {
                 var view = config.GetConfigurationView();
-                ContainerTabItems.Add(new ContainerTab()
-                {
-                    Header = config.GetName(),
-                    Control = view.Key,
-                    Save = view.Value
-                });
+                ContainerTabItems.Add(new ContainerTab
+                (
+                    header: config.GetName(),
+                    control: view.Key,
+                    save: view.Value
+                ));
             }
 
             SaveAction = new DelegateCommand(Save);
@@ -44,7 +51,8 @@ namespace WoWDatabaseEditor.Services.ConfigurationService.ViewModels
 
         private void Save()
         {
-            SelectedTabItem.Save();
+            if (SelectedTabItem != null)
+                SelectedTabItem.Save();
         }
     }
 }

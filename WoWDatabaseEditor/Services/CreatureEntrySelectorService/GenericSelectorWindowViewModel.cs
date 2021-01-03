@@ -25,9 +25,9 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
         public ICollectionView AllItems => _items.View;
 
-        public T SelectedItem { get; set; }
+        public T? SelectedItem { get; set; }
 
-        private string _search;
+        private string _search = "";
         public string SearchText
         {
             get { return _search; }

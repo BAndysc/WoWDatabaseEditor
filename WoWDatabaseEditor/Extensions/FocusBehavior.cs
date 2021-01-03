@@ -31,7 +31,7 @@ namespace WoWDatabaseEditor.Extensions
         static void OnFocusFirstPropertyChanged(
             DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            Control control = obj as Control;
+            Control? control = obj as Control;
             if (control == null || !(args.NewValue is bool))
             {
                 return;

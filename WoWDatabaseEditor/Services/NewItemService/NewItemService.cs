@@ -20,10 +20,10 @@ namespace WoWDatabaseEditor.Services.NewItemService
             viewModel = newItemWindowViewModel;
         }
 
-        public ISolutionItem GetNewSolutionItem()
+        public ISolutionItem? GetNewSolutionItem()
         {
-            if (new NewItemWindow(viewModel.Value).ShowDialog().Value)
-                return viewModel.Value.SelectedPrototype.CreateSolutionItem();
+            if (new NewItemWindow(viewModel.Value).ShowDialog() ?? false)
+                return viewModel.Value.SelectedPrototype!.CreateSolutionItem();
             return null;
         }
     }

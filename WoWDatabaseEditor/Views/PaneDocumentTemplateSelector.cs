@@ -10,13 +10,13 @@ namespace WoWDatabaseEditor.Views
 {
     public class PaneDocumentTemplateSelector : DataTemplateSelector
     {
-        public DataTemplate DocumentTemplate
+        public DataTemplate? DocumentTemplate
         {
             get;
             set;
         }
 
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        public override DataTemplate? SelectTemplate(object item, DependencyObject container)
         {
             return DocumentTemplate;
         }

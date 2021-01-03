@@ -32,14 +32,14 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
             List<ColumnDescriptor> columns = new List<ColumnDescriptor>()
             {
-                new ColumnDescriptor { HeaderText = "Entry", DisplayMember = "Entry" },
-                new ColumnDescriptor { HeaderText = "Name", DisplayMember = "Name" },
+                new ColumnDescriptor(headerText: "Entry", displayMember: "Entry"),
+                new ColumnDescriptor(headerText: "Name", displayMember: "Name"),
             };
             
             var context = new GenericSelectorWindowViewModel<T>(columns, GetList(), _entryGetter, _index);
             window.DataContext = context;
 
-            if (window.ShowDialog().Value)
+            if (window.ShowDialog() ?? false)
                 return context.GetEntry();
 
             return null;
@@ -93,6 +93,12 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
     public class SpellMiniEntry
     {
+        public SpellMiniEntry(uint entry, string name)
+        {
+            Entry = entry;
+            Name = name;
+        }
+
         public uint Entry { get; set; }
         public string Name { get; set; }
     }
@@ -110,7 +116,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
             List<SpellMiniEntry> spells = new List<SpellMiniEntry>();
 
             foreach (var spellId in spellStore.Spells)
-                spells.Add(new SpellMiniEntry {Entry = spellId, Name= spellStore.GetName(spellId)});
+                spells.Add(new SpellMiniEntry(entry: spellId, name: spellStore.GetName(spellId)));
 
             return spells;
         }

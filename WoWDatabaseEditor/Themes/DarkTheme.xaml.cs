@@ -5,9 +5,14 @@ public partial class DarkTheme
 {
     void ListView_Thumb_OnDeltaDrag(object sender, DragDeltaEventArgs e)
     {
-        Thumb thumb = sender as Thumb;
-        GridViewColumnHeader parent = thumb.TemplatedParent as GridViewColumnHeader;
+        if (!(sender is Thumb thumb))
+            return;
+        
+        GridViewColumnHeader? parent = thumb.TemplatedParent as GridViewColumnHeader;
 
+        if (parent == null)
+            return;
+        
         if (double.IsNaN(parent.Column.Width))
             parent.Column.Width = parent.Column.ActualWidth;
 

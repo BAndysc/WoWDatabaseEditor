@@ -23,9 +23,9 @@ namespace WoWDatabaseEditor
     /// </summary>
     public partial class App : PrismApplication
     {
-        private SplashScreenView splash;
+        private SplashScreenView? splash;
 
-        private IModulesManager modulesManager;
+        private IModulesManager? modulesManager;
 
         protected override IContainerExtension CreateContainerExtension()
         {
@@ -44,7 +44,7 @@ namespace WoWDatabaseEditor
              * The disadvantage is that assemblies cannot conflict with each other. If using AssemblyLoadContext
              * there would be no problem with for instance different versions of a package.
              */
-            string executingAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string? executingAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 if (args.Name.EndsWith("resources") || args.RequestingAssembly == null)
@@ -106,7 +106,7 @@ namespace WoWDatabaseEditor
             foreach (var conflict in conflicts)
             {
                 MessageBox.Show($"Module {conflict.ConflictingAssembly.GetName().Name} conflicts with module {conflict.FirstAssembly.GetName().Name}. They provide same functionality. This is not allowed. Disablig {conflict.ConflictingAssembly.GetName().Name}");
-                modulesManager.AddConflicted(conflict.ConflictingAssembly, conflict.FirstAssembly);
+                modulesManager!.AddConflicted(conflict.ConflictingAssembly, conflict.FirstAssembly);
                 allAssemblies.Remove(conflict.ConflictingAssembly);
             }
             
@@ -115,7 +115,9 @@ namespace WoWDatabaseEditor
         
         private IEnumerable<string> GetPluginDlls()
         {
-            string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (path == null)
+                return ArraySegment<string>.Empty;
             return Directory.GetFiles(path, "WDE*.dll");
         }
 
@@ -123,6 +125,12 @@ namespace WoWDatabaseEditor
         {
             public Assembly ConflictingAssembly;
             public Assembly FirstAssembly;
+
+            public Conflict(Assembly conflictingAssembly, Assembly firstAssembly)
+            {
+                ConflictingAssembly = conflictingAssembly;
+                FirstAssembly = firstAssembly;
+            }
         }
 
         private IList<Conflict> DetectConflicts(List<Assembly> allAssemblies)
@@ -147,7 +155,7 @@ namespace WoWDatabaseEditor
                     var intersection = otherAssembly.Value.Intersect(implementedInterfaces).ToList();
 
                     if (intersection.Count > 0)
-                        conflictingAssemblies.Add(new Conflict { ConflictingAssembly = assembly, FirstAssembly = otherAssembly.Key });
+                        conflictingAssemblies.Add(new Conflict(conflictingAssembly: assembly, firstAssembly: otherAssembly.Key));
                 }
 
                 providedInterfaces.Add(assembly, implementedInterfaces.ToList());
@@ -161,7 +169,7 @@ namespace WoWDatabaseEditor
             var modules = AllClasses.FromAssemblies(allAssemblies).Where(t => t.GetInterfaces().Contains(typeof(IModule))).ToList();
 
             foreach (var module in modules)
-                modulesManager.AddModule(module.Assembly);
+                modulesManager!.AddModule(module.Assembly);
 
             modules.Select(module => new ModuleInfo()
             {
@@ -184,7 +192,7 @@ namespace WoWDatabaseEditor
             var eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<AllModulesLoaded>().Publish();
 
-            splash.Close();
+            splash!.Close();
 
             mainWindow.ShowDialog();
             Current.Shutdown();

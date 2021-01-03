@@ -13,22 +13,18 @@ namespace WoWDatabaseEditor.ViewModels
     {
         private readonly ICommand _command;
 
-        public MenuItemViewModel(Action action)
-        {
-            _command = new CommandViewModel(action);
-        }
-
         public string Header { get; set; }
 
         public ObservableCollection<MenuItemViewModel> MenuItems { get; set; }
 
-        public ICommand Command
+        public MenuItemViewModel(Action action, string header)
         {
-            get
-            {
-                return _command;
-            }
+            _command = new CommandViewModel(action);
+            Header = header;
+            MenuItems = new ObservableCollection<MenuItemViewModel>();
         }
+
+        public ICommand Command => _command;
     }
 
     public class CommandViewModel : ICommand
@@ -40,17 +36,17 @@ namespace WoWDatabaseEditor.ViewModels
             _action = action;
         }
 
-        public void Execute(object o)
+        public void Execute(object? o)
         {
             _action();
         }
 
-        public bool CanExecute(object o)
+        public bool CanExecute(object? o)
         {
             return true;
         }
 
-        public event EventHandler CanExecuteChanged
+        public event EventHandler? CanExecuteChanged
         {
             add { }
             remove { }

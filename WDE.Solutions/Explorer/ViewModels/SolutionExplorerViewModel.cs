@@ -93,7 +93,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
             RequestOpenItem = new DelegateCommand<SolutionItemViewModel>((item) =>
             {
-                if (!item.IsContainer)
+                if (item != null && !item.IsContainer)
                     _ea.GetEvent<EventRequestOpenItem>().Publish(item.Item);
             });
 

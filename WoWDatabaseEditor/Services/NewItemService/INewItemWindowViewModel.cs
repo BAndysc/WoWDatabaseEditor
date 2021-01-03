@@ -13,7 +13,7 @@ namespace WoWDatabaseEditor.Services.NewItemService
     public interface INewItemWindowViewModel
     {
         ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; }
-        NewItemPrototypeInfo SelectedPrototype { get;  }
+        NewItemPrototypeInfo? SelectedPrototype { get;  }
     }
 
     public class NewItemPrototypeInfo

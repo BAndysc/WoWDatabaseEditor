@@ -11,7 +11,7 @@ namespace WoWDatabaseEditor.Views.Helpers
 {
     public class ActiveDocumentConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType,
+        public object? Convert(object value, Type targetType,
             object parameter, CultureInfo culture)
         {
             if (value is IDocument)
@@ -20,7 +20,7 @@ namespace WoWDatabaseEditor.Views.Helpers
             return null;
         }
 
-        public object ConvertBack(object value, Type targetType,
+        public object? ConvertBack(object value, Type targetType,
             object parameter, CultureInfo culture)
         {
             if (value is IDocument)

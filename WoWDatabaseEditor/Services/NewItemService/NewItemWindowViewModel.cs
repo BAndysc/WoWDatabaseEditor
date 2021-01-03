@@ -13,6 +13,15 @@ namespace WoWDatabaseEditor.Services.NewItemService
     [WDE.Module.Attributes.AutoRegister]
     public class NewItemWindowViewModel : BindableBase, INewItemWindowViewModel
     {
+        public ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; private set; }
+
+        private NewItemPrototypeInfo? _selectedPrototype;
+        public NewItemPrototypeInfo? SelectedPrototype
+        {
+            get { return _selectedPrototype; }
+            set { SetProperty(ref _selectedPrototype, value); }
+        }
+        
         public NewItemWindowViewModel(IEnumerable<ISolutionItemProvider> items)
         {
             ItemPrototypes = new ObservableCollection<NewItemPrototypeInfo>();
@@ -21,15 +30,6 @@ namespace WoWDatabaseEditor.Services.NewItemService
             {
                 ItemPrototypes.Add(new NewItemPrototypeInfo(item));
             }
-        }
-        
-        public ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; private set; }
-
-        private NewItemPrototypeInfo _selectedPrototype;
-        public NewItemPrototypeInfo SelectedPrototype
-        {
-            get { return _selectedPrototype; }
-            set { SetProperty(ref _selectedPrototype, value); }
         }
     }
 }

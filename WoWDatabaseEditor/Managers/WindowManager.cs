@@ -27,12 +27,12 @@ namespace WoWDatabaseEditor.Managers
             _eventAggregator = eventAggregator;
         }
         
-        private IDocument _activeDocument;
-        public IDocument ActiveDocument
+        private IDocument? _activeDocument;
+        public IDocument? ActiveDocument
         {
             get => _activeDocument;
             set {
-                if (value == null && OpenedDocuments.Contains(_activeDocument))
+                if (value == null && _activeDocument != null && OpenedDocuments.Contains(_activeDocument))
                     return;
                 SetProperty(ref _activeDocument, value);
                 _eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);

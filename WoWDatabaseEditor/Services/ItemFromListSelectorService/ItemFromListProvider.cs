@@ -22,7 +22,7 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             ItemFromListProviderView view = new ItemFromListProviderView();
             ItemFromListProviderViewModel vm = new ItemFromListProviderViewModel(items, flags);
             view.DataContext = vm;
-            if (view.ShowDialog().Value)
+            if (view.ShowDialog() ?? false)
                 return vm.GetEntry();
             return null;
         }
