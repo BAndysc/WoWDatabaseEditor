@@ -21,7 +21,7 @@ namespace WDE.Common.Parameters
 
         public virtual Parameter Clone()
         {
-            return new Parameter(Name) {Value = _value};
+            return new Parameter(Name) {Value = _value, Items = Items, Description = Description};
         }
     }
 
