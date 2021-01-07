@@ -20,9 +20,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Windows" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\WDE.Module\WDE.Module.csproj" />
   </ItemGroup>
   <ItemGroup>
