@@ -52,7 +52,8 @@ namespace WDE.Common.Parameters
 
         public void SetValue(T value)
         {
-            Value = value;
+            if (Comparer<T>.Default.Compare(value, Value) != 0)
+                Value = value;
         }
 
         public T GetValue()

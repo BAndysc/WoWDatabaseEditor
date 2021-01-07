@@ -18,12 +18,22 @@ namespace WDE.Common.Parameters
                 return Items[Value].Name;
             return Value.ToString();
         }
+
+        public virtual Parameter Clone()
+        {
+            return new Parameter(Name) {Value = _value};
+        }
     }
 
     public class NullParameter : Parameter
     {
         public NullParameter() : base("empty")
         {
+        }
+        
+        public override Parameter Clone()
+        {
+            return new NullParameter() {Value = _value};
         }
     }
 
@@ -36,6 +46,11 @@ namespace WDE.Common.Parameters
         public override string ToString()
         {
             return (GetValue() / 1000.0f).ToString(CultureInfo.InvariantCulture);
+        }
+        
+        public override Parameter Clone()
+        {
+            return new FloatIntParameter(Name) {Value = _value};
         }
     }
 
@@ -74,6 +89,11 @@ namespace WDE.Common.Parameters
                 }
             }
             return string.Join(", ", flags);
+        }
+        
+        public override Parameter Clone()
+        {
+            return new FlagParameter(Name) {Value = _value};
         }
     }
 

@@ -166,5 +166,10 @@ namespace WDE.DbcStore
                 return GetValue().ToString();
             return _storage[GetValue()];
         }
+
+        public override Parameter Clone()
+        {
+            return new DbcParameter(Name, _storage) {Value = _value};
+        }
     }
 }
