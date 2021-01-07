@@ -14,6 +14,7 @@ using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Editor.Views;
 using Prism.Ioc;
 using Prism.Events;
+using SmartFormat;
 using WDE.Common.Providers;
 using WDE.Common.DBC;
 using WDE.Common.Solution;
@@ -26,7 +27,7 @@ namespace WDE.SmartScriptEditor
     {
         public SmartScriptModule()
         {
+            Smart.Default.Parser.UseAlternativeEscapeChar('\\');
         }
-
     }
 }

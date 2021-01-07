@@ -135,22 +135,29 @@ namespace WDE.SmartScriptEditor.Models
                         }
                 }
 
-                string output = Smart.Format(readable, new
+                try
                 {
-                    pram1 = GetParameter(0),
-                    pram2 = GetParameter(1),
-                    pram3 = GetParameter(2),
-                    pram4 = GetParameter(3),
-                    datapram1 = GetParameter(0),
-                    timed1 = GetParameter(0),
-                    function1 = GetParameter(0),
-                    action1 = GetParameter(0),
-                    pram1value = GetParameter(0).GetValue(),
-                    pram2value = GetParameter(1).GetValue(),
-                    pram3value = GetParameter(2).GetValue(),
-                    pram4value = GetParameter(3).GetValue()
-                });
-                return output;
+                    string output = Smart.Format(readable, new
+                    {
+                        pram1 = GetParameter(0),
+                        pram2 = GetParameter(1),
+                        pram3 = GetParameter(2),
+                        pram4 = GetParameter(3),
+                        datapram1 = GetParameter(0),
+                        timed1 = GetParameter(0),
+                        function1 = GetParameter(0),
+                        action1 = GetParameter(0),
+                        pram1value = GetParameter(0).GetValue(),
+                        pram2value = GetParameter(1).GetValue(),
+                        pram3value = GetParameter(2).GetValue(),
+                        pram4value = GetParameter(3).GetValue()
+                    });
+                    return output;
+                }
+                catch (SmartFormat.Core.Parsing.ParsingErrors)
+                {
+                    return $"Event {Id} has invalid Readable format in events.json";
+                }
             }
         }
 

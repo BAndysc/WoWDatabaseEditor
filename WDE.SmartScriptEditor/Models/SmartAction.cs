@@ -58,35 +58,42 @@ namespace WDE.SmartScriptEditor.Models
         {
             get
             {
-                string output = Smart.Format(ReadableHint, new
+                try
                 {
-                    target = Target.Readable,
-                    source = Source.Readable,
-                    targetcoords = Target.GetCoords(),
-                    target_position = Target.GetPosition(),
-                    targetid = Target.Id,
-                    pram1 = GetParameter(0),
-                    pram2 = GetParameter(1),
-                    pram3 = GetParameter(2),
-                    pram4 = GetParameter(3),
-                    pram5 = GetParameter(4),
-                    pram6 = GetParameter(5),
-                    datapram1 = "data #"+ GetParameter(0).GetValue(),
-                    stored = "stored target #" + GetParameter(0).GetValue(),
-                    storedPoint = "stored point #" + GetParameter(0).GetValue(),
-                    timed1 = "timed event #" + GetParameter(0).GetValue(),
-                    timed4 = "timed event #" + GetParameter(0).GetValue(),
-                    function1 = "function #" + GetParameter(0).GetValue(),
-                    action1 = "action #" + GetParameter(0).GetValue(),
-                    pram1value = GetParameter(0).GetValue(),
-                    pram2value = GetParameter(1).GetValue(),
-                    pram3value = GetParameter(2).GetValue(),
-                    pram4value = GetParameter(3).GetValue(),
-                    pram5value = GetParameter(4).GetValue(),
-                    pram6value = GetParameter(5).GetValue(),
-                    //comment = Comment
-                });
-                return output;
+                    string output = Smart.Format(ReadableHint, new
+                    {
+                        target = Target.Readable,
+                        source = Source.Readable,
+                        targetcoords = Target.GetCoords(),
+                        target_position = Target.GetPosition(),
+                        targetid = Target.Id,
+                        pram1 = GetParameter(0),
+                        pram2 = GetParameter(1),
+                        pram3 = GetParameter(2),
+                        pram4 = GetParameter(3),
+                        pram5 = GetParameter(4),
+                        pram6 = GetParameter(5),
+                        datapram1 = "data #" + GetParameter(0).GetValue(),
+                        stored = "stored target #" + GetParameter(0).GetValue(),
+                        storedPoint = "stored point #" + GetParameter(0).GetValue(),
+                        timed1 = "timed event #" + GetParameter(0).GetValue(),
+                        timed4 = "timed event #" + GetParameter(0).GetValue(),
+                        function1 = "function #" + GetParameter(0).GetValue(),
+                        action1 = "action #" + GetParameter(0).GetValue(),
+                        pram1value = GetParameter(0).GetValue(),
+                        pram2value = GetParameter(1).GetValue(),
+                        pram3value = GetParameter(2).GetValue(),
+                        pram4value = GetParameter(3).GetValue(),
+                        pram5value = GetParameter(4).GetValue(),
+                        pram6value = GetParameter(5).GetValue(),
+                        //comment = Comment
+                    });
+                    return output;
+                }
+                catch (SmartFormat.Core.Parsing.ParsingErrors)
+                {
+                    return $"Action {Id} has invalid Readable format in actions.json";
+                }
             }
         }
 
