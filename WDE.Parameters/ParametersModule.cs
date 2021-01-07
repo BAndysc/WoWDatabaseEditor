@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-
+using Prism.Events;
 using Prism.Modularity;
 using WDE.Common;
 using WDE.Common.Parameters;
@@ -27,10 +27,10 @@ namespace WDE.Parameters
 
         public override void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<AllModulesLoaded>().Subscribe(() =>
+            containerProvider.Resolve<IEventAggregator>().GetEvent<AllModulesLoaded>().Subscribe(() =>
             {
                 new ParameterLoader(containerProvider.Resolve<IDatabaseProvider>()).Load(containerProvider.Resolve<ParameterFactory>());
-            });
+            }, ThreadOption.PublisherThread, true);
         }
     }
 }

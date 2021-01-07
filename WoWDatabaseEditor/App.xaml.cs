@@ -11,8 +11,8 @@ using Prism.Modularity;
 using Prism.Unity;
 using Unity;
 using Unity.RegistrationByConvention;
+using WDE.Common.Events;
 using WDE.Module.Attributes;
-using WoWDatabaseEditor.Events;
 using WoWDatabaseEditor.ModulesManagement;
 using WoWDatabaseEditor.Views;
 

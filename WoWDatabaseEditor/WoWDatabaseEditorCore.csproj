@@ -90,4 +90,7 @@
       <Version>4.50.1</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Events" />
+  </ItemGroup>
 </Project>

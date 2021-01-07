@@ -12,8 +12,6 @@ using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Windows;
-using WoWDatabaseEditor.Events;
-using WoWDatabaseEditor.Services.NewItemService;
 using WoWDatabaseEditor.Views;
 using Prism.Ioc;
 using WDE.Common.Solution;
