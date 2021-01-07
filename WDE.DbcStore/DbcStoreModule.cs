@@ -33,7 +33,7 @@ namespace WDE.DbcStore
         {
             containerProvider.Resolve<IEventAggregator>().GetEvent<AllModulesLoaded>().Subscribe(() => {
                 containerProvider.Resolve<DbcStore>().Load();
-            });
+            }, ThreadOption.PublisherThread, true);
         }
     }
 }
