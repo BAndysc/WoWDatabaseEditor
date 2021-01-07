@@ -50,7 +50,7 @@ namespace WDE.ThemeChanger
             if (!curentTheme.Contains(compareStr))
             {
                 Application.Current.Resources.MergedDictionaries.Clear();
-                Uri uriOne = new Uri("pack://application:,,,/Xceed.Wpf.AvalonDock.Themes.VS2013;component/" + theme.Name + ".xaml");
+                Uri uriOne = new Uri("pack://application:,,,/AvalonDock.Themes.VS2013;component/" + theme.Name + ".xaml");
                 Uri uriTwo = new Uri("Themes/" + theme.Name + ".xaml", UriKind.RelativeOrAbsolute);
                 Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = uriOne });
                 Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = uriTwo });

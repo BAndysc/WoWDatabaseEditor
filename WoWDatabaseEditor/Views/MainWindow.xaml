@@ -4,7 +4,6 @@
         xmlns:prism="http://prismlibrary.com/"
         xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:views="clr-namespace:WoWDatabaseEditor.Views"
         xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
         xmlns:viewModels="clr-namespace:WoWDatabaseEditor.ViewModels"
@@ -17,6 +16,7 @@
         Icon="/icon.png"
         Loaded="Window_Loaded"
         Closed="Window_Closed"
+        x:Name="rootWindow"
         >
     <Controls:MetroWindow.WindowButtonCommands>
         <Controls:WindowButtonCommands
@@ -58,7 +58,8 @@
                     <MenuItem Header="_Window" ItemsSource="{Binding WindowManager.OpenedDocuments}">
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="{x:Type MenuItem}">
-                                <Setter Property="Command" Value="{Binding Command}" />
+                                <Setter Property="Command" Value="{Binding ElementName=rootWindow, Path=DataContext.WindowManager.ActivateDocument}" />
+                                <Setter Property="CommandParameter" Value="{Binding}" />
                             </Style>
                         </MenuItem.ItemContainerStyle>
                         <MenuItem.ItemTemplate>
@@ -85,29 +86,33 @@
         </DataTemplate>
     </Controls:MetroWindow.TitleTemplate>
     <DockPanel>
-        <avalonDock:DockingManager AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
+        <DockingManager AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
 
-            <avalonDock:DockingManager.LayoutItemTemplateSelector>
+            <DockingManager.LayoutItemTemplateSelector>
                 <views:PaneDocumentTemplateSelector>
                     <views:PaneDocumentTemplateSelector.DocumentTemplate>
-                        <DataTemplate>
-                            <ContentControl Content="{Binding Content}">
+                        <DataTemplate><ContentControl Content="{Binding Content}">
                             </ContentControl>
                         </DataTemplate>
                     </views:PaneDocumentTemplateSelector.DocumentTemplate>
-                </views:PaneDocumentTemplateSelector>
-            </avalonDock:DockingManager.LayoutItemTemplateSelector>
-            <avalonDock:DockingManager.LayoutItemContainerStyle>
+                    <views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
+                        <DataTemplate><ContentControl Content="{Binding Content.Content}">
+                            </ContentControl>
+                        </DataTemplate>
+                    </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
+                </views:PaneDocumentTemplateSelector>                
+            </DockingManager.LayoutItemTemplateSelector>
+            <DockingManager.LayoutItemContainerStyle>
                 <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
-                <Style TargetType="{x:Type avalonDock:LayoutItem}" >
+                <Style TargetType="{x:Type LayoutItem}" >
                     <Setter Property="Title" Value="{Binding Model.Title}" />
                     <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
                     <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
                     <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}"></Setter>
                 </Style>
-            </avalonDock:DockingManager.LayoutItemContainerStyle>
-        </avalonDock:DockingManager>
+            </DockingManager.LayoutItemContainerStyle>
+        </DockingManager>
     </DockPanel>
     <!--<Grid>
         <ContentControl prism:RegionManager.RegionName="ContentRegion" >

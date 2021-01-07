@@ -33,7 +33,7 @@ namespace WoWDatabaseEditor.Managers.ViewModels
         public ContentControl Content => document.Content;
 
         public System.Windows.Visibility Visibility { get; set; }
-
+        
         public DocumentDecorator(IDocument document, Action<DocumentDecorator> closeAction)
         {
             this.document = document;

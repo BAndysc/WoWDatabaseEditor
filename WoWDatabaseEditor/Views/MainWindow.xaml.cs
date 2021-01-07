@@ -2,9 +2,8 @@
 using System;
 using System.Windows;
 using System.Windows.Input;
-using WoWDatabaseEditor.ViewModels;
-using Xceed.Wpf.AvalonDock;
-using Xceed.Wpf.AvalonDock.Layout.Serialization;
+using AvalonDock;
+using AvalonDock.Layout.Serialization;
 
 namespace WoWDatabaseEditor.Views
 {

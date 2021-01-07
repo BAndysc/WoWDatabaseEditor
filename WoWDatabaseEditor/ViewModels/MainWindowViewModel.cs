@@ -17,6 +17,7 @@ using WoWDatabaseEditor.Services.NewItemService;
 using WoWDatabaseEditor.Views;
 using Prism.Ioc;
 using WDE.Common.Solution;
+using WoWDatabaseEditor.Managers;
 
 namespace WoWDatabaseEditor.ViewModels
 {
@@ -37,7 +38,8 @@ namespace WoWDatabaseEditor.ViewModels
             set => SetProperty(ref _title, value);
         }
 
-        private readonly Dictionary<ISolutionItem, Document> documents = new Dictionary<ISolutionItem, Document>();
+        private readonly Dictionary<ISolutionItem, Document> documents = new ();
+        private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new ();
 
         public DelegateCommand ExecuteCommandNew { get; private set; }
         public DelegateCommand ExecuteSettings { get; private set; }
@@ -57,10 +59,19 @@ namespace WoWDatabaseEditor.ViewModels
 
             About = new DelegateCommand(ShowAbout);
 
+            _eventAggregator.GetEvent<WindowManager.DocumentClosedEvent>().Subscribe(document =>
+            {
+                if (!documentToSolution.ContainsKey(document))
+                    return;
+                
+                documents.Remove(documentToSolution[document]);
+                documentToSolution.Remove(document);
+            });
+            
             _eventAggregator.GetEvent<EventRequestOpenItem>().Subscribe(item =>
             {
                 if (documents.ContainsKey(item))
-                    WindowManager.ActiveDocument = documents[item];
+                    WindowManager.OpenDocument(documents[item]);
                 else
                 {
                     var editor = solutionEditorManager.GetEditor(item);
@@ -70,6 +81,7 @@ namespace WoWDatabaseEditor.ViewModels
                     {
                         WindowManager.OpenDocument(editor);
                         documents[item] = editor;
+                        documentToSolution[editor] = item;
                     }
                 }
 

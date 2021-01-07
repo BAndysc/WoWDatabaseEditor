@@ -7,7 +7,7 @@
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Xceed.Wpf.AvalonDock.Themes.VS2013;component/BlueTheme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/AvalonDock.Themes.VS2013;component/BlueTheme.xaml" />
                 <ResourceDictionary Source="Themes/BlueTheme.xaml"/>
 
             </ResourceDictionary.MergedDictionaries>

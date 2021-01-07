@@ -3,10 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:views="clr-namespace:WDE.Solutions.Explorer.Views"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:dd="urn:gong-wpf-dragdrop"
-             xmlns:attachedCommandBehavior="clr-namespace:AttachedCommandBehavior;assembly=AttachedCommandBehavior"
              prism:ViewModelLocator.AutoWireViewModel="True" x:Name="UC">
     <UserControl.Resources>
 
@@ -190,15 +188,15 @@
 
         <TreeView x:Name="tv" ItemsSource="{Binding Root}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
             
-            <attachedCommandBehavior:CommandBehaviorCollection.Behaviors>
-                <attachedCommandBehavior:BehaviorBinding Event="MouseDoubleClick" Command="{Binding RequestOpenItem}" CommandParameter="{Binding ElementName=tv, Path=SelectedItem}"/>
-            </attachedCommandBehavior:CommandBehaviorCollection.Behaviors>
-
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectedItemChanged">
                     <i:InvokeCommandAction Command="{Binding SelectedItemChangedCommand}" CommandParameter="{Binding ElementName=tv, Path=SelectedItem}"/>
                 </i:EventTrigger>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding RequestOpenItem}" CommandParameter="{Binding ElementName=tv, Path=SelectedItem}"/>
+                </i:EventTrigger>
             </i:Interaction.Triggers>
+ 
             <TreeView.ItemContainerStyle>
                 <Style BasedOn="{StaticResource TreeViewFullRow}" TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>

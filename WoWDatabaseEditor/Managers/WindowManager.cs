@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
-using Microsoft.Expression.Interactivity.Core;
 
 using Prism.Events;
 using Prism.Mvvm;
@@ -25,7 +24,10 @@ namespace WoWDatabaseEditor.Managers
         public WindowManager(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;
+            ActivateDocument = new DelegateCommand<IDocument>(doc => ActiveDocument = doc);
         }
+        
+        public DelegateCommand<IDocument> ActivateDocument { get; }
         
         private IDocument? _activeDocument;
         public IDocument? ActiveDocument
@@ -34,6 +36,8 @@ namespace WoWDatabaseEditor.Managers
             set {
                 if (value == null && _activeDocument != null && OpenedDocuments.Contains(_activeDocument))
                     return;
+                if (value != null && documents.ContainsKey(value))
+                    value = documents[value];
                 SetProperty(ref _activeDocument, value);
                 _eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
             }
@@ -43,16 +47,26 @@ namespace WoWDatabaseEditor.Managers
         public ObservableCollection<ITool> OpenedTools { get; } = new ObservableCollection<ITool>();         
         private Dictionary<Type, ToolWindow> Opened { get; } = new Dictionary<Type, ToolWindow>();
 
+        private Dictionary<IDocument, DocumentDecorator> documents = new();
+        
         public void OpenDocument(IDocument editor)
         {
-            var document = new DocumentDecorator(editor, doc =>
+            if (documents.ContainsKey(editor))
+                ActiveDocument = documents[editor];
+            else
             {
-                OpenedDocuments.Remove(doc);
-                if (ActiveDocument == doc)
-                    ActiveDocument = null;
-            });
-            OpenedDocuments.Add(document);
-            ActiveDocument = document;
+                var document = new DocumentDecorator(editor, doc =>
+                {
+                    documents.Remove(editor);
+                    OpenedDocuments.Remove(doc);
+                    if (ActiveDocument == doc)
+                        ActiveDocument = null;
+                    _eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
+                });
+                documents[editor] = document;
+                OpenedDocuments.Add(document);
+                ActiveDocument = document;   
+            }
         }
 
         public void OpenTool(IToolProvider provider)
@@ -73,5 +87,7 @@ namespace WoWDatabaseEditor.Managers
 
             OpenedTools.Add(toolWindow);
         }
+
+        public class DocumentClosedEvent : PubSubEvent<IDocument> {}
     }
 }
