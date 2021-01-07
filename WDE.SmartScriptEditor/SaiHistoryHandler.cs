@@ -44,6 +44,8 @@ namespace WDE.SmartScriptEditor
 
             smartEvent.Actions.CollectionChanged -= Actions_CollectionChanged;
 
+            smartEvent.BulkEditingStarted -= OnBulkEditingStarted;
+            smartEvent.BulkEditingFinished -= OnBulkEditingFinished;
             smartEvent.Chance.OnValueChanged -= Parameter_OnValueChanged;
             smartEvent.Flags.OnValueChanged -= Parameter_OnValueChanged;
             smartEvent.Phases.OnValueChanged -= Parameter_OnValueChanged;
@@ -70,6 +72,9 @@ namespace WDE.SmartScriptEditor
 
         private void BindAction(SmartAction smartAction)
         {
+            smartAction.BulkEditingStarted += OnBulkEditingStarted;
+            smartAction.BulkEditingFinished += OnBulkEditingFinished;
+            
             for (int i = 0; i < smartAction.ParametersCount; ++i)
                 smartAction.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
 
@@ -85,6 +90,9 @@ namespace WDE.SmartScriptEditor
 
         private void UnbindAction(SmartAction smartAction)
         {
+            smartAction.BulkEditingStarted -= OnBulkEditingStarted;
+            smartAction.BulkEditingFinished -= OnBulkEditingFinished;
+            
             for (int i = 0; i < smartAction.ParametersCount; ++i)
                 smartAction.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
 
@@ -112,6 +120,8 @@ namespace WDE.SmartScriptEditor
 
         private void BindEvent(SmartEvent smartEvent)
         {
+            smartEvent.BulkEditingStarted += OnBulkEditingStarted;
+            smartEvent.BulkEditingFinished += OnBulkEditingFinished;
             smartEvent.Chance.OnValueChanged += Parameter_OnValueChanged;
             smartEvent.Flags.OnValueChanged += Parameter_OnValueChanged;
             smartEvent.Phases.OnValueChanged += Parameter_OnValueChanged;
@@ -125,6 +135,16 @@ namespace WDE.SmartScriptEditor
 
             foreach (var smartAction in smartEvent.Actions)
                 BindAction(smartAction);
+        }
+
+        private void OnBulkEditingFinished(string editName)
+        {
+            EndBulkEdit(editName);
+        }
+
+        private void OnBulkEditingStarted()
+        {
+            StartBulkEdit();
         }
 
         private void Actions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -157,18 +177,20 @@ namespace WDE.SmartScriptEditor
             private readonly SmartScript _script;
             private readonly SmartEvent _smartEvent;
             private readonly int _index;
+            private readonly string _readable;
 
             public EventAddedAction(SmartScript script, SmartEvent smartEvent, int index)
             {
                 _script = script;
                 _smartEvent = smartEvent;
                 _index = index;
+                _readable = smartEvent.Readable;
             }
 
             public string GetDescription()
             {
                 // @Todo: how to localize this?
-                return "Added event " + _smartEvent.Readable;
+                return "Added event " + _readable;
             }
 
             public void Redo()
@@ -248,6 +270,7 @@ namespace WDE.SmartScriptEditor
             {
             }
         }
+        
     }
 
     public  class ActionAddedAction : IHistoryAction

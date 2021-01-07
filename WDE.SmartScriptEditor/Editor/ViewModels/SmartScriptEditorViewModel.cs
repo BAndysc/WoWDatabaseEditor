@@ -71,7 +71,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.itemNameRegistry = itemNameRegistry;
             
             EditEvent = new DelegateCommand(EditEventCommand);
-            EditAction = new DelegateCommand<SmartAction>(EditActionCommand);
+            EditAction = new DelegateCommand<SmartAction>(action => EditActionCommand(action));
             AddEvent = new DelegateCommand(AddEventCommand);
             AddAction = new DelegateCommand<SmartEvent>(AddActionCommand);
 
@@ -252,9 +252,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SmartSource source = smartFactory.SourceFactory(sourceId.Value);
                 
             SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
-            EditActionCommand(ev);
-            obj.Actions.Add(ev);
-            
+            if (EditActionCommand(ev))
+                obj.Actions.Add(ev);
         }
 
         private void AddEventCommand()
@@ -267,14 +266,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (id.HasValue)
             {
                 SmartEvent ev = smartFactory.EventFactory(id.Value);
-                EditEventCommand(ev);
-                script.Events.Add(ev);
+                if (EditEventCommand(ev))
+                    script.Events.Add(ev);
             }
         }
 
-        private void EditActionCommand(SmartAction obj)
+        private bool EditActionCommand(SmartAction originalAction)
         {
+            //@todo: constructing view in place is veeery ugly
             ParametersEditView v = new ParametersEditView();
+            var obj = originalAction.Copy();
+            
             List<KeyValuePair<Parameter, string>> paramss = new List<KeyValuePair<Parameter, string>>();
            
             for (int i = 0; i < obj.Source.ParametersCount; ++i)
@@ -298,8 +300,29 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 paramss.Add(new KeyValuePair<Parameter, string>(wrapper, "Target"));
             }
 
-            v.DataContext = new ParametersEditViewModel(itemFromListProvider, obj, paramss);
-            v.ShowDialog();
+            var viewModel = new ParametersEditViewModel(itemFromListProvider, obj, paramss);
+            v.DataContext = viewModel;
+            bool result = v.ShowDialog() ?? false;
+            if (result)
+            {
+                using (originalAction.BulkEdit("Edit action " + obj.Readable))
+                {
+                    for (int i = 0; i < originalAction.Target.Position.Length; ++i)
+                        originalAction.Target.Position[i].Value = obj.Target.Position[i].Value;
+                    
+                    for (int i = 0; i < originalAction.Target.ParametersCount; ++i)
+                        originalAction.Target.SetParameter(i, obj.Target.GetParameter(i).Value);   
+                    
+                    for (int i = 0; i < originalAction.Source.ParametersCount; ++i)
+                        originalAction.Source.SetParameter(i, obj.Source.GetParameter(i).Value);   
+                    
+                    for (int i = 0; i < originalAction.ParametersCount; ++i)
+                        originalAction.SetParameter(i, obj.GetParameter(i).Value);   
+                }
+            }
+            
+            viewModel.Dispose();
+            return result;
         }
 
         private void EditEventCommand()
@@ -307,8 +330,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             EditEventCommand(SelectedItem);
         }
 
-        private void EditEventCommand(SmartEvent ev)
+        private bool EditEventCommand(SmartEvent originalEvent)
         {
+            //@todo: constructing view in place is veeery ugly
+            var ev = originalEvent.ShallowCopy();
+            
             ParametersEditView v = new ParametersEditView();
             List<KeyValuePair<Parameter, string>> paramss = new List<KeyValuePair<Parameter, string>>();
             paramss.Add(new KeyValuePair<Parameter, string>(ev.Chance, "General"));
@@ -321,8 +347,25 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (!ev.GetParameter(i).Name.Equals("empty"))
                     paramss.Add(new KeyValuePair<Parameter, string>(ev.GetParameter(i), "Event specific"));
 
-            v.DataContext = new ParametersEditViewModel(itemFromListProvider, ev, paramss);
-            v.ShowDialog();
+            var viewModel = new ParametersEditViewModel(itemFromListProvider, ev, paramss);
+            v.DataContext = viewModel;
+            bool result = v.ShowDialog() ?? false;
+            if (result)
+            {
+                using (originalEvent.BulkEdit("Edit event " + ev.Readable))
+                {
+                    originalEvent.Chance.SetValue(ev.Chance.Value);
+                    originalEvent.Flags.SetValue(ev.Flags.Value);
+                    originalEvent.Phases.SetValue(ev.Phases.Value);
+                    originalEvent.CooldownMax.SetValue(ev.CooldownMax.Value);
+                    originalEvent.CooldownMin.SetValue(ev.CooldownMin.Value);
+                    for (int i = 0; i < originalEvent.ParametersCount; ++i)
+                        originalEvent.SetParameter(i, ev.GetParameter(i).Value);   
+                }
+            }
+            
+            viewModel.Dispose();
+            return result;
         }
     }
 }

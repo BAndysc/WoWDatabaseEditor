@@ -50,8 +50,10 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-        <WrapPanel Grid.Row="2" Margin="0,10,0,0" HorizontalAlignment="Right">
-            <Button Click="ButtonBase_OnClick" Content="  Ok  "></Button>
-        </WrapPanel>
+        <DockPanel Grid.Row="2" Margin="0,10,0,0" LastChildFill="True">
+            <Button Click="Cancel_OnClick" Content="  Cancel  " DockPanel.Dock="Left"></Button>
+            <Button Click="ButtonBase_OnClick" Content="  Ok  " DockPanel.Dock="Right"></Button>
+            <Label></Label>
+        </DockPanel>
     </Grid>
 </Window>

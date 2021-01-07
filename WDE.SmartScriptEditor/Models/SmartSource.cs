@@ -54,5 +54,13 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
         public override int ParametersCount => 3;
+        
+        public SmartSource Copy()
+        {
+            SmartSource se = new SmartSource(Id) {ReadableHint = ReadableHint, DescriptionRules = DescriptionRules};
+            for (int i = 0; i < ParametersCount; ++i)
+                se.SetParameterObject(i, GetParameter(i).Clone());
+            return se;
+        }
     }
 }

@@ -154,6 +154,22 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
+        public SmartEvent ShallowCopy()
+        {
+            SmartEvent se = new SmartEvent(Id);
+            se.ReadableHint = ReadableHint;
+            se.DescriptionRules = DescriptionRules;
+            se.Chance = Chance.Clone();
+            se.Flags = Flags.Clone();
+            se.Chance = Chance.Clone();
+            se.Phases = Phases.Clone();
+            se.CooldownMin = CooldownMin.Clone();
+            se.CooldownMax = CooldownMax.Clone();
+            for (int i = 0; i < ParametersCount; ++i)
+                se.SetParameterObject(i, GetParameter(i).Clone());
+            return se;
+        }
+        
         public override int ParametersCount => 4;
     }
 }

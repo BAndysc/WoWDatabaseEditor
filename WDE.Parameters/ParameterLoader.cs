@@ -48,6 +48,11 @@ namespace WDE.Parameters
         {
             Items = options;
         }
+        
+        public override Parameter Clone()
+        {
+            return new SwitchParameter(Name, Items) {Value = _value};
+        }
     }
 
     public class BoolParameter : SwitchParameter
@@ -55,35 +60,64 @@ namespace WDE.Parameters
         public BoolParameter(string name) : base(name, new Dictionary<int, SelectOption>(){{0, new SelectOption("No")}, { 1, new SelectOption("Yes") } })
         {
         }
+        
+        public override Parameter Clone()
+        {
+            return new BoolParameter(Name) {Value = _value};
+        }
     }
 
     public class CreatureParameter : Parameter
     {
+        private readonly IDatabaseProvider _database;
+
         public CreatureParameter(string name, IDatabaseProvider database) : base(name)
         {
+            _database = database;
             Items = new Dictionary<int, SelectOption>();
             foreach (var item in database.GetCreatureTemplates())
                 Items.Add((int)item.Entry, new SelectOption(item.Name));
+        }
+        
+        public override Parameter Clone()
+        {
+            return new CreatureParameter(Name, _database) {Value = _value};
         }
     }
 
     public class QuestParameter : Parameter
     {
+        private readonly IDatabaseProvider _database;
+
         public QuestParameter(string name, IDatabaseProvider database) : base(name)
         {
+            _database = database;
             Items = new Dictionary<int, SelectOption>();
             foreach (var item in database.GetQuestTemplates())
                 Items.Add((int)item.Entry, new SelectOption(item.Name));
+        }
+        
+        public override Parameter Clone()
+        {
+            return new QuestParameter(Name, _database) {Value = _value};
         }
     }
 
     public class GameobjectParameter : Parameter
     {
+        private readonly IDatabaseProvider _database;
+
         public GameobjectParameter(string name, IDatabaseProvider database) : base(name)
         {
+            _database = database;
             Items = new Dictionary<int, SelectOption>();
             foreach (var item in database.GetGameObjectTemplates())
                 Items.Add((int)item.Entry, new SelectOption(item.Name));
+        }
+        
+        public override Parameter Clone()
+        {
+            return new GameobjectParameter(Name, _database) {Value = _value};
         }
     }
 }

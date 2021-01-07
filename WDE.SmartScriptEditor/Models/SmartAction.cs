@@ -20,9 +20,16 @@ namespace WDE.SmartScriptEditor.Models
             get { return _source; }
             set
             {
+                if (_source != null)
+                    _source.OnChanged -= SourceOnOnChanged;
                 _source = value;
-                _source.OnChanged += (sender, args) => CallOnChanged();
+                _source.OnChanged += SourceOnOnChanged;
             }
+        }
+
+        private void SourceOnOnChanged(object? sender, EventArgs e)
+        {
+            CallOnChanged();
         }
 
         private SmartTarget _target;
@@ -31,8 +38,10 @@ namespace WDE.SmartScriptEditor.Models
             get { return _target; }
             set
             {
+                if (_target != null)
+                    _target.OnChanged -= SourceOnOnChanged;
                 _target = value;
-                _target.OnChanged += (sender, args) => CallOnChanged();
+                _target.OnChanged += SourceOnOnChanged;
             }
         }
 
@@ -83,5 +92,14 @@ namespace WDE.SmartScriptEditor.Models
 
         public override int ParametersCount => 6;
 
+        public SmartAction Copy()
+        {
+            SmartAction se = new SmartAction(Id, Source.Copy(), Target.Copy());
+            se.ReadableHint = ReadableHint;
+            se.DescriptionRules = DescriptionRules;
+            for (int i = 0; i < ParametersCount; ++i)
+                se.SetParameterObject(i, GetParameter(i).Clone());
+            return se;
+        }
     }
 }

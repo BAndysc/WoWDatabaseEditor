@@ -87,5 +87,22 @@ namespace WDE.SmartScriptEditor.Models
             string output = Readable;
             return output.Contains("position") || IsPosition ? output : "position of " + output + (HasPosition() ? " moved by offset " + GetCoords() : "");
         }
+        
+        public SmartTarget Copy()
+        {
+            SmartTarget se = new SmartTarget(Id)
+            {
+                ReadableHint = ReadableHint, 
+                DescriptionRules = DescriptionRules,
+                X = X,
+                Y = Y,
+                Z = Z,
+                O = O,
+                IsPosition = IsPosition
+            };
+            for (int i = 0; i < ParametersCount; ++i)
+                se.SetParameterObject(i, GetParameter(i).Clone());
+            return se;
+        }
     }
 }

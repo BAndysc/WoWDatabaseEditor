@@ -11,6 +11,8 @@ namespace WDE.SmartScriptEditor.Models
 {
     public abstract class SmartBaseElement : INotifyPropertyChanged
     {
+        public event Action BulkEditingStarted = delegate {  };
+        public event Action<string> BulkEditingFinished = delegate {  };
         public event EventHandler OnChanged = delegate { };
         public List<DescriptionRule> DescriptionRules { get; set; }
         private readonly Parameter[] _params;
@@ -55,6 +57,29 @@ namespace WDE.SmartScriptEditor.Models
             OnChanged(this, null);
         }
 
+        public System.IDisposable BulkEdit(string name)
+        {
+            return new BulkEditing(this, name);
+        }
+
+        private class BulkEditing : System.IDisposable
+        {
+            private readonly SmartBaseElement _smartBaseElement;
+            private readonly string _name;
+
+            public BulkEditing(SmartBaseElement smartBaseElement, string name)
+            {
+                _smartBaseElement = smartBaseElement;
+                _name = name;
+                _smartBaseElement.BulkEditingStarted.Invoke();
+            }
+
+            public void Dispose()
+            {
+                _smartBaseElement.BulkEditingFinished.Invoke(_name);
+            }
+        }
+        
         public abstract string Readable { get; }
         public abstract int ParametersCount { get;}
         public event PropertyChangedEventHandler PropertyChanged;
