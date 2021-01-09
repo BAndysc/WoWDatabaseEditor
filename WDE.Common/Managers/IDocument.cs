@@ -14,6 +14,9 @@ namespace WDE.Common.Managers
         string Title { get; }
         ICommand Undo { get; }
         ICommand Redo { get; }
+        ICommand Copy { get; }
+        ICommand Cut { get; }
+        ICommand Paste { get; }
         ICommand Save { get; }
 
         ICommand CloseCommand { get; }
