@@ -9,5 +9,7 @@ namespace WDE.Common.Database
     {
         uint Entry { get; set; }
         string Name { get; set; }
+        string AIName { get; set; }
+        string ScriptName { get; set; }
     }
 }

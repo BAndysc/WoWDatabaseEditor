@@ -5,7 +5,7 @@ using WDE.Common.History;
 
 namespace WDE.Common.Managers
 {
-    public sealed class Document : IDocument
+    public sealed class Document : IDocument, System.IDisposable
     {
         public string Title { get; set; }
         public ICommand Undo { get; set; } = new DisabledCommand();
@@ -22,6 +22,13 @@ namespace WDE.Common.Managers
         
         public ContentControl Content { get; set; }
 
+        public event Action OnDispose = delegate { };
+        
+        public void Dispose()
+        {
+            OnDispose();
+        }
+        
         private class DisabledCommand : ICommand
         {
             public bool CanExecute(object? parameter)

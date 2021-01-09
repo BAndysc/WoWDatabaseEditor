@@ -18,6 +18,7 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
         private string? _host;
         private string? _user;
         private string? _pass;
+        private string? _port;
         private string? _database;
         private readonly IConnectionSettingsProvider settings;
 
@@ -25,6 +26,12 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
         {
             get { return _host; }
             set { SetProperty(ref _host, value); }
+        }
+        
+        public string? Port
+        {
+            get { return _port; }
+            set { SetProperty(ref _port, value); }
         }
 
         public string? User
@@ -49,7 +56,8 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
         public DatabaseConfigViewModel(IConnectionSettingsProvider settings)
         {
             SaveAction = Save;
-            Database = settings.GetSettings().DB;
+            Database = settings.GetSettings().Database;
+            Port = (settings.GetSettings().Port ?? 3306).ToString();
             User = settings.GetSettings().User;
             Password = settings.GetSettings().Password;
             Host = settings.GetSettings().Host;
@@ -58,7 +66,10 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
 
         private void Save()
         {
-            settings.UpdateSettings(User, Password, Host, Database);
+            int? port = null;
+            if (int.TryParse(Port, out var port_))
+                port = port_;
+            settings.UpdateSettings(User, Password, Host, port, Database);
         }
     }
 }

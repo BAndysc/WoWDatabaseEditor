@@ -3,19 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Shaolinq;
+using LinqToDB.Mapping;
 using WDE.Common.Database;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
-    [DataAccessObject(Name="creature_template")]
-    public abstract class MySqlCreatureTemplate : DataAccessObject, ICreatureTemplate
+    [Table(Name="creature_template")]
+    public class MySqlCreatureTemplate : ICreatureTemplate
     {
-        [PrimaryKey]
-        [PersistedMember(Name="entry")]
-        public abstract uint Entry { get; set; }
+        [PrimaryKey, Identity]
+        [Column(Name="entry")]
+        public uint Entry { get; set; }
+
+        [Column(Name = "name")] 
+        public string? Name { get; set; }
         
-        [PersistedMember(Name = "name")]
-        public abstract string Name { get; set; }
+        [Column(Name = "AIName")] 
+        public string? AIName { get; set; }
+        
+        [Column(Name = "ScriptName")] 
+        public string? ScriptName { get; set; }
     }
 }

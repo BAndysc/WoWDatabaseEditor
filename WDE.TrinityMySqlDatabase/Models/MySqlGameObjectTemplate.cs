@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Shaolinq;
+using LinqToDB.Mapping;
 using WDE.Common.Database;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
-    [DataAccessObject(Name = "gameobject_template")]
-    public abstract class MySqlGameObjectTemplate : DataAccessObject, IGameObjectTemplate
+    [Table(Name = "gameobject_template")]
+    public class MySqlGameObjectTemplate : IGameObjectTemplate
     {
         [PrimaryKey]
-        [PersistedMember(Name = "entry")]
-        public abstract uint Entry { get; set; }
+        [Column(Name = "entry")]
+        public uint Entry { get; set; }
 
-        [PersistedMember(Name = "name")]
-        public abstract string Name { get; set; }
+        [Column(Name = "name")]
+        public string Name { get; set; } = "";
     }
 }

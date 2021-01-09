@@ -9,7 +9,7 @@ using WDE.Common.History;
 
 namespace WDE.Common.Managers
 {
-    public interface IDocument
+    public interface IDocument : System.IDisposable
     {
         string Title { get; }
         ICommand Undo { get; }

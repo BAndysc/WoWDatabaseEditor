@@ -36,12 +36,13 @@ namespace WDE.TrinityMySqlDatabase.Providers
 
         public DbAccess GetSettings() => DbAccess;
 
-        public void UpdateSettings(string? user, string? password, string? host, string? database)
+        public void UpdateSettings(string? user, string? password, string? host, int? port, string? database)
         {
-            DbAccess.DB = database;
+            DbAccess.Database = database;
             DbAccess.User = user;
             DbAccess.Password = password;
             DbAccess.Host = host;
+            DbAccess.Port = port;
             JsonSerializer ser = new Newtonsoft.Json.JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
             using (StreamWriter file = File.CreateText(@"database.json"))
             {
