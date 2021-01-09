@@ -62,6 +62,7 @@ namespace WoWDatabaseEditor.Managers
                     if (ActiveDocument == doc)
                         ActiveDocument = null;
                     _eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
+                    doc.Dispose();
                 });
                 documents[editor] = document;
                 OpenedDocuments.Add(document);

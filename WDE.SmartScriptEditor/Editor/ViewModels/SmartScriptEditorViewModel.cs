@@ -25,7 +25,7 @@ using WDE.SmartScriptEditor.Editor.UserControls;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class SmartScriptEditorViewModel : BindableBase
+    public class SmartScriptEditorViewModel : BindableBase, System.IDisposable
     {
         private readonly IDatabaseProvider database;
         private readonly IHistoryManager history;
@@ -425,7 +425,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 RedoCommand.RaiseCanExecuteChanged();
             };
             
-            eventAggregator.GetEvent<EventRequestGenerateSql>().Subscribe((args) =>
+            token = eventAggregator.GetEvent<EventRequestGenerateSql>().Subscribe((args) =>
             {
                 if (args.Item is SmartScriptSolutionItem)
                 {
@@ -436,6 +436,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     }
                 }
             });
+        }
+        SubscriptionToken token;
+
+        public void Dispose()
+        {
+            token.Dispose();
         }
 
         private bool anyEventSelected => Events.Any(e => e.IsSelected);
@@ -514,7 +520,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
             }
 
-            database.InstallScriptFor(_item.Entry, _item.SmartType, lines);
+            try
+            {
+                database.InstallScriptFor(_item.Entry, _item.SmartType, lines);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while saving script to the database: " + e.Message);
+            }
         }
 
         private AbstractSmartScriptLine GenerateSingleSai(int eventId, SmartEvent ev, SmartAction action, int link = 0, string comment = null)

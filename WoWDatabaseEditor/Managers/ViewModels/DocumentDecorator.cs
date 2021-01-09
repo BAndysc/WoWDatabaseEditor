@@ -54,5 +54,10 @@ namespace WoWDatabaseEditor.Managers.ViewModels
             closeAction(this);
             document.CloseCommand?.Execute(null);
         }
+
+        public void Dispose()
+        {
+            document.Dispose();
+        }
     }
 }

@@ -49,6 +49,7 @@ namespace WDE.SmartScriptEditor.Providers
                 History = vm.History,
                 CanClose = true
             };
+            editor.OnDispose += () => vm.Dispose();
 
             return editor;
         }

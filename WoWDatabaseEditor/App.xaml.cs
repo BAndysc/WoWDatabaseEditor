@@ -44,6 +44,7 @@ namespace WoWDatabaseEditor
              * The disadvantage is that assemblies cannot conflict with each other. If using AssemblyLoadContext
              * there would be no problem with for instance different versions of a package.
              */
+            Dictionary<string, string> assemblyToRequesting = new Dictionary<string, string>();
             string? executingAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
@@ -53,9 +54,14 @@ namespace WoWDatabaseEditor
                 var name = new AssemblyName(args.Name);
 
                 var requestingAssemblyPath = executingAssemblyLocation + "/" + args.RequestingAssembly.GetName().Name + ".dll";
-                
+
                 if (!File.Exists(requestingAssemblyPath))
-                    return null;
+                {
+                    if (!assemblyToRequesting.TryGetValue(args.RequestingAssembly.GetName().Name ?? "", out requestingAssemblyPath))
+                        return null;
+                }
+                
+                assemblyToRequesting.Add(name.Name ?? "", requestingAssemblyPath);
                 
                 var dependencyPathResolver = new AssemblyDependencyResolver(requestingAssemblyPath);
                 var path = dependencyPathResolver.ResolveAssemblyToPath(name);
