@@ -23,6 +23,12 @@ namespace WoWDatabaseEditor.Managers.ViewModels
         public ICommand Redo => document.Redo;
 
         public ICommand Save => document.Save;
+        
+        public ICommand Copy => document.Copy;
+
+        public ICommand Paste => document.Paste;
+
+        public ICommand Cut => document.Cut;
 
         public ICommand CloseCommand { get; private set; }
 

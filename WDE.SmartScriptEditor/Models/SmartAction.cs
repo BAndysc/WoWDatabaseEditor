@@ -1,5 +1,7 @@
 ﻿using SmartFormat;
 using System;
+using System.ComponentModel;
+using WDE.SmartScriptEditor.Editor.UserControls;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -7,11 +9,27 @@ namespace WDE.SmartScriptEditor.Models
     {
         public static readonly int SmartActionParametersCount = 6;
 
-        public SmartEvent _parent;
+        private SmartEvent _parent;
         public SmartEvent Parent
         {
             get { return _parent; }
-            set { _parent = value; }
+            set
+            {
+                if (_parent != null)
+                    _parent.PropertyChanged -= ParentPropertyChanged;
+                _parent = value;
+                value.PropertyChanged += ParentPropertyChanged;
+            }
+        }
+
+        private void ParentPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SmartEvent.IsSelected))
+            {
+                //if (!_parent.IsSelected)
+                //    IsSelected = false;
+                OnPropertyChanged(nameof(IsSelected));
+            }
         }
 
         private SmartSource _source;
@@ -24,6 +42,17 @@ namespace WDE.SmartScriptEditor.Models
                     _source.OnChanged -= SourceOnOnChanged;
                 _source = value;
                 _source.OnChanged += SourceOnOnChanged;
+            }
+        }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected || _parent.IsSelected;
+            set
+            {
+                _isSelected = value;
+                OnPropertyChanged();
             }
         }
 

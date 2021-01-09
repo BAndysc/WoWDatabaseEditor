@@ -30,94 +30,68 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
 
         public ICommand EditEventCommand
         {
-            get
-            {
-                return (ICommand)GetValue(EditEventCommandProperty);
-            }
-
-            set
-            {
-                SetValue(EditEventCommandProperty, value);
-            }
+            get => (ICommand)GetValue(EditEventCommandProperty);
+            set => SetValue(EditEventCommandProperty, value);
         }
 
-        public static DependencyProperty EditActionCommandProperty
+
+        public static DependencyProperty DeselectAllRequestProperty
             = DependencyProperty.Register(
-            "EditActionCommand",
-            typeof(ICommand),
-            typeof(SmartEventView));
+                nameof(DeselectAllRequest),
+                typeof(ICommand),
+                typeof(SmartEventView));
 
-        public ICommand EditActionCommand
+        public ICommand DeselectAllRequest
         {
-            get
-            {
-                return (ICommand)GetValue(EditActionCommandProperty);
-            }
-
-            set
-            {
-                SetValue(EditActionCommandProperty, value);
-            }
+            get => (ICommand)GetValue(DeselectAllRequestProperty);
+            set => SetValue(DeselectAllRequestProperty, value);
         }
 
-        public static DependencyProperty AddActionCommandProperty
+        public static DependencyProperty DeselectActionsOfDeselectedEventsRequestProperty
             = DependencyProperty.Register(
-            "AddActionCommand",
-            typeof(ICommand),
-            typeof(SmartEventView));
+                nameof(DeselectActionsOfDeselectedEventsRequest),
+                typeof(ICommand),
+                typeof(SmartEventView));
 
-        public ICommand AddActionCommand
+        public ICommand DeselectActionsOfDeselectedEventsRequest
         {
-            get
-            {
-                return (ICommand)GetValue(AddActionCommandProperty);
-            }
-
-            set
-            {
-                SetValue(AddActionCommandProperty, value);
-            }
+            get => (ICommand)GetValue(DeselectActionsOfDeselectedEventsRequestProperty);
+            set => SetValue(DeselectActionsOfDeselectedEventsRequestProperty, value);
         }
 
-        public static DependencyProperty DeleteActionCommandProperty
+        public static DependencyProperty IsSelectedProperty
             = DependencyProperty.Register(
-            "DeleteActionCommand",
-            typeof(ICommand),
-            typeof(SmartEventView));
+                nameof(IsSelected),
+                typeof(bool),
+                typeof(SmartEventView),
+                new PropertyMetadata(false));
 
-        public ICommand DeleteActionCommand
+        public bool IsSelected
         {
-            get { return (ICommand)GetValue(DeleteActionCommandProperty); }
-            set { SetValue(DeleteActionCommandProperty, value); }
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
         }
-
+        
         public SmartEventView()
         {
             InitializeComponent();
-
-            ActionsVieww.EditActionCommand = new DelegateCommand<SmartAction>(EditAction);
-            ActionsVieww.DeleteSmartActionCommand = new DelegateCommand<SmartAction>(DeleteAction);
         }
-
-        private void DeleteAction(SmartAction obj)
-        {
-            DeleteActionCommand?.Execute(obj);
-        }
-
-        private void EditAction(SmartAction action)
-        {
-            EditActionCommand?.Execute(action);
-        }
-
+        
         private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 2)
+            if (e.ClickCount == 1)
+            {
+                DeselectActionsOfDeselectedEventsRequest?.Execute(null);
+                if (!IsSelected)
+                {
+                    if (!Keyboard.IsKeyDown(Key.LeftCtrl))
+                        DeselectAllRequest?.Execute(null);
+                    IsSelected = true;   
+                }
+            }
+            else if (e.ClickCount == 2)
                 EditEventCommand?.Execute(DataContext);
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            AddActionCommand?.Execute(this.DataContext);
-        }
     }
 }

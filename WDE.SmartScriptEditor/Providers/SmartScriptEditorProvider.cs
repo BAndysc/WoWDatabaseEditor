@@ -43,6 +43,9 @@ namespace WDE.SmartScriptEditor.Providers
                 Undo = vm.UndoCommand,
                 Redo = vm.RedoCommand,
                 Save = vm.SaveCommand,
+                Copy = vm.CopyCommand,
+                Paste = vm.PasteCommand,
+                Cut = vm.CutCommand,
                 History = vm.History,
                 CanClose = true
             };

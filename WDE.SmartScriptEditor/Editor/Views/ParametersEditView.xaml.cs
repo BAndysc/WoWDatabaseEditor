@@ -1,4 +1,11 @@
-﻿using System.Windows;
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace WDE.SmartScriptEditor.Editor.Views
 {
@@ -10,17 +17,45 @@ namespace WDE.SmartScriptEditor.Editor.Views
         public ParametersEditView()
         {
             InitializeComponent();
+            
+            Loaded += OnLoaded;
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            FindVisualChild<TextBox>(Parameters.ItemContainerGenerator.ContainerFromIndex(0))?.Focus();
+        }
+        
+        public static T FindVisualChild<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null
+                        && child is T)
+                    {
+                        return (T)child;
+                    }
+
+                    T childItem = FindVisualChild<T>(child);
+                    if (childItem != null)
+                        return childItem;
+                }
+            }
+            return null;
+        }
+        
+        private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            DialogResult = false;
             Close();
         }
 
-        private void Cancel_OnClick(object sender, RoutedEventArgs e)
+        private void AcceptCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            DialogResult = false;
+            DialogResult = true;
             Close();
         }
     }

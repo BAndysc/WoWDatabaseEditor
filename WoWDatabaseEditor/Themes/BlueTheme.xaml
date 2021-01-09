@@ -23,11 +23,17 @@
     <SolidColorBrush x:Key="SmartScripts.Background" Color="#F5F6FC"/>
     <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#267171"/>
     <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="#F5F6FC"/>
+    <SolidColorBrush x:Key="SmartScripts.Action.Border" Color="#E9EFFB"/>
     <SolidColorBrush x:Key="SmartScripts.Action.Background" Color="#E9EFFB"/>
-    <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="#000000"/>
+    <SolidColorBrush x:Key="SmartScripts.Action.Selected.Border" Color="#F5C61F"/>
+    <SolidColorBrush x:Key="SmartScripts.Action.Selected.Background" Color="#FFF2BF"/>
+    <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="#FF282828"/>
     <SolidColorBrush x:Key="SmartScripts.Event.Background" Color="#F5F8FF"/>
-    <SolidColorBrush x:Key="SmartScripts.Event.Foreground" Color="#000000"/>
+    <SolidColorBrush x:Key="SmartScripts.Event.Foreground" Color="#FF282828"/>
     <SolidColorBrush x:Key="SmartScripts.Event.Border" Color="#BFCCE0"/>
+    <SolidColorBrush x:Key="SmartScripts.Event.Selected.Background" Color="#FFF5F2BF"/>
+    <SolidColorBrush x:Key="SmartScripts.Event.Selected.Foreground" Color="#FF282828"/>
+    <SolidColorBrush x:Key="SmartScripts.Event.Selected.Border" Color="#FFF5C61F"/>
     <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0"/>
     <!-- Content -->
     <SolidColorBrush x:Key="ContentSpecialBackground" Color="#FFD8D8DC" />

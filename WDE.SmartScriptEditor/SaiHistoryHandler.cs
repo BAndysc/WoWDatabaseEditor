@@ -10,7 +10,7 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor
 {
-    public class SaiHistoryHandler : HistoryHandler
+    public class SaiHistoryHandler : HistoryHandler, System.IDisposable
     {
         private readonly SmartScript _script;
 
@@ -18,9 +18,18 @@ namespace WDE.SmartScriptEditor
         {
             _script = script;
             _script.Events.CollectionChanged += Events_CollectionChanged;
+            _script.BulkEditingStarted += OnBulkEditingStarted;
+            _script.BulkEditingFinished += OnBulkEditingFinished;
 
             foreach (SmartEvent ev in _script.Events)
                 BindEvent(ev);
+        }
+
+        public void Dispose()
+        {
+            _script.Events.CollectionChanged -= Events_CollectionChanged;
+            _script.BulkEditingStarted -= OnBulkEditingStarted;
+            _script.BulkEditingFinished -= OnBulkEditingFinished;
         }
 
         private void Events_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

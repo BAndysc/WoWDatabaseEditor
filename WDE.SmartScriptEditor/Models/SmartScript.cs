@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
 using Prism.Ioc;
+using WDE.SmartScriptEditor.Editor.UserControls;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -18,6 +19,8 @@ namespace WDE.SmartScriptEditor.Models
         public readonly int EntryOrGuid;
         public readonly SmartScriptType SourceType;
         private readonly ISmartFactory smartFactory;
+        public event Action BulkEditingStarted = delegate {  };
+        public event Action<string> BulkEditingFinished = delegate {  };
 
         public SmartScript(SmartScriptSolutionItem item, ISmartFactory smartFactory)
         {
@@ -63,7 +66,29 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        private SmartAction SafeActionFactory(ISmartScriptLine line)
+        public void InsertFromClipboard(int index, IEnumerable<ISmartScriptLine> lines)
+        {
+            SmartEvent currentEvent = null;
+            int prevIndex = 0;
+            foreach (var line in lines)
+            {
+                if (currentEvent == null || prevIndex != line.Id)
+                {
+                    prevIndex = line.Id;
+                    currentEvent = SafeEventFactory(line);
+                    Events.Insert(index++, currentEvent);
+                }
+
+                if (line.ActionType != -1)
+                {
+                    var action = SafeActionFactory(line);
+                    if (action != null)
+                        currentEvent.AddAction(action);                    
+                }
+            }
+        }
+        
+        public SmartAction SafeActionFactory(ISmartScriptLine line)
         {
             try
             {
@@ -76,7 +101,7 @@ namespace WDE.SmartScriptEditor.Models
             return null;
         }
 
-        private SmartEvent SafeEventFactory(ISmartScriptLine line)
+        public SmartEvent SafeEventFactory(ISmartScriptLine line)
         {
             try
             {
@@ -87,6 +112,29 @@ namespace WDE.SmartScriptEditor.Models
                 System.Windows.MessageBox.Show($"Event {line.EventType} unknown, skipping action");
             }
             return null;
+        }
+        
+        public System.IDisposable BulkEdit(string name)
+        {
+            return new BulkEditing(this, name);
+        }
+
+        private class BulkEditing : System.IDisposable
+        {
+            private readonly SmartScript _smartScript;
+            private readonly string _name;
+
+            public BulkEditing(SmartScript smartScript, string name)
+            {
+                _smartScript = smartScript;
+                _name = name;
+                _smartScript.BulkEditingStarted.Invoke();
+            }
+
+            public void Dispose()
+            {
+                _smartScript.BulkEditingFinished.Invoke(_name);
+            }
         }
     }
 

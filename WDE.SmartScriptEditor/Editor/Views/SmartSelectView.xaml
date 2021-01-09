@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Helpers"
+             WindowStyle="ToolWindow"
              Height="440" Width="637" WindowStartupLocation="CenterScreen" helpers:FocusBehavior.FocusFirst="true"
              Background="{DynamicResource SmartScripts.Background}">
     <Grid Margin="6">

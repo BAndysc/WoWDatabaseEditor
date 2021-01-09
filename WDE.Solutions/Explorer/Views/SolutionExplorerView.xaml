@@ -5,6 +5,7 @@
              xmlns:views="clr-namespace:WDE.Solutions.Explorer.Views"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:dd="urn:gong-wpf-dragdrop"
+             xmlns:helpers="clr-namespace:WDE.Solutions.Explorer.Helpers"
              prism:ViewModelLocator.AutoWireViewModel="True" x:Name="UC">
     <UserControl.Resources>
 
@@ -127,8 +128,11 @@
                                 </MultiTrigger.Conditions>
                                 <Setter TargetName="PART_Header" Property="MinHeight" Value="19"/>
                             </MultiTrigger>
+                            <Trigger Property="helpers:MyTreeViewHelper.IsMouseDirectlyOverItem" Value="true">
+                                <Setter TargetName="Bd" Property="Background" Value="#c9def5" /><!--{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>-->
+                            </Trigger>
                             <Trigger Property="IsSelected" Value="true">
-                                <Setter TargetName="Bd" Property="Background" Value="#3399FF" /><!--{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>-->
+                                <Setter TargetName="Bd" Property="Background" Value="#3399ff" /><!--{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>-->
                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
                             </Trigger>
                             <MultiTrigger>

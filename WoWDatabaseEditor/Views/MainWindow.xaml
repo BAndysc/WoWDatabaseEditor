@@ -27,6 +27,15 @@
     <Window.Resources>
         <helpers:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Undo}" />
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Redo}" />
+        <KeyBinding Key="Z" Modifiers="Control+Shift" Command="{Binding WindowManager.ActiveDocument.Redo}" />
+        
+        <KeyBinding Key="C" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Copy}" />
+        <KeyBinding Key="V" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Paste}" />
+        <KeyBinding Key="X" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Cut}" />
+    </Window.InputBindings>
     <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands>
             <StackPanel Name="menuHolder" Orientation="Horizontal">
@@ -42,6 +51,10 @@
                     <MenuItem Header="_Edit">
                         <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z" Foreground="{DynamicResource MenuDefaultText}"/>
                         <MenuItem Header="_Redo" Command="{Binding WindowManager.ActiveDocument.Redo}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <Separator />
+                        <MenuItem Header="_Copy" Command="{Binding WindowManager.ActiveDocument.Copy}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="Cu_t" Command="{Binding WindowManager.ActiveDocument.Cut}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Paste" Command="{Binding WindowManager.ActiveDocument.Paste}" Foreground="{DynamicResource MenuDefaultText}"/>
                     </MenuItem>
                     <MenuItem Header="_View" ItemsSource="{Binding Windows}">
                         <MenuItem.ItemContainerStyle>

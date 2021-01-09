@@ -3,8 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
+             WindowStyle="ToolWindow"
              xmlns:views="clr-namespace:WDE.SmartScriptEditor.Editor.Views" Height="485.361" Width="455.457" WindowStartupLocation="CenterScreen"
              Background="{DynamicResource SmartScripts.Background}">
+    <Window.Resources>
+        <RoutedUICommand x:Key="CloseDialogCommand"/>
+        <RoutedUICommand x:Key="AcceptDialogCommand"/>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource CloseDialogCommand}" Executed="CommandBinding_OnExecuted"/>
+        <CommandBinding Command="{StaticResource AcceptDialogCommand}" Executed="AcceptCommandBinding_OnExecuted"/>
+    </Window.CommandBindings>  
+    <Window.InputBindings>
+        <KeyBinding Key="Enter" Command="{StaticResource AcceptDialogCommand}"></KeyBinding>
+        <KeyBinding Key="Escape" Command="{StaticResource CloseDialogCommand}"></KeyBinding>
+    </Window.InputBindings>
     <Grid Margin="6">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
@@ -13,7 +26,7 @@
         </Grid.RowDefinitions>
         <TextBlock Text="{Binding Readable}" Margin="0,0,0,10"></TextBlock>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
-            <ItemsControl ItemsSource="{Binding AllItems}">
+            <ItemsControl ItemsSource="{Binding AllItems}" x:Name="Parameters">
 
                 <ItemsControl.GroupStyle>
                     <GroupStyle>
@@ -22,7 +35,7 @@
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="GroupItem">
-                                            <GroupBox Header="{Binding Path=Name}" >
+                                            <GroupBox Header="{Binding Path=Name}" Focusable="False">
                                                 <ItemsPresenter />
                                             </GroupBox>
                                         </ControlTemplate>
@@ -51,8 +64,8 @@
             </ItemsControl>
         </ScrollViewer>
         <DockPanel Grid.Row="2" Margin="0,10,0,0" LastChildFill="True">
-            <Button Click="Cancel_OnClick" Content="  Cancel  " DockPanel.Dock="Left"></Button>
-            <Button Click="ButtonBase_OnClick" Content="  Ok  " DockPanel.Dock="Right"></Button>
+            <Button Command="{StaticResource CloseDialogCommand}" Content="  Cancel  " DockPanel.Dock="Left"></Button>
+            <Button Command="{StaticResource AcceptDialogCommand}" Content="  Ok  " DockPanel.Dock="Right"></Button>
             <Label></Label>
         </DockPanel>
     </Grid>

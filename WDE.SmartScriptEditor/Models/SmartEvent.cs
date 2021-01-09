@@ -24,6 +24,17 @@ namespace WDE.SmartScriptEditor.Models
 
         public int ActualId { get; set; }
 
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public Parameter CooldownMax
         {
             get { return _cooldownMax; }

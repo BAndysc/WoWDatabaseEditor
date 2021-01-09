@@ -1,44 +1,120 @@
 ﻿<UserControl x:Class="WDE.SmartScriptEditor.Editor.UserControls.SmartScriptView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
-             xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+             xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels"
+             xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Helpers"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" x:Name="Rooot"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300"
+             helpers:InputBindingsBehavior.TakesInputBindingPrecedence="True">
+    <UserControl.Resources>
+        <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <system:Boolean x:Key="FalseValue">False</system:Boolean>
+        <system:Boolean x:Key="TrueValue">True</system:Boolean>
+    </UserControl.Resources>
+    <UserControl.InputBindings>
+        <KeyBinding Key="Back" Command="{Binding DeleteSelected}" />
+        <KeyBinding Key="Delete" Command="{Binding DeleteSelected}" />
+        <KeyBinding Key="Enter" Command="{Binding EditSelected}" />
+        <KeyBinding Key="A" Modifiers="Control" Command="{Binding SelectAll}" />
+        <KeyBinding Key="Up" Command="{Binding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Key="Down" Command="{Binding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Key="Up" Modifiers="Control" Command="{Binding SelectionUp}" CommandParameter="{StaticResource TrueValue}"  />
+        <KeyBinding Key="Down" Modifiers="Control" Command="{Binding SelectionDown}" CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Key="Right" Command="{Binding SelectionRight}" />
+        <KeyBinding Key="Left" Command="{Binding SelectionLeft}" />
+    </UserControl.InputBindings>
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-        <DockPanel Background="{DynamicResource SmartScripts.Background}">
-            <Border Padding="7">
-                <DockPanel>
-                    <ListBox Background="Transparent" KeyDown="UIElement_OnKeyDown" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedItem}" ScrollViewer.CanContentScroll="False" HorizontalContentAlignment="Stretch" DockPanel.Dock="Top" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-                        <ListBox.Template>
-                            <ControlTemplate>
-                                <ItemsPresenter />
-                            </ControlTemplate>
-                        </ListBox.Template>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <local:SmartEventView PreviewMouseDown="UIElement_OnMouseDown" EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}" DeleteActionCommand="{Binding DataContext.DeleteAction, ElementName=Rooot}"  AddActionCommand="{Binding DataContext.AddAction, ElementName=Rooot}" EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"></local:SmartEventView>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <Button Margin="4,0,0,0" Content="New event" DockPanel.Dock="Top" Command="{Binding AddEvent}" VerticalAlignment="Top">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="OverridesDefaultStyle" Value="True"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </DockPanel>
-            </Border>
+        <DockPanel Background="{DynamicResource SmartScripts.Background}" LastChildFill="True">
+            <ItemsControl ItemsSource="{Binding Together}" IsHitTestVisible="True" DockPanel.Dock="Top" Margin="7,0,7,0">
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type models:SmartEvent}">
+                        <local:SmartEventView
+                            PreviewMouseDown="UIElement_OnMouseDown"
+                            IsHitTestVisible="True"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                            DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectActions, ElementName=Rooot}"
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type models:SmartAction}">
+                        <local:SmartActionView
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            DeselectAllEventsRequest="{Binding DataContext.DeselectAllEvents, ElementName=Rooot}"
+                            EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:NewActionViewModel}">
+                        <Button
+                            BorderThickness="0" Background="#E9EFFB"
+                            Foreground="#BFCCDE" Content="Add action"
+                            Command="{Binding DataContext.AddAction, ElementName=Rooot}"
+                            CommandParameter="{Binding}"
+                            Visibility="{Binding Path=Event, Converter={StaticResource NullToVisibilityConverter}}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <ContentPresenter HorizontalAlignment="Left"
+                                                                  VerticalAlignment="Center" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <local:SmartScriptPanelLayout Background="Transparent"
+                                                      DropItems="{Binding OnDropItems}"
+                                                      DropActions="{Binding OnDropActions}"
+                                                      IsItemsHost="True" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="local:SmartScriptPanelLayout.Selected"
+                                Value="{Binding IsSelected, Mode=TwoWay}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>
+            <Canvas Background="Transparent">
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="MouseDown">
+                        <b:InvokeCommandAction Command="{Binding DeselectAll}"/>
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+                <Button
+                    BorderThickness="0" Background="#E9EFFB"
+                    Foreground="#BFCCDE" Content="Add event"
+                    Margin="4,0,0,0"
+                    VerticalAlignment="Top"
+                    Command="{Binding AddEvent}">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="OverridesDefaultStyle" Value="True" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <ContentPresenter HorizontalAlignment="Left"
+                                                          VerticalAlignment="Center" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Canvas>
         </DockPanel>
     </ScrollViewer>
 </UserControl>
