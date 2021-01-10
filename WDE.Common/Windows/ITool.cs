@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using WDE.Common.Managers;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Windows
@@ -13,7 +14,7 @@ namespace WDE.Common.Windows
     {
         bool AllowMultiple { get; }
         string Name { get; }
-        ContentControl GetView();
+        ITool Provide();
 
         bool CanOpenOnStart  { get; }
     }

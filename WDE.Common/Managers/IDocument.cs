@@ -18,12 +18,8 @@ namespace WDE.Common.Managers
         ICommand Cut { get; }
         ICommand Paste { get; }
         ICommand Save { get; }
-
-        ICommand CloseCommand { get; }
+        ICommand CloseCommand { get; set;  }
         bool CanClose { get; }
-
         IHistoryManager History { get; }
-
-        ContentControl Content { get; }
     }
 }

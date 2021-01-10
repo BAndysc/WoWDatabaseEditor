@@ -17,6 +17,6 @@ namespace WDE.Common.Solution
     [NonUniqueProvider]
     public interface ISolutionItemEditorProvider<T> : ISolutionItemEditorProvider where T : ISolutionItem
     {
-        Document GetEditor(T item);
+        IDocument GetEditor(T item);
     }
 }

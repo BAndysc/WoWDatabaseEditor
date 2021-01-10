@@ -10,6 +10,5 @@ namespace WDE.Common
     [UniqueProvider]
     public interface ISolutionExplorer
     {
-        ContentControl GetSolutionExplorerView();
     }
 }
