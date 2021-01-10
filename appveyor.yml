@@ -1,4 +1,7 @@
-version: 1.0.{build}
+version: 0.1.{build}
+branches:
+  only:
+  - master
 configuration: Release
 platform: x64
 install:
@@ -10,3 +13,12 @@ build_script:
     7z a WoWDatabaseEditor.zip bin/wowdatabaseeditor/*
 artifacts:
 - path: WoWDatabaseEditor.zip
+  name: WoWDatabaseEditor.zip
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: /IVwC+zBHW7mliWiKN/q6M7iLf7K1TGoT1aSQuBjDH/syiNOCw9o0cl8lxWR8xqe
+  artifact: WoWDatabaseEditor.zip
+  prerelease: true
+  on:
+    branch: master
