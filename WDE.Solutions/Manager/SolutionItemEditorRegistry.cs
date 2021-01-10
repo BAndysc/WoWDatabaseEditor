@@ -27,13 +27,13 @@ namespace WDE.Solutions.Manager
             editorProviders.Add(typeof(T), provider);
         }
 
-        private Document GetEditor<T>(T item) where T : ISolutionItem
+        private IDocument GetEditor<T>(T item) where T : ISolutionItem
         {
             var x = editorProviders[item.GetType()] as ISolutionItemEditorProvider<T>;
             return x.GetEditor(item);
         }
 
-        public Document GetEditor(ISolutionItem item)
+        public IDocument GetEditor(ISolutionItem item)
         {
             return GetEditor((dynamic)item);
         }

@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using WDE.Common.Events;
 using WDE.Common.History;
 using Prism.Ioc;
@@ -21,19 +22,19 @@ namespace WDE.HistoryWindow.ViewModels
         public bool IsFromFuture { get; set; }
     }
 
-    internal class HistoryViewModel : BindableBase
+    internal class HistoryViewModel : BindableBase, ITool
     {
         public ObservableCollection<HistoryEvent> Items { get; set; } = new ObservableCollection<HistoryEvent>();
 
         private IDocument previousDocument;
 
-        private string _title;
-        public string Title
+        public string Title => "History";
+        private Visibility _visibility;
+        public Visibility Visibility
         {
-            get { return _title; }
-            set { SetProperty(ref _title, value); }
+            get => _visibility;
+            set => SetProperty(ref _visibility, value);
         }
-
         public HistoryViewModel(IEventAggregator eventAggregator)
         {
             eventAggregator.GetEvent<EventActiveDocumentChanged>().Subscribe(doc =>

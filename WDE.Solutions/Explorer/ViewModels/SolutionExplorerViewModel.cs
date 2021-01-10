@@ -5,16 +5,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-
+using System.Windows.Controls;
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Solution;
 using Prism.Ioc;
+using WDE.Common.Managers;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {
-    public class SolutionExplorerViewModel : BindableBase
+    public class SolutionExplorerViewModel : BindableBase, ITool
     {
         private readonly ISolutionItemNameRegistry itemNameRegistry;
         private readonly ISolutionManager _solutionManager;
@@ -112,6 +113,14 @@ namespace WDE.Solutions.Explorer.ViewModels
             var viewModel = new SolutionItemViewModel(itemNameRegistry, item);
             _itemToViewmodel.Add(item, viewModel);
             Root.Add(viewModel);
+        }
+
+        public string Title { get; } = "Solution explorer";
+        private Visibility _visibility;
+        public Visibility Visibility
+        {
+            get => _visibility;
+            set => SetProperty(ref _visibility, value);
         }
     }
 }

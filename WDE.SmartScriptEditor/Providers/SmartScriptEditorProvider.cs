@@ -29,29 +29,12 @@ namespace WDE.SmartScriptEditor.Providers
             this.containerProvider = containerProvider;
         }
 
-        public Document GetEditor(SmartScriptSolutionItem item)
+        public IDocument GetEditor(SmartScriptSolutionItem item)
         {
-            var view = new SmartScriptEditorView();
             var vm = containerProvider.Resolve<SmartScriptEditorViewModel>();
             vm.SetSolutionItem(item);
-            view.DataContext = vm;
-
-            Document editor = new Document
-            {
-                Title = solutionItemNameRegistry.GetName(item),
-                Content = view,
-                Undo = vm.UndoCommand,
-                Redo = vm.RedoCommand,
-                Save = vm.SaveCommand,
-                Copy = vm.CopyCommand,
-                Paste = vm.PasteCommand,
-                Cut = vm.CutCommand,
-                History = vm.History,
-                CanClose = true
-            };
-            editor.OnDispose += () => vm.Dispose();
-
-            return editor;
+            
+            return vm;
         }
     }
 }

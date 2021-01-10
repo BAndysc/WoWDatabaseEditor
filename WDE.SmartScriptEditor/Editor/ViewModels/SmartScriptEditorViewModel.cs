@@ -21,11 +21,13 @@ using WDE.Common.Solution;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
+using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Editor.UserControls;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class SmartScriptEditorViewModel : BindableBase, System.IDisposable
+    public class SmartScriptEditorViewModel : BindableBase, IDocument, System.IDisposable
     {
         private readonly IDatabaseProvider database;
         private readonly IHistoryManager history;
@@ -44,7 +46,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ObservableCollection<SmartEvent> Events => script.Events;
 
         public CompositeCollection Together { get; }= new CompositeCollection();
-        
+
+        public bool CanClose { get; } = true;
         public IHistoryManager History => history;
 
         public SmartEvent SelectedItem => Events.FirstOrDefault(ev => ev.IsSelected);
@@ -82,7 +85,24 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand SelectionLeft { get; set; }
         public DelegateCommand SelectAll { get; set; }
 
-        public SmartScriptEditorViewModel(IHistoryManager history, IDatabaseProvider database, IEventAggregator eventAggregator, ISmartDataManager smartDataManager, ISmartFactory smartFactory, IItemFromListProvider itemFromListProvider, ISmartTypeListProvider smartTypeListProvider, ISolutionItemNameRegistry itemNameRegistry)
+        public string Title { get; set;  }
+        public ICommand Undo => UndoCommand;
+        public ICommand Redo => RedoCommand;
+
+        public ICommand Copy => CopyCommand;
+        public ICommand Cut => CutCommand;
+        public ICommand Paste => PasteCommand;
+        public ICommand Save => SaveCommand;
+        public ICommand CloseCommand { get; set; }
+
+        public SmartScriptEditorViewModel(IHistoryManager history, 
+            IDatabaseProvider database, 
+            IEventAggregator eventAggregator, 
+            ISmartDataManager smartDataManager, 
+            ISmartFactory smartFactory, 
+            IItemFromListProvider itemFromListProvider,
+            ISmartTypeListProvider smartTypeListProvider, 
+            ISolutionItemNameRegistry itemNameRegistry)
         {
             this.history = history;
             this.database = database;
@@ -91,7 +111,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.itemFromListProvider = itemFromListProvider;
             this.smartTypeListProvider = smartTypeListProvider;
             this.itemNameRegistry = itemNameRegistry;
-            
+
             EditEvent = new DelegateCommand(EditEventCommand);
             DeselectActions = new DelegateCommand(() =>
             {
@@ -460,6 +480,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             Debug.Assert(_item == null);
             _item = item;
+            Title = itemNameRegistry.GetName(item);
 
             var lines = database.GetScriptFor(_item.Entry, _item.SmartType);
             script = new SmartScript(_item, smartFactory);

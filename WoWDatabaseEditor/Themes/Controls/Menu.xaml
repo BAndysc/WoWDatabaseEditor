@@ -20,7 +20,7 @@
     </Geometry>
 
     <!--Shadow-->
-    <DropShadowEffect x:Key="StandardDropShadow" ShadowDepth="3" Opacity="0.6" Direction="305" />
+    <DropShadowEffect x:Key="StandardDropShadow" ShadowDepth="5" Opacity="0.1" Direction="305" />
 
     <SolidColorBrush x:Key="DisabledMenuItemBrush" Color="#FF9A9A9A" />
 
@@ -267,6 +267,7 @@
     <Style x:Key="MetroMenuItem" TargetType="{x:Type MenuItem}">
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="8,2,10,2" />
+        <Setter Property="Foreground" Value="{DynamicResource MenuDefaultText}" />
         <Setter Property="Template" Value="{StaticResource {ComponentResourceKey ResourceId=SubmenuItemTemplateKey}}" />
         <Style.Resources>
             <!--Disabled all images placed inside a button - most common scenario-->

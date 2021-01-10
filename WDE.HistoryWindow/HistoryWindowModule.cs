@@ -12,6 +12,7 @@ using WDE.HistoryWindow.ViewModels;
 using WDE.HistoryWindow.Views;
 using Prism.Ioc;
 using Prism.Events;
+using WDE.Common.Managers;
 using WDE.Module.Attributes;
 using WDE.Module;
 
@@ -27,16 +28,14 @@ namespace WDE.HistoryWindow
             this.eventAggregator = eventAggregator;
         }
         
-        public ContentControl GetView()
-        {
-            var view = new HistoryView();
-            view.DataContext = new HistoryViewModel(eventAggregator);
-            return view;
-        }
-
         public bool AllowMultiple => false;
 
         public string Name => "History view";
+
+        public ITool Provide()
+        {
+            return new HistoryViewModel(eventAggregator);
+        }
 
         public bool CanOpenOnStart => false;
     }

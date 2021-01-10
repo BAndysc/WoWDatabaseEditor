@@ -8,11 +8,8 @@ using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
-using Prism.Ioc;
 using Prism.Commands;
-using System.Windows.Controls;
 using System.Windows.Input;
-using WoWDatabaseEditor.Managers.ViewModels;
 
 namespace WoWDatabaseEditor.Managers
 {
@@ -28,7 +25,6 @@ namespace WoWDatabaseEditor.Managers
         }
         
         public DelegateCommand<IDocument> ActivateDocument { get; }
-        
         private IDocument? _activeDocument;
         public IDocument? ActiveDocument
         {
@@ -36,8 +32,6 @@ namespace WoWDatabaseEditor.Managers
             set {
                 if (value == null && _activeDocument != null && OpenedDocuments.Contains(_activeDocument))
                     return;
-                if (value != null && documents.ContainsKey(value))
-                    value = documents[value];
                 SetProperty(ref _activeDocument, value);
                 _eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
             }
@@ -45,29 +39,22 @@ namespace WoWDatabaseEditor.Managers
 
         public ObservableCollection<IDocument> OpenedDocuments { get; } = new ObservableCollection<IDocument>();
         public ObservableCollection<ITool> OpenedTools { get; } = new ObservableCollection<ITool>();         
-        private Dictionary<Type, ToolWindow> Opened { get; } = new Dictionary<Type, ToolWindow>();
+        private Dictionary<Type, ITool> Opened { get; } = new Dictionary<Type, ITool>();
 
-        private Dictionary<IDocument, DocumentDecorator> documents = new();
-        
         public void OpenDocument(IDocument editor)
         {
-            if (documents.ContainsKey(editor))
-                ActiveDocument = documents[editor];
-            else
+            if (!OpenedDocuments.Contains(editor))
             {
-                var document = new DocumentDecorator(editor, doc =>
+                var origCommand = editor.CloseCommand;
+                editor.CloseCommand = new Command(() =>
                 {
-                    documents.Remove(editor);
-                    OpenedDocuments.Remove(doc);
-                    if (ActiveDocument == doc)
-                        ActiveDocument = null;
+                    origCommand?.Execute(null);
+                    OpenedDocuments.Remove(editor);
                     _eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
-                    doc.Dispose();
-                });
-                documents[editor] = document;
-                OpenedDocuments.Add(document);
-                ActiveDocument = document;   
+                }, () => origCommand?.CanExecute(null) ?? true);
+                OpenedDocuments.Add(editor);
             }
+            ActiveDocument = editor;
         }
 
         public void OpenTool(IToolProvider provider)
@@ -81,14 +68,38 @@ namespace WoWDatabaseEditor.Managers
                 }
             }
 
-            var toolWindow = new ToolWindow(provider.Name, provider.GetView());
+            var tool = provider.Provide();
             
             if (!provider.AllowMultiple)
-                Opened.Add(provider.GetType(), toolWindow);
+                Opened.Add(provider.GetType(), tool);
 
-            OpenedTools.Add(toolWindow);
+            OpenedTools.Add(tool);
         }
 
+        private class Command : ICommand
+        {
+            public readonly Func<bool> canExecute;
+            public readonly Action action;
+
+            public Command(Action action, Func<bool> canExecute)
+            {
+                this.action = action;
+                this.canExecute = canExecute;
+            }
+
+            public bool CanExecute(object? parameter)
+            {
+                return canExecute.Invoke();
+            }
+
+            public void Execute(object? parameter)
+            {
+                action();
+            }
+
+            public event EventHandler? CanExecuteChanged;
+        }
+        
         public class DocumentClosedEvent : PubSubEvent<IDocument> {}
     }
 }

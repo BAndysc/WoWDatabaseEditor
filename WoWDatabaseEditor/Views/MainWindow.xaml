@@ -8,6 +8,7 @@
         xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
         xmlns:viewModels="clr-namespace:WoWDatabaseEditor.ViewModels"
         xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+        xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
         Style="{DynamicResource MainWindowStyle}"
         Title="{Binding Title}"
         WindowStartupLocation="CenterScreen"
@@ -41,47 +42,40 @@
             <StackPanel Name="menuHolder" Orientation="Horizontal">
                 <Menu DockPanel.Dock="Top" Margin="2">
                     <MenuItem Header="_File">
-                        <MenuItem Header="_Load" Command="{Binding ExecuteCommandNew}" Foreground="{DynamicResource MenuDefaultText}"/>
-                        <MenuItem Header="_Save" Command="{Binding WindowManager.ActiveDocument.Save}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Load" Command="{Binding ExecuteCommandNew}" />
+                        <MenuItem Header="_Save" Command="{Binding WindowManager.ActiveDocument.Save}" />
                         <Separator />
-                        <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}" />
                         <Separator />
-                        <MenuItem Header="_Exit"  Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Exit"  />
                     </MenuItem>
                     <MenuItem Header="_Edit">
-                        <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z" Foreground="{DynamicResource MenuDefaultText}"/>
-                        <MenuItem Header="_Redo" Command="{Binding WindowManager.ActiveDocument.Redo}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z" />
+                        <MenuItem Header="_Redo" Command="{Binding WindowManager.ActiveDocument.Redo}" />
                         <Separator />
-                        <MenuItem Header="_Copy" Command="{Binding WindowManager.ActiveDocument.Copy}" Foreground="{DynamicResource MenuDefaultText}"/>
-                        <MenuItem Header="Cu_t" Command="{Binding WindowManager.ActiveDocument.Cut}" Foreground="{DynamicResource MenuDefaultText}"/>
-                        <MenuItem Header="_Paste" Command="{Binding WindowManager.ActiveDocument.Paste}" Foreground="{DynamicResource MenuDefaultText}"/>
+                        <MenuItem Header="_Copy" Command="{Binding WindowManager.ActiveDocument.Copy}" />
+                        <MenuItem Header="Cu_t" Command="{Binding WindowManager.ActiveDocument.Cut}" />
+                        <MenuItem Header="_Paste" Command="{Binding WindowManager.ActiveDocument.Paste}" />
                     </MenuItem>
                     <MenuItem Header="_View" ItemsSource="{Binding Windows}">
                         <MenuItem.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}">
+                            <Style TargetType="{x:Type MenuItem}"  BasedOn="{StaticResource MetroMenuItem}">
                                 <Setter Property="Command" Value="{Binding Command}" />
+                                <Setter Property="Header" Value="{Binding Header}" />
+
                             </Style>
                         </MenuItem.ItemContainerStyle>
-                        <MenuItem.ItemTemplate>
-                            <HierarchicalDataTemplate DataType="{x:Type viewModels:MenuItemViewModel}" ItemsSource="{Binding Path=MenuItems}">
-                                <TextBlock Text="{Binding Header}"/>
-                            </HierarchicalDataTemplate>
-                        </MenuItem.ItemTemplate>
                     </MenuItem>
                     <MenuItem Header="_Window" ItemsSource="{Binding WindowManager.OpenedDocuments}">
                         <MenuItem.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}">
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
+                                <Setter Property="Header" Value="{Binding Title}"/>
                                 <Setter Property="Command" Value="{Binding ElementName=rootWindow, Path=DataContext.WindowManager.ActivateDocument}" />
                                 <Setter Property="CommandParameter" Value="{Binding}" />
                             </Style>
                         </MenuItem.ItemContainerStyle>
-                        <MenuItem.ItemTemplate>
-                            <HierarchicalDataTemplate>
-                                <TextBlock Text="{Binding Title}"/>
-                            </HierarchicalDataTemplate>
-                        </MenuItem.ItemTemplate>
                     </MenuItem>
-                    <MenuItem Header="_Help" Foreground="{DynamicResource MenuDefaultText}">
+                    <MenuItem Header="_Help" >
                         <MenuItem Header="_About" Command="{Binding About}"></MenuItem>
                     </MenuItem>
                 </Menu>
@@ -99,18 +93,24 @@
         </DataTemplate>
     </Controls:MetroWindow.TitleTemplate>
     <DockPanel>
-        <DockingManager AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
+        <StatusBar DockPanel.Dock="Bottom" Height="20" Background="{DynamicResource StatusBarBackground}" VerticalAlignment="Center">
+            <TextBlock Foreground="{DynamicResource StatusBarForeground}" HorizontalAlignment="Left" VerticalAlignment="Center">WoW Database Editor</TextBlock>
+        </StatusBar>
+        <DockingManager 
+            AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
 
             <DockingManager.LayoutItemTemplateSelector>
                 <views:PaneDocumentTemplateSelector>
                     <views:PaneDocumentTemplateSelector.DocumentTemplate>
-                        <DataTemplate><ContentControl Content="{Binding Content}">
+                        <DataTemplate>
+                            <ContentControl utils:ViewBind.Model="{Binding}">
                             </ContentControl>
                         </DataTemplate>
                     </views:PaneDocumentTemplateSelector.DocumentTemplate>
                     <views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
-                        <DataTemplate><ContentControl Content="{Binding Content.Content}">
+                        <DataTemplate>
+                            <ContentControl utils:ViewBind.Model="{Binding}" DataContext="{Binding Content}">
                             </ContentControl>
                         </DataTemplate>
                     </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
@@ -127,9 +127,5 @@
             </DockingManager.LayoutItemContainerStyle>
         </DockingManager>
     </DockPanel>
-    <!--<Grid>
-        <ContentControl prism:RegionManager.RegionName="ContentRegion" >
-        </ContentControl>
-    </Grid>-->
 </Controls:MetroWindow>
 

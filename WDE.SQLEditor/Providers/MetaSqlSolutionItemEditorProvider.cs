@@ -18,20 +18,9 @@ namespace WDE.SQLEditor.Providers
             this.sqlGeneratorsRegistry = sqlGeneratorsRegistry;
         }
 
-        public Document GetEditor(MetaSolutionSQL item)
+        public IDocument GetEditor(MetaSolutionSQL item)
         {
-            var view = new SqlEditorView();
-            var vm = new SqlEditorViewModel(sqlGeneratorsRegistry.Value.GenerateSql(item as MetaSolutionSQL));
-            view.DataContext = vm;
-
-            Document editor = new Document();
-            editor.Title = "Sql output";
-            editor.Content = view;
-            editor.CanClose = true;
-            editor.Undo = new DelegateCommand(() => { }, () => false);
-            editor.Redo = new DelegateCommand(() => { }, () => false);
-
-            return editor;
+            return new SqlEditorViewModel(sqlGeneratorsRegistry.Value.GenerateSql(item as MetaSolutionSQL));
         }
     }
 }
