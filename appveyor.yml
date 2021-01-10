@@ -1,0 +1,12 @@
+version: 1.0.{build}
+configuration: Release
+platform: x64
+install:
+- cmd: git submodule update --init --recursive
+build_script:
+- cmd: >-
+    dotnet publish -c Release -r win-x64 --self-contained false -f net5.0-windows -o bin/wowdatabaseeditor/
+
+    7z a WoWDatabaseEditor.zip bin/wowdatabaseeditor/*
+artifacts:
+- path: WoWDatabaseEditor.zip
