@@ -23,6 +23,9 @@
     <ProjectReference Include="..\WDE.Module\WDE.Module.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AsyncAwaitBestPractices.MVVM">
+      <Version>5.0.2</Version>
+    </PackageReference>
     <PackageReference Include="CommonServiceLocator">
       <Version>2.0.5</Version>
     </PackageReference>
