@@ -1,12 +1,7 @@
 version: 0.1.{build}
-branches:
-  only:
-  - master
 image: Visual Studio 2019
 configuration: Release
 platform: x64
-install:
-- cmd: git submodule update --init --recursive
 build_script:
 - cmd: >-
     dotnet publish -c Release -r win-x64 --self-contained false -f net5.0-windows -o bin/wowdatabaseeditor/
@@ -15,11 +10,3 @@ build_script:
 artifacts:
 - path: WoWDatabaseEditor.zip
   name: WoWDatabaseEditor.zip
-deploy:
-- provider: GitHub
-  auth_token:
-    secure: /IVwC+zBHW7mliWiKN/q6M7iLf7K1TGoT1aSQuBjDH/syiNOCw9o0cl8lxWR8xqe
-  artifact: WoWDatabaseEditor.zip
-  prerelease: true
-  on:
-    branch: master
