@@ -6,6 +6,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:helpers="clr-namespace:WDE.Solutions.Explorer.Helpers"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              prism:ViewModelLocator.AutoWireViewModel="True" x:Name="UC">
     <UserControl.Resources>
 
@@ -190,7 +191,7 @@
     <Grid>
 
 
-        <TreeView x:Name="tv" ItemsSource="{Binding Root}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
+        <TreeView x:Name="tv" ItemsSource="{Binding Root}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}">
             
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectedItemChanged">
@@ -204,6 +205,8 @@
             <TreeView.ItemContainerStyle>
                 <Style BasedOn="{StaticResource TreeViewFullRow}" TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+
                     <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
                     <!--<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -223,9 +226,31 @@
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding ExtraId}" FontFamily="Consolas" Background="{DynamicResource ContentSpecialBackground}" Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
-                        </TextBlock>
-                        <TextBlock Text="{Binding Name}" />
+                        <Image Width="14" Height="14" Margin="0,0,6,0">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsContainer}">
+                                            <DataTrigger.Value><system:Boolean>True</system:Boolean></DataTrigger.Value>
+                                            <Setter Property="Source" Value="{DynamicResource Folder}"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="Source" Value="{DynamicResource File}"></Setter>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                        <Label Padding="2" VerticalContentAlignment="Center" Content="{Binding ExtraId}" FontFamily="Consolas" Background="{DynamicResource ContentSpecialBackground}" Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ExtraId}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>       
+                        </Label>
+                        <Label Margin="0,0,0,0" Padding="0,0,0,0" VerticalContentAlignment="Center" Content="{Binding Name}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>

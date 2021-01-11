@@ -14,7 +14,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         private ISolutionItemNameRegistry itemNameRegistry;
 
         private readonly ISolutionItem _item;
-        private readonly SolutionItemViewModel _parent;
+        private SolutionItemViewModel _parent;
 
         private readonly ObservableCollection<SolutionItemViewModel> _children;
         public ObservableCollection<SolutionItemViewModel> Children => _children;
@@ -26,14 +26,24 @@ namespace WDE.Solutions.Explorer.ViewModels
         public bool IsContainer => _item.IsContainer;
         public bool IsExportable => _item.IsExportable;
         public ISolutionItem Item => _item;
-        public SolutionItemViewModel Parent => _parent;
+        public SolutionItemViewModel Parent
+        {
+            get => _parent;
+            set => _parent = value;
+        }
 
         private bool _isSelected;
-
         public bool IsSelected
         {
-            get { return _isSelected; }
-            set { SetProperty(ref _isSelected, value); }
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
+        }
+        
+        private bool _isExpanded;
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => SetProperty(ref _isExpanded, value);
         }
 
         public SolutionItemViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionItem item) : this(itemNameRegistry, item, null)
@@ -58,8 +68,11 @@ namespace WDE.Solutions.Explorer.ViewModels
                 item.Items.CollectionChanged += (sender, args) =>
                 {
                     if (args.NewItems != null)
+                    {
+                        int i = 0;
                         foreach (object obj in args.NewItems)
-                            AddItem(obj as ISolutionItem);
+                            AddItem(obj as ISolutionItem, args.NewStartingIndex + i);
+                    }
 
                     if (args.OldItems != null)
                         foreach (object obj in args.OldItems)
@@ -72,11 +85,21 @@ namespace WDE.Solutions.Explorer.ViewModels
             }
         }
 
-        private void AddItem(ISolutionItem item)
+        private void AddItem(ISolutionItem item, int index = -1)
         {
-            var viewModel = new SolutionItemViewModel(itemNameRegistry, item, this);
-            _children.Add(viewModel);
-            _itemToViewmodel.Add(item, viewModel);
+            if (!_itemToViewmodel.TryGetValue(item, out var viewModel))
+            {
+                viewModel = new SolutionItemViewModel(itemNameRegistry, item, this);
+                _itemToViewmodel[item] = viewModel;
+            }
+            else
+                viewModel.Parent = this;
+            _children.Insert(index < 0 ? _children.Count : index, viewModel);
+        }
+
+        public void AddViewModel(SolutionItemViewModel sourceItem)
+        {
+            _itemToViewmodel[sourceItem.Item] = sourceItem;
         }
     }
 }
