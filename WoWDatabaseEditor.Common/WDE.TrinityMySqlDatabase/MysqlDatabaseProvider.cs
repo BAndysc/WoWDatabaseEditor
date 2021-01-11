@@ -199,7 +199,7 @@ namespace WDE.TrinityMySqlDatabase
                     Name = "Trinity",
                     ProviderName = "MySqlConnector",
                     ConnectionString =
-                        $"Server={access.Host};Port={access.Port ?? 3306};Database={access.Database};Uid={access.User};Pwd={access.Password};"
+                        $"Server={access.Host};Port={access.Port ?? 3306};Database={access.Database};Uid={access.User};Pwd={access.Password};AllowUserVariables=True"
                 }
             };
         }

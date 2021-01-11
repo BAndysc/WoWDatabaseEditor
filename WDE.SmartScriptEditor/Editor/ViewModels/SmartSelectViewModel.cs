@@ -1,53 +1,36 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Windows.Data;
-
+using Prism.Mvvm;
 using WDE.SmartScriptEditor.Data;
-using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartSelectViewModel : BindableBase
     {
-        private readonly Func<SmartGenericJsonData, bool> _predicate;
-        private readonly ObservableCollection<SmartItem> _allItems = new ObservableCollection<SmartItem>();
+        private readonly ObservableCollection<SmartItem> allItems = new();
 
-        private CollectionViewSource _items;
-        private SmartItem _selectedItem;
-        private string _searchBox;
+        private readonly CollectionViewSource items;
+        private readonly Func<SmartGenericJsonData, bool> predicate;
+        private string searchBox;
+        private SmartItem selectedItem;
 
-        public ICollectionView AllItems => _items.View;
-
-        public string SearchBox
+        public SmartSelectViewModel(string file,
+            SmartType type,
+            Func<SmartGenericJsonData, bool> predicate,
+            ISmartDataManager smartDataManager)
         {
-            get { return _searchBox; }
-            set { SetProperty(ref _searchBox, value); _items.View.Refresh(); }
-        }
-
-        public SmartItem SelectedItem
-        {
-            get { return _selectedItem; }
-            set { SetProperty(ref _selectedItem, value);  }
-        }
-
-        public SmartSelectViewModel(string file, SmartType type, Func<SmartGenericJsonData, bool> predicate, ISmartDataManager smartDataManager)
-        {
-            _predicate = predicate;
+            this.predicate = predicate;
             string group = null;
-            foreach (string line in File.ReadLines("SmartData/" + file))
-            {
+            foreach (var line in File.ReadLines("SmartData/" + file))
                 if (line.IndexOf(" ", StringComparison.Ordinal) == 0)
                 {
                     if (!smartDataManager.Contains(type, line.Trim()))
                         continue;
 
-                    SmartItem i = new SmartItem();
+                    var i = new SmartItem();
                     var data = smartDataManager.GetDataByName(type, line.Trim());
 
                     i.Group = group;
@@ -57,43 +40,56 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     i.Deprecated = data.Deprecated;
                     i.Data = data;
 
-                    _allItems.Add(i);
+                    allItems.Add(i);
                 }
                 else
-                {
-                    group = line;
-                }
-            }
+                    @group = line;
 
-            _items = new CollectionViewSource();
-            _items.Source = _allItems;
-            _items.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
-            _items.Filter += ItemsOnFilter;
+            items = new CollectionViewSource();
+            items.Source = allItems;
+            items.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
+            items.Filter += ItemsOnFilter;
 
-            if (_items.View.MoveCurrentToFirst())
+            if (items.View.MoveCurrentToFirst()) SelectedItem = items.View.CurrentItem as SmartItem;
+        }
+
+        public ICollectionView AllItems => items.View;
+
+        public string SearchBox
+        {
+            get => searchBox;
+            set
             {
-                SelectedItem = _items.View.CurrentItem as SmartItem;
+                SetProperty(ref searchBox, value);
+                items.View.Refresh();
             }
+        }
+
+        public SmartItem SelectedItem
+        {
+            get => selectedItem;
+            set => SetProperty(ref selectedItem, value);
         }
 
         private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
         {
             var item = filterEventArgs.Item as SmartItem;
 
-            if (_predicate != null && !_predicate(item.Data))
+            if (predicate != null && !predicate(item.Data))
                 filterEventArgs.Accepted = false;
             else
-                filterEventArgs.Accepted = string.IsNullOrEmpty(SearchBox) || item.Name.ToLower().Contains(SearchBox.ToLower());
+                filterEventArgs.Accepted =
+                    string.IsNullOrEmpty(SearchBox) || item.Name.ToLower().Contains(SearchBox.ToLower());
         }
     }
 
     public class SmartItem
     {
+        public SmartGenericJsonData Data;
         public string Name { get; set; }
         public bool Deprecated { get; set; }
         public string Help { get; set; }
         public int Id { get; set; }
         public string Group { get; set; }
-        public SmartGenericJsonData Data;
     }
 }

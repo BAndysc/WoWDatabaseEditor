@@ -1,30 +1,29 @@
 ﻿<Window x:Class="WDE.SmartScriptEditor.Editor.Views.ParametersEditView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:prism="http://prismlibrary.com/"
-             xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
-             WindowStyle="ToolWindow"
-             xmlns:views="clr-namespace:WDE.SmartScriptEditor.Editor.Views" Height="485.361" Width="455.457" WindowStartupLocation="CenterScreen"
-             Background="{DynamicResource SmartScripts.Background}">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="ToolWindow"
+        xmlns:views="clr-namespace:WDE.SmartScriptEditor.Editor.Views" Height="485.361" Width="455.457"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource SmartScripts.Background}">
     <Window.Resources>
-        <RoutedUICommand x:Key="CloseDialogCommand"/>
-        <RoutedUICommand x:Key="AcceptDialogCommand"/>
+        <RoutedUICommand x:Key="CloseDialogCommand" />
+        <RoutedUICommand x:Key="AcceptDialogCommand" />
     </Window.Resources>
     <Window.CommandBindings>
-        <CommandBinding Command="{StaticResource CloseDialogCommand}" Executed="CommandBinding_OnExecuted"/>
-        <CommandBinding Command="{StaticResource AcceptDialogCommand}" Executed="AcceptCommandBinding_OnExecuted"/>
-    </Window.CommandBindings>  
+        <CommandBinding Command="{StaticResource CloseDialogCommand}" Executed="CommandBinding_OnExecuted" />
+        <CommandBinding Command="{StaticResource AcceptDialogCommand}" Executed="AcceptCommandBinding_OnExecuted" />
+    </Window.CommandBindings>
     <Window.InputBindings>
-        <KeyBinding Key="Enter" Command="{StaticResource AcceptDialogCommand}"></KeyBinding>
-        <KeyBinding Key="Escape" Command="{StaticResource CloseDialogCommand}"></KeyBinding>
+        <KeyBinding Key="Enter" Command="{StaticResource AcceptDialogCommand}" />
+        <KeyBinding Key="Escape" Command="{StaticResource CloseDialogCommand}" />
     </Window.InputBindings>
     <Grid Margin="6">
         <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
-            <RowDefinition/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="32" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding Readable}" Margin="0,0,0,10"></TextBlock>
+        <TextBlock Text="{Binding Readable}" Margin="0,0,0,10" />
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
             <ItemsControl ItemsSource="{Binding AllItems}" x:Name="Parameters">
 
@@ -53,9 +52,9 @@
                                 <Style TargetType="views:ParameterEditorView">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Parameter.Name}" Value="empty">
-                                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                            <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
-                                    </Style.Triggers>   
+                                    </Style.Triggers>
                                 </Style>
                             </views:ParameterEditorView.Style>
                         </views:ParameterEditorView>
@@ -64,9 +63,9 @@
             </ItemsControl>
         </ScrollViewer>
         <DockPanel Grid.Row="2" Margin="0,10,0,0" LastChildFill="True">
-            <Button Command="{StaticResource CloseDialogCommand}" Content="  Cancel  " DockPanel.Dock="Left"></Button>
-            <Button Command="{StaticResource AcceptDialogCommand}" Content="  Ok  " DockPanel.Dock="Right"></Button>
-            <Label></Label>
+            <Button Command="{StaticResource CloseDialogCommand}" Content="  Cancel  " DockPanel.Dock="Left" />
+            <Button Command="{StaticResource AcceptDialogCommand}" Content="  Ok  " DockPanel.Dock="Right" />
+            <Label />
         </DockPanel>
     </Grid>
 </Window>

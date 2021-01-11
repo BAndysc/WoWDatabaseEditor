@@ -24,14 +24,17 @@
         <KeyBinding Key="A" Modifiers="Control" Command="{Binding SelectAll}" />
         <KeyBinding Key="Up" Command="{Binding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
         <KeyBinding Key="Down" Command="{Binding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
-        <KeyBinding Key="Up" Modifiers="Control" Command="{Binding SelectionUp}" CommandParameter="{StaticResource TrueValue}"  />
-        <KeyBinding Key="Down" Modifiers="Control" Command="{Binding SelectionDown}" CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Key="Up" Modifiers="Control" Command="{Binding SelectionUp}"
+                    CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Key="Down" Modifiers="Control" Command="{Binding SelectionDown}"
+                    CommandParameter="{StaticResource TrueValue}" />
         <KeyBinding Key="Right" Command="{Binding SelectionRight}" />
         <KeyBinding Key="Left" Command="{Binding SelectionLeft}" />
     </UserControl.InputBindings>
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <DockPanel Background="{DynamicResource SmartScripts.Background}" LastChildFill="True">
-            <ItemsControl ItemsSource="{Binding Together}" IsHitTestVisible="True" DockPanel.Dock="Top" Margin="7,0,7,0">
+            <ItemsControl ItemsSource="{Binding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
+                          Margin="7,0,7,0">
                 <ItemsControl.Resources>
                     <DataTemplate DataType="{x:Type models:SmartEvent}">
                         <local:SmartEventView
@@ -91,7 +94,7 @@
             <Canvas Background="Transparent" MinHeight="30">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="MouseDown">
-                        <b:InvokeCommandAction Command="{Binding DeselectAll}"/>
+                        <b:InvokeCommandAction Command="{Binding DeselectAll}" />
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
                 <Button

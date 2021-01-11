@@ -4,14 +4,11 @@ using System.Windows.Input;
 namespace WDE.SmartScriptEditor.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for SmartSelectView.xaml
+    ///     Interaction logic for SmartSelectView.xaml
     /// </summary>
     public partial class SmartSelectView : Window
     {
-        public SmartSelectView()
-        {
-            InitializeComponent();
-        }
+        public SmartSelectView() { InitializeComponent(); }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
@@ -27,14 +24,13 @@ namespace WDE.SmartScriptEditor.Editor.Views
 
         private void Control_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            DialogResult = (Items.SelectedItem != null);
+            DialogResult = Items.SelectedItem != null;
             Close();
         }
 
         private void TextBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
-            {
                 if (Items.Items.Count > 0)
                 {
                     if (Items.SelectedIndex == -1)
@@ -42,7 +38,6 @@ namespace WDE.SmartScriptEditor.Editor.Views
 
                     Control_OnMouseDoubleClick(null, null);
                 }
-            }
         }
     }
 }

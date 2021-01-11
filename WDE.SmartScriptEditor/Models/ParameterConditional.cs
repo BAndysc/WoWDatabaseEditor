@@ -8,11 +8,6 @@ namespace WDE.SmartScriptEditor.Models
 {
     public abstract class ParameterConditional
     {
-        public Parameter CompareTo { get; set; }
-        public Parameter Compared { get; set; }
-        public WarningType WarningType { get; set; }
-        public string Description { get; set; }
-
         protected ParameterConditional(WarningType warningType, string description)
         {
             WarningType = warningType;
@@ -25,7 +20,10 @@ namespace WDE.SmartScriptEditor.Models
             WarningType = warningType;
         }
 
-        protected ParameterConditional(Parameter compared, Parameter compareTo, WarningType warningType, string description = null)
+        protected ParameterConditional(Parameter compared,
+            Parameter compareTo,
+            WarningType warningType,
+            string description = null)
         {
             Compared = compared;
             CompareTo = compareTo;
@@ -33,23 +31,25 @@ namespace WDE.SmartScriptEditor.Models
             Description = description;
         }
 
-        protected ParameterConditional(Parameter compared, int value, WarningType warningType, string description = null) : this(compared, new Parameter(value.ToString()), warningType, description)
+        protected ParameterConditional(Parameter compared,
+            int value,
+            WarningType warningType,
+            string description = null) : this(compared, new Parameter(value.ToString()), warningType, description)
         {
         }
 
-        public void SetCompareTo(Parameter parameter)
-        {
-            CompareTo = parameter;
-        }
+        public Parameter CompareTo { get; set; }
+        public Parameter Compared { get; set; }
+        public WarningType WarningType { get; set; }
+        public string Description { get; set; }
 
-        public void SetCompareTo(int parametr)
-        {
-            SetCompareTo(new Parameter(parametr.ToString()));
-        }
+        public void SetCompareTo(Parameter parameter) { CompareTo = parameter; }
+
+        public void SetCompareTo(int parametr) { SetCompareTo(new Parameter(parametr.ToString())); }
 
         public void SetDescription(string error)
         {
-            Description = Smart.Format(error, new { compared = Compared.Name, compareto = CompareTo.Name });
+            Description = Smart.Format(error, new {compared = Compared.Name, compareto = CompareTo.Name});
         }
 
         public abstract bool Validate();
@@ -61,28 +61,29 @@ namespace WDE.SmartScriptEditor.Models
                 case "CompareValue":
                     return new ParameterConditionalCompareValue(parameter);
             }
+
             return null;
         }
     }
 
     public class ParameterConditionalCompareAny : ParameterConditional
     {
-        private readonly CompareType _compareType;
-        private int _value;
-        private readonly string _compareTo;
-        private readonly string _compare;
+        private readonly string compare;
+        private readonly string compareTo;
+        private readonly CompareType compareType;
+        private int value;
 
         public ParameterConditionalCompareAny(SmartConditionalJsonData data) : base(null, WarningType.NOT_SET)
         {
-            _compareType = data.CompareType;
-            _value = data.CompareToValue;
-            _compareTo = data.ComparedToAnyParam;
-            _compare = data.ComparedAnyParam;
+            compareType = data.CompareType;
+            value = data.CompareToValue;
+            compareTo = data.ComparedToAnyParam;
+            compare = data.ComparedAnyParam;
         }
 
         public bool Validate(int compare, int compareTo)
         {
-            switch (_compareType)
+            switch (compareType)
             {
                 case CompareType.EQUALS:
                     return compare == compareTo;
@@ -97,20 +98,21 @@ namespace WDE.SmartScriptEditor.Models
                 case CompareType.GREATER_OR_EQUALS:
                     return compare >= compareTo;
             }
+
             return false;
         }
 
         internal bool Validate(DescriptionParams paramz)
         {
-            int compareSource = ValueForSource(_compare, paramz);
-            if (_compareTo != null)
-                _value = ValueForSource(_compareTo, paramz);
-            return Validate(compareSource, _value);
+            var compareSource = ValueForSource(compare, paramz);
+            if (compareTo != null)
+                value = ValueForSource(compareTo, paramz);
+            return Validate(compareSource, value);
         }
 
         private int ValueForSource(string compare, DescriptionParams paramz)
         {
-            int compareSource = 0;
+            var compareSource = 0;
             switch (compare)
             {
                 case "sourcetype":
@@ -135,19 +137,17 @@ namespace WDE.SmartScriptEditor.Models
                     compareSource = paramz.pram6;
                     break;
             }
+
             return compareSource;
         }
 
-        public override bool Validate()
-        {
-            return false;
-        }
+        public override bool Validate() { return false; }
     }
 
     public class ParameterConditionalCompareValue : ParameterConditional
     {
+        private readonly int max;
         private CompareType compareType;
-        private int max;
 
         public ParameterConditionalCompareValue(Parameter compared) : base(compared, WarningType.INVALID_VALUE) { }
 
@@ -165,7 +165,10 @@ namespace WDE.SmartScriptEditor.Models
             Description = compared.Name + " must be " + compareType + " " + compareTo;
         }
 
-        public ParameterConditionalCompareValue(Parameter compared, int compareTo, CompareType compareType, string description)
+        public ParameterConditionalCompareValue(Parameter compared,
+            int compareTo,
+            CompareType compareType,
+            string description)
             : base(compared, compareTo, WarningType.INVALID_PARAMETER)
         {
             this.compareType = compareType;
@@ -206,13 +209,14 @@ namespace WDE.SmartScriptEditor.Models
                 case CompareType.BETWEEN:
                     return Compared.GetValue() >= CompareTo.GetValue() && Compared.GetValue() <= max;
             }
+
             return false;
         }
     }
 
     public class ParameterConditionalFlag : ParameterConditional
     {
-        private List<int> flags;
+        private readonly List<int> flags;
 
         public ParameterConditionalFlag(Parameter compared, List<int> flags) : base(compared, WarningType.INVALID_VALUE)
         {
@@ -221,57 +225,55 @@ namespace WDE.SmartScriptEditor.Models
 
         public override bool Validate()
         {
-            int value = Compared.GetValue();
-            foreach (int flag in flags)
+            var value = Compared.GetValue();
+            foreach (var flag in flags)
                 value = value & ~flag;
             if (value > 0)
             {
-                List<int> unsupported_flags = new List<int>();
-                string bits = Convert.ToString(value, 2);
-                for (int i = 0; i < bits.Length; ++i)
-                {
+                var unsupportedFlags = new List<int>();
+                var bits = Convert.ToString(value, 2);
+                for (var i = 0; i < bits.Length; ++i)
                     if (bits[i] == '1')
-                    {
-                        unsupported_flags.Add((int)Math.Pow(2, (bits.Length - i - 1)));
-                    }
-                }
-                Description = Compared.Name + " contains unsupported flags: " + String.Join(", ", unsupported_flags);
+                        unsupportedFlags.Add((int) Math.Pow(2, bits.Length - i - 1));
+                Description = Compared.Name + " contains unsupported flags: " + string.Join(", ", unsupportedFlags);
                 return false;
             }
+
             return true;
         }
     }
 
     public class ParameterConditionalGroup : ParameterConditional
     {
-        private List<ParameterConditional> conditionals;
+        private readonly List<ParameterConditional> conditionals;
+
         public ParameterConditionalGroup(List<ParameterConditional> conditionals, string description)
             : base(WarningType.INVALID_PARAMETER, description)
         {
             this.conditionals = conditionals;
         }
+
         public override bool Validate()
         {
-            foreach (ParameterConditional conditional in conditionals)
-            {
+            foreach (var conditional in conditionals)
                 if (!conditional.Validate())
                     return false;
-            }
             return true;
         }
     }
 
     public class ParameterConditionalInversed : ParameterConditional
     {
-        private ParameterConditional conditional;
-        public ParameterConditionalInversed(ParameterConditional conditional) : base(conditional.Compared, conditional.CompareTo, conditional.WarningType, conditional.Description)
+        private readonly ParameterConditional conditional;
+
+        public ParameterConditionalInversed(ParameterConditional conditional) : base(conditional.Compared,
+            conditional.CompareTo,
+            conditional.WarningType,
+            conditional.Description)
         {
             this.conditional = conditional;
         }
 
-        public override bool Validate()
-        {
-            return !conditional.Validate();
-        }
+        public override bool Validate() { return !conditional.Validate(); }
     }
 }

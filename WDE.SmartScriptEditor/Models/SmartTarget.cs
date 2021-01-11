@@ -7,8 +7,6 @@ namespace WDE.SmartScriptEditor.Models
     {
         public readonly FloatParameter[] Position;
 
-        public bool IsPosition { get; set; }
-
         public SmartTarget(int id) : base(id)
         {
             Position = new FloatParameter[4];
@@ -18,65 +16,65 @@ namespace WDE.SmartScriptEditor.Models
             Position[2] = new FloatParameter("Target Z");
             Position[3] = new FloatParameter("Target O");
 
-            for (int i = 0; i < 4; ++i)
+            for (var i = 0; i < 4; ++i)
                 Position[i].OnValueChanged += (sender, value) => CallOnChanged();
         }
 
+        public bool IsPosition { get; set; }
+
         public float X
         {
-            get { return Position[0].GetValue();  }
-            set { Position[0].SetValue(value); }
+            get => Position[0].GetValue();
+            set => Position[0].SetValue(value);
         }
 
         public float Y
         {
-            get { return Position[1].GetValue(); }
-            set { Position[1].SetValue(value); }
+            get => Position[1].GetValue();
+            set => Position[1].SetValue(value);
         }
 
         public float Z
         {
-            get { return Position[2].GetValue(); }
-            set { Position[2].SetValue(value); }
+            get => Position[2].GetValue();
+            set => Position[2].SetValue(value);
         }
 
         public float O
         {
-            get { return Position[3].GetValue(); }
-            set { Position[3].SetValue(value); }
-        }
-
-        public string GetCoords()
-        {
-            return $"({X}, {Y}, {Z}, {O})";
+            get => Position[3].GetValue();
+            set => Position[3].SetValue(value);
         }
 
         public override string Readable
         {
             get
             {
-                string output = Smart.Format(ReadableHint, new
-                {
-                    pram1 = GetParameter(0).ToString(),
-                    pram2 = GetParameter(1).ToString(),
-                    pram3 = GetParameter(2).ToString(),
-                    pram1value = GetParameter(0).GetValue(),
-                    pram2value = GetParameter(1).GetValue(),
-                    pram3value = GetParameter(2).GetValue(),
-                    x = X,
-                    y = Y,
-                    z = Z,
-                    o = O,
-                    stored = "Stored target #" + GetParameter(0).GetValue(),
-                    storedPoint = "Stored point #" + GetParameter(0).GetValue()
-                });
+                var output = Smart.Format(ReadableHint,
+                    new
+                    {
+                        pram1 = GetParameter(0).ToString(),
+                        pram2 = GetParameter(1).ToString(),
+                        pram3 = GetParameter(2).ToString(),
+                        pram1value = GetParameter(0).GetValue(),
+                        pram2value = GetParameter(1).GetValue(),
+                        pram3value = GetParameter(2).GetValue(),
+                        x = X,
+                        y = Y,
+                        z = Z,
+                        o = O,
+                        stored = "Stored target #" + GetParameter(0).GetValue(),
+                        storedPoint = "Stored point #" + GetParameter(0).GetValue()
+                    });
                 return output;
             }
         }
 
+        public string GetCoords() { return $"({X}, {Y}, {Z}, {O})"; }
+
         private bool HasPosition()
         {
-            for (int i = 0; i < 4; ++i)
+            for (var i = 0; i < 4; ++i)
                 if (Position[i].Value != 0)
                     return true;
             return false;
@@ -84,15 +82,17 @@ namespace WDE.SmartScriptEditor.Models
 
         public string GetPosition()
         {
-            string output = Readable;
-            return output.Contains("position") || IsPosition ? output : "position of " + output + (HasPosition() ? " moved by offset " + GetCoords() : "");
+            var output = Readable;
+            return output.Contains("position") || IsPosition
+                ? output
+                : "position of " + output + (HasPosition() ? " moved by offset " + GetCoords() : "");
         }
-        
+
         public SmartTarget Copy()
         {
-            SmartTarget se = new SmartTarget(Id)
+            var se = new SmartTarget(Id)
             {
-                ReadableHint = ReadableHint, 
+                ReadableHint = ReadableHint,
                 DescriptionRules = DescriptionRules,
                 X = X,
                 Y = Y,
@@ -100,7 +100,7 @@ namespace WDE.SmartScriptEditor.Models
                 O = O,
                 IsPosition = IsPosition
             };
-            for (int i = 0; i < ParametersCount; ++i)
+            for (var i = 0; i < ParametersCount; ++i)
                 se.SetParameterObject(i, GetParameter(i).Clone());
             return se;
         }

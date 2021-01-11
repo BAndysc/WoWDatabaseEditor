@@ -1,23 +1,22 @@
 ﻿<UserControl x:Class="WDE.SmartScriptEditor.Editor.Views.ParameterEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:prism="http://prismlibrary.com/" 
              xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Helpers"
              Background="{DynamicResource SmartScripts.Background}">
     <Grid>
         <Grid.Resources>
-            <helpers:IsNullConverter x:Key="IsNullConverter"/>
+            <helpers:IsNullConverter x:Key="IsNullConverter" />
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <Label HorizontalAlignment="Right" Content="{Binding Parameter.Name, Mode=OneWay}"/>
+        <Label HorizontalAlignment="Right" Content="{Binding Parameter.Name, Mode=OneWay}" />
         <TextBox Grid.Column="1" VerticalContentAlignment="Center" FontFamily="Consolas">
             <TextBox.Style>
                 <Style TargetType="{x:Type TextBox}">
-                    <Setter Property="Text" Value="{Binding Parameter.String, Mode=OneWay}"></Setter>
+                    <Setter Property="Text" Value="{Binding Parameter.String, Mode=OneWay}" />
                     <Style.Triggers>
                         <Trigger Property="IsFocused" Value="true">
                             <Setter Property="Text" Value="{Binding Parameter.Value}" />
@@ -31,7 +30,8 @@
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Parameter.Items, Converter={StaticResource IsNullConverter}}" Value="True">
+                        <DataTrigger Binding="{Binding Parameter.Items, Converter={StaticResource IsNullConverter}}"
+                                     Value="True">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
 

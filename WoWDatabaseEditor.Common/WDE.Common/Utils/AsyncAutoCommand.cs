@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.Annotations;
@@ -16,7 +17,7 @@ namespace WDE.Common.Utils
             set
             {
                 _isBusy = value;
-                command.RaiseCanExecuteChanged();
+                Application.Current.Dispatcher.Invoke(() => command.RaiseCanExecuteChanged());
             }
         }
         

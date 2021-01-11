@@ -8,11 +8,14 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
     public class InputBindingsBehavior
     {
         public static readonly DependencyProperty TakesInputBindingPrecedenceProperty =
-            DependencyProperty.RegisterAttached("TakesInputBindingPrecedence", typeof(bool), typeof(InputBindingsBehavior), new UIPropertyMetadata(false, OnTakesInputBindingPrecedenceChanged));
+            DependencyProperty.RegisterAttached("TakesInputBindingPrecedence",
+                typeof(bool),
+                typeof(InputBindingsBehavior),
+                new UIPropertyMetadata(false, OnTakesInputBindingPrecedenceChanged));
 
         public static bool GetTakesInputBindingPrecedence(UIElement obj)
         {
-            return (bool)obj.GetValue(TakesInputBindingPrecedenceProperty);
+            return (bool) obj.GetValue(TakesInputBindingPrecedenceProperty);
         }
 
         public static void SetTakesInputBindingPrecedence(UIElement obj, bool value)
@@ -20,14 +23,15 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             obj.SetValue(TakesInputBindingPrecedenceProperty, value);
         }
 
-        private static void OnTakesInputBindingPrecedenceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnTakesInputBindingPrecedenceChanged(DependencyObject d,
+            DependencyPropertyChangedEventArgs e)
         {
-            ((UIElement)d).PreviewKeyDown += new KeyEventHandler(InputBindingsBehavior_PreviewKeyDown);
+            ((UIElement) d).PreviewKeyDown += InputBindingsBehavior_PreviewKeyDown;
         }
 
         private static void InputBindingsBehavior_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            var uielement = (UIElement)sender;
+            var uielement = (UIElement) sender;
 
             var foundBinding = uielement.InputBindings
                 .OfType<KeyBinding>()
@@ -37,9 +41,7 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             {
                 e.Handled = true;
                 if (foundBinding.Command.CanExecute(foundBinding.CommandParameter))
-                {
                     foundBinding.Command.Execute(foundBinding.CommandParameter);
-                }
             }
         }
     }

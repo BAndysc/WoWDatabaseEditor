@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WDE.Common.Database;
+﻿using WDE.Common.Database;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Data

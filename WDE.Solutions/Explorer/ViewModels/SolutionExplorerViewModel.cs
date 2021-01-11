@@ -199,7 +199,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                 if (destList == sourceList && dropInfo.InsertIndex >= prevPosition)
                     destPosition--;
                     
-                destList.Insert(destPosition, sourceItem.Item);
+                destList.Insert(Math.Clamp(destPosition, 0, destList.Count), sourceItem.Item);
             }
         }
     }

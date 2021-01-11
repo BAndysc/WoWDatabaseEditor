@@ -1,40 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
+using SmartFormat;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
-using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Exporter
 {
     public class SmartScriptExporter
     {
-        private static readonly string SAI_SQL = "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
+        private static readonly string SaiSql =
+            "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
 
-        private readonly SmartScript _script;
+        private readonly SmartScript script;
         private readonly ISmartFactory smartFactory;
-        private StringBuilder _sql = new StringBuilder();
+        private readonly StringBuilder sql = new();
 
         public SmartScriptExporter(SmartScript script, ISmartFactory smartFactory)
         {
-            _script = script;
+            this.script = script;
             this.smartFactory = smartFactory;
         }
 
         public string GetSql()
         {
             BuildHeader();
-            return _sql.ToString();
+            return sql.ToString();
         }
 
         private void BuildHeader()
         {
-            _sql.AppendLine($"SET @ENTRY := {_script.EntryOrGuid};");
+            sql.AppendLine($"SET @ENTRY := {script.EntryOrGuid};");
             BuildDelete();
             BuildUpdate();
             BuildInsert();
@@ -42,17 +39,17 @@ namespace WDE.SmartScriptEditor.Exporter
 
         private void BuildInsert()
         {
-            if (_script.Events.Count == 0)
+            if (script.Events.Count == 0)
                 return;
 
-            _sql.AppendLine(
+            sql.AppendLine(
                 "INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES");
 
-            var serializedScript = _script.ToWaitFreeSmartScriptLines(smartFactory);
-            IEnumerable<string> lines = serializedScript.Select(GenerateSingleSai);
-            
-            _sql.Append(string.Join(",\n", lines));
-            _sql.AppendLine(";");
+            var serializedScript = script.ToWaitFreeSmartScriptLines(smartFactory);
+            var lines = serializedScript.Select(GenerateSingleSai);
+
+            sql.Append(string.Join(",\n", lines));
+            sql.AppendLine(";");
         }
 
         private string GenerateSingleSai(ISmartScriptLine line)
@@ -62,7 +59,7 @@ namespace WDE.SmartScriptEditor.Exporter
             object data = new
             {
                 entryorguid = "@ENTRY",
-                source_type = ((int)_script.SourceType).ToString(),
+                source_type = ((int) script.SourceType).ToString(),
                 id = line.Id.ToString(),
                 linkto = line.Link.ToString(),
 
@@ -97,7 +94,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 target_param2 = line.TargetParam2.ToString(),
                 target_param3 = line.TargetParam3.ToString(),
                 target_condition_id = line.TargetConditionId.ToString(),
-                
+
                 x = line.TargetX.ToString(CultureInfo.InvariantCulture),
                 y = line.TargetY.ToString(CultureInfo.InvariantCulture),
                 z = line.TargetZ.ToString(CultureInfo.InvariantCulture),
@@ -106,48 +103,54 @@ namespace WDE.SmartScriptEditor.Exporter
                 comment = line.Comment
             };
 
-            return SmartFormat.Smart.Format(SAI_SQL, data);
+            return Smart.Format(SaiSql, data);
         }
 
         private void BuildUpdate()
         {
-            switch (_script.SourceType)
+            switch (script.SourceType)
             {
                 case SmartScriptType.Creature:
-                    _sql.AppendLine(
+                    sql.AppendLine(
                         "UPDATE creature_template SET AIName=\"SmartAI\" WHERE entry= @ENTRY;");
                     break;
                 case SmartScriptType.GameObject:
-                    _sql.AppendLine(
+                    sql.AppendLine(
                         "UPDATE gameobject_template SET AIName=\"SmartGameObjectAI\" WHERE entry=@ENTRY;");
                     break;
                 case SmartScriptType.Quest:
-                    _sql.AppendLine("DELETE FROM quest_scripts WHERE questId = @ENTRY;");
-                    _sql.AppendLine("INSERT INTO quest_scripts(questId, ScriptName) VALUES(@ENTRY, \"SmartQuest\");");
+                    sql.AppendLine("DELETE FROM quest_scripts WHERE questId = @ENTRY;");
+                    sql.AppendLine("INSERT INTO quest_scripts(questId, ScriptName) VALUES(@ENTRY, \"SmartQuest\");");
                     break;
                 case SmartScriptType.Spell:
-                    _sql.AppendLine("DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartSpell\";");
-                    _sql.AppendLine("INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartSpell\");");
+                    sql.AppendLine(
+                        "DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartSpell\";");
+                    sql.AppendLine(
+                        "INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartSpell\");");
                     break;
                 case SmartScriptType.Aura:
-                    _sql.AppendLine("DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartAura\";");
-                    _sql.AppendLine("INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartAura\");");
+                    sql.AppendLine(
+                        "DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartAura\";");
+                    sql.AppendLine(
+                        "INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartAura\");");
                     break;
                 case SmartScriptType.Cinematic:
-                    _sql.AppendLine("DELETE FROM cinematic_scripts WHERE cinematicId = @ENTRY;");
-                    _sql.AppendLine("INSERT INTO cinematic_scripts(cinematicId, ScriptName) VALUES(@ENTRY, \"SmartCinematic\");");
+                    sql.AppendLine("DELETE FROM cinematic_scripts WHERE cinematicId = @ENTRY;");
+                    sql.AppendLine(
+                        "INSERT INTO cinematic_scripts(cinematicId, ScriptName) VALUES(@ENTRY, \"SmartCinematic\");");
                     break;
                 case SmartScriptType.AreaTrigger:
-                    _sql.AppendLine("DELETE FROM areatrigger_scripts WHERE entry = @ENTRY;");
-                    _sql.AppendLine("INSERT INTO areatrigger_scripts(entry, ScriptName) VALUES(@ENTRY, \"SmartTrigger\");");
+                    sql.AppendLine("DELETE FROM areatrigger_scripts WHERE entry = @ENTRY;");
+                    sql.AppendLine(
+                        "INSERT INTO areatrigger_scripts(entry, ScriptName) VALUES(@ENTRY, \"SmartTrigger\");");
                     break;
             }
         }
 
         private void BuildDelete()
         {
-            _sql.AppendLine(
-                $"DELETE FROM smart_scripts WHERE entryOrGuid = {_script.EntryOrGuid} AND source_type = {(int)_script.SourceType};");
+            sql.AppendLine(
+                $"DELETE FROM smart_scripts WHERE entryOrGuid = {script.EntryOrGuid} AND source_type = {(int) script.SourceType};");
         }
     }
 }

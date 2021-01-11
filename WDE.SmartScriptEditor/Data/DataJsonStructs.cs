@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using WDE.Common.Database;
@@ -15,7 +11,6 @@ namespace WDE.SmartScriptEditor.Data
     [ExcludeFromCodeCoverage]
     public struct SmartParameterJsonData
     {
-
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
@@ -50,18 +45,24 @@ namespace WDE.SmartScriptEditor.Data
     {
         [Description("equal")]
         EQUALS,
+
         [Description("not equal")]
         NOT_EQUALS,
+
         [Description("lower than")]
         LOWER_THAN,
+
         [Description("greater than")]
         GREATER_THAN,
+
         [Description("lower or equal")]
         LOWER_OR_EQUALS,
+
         [Description("greater or equal")]
         GREATER_OR_EQUALS,
+
         [Description("between")]
-        BETWEEN,
+        BETWEEN
     }
 
     [ExcludeFromCodeCoverage]
@@ -189,9 +190,6 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "tooltip")]
         public string Tooltip { get; set; }
 
-        public bool HasParameters()
-        {
-            return Parameters != null && Parameters.Count > 0;
-        }
+        public bool HasParameters() { return Parameters != null && Parameters.Count > 0; }
     }
 }

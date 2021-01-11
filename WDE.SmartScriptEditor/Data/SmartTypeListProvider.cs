@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using WDE.SmartScriptEditor.Data;
+using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Editor.Views;
-using Prism.Ioc;
-using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor.Data
 {
@@ -17,10 +10,7 @@ namespace WDE.SmartScriptEditor.Data
     {
         private readonly ISmartDataManager smartDataManager;
 
-        public SmartTypeListProvider(ISmartDataManager smartDataManager)
-        {
-            this.smartDataManager = smartDataManager;
-        }
+        public SmartTypeListProvider(ISmartDataManager smartDataManager) { this.smartDataManager = smartDataManager; }
 
         public int? Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
         {
@@ -28,7 +18,7 @@ namespace WDE.SmartScriptEditor.Data
             var model = new SmartSelectViewModel(GetFileNameFor(type), type, predicate, smartDataManager);
             view.DataContext = model;
 
-            bool? res = view.ShowDialog();
+            var res = view.ShowDialog();
 
             if (res.HasValue && res.Value)
                 return model.SelectedItem.Id;
@@ -49,6 +39,7 @@ namespace WDE.SmartScriptEditor.Data
                 case SmartType.SmartSource:
                     return "targets.txt";
             }
+
             return null;
         }
     }

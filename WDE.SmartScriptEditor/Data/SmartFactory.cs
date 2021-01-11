@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Models;
-using Prism.Ioc;
 
 namespace WDE.SmartScriptEditor.Data
 {
-    [Module.Attributes.AutoRegister, Module.Attributes.SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class SmartFactory : ISmartFactory
     {
-        private readonly IParameterFactory _parameterFactory;
+        private readonly IParameterFactory parameterFactory;
         private readonly ISmartDataManager smartDataManager;
 
         public SmartFactory(IParameterFactory parameterFactory, ISmartDataManager smartDataManager)
         {
-            _parameterFactory = parameterFactory;
+            this.parameterFactory = parameterFactory;
             this.smartDataManager = smartDataManager;
         }
 
@@ -28,7 +25,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartEvent, id))
                 throw new NullReferenceException("No data for event id " + id);
 
-            SmartEvent ev = new SmartEvent(id);
+            var ev = new SmartEvent(id);
             var raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
             ev.Chance.SetValue(100);
             SetParameterObjects(ev, raw);
@@ -36,10 +33,7 @@ namespace WDE.SmartScriptEditor.Data
             if (raw.DescriptionRules != null)
             {
                 ev.DescriptionRules = new List<DescriptionRule>();
-                foreach (var rule in raw.DescriptionRules)
-                {
-                    ev.DescriptionRules.Add(new DescriptionRule(rule));
-                }
+                foreach (var rule in raw.DescriptionRules) ev.DescriptionRules.Add(new DescriptionRule(rule));
             }
 
             return ev;
@@ -47,7 +41,7 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartEvent EventFactory(ISmartScriptLine line)
         {
-            SmartEvent ev = EventFactory(line.EventType);
+            var ev = EventFactory(line.EventType);
 
             ev.Chance.SetValue(line.EventChance);
             ev.Phases.SetValue(line.EventPhaseMask);
@@ -55,10 +49,64 @@ namespace WDE.SmartScriptEditor.Data
             ev.CooldownMin.SetValue(line.EventCooldownMin);
             ev.CooldownMax.SetValue(line.EventCooldownMax);
 
-            for (int i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
+            for (var i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
                 ev.SetParameter(i, GetEventParameter(line, i));
 
             return ev;
+        }
+
+        public SmartAction ActionFactory(int id, SmartSource source, SmartTarget target)
+        {
+            if (!smartDataManager.Contains(SmartType.SmartAction, id))
+                throw new NullReferenceException("No data for action id " + id);
+
+            var action = new SmartAction(id, source, target);
+
+            SetParameterObjects(action, smartDataManager.GetRawData(SmartType.SmartAction, id));
+
+            return action;
+        }
+
+        public SmartAction ActionFactory(ISmartScriptLine line)
+        {
+            var source = SourceFactory(line);
+            var target = TargetFactory(line);
+
+            var action = ActionFactory(line.ActionType, source, target);
+
+            for (var i = 0; i < SmartAction.SmartActionParametersCount; ++i)
+                action.SetParameter(i, GetActionParameter(line, i));
+
+            return action;
+        }
+
+        public SmartTarget TargetFactory(int id)
+        {
+            if (!smartDataManager.Contains(SmartType.SmartTarget, id))
+                throw new NullReferenceException("No data for target id " + id);
+
+            var target = new SmartTarget(id);
+
+            SetParameterObjects(target, smartDataManager.GetRawData(SmartType.SmartTarget, id));
+
+            var targetTypes = smartDataManager.GetRawData(SmartType.SmartTarget, id).Types;
+
+            if (targetTypes != null && targetTypes.Contains("Position"))
+                target.IsPosition = true;
+
+            return target;
+        }
+
+        public SmartSource SourceFactory(int id)
+        {
+            if (!smartDataManager.Contains(SmartType.SmartSource, id))
+                throw new NullReferenceException("No data for source id " + id);
+
+            var source = new SmartSource(id);
+
+            SetParameterObjects(source, smartDataManager.GetRawData(SmartType.SmartSource, id));
+
+            return source;
         }
 
         private int GetEventParameter(ISmartScriptLine line, int i)
@@ -75,32 +123,8 @@ namespace WDE.SmartScriptEditor.Data
                 case 3:
                     return line.EventParam4;
             }
+
             throw new ArgumentException("Event parameter out of range");
-        }
-
-        public SmartAction ActionFactory(int id, SmartSource source, SmartTarget target)
-        {
-            if (!smartDataManager.Contains(SmartType.SmartAction, id))
-                throw new NullReferenceException("No data for action id " + id);
-
-            SmartAction action = new SmartAction(id, source, target);
-
-            SetParameterObjects(action, smartDataManager.GetRawData(SmartType.SmartAction, id));
-
-            return action;
-        }
-
-        public SmartAction ActionFactory(ISmartScriptLine line)
-        {
-            SmartSource source = SourceFactory(line);
-            SmartTarget target = TargetFactory(line);
-
-            SmartAction action = ActionFactory(line.ActionType, source, target);
-
-            for (int i = 0; i < SmartAction.SmartActionParametersCount; ++i)
-                action.SetParameter(i, GetActionParameter(line, i));
-
-            return action;
         }
 
         private int GetActionParameter(ISmartScriptLine line, int i)
@@ -121,29 +145,13 @@ namespace WDE.SmartScriptEditor.Data
                 case 5:
                     return line.ActionParam6;
             }
+
             throw new ArgumentException("Action parameter out of range");
-        }
-
-        public SmartTarget TargetFactory(int id)
-        {
-            if (!smartDataManager.Contains(SmartType.SmartTarget, id))
-                throw new NullReferenceException("No data for target id " + id);
-
-            SmartTarget target = new SmartTarget(id);
-
-            SetParameterObjects(target, smartDataManager.GetRawData(SmartType.SmartTarget, id));
-
-            var targetTypes = smartDataManager.GetRawData(SmartType.SmartTarget, id).Types;
-
-            if (targetTypes != null && targetTypes.Contains("Position"))
-                target.IsPosition = true;
-
-            return target;
         }
 
         public SmartTarget TargetFactory(ISmartScriptLine line)
         {
-            SmartTarget target = TargetFactory(line.TargetType);
+            var target = TargetFactory(line.TargetType);
 
             target.X = line.TargetX;
             target.Y = line.TargetY;
@@ -152,7 +160,7 @@ namespace WDE.SmartScriptEditor.Data
 
             target.Condition.SetValue(line.TargetConditionId);
 
-            for (int i = 0; i < SmartTarget.SmartSourceParametersCount; ++i)
+            for (var i = 0; i < SmartSource.SmartSourceParametersCount; ++i)
                 target.SetParameter(i, GetTargetParameter(line, i));
 
             return target;
@@ -170,28 +178,17 @@ namespace WDE.SmartScriptEditor.Data
                 case 2:
                     return line.SourceParam3;
             }
+
             throw new ArgumentException("Source parameter out of range");
-        }
-
-        public SmartSource SourceFactory(int id)
-        {
-            if (!smartDataManager.Contains(SmartType.SmartSource, id))
-                throw new NullReferenceException("No data for source id " + id);
-
-            SmartSource source = new SmartSource(id);
-
-            SetParameterObjects(source, smartDataManager.GetRawData(SmartType.SmartSource, id));
-
-            return source;
         }
 
         private SmartSource SourceFactory(ISmartScriptLine line)
         {
-            SmartSource source = SourceFactory(line.SourceType);
+            var source = SourceFactory(line.SourceType);
 
             source.Condition.SetValue(line.SourceConditionId);
 
-            for (int i = 0; i < SmartSource.SmartSourceParametersCount; ++i)
+            for (var i = 0; i < SmartSource.SmartSourceParametersCount; ++i)
                 source.SetParameter(i, GetSourceParameter(line, i));
 
             return source;
@@ -209,6 +206,7 @@ namespace WDE.SmartScriptEditor.Data
                 case 2:
                     return line.TargetParam3;
             }
+
             throw new ArgumentException("Target parameter out of range");
         }
 
@@ -217,10 +215,12 @@ namespace WDE.SmartScriptEditor.Data
             element.ReadableHint = data.Description;
             if (data.Parameters == null)
                 return;
-            
-            for (int i = 0; i < data.Parameters.Count; ++i)
+
+            for (var i = 0; i < data.Parameters.Count; ++i)
             {
-                var parameter = _parameterFactory.Factory(data.Parameters[i].Type, data.Parameters[i].Name, data.Parameters[i].DefaultVal);
+                var parameter = parameterFactory.Factory(data.Parameters[i].Type,
+                    data.Parameters[i].Name,
+                    data.Parameters[i].DefaultVal);
                 parameter.Description = data.Parameters[i].Description;
                 if (data.Parameters[i].Values != null)
                     parameter.Items = data.Parameters[i].Values;

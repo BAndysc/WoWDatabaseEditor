@@ -2,7 +2,7 @@
 {
     public class DropActionsArgs
     {
-        public int EventIndex;
         public int ActionIndex;
+        public int EventIndex;
     }
 }

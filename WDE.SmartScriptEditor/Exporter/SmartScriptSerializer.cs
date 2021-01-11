@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SmartFormat;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
@@ -11,15 +12,17 @@ namespace WDE.SmartScriptEditor.Exporter
 {
     public static class SmartScriptSerializer
     {
-        private static readonly Regex SAI_LINE_REGEX = new Regex(
-            @"\(\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*"".*?""\s*\)"); 
-        private static readonly string SAI_SQL = "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
+        private static readonly Regex SaiLineRegex = new(
+            @"\(\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*"".*?""\s*\)");
+
+        private static readonly string SaiSql =
+            "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
 
         public static bool TryToISmartScriptLine(this string str, out ISmartScriptLine line)
         {
             line = new AbstractSmartScriptLine();
 
-            Match m = SAI_LINE_REGEX.Match(str);
+            var m = SaiLineRegex.Match(str);
             if (!m.Success || m.Groups.Count != 28)
                 return false;
 
@@ -51,13 +54,12 @@ namespace WDE.SmartScriptEditor.Exporter
             line.TargetZ = float.Parse(m.Groups[26].ToString(), CultureInfo.InvariantCulture);
             line.TargetO = float.Parse(m.Groups[27].ToString(), CultureInfo.InvariantCulture);
             line.Comment = m.Groups[28].ToString();
-            
+
             return true;
         }
-        
+
         public static string ToSqlString(this ISmartScriptLine line)
         {
-            
             object data = new
             {
                 entryorguid = line.EntryOrGuid.ToString(),
@@ -105,7 +107,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 comment = line.Comment
             };
 
-            return SmartFormat.Smart.Format(SAI_SQL, data);
+            return Smart.Format(SaiSql, data);
         }
 
         public static ISmartScriptLine[] ToWaitFreeSmartScriptLines(this SmartScript script, ISmartFactory smartFactory)
@@ -113,58 +115,62 @@ namespace WDE.SmartScriptEditor.Exporter
             if (script.Events.Count == 0)
                 return new ISmartScriptLine[0];
 
-            int eventId = 0;
-            List<ISmartScriptLine> lines = new List<ISmartScriptLine>();
-            bool previousWasWait = false;
-            int nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EVENT_TRIGGER_TIMED).Select(e => e.GetParameter(0).Value).DefaultIfEmpty(0).Max() + 1;
-            
+            var eventId = 0;
+            var lines = new List<ISmartScriptLine>();
+            var previousWasWait = false;
+            var nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EventTriggerTimed)
+                .Select(e => e.GetParameter(0).Value)
+                .DefaultIfEmpty(0)
+                .Max() + 1;
+
             //@todo: don't use hardcoded IDs!!!!
-            foreach (SmartEvent e in script.Events)
+            foreach (var e in script.Events)
             {
                 if (e.Actions.Count == 0)
                     continue;
 
                 e.ActualId = eventId;
 
-                for (int index = 0; index < e.Actions.Count; ++index)
+                for (var index = 0; index < e.Actions.Count; ++index)
                 {
-                    SmartEvent actualEvent = e;
+                    var actualEvent = e;
 
                     if (previousWasWait)
                     {
-                        actualEvent = smartFactory.EventFactory(SmartConstants.EVENT_TRIGGER_TIMED);
+                        actualEvent = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
                         actualEvent.SetParameter(0, nextTriggerId++);
                     }
-                    else if (index > 0)
-                        actualEvent = smartFactory.EventFactory(SmartConstants.EVENT_LINK);
+                    else if (index > 0) actualEvent = smartFactory.EventFactory(SmartConstants.EventLink);
 
-                    int linkTo = (e.Actions.Count - 1 == index ? 0 : eventId + 1);
+                    var linkTo = e.Actions.Count - 1 == index ? 0 : eventId + 1;
 
-                    SmartAction actualAction = e.Actions[index];
+                    var actualAction = e.Actions[index];
 
-                    if (actualAction.Id == SmartConstants.ACTION_WAIT)
+                    if (actualAction.Id == SmartConstants.ActionWait)
                     {
                         linkTo = 0;
-                        SmartAction waitAction = actualAction;
-                        actualAction = smartFactory.ActionFactory(SmartConstants.ACTION_TRIGGER_TIMED, smartFactory.SourceFactory(SmartConstants.SOURCE_NONE), smartFactory.TargetFactory(SmartConstants.TARGET_NONE));
+                        var waitAction = actualAction;
+                        actualAction = smartFactory.ActionFactory(SmartConstants.ActionTriggerTimed,
+                            smartFactory.SourceFactory(SmartConstants.SourceNone),
+                            smartFactory.TargetFactory(SmartConstants.TargetNone));
                         actualAction.SetParameter(0, nextTriggerId);
                         actualAction.SetParameter(1, waitAction.GetParameter(0).GetValue());
                         actualAction.SetParameter(2, waitAction.GetParameter(0).GetValue());
-                        actualAction.Comment = SmartConstants.COMMENT_WAIT;
+                        actualAction.Comment = SmartConstants.CommentWait;
                         previousWasWait = true;
                     }
                     else
                         previousWasWait = false;
 
-                    SmartEvent eventToSerialize = actualEvent.ShallowCopy();
+                    var eventToSerialize = actualEvent.ShallowCopy();
                     eventToSerialize.Actions.Add(actualAction.Copy());
 
                     var serialized =
                         eventToSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, linkTo);
-                    
+
                     if (serialized.Length != 1)
                         throw new InvalidOperationException();
-                    
+
                     lines.Add(serialized[0]);
 
                     eventId++;
@@ -174,23 +180,29 @@ namespace WDE.SmartScriptEditor.Exporter
             return lines.ToArray();
         }
 
-        public static ISmartScriptLine[] ToSmartScriptLines(this SmartEvent e, int scriptEntryOrGuid, SmartScriptType scriptSourceType, int id, int? linkTo = null)
+        public static ISmartScriptLine[] ToSmartScriptLines(this SmartEvent e,
+            int scriptEntryOrGuid,
+            SmartScriptType scriptSourceType,
+            int id,
+            int? linkTo = null)
         {
-            List<ISmartScriptLine> lines = new List<ISmartScriptLine>();
-            IEnumerable<SmartAction> actions = e.Actions.Count == 0 ? new List<SmartAction>()
-            {
-                new SmartAction(-1, new SmartSource(-1){ReadableHint = ""}, new SmartTarget(-1){ReadableHint = ""})
+            var lines = new List<ISmartScriptLine>();
+            IEnumerable<SmartAction> actions = e.Actions.Count == 0
+                ? new List<SmartAction>
                 {
-                    ReadableHint = ""
+                    new(-1, new SmartSource(-1) {ReadableHint = ""}, new SmartTarget(-1) {ReadableHint = ""})
+                    {
+                        ReadableHint = ""
+                    }
                 }
-            } : e.Actions;
-            
+                : e.Actions;
+
             foreach (var a in actions)
             {
-                var line = new AbstractSmartScriptLine()
+                var line = new AbstractSmartScriptLine
                 {
                     EntryOrGuid = scriptEntryOrGuid,
-                    ScriptSourceType = (int)scriptSourceType,
+                    ScriptSourceType = (int) scriptSourceType,
                     Id = id,
                     Link = linkTo ?? 0,
                     EventType = e.Id,
@@ -224,8 +236,9 @@ namespace WDE.SmartScriptEditor.Exporter
                     TargetY = a.Target.Y,
                     TargetZ = a.Target.Z,
                     TargetO = a.Target.O,
-                    Comment = e.Readable + " - " + a.Readable + (string.IsNullOrEmpty(a.Comment) ? "" : (" // " + a.Comment)),
-                };   
+                    Comment = e.Readable + " - " + a.Readable +
+                              (string.IsNullOrEmpty(a.Comment) ? "" : " // " + a.Comment)
+                };
                 lines.Add(line);
             }
 

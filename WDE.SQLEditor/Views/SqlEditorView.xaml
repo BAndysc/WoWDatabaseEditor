@@ -4,9 +4,10 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:WDE.SQLEditor.UserControls"
              Loaded="UserControl_Loaded">
-    <Grid>
-        <local:CodeEditor Padding="5" x:Name="MyAvalonEdit" Text="{Binding Code}" FontFamily="Consolas" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+    <DockPanel LastChildFill="True">
+        <Button DockPanel.Dock="Top" Content="Execute SQL" Command="{Binding ExecuteSql}"></Button>
+        <local:CodeEditor Document="{Binding Code, Mode=TwoWay}" Padding="5" x:Name="MyAvalonEdit" FontFamily="Consolas" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                 
                 </local:CodeEditor>
-    </Grid>
+    </DockPanel>
 </UserControl>

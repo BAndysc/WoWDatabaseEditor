@@ -1,54 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Models
 {
     public class DescriptionRule
     {
-        public string Description { get; }
-        private bool _inverted = false;
-        protected List<ParameterConditionalCompareAny> Conditionals = new List<ParameterConditionalCompareAny>();
-        
-        public bool Matches(DescriptionParams paramz)
-        {
-            foreach (ParameterConditionalCompareAny condition in Conditionals)
-            {
-                if (!condition.Validate(paramz))
-                    return false;
-            }
-
-            return true;
-        }
+        protected List<ParameterConditionalCompareAny> Conditionals = new();
+        private bool inverted;
 
         public DescriptionRule(SmartDescriptionRulesJsonData data)
         {
             Description = data.Description;
             if (data.Conditions != null)
-            {
-                foreach (SmartConditionalJsonData condition in data.Conditions)
+                foreach (var condition in data.Conditions)
                 {
-                    ParameterConditionalCompareAny conditional = new ParameterConditionalCompareAny(condition);
+                    var conditional = new ParameterConditionalCompareAny(condition);
 
-                    _inverted = condition.Invert;
+                    inverted = condition.Invert;
 
                     Conditionals.Add(conditional);
                 }
-            }
+        }
+
+        public string Description { get; }
+
+        public bool Matches(DescriptionParams paramz)
+        {
+            foreach (var condition in Conditionals)
+                if (!condition.Validate(paramz))
+                    return false;
+
+            return true;
         }
     }
 
     public class DescriptionParams
     {
-        public int source_type;
         public int pram1;
         public int pram2;
         public int pram3;
         public int pram4;
         public int pram5;
         public int pram6;
+        public int source_type;
     }
 }

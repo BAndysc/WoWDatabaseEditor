@@ -1,49 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WDE.Common.History;
 using WDE.Common.Parameters;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor
 {
-    public class SaiHistoryHandler : HistoryHandler, System.IDisposable
+    public class SaiHistoryHandler : HistoryHandler, IDisposable
     {
-        private readonly SmartScript _script;
+        private readonly SmartScript script;
 
         public SaiHistoryHandler(SmartScript script)
         {
-            _script = script;
-            _script.Events.CollectionChanged += Events_CollectionChanged;
-            _script.BulkEditingStarted += OnBulkEditingStarted;
-            _script.BulkEditingFinished += OnBulkEditingFinished;
+            this.script = script;
+            this.script.Events.CollectionChanged += Events_CollectionChanged;
+            this.script.BulkEditingStarted += OnBulkEditingStarted;
+            this.script.BulkEditingFinished += OnBulkEditingFinished;
 
-            foreach (SmartEvent ev in _script.Events)
+            foreach (var ev in this.script.Events)
                 BindEvent(ev);
         }
 
         public void Dispose()
         {
-            _script.Events.CollectionChanged -= Events_CollectionChanged;
-            _script.BulkEditingStarted -= OnBulkEditingStarted;
-            _script.BulkEditingFinished -= OnBulkEditingFinished;
+            script.Events.CollectionChanged -= Events_CollectionChanged;
+            script.BulkEditingStarted -= OnBulkEditingStarted;
+            script.BulkEditingFinished -= OnBulkEditingFinished;
         }
 
         private void Events_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (object ev in e.NewItems)
+                foreach (var ev in e.NewItems)
                     AddedEvent(ev as SmartEvent, e.NewStartingIndex);
-            }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                foreach (object ev in e.OldItems)
+                foreach (var ev in e.OldItems)
                     RemovedEvent(ev as SmartEvent, e.OldStartingIndex);
-            }
         }
 
         private void UnbindEvent(SmartEvent smartEvent)
@@ -61,7 +53,7 @@ namespace WDE.SmartScriptEditor
             smartEvent.CooldownMin.OnValueChanged -= Parameter_OnValueChanged;
             smartEvent.CooldownMax.OnValueChanged -= Parameter_OnValueChanged;
 
-            for (int i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
+            for (var i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
                 smartEvent.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
         }
 
@@ -83,17 +75,17 @@ namespace WDE.SmartScriptEditor
         {
             smartAction.BulkEditingStarted += OnBulkEditingStarted;
             smartAction.BulkEditingFinished += OnBulkEditingFinished;
-            
-            for (int i = 0; i < smartAction.ParametersCount; ++i)
+
+            for (var i = 0; i < smartAction.ParametersCount; ++i)
                 smartAction.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
 
-            for (int i = 0; i < smartAction.Source.ParametersCount; ++i)
+            for (var i = 0; i < smartAction.Source.ParametersCount; ++i)
                 smartAction.Source.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
 
-            for (int i = 0; i < smartAction.Target.ParametersCount; ++i)
+            for (var i = 0; i < smartAction.Target.ParametersCount; ++i)
                 smartAction.Target.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
 
-            for (int i = 0; i < 4; ++i)
+            for (var i = 0; i < 4; ++i)
                 smartAction.Target.Position[i].OnValueChanged += ParameterFloat_OnValueChange;
         }
 
@@ -101,30 +93,30 @@ namespace WDE.SmartScriptEditor
         {
             smartAction.BulkEditingStarted -= OnBulkEditingStarted;
             smartAction.BulkEditingFinished -= OnBulkEditingFinished;
-            
-            for (int i = 0; i < smartAction.ParametersCount; ++i)
+
+            for (var i = 0; i < smartAction.ParametersCount; ++i)
                 smartAction.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
 
-            for (int i = 0; i < smartAction.Source.ParametersCount; ++i)
+            for (var i = 0; i < smartAction.Source.ParametersCount; ++i)
                 smartAction.Source.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
 
-            for (int i = 0; i < smartAction.Target.ParametersCount; ++i)
+            for (var i = 0; i < smartAction.Target.ParametersCount; ++i)
                 smartAction.Target.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
 
-            for (int i = 0; i < 4; ++i)
+            for (var i = 0; i < 4; ++i)
                 smartAction.Target.Position[i].OnValueChanged -= ParameterFloat_OnValueChange;
         }
 
         private void AddedEvent(SmartEvent smartEvent, int index)
         {
-            PushAction(new EventAddedAction(_script, smartEvent, index));
+            PushAction(new EventAddedAction(script, smartEvent, index));
             BindEvent(smartEvent);
         }
 
         private void RemovedEvent(SmartEvent smartEvent, int index)
         {
             UnbindEvent(smartEvent);
-            PushAction(new EventRemovedAction(_script, smartEvent, index));
+            PushAction(new EventRemovedAction(script, smartEvent, index));
         }
 
         private void BindEvent(SmartEvent smartEvent)
@@ -137,7 +129,7 @@ namespace WDE.SmartScriptEditor
             smartEvent.CooldownMin.OnValueChanged += Parameter_OnValueChanged;
             smartEvent.CooldownMax.OnValueChanged += Parameter_OnValueChanged;
 
-            for (int i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
+            for (var i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
                 smartEvent.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
 
             smartEvent.Actions.CollectionChanged += Actions_CollectionChanged;
@@ -146,28 +138,18 @@ namespace WDE.SmartScriptEditor
                 BindAction(smartAction);
         }
 
-        private void OnBulkEditingFinished(string editName)
-        {
-            EndBulkEdit(editName);
-        }
+        private void OnBulkEditingFinished(string editName) { EndBulkEdit(editName); }
 
-        private void OnBulkEditingStarted()
-        {
-            StartBulkEdit();
-        }
+        private void OnBulkEditingStarted() { StartBulkEdit(); }
 
         private void Actions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (object ev in e.NewItems)
+                foreach (var ev in e.NewItems)
                     AddedAction(ev as SmartAction, (ev as SmartAction).Parent, e.NewStartingIndex);
-            }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                foreach (object ac in e.OldItems)
+                foreach (var ac in e.OldItems)
                     RemovedAction(ac as SmartAction, (ac as SmartAction).Parent, e.OldStartingIndex);
-            }
         }
 
 
@@ -175,7 +157,7 @@ namespace WDE.SmartScriptEditor
         {
             PushAction(new ParameterChangedAction(sender as Parameter, e.Old, e.New));
         }
-        
+
         private void ParameterFloat_OnValueChange(object sender, ParameterChangedValue<float> e)
         {
             PushAction(new GenericParameterChangedAction<float>(sender as FloatParameter, e.Old, e.New));
@@ -183,162 +165,126 @@ namespace WDE.SmartScriptEditor
 
         private class EventAddedAction : IHistoryAction
         {
-            private readonly SmartScript _script;
-            private readonly SmartEvent _smartEvent;
-            private readonly int _index;
-            private readonly string _readable;
+            private readonly int index;
+            private readonly string readable;
+            private readonly SmartScript script;
+            private readonly SmartEvent smartEvent;
 
             public EventAddedAction(SmartScript script, SmartEvent smartEvent, int index)
             {
-                _script = script;
-                _smartEvent = smartEvent;
-                _index = index;
-                _readable = smartEvent.Readable;
+                this.script = script;
+                this.smartEvent = smartEvent;
+                this.index = index;
+                readable = smartEvent.Readable;
             }
 
             public string GetDescription()
             {
                 // @Todo: how to localize this?
-                return "Added event " + _readable;
+                return "Added event " + readable;
             }
 
-            public void Redo()
-            {
-                _script.Events.Insert(_index, _smartEvent);
-            }
+            public void Redo() { script.Events.Insert(index, smartEvent); }
 
-            public void Undo()
-            {
-                _script.Events.Remove(_smartEvent);
-            }
+            public void Undo() { script.Events.Remove(smartEvent); }
         }
-        
+
         private class EventRemovedAction : IHistoryAction
         {
-            private readonly SmartScript _script;
-            private readonly SmartEvent _smartEvent;
-            private readonly int _index;
+            private readonly int index;
+            private readonly SmartScript script;
+            private readonly SmartEvent smartEvent;
 
             public EventRemovedAction(SmartScript script, SmartEvent smartEvent, int index)
             {
-                _script = script;
-                _smartEvent = smartEvent;
-                _index = index;
+                this.script = script;
+                this.smartEvent = smartEvent;
+                this.index = index;
             }
 
             public string GetDescription()
             {
                 // @Todo: how to localize this?
-                return "Removed event " + _smartEvent.Readable;
+                return "Removed event " + smartEvent.Readable;
             }
 
-            public void Redo()
-            {
-                _script.Events.Remove(_smartEvent);
-            }
+            public void Redo() { script.Events.Remove(smartEvent); }
 
-            public void Undo()
-            {
-                _script.Events.Insert(_index, _smartEvent);
-            }
+            public void Undo() { script.Events.Insert(index, smartEvent); }
         }
 
         private class GenericParameterChangedAction<T> : IHistoryAction
         {
-            private readonly GenericBaseParameter<T> _param;
-            private readonly T _old;
-            private readonly T _new;
+            private readonly T @new;
+            private readonly T old;
+            private readonly GenericBaseParameter<T> param;
 
             public GenericParameterChangedAction(GenericBaseParameter<T> param, T old, T @new)
             {
-                _param = param;
-                _old = old;
-                _new = @new;
+                this.param = param;
+                this.old = old;
+                this.@new = @new;
             }
 
             public string GetDescription()
             {
                 // @Todo: how to localize this?
-                return "Changed " + _param.Name + " from " + _old + " to " + _new;
+                return "Changed " + param.Name + " from " + old + " to " + @new;
             }
 
-            public void Redo()
-            {
-                _param.SetValue(_new);
-            }
+            public void Redo() { param.SetValue(@new); }
 
-            public void Undo()
-            {
-                _param.SetValue(_old);
-            }
+            public void Undo() { param.SetValue(old); }
         }
 
         private class ParameterChangedAction : GenericParameterChangedAction<int>
         {
-            public ParameterChangedAction(GenericBaseParameter<int> param, int old, int @new) : base(param, old, @new)
-            {
-            }
+            public ParameterChangedAction(GenericBaseParameter<int> param, int old, int @new) : base(param, old, @new) { }
         }
-        
     }
 
-    public  class ActionAddedAction : IHistoryAction
+    public class ActionAddedAction : IHistoryAction
     {
-        private readonly SmartEvent _parent;
-        private readonly SmartAction _smartAction;
-        private readonly int _index;
+        private readonly int index;
+        private readonly SmartEvent parent;
+        private readonly SmartAction smartAction;
 
         public ActionAddedAction(SmartEvent parent, SmartAction smartAction, int index)
         {
-            _parent = parent;
-            _smartAction = smartAction;
-            _index = index;
+            this.parent = parent;
+            this.smartAction = smartAction;
+            this.index = index;
         }
 
         public string GetDescription()
         {
             // @Todo: how to localize this?
-            return "Added action " + _smartAction.Readable;
+            return "Added action " + smartAction.Readable;
         }
 
-        public void Redo()
-        {
-            _parent.Actions.Insert(_index, _smartAction);
-        }
+        public void Redo() { parent.Actions.Insert(index, smartAction); }
 
-        public void Undo()
-        {
-            _parent.Actions.Remove(_smartAction);
-        }
+        public void Undo() { parent.Actions.Remove(smartAction); }
     }
 
 
     public class ActionRemovedAction : IHistoryAction
     {
-        private readonly SmartEvent _parent;
-        private readonly SmartAction _smartAction;
-        private readonly int _index;
+        private readonly int index;
+        private readonly SmartEvent parent;
+        private readonly SmartAction smartAction;
 
         public ActionRemovedAction(SmartEvent parent, SmartAction smartAction, int index)
         {
-            _parent = parent;
-            _smartAction = smartAction;
-            _index = index;
+            this.parent = parent;
+            this.smartAction = smartAction;
+            this.index = index;
         }
 
-        public string GetDescription()
-        {
-            return "Removed action " + _smartAction.Readable;
-        }
+        public string GetDescription() { return "Removed action " + smartAction.Readable; }
 
-        public void Redo()
-        {
-            _parent.Actions.Remove(_smartAction);
-        }
+        public void Redo() { parent.Actions.Remove(smartAction); }
 
-        public void Undo()
-        {
-            _parent.Actions.Insert(_index, _smartAction);
-        }
+        public void Undo() { parent.Actions.Insert(index, smartAction); }
     }
 }

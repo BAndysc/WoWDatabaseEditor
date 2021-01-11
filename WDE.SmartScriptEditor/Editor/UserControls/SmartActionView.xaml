@@ -1,10 +1,9 @@
 ﻿<UserControl x:Class="WDE.SmartScriptEditor.Editor.UserControls.SmartActionView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
-             mc:Ignorable="d" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.Style>
@@ -17,22 +16,23 @@
                 </Style.Triggers>
             </Style>
         </Grid.Style>
-        
+
         <Border BorderThickness="1">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Border}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsSelected}" Value="true">
-                            <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
+                            <Setter Property="BorderBrush"
+                                    Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            
+
             <TextBlock Padding="2" TextWrapping="WrapWithOverflow">
                 <Run Foreground="{DynamicResource SmartScripts.Source.Foreground}">
-                    <Run.Style>    
+                    <Run.Style>
                         <Style TargetType="{x:Type Run}">
                             <Setter Property="Run.Text" Value="{Binding Source.Readable, Mode=OneWay}" />
                             <Style.Triggers>
@@ -47,7 +47,7 @@
                     </Run.Style>
                 </Run>
                 <Run Foreground="{DynamicResource SmartScripts.Action.Foreground}">
-                    <Run.Style>    
+                    <Run.Style>
                         <Style TargetType="{x:Type Run}">
                             <Setter Property="Run.Text" Value=": " />
                             <Style.Triggers>
@@ -61,7 +61,8 @@
                         </Style>
                     </Run.Style>
                 </Run>
-                <Run Text="{Binding Readable, Mode=OneWay}" Foreground="{DynamicResource SmartScripts.Action.Foreground}"></Run>
+                <Run Text="{Binding Readable, Mode=OneWay}"
+                     Foreground="{DynamicResource SmartScripts.Action.Foreground}" />
             </TextBlock>
         </Border>
     </Grid>

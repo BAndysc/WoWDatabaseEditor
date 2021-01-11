@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor.Data
@@ -22,19 +18,10 @@ namespace WDE.SmartScriptEditor.Data
             targets = JsonConvert.DeserializeObject<List<SmartGenericJsonData>>(jsonProvider.GetTargetsJson());
         }
 
-        public IEnumerable<SmartGenericJsonData> GetActions()
-        {
-            return actions;
-        }
+        public IEnumerable<SmartGenericJsonData> GetActions() { return actions; }
 
-        public IEnumerable<SmartGenericJsonData> GetEvents()
-        {
-            return events;
-        }
+        public IEnumerable<SmartGenericJsonData> GetEvents() { return events; }
 
-        public IEnumerable<SmartGenericJsonData> GetTargets()
-        {
-            return targets;
-        }
+        public IEnumerable<SmartGenericJsonData> GetTargets() { return targets; }
     }
 }
