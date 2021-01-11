@@ -19,10 +19,13 @@ using Prism.Ioc;
 using WDE.Common.Providers;
 using WDE.Common.Solution;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Editor.UserControls;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
@@ -35,6 +38,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly ISmartFactory smartFactory;
         private readonly ISmartTypeListProvider smartTypeListProvider;
+        private readonly IStatusBar statusbar;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
 
         private SmartScriptSolutionItem _item;
@@ -75,7 +79,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand CopyCommand { get; set; }
         public DelegateCommand CutCommand { get; set; }
         public DelegateCommand PasteCommand { get; set; }
-        public DelegateCommand SaveCommand { get; set; }
+        public AsyncAutoCommand SaveCommand { get; set; }
         public DelegateCommand DeleteSelected { get; set; }
         public DelegateCommand EditSelected { get; set; }
         
@@ -102,6 +106,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ISmartFactory smartFactory, 
             IItemFromListProvider itemFromListProvider,
             ISmartTypeListProvider smartTypeListProvider, 
+            IStatusBar statusbar,
             ISolutionItemNameRegistry itemNameRegistry)
         {
             this.history = history;
@@ -110,6 +115,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.smartFactory = smartFactory;
             this.itemFromListProvider = itemFromListProvider;
             this.smartTypeListProvider = smartTypeListProvider;
+            this.statusbar = statusbar;
             this.itemNameRegistry = itemNameRegistry;
 
             EditEvent = new DelegateCommand(EditEventCommand);
@@ -192,7 +198,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AddEvent = new DelegateCommand(AddEventCommand);
             AddAction = new DelegateCommand<NewActionViewModel>(AddActionCommand);
 
-            SaveCommand = new DelegateCommand(SaveAllToDb);
+            SaveCommand = new AsyncAutoCommand(SaveAllToDb, null, e =>
+            {
+                statusbar.PublishNotification(new PlainNotification(NotificationType.Error, "Error while saving script to the database: " + e.Message));
+            });
 
             DeleteAction = new DelegateCommand<SmartAction>(DeleteActionCommand);
             DeleteSelected = new DelegateCommand(() =>
@@ -515,10 +524,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             history.AddHandler(new SaiHistoryHandler(script));
         }
-
-        private void SaveAllToDb()
+        
+        private async Task SaveAllToDb()
         {
-
+            statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));
             List<AbstractSmartScriptLine> lines = new List<AbstractSmartScriptLine>();
 
             int eventId = 1;
@@ -541,14 +550,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
             }
 
-            try
-            {
-                database.InstallScriptFor(_item.Entry, _item.SmartType, lines);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error while saving script to the database: " + e.Message);
-            }
+            await database.InstallScriptFor(_item.Entry, _item.SmartType, lines);
+
+            statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
         }
 
         private AbstractSmartScriptLine GenerateSingleSai(int eventId, SmartEvent ev, SmartAction action, int link = 0, string comment = null)
