@@ -55,6 +55,17 @@ namespace WDE.SmartScriptEditor.Models
                 OnPropertyChanged();
             }
         }
+        
+        private string _comment;
+        public string Comment
+        {
+            get => _comment;
+            set
+            {
+                _comment = value;
+                OnPropertyChanged();
+            }
+        }
 
         private void SourceOnOnChanged(object? sender, EventArgs e)
         {
@@ -131,6 +142,7 @@ namespace WDE.SmartScriptEditor.Models
         public SmartAction Copy()
         {
             SmartAction se = new SmartAction(Id, Source.Copy(), Target.Copy());
+            se.Comment = Comment;
             se.ReadableHint = ReadableHint;
             se.DescriptionRules = DescriptionRules;
             for (int i = 0; i < ParametersCount; ++i)

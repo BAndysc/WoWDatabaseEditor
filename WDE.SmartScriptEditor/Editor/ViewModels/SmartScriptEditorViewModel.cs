@@ -282,7 +282,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var selectedActions = Events.SelectMany(e => e.Actions).Where(e => e.IsSelected).ToList();
                     if (selectedActions.Count > 0)
                     {
-                        var fakeEvent = new SmartEvent(-1);
+                        var fakeEvent = new SmartEvent(-1){ReadableHint = ""};
                         foreach (var a in selectedActions)
                             fakeEvent.AddAction(a.Copy());
                         var lines = string.Join("\n", fakeEvent.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, 0).Select(s => s.ToSqlString()));
@@ -528,28 +528,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private async Task SaveAllToDb()
         {
             statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));
-            List<AbstractSmartScriptLine> lines = new List<AbstractSmartScriptLine>();
 
-            int eventId = 1;
-
-            foreach (SmartEvent e in script.Events)
-            {
-                if (e.Actions.Count == 0)
-                    continue;
-
-                e.ActualId = eventId;
-                lines.Add(GenerateSingleSai(eventId, e, e.Actions[0], (e.Actions.Count == 1 ? 0 : eventId + 1)));
-
-                eventId++;
-
-                for (int index = 1; index < e.Actions.Count; ++index)
-                {
-                    lines.Add(GenerateSingleSai(eventId, smartFactory.EventFactory(61),
-                        e.Actions[index], (e.Actions.Count - 1 == index ? 0 : eventId + 1)));
-                    eventId++;
-                }
-            }
-
+            var lines = script.ToWaitFreeSmartScriptLines(smartFactory);
             await database.InstallScriptFor(_item.Entry, _item.SmartType, lines);
 
             statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));

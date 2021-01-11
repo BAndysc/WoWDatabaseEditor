@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,9 @@ namespace WDE.SmartScriptEditor.Models
             int previousLink = -1;
             SmartEvent currentEvent = null;
 
+            SortedDictionary<int, SmartEvent> triggerIdToActionParent = new();
+            SortedDictionary<int, SmartEvent> triggerIdToEvent = new();
+            
             foreach (var line in lines)
             {
                 if (!entry.HasValue)
@@ -53,16 +57,58 @@ namespace WDE.SmartScriptEditor.Models
                 {
                     currentEvent = SafeEventFactory(line);
                     if (currentEvent != null)
+                    {
+                        if (currentEvent.Id == SmartConstants.EVENT_TRIGGER_TIMED)
+                        {
+                            triggerIdToEvent[currentEvent.GetParameter(0).Value] = currentEvent;
+                        }
                         Events.Add(currentEvent);
+                    }
                     else
                         continue;
                 }
 
+                var comment = line.Comment.Contains(" // ")
+                    ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim()
+                    : "";
+
                 var action = SafeActionFactory(line);
                 if (action != null)
+                {
+                    if (comment != SmartConstants.COMMENT_WAIT)
+                        action.Comment = comment;
+                    if (action.Id == SmartConstants.ACTION_TRIGGER_TIMED && comment == SmartConstants.COMMENT_WAIT)
+                        triggerIdToActionParent[action.GetParameter(0).Value] = currentEvent;
                     currentEvent.AddAction(action);
-
+                }
                 previousLink = line.Link;
+            }
+
+            var sortedTriggers = triggerIdToEvent.Keys.ToList();
+            sortedTriggers.Reverse();
+            foreach (int triggerId in sortedTriggers)
+            {
+                var @event = triggerIdToEvent[triggerId];
+                if (!triggerIdToActionParent.ContainsKey(triggerId))
+                    continue;
+                
+                var caller = triggerIdToActionParent[triggerId];
+
+                var lastAction = caller.Actions[caller.Actions.Count - 1];
+                
+                if (lastAction.Id != SmartConstants.ACTION_TRIGGER_TIMED || lastAction.GetParameter(1).Value != lastAction.GetParameter(2).Value)
+                    continue;
+
+                var waitTime = lastAction.GetParameter(1).Value;
+                var waitAction =
+                    smartFactory.ActionFactory(SmartConstants.ACTION_WAIT, smartFactory.SourceFactory(SmartConstants.SOURCE_NONE), smartFactory.TargetFactory(SmartConstants.TARGET_NONE));
+                waitAction.SetParameter(0, waitTime);
+                
+                caller.Actions.RemoveAt(caller.Actions.Count - 1);
+                caller.AddAction(waitAction);
+                foreach (var a in @event.Actions)
+                    caller.AddAction(a);
+                Events.Remove(@event);
             }
         }
 

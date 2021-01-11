@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,115 +48,62 @@ namespace WDE.SmartScriptEditor.Exporter
             _sql.AppendLine(
                 "INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES");
 
-            int eventId = 0;
-            List<string> lines = new List<string>();
-
-            bool previousWasWait = false;
-            int nextTriggerId = 1000;
-
-
-            //@todo: don't use hardcoded IDs!!!!
-            foreach (SmartEvent e in _script.Events)
-            {
-                if (e.Actions.Count == 0)
-                    continue;
-
-                e.ActualId = eventId;
-
-                for (int index = 0; index < e.Actions.Count; ++index)
-                {
-                    SmartEvent actualEvent = e;
-
-                    if (previousWasWait)
-                    {
-                        actualEvent = smartFactory.EventFactory(59);
-                        actualEvent.SetParameter(0, nextTriggerId++);
-                    }
-                    else if (index > 0)
-                        actualEvent = smartFactory.EventFactory(61);
-
-                    int linkTo = (e.Actions.Count - 1 == index ? 0 : eventId + 1);
-
-                    SmartAction actualAction = e.Actions[index];
-
-                    if (actualAction.Id == 9999)
-                    {
-                        linkTo = 0;
-                        SmartAction waitAction = actualAction;
-                        actualAction = smartFactory.ActionFactory(67, smartFactory.SourceFactory(0), smartFactory.TargetFactory(0));
-                        actualAction.SetParameter(0, nextTriggerId);
-                        actualAction.SetParameter(1, waitAction.GetParameter(0).GetValue());
-                        actualAction.SetParameter(2, waitAction.GetParameter(0).GetValue());
-
-                        previousWasWait = true;
-                    }
-                    else
-                        previousWasWait = false;
-
-                    lines.Add(GenerateSingleSai(eventId, actualEvent, actualAction, linkTo));
-
-                    eventId++;
-                }
-            }
+            var serializedScript = _script.ToWaitFreeSmartScriptLines(smartFactory);
+            IEnumerable<string> lines = serializedScript.Select(GenerateSingleSai);
+            
             _sql.Append(string.Join(",\n", lines));
             _sql.AppendLine(";");
         }
 
-        private string GenerateSingleSai(int eventId, SmartEvent ev, SmartAction action, int link = 0, string comment = null)
+        private string GenerateSingleSai(ISmartScriptLine line)
         {
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
-            customCulture.NumberFormat.NumberDecimalSeparator = ".";
-
-            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
-
             //if (action.Id == 188) // ACTION DEBUG MESSAGE
             //    comment = action.Comment;
             object data = new
             {
                 entryorguid = "@ENTRY",
                 source_type = ((int)_script.SourceType).ToString(),
-                id = eventId.ToString(),
-                linkto = link.ToString(),
+                id = line.Id.ToString(),
+                linkto = line.Link.ToString(),
 
-                event_id = ev.Id.ToString(),
-                phasemask = ev.Phases.GetValue().ToString(),
-                chance = ev.Chance.ToString(),
-                flags = ev.Flags.GetValue().ToString(),
-                event_param1 = ev.GetParameter(0).GetValue().ToString(),
-                event_param2 = ev.GetParameter(1).GetValue().ToString(),
-                event_param3 = ev.GetParameter(2).GetValue().ToString(),
-                event_param4 = ev.GetParameter(3).GetValue().ToString(),
+                event_id = line.EventType.ToString(),
+                phasemask = line.EventPhaseMask.ToString(),
+                chance = line.EventChance.ToString(),
+                flags = line.EventFlags.ToString(),
+                event_param1 = line.EventParam1.ToString(),
+                event_param2 = line.EventParam2.ToString(),
+                event_param3 = line.EventParam3.ToString(),
+                event_param4 = line.EventParam4.ToString(),
 
-                event_cooldown_min = ev.CooldownMin.GetValue().ToString(),
-                event_cooldown_max = ev.CooldownMax.GetValue().ToString(),
+                event_cooldown_min = line.EventCooldownMin.ToString(),
+                event_cooldown_max = line.EventCooldownMax.ToString(),
 
-                action_id = action.Id.ToString(),
-                action_param1 = action.GetParameter(0).GetValue().ToString(),
-                action_param2 = action.GetParameter(1).GetValue().ToString(),
-                action_param3 = action.GetParameter(2).GetValue().ToString(),
-                action_param4 = action.GetParameter(3).GetValue().ToString(),
-                action_param5 = action.GetParameter(4).GetValue().ToString(),
-                action_param6 = action.GetParameter(5).GetValue().ToString(),
+                action_id = line.ActionType.ToString(),
+                action_param1 = line.ActionParam1.ToString(),
+                action_param2 = line.ActionParam2.ToString(),
+                action_param3 = line.ActionParam3.ToString(),
+                action_param4 = line.ActionParam4.ToString(),
+                action_param5 = line.ActionParam5.ToString(),
+                action_param6 = line.ActionParam6.ToString(),
 
-                action_source_id = action.Source.Id.ToString(),
-                source_param1 = action.Source.GetParameter(0).GetValue().ToString(),
-                source_param2 = action.Source.GetParameter(1).GetValue().ToString(),
-                source_param3 = action.Source.GetParameter(2).GetValue().ToString(),
-                source_condition_id = action.Source.Condition.GetValue().ToString(),
+                action_source_id = line.SourceType.ToString(),
+                source_param1 = line.SourceParam1.ToString(),
+                source_param2 = line.SourceParam2.ToString(),
+                source_param3 = line.SourceParam3.ToString(),
+                source_condition_id = line.SourceConditionId.ToString(),
 
-                target_id = action.Target.Id.ToString(),
-                target_param1 = action.Target.GetParameter(0).GetValue().ToString(),
-                target_param2 = action.Target.GetParameter(1).GetValue().ToString(),
-                target_param3 = action.Target.GetParameter(2).GetValue().ToString(),
-                target_condition_id = action.Target.Condition.GetValue().ToString(),
+                target_id = line.TargetType.ToString(),
+                target_param1 = line.TargetParam1.ToString(),
+                target_param2 = line.TargetParam2.ToString(),
+                target_param3 = line.TargetParam3.ToString(),
+                target_condition_id = line.TargetConditionId.ToString(),
+                
+                x = line.TargetX.ToString(CultureInfo.InvariantCulture),
+                y = line.TargetY.ToString(CultureInfo.InvariantCulture),
+                z = line.TargetZ.ToString(CultureInfo.InvariantCulture),
+                o = line.TargetO.ToString(CultureInfo.InvariantCulture),
 
-
-                x = action.Target.X.ToString(),
-                y = action.Target.X.ToString(),
-                z = action.Target.X.ToString(),
-                o = action.Target.X.ToString(),
-
-                comment = comment ?? (ev.Readable + " - " + action.Readable)
+                comment = line.Comment
             };
 
             return SmartFormat.Smart.Format(SAI_SQL, data);

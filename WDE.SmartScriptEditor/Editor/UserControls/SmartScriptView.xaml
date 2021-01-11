@@ -88,7 +88,7 @@
                     </Style>
                 </ItemsControl.ItemContainerStyle>
             </ItemsControl>
-            <Canvas Background="Transparent">
+            <Canvas Background="Transparent" MinHeight="30">
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="MouseDown">
                         <b:InvokeCommandAction Command="{Binding DeselectAll}"/>
