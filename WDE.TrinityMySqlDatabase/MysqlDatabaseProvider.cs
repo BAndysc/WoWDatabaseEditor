@@ -111,20 +111,20 @@ namespace WDE.TrinityMySqlDatabase
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
         }
 
-        public void InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)
+        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)
         {
             if (model == null)
                 return;
 
-            model.BeginTransaction();
-            model.SmartScript.Where(x => x.EntryOrGuid == entryOrGuid && x.ScriptSourceType == (int) type).Delete();
+            await model.BeginTransactionAsync();
+            await model.SmartScript.Where(x => x.EntryOrGuid == entryOrGuid && x.ScriptSourceType == (int) type).DeleteAsync();
             if (type == SmartScriptType.Creature)
             {
-                model.CreatureTemplate
+                await model.CreatureTemplate
                     .Where(p => p.Entry == entryOrGuid)
                     .Set(p => p.AIName, "SmartAI")
                     .Set(p => p.ScriptName, "")
-                    .Update();
+                    .UpdateAsync();
             }
 
             foreach (var line in script)
@@ -162,9 +162,9 @@ namespace WDE.TrinityMySqlDatabase
                     TargetO = line.TargetO,
                     Comment = line.Comment
                 };
-                model.Insert(sqlLine);
+                await model.InsertAsync(sqlLine);
             }
-            model.CommitTransaction();
+            await model.CommitTransactionAsync();
         }
 
         public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
@@ -187,8 +187,8 @@ namespace WDE.TrinityMySqlDatabase
     {
         public IEnumerable<IDataProviderSettings> DataProviders => Enumerable.Empty<IDataProviderSettings>();
 
-        public string DefaultConfiguration => "MySql";
-        public string DefaultDataProvider => "MySql";
+        public string DefaultConfiguration => "MySqlConnector";
+        public string DefaultDataProvider => "MySqlConnector";
 
         public MySqlSettings(DbAccess access)
         {
@@ -197,7 +197,7 @@ namespace WDE.TrinityMySqlDatabase
                 new ConnectionStringSettings
                 {
                     Name = "Trinity",
-                    ProviderName = "MySql",
+                    ProviderName = "MySqlConnector",
                     ConnectionString =
                         $"Server={access.Host};Port={access.Port ?? 3306};Database={access.Database};Uid={access.User};Pwd={access.Password};"
                 }

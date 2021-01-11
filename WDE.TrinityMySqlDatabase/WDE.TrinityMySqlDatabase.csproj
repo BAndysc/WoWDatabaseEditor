@@ -39,8 +39,8 @@
     <PackageReference Include="linq2db">
       <Version>3.2.3</Version>
     </PackageReference>
-    <PackageReference Include="linq2db.MySql">
-      <Version>2.9.8</Version>
+    <PackageReference Include="linq2db.MySqlConnector">
+      <Version>3.2.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="MySql.Data">
