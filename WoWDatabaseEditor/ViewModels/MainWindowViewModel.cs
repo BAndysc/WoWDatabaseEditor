@@ -26,6 +26,7 @@ namespace WoWDatabaseEditor.ViewModels
         private readonly INewItemService newItemService;
         private readonly ISolutionManager solutionManager;
 
+        public IStatusBar StatusBar { get; }
         public IWindowManager WindowManager { get; private set; }
 
         private string _title = "Visual Database Editor 2018";
@@ -45,10 +46,18 @@ namespace WoWDatabaseEditor.ViewModels
 
         public ObservableCollection<MenuItemViewModel> Windows { get; set; }
 
-        public MainWindowViewModel(IEventAggregator eventAggregator, IWindowManager wndowManager, IConfigureService settings, INewItemService newItemService, ISolutionManager solutionManager, Lazy<IEnumerable<IToolProvider>> tools, ISolutionItemEditorRegistry solutionEditorManager)
+        public MainWindowViewModel(IEventAggregator eventAggregator, 
+            IWindowManager wndowManager,
+            IConfigureService settings, 
+            INewItemService newItemService, 
+            ISolutionManager solutionManager, 
+            IStatusBar statusBar,
+            Lazy<IEnumerable<IToolProvider>> tools, 
+            ISolutionItemEditorRegistry solutionEditorManager)
         {
             _eventAggregator = eventAggregator;
             WindowManager = wndowManager;
+            StatusBar = statusBar;
             this.settings = settings;
             this.newItemService = newItemService;
             this.solutionManager = solutionManager;

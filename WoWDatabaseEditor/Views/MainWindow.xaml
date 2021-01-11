@@ -93,9 +93,7 @@
         </DataTemplate>
     </Controls:MetroWindow.TitleTemplate>
     <DockPanel>
-        <StatusBar DockPanel.Dock="Bottom" Height="20" Background="{DynamicResource StatusBarBackground}" VerticalAlignment="Center">
-            <TextBlock Foreground="{DynamicResource StatusBarForeground}" HorizontalAlignment="Left" VerticalAlignment="Center">WoW Database Editor</TextBlock>
-        </StatusBar>
+        <views:StatusBarView DockPanel.Dock="Bottom" Height="20" DataContext="{Binding StatusBar}" />
         <DockingManager 
             AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
