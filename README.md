@@ -3,23 +3,9 @@ Editor for Smart Scripts for TrinityCore based servers.
 
 This project is continuation of [Visual SAI Studio](https://github.com/BandyscLegacy/VisualSAIStudio), but rewritten from scratch. It is still in early stages, but anyone is welcome to help :-) Together we can make great wow emu editor!
 
-### Repositories
+# Binaries
 
-This application is splited into few repositories, at the moment:
- 
- * [WoWDatabaseEditor.Common](https://github.com/BAndysc/WoWDatabaseEditor.Common) - contains general common projects like dbc loading, database connection, possibly mpq loading in the future
- * [WowDatabaseEditor](https://github.com/BAndysc/WoWDatabaseEditor) - contains projects directly connected to database editing like smart script editing
- 
-**Remember to clone this repo with submodules or else it won't compile!**
-
-If folder `WoWDatabaseEditor.Common` is empty, you don't have submodules. To download submodules, use commands:
-
-```
-git submodule init
-git submodule update
-```
-
-Later, `git submodule update` is enough to update sub repo
+Every commit is built by AppVeyor, here are the latest binaries: [WoWDatabaseEditor.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditor.zip?branch=master)
 
 ## Thanks to:
  * [tgjones](https://github.com/tgjones/gemini) for Gemini Graph Editor
