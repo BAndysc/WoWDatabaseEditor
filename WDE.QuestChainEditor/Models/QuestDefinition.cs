@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WDE.QuestChainEditor.Models
+﻿namespace WDE.QuestChainEditor.Models
 {
     public class QuestDefinition
     {
+        public QuestDefinition(uint id, string title)
+        {
+            Id = id;
+            Title = title;
+        }
+
         public uint Id { get; }
         public string Title { get; }
-
-        public QuestDefinition(uint Id, string Title)
-        {
-            this.Id = Id;
-            this.Title = Title;
-        }
     }
 }

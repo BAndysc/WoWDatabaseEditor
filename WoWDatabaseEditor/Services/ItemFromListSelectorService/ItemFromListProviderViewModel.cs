@@ -1,41 +1,24 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows.Data;
-
-using WDE.Common.Database;
+using Prism.Mvvm;
 using WDE.Common.Parameters;
 using WoWDatabaseEditor.Extensions;
-using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 {
     public class ItemFromListProviderViewModel : BindableBase
     {
-        private readonly bool _asFlags;
-        public ObservableCollection<KeyValuePair<int, CheckableSelectOption>> RawItems { get; set; }
-        public ObservableCollection<ColumnDescriptor> Columns { get; set; }
+        private readonly bool asFlags;
 
-        private CollectionViewSource _items;
+        private readonly CollectionViewSource items;
 
-        public ICollectionView AllItems => _items.View;
-
-        public KeyValuePair<int, CheckableSelectOption>? SelectedItem { get; set; }
-
-        private string _search = "";
-        public string SearchText
-        {
-            get { return _search; }
-            set { SetProperty(ref _search, value); _items.View.Refresh(); }
-        }
+        private string search = "";
 
         public ItemFromListProviderViewModel(Dictionary<int, SelectOption> items, bool asFlags)
         {
-            _asFlags = asFlags;
+            this.asFlags = asFlags;
             RawItems = new ObservableCollection<KeyValuePair<int, CheckableSelectOption>>();
 
             foreach (int key in items.Keys)
@@ -43,52 +26,68 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
-                new ColumnDescriptor(headerText: "Key", displayMember: "Key"),
-                new ColumnDescriptor(headerText: "Name", displayMember: "Value.Name"),
-                new ColumnDescriptor(headerText: "Description", displayMember: "Value.Description"),
+                new("Key", "Key"),
+                new("Name", "Value.Name"),
+                new("Description", "Value.Description")
             };
 
             if (asFlags)
-                Columns.Insert(0, new ColumnDescriptor(headerText: "", displayMember: "Value.IsChecked", checkboxMember: true));
+                Columns.Insert(0, new ColumnDescriptor("", "Value.IsChecked", true));
 
-            _items = new CollectionViewSource();
-            _items.Source = RawItems;
-            _items.Filter += ItemsOnFilter;
+            this.items = new CollectionViewSource();
+            this.items.Source = RawItems;
+            this.items.Filter += ItemsOnFilter;
+        }
+
+        public ObservableCollection<KeyValuePair<int, CheckableSelectOption>> RawItems { get; set; }
+        public ObservableCollection<ColumnDescriptor> Columns { get; set; }
+
+        public ICollectionView AllItems => items.View;
+
+        public KeyValuePair<int, CheckableSelectOption>? SelectedItem { get; set; }
+
+        public string SearchText
+        {
+            get => search;
+            set
+            {
+                SetProperty(ref search, value);
+                items.View.Refresh();
+            }
         }
 
         private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
         {
-            KeyValuePair<int, CheckableSelectOption>? model = filterEventArgs.Item as KeyValuePair<int, CheckableSelectOption>?;
-            filterEventArgs.Accepted = string.IsNullOrEmpty(SearchText) || model != null && model.Value.Value.Name.ToLower().Contains(SearchText.ToLower());
+            var model = filterEventArgs.Item as KeyValuePair<int, CheckableSelectOption>?;
+            filterEventArgs.Accepted = string.IsNullOrEmpty(SearchText) ||
+                                       model != null && model.Value.Value.Name.ToLower().Contains(SearchText.ToLower());
         }
 
         public int GetEntry()
         {
-            if (_asFlags)
+            if (asFlags)
             {
-                int val = 0;
+                var val = 0;
                 foreach (var item in RawItems)
                 {
                     if (item.Value.IsChecked)
                         val |= item.Key;
                 }
+
                 return val;
             }
-            else
-            {
-                if (SelectedItem != null)
-                    return SelectedItem.Value.Key;
 
-                int res;
-                int.TryParse(SearchText, out res);
-                return res;
-            }
+            if (SelectedItem != null)
+                return SelectedItem.Value.Key;
+
+            int res;
+            int.TryParse(SearchText, out res);
+            return res;
         }
     }
 
     public class CheckableSelectOption : SelectOption
     {
-
         public CheckableSelectOption(SelectOption selectOption)
         {
             Name = selectOption.Name;

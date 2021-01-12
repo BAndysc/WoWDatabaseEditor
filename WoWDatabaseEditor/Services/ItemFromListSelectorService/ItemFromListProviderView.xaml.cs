@@ -4,7 +4,7 @@ using System.Windows.Input;
 namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 {
     /// <summary>
-    /// Interaction logic for ItemFromListProviderView.xaml
+    ///     Interaction logic for ItemFromListProviderView.xaml
     /// </summary>
     public partial class ItemFromListProviderView : Window
     {

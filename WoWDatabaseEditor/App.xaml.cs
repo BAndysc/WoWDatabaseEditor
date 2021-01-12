@@ -19,18 +19,12 @@ using WoWDatabaseEditor.Views;
 namespace WoWDatabaseEditor
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    ///     Interaction logic for App.xaml
     /// </summary>
     public partial class App : PrismApplication
     {
-        private SplashScreenView? splash;
-
         private IModulesManager? modulesManager;
-
-        protected override IContainerExtension CreateContainerExtension()
-        {
-            return new UnityContainerExtension(new UnityContainer().AddExtension(new Diagnostic()));
-        }
+        private SplashScreenView? splash;
 
         public App()
         {
@@ -44,36 +38,41 @@ namespace WoWDatabaseEditor
              * The disadvantage is that assemblies cannot conflict with each other. If using AssemblyLoadContext
              * there would be no problem with for instance different versions of a package.
              */
-            Dictionary<string, string> assemblyToRequesting = new Dictionary<string, string>();
+            Dictionary<string, string> assemblyToRequesting = new();
             string? executingAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 if (args.Name.EndsWith("resources") || args.RequestingAssembly == null)
                     return null;
-                
-                var name = new AssemblyName(args.Name);
 
-                var requestingAssemblyPath = executingAssemblyLocation + "/" + args.RequestingAssembly.GetName().Name + ".dll";
+                AssemblyName? name = new(args.Name);
+
+                string? requestingAssemblyPath = executingAssemblyLocation + "/" + args.RequestingAssembly.GetName().Name + ".dll";
 
                 if (!File.Exists(requestingAssemblyPath))
                 {
                     if (!assemblyToRequesting.TryGetValue(args.RequestingAssembly.GetName().Name ?? "", out requestingAssemblyPath))
                         return null;
                 }
-                
+
                 assemblyToRequesting.Add(name.Name ?? "", requestingAssemblyPath);
-                
-                var dependencyPathResolver = new AssemblyDependencyResolver(requestingAssemblyPath);
-                var path = dependencyPathResolver.ResolveAssemblyToPath(name);
-                
+
+                AssemblyDependencyResolver? dependencyPathResolver = new(requestingAssemblyPath);
+                string? path = dependencyPathResolver.ResolveAssemblyToPath(name);
+
                 if (path == null)
                     return null;
-                
+
                 if (AssemblyLoadContext.Default.Assemblies.FirstOrDefault(t => t.GetName() == name) != null)
                     return AssemblyLoadContext.Default.Assemblies.FirstOrDefault(t => t.GetName() == name);
-                
+
                 return AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
             };
+        }
+
+        protected override IContainerExtension CreateContainerExtension()
+        {
+            return new UnityContainerExtension(new UnityContainer().AddExtension(new Diagnostic()));
         }
 
         protected override Window CreateShell()
@@ -87,9 +86,9 @@ namespace WoWDatabaseEditor
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterInstance<IContainerProvider>(Container);
+            containerRegistry.RegisterInstance(Container);
             modulesManager = new ModulesManager();
-            containerRegistry.RegisterInstance<IModulesManager>(modulesManager);
+            containerRegistry.RegisterInstance(modulesManager);
         }
 
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
@@ -111,14 +110,15 @@ namespace WoWDatabaseEditor
 
             foreach (var conflict in conflicts)
             {
-                MessageBox.Show($"Module {conflict.ConflictingAssembly.GetName().Name} conflicts with module {conflict.FirstAssembly.GetName().Name}. They provide same functionality. This is not allowed. Disablig {conflict.ConflictingAssembly.GetName().Name}");
+                MessageBox.Show(
+                    $"Module {conflict.ConflictingAssembly.GetName().Name} conflicts with module {conflict.FirstAssembly.GetName().Name}. They provide same functionality. This is not allowed. Disablig {conflict.ConflictingAssembly.GetName().Name}");
                 modulesManager!.AddConflicted(conflict.ConflictingAssembly, conflict.FirstAssembly);
                 allAssemblies.Remove(conflict.ConflictingAssembly);
             }
-            
+
             AddMoulesFromLoadedAssemblies(moduleCatalog, allAssemblies);
         }
-        
+
         private IEnumerable<string> GetPluginDlls()
         {
             string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -127,23 +127,11 @@ namespace WoWDatabaseEditor
             return Directory.GetFiles(path, "WDE*.dll");
         }
 
-        private class Conflict
-        {
-            public Assembly ConflictingAssembly;
-            public Assembly FirstAssembly;
-
-            public Conflict(Assembly conflictingAssembly, Assembly firstAssembly)
-            {
-                ConflictingAssembly = conflictingAssembly;
-                FirstAssembly = firstAssembly;
-            }
-        }
-
         private IList<Conflict> DetectConflicts(List<Assembly> allAssemblies)
         {
-            Dictionary<Assembly, IList<Type>> providedInterfaces = new Dictionary<Assembly, IList<Type>>();
+            Dictionary<Assembly, IList<Type>> providedInterfaces = new();
 
-            List<Conflict> conflictingAssemblies = new List<Conflict>();
+            List<Conflict> conflictingAssemblies = new();
 
             foreach (var assembly in allAssemblies)
             {
@@ -161,7 +149,7 @@ namespace WoWDatabaseEditor
                     var intersection = otherAssembly.Value.Intersect(implementedInterfaces).ToList();
 
                     if (intersection.Count > 0)
-                        conflictingAssemblies.Add(new Conflict(conflictingAssembly: assembly, firstAssembly: otherAssembly.Key));
+                        conflictingAssemblies.Add(new Conflict(assembly, otherAssembly.Key));
                 }
 
                 providedInterfaces.Add(assembly, implementedInterfaces.ToList());
@@ -177,12 +165,14 @@ namespace WoWDatabaseEditor
             foreach (var module in modules)
                 modulesManager!.AddModule(module.Assembly);
 
-            modules.Select(module => new ModuleInfo()
-            {
-                ModuleName = module.Name,
-                ModuleType = module.AssemblyQualifiedName,
-                Ref = "file://" + module.Assembly.Location
-            }).ToList().ForEach(info => moduleCatalog.AddModule(info));
+            modules.Select(module => new ModuleInfo
+                {
+                    ModuleName = module.Name,
+                    ModuleType = module.AssemblyQualifiedName,
+                    Ref = "file://" + module.Assembly.Location
+                })
+                .ToList()
+                .ForEach(info => moduleCatalog.AddModule(info));
         }
 
         protected override IModuleCatalog CreateModuleCatalog()
@@ -193,15 +183,27 @@ namespace WoWDatabaseEditor
         protected override void OnInitialized()
         {
             // have no idea if it makes sense, but works
-            var mainWindow = Container.Resolve<MainWindow>();
+            MainWindow? mainWindow = Container.Resolve<MainWindow>();
 
-            var eventAggregator = Container.Resolve<IEventAggregator>();
+            IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<AllModulesLoaded>().Publish();
 
             splash!.Close();
 
             mainWindow.ShowDialog();
             Current.Shutdown();
+        }
+
+        private class Conflict
+        {
+            public readonly Assembly ConflictingAssembly;
+            public readonly Assembly FirstAssembly;
+
+            public Conflict(Assembly conflictingAssembly, Assembly firstAssembly)
+            {
+                ConflictingAssembly = conflictingAssembly;
+                FirstAssembly = firstAssembly;
+            }
         }
     }
 }

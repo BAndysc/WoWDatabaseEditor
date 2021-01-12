@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using AvalonDock.Controls;
 
@@ -20,8 +15,8 @@ namespace WoWDatabaseEditor.Views
             {
                 if (cp.TemplatedParent is LayoutAnchorableControl)
                     return AnchorableDocumentTemplate;
-
             }
+
             return DocumentTemplate;
         }
     }

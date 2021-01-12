@@ -12,8 +12,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
 {
     internal class SmartScriptPanelLayout : Panel
     {
-        private readonly List<(float y, float height, int actionIndex, int eventIndex)> actionHeights =
-            new();
+        private readonly List<(float y, float height, int actionIndex, int eventIndex)> actionHeights = new();
 
         private readonly Dictionary<SmartAction, ContentPresenter> actionToPresenter = new();
 
@@ -70,7 +69,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
 
         private void OnLoadVisualChild(object sender, RoutedEventArgs e)
         {
-            var visualAddedPresenter = sender as ContentPresenter;
+            ContentPresenter visualAddedPresenter = sender as ContentPresenter;
             if (visualAddedPresenter.Content is SmartEvent @event)
             {
                 presenterToEvent[visualAddedPresenter] = @event;
@@ -95,15 +94,17 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
         private IEnumerable<ContentPresenter> Events()
         {
             foreach (ContentPresenter child in InternalChildren)
+            {
                 if (child.Content is SmartEvent)
                     yield return child;
+            }
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            var s = base.MeasureOverride(availableSize);
-            var totalDesiredHeight = EventSpacing;
-            foreach (var eventPresenter in Events())
+            Size s = base.MeasureOverride(availableSize);
+            float totalDesiredHeight = EventSpacing;
+            foreach (ContentPresenter eventPresenter in Events())
             {
                 eventPresenter.Measure(new Size(EventWidth, availableSize.Height));
 
@@ -112,13 +113,13 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                 if (!presenterToEvent.ContainsKey(eventPresenter))
                     continue;
 
-                var @event = presenterToEvent[eventPresenter];
-                foreach (var action in @event.Actions)
+                SmartEvent @event = presenterToEvent[eventPresenter];
+                foreach (SmartAction action in @event.Actions)
                 {
                     if (!actionToPresenter.ContainsKey(action))
                         continue;
 
-                    var actionPresenter = actionToPresenter[action];
+                    ContentPresenter actionPresenter = actionToPresenter[action];
                     actionPresenter.Measure(new Size(ActualWidth - EventWidth, availableSize.Height));
 
                     actionsHeight += (float) actionPresenter.DesiredSize.Height + ActionSpacing;
@@ -136,8 +137,10 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 if (!(e.Source is SmartEventView) && !(e.Source is SmartActionView))
-                    foreach (var @event in Events())
+                {
+                    foreach (ContentPresenter @event in Events())
                         SetSelected(@event, false);
+                }
 
                 mouseStartPosition = e.GetPosition(this);
             }
@@ -155,8 +158,11 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             if (draggingEvents)
                 DropItems?.Execute(OverIndexEvent);
             else if (draggingActions)
+            {
                 DropActions?.Execute(new DropActionsArgs
                     {EventIndex = overIndexAction.eventIndex, ActionIndex = overIndexAction.actionIndex});
+            }
+
             draggingEvents = false;
             draggingActions = false;
             InvalidateArrange();
@@ -168,15 +174,16 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             base.OnRender(dc);
             if (draggingActions)
             {
-                var x = EventWidth;
-                var y = overIndexAction.y - overIndexAction.height / 2 - 1;
-                dc.DrawLine(new Pen(Brushes.Gray, 1),
-                    new Point(x, y),
-                    new Point(x + 200, y));
+                float x = EventWidth;
+                float y = overIndexAction.y - overIndexAction.height / 2 - 1;
+                dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + 200, y));
             }
         }
 
-        private bool AnyActionSelected() { return actionToPresenter.Keys.Any(a => a.IsSelected); }
+        private bool AnyActionSelected()
+        {
+            return actionToPresenter.Keys.Any(a => a.IsSelected);
+        }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
@@ -200,7 +207,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             {
                 var eventIndex = 0;
                 var found = false;
-                foreach (var f in eventHeights)
+                foreach (float f in eventHeights)
                 {
                     if (f > mouseY)
                     {
@@ -213,18 +220,22 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                 }
 
                 if (!found)
+                {
                     OverIndexEvent = eventHeights.Count > 0 && mouseY > eventHeights[eventHeights.Count - 1]
                         ? eventHeights.Count - 1
                         : 0;
+                }
             }
             else if (draggingActions)
             {
-                foreach (var tuple in actionHeights)
+                foreach ((float y, float height, int actionIndex, int eventIndex) tuple in actionHeights)
+                {
                     if (tuple.y > mouseY)
                     {
                         overIndexAction = tuple;
                         break;
                     }
+                }
 
                 InvalidateVisual();
             }
@@ -236,12 +247,12 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
         {
             eventHeights.Clear();
             actionHeights.Clear();
-            var y = EventSpacing;
+            float y = EventSpacing;
 
             float selectedHeight = 0;
-            foreach (var child in Events())
+            foreach (ContentPresenter child in Events())
             {
-                var height = Math.Max(MeasureActions(child), (float) child.DesiredSize.Height);
+                float height = Math.Max(MeasureActions(child), (float) child.DesiredSize.Height);
                 eventHeights.Add(y + (height + EventSpacing) / 2);
                 y += height + EventSpacing;
 
@@ -263,18 +274,18 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             var eventIndex = 0;
             if (addActionViewModel != null)
                 addActionViewModel.Event = null;
-            foreach (var child in Events())
+            foreach (ContentPresenter child in Events())
             {
                 var height = (float) child.DesiredSize.Height;
                 if (!draggingEvents || !GetSelected(child))
                 {
-                    var actionHeight = ArrangeActions(eventIndex, 0, finalSize, child, y, height);
+                    float actionHeight = ArrangeActions(eventIndex, 0, finalSize, child, y, height);
                     height = Math.Max(height, actionHeight);
                     child.Arrange(new Rect(0, y, EventWidth, height));
 
                     if (mouseY > y && mouseY < y + height && !draggingActions && !draggingEvents)
                     {
-                        if (addActionViewModel != null && presenterToEvent.TryGetValue(child, out var smartEvent))
+                        if (addActionViewModel != null && presenterToEvent.TryGetValue(child, out SmartEvent smartEvent))
                             addActionViewModel.Event = smartEvent;
                         addActionPresenter.Arrange(new Rect(EventWidth,
                             y + actionHeight - 26,
@@ -294,7 +305,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             }
 
             eventIndex = 0;
-            foreach (var eventPresenter in Events())
+            foreach (ContentPresenter eventPresenter in Events())
             {
                 var height = (float) eventPresenter.DesiredSize.Height;
                 if (draggingEvents && GetSelected(eventPresenter))
@@ -318,13 +329,13 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             float eventHeight)
         {
             float totalHeight = 26;
-            if (!presenterToEvent.TryGetValue(eveentPresenter, out var @event))
+            if (!presenterToEvent.TryGetValue(eveentPresenter, out SmartEvent @event))
                 return totalHeight;
 
             var actionIndex = 0;
-            foreach (var action in @event.Actions)
+            foreach (SmartAction action in @event.Actions)
             {
-                if (!actionToPresenter.TryGetValue(action, out var actionPresenter))
+                if (!actionToPresenter.TryGetValue(action, out ContentPresenter actionPresenter))
                     continue;
 
                 var height = (float) actionPresenter.DesiredSize.Height;
@@ -336,7 +347,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                 actionIndex++;
             }
 
-            var rest = Math.Max(26, eventHeight - (totalHeight - 26));
+            float rest = Math.Max(26, eventHeight - (totalHeight - 26));
 
             actionHeights.Add((y + (rest + ActionSpacing) / 2, rest, actionIndex, eventIndex));
 
@@ -346,12 +357,12 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
         private float MeasureActions(ContentPresenter eventPresenter)
         {
             float totalHeight = 26;
-            if (!presenterToEvent.TryGetValue(eventPresenter, out var @event))
+            if (!presenterToEvent.TryGetValue(eventPresenter, out SmartEvent @event))
                 return totalHeight;
 
-            foreach (var action in @event.Actions)
+            foreach (SmartAction action in @event.Actions)
             {
-                if (!actionToPresenter.TryGetValue(action, out var actionPresenter))
+                if (!actionToPresenter.TryGetValue(action, out ContentPresenter actionPresenter))
                     continue;
 
                 var height = (float) actionPresenter.DesiredSize.Height;
@@ -370,17 +381,16 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
 
         #region Properties
 
-        public static readonly DependencyProperty SelectedProperty =
-            DependencyProperty.RegisterAttached("Selected",
-                typeof(bool),
-                typeof(SmartScriptPanelLayout),
-                new FrameworkPropertyMetadata(false,
-                    FrameworkPropertyMetadataOptions.AffectsParentArrange));
+        public static readonly DependencyProperty SelectedProperty = DependencyProperty.RegisterAttached("Selected",
+            typeof(bool),
+            typeof(SmartScriptPanelLayout),
+            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsParentArrange));
 
         [AttachedPropertyBrowsableForChildren]
         public static bool GetSelected(UIElement element)
         {
-            if (element == null) throw new ArgumentNullException("element");
+            if (element == null)
+                throw new ArgumentNullException("element");
 
             return (bool) element.GetValue(SelectedProperty);
         }
@@ -388,7 +398,8 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
         [AttachedPropertyBrowsableForChildren]
         public static void SetSelected(UIElement element, bool length)
         {
-            if (element == null) throw new ArgumentNullException("element");
+            if (element == null)
+                throw new ArgumentNullException("element");
 
             element.SetValue(SelectedProperty, length);
         }
@@ -399,11 +410,10 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             set => SetValue(OverIndexEventProperty, value);
         }
 
-        public static readonly DependencyProperty OverIndexEventProperty =
-            DependencyProperty.Register(nameof(OverIndexEvent),
-                typeof(int),
-                typeof(SmartScriptPanelLayout),
-                new PropertyMetadata(0));
+        public static readonly DependencyProperty OverIndexEventProperty = DependencyProperty.Register(nameof(OverIndexEvent),
+            typeof(int),
+            typeof(SmartScriptPanelLayout),
+            new PropertyMetadata(0));
 
         public float EventSpacing
         {
@@ -411,11 +421,10 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             set => SetValue(EventSpacingProperty, value);
         }
 
-        public static readonly DependencyProperty EventSpacingProperty =
-            DependencyProperty.Register(nameof(EventSpacing),
-                typeof(float),
-                typeof(SmartScriptPanelLayout),
-                new PropertyMetadata(10f));
+        public static readonly DependencyProperty EventSpacingProperty = DependencyProperty.Register(nameof(EventSpacing),
+            typeof(float),
+            typeof(SmartScriptPanelLayout),
+            new PropertyMetadata(10f));
 
         public float ActionSpacing
         {
@@ -423,18 +432,15 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             set => SetValue(ActionSpacingProperty, value);
         }
 
-        public static readonly DependencyProperty ActionSpacingProperty =
-            DependencyProperty.Register(nameof(ActionSpacing),
-                typeof(float),
-                typeof(SmartScriptPanelLayout),
-                new PropertyMetadata(2f));
+        public static readonly DependencyProperty ActionSpacingProperty = DependencyProperty.Register(nameof(ActionSpacing),
+            typeof(float),
+            typeof(SmartScriptPanelLayout),
+            new PropertyMetadata(2f));
 
-        public static readonly DependencyProperty DropItemsProperty =
-            DependencyProperty.Register(
-                nameof(DropItems),
-                typeof(ICommand),
-                typeof(SmartScriptPanelLayout),
-                new UIPropertyMetadata(null));
+        public static readonly DependencyProperty DropItemsProperty = DependencyProperty.Register(nameof(DropItems),
+            typeof(ICommand),
+            typeof(SmartScriptPanelLayout),
+            new UIPropertyMetadata(null));
 
         public ICommand DropItems
         {
@@ -442,12 +448,10 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             set => SetValue(DropItemsProperty, value);
         }
 
-        public static readonly DependencyProperty DropActionsProperty =
-            DependencyProperty.Register(
-                nameof(DropActions),
-                typeof(ICommand),
-                typeof(SmartScriptPanelLayout),
-                new UIPropertyMetadata(null));
+        public static readonly DependencyProperty DropActionsProperty = DependencyProperty.Register(nameof(DropActions),
+            typeof(ICommand),
+            typeof(SmartScriptPanelLayout),
+            new UIPropertyMetadata(null));
 
         public ICommand DropActions
         {

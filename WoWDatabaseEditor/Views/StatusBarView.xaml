@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:managers="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
-             xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <StatusBar Background="{DynamicResource StatusBarBackground}" VerticalAlignment="Center">
@@ -15,27 +14,27 @@
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding CurrentNotification.Type}"
                                          Value="{x:Static managers:NotificationType.Error}">
-                                <Setter Property="Source" Value="{DynamicResource StatusBarIconError}"></Setter>
+                                <Setter Property="Source" Value="{DynamicResource StatusBarIconError}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding CurrentNotification.Type}"
                                          Value="{x:Static managers:NotificationType.Warning}">
-                                <Setter Property="Source" Value="{DynamicResource StatusBarIconWarning}"></Setter>
+                                <Setter Property="Source" Value="{DynamicResource StatusBarIconWarning}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding CurrentNotification.Type}"
                                          Value="{x:Static managers:NotificationType.Info}">
-                                <Setter Property="Source" Value="{DynamicResource StatusBarIconNotice}"></Setter>
+                                <Setter Property="Source" Value="{DynamicResource StatusBarIconNotice}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding CurrentNotification.Type}"
                                          Value="{x:Static managers:NotificationType.Success}">
-                                <Setter Property="Source" Value="{DynamicResource StatusBarIconSuccess}"></Setter>
+                                <Setter Property="Source" Value="{DynamicResource StatusBarIconSuccess}" />
                             </DataTrigger>
-                            
+
                         </Style.Triggers>
                     </Style>
                 </Image.Style>
             </Image>
-            <TextBlock Foreground="{DynamicResource StatusBarForeground}" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}">
-            </TextBlock>
+            <TextBlock Foreground="{DynamicResource StatusBarForeground}" HorizontalAlignment="Left"
+                       VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}" />
         </StackPanel>
     </StatusBar>
 </UserControl>

@@ -9,7 +9,10 @@ namespace WDE.SmartScriptEditor.Models
 
         private Parameter condition;
 
-        public SmartSource(int id) : base(SmartSourceParametersCount, id) { Condition = new Parameter("Condition ID"); }
+        public SmartSource(int id) : base(SmartSourceParametersCount, id)
+        {
+            Condition = new Parameter("Condition ID");
+        }
 
         public Parameter Condition
         {
@@ -27,7 +30,7 @@ namespace WDE.SmartScriptEditor.Models
         {
             get
             {
-                var output = Smart.Format(ReadableHint,
+                string output = Smart.Format(ReadableHint,
                     new
                     {
                         pram1 = GetParameter(0).ToString(),
@@ -45,11 +48,14 @@ namespace WDE.SmartScriptEditor.Models
 
         public override int ParametersCount => 3;
 
-        private void _condition_OnValueChanged(object sender, ParameterChangedValue<int> e) { CallOnChanged(); }
+        private void _condition_OnValueChanged(object sender, ParameterChangedValue<int> e)
+        {
+            CallOnChanged();
+        }
 
         public SmartSource Copy()
         {
-            var se = new SmartSource(Id) {ReadableHint = ReadableHint, DescriptionRules = DescriptionRules};
+            SmartSource se = new(Id) {ReadableHint = ReadableHint, DescriptionRules = DescriptionRules};
             for (var i = 0; i < ParametersCount; ++i)
                 se.SetParameterObject(i, GetParameter(i).Clone());
             return se;

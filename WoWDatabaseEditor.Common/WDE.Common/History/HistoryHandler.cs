@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WDE.Common.History
 {
     public abstract class HistoryHandler
     {
+        private readonly List<IHistoryAction> bulkEditing = new();
+        private bool inBulkEditing;
         public event EventHandler<IHistoryAction> ActionPush = delegate { };
 
-        private List<IHistoryAction> bulkEditing = new List<IHistoryAction>();
-        private bool inBulkEditing = false;
-        
         protected void StartBulkEdit()
         {
             inBulkEditing = true;

@@ -7,6 +7,9 @@ namespace WDE.SmartScriptEditor.Editor.Views
     /// </summary>
     public partial class SmartScriptEditorView : UserControl
     {
-        public SmartScriptEditorView() { InitializeComponent(); }
+        public SmartScriptEditorView()
+        {
+            InitializeComponent();
+        }
     }
 }

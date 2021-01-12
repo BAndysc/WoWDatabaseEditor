@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WDE.Common.Database
+﻿namespace WDE.Common.Database
 {
     public enum SmartScriptType
     {
@@ -18,6 +13,6 @@ namespace WDE.Common.Database
         Instance = 8,
         TimedActionList = 9,
         Aura = 10,
-        Cinematic = 11,
+        Cinematic = 11
     }
 }

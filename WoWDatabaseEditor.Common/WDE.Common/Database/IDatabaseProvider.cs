@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Module.Attributes;
 
@@ -11,10 +9,10 @@ namespace WDE.Common.Database
     {
         ICreatureTemplate GetCreatureTemplate(uint entry);
         IEnumerable<ICreatureTemplate> GetCreatureTemplates();
-        
+
         IGameObjectTemplate GetGameObjectTemplate(uint entry);
         IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
-        
+
         IQuestTemplate GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
 

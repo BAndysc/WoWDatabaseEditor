@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WDE.Common;
@@ -25,7 +21,7 @@ namespace WDE.Blueprints.Providers
 
         public ImageSource GetImage()
         {
-            return new BitmapImage(new Uri($"/WDE.Blueprints;component/Resources/icon.png", UriKind.Relative));
+            return new BitmapImage(new Uri("/WDE.Blueprints;component/Resources/icon.png", UriKind.Relative));
         }
 
         public string GetName()

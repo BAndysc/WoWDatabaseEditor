@@ -3,7 +3,7 @@
 namespace WDE.Solutions.Explorer.Views
 {
     /// <summary>
-    /// Interaction logic for SolutionExplorerView
+    ///     Interaction logic for SolutionExplorerView
     /// </summary>
     public partial class SolutionExplorerView : UserControl
     {

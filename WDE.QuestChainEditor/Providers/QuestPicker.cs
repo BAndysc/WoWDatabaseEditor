@@ -1,9 +1,4 @@
 ﻿using ExtensionMethods;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WDE.Module.Attributes;
 using WDE.QuestChainEditor.Editor.ViewModels;
 using WDE.QuestChainEditor.Editor.Views;
@@ -14,25 +9,23 @@ namespace WDE.QuestChainEditor.Providers
     [AutoRegister]
     public class QuestPicker : IQuestPicker
     {
-        public IQuestsProvider QuestsProvider { get; }
-
         public QuestPicker(IQuestsProvider questsProvider)
         {
             QuestsProvider = questsProvider;
         }
-        
+
+        public IQuestsProvider QuestsProvider { get; }
+
         public QuestDefinition ChooseQuest()
         {
-            var picker = new QuestPickerWindow();
-            var model = new QuestsViewModel(QuestsProvider);
+            QuestPickerWindow picker = new();
+            QuestsViewModel model = new(QuestsProvider);
             picker.DataContext = model;
-            
-            var result = picker.ShowDialogCenteredToMouse();
-            
+
+            bool? result = picker.ShowDialogCenteredToMouse();
+
             if (result.HasValue && result.Value && model.ChosenItem != null)
-            {
                 return model.ChosenItem;
-            }
             return null;
         }
     }

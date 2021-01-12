@@ -2,58 +2,63 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
-
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
-using Prism.Commands;
-using System.Windows.Input;
+using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditor.Managers
 {
-    [WDE.Module.Attributes.AutoRegister, WDE.Module.Attributes.SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class WindowManager : BindableBase, IWindowManager
     {
-        private readonly IEventAggregator _eventAggregator;
+        private readonly IEventAggregator eventAggregator;
+        private IDocument? activeDocument;
 
         public WindowManager(IEventAggregator eventAggregator)
         {
-            _eventAggregator = eventAggregator;
+            this.eventAggregator = eventAggregator;
             ActivateDocument = new DelegateCommand<IDocument>(doc => ActiveDocument = doc);
         }
-        
+
         public DelegateCommand<IDocument> ActivateDocument { get; }
-        private IDocument? _activeDocument;
+        private Dictionary<Type, ITool> Opened { get; } = new();
+
         public IDocument? ActiveDocument
         {
-            get => _activeDocument;
-            set {
-                if (value == null && _activeDocument != null && OpenedDocuments.Contains(_activeDocument))
+            get => activeDocument;
+            set
+            {
+                if (value == null && activeDocument != null && OpenedDocuments.Contains(activeDocument))
                     return;
-                SetProperty(ref _activeDocument, value);
-                _eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
+                SetProperty(ref activeDocument, value);
+                eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
             }
         }
 
-        public ObservableCollection<IDocument> OpenedDocuments { get; } = new ObservableCollection<IDocument>();
-        public ObservableCollection<ITool> OpenedTools { get; } = new ObservableCollection<ITool>();         
-        private Dictionary<Type, ITool> Opened { get; } = new Dictionary<Type, ITool>();
+        public ObservableCollection<IDocument> OpenedDocuments { get; } = new();
+        public ObservableCollection<ITool> OpenedTools { get; } = new();
 
         public void OpenDocument(IDocument editor)
         {
             if (!OpenedDocuments.Contains(editor))
             {
-                var origCommand = editor.CloseCommand;
+                ICommand? origCommand = editor.CloseCommand;
                 editor.CloseCommand = new Command(() =>
-                {
-                    origCommand?.Execute(null);
-                    OpenedDocuments.Remove(editor);
-                    _eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
-                }, () => origCommand?.CanExecute(null) ?? true);
+                    {
+                        origCommand?.Execute(null);
+                        OpenedDocuments.Remove(editor);
+                        eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
+                    },
+                    () => origCommand?.CanExecute(null) ?? true);
                 OpenedDocuments.Add(editor);
             }
+
             ActiveDocument = editor;
         }
 
@@ -68,8 +73,8 @@ namespace WoWDatabaseEditor.Managers
                 }
             }
 
-            var tool = provider.Provide();
-            
+            ITool? tool = provider.Provide();
+
             if (!provider.AllowMultiple)
                 Opened.Add(provider.GetType(), tool);
 
@@ -78,8 +83,8 @@ namespace WoWDatabaseEditor.Managers
 
         private class Command : ICommand
         {
-            public readonly Func<bool> canExecute;
-            public readonly Action action;
+            private readonly Action action;
+            private readonly Func<bool> canExecute;
 
             public Command(Action action, Func<bool> canExecute)
             {
@@ -99,7 +104,9 @@ namespace WoWDatabaseEditor.Managers
 
             public event EventHandler? CanExecuteChanged;
         }
-        
-        public class DocumentClosedEvent : PubSubEvent<IDocument> {}
+
+        public class DocumentClosedEvent : PubSubEvent<IDocument>
+        {
+        }
     }
 }

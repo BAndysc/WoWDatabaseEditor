@@ -27,7 +27,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             if (Parameter.Items != null)
             {
-                var val = itemFromListProvider.GetItemFromList(Parameter.Items, Parameter is FlagParameter);
+                int? val = itemFromListProvider.GetItemFromList(Parameter.Items, Parameter is FlagParameter);
                 if (val.HasValue)
                     Parameter.Value = val.Value;
             }

@@ -1,18 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
 using WDE.QuestChainEditor.Editor.ViewModels;
 using WDE.QuestChainEditor.Exporter;
 using WDE.QuestChainEditor.Models;
@@ -23,44 +9,38 @@ using WDE.TrinityMySqlDatabase.Providers;
 namespace QuestChainTest
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        QuestList quests;
+        private readonly QuestList quests;
+
         public MainWindow()
         {
             InitializeComponent();
-            
+
             quests = new QuestList();
-            
+
             new TrinityMySqlDatabaseModule().OnInitialized(null);
 
-            var db = new TrinityMysqlDatabaseProvider(new ConnectionSettingsProvider());
+            TrinityMysqlDatabaseProvider db = new(new ConnectionSettingsProvider());
 
-            var exampleQuestProvider = new ExampleQuestsProvider();
+            ExampleQuestsProvider exampleQuestProvider = new();
 
             View.DataContext = new QuestChainEditorViewModel(new QuestPicker(exampleQuestProvider), quests);
 
             quests.OnAddedQuest += (sender, quest) =>
             {
                 Update();
-                quest.RequiredQuests.CollectionChanged += (sender2, e2) =>
-                {
-                    Update();
-                };
+                quest.RequiredQuests.CollectionChanged += (sender2, e2) => { Update(); };
             };
             quests.OnRemovedQuest += (sender, quest) => Update();
             Update();
 
-            foreach (var q in quests)
-            {
-                q.RequiredQuests.CollectionChanged += (sender, e) =>
-                {
-                    Update();
-                };
-            }
+            foreach (Quest q in quests)
+                q.RequiredQuests.CollectionChanged += (sender, e) => { Update(); };
         }
+
         private void Update()
         {
             Text.Text = new QuestChainExporter().GenerateSQL(quests);

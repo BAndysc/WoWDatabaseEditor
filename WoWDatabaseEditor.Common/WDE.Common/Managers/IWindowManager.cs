@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
-using WDE.Module.Attributes;
 using WDE.Common.Windows;
+using WDE.Module.Attributes;
 
 namespace WDE.Common.Managers
 {
@@ -8,11 +8,11 @@ namespace WDE.Common.Managers
     public interface IWindowManager
     {
         IDocument ActiveDocument { get; set; }
-        
+
         ObservableCollection<IDocument> OpenedDocuments { get; }
-        void OpenDocument(IDocument editor);
-        
+
         ObservableCollection<ITool> OpenedTools { get; }
+        void OpenDocument(IDocument editor);
         void OpenTool(IToolProvider provider);
     }
 }

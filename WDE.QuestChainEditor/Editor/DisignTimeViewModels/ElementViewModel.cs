@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Media;
 
 namespace WDE.QuestChainEditor.Editor.DisignTimeViewModels
@@ -15,36 +11,40 @@ namespace WDE.QuestChainEditor.Editor.DisignTimeViewModels
 
         public bool IsSelected => true;
 
-        public IEnumerable<Connector> InputConnectors => new[]
-        {
-            new Connector(""),
-        };
+        public IEnumerable<Connector> InputConnectors =>
+            new[]
+            {
+                new Connector("")
+            };
 
-        public IEnumerable<Connector> OutputConnectors => new[]
-        {
-            new Connector("", true),
-        };
+        public IEnumerable<Connector> OutputConnectors =>
+            new[]
+            {
+                new Connector("", true)
+            };
     }
 
 
     internal class ConnectorViewModel : Connector
     {
-        public ConnectorViewModel() : base("", false) { }
+        public ConnectorViewModel() : base("")
+        {
+        }
     }
 
     internal class Connector
     {
-        public string Name { get; }
-
-        public bool NonEmpty { get; }
-
-        public Color Color { get; }
-        
         public Connector(string name, bool nonEmpty = false)
         {
             Name = name;
             NonEmpty = nonEmpty;
             Color = Colors.DarkSeaGreen;
         }
+
+        public string Name { get; }
+
+        public bool NonEmpty { get; }
+
+        public Color Color { get; }
     }
 }

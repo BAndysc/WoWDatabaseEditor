@@ -50,7 +50,7 @@ namespace WDE.SmartScriptEditor.Models
         {
             get
             {
-                var output = Smart.Format(ReadableHint,
+                string output = Smart.Format(ReadableHint,
                     new
                     {
                         pram1 = GetParameter(0).ToString(),
@@ -70,19 +70,25 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        public string GetCoords() { return $"({X}, {Y}, {Z}, {O})"; }
+        public string GetCoords()
+        {
+            return $"({X}, {Y}, {Z}, {O})";
+        }
 
         private bool HasPosition()
         {
             for (var i = 0; i < 4; ++i)
+            {
                 if (Position[i].Value != 0)
                     return true;
+            }
+
             return false;
         }
 
         public string GetPosition()
         {
-            var output = Readable;
+            string output = Readable;
             return output.Contains("position") || IsPosition
                 ? output
                 : "position of " + output + (HasPosition() ? " moved by offset " + GetCoords() : "");
@@ -90,7 +96,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartTarget Copy()
         {
-            var se = new SmartTarget(Id)
+            SmartTarget se = new(Id)
             {
                 ReadableHint = ReadableHint,
                 DescriptionRules = DescriptionRules,

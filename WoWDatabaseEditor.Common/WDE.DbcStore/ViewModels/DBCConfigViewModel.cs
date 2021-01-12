@@ -1,12 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System;
 using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using WDE.DbcStore.Data;
 using WDE.DbcStore.Providers;
 
 namespace WDE.DbcStore.ViewModels
@@ -15,28 +9,11 @@ namespace WDE.DbcStore.ViewModels
     {
         private readonly IDbcSettingsProvider dbcSettings;
 
-        public Action SaveAction { get; set; }
-        
-        private string _path;
-        public string Path
-        {
-            get { return _path; }
-            set { SetProperty(ref _path, value); }
-        }
+        private DBCVersions dbcVersion;
 
-        private bool _skipLoading;
-        public bool SkipLoading
-        {
-            get { return _skipLoading; }
-            set { SetProperty(ref _skipLoading, value); }
-        }
+        private string path;
 
-        private DBCVersions _dbcVersion;
-        public DBCVersions DBCVersion
-        {
-            get { return _dbcVersion; }
-            set { SetProperty(ref _dbcVersion, value); }
-        }
+        private bool skipLoading;
 
         public DBCConfigViewModel(IDbcSettingsProvider dbcSettings)
         {
@@ -47,9 +24,29 @@ namespace WDE.DbcStore.ViewModels
             this.dbcSettings = dbcSettings;
         }
 
+        public Action SaveAction { get; set; }
+
+        public string Path
+        {
+            get => path;
+            set => SetProperty(ref path, value);
+        }
+
+        public bool SkipLoading
+        {
+            get => skipLoading;
+            set => SetProperty(ref skipLoading, value);
+        }
+
+        public DBCVersions DBCVersion
+        {
+            get => dbcVersion;
+            set => SetProperty(ref dbcVersion, value);
+        }
+
         private void Save()
         {
-            dbcSettings.UpdateSettings(new Data.DBCSettings() { Path = Path, SkipLoading = SkipLoading, DBCVersion = DBCVersion });
+            dbcSettings.UpdateSettings(new DBCSettings {Path = Path, SkipLoading = SkipLoading, DBCVersion = DBCVersion});
         }
     }
 }

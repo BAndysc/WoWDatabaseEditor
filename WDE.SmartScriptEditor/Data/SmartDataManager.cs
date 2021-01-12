@@ -76,7 +76,7 @@ namespace WDE.SmartScriptEditor.Data
 
         private void Load(SmartType type, IEnumerable<SmartGenericJsonData> data)
         {
-            foreach (var d in data)
+            foreach (SmartGenericJsonData d in data)
                 Add(type, d);
         }
 
@@ -114,12 +114,20 @@ namespace WDE.SmartScriptEditor.Data
     [ExcludeFromCodeCoverage]
     public class SmartDataWithSuchIdExists : Exception
     {
-        public SmartDataWithSuchIdExists() { }
+        public SmartDataWithSuchIdExists()
+        {
+        }
 
-        public SmartDataWithSuchIdExists(string message) : base(message) { }
+        public SmartDataWithSuchIdExists(string message) : base(message)
+        {
+        }
 
-        public SmartDataWithSuchIdExists(string message, Exception innerException) : base(message, innerException) { }
+        public SmartDataWithSuchIdExists(string message, Exception innerException) : base(message, innerException)
+        {
+        }
 
-        protected SmartDataWithSuchIdExists(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected SmartDataWithSuchIdExists(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
     }
 }

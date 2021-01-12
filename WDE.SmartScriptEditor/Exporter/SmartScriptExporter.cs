@@ -111,38 +111,30 @@ namespace WDE.SmartScriptEditor.Exporter
             switch (script.SourceType)
             {
                 case SmartScriptType.Creature:
-                    sql.AppendLine(
-                        "UPDATE creature_template SET AIName=\"SmartAI\" WHERE entry= @ENTRY;");
+                    sql.AppendLine("UPDATE creature_template SET AIName=\"SmartAI\" WHERE entry= @ENTRY;");
                     break;
                 case SmartScriptType.GameObject:
-                    sql.AppendLine(
-                        "UPDATE gameobject_template SET AIName=\"SmartGameObjectAI\" WHERE entry=@ENTRY;");
+                    sql.AppendLine("UPDATE gameobject_template SET AIName=\"SmartGameObjectAI\" WHERE entry=@ENTRY;");
                     break;
                 case SmartScriptType.Quest:
                     sql.AppendLine("DELETE FROM quest_scripts WHERE questId = @ENTRY;");
                     sql.AppendLine("INSERT INTO quest_scripts(questId, ScriptName) VALUES(@ENTRY, \"SmartQuest\");");
                     break;
                 case SmartScriptType.Spell:
-                    sql.AppendLine(
-                        "DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartSpell\";");
-                    sql.AppendLine(
-                        "INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartSpell\");");
+                    sql.AppendLine("DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartSpell\";");
+                    sql.AppendLine("INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartSpell\");");
                     break;
                 case SmartScriptType.Aura:
-                    sql.AppendLine(
-                        "DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartAura\";");
-                    sql.AppendLine(
-                        "INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartAura\");");
+                    sql.AppendLine("DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartAura\";");
+                    sql.AppendLine("INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartAura\");");
                     break;
                 case SmartScriptType.Cinematic:
                     sql.AppendLine("DELETE FROM cinematic_scripts WHERE cinematicId = @ENTRY;");
-                    sql.AppendLine(
-                        "INSERT INTO cinematic_scripts(cinematicId, ScriptName) VALUES(@ENTRY, \"SmartCinematic\");");
+                    sql.AppendLine("INSERT INTO cinematic_scripts(cinematicId, ScriptName) VALUES(@ENTRY, \"SmartCinematic\");");
                     break;
                 case SmartScriptType.AreaTrigger:
                     sql.AppendLine("DELETE FROM areatrigger_scripts WHERE entry = @ENTRY;");
-                    sql.AppendLine(
-                        "INSERT INTO areatrigger_scripts(entry, ScriptName) VALUES(@ENTRY, \"SmartTrigger\");");
+                    sql.AppendLine("INSERT INTO areatrigger_scripts(entry, ScriptName) VALUES(@ENTRY, \"SmartTrigger\");");
                     break;
             }
         }

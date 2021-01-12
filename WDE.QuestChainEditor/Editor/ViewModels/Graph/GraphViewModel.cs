@@ -1,9 +1,10 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
+using Prism.Mvvm;
 using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.Providers;
 
@@ -11,19 +12,16 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
 {
     public class GraphViewModel : BindableBase
     {
-        public ObservableCollection<ElementViewModel> Elements { get; }
-        
-        public ObservableCollection<ConnectionViewModel> Connections { get; }
-
-        public IEnumerable<ElementViewModel> SelectedElements => Elements.Where(x => x.IsSelected);
-
-        public IEnumerable<ConnectionViewModel> SelectedConnections => Connections.Where(x => x.IsSelected);
-
-        public event Action<ConnectionViewModel> RequestNodePickerWindow = delegate { };
-
-        private Dictionary<Quest, ElementViewModel> QuestToViweModel = new Dictionary<Quest, ElementViewModel>();
         private readonly IQuestPicker picker;
         private readonly QuestList quests;
+
+        private readonly Dictionary<Quest, ElementViewModel> questToViweModel = new();
+
+        private bool connectingTo;
+        private Point currentDragPoint;
+
+        public ConnectionViewModel PendingConnection;
+        private bool useCurrentDragPoint;
 
         public GraphViewModel(IQuestPicker picker, QuestList quests)
         {
@@ -33,16 +31,26 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
             quests.OnAddedQuest += Quests_OnAddedQuest;
             quests.OnRemovedQuest += Quests_OnRemovedQuest;
 
-            foreach (var quest in quests)
+            foreach (Quest quest in quests)
                 OnQuestAddedToCollection(quest);
             this.picker = picker;
             this.quests = quests;
         }
 
+        public ObservableCollection<ElementViewModel> Elements { get; }
+
+        public ObservableCollection<ConnectionViewModel> Connections { get; }
+
+        public IEnumerable<ElementViewModel> SelectedElements => Elements.Where(x => x.IsSelected);
+
+        public IEnumerable<ConnectionViewModel> SelectedConnections => Connections.Where(x => x.IsSelected);
+
+        public event Action<ConnectionViewModel> RequestNodePickerWindow = delegate { };
+
         private void Quests_OnRemovedQuest(QuestList arg1, Quest quest)
         {
-            DeleteElement(QuestToViweModel[quest]);
-            QuestToViweModel.Remove(quest);
+            DeleteElement(questToViweModel[quest]);
+            questToViweModel.Remove(quest);
         }
 
         private void Quests_OnAddedQuest(QuestList arg1, Quest quest)
@@ -52,50 +60,52 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
 
         private void OnRequiredQuestAdded(Quest quest, Quest dependency)
         {
-            if (!QuestToViweModel.ContainsKey(quest))
+            if (!questToViweModel.ContainsKey(quest))
                 throw new Exception("Fatal error - quest should be in list");
 
-            if (!QuestToViweModel.ContainsKey(dependency))
+            if (!questToViweModel.ContainsKey(dependency))
                 OnQuestAddedToCollection(dependency);
 
-            var vmReq = QuestToViweModel[quest];
-            var vmDep = QuestToViweModel[dependency];
+            ElementViewModel vmReq = questToViweModel[quest];
+            ElementViewModel vmDep = questToViweModel[dependency];
 
             Connections.Add(new ConnectionViewModel(vmDep.OutputConnectors[0], vmReq.InputConnectors[0]));
         }
 
         private void OnQuestAddedToCollection(Quest quest)
         {
-            if (QuestToViweModel.ContainsKey(quest))
+            if (questToViweModel.ContainsKey(quest))
                 return;
 
-            var vm = new QuestViewModel(quest);
-            AddElement(vm, UseCurrentDragPoint ? CurrentDragPoint.X : 10000, UseCurrentDragPoint ? CurrentDragPoint.Y : 10000);
-            QuestToViweModel.Add(quest, vm);
+            QuestViewModel vm = new(quest);
+            AddElement(vm, useCurrentDragPoint ? currentDragPoint.X : 10000, useCurrentDragPoint ? currentDragPoint.Y : 10000);
+            questToViweModel.Add(quest, vm);
 
-            foreach (var dep in quest.RequiredQuests)
+            foreach (Quest dep in quest.RequiredQuests)
                 OnRequiredQuestAdded(quest, dep);
 
             quest.RequiredQuests.CollectionChanged += (sender, e) =>
             {
-                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+                if (e.Action == NotifyCollectionChangedAction.Add)
                 {
                     foreach (Quest dependency in e.NewItems)
                         OnRequiredQuestAdded(quest, dependency);
                 }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+                else if (e.Action == NotifyCollectionChangedAction.Remove)
                 {
                     foreach (Quest dependency in e.OldItems)
                     {
-                        var depVM = QuestToViweModel[dependency];
+                        ElementViewModel depVm = questToViweModel[dependency];
 
-                        var connection = vm.InputConnectors[0].Connections.Where(t => t.From == depVM.OutputConnectors[0]).FirstOrDefault();
+                        ConnectionViewModel? connection = vm.InputConnectors[0]
+                            .Connections.Where(t => t.From == depVm.OutputConnectors[0])
+                            .FirstOrDefault();
 
                         connection.Detach();
                         Connections.Remove(connection);
                     }
                 }
-             };
+            };
         }
 
         public ElementViewModel AddElement(ElementViewModel model, double x, double y)
@@ -108,24 +118,23 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
 
         public void ShowPicker(Point point)
         {
-            CurrentDragPoint = point;
+            currentDragPoint = point;
 
-            var quest = picker.ChooseQuest();
+            QuestDefinition quest = picker.ChooseQuest();
             if (quest == null)
                 return;
-            var q = new Quest(quest.Id, quest.Title);
-            UseCurrentDragPoint = true;
+            Quest q = new(quest.Id, quest.Title);
+            useCurrentDragPoint = true;
             quests.AddQuest(q);
-            UseCurrentDragPoint = false;
+            useCurrentDragPoint = false;
         }
 
-        private bool connectingTo = false;
         public ConnectionViewModel OnConnectionDragStarted(ConnectorViewModel sourceConnector, Point currentDragPoint)
         {
             if (sourceConnector is OutputConnectorViewModel)
             {
                 connectingTo = true;
-                var connection = new ConnectionViewModel((OutputConnectorViewModel)sourceConnector)
+                ConnectionViewModel connection = new((OutputConnectorViewModel) sourceConnector)
                 {
                     ToPosition = currentDragPoint
                 };
@@ -135,10 +144,10 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
                 return connection;
             }
 
-            else if (sourceConnector is InputConnectorViewModel)
+            if (sourceConnector is InputConnectorViewModel)
             {
                 connectingTo = false;
-                var connection = new ConnectionViewModel((InputConnectorViewModel)sourceConnector)
+                ConnectionViewModel connection = new((InputConnectorViewModel) sourceConnector)
                 {
                     FromPosition = currentDragPoint
                 };
@@ -147,6 +156,7 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
 
                 return connection;
             }
+
             return null;
         }
 
@@ -158,93 +168,87 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
             if (connectingTo)
                 nearbyConnector = FindNearbyInputConnector(connection, currentDragPoint);
             else
-                nearbyConnector = FindNearbyOutputConnector(connection, currentDragPoint); 
+                nearbyConnector = FindNearbyOutputConnector(connection, currentDragPoint);
 
-            Point pnt = (nearbyConnector != null)
-                    ? nearbyConnector.Position
-                    : currentDragPoint;
+            Point pnt = nearbyConnector != null ? nearbyConnector.Position : currentDragPoint;
 
             if (connectingTo)
                 connection.ToPosition = pnt;
             else
                 connection.FromPosition = pnt;
         }
-        
-        public ConnectionViewModel pendingConnection;
-        Point CurrentDragPoint;
-        private bool UseCurrentDragPoint;
 
-        public void OnConnectionDragCompleted(Point currentDragPoint, ConnectionViewModel newConnection, ConnectorViewModel sourceConnector)
+        public void OnConnectionDragCompleted(Point currentDragPoint,
+            ConnectionViewModel newConnection,
+            ConnectorViewModel sourceConnector)
         {
-            var fromNewConnection = (QuestViewModel)(newConnection.From?.Element);
-            var toNewConnection = (QuestViewModel)(newConnection.To?.Element);
+            QuestViewModel fromNewConnection = (QuestViewModel) newConnection.From?.Element;
+            QuestViewModel toNewConnection = (QuestViewModel) newConnection.To?.Element;
 
             newConnection.Detach();
             Connections.Remove(newConnection);
 
-            CurrentDragPoint = currentDragPoint;
+            this.currentDragPoint = currentDragPoint;
             if (connectingTo)
             {
-                var nearbyConnector = FindNearbyInputConnector(newConnection, currentDragPoint);
+                InputConnectorViewModel nearbyConnector = FindNearbyInputConnector(newConnection, currentDragPoint);
 
                 if (nearbyConnector == null)
                 {
-                    var quest = picker.ChooseQuest();
+                    QuestDefinition quest = picker.ChooseQuest();
                     if (quest == null)
                         return;
-                    var q = new Quest(quest.Id, quest.Title);
-                    UseCurrentDragPoint = true;
+                    Quest q = new(quest.Id, quest.Title);
+                    useCurrentDragPoint = true;
                     bool added = quests.AddQuest(q);
-                    UseCurrentDragPoint = false;
+                    useCurrentDragPoint = false;
                     if (added)
-                        q.RequiredQuests.Add(fromNewConnection.quest);
+                        q.RequiredQuests.Add(fromNewConnection.Quest);
                     return;
                 }
 
                 if (nearbyConnector == null || sourceConnector.Element == nearbyConnector.Element)
                     return;
 
-                var to = ((QuestViewModel)nearbyConnector.Element).quest;
-                var from = fromNewConnection.quest;
+                Quest to = ((QuestViewModel) nearbyConnector.Element).Quest;
+                Quest from = fromNewConnection.Quest;
                 to.RequiredQuests.Add(from);
             }
             else
             {
-                var nearbyConnector = FindNearbyOutputConnector(newConnection, currentDragPoint);
-                
+                OutputConnectorViewModel nearbyConnector = FindNearbyOutputConnector(newConnection, currentDragPoint);
+
                 if (nearbyConnector == null)
                 {
-                    var quest = picker.ChooseQuest();
+                    QuestDefinition quest = picker.ChooseQuest();
                     if (quest == null)
                         return;
-                    var q = new Quest(quest.Id, quest.Title);
-                    UseCurrentDragPoint = true;
+                    Quest q = new(quest.Id, quest.Title);
+                    useCurrentDragPoint = true;
                     bool added = quests.AddQuest(q);
-                    UseCurrentDragPoint = false;
+                    useCurrentDragPoint = false;
                     if (added)
-                        toNewConnection.quest.RequiredQuests.Add(q);
+                        toNewConnection.Quest.RequiredQuests.Add(q);
                     return;
                 }
 
                 if (nearbyConnector == null || sourceConnector.Element == nearbyConnector.Element)
                     return;
 
-                var to = toNewConnection.quest;
-                var from = ((QuestViewModel)nearbyConnector.Element).quest;
+                Quest to = toNewConnection.Quest;
+                Quest from = ((QuestViewModel) nearbyConnector.Element).Quest;
                 to.RequiredQuests.Add(from);
             }
         }
 
         private InputConnectorViewModel FindNearbyInputConnector(ConnectionViewModel connection, Point mousePosition)
         {
-            return Elements.SelectMany(x => x.InputConnectors)
-                .FirstOrDefault(x => AreClose(x.Position, mousePosition, 10));
+            return Elements.SelectMany(x => x.InputConnectors).FirstOrDefault(x => AreClose(x.Position, mousePosition, 10));
         }
 
         private OutputConnectorViewModel FindNearbyOutputConnector(ConnectionViewModel connection, Point mousePosition)
         {
-            return Elements.SelectMany(x => x.OutputConnectors)
-                .FirstOrDefault(x => AreClose(x.Position, mousePosition, 10));
+            return Elements.SelectMany(x => x.OutputConnectors).FirstOrDefault(x => AreClose(x.Position, mousePosition, 10));
         }
 
         private static bool AreClose(Point point1, Point point2, double distance)
@@ -254,28 +258,25 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
 
         private void DeleteElement(ElementViewModel element)
         {
-            foreach (var item in element.AttachedConnections)
+            foreach (ConnectionViewModel item in element.AttachedConnections)
                 Connections.Remove(item);
             Elements.Remove(element);
         }
-        
+
         public void DeleteSelectedElements()
         {
-            Elements.Where(x => x.IsSelected).Select(x => ((QuestViewModel)x).quest)
-                .ToList()
-                .ForEach(x => quests.RemoveQuest(x));
+            Elements.Where(x => x.IsSelected).Select(x => ((QuestViewModel) x).Quest).ToList().ForEach(x => quests.RemoveQuest(x));
         }
 
         public void DeleteSelectedConnections()
         {
-            foreach (var connection in Connections.Where(x => x.IsSelected).ToList())
+            foreach (ConnectionViewModel connection in Connections.Where(x => x.IsSelected).ToList())
             {
-                var from = ((QuestViewModel)connection.From.Element).quest;
-                var to = ((QuestViewModel)connection.To.Element).quest;
+                Quest from = ((QuestViewModel) connection.From.Element).Quest;
+                Quest to = ((QuestViewModel) connection.To.Element).Quest;
 
                 to.RequiredQuests.Remove(from);
             }
         }
-        
     }
 }

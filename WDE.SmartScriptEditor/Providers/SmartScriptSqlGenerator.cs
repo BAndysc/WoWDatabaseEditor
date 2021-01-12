@@ -28,7 +28,7 @@ namespace WDE.SmartScriptEditor.Providers
 
         public string GenerateSql(SmartScriptSolutionItem item)
         {
-            var args = new EventRequestGenerateSqlArgs();
+            EventRequestGenerateSqlArgs args = new();
             args.Item = item;
 
             eventAggregator.GetEvent<EventRequestGenerateSql>().Publish(args);
@@ -36,7 +36,7 @@ namespace WDE.SmartScriptEditor.Providers
             if (args.Sql != null)
                 return args.Sql;
 
-            var script = new SmartScript(item, smartFactory.Value);
+            SmartScript script = new(item, smartFactory.Value);
             script.Load(database.Value.GetScriptFor(item.Entry, item.SmartType));
             return new SmartScriptExporter(script, smartFactory.Value).GetSql();
         }

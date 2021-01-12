@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -11,51 +9,33 @@ using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
-using WDE.Common.Windows;
-using WoWDatabaseEditor.Views;
-using Prism.Ioc;
 using WDE.Common.Solution;
+using WDE.Common.Windows;
 using WoWDatabaseEditor.Managers;
 
 namespace WoWDatabaseEditor.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private readonly IEventAggregator _eventAggregator;
-        private readonly IConfigureService settings;
+        private readonly Dictionary<ISolutionItem, IDocument> documents = new();
+        private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new();
+        private readonly IEventAggregator eventAggregator;
         private readonly INewItemService newItemService;
+        private readonly IConfigureService settings;
         private readonly ISolutionManager solutionManager;
 
-        public IStatusBar StatusBar { get; }
-        public IWindowManager WindowManager { get; private set; }
+        private string title = "Visual Database Editor 2018";
 
-        private string _title = "Visual Database Editor 2018";
-
-        public string Title
-        {
-            get => _title;
-            set => SetProperty(ref _title, value);
-        }
-
-        private readonly Dictionary<ISolutionItem, IDocument> documents = new ();
-        private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new ();
-
-        public DelegateCommand ExecuteCommandNew { get; private set; }
-        public DelegateCommand ExecuteSettings { get; private set; }
-        public DelegateCommand About { get; private set; }
-
-        public ObservableCollection<MenuItemViewModel> Windows { get; set; }
-
-        public MainWindowViewModel(IEventAggregator eventAggregator, 
+        public MainWindowViewModel(IEventAggregator eventAggregator,
             IWindowManager wndowManager,
-            IConfigureService settings, 
-            INewItemService newItemService, 
-            ISolutionManager solutionManager, 
+            IConfigureService settings,
+            INewItemService newItemService,
+            ISolutionManager solutionManager,
             IStatusBar statusBar,
-            Lazy<IEnumerable<IToolProvider>> tools, 
+            Lazy<IEnumerable<IToolProvider>> tools,
             ISolutionItemEditorRegistry solutionEditorManager)
         {
-            _eventAggregator = eventAggregator;
+            this.eventAggregator = eventAggregator;
             WindowManager = wndowManager;
             StatusBar = statusBar;
             this.settings = settings;
@@ -66,45 +46,63 @@ namespace WoWDatabaseEditor.ViewModels
 
             About = new DelegateCommand(ShowAbout);
 
-            _eventAggregator.GetEvent<WindowManager.DocumentClosedEvent>().Subscribe(document =>
-            {
-                if (!documentToSolution.ContainsKey(document))
-                    return;
-                
-                documents.Remove(documentToSolution[document]);
-                documentToSolution.Remove(document);
-            });
-            
-            _eventAggregator.GetEvent<EventRequestOpenItem>().Subscribe(item =>
-            {
-                if (documents.ContainsKey(item))
-                    WindowManager.OpenDocument(documents[item]);
-                else
+            this.eventAggregator.GetEvent<WindowManager.DocumentClosedEvent>()
+                .Subscribe(document =>
                 {
-                    var editor = solutionEditorManager.GetEditor(item);
-                    if (editor == null)
-                        MessageBox.Show("Editor for " + item.GetType().ToString() + " not registered.");
-                    else
-                    {
-                        WindowManager.OpenDocument(editor);
-                        documents[item] = editor;
-                        documentToSolution[editor] = item;
-                    }
-                }
+                    if (!documentToSolution.ContainsKey(document))
+                        return;
 
-            }, true);
+                    documents.Remove(documentToSolution[document]);
+                    documentToSolution.Remove(document);
+                });
+
+            this.eventAggregator.GetEvent<EventRequestOpenItem>()
+                .Subscribe(item =>
+                    {
+                        if (documents.ContainsKey(item))
+                            WindowManager.OpenDocument(documents[item]);
+                        else
+                        {
+                            IDocument? editor = solutionEditorManager.GetEditor(item);
+                            if (editor == null)
+                                MessageBox.Show("Editor for " + item.GetType() + " not registered.");
+                            else
+                            {
+                                WindowManager.OpenDocument(editor);
+                                documents[item] = editor;
+                                documentToSolution[editor] = item;
+                            }
+                        }
+                    },
+                    true);
 
             Windows = new ObservableCollection<MenuItemViewModel>();
 
             foreach (var window in tools.Value)
             {
-                MenuItemViewModel model = new MenuItemViewModel(() => WindowManager.OpenTool(window), window.Name);
+                MenuItemViewModel model = new(() => WindowManager.OpenTool(window), window.Name);
                 Windows.Add(model);
                 if (window.CanOpenOnStart)
                     model.Command.Execute(null);
             }
+
             ShowAbout();
         }
+
+        public IStatusBar StatusBar { get; }
+        public IWindowManager WindowManager { get; }
+
+        public string Title
+        {
+            get => title;
+            set => SetProperty(ref title, value);
+        }
+
+        public DelegateCommand ExecuteCommandNew { get; }
+        public DelegateCommand ExecuteSettings { get; }
+        public DelegateCommand About { get; }
+
+        public ObservableCollection<MenuItemViewModel> Windows { get; set; }
 
         private void ShowAbout()
         {

@@ -1,66 +1,54 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using GongSolutions.Wpf.DragDrop;
+using Prism.Commands;
 using Prism.Events;
+using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Events;
-using WDE.Common.Solution;
-using Prism.Ioc;
 using WDE.Common.Managers;
+using WDE.Common.Solution;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {
     public class SolutionExplorerViewModel : BindableBase, ITool, IDropTarget
     {
+        private readonly IEventAggregator ea;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
-        private readonly ISolutionManager _solutionManager;
-        private readonly IEventAggregator _ea;
-        private readonly IStatusBar _statusBar;
 
-        private ObservableCollection<SolutionItemViewModel> _firstGeneration;
-        public ObservableCollection<SolutionItemViewModel> Root => _firstGeneration;
+        private readonly Dictionary<ISolutionItem, SolutionItemViewModel> itemToViewmodel;
+        private readonly ISolutionManager solutionManager;
+        private readonly IStatusBar statusBar;
 
-        public DelegateCommand AddItem { get; private set; }
-        public DelegateCommand RemoveItem { get; private set; }
-        public DelegateCommand GenerateSQL { get; private set; }
-        public DelegateCommand<SolutionItemViewModel> SelectedItemChangedCommand { get; private set; }
-        public DelegateCommand<SolutionItemViewModel> RequestOpenItem { get; private set; }
+        private SolutionItemViewModel selected;
+        private Visibility visibility;
 
-        private SolutionItemViewModel _selected;
-        private Dictionary<ISolutionItem, SolutionItemViewModel> _itemToViewmodel;
-
-        public SolutionExplorerViewModel(ISolutionItemNameRegistry itemNameRegistry, 
+        public SolutionExplorerViewModel(ISolutionItemNameRegistry itemNameRegistry,
             ISolutionManager solutionManager,
-            IEventAggregator ea, 
-            INewItemService newItemService, 
+            IEventAggregator ea,
+            INewItemService newItemService,
             IStatusBar statusBar,
             ISolutionItemSqlGeneratorRegistry sqlGeneratorRegistry)
         {
             this.itemNameRegistry = itemNameRegistry;
-            _solutionManager = solutionManager;
-            _ea = ea;
-            _statusBar = statusBar;
+            this.solutionManager = solutionManager;
+            this.ea = ea;
+            this.statusBar = statusBar;
 
-            _firstGeneration = new ObservableCollection<SolutionItemViewModel>();
-            _itemToViewmodel = new Dictionary<ISolutionItem, SolutionItemViewModel>();
+            Root = new ObservableCollection<SolutionItemViewModel>();
+            itemToViewmodel = new Dictionary<ISolutionItem, SolutionItemViewModel>();
 
-            foreach (var item in _solutionManager.Items)
-            {
+            foreach (ISolutionItem item in this.solutionManager.Items)
                 AddItemToRoot(item);
-            }
 
-            _solutionManager.Items.CollectionChanged += (sender, args) =>
+            this.solutionManager.Items.CollectionChanged += (sender, args) =>
             {
                 if (args.NewItems != null)
                 {
-                    int i = 0;
-                    foreach (var obj in args.NewItems)
+                    var i = 0;
+                    foreach (object obj in args.NewItems)
                     {
                         AddItemToRoot(obj as ISolutionItem, args.NewStartingIndex + i);
                         i++;
@@ -68,12 +56,14 @@ namespace WDE.Solutions.Explorer.ViewModels
                 }
 
                 if (args.OldItems != null)
-                    foreach (var obj in args.OldItems)
+                {
+                    foreach (object obj in args.OldItems)
                     {
-                        var solutionItem = obj as ISolutionItem;
-                        Root.Remove(_itemToViewmodel[solutionItem]);
-                        _itemToViewmodel.Remove(solutionItem);
+                        ISolutionItem solutionItem = obj as ISolutionItem;
+                        Root.Remove(itemToViewmodel[solutionItem]);
+                        itemToViewmodel.Remove(solutionItem);
                     }
+                }
             };
 
             AddItem = new DelegateCommand(() =>
@@ -81,77 +71,60 @@ namespace WDE.Solutions.Explorer.ViewModels
                 ISolutionItem item = newItemService.GetNewSolutionItem();
                 if (item != null)
                 {
-                    if (_selected == null)
-                        solutionManager.Items.Add(item);    
+                    if (selected == null)
+                        solutionManager.Items.Add(item);
                     else
-                        _selected.Item.Items.Add(item);
+                        selected.Item.Items.Add(item);
                 }
             });
 
             RemoveItem = new DelegateCommand(() =>
             {
-                if (_selected != null)
+                if (selected != null)
                 {
-                    if (_selected.Parent == null)
-                        _solutionManager.Items.Remove(_selected.Item);
+                    if (selected.Parent == null)
+                        this.solutionManager.Items.Remove(selected.Item);
                     else
-                    {
-                        _selected.Parent.Item.Items.Remove(_selected.Item);
-                    }
+                        selected.Parent.Item.Items.Remove(selected.Item);
                 }
             });
 
-            SelectedItemChangedCommand = new DelegateCommand<SolutionItemViewModel>((ob) =>
-            {
-                _selected = ob;
-            });
+            SelectedItemChangedCommand = new DelegateCommand<SolutionItemViewModel>(ob => { selected = ob; });
 
-            RequestOpenItem = new DelegateCommand<SolutionItemViewModel>((item) =>
+            RequestOpenItem = new DelegateCommand<SolutionItemViewModel>(item =>
             {
                 if (item != null && !item.IsContainer)
-                    _ea.GetEvent<EventRequestOpenItem>().Publish(item.Item);
+                    this.ea.GetEvent<EventRequestOpenItem>().Publish(item.Item);
             });
 
             GenerateSQL = new DelegateCommand(() =>
             {
-                if (_selected != null)
+                if (selected != null)
                 {
-                    MetaSolutionSQL solution = new MetaSolutionSQL(sqlGeneratorRegistry.GenerateSql(_selected.Item));
-                    _ea.GetEvent<EventRequestOpenItem>().Publish(solution);
+                    MetaSolutionSQL solution = new(sqlGeneratorRegistry.GenerateSql(selected.Item));
+                    this.ea.GetEvent<EventRequestOpenItem>().Publish(solution);
                 }
             });
         }
 
-        private void AddItemToRoot(ISolutionItem item, int index = -1)
-        {
-            if (!_itemToViewmodel.TryGetValue(item, out var viewModel))
-            {
-                viewModel = new SolutionItemViewModel(itemNameRegistry, item);
-                _itemToViewmodel[item] = viewModel;
-            }
-            else
-                viewModel.Parent = null;    
-            Root.Insert(index < 0 ? Root.Count : index, viewModel);
-        }
+        public ObservableCollection<SolutionItemViewModel> Root { get; }
 
-        public string Title { get; } = "Solution explorer";
-        private Visibility _visibility;
-        public Visibility Visibility
-        {
-            get => _visibility;
-            set => SetProperty(ref _visibility, value);
-        }
+        public DelegateCommand AddItem { get; }
+        public DelegateCommand RemoveItem { get; }
+        public DelegateCommand GenerateSQL { get; }
+        public DelegateCommand<SolutionItemViewModel> SelectedItemChangedCommand { get; }
+        public DelegateCommand<SolutionItemViewModel> RequestOpenItem { get; }
 
         public void DragOver(IDropInfo dropInfo)
         {
             SolutionItemViewModel sourceItem = dropInfo.Data as SolutionItemViewModel;
             SolutionItemViewModel targetItem = dropInfo.TargetItem as SolutionItemViewModel;
-		
+
             if (sourceItem != null)
             {
-                var highlight = dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.TargetItemCenter) &&
-                                (targetItem?.IsContainer ?? false);
-            
+                bool highlight = dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.TargetItemCenter) &&
+                                 (targetItem?.IsContainer ?? false);
+
                 dropInfo.DropTargetAdorner = highlight ? DropTargetAdorners.Highlight : DropTargetAdorners.Insert;
                 dropInfo.Effects = DragDropEffects.Move;
             }
@@ -161,16 +134,16 @@ namespace WDE.Solutions.Explorer.ViewModels
         {
             SolutionItemViewModel sourceItem = dropInfo.Data as SolutionItemViewModel;
             SolutionItemViewModel targetItem = dropInfo.TargetItem as SolutionItemViewModel;
-            
+
             if (sourceItem == null)
                 return;
-            
-            int prevPosition = 0;
-            var sourceList = sourceItem.Parent == null ? _solutionManager.Items : sourceItem.Parent.Item.Items;
-            var destListOwner = (dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight)
+
+            var prevPosition = 0;
+            var sourceList = sourceItem.Parent == null ? solutionManager.Items : sourceItem.Parent.Item.Items;
+            SolutionItemViewModel destListOwner = dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight
                 ? targetItem
                 : targetItem?.Parent;
-            var destList = destListOwner?.Item?.Items ?? _solutionManager.Items;
+            var destList = destListOwner?.Item?.Items ?? solutionManager.Items;
 
             while (destListOwner != null)
             {
@@ -178,7 +151,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                     return;
                 destListOwner = destListOwner.Parent;
             }
-            
+
             prevPosition = sourceList.IndexOf(sourceItem.Item);
             if (prevPosition >= 0)
                 sourceList.RemoveAt(prevPosition);
@@ -191,16 +164,37 @@ namespace WDE.Solutions.Explorer.ViewModels
             else
             {
                 if (targetItem == null || targetItem.Parent == null)
-                    _itemToViewmodel[sourceItem.Item] = sourceItem;
+                    itemToViewmodel[sourceItem.Item] = sourceItem;
                 else
                     targetItem.Parent.AddViewModel(sourceItem);
-                
-                var destPosition = dropInfo.InsertIndex;
+
+                int destPosition = dropInfo.InsertIndex;
                 if (destList == sourceList && dropInfo.InsertIndex >= prevPosition)
                     destPosition--;
-                    
+
                 destList.Insert(Math.Clamp(destPosition, 0, destList.Count), sourceItem.Item);
             }
+        }
+
+        public string Title { get; } = "Solution explorer";
+
+        public Visibility Visibility
+        {
+            get => visibility;
+            set => SetProperty(ref visibility, value);
+        }
+
+        private void AddItemToRoot(ISolutionItem item, int index = -1)
+        {
+            if (!itemToViewmodel.TryGetValue(item, out SolutionItemViewModel viewModel))
+            {
+                viewModel = new SolutionItemViewModel(itemNameRegistry, item);
+                itemToViewmodel[item] = viewModel;
+            }
+            else
+                viewModel.Parent = null;
+
+            Root.Insert(index < 0 ? Root.Count : index, viewModel);
         }
     }
 }

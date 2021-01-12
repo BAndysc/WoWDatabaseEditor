@@ -1,32 +1,30 @@
-﻿using MahApps.Metro.Controls;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
 using AvalonDock;
+using AvalonDock.Layout;
 using AvalonDock.Layout.Serialization;
+using MahApps.Metro.Controls;
 
 namespace WoWDatabaseEditor.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        public static DependencyProperty DocumentClosedCommandProperty =
+            DependencyProperty.Register("DocumentClosedCommand", typeof(ICommand), typeof(MainWindow));
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        public static DependencyProperty DocumentClosedCommandProperty
-        = DependencyProperty.Register(
-        "DocumentClosedCommand",
-        typeof(ICommand),
-        typeof(MainWindow));
-
         public ICommand DocumentClosedCommand
         {
-            get { return (ICommand)GetValue(DocumentClosedCommandProperty); }
-            set { SetValue(DocumentClosedCommandProperty, value); }
+            get => (ICommand) GetValue(DocumentClosedCommandProperty);
+            set => SetValue(DocumentClosedCommandProperty, value);
         }
 
         private void DockingManager_OnDocumentClosed(object sender, DocumentClosedEventArgs e)
@@ -34,9 +32,9 @@ namespace WoWDatabaseEditor.Views
             DocumentClosedCommand?.Execute(e.Document.Content);
         }
 
-        private void Window_Closed(object sender, System.EventArgs e)
+        private void Window_Closed(object sender, EventArgs e)
         {
-            var layoutSerializer = new XmlLayoutSerializer(DockingManager);
+            XmlLayoutSerializer? layoutSerializer = new(DockingManager);
             layoutSerializer.Serialize(@".\AvalonDock.Layout.config");
         }
 
@@ -47,10 +45,10 @@ namespace WoWDatabaseEditor.Views
 
         public void LoadLayout()
         {
-            var layoutSerializer = new XmlLayoutSerializer(DockingManager);
+            XmlLayoutSerializer? layoutSerializer = new(DockingManager);
             layoutSerializer.LayoutSerializationCallback += (s, e) =>
             {
-                var x = e.Model;
+                LayoutContent? x = e.Model;
                 e.Cancel = true;
             };
             try

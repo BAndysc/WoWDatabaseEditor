@@ -1,35 +1,30 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-
+using Prism.Mvvm;
 using WDE.Common;
-using Prism.Ioc;
+using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
-    [WDE.Module.Attributes.AutoRegister]
+    [AutoRegister]
     public class NewItemWindowViewModel : BindableBase, INewItemWindowViewModel
     {
-        public ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; private set; }
+        private NewItemPrototypeInfo? selectedPrototype;
 
-        private NewItemPrototypeInfo? _selectedPrototype;
-        public NewItemPrototypeInfo? SelectedPrototype
-        {
-            get { return _selectedPrototype; }
-            set { SetProperty(ref _selectedPrototype, value); }
-        }
-        
         public NewItemWindowViewModel(IEnumerable<ISolutionItemProvider> items)
         {
             ItemPrototypes = new ObservableCollection<NewItemPrototypeInfo>();
 
             foreach (var item in items)
-            {
                 ItemPrototypes.Add(new NewItemPrototypeInfo(item));
-            }
+        }
+
+        public ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; }
+
+        public NewItemPrototypeInfo? SelectedPrototype
+        {
+            get => selectedPrototype;
+            set => SetProperty(ref selectedPrototype, value);
         }
     }
 }

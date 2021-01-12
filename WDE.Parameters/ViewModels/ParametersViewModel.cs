@@ -1,44 +1,40 @@
-﻿
-using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
+using Prism.Mvvm;
 using WDE.Parameters.Models;
-using Prism.Ioc;
 
 namespace WDE.Parameters.ViewModels
 {
     public class ParametersViewModel : BindableBase
     {
-        private ParameterSpecModel _selected;
-        private bool _hasSelected = true;
-
-        public ObservableCollection<ParameterSpecModel> Parameters { get; } = new ObservableCollection<ParameterSpecModel>();
-
-        public ParameterSpecModel Selected
-        {
-            get { return _selected; }
-            set { SetProperty(ref _selected, value); }
-        }
-
-        public bool HasSelected
-        {
-            get { return _hasSelected; }
-            set { SetProperty(ref _hasSelected, value); }
-        }
-
-        public Action SaveAction { get; set; }
+        private bool hasSelected = true;
+        private ParameterSpecModel selected;
 
         public ParametersViewModel(ParameterFactory factory)
         {
             SaveAction = Save;
-            
-            foreach (var key in factory.GetKeys())
-            {
+
+            foreach (string key in factory.GetKeys())
                 Parameters.Add(factory.GetDefinition(key));
-            }
             if (Parameters.Count > 0)
                 Selected = Parameters[0];
         }
+
+        public ObservableCollection<ParameterSpecModel> Parameters { get; } = new();
+
+        public ParameterSpecModel Selected
+        {
+            get => selected;
+            set => SetProperty(ref selected, value);
+        }
+
+        public bool HasSelected
+        {
+            get => hasSelected;
+            set => SetProperty(ref hasSelected, value);
+        }
+
+        public Action SaveAction { get; set; }
 
         private void Save()
         {

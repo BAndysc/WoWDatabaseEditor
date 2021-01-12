@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
@@ -10,53 +8,53 @@ using WDE.ThemeChanger.Providers;
 
 namespace WDE.ThemeChanger
 {
-    [AutoRegister, SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class ThemeManager : IThemeManager
     {
-        private Theme _currentTheme;
-        private List<Theme> _themes => new List<Theme>() { new Theme("DarkTheme"), new Theme("BlueTheme") };
-
-        private Theme _defaultTheme = new Theme("BlueTheme");
-
-        public Theme CurrentTheme => _currentTheme;
-
-        public IEnumerable<Theme> Themes => _themes;
+        private readonly Theme defaultTheme = new("BlueTheme");
 
         public ThemeManager(IThemeSettingsProvider themeSettings)
         {
-            var currentThemeName = themeSettings.GetSettings().Name;
+            string currentThemeName = themeSettings.GetSettings().Name;
 
-            var theme = new Theme(currentThemeName);
+            Theme theme = new(currentThemeName);
 
             if (!IsValidTheme(theme))
-                theme = _defaultTheme;
+                theme = defaultTheme;
 
             SetTheme(theme);
         }
 
-        private bool IsValidTheme(Theme theme)
-        {
-            return !string.IsNullOrEmpty(theme.Name) && _themes.Select(t => t.Name).Contains(theme.Name);
-        }
+        private List<Theme> themes => new() {new("DarkTheme"), new("BlueTheme")};
+
+        public Theme CurrentTheme { get; private set; }
+
+        public IEnumerable<Theme> Themes => themes;
 
         public void SetTheme(Theme theme)
         {
             if (!IsValidTheme(theme))
                 return;
 
-            string curentTheme = Application.Current.Resources.MergedDictionaries[1].Source.ToString();
+            var curentTheme = Application.Current.Resources.MergedDictionaries[1].Source.ToString();
             string compareStr = "/" + theme.Name + ".xaml";
 
             if (!curentTheme.Contains(compareStr))
             {
                 Application.Current.Resources.MergedDictionaries.Clear();
-                Uri uriOne = new Uri("pack://application:,,,/AvalonDock.Themes.VS2013;component/" + theme.Name + ".xaml");
-                Uri uriTwo = new Uri("Themes/" + theme.Name + ".xaml", UriKind.RelativeOrAbsolute);
-                Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = uriOne });
-                Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = uriTwo });
+                Uri uriOne = new("pack://application:,,,/AvalonDock.Themes.VS2013;component/" + theme.Name + ".xaml");
+                Uri uriTwo = new("Themes/" + theme.Name + ".xaml", UriKind.RelativeOrAbsolute);
+                Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary {Source = uriOne});
+                Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary {Source = uriTwo});
             }
 
-            _currentTheme = theme;
+            CurrentTheme = theme;
+        }
+
+        private bool IsValidTheme(Theme theme)
+        {
+            return !string.IsNullOrEmpty(theme.Name) && themes.Select(t => t.Name).Contains(theme.Name);
         }
     }
 }

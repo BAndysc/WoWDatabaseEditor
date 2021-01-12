@@ -1,10 +1,7 @@
-﻿using Prism.Ioc;
-using Prism.Modularity;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Prism.Ioc;
+using Prism.Modularity;
 using WDE.Module.Attributes;
 
 namespace WDE.Module
@@ -13,7 +10,6 @@ namespace WDE.Module
     {
         public virtual void OnInitialized(IContainerProvider containerProvider)
         {
-            
         }
 
         public virtual void RegisterTypes(IContainerRegistry containerRegistry)
@@ -26,34 +22,34 @@ namespace WDE.Module
             var defaultRegisters = GetType().Assembly.GetTypes().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));
 
             //HashSet<Type> alreadyInitialized = new HashSet<Type>();
-            foreach (var register in defaultRegisters)
+            foreach (Type register in defaultRegisters)
             {
                 if (register.IsAbstract)
                     continue;
 
-                var singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
+                bool singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
 
-                foreach (var interface_ in register.GetInterfaces().Union(new[] { register }))
+                foreach (Type @interface in register.GetInterfaces().Union(new[] {register}))
                 {
-                    var isUnique = !interface_.IsDefined(typeof(NonUniqueProviderAttribute), false);
+                    bool isUnique = !@interface.IsDefined(typeof(NonUniqueProviderAttribute), false);
 
                     string name = null;
 
                     //if (alreadyInitialized.Contains(interface_))
-                        name = register.ToString() + interface_.ToString();
+                    name = register + @interface.ToString();
                     //else
                     //     alreadyInitialized.Add(interface_);
 
                     //LifetimeManager life = null;
 
                     if (singleton && isUnique)
-                        containerRegistry.RegisterSingleton(interface_, register);
+                        containerRegistry.RegisterSingleton(@interface, register);
                     //life = new ContainerControlledLifetimeManager();
                     else
-                        containerRegistry.Register(interface_, register, isUnique ? null : name);
-                        // life = new TransientLifetimeManager();
+                        containerRegistry.Register(@interface, register, isUnique ? null : name);
+                    // life = new TransientLifetimeManager();
 
-                        //Container.GetContainer().RegisterType(interface_, register, name, life);
+                    //Container.GetContainer().RegisterType(interface_, register, name, life);
                 }
             }
         }

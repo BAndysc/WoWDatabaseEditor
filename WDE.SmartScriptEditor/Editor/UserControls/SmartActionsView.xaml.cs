@@ -12,23 +12,17 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
     /// </summary>
     public partial class SmartActionsView : UserControl
     {
-        public static DependencyProperty EditActionCommandProperty
-            = DependencyProperty.Register(
-                "EditActionCommand",
-                typeof(ICommand),
-                typeof(SmartActionsView));
+        public static DependencyProperty EditActionCommandProperty =
+            DependencyProperty.Register("EditActionCommand", typeof(ICommand), typeof(SmartActionsView));
 
-        public static DependencyProperty DeleteActionCommandProperty
-            = DependencyProperty.Register(
-                "DeleteSmartActionCommand",
-                typeof(ICommand),
-                typeof(SmartActionsView));
+        public static DependencyProperty DeleteActionCommandProperty =
+            DependencyProperty.Register("DeleteSmartActionCommand", typeof(ICommand), typeof(SmartActionsView));
 
         public SmartActionsView()
         {
             InitializeComponent();
 
-            var myBinding = new Binding();
+            Binding myBinding = new();
             myBinding.Source = this;
             myBinding.Path = new PropertyPath("Selected");
             myBinding.Mode = BindingMode.TwoWay;
@@ -56,7 +50,9 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                 EditActionCommand?.Execute(Selected);
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e) { }
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+        }
 
         private void ActionList_OnKeyDown(object sender, KeyEventArgs e)
         {

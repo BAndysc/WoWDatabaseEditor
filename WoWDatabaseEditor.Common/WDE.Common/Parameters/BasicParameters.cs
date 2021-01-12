@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WDE.Common.Parameters
 {
@@ -21,7 +18,7 @@ namespace WDE.Common.Parameters
 
         public virtual Parameter Clone()
         {
-            return new Parameter(Name) {Value = _value, Items = Items, Description = Description};
+            return new(Name) {Value = value, Items = Items, Description = Description};
         }
     }
 
@@ -30,10 +27,10 @@ namespace WDE.Common.Parameters
         public NullParameter() : base("empty")
         {
         }
-        
+
         public override Parameter Clone()
         {
-            return new NullParameter() {Value = _value};
+            return new NullParameter {Value = value};
         }
     }
 
@@ -47,10 +44,10 @@ namespace WDE.Common.Parameters
         {
             return (GetValue() / 1000.0f).ToString(CultureInfo.InvariantCulture);
         }
-        
+
         public override Parameter Clone()
         {
-            return new FloatIntParameter(Name) {Value = _value};
+            return new FloatIntParameter(Name) {Value = value};
         }
     }
 
@@ -58,7 +55,6 @@ namespace WDE.Common.Parameters
     {
         public FloatParameter(string name) : base(name)
         {
-            
         }
 
         public override string ToString()
@@ -75,26 +71,24 @@ namespace WDE.Common.Parameters
 
         public override string ToString()
         {
-            List<String> flags = new List<string>();
-            for (int i = 0; i < 31; ++i)
+            var flags = new List<string>();
+            for (var i = 0; i < 31; ++i)
             {
                 if (((1 << i) & GetValue()) > 0)
                 {
                     if (Items.ContainsKey(1 << i))
                         flags.Add(Items[1 << i].Name);
                     else
-                    {
                         flags.Add("Flag unknown " + (1 << i));
-                    }
                 }
             }
+
             return string.Join(", ", flags);
         }
-        
+
         public override Parameter Clone()
         {
-            return new FlagParameter(Name) {Value = _value};
+            return new FlagParameter(Name) {Value = value};
         }
     }
-
 }

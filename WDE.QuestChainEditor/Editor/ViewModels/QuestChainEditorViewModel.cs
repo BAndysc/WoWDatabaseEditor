@@ -1,10 +1,4 @@
 ﻿using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.Providers;
 
@@ -12,8 +6,6 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
 {
     public class QuestChainEditorViewModel : BindableBase
     {
-        public GraphViewModel GraphViewModel { get; }
-        
         public QuestChainEditorViewModel(IQuestPicker picker, QuestList quests)
         {
             GraphViewModel = new GraphViewModel(picker, quests);
@@ -23,7 +15,8 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
             //GraphViewModel.AddElement(new NodeViewModel("Da Voodoo: Stormer Heart"), 10300, 10000);
             //GraphViewModel.AddElement(new NodeViewModel("Da Voodoo: Ram Horns"), 10300, 10000);
             //GraphViewModel.AddElement(new NodeViewModel("Da Voodoo: Resonite Crystal"), 10300, 10000);
-
         }
+
+        public GraphViewModel GraphViewModel { get; }
     }
 }

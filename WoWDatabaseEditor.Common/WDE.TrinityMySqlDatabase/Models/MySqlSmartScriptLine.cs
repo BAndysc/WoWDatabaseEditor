@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 using LinqToDB.Mapping;
 using WDE.Common.Database;
 
@@ -16,7 +11,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "entryorguid")]
         [PrimaryKey]
         public int EntryOrGuid { get; set; }
-        
+
         [Column(Name = "source_type")]
         [PrimaryKey]
         public int ScriptSourceType { get; set; }
@@ -51,7 +46,7 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "event_param4")]
         public int EventParam4 { get; set; }
-        
+
         [Column(Name = "action_type")]
         public int ActionType { get; set; }
 
@@ -84,7 +79,7 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "target_param3")]
         public int TargetParam3 { get; set; }
-        
+
         [Column(Name = "target_x")]
         public float TargetX { get; set; }
 
@@ -101,20 +96,52 @@ namespace WDE.TrinityMySqlDatabase.Models
         public string Comment { get; set; } = "";
 
         // those are not used on TC
-        public int SourceType { get => 0; set { } }
+        public int SourceType
+        {
+            get => 0;
+            set { }
+        }
 
-        public int SourceParam1 { get => 0; set { } }
+        public int SourceParam1
+        {
+            get => 0;
+            set { }
+        }
 
-        public int SourceParam2 { get => 0; set { } }
+        public int SourceParam2
+        {
+            get => 0;
+            set { }
+        }
 
-        public int SourceParam3 { get => 0; set { } }
+        public int SourceParam3
+        {
+            get => 0;
+            set { }
+        }
 
-        public int SourceConditionId { get => 0; set { } }
+        public int SourceConditionId
+        {
+            get => 0;
+            set { }
+        }
 
-        public int TargetConditionId { get => 0; set { } }
-        
-        public int EventCooldownMin { get => 0; set { } }
+        public int TargetConditionId
+        {
+            get => 0;
+            set { }
+        }
 
-        public int EventCooldownMax { get => 0; set { } }
+        public int EventCooldownMin
+        {
+            get => 0;
+            set { }
+        }
+
+        public int EventCooldownMax
+        {
+            get => 0;
+            set { }
+        }
     }
 }

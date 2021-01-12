@@ -9,13 +9,13 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
     /// </summary>
     public partial class SmartScriptView : UserControl
     {
-        public static DependencyProperty DeleteEventCommandProperty
-            = DependencyProperty.Register(
-                "DeleteEventCommand",
-                typeof(ICommand),
-                typeof(SmartScriptView));
+        public static DependencyProperty DeleteEventCommandProperty =
+            DependencyProperty.Register("DeleteEventCommand", typeof(ICommand), typeof(SmartScriptView));
 
-        public SmartScriptView() { InitializeComponent(); }
+        public SmartScriptView()
+        {
+            InitializeComponent();
+        }
 
         public ICommand DeleteEventCommand
         {
@@ -23,13 +23,18 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             set => SetValue(DeleteEventCommandProperty, value);
         }
 
-        private void EventSetter_OnHandler(object sender, MouseButtonEventArgs e) { }
+        private void EventSetter_OnHandler(object sender, MouseButtonEventArgs e)
+        {
+        }
 
-        private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e) { }
+        private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+        }
 
         private void UIElement_OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete) DeleteEventCommand?.Execute(this);
+            if (e.Key == Key.Delete)
+                DeleteEventCommand?.Execute(this);
         }
     }
 }

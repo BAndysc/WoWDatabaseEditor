@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using WDE.Common;
 using WDE.Module.Attributes;
@@ -12,7 +9,8 @@ using WDE.TrinityMySqlDatabase.Views;
 
 namespace WDE.TrinityMySqlDatabase
 {
-    [AutoRegister, SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class TrinityMySqlDatabaseConfiguration : IConfigurable
     {
         private readonly IConnectionSettingsProvider databaseSettings;
@@ -24,8 +22,8 @@ namespace WDE.TrinityMySqlDatabase
 
         public KeyValuePair<ContentControl, Action> GetConfigurationView()
         {
-            var view = new DatabaseConfigView();
-            var viewModel = new DatabaseConfigViewModel(databaseSettings);
+            DatabaseConfigView? view = new DatabaseConfigView();
+            DatabaseConfigViewModel? viewModel = new DatabaseConfigViewModel(databaseSettings);
             view.DataContext = viewModel;
             return new KeyValuePair<ContentControl, Action>(view, viewModel.SaveAction);
         }

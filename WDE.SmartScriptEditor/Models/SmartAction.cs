@@ -90,7 +90,7 @@ namespace WDE.SmartScriptEditor.Models
             {
                 try
                 {
-                    var output = Smart.Format(ReadableHint,
+                    string output = Smart.Format(ReadableHint,
                         new
                         {
                             target = Target.Readable,
@@ -138,11 +138,14 @@ namespace WDE.SmartScriptEditor.Models
                 OnPropertyChanged(nameof(IsSelected));
         }
 
-        private void SourceOnOnChanged(object? sender, EventArgs e) { CallOnChanged(); }
+        private void SourceOnOnChanged(object? sender, EventArgs e)
+        {
+            CallOnChanged();
+        }
 
         public SmartAction Copy()
         {
-            var se = new SmartAction(Id, Source.Copy(), Target.Copy());
+            SmartAction se = new(Id, Source.Copy(), Target.Copy());
             se.Comment = Comment;
             se.ReadableHint = ReadableHint;
             se.DescriptionRules = DescriptionRules;

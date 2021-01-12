@@ -10,13 +10,14 @@ namespace WoWDatabaseEditor.ViewModels
         public void Dispose()
         {
         }
+
         public string Title { get; } = "About";
         public ICommand Undo { get; } = new DisabledCommand();
-        public ICommand Redo { get; }= new DisabledCommand();
-        public ICommand Copy { get; }= new DisabledCommand();
-        public ICommand Cut { get; }= new DisabledCommand();
-        public ICommand Paste { get; }= new DisabledCommand();
-        public ICommand Save { get; }= new DisabledCommand();
+        public ICommand Redo { get; } = new DisabledCommand();
+        public ICommand Copy { get; } = new DisabledCommand();
+        public ICommand Cut { get; } = new DisabledCommand();
+        public ICommand Paste { get; } = new DisabledCommand();
+        public ICommand Save { get; } = new DisabledCommand();
         public ICommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         public IHistoryManager? History { get; } = null;

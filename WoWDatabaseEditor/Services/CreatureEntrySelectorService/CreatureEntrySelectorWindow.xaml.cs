@@ -1,9 +1,10 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 {
     /// <summary>
-    /// Interaction logic for CreatureEntrySelectorWindow.xaml
+    ///     Interaction logic for CreatureEntrySelectorWindow.xaml
     /// </summary>
     public partial class CreatureEntrySelectorWindow : Window
     {
@@ -18,7 +19,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
             Close();
         }
 
-        private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             DialogResult = true;
             Close();

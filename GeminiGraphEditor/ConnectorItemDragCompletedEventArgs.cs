@@ -4,8 +4,7 @@ namespace GeminiGraphEditor
 {
     public class ConnectorItemDragCompletedEventArgs : RoutedEventArgs
     {
-        public ConnectorItemDragCompletedEventArgs(RoutedEvent routedEvent, object source) :
-            base(routedEvent, source)
+        public ConnectorItemDragCompletedEventArgs(RoutedEvent routedEvent, object source) : base(routedEvent, source)
         {
         }
     }

@@ -1,29 +1,30 @@
-﻿using MahApps.Metro.Controls;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Input;
+using MahApps.Metro.Controls;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
     /// <summary>
-    /// Interaction logic for NewItemWindow.xaml
+    ///     Interaction logic for NewItemWindow.xaml
     /// </summary>
     public partial class NewItemWindow : MetroWindow
     {
         public NewItemWindow(INewItemWindowViewModel viewModel)
         {
-            this.DataContext = viewModel;
+            DataContext = viewModel;
             InitializeComponent();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
-            this.Close();
+            DialogResult = true;
+            Close();
         }
 
-        private void ListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            this.DialogResult = true;
-            this.Close();
+            DialogResult = true;
+            Close();
         }
     }
 }

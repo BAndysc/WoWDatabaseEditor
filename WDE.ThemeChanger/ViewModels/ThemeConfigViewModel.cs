@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WDE.ThemeChanger.Providers;
 using Prism.Mvvm;
-using System.Windows;
 using WDE.Common.Managers;
+using WDE.ThemeChanger.Providers;
 
 namespace WDE.ThemeChanger.ViewModels
 {
@@ -14,32 +11,37 @@ namespace WDE.ThemeChanger.ViewModels
     {
         private readonly IThemeSettingsProvider settings;
         private readonly IThemeManager themeManager;
-        public Action SaveAction { get; set; }
 
-        private Theme _name;
-        private List<Theme> _themes;
-
-        public Theme Name
-        {
-            get { return _name; }
-            set { SetProperty(ref _name, value); themeManager.SetTheme(value); }
-        }
-
-        public List<Theme> Themes
-        {
-            get { return _themes; }
-            set { SetProperty(ref _themes, value); }
-        }
+        private Theme name;
+        private List<Theme> themes;
 
         public ThemeConfigViewModel(IThemeSettingsProvider s, IThemeManager themeManager)
         {
             this.themeManager = themeManager;
             SaveAction = Save;
 
-            _name = themeManager.CurrentTheme;
-            _themes = themeManager.Themes.ToList();
+            name = themeManager.CurrentTheme;
+            themes = themeManager.Themes.ToList();
 
             settings = s;
+        }
+
+        public Action SaveAction { get; set; }
+
+        public Theme Name
+        {
+            get => name;
+            set
+            {
+                SetProperty(ref name, value);
+                themeManager.SetTheme(value);
+            }
+        }
+
+        public List<Theme> Themes
+        {
+            get => themes;
+            set => SetProperty(ref themes, value);
         }
 
         private void Save()

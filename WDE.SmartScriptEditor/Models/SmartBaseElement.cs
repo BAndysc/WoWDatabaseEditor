@@ -39,18 +39,30 @@ namespace WDE.SmartScriptEditor.Models
             parameter.OnValueChanged += SmartBaseElement_OnValueChanged;
         }
 
-        public void SetParameter(int index, int value) { @params[index].SetValue(value); }
+        public void SetParameter(int index, int value)
+        {
+            @params[index].SetValue(value);
+        }
 
-        public Parameter GetParameter(int index) { return @params[index]; }
+        public Parameter GetParameter(int index)
+        {
+            return @params[index];
+        }
 
-        private void SmartBaseElement_OnValueChanged(object sender, ParameterChangedValue<int> e) { CallOnChanged(); }
+        private void SmartBaseElement_OnValueChanged(object sender, ParameterChangedValue<int> e)
+        {
+            CallOnChanged();
+        }
 
         protected void CallOnChanged(SmartBaseElement smartEvent = null, ParameterChangedValue<int> e = null)
         {
             OnChanged(this, null);
         }
 
-        public IDisposable BulkEdit(string name) { return new BulkEditing(this, name); }
+        public IDisposable BulkEdit(string name)
+        {
+            return new BulkEditing(this, name);
+        }
 
         protected virtual void OnPropertyChanged([CallerMemberName]
             string propertyName = null)
@@ -70,7 +82,10 @@ namespace WDE.SmartScriptEditor.Models
                 this.smartBaseElement.BulkEditingStarted.Invoke();
             }
 
-            public void Dispose() { smartBaseElement.BulkEditingFinished.Invoke(name); }
+            public void Dispose()
+            {
+                smartBaseElement.BulkEditingFinished.Invoke(name);
+            }
         }
     }
 }

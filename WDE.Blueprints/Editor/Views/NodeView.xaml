@@ -1,13 +1,13 @@
 ﻿<UserControl x:Class="WDE.Blueprints.Editor.Views.NodeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WDE.Blueprints.Editor.Views"
              xmlns:controls="clr-namespace:GeminiGraphEditor;assembly=GeminiGraphEditor"
              xmlns:designTimeVMs="clr-namespace:WDE.Blueprints.Editor.DisignTimeViewModels"
-             mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance designTimeVMs:ElementViewModel, IsDesignTimeCreatable=True}" >
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance designTimeVMs:ElementViewModel, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
         <Style TargetType="controls:ConnectorItem">
             <Setter Property="Position" Value="{Binding Position, Mode=OneWayToSource}" />
@@ -21,7 +21,7 @@
         </Style>
 
         <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="White" />
         </Style>
     </UserControl.Resources>
     <Border BorderThickness="2" Padding="2" CornerRadius="4">
@@ -36,8 +36,8 @@
         </Border.Style>
         <Border CornerRadius="4" Background="#FF0F0F0F">
             <Border.Effect>
-                <DropShadowEffect Color="DarkGray" ShadowDepth="0" 
-														  BlurRadius="10" />
+                <DropShadowEffect Color="DarkGray" ShadowDepth="0"
+                                  BlurRadius="10" />
             </Border.Effect>
             <StackPanel Orientation="Vertical">
                 <Border Padding="5 2 2 2" BorderBrush="DodgerBlue" BorderThickness="0 0 0 0" CornerRadius="2 2 0 0">
@@ -66,15 +66,16 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" MinWidth="50" />
-                            <ColumnDefinition Width="*"  MinWidth="50" />
+                            <ColumnDefinition Width="*" MinWidth="50" />
                         </Grid.ColumnDefinitions>
-                        <ItemsControl Grid.Column="0" ItemsSource="{Binding InputConnectors}" 
-															  VerticalAlignment="Top" Padding="0 5 5 0">
+                        <ItemsControl Grid.Column="0" ItemsSource="{Binding InputConnectors}"
+                                      VerticalAlignment="Top" Padding="0 5 5 0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Height="20">
                                         <controls:ConnectorItem />
-                                        <TextBlock Foreground="White" Text="{Binding Name}" FontSize="11" VerticalAlignment="Center" Margin="3 0 0 0"/>
+                                        <TextBlock Foreground="White" Text="{Binding Name}" FontSize="11"
+                                                   VerticalAlignment="Center" Margin="3 0 0 0" />
                                         <Border BorderBrush="BlueViolet" BorderThickness="1">
                                             <Border.Style>
                                                 <Style TargetType="Border">
@@ -82,19 +83,20 @@
                                                         <DataTrigger Binding="{Binding NonEmpty}" Value="True">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IOType}" Value="Exec">
+                                                        <DataTrigger Binding="{Binding IoType}" Value="Exec">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IOType}" Value="Vector3">
+                                                        <DataTrigger Binding="{Binding IoType}" Value="Vector3">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IOType}" Value="Bool">
+                                                        <DataTrigger Binding="{Binding IoType}" Value="Bool">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-                                            <TextBox Text="{Binding DirectValue, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="Black" Foreground="White" />
+                                            <TextBox Text="{Binding DirectValue, UpdateSourceTrigger=PropertyChanged}"
+                                                     BorderThickness="0" Background="Black" Foreground="White" />
                                         </Border>
                                     </StackPanel>
                                 </DataTemplate>
@@ -103,14 +105,16 @@
 
                         <Border Grid.Column="1" VerticalAlignment="Top">
                             <StackPanel Orientation="Vertical">
-                                <ItemsControl Grid.Column="0" ItemsSource="{Binding OutputConnectors}" 
-															  VerticalAlignment="Top" Padding="5 5 0 0">
+                                <ItemsControl ItemsSource="{Binding OutputConnectors}"
+                                              VerticalAlignment="Top" Padding="5 5 0 0">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <DockPanel Height="20">
                                                 <controls:ConnectorItem DockPanel.Dock="Right" />
-                                                <TextBlock DockPanel.Dock="Right" Foreground="White"  Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
-																		   Margin="0 0 3 0" HorizontalAlignment="Right"/>
+                                                <TextBlock DockPanel.Dock="Right" Foreground="White"
+                                                           Text="{Binding Name}" FontSize="11"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0 0 3 0" HorizontalAlignment="Right" />
                                             </DockPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

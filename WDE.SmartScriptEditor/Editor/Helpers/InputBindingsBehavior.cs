@@ -23,18 +23,16 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
             obj.SetValue(TakesInputBindingPrecedenceProperty, value);
         }
 
-        private static void OnTakesInputBindingPrecedenceChanged(DependencyObject d,
-            DependencyPropertyChangedEventArgs e)
+        private static void OnTakesInputBindingPrecedenceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((UIElement) d).PreviewKeyDown += InputBindingsBehavior_PreviewKeyDown;
         }
 
         private static void InputBindingsBehavior_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            var uielement = (UIElement) sender;
+            UIElement uielement = (UIElement) sender;
 
-            var foundBinding = uielement.InputBindings
-                .OfType<KeyBinding>()
+            KeyBinding? foundBinding = uielement.InputBindings.OfType<KeyBinding>()
                 .FirstOrDefault(kb => kb.Key == e.Key && kb.Modifiers == e.KeyboardDevice.Modifiers);
 
             if (foundBinding != null)

@@ -1,8 +1,8 @@
-﻿using Prism.Mvvm;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
+using Prism.Mvvm;
 using WDE.Blueprints.Data;
 using WDE.Blueprints.Enums;
 using WDE.Blueprints.Managers;
@@ -11,43 +11,45 @@ namespace WDE.Blueprints.Editor.ViewModels
 {
     public class NodesViewModel : BindableBase
     {
-        private readonly ObservableCollection<NodeDefinition> _allItems = new ObservableCollection<NodeDefinition>();
+        private readonly ObservableCollection<NodeDefinition> allItems = new();
 
-        private CollectionViewSource _items;
-        private NodeDefinition _selectedItem;
-        private string _searchBox;
-        private ConnectionViewModel contextConnection = null;
+        private readonly CollectionViewSource items;
+        private string searchBox;
+        private NodeDefinition selectedItem;
+        private ConnectionViewModel contextConnection;
+
+        public NodesViewModel(IBlueprintDefinitionsRegistry registry)
+        {
+            allItems.AddRange(registry.GetAllDefinitions());
+
+            items = new CollectionViewSource
+            {
+                Source = allItems
+            };
+            items.GroupDescriptions.Add(new PropertyGroupDescription("NodeType"));
+            items.Filter += ItemsOnFilter;
+
+            if (items.View.MoveCurrentToFirst())
+                SelectedItem = items.View.CurrentItem as NodeDefinition;
+        }
 
         public string SearchBox
         {
-            get { return _searchBox; }
-            set { SetProperty(ref _searchBox, value); _items.View.Refresh(); }
+            get => searchBox;
+            set
+            {
+                SetProperty(ref searchBox, value);
+                items.View.Refresh();
+            }
         }
 
         public NodeDefinition SelectedItem
         {
-            get { return _selectedItem; }
-            set { SetProperty(ref _selectedItem, value); }
+            get => selectedItem;
+            set => SetProperty(ref selectedItem, value);
         }
 
-        public ICollectionView AllItems => _items.View;
-
-        public NodesViewModel(IBlueprintDefinitionsRegistry registry)
-        {
-            _allItems.AddRange(registry.GetAllDefinitions());
-
-            _items = new CollectionViewSource
-            {
-                Source = _allItems
-            };
-            _items.GroupDescriptions.Add(new PropertyGroupDescription("NodeType"));
-            _items.Filter += ItemsOnFilter;
-
-            if (_items.View.MoveCurrentToFirst())
-            {
-                SelectedItem = _items.View.CurrentItem as NodeDefinition;
-            }
-        }
+        public ICollectionView AllItems => items.View;
 
 
         internal void SetCurrentConnectionContext(ConnectionViewModel context)
@@ -58,19 +60,20 @@ namespace WDE.Blueprints.Editor.ViewModels
 
         private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
         {
-            var item = filterEventArgs.Item as NodeDefinition;
+            NodeDefinition item = filterEventArgs.Item as NodeDefinition;
 
             if (contextConnection != null)
             {
                 if (contextConnection.From != null)
                 {
-                    bool accept = false;
-                    if (contextConnection.From.IOType == IOType.Exec)
+                    var accept = false;
+                    if (contextConnection.From.IoType == IoType.Exec)
                     {
                         if (item.NodeType == NodeType.Statement)
                             accept = true;
                     }
-                    if (!accept && (item.Inputs == null || item.Inputs.All(o => o.Type != contextConnection.From.IOType)))
+
+                    if (!accept && (item.Inputs == null || item.Inputs.All(o => o.Type != contextConnection.From.IoType)))
                     {
                         filterEventArgs.Accepted = false;
                         return;
@@ -78,13 +81,14 @@ namespace WDE.Blueprints.Editor.ViewModels
                 }
                 else if (contextConnection.To != null)
                 {
-                    bool accept = false;
-                    if (contextConnection.To.IOType == IOType.Exec)
+                    var accept = false;
+                    if (contextConnection.To.IoType == IoType.Exec)
                     {
                         if (item.NodeType == NodeType.Statement)
                             accept = true;
                     }
-                    if (!accept && (item.Outputs == null || item.Outputs.All(o => o.Type != contextConnection.To.IOType)))
+
+                    if (!accept && (item.Outputs == null || item.Outputs.All(o => o.Type != contextConnection.To.IoType)))
                     {
                         filterEventArgs.Accepted = false;
                         return;
@@ -98,15 +102,10 @@ namespace WDE.Blueprints.Editor.ViewModels
                 return;
             }
 
-            if (_allItems.Where(i => i.Header.ToLower() == SearchBox.ToLower()).Count() == 1)
-            {
+            if (allItems.Where(i => i.Header.ToLower() == SearchBox.ToLower()).Count() == 1)
                 filterEventArgs.Accepted = item.Header.ToLower() == SearchBox.ToLower();
-            }
             else
-            {
                 filterEventArgs.Accepted = item.Header.ToLower().Contains(SearchBox.ToLower());
-
-            }
         }
     }
 }

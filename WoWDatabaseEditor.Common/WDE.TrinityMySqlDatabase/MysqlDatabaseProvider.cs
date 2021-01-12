@@ -1,38 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Transactions;
 using System.Windows;
 using LinqToDB;
 using LinqToDB.Configuration;
 using LinqToDB.Data;
-using MySql.Data.MySqlClient;
-using LinqToDB.Mapping;
-using WDE.Module.Attributes;
 using WDE.Common.Database;
+using WDE.Module.Attributes;
 using WDE.TrinityMySqlDatabase.Data;
 using WDE.TrinityMySqlDatabase.Models;
 using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase
 {
-    [AutoRegister, SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class TrinityMysqlDatabaseProvider : IDatabaseProvider
     {
-        private TrinityDatabase? model;
+        private List<MySqlCreatureTemplate>? creatureTemplateCache;
 
-        private List<MySqlCreatureTemplate>? CreatureTemplateCache;
+        private List<MySqlGameObjectTemplate>? gameObjectTemplateCache;
+        private readonly TrinityDatabase? model;
 
-        private List<MySqlGameObjectTemplate>? GameObjectTemplateCache;
-
-        private List<MySqlQuestTemplate>? QuestTemplateCache;
+        private List<MySqlQuestTemplate>? questTemplateCache;
 
         public TrinityMysqlDatabaseProvider(IConnectionSettingsProvider settings)
         {
-            string? Host = settings.GetSettings().Host;
+            string? host = settings.GetSettings().Host;
             try
             {
                 DataConnection.DefaultSettings = new MySqlSettings(settings.GetSettings());
@@ -41,7 +36,7 @@ namespace WDE.TrinityMySqlDatabase
             }
             catch (Exception e)
             {
-                if (!string.IsNullOrEmpty(Host))
+                if (!string.IsNullOrEmpty(host))
                     MessageBox.Show($"Cannot connect to MySql database: {e.Message} Check your settings.");
                 model = null;
             }
@@ -62,34 +57,38 @@ namespace WDE.TrinityMySqlDatabase
         {
             if (model == null)
                 return new List<ICreatureTemplate>();
-            if (CreatureTemplateCache == null)
-                CreatureTemplateCache = (from t in model.CreatureTemplate orderby t.Entry select t).ToList();
-            return CreatureTemplateCache;
+            if (creatureTemplateCache == null)
+                creatureTemplateCache = (from t in model.CreatureTemplate orderby t.Entry select t).ToList();
+            return creatureTemplateCache;
         }
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
             if (model == null)
                 return new List<ISmartScriptLine>();
-            return model.SmartScript.Where((line) => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int)type).ToList();
+            return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
         }
 
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
         {
             if (model == null)
                 return new List<IGameObjectTemplate>();
-            if (GameObjectTemplateCache == null)
-                GameObjectTemplateCache = (from t in model.GameObjectTemplate orderby t.Entry select t).ToList();
-            return GameObjectTemplateCache;
+            if (gameObjectTemplateCache == null)
+                gameObjectTemplateCache = (from t in model.GameObjectTemplate orderby t.Entry select t).ToList();
+            return gameObjectTemplateCache;
         }
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates()
         {
             if (model == null)
                 return new List<IQuestTemplate>();
-            if (QuestTemplateCache == null)
-                QuestTemplateCache = (from t in model.QuestTemplate join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn from subaddon in adn.DefaultIfEmpty() orderby t.Entry select t.SetAddon(subaddon)).ToList();
-            return QuestTemplateCache;
+            if (questTemplateCache == null)
+                questTemplateCache = (from t in model.QuestTemplate
+                    join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
+                    from subaddon in adn.DefaultIfEmpty()
+                    orderby t.Entry
+                    select t.SetAddon(subaddon)).ToList();
+            return questTemplateCache;
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
@@ -107,7 +106,7 @@ namespace WDE.TrinityMySqlDatabase
                 return null;
             if (model.QuestTemplate.Count(x => x.Entry == entry) == 0)
                 return null;
-            var addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
+            MySqlQuestTemplateAddon? addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
         }
 
@@ -120,8 +119,7 @@ namespace WDE.TrinityMySqlDatabase
             await model.SmartScript.Where(x => x.EntryOrGuid == entryOrGuid && x.ScriptSourceType == (int) type).DeleteAsync();
             if (type == SmartScriptType.Creature)
             {
-                await model.CreatureTemplate
-                    .Where(p => p.Entry == entryOrGuid)
+                await model.CreatureTemplate.Where(p => p.Entry == entryOrGuid)
                     .Set(p => p.AIName, "SmartAI")
                     .Set(p => p.ScriptName, "")
                     .UpdateAsync();
@@ -129,7 +127,7 @@ namespace WDE.TrinityMySqlDatabase
 
             foreach (var line in script)
             {
-                MySqlSmartScriptLine sqlLine = new ()
+                MySqlSmartScriptLine sqlLine = new()
                 {
                     EntryOrGuid = line.EntryOrGuid,
                     ScriptSourceType = line.ScriptSourceType,
@@ -164,6 +162,7 @@ namespace WDE.TrinityMySqlDatabase
                 };
                 await model.InsertAsync(sqlLine);
             }
+
             await model.CommitTransactionAsync();
         }
 
@@ -172,9 +171,11 @@ namespace WDE.TrinityMySqlDatabase
             if (model == null)
                 return new List<IConditionLine>();
 
-            return model.Conditions.Where((line) => line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId);
+            return model.Conditions.Where(line =>
+                line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId);
         }
     }
+
     public class ConnectionStringSettings : IConnectionStringSettings
     {
         public string ConnectionString { get; set; } = "";
@@ -185,11 +186,6 @@ namespace WDE.TrinityMySqlDatabase
 
     public class MySqlSettings : ILinqToDBSettings
     {
-        public IEnumerable<IDataProviderSettings> DataProviders => Enumerable.Empty<IDataProviderSettings>();
-
-        public string DefaultConfiguration => "MySqlConnector";
-        public string DefaultDataProvider => "MySqlConnector";
-
         public MySqlSettings(DbAccess access)
         {
             ConnectionStrings = new[]
@@ -203,7 +199,12 @@ namespace WDE.TrinityMySqlDatabase
                 }
             };
         }
-        
+
+        public IEnumerable<IDataProviderSettings> DataProviders => Enumerable.Empty<IDataProviderSettings>();
+
+        public string DefaultConfiguration => "MySqlConnector";
+        public string DefaultDataProvider => "MySqlConnector";
+
         public IEnumerable<IConnectionStringSettings> ConnectionStrings { get; }
     }
 }

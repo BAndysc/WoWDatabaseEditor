@@ -43,8 +43,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public ICollectionView AllItems => items.View;
 
-        public void Dispose() { element.OnChanged -= ElementOnOnChanged; }
+        public void Dispose()
+        {
+            element.OnChanged -= ElementOnOnChanged;
+        }
 
-        private void ElementOnOnChanged(object? sender, EventArgs e) { Readable = element.Readable; }
+        private void ElementOnOnChanged(object? sender, EventArgs e)
+        {
+            Readable = element.Readable;
+        }
     }
 }

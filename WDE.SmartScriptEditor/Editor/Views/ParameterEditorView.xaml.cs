@@ -7,6 +7,9 @@ namespace WDE.SmartScriptEditor.Editor.Views
     /// </summary>
     public partial class ParameterEditorView : UserControl
     {
-        public ParameterEditorView() { InitializeComponent(); }
+        public ParameterEditorView()
+        {
+            InitializeComponent();
+        }
     }
 }

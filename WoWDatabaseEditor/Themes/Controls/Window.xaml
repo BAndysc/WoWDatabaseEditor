@@ -3,7 +3,7 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls">
 
-    <Style x:Key="MainWindowStyle" 
+    <Style x:Key="MainWindowStyle"
            TargetType="controls:MetroWindow"
            BasedOn="{StaticResource {x:Type controls:MetroWindow}}">
         <Setter Property="WindowTitleBrush" Value="{DynamicResource MainWindowCaptionActiveBackground}" />

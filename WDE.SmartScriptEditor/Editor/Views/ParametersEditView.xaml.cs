@@ -25,17 +25,18 @@ namespace WDE.SmartScriptEditor.Editor.Views
         public static T FindVisualChild<T>(DependencyObject depObj) where T : DependencyObject
         {
             if (depObj != null)
+            {
                 for (var i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
                 {
-                    var child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null
-                        && child is T)
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
                         return (T) child;
 
-                    var childItem = FindVisualChild<T>(child);
+                    T childItem = FindVisualChild<T>(child);
                     if (childItem != null)
                         return childItem;
                 }
+            }
 
             return null;
         }

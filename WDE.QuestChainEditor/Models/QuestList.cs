@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WDE.QuestChainEditor.Models
 {
     public class QuestList : IEnumerable<Quest>
     {
-        public event Action<QuestList, Quest> OnAddedQuest = delegate { };
-        public event Action<QuestList, Quest> OnRemovedQuest = delegate { };
-
-        private HashSet<Quest> quests;
+        private readonly HashSet<Quest> quests;
 
         public QuestList()
         {
             quests = new HashSet<Quest>();
         }
+
+        public IEnumerator<Quest> GetEnumerator()
+        {
+            return quests.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return quests.GetEnumerator();
+        }
+
+        public event Action<QuestList, Quest> OnAddedQuest = delegate { };
+        public event Action<QuestList, Quest> OnRemovedQuest = delegate { };
 
         public bool AddQuest(Quest quest)
         {
@@ -33,25 +39,14 @@ namespace WDE.QuestChainEditor.Models
 
         public void RemoveQuest(Quest quest)
         {
-            foreach (var q in quests)
+            foreach (Quest q in quests)
             {
                 if (q.RequiredQuests.Contains(quest))
-                {
                     q.RequiredQuests.Remove(quest);
-                }
             }
+
             quests.Remove(quest);
             OnRemovedQuest(this, quest);
-        }
-
-        public IEnumerator<Quest> GetEnumerator()
-        {
-            return quests.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return quests.GetEnumerator();
         }
     }
 }

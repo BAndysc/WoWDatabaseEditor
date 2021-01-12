@@ -10,7 +10,7 @@ namespace WDE.Solutions.Explorer.Helpers
         //
         // The TreeViewItem that the mouse is currently directly over (or null).
         //
-        private static TreeViewItem _currentItem = null;
+        private static TreeViewItem currentItem;
 
         //
         // IsMouseDirectlyOverItem:  A DependencyProperty that will be true only on the 
@@ -23,39 +23,22 @@ namespace WDE.Solutions.Explorer.Helpers
         // The property key (since this is a read-only DP)
         private static readonly DependencyPropertyKey IsMouseDirectlyOverItemKey =
             DependencyProperty.RegisterAttachedReadOnly("IsMouseDirectlyOverItem",
-                                                typeof(bool),
-                                                typeof(MyTreeViewHelper),
-                                                new FrameworkPropertyMetadata(null, new CoerceValueCallback(CalculateIsMouseDirectlyOverItem)));
+                typeof(bool),
+                typeof(MyTreeViewHelper),
+                new FrameworkPropertyMetadata(null, CalculateIsMouseDirectlyOverItem));
 
         // The DP itself
-        public static readonly DependencyProperty IsMouseDirectlyOverItemProperty =
-            IsMouseDirectlyOverItemKey.DependencyProperty;
-
-        // A strongly-typed getter for the property.
-        public static bool GetIsMouseDirectlyOverItem(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(IsMouseDirectlyOverItemProperty);
-        }
-
-        // A coercion method for the property
-        private static object CalculateIsMouseDirectlyOverItem(DependencyObject item, object value)
-        {
-            // This method is called when the IsMouseDirectlyOver property is being calculated
-            // for a TreeViewItem.  
-
-            if (item == _currentItem)
-                return true;
-            else
-                return false;
-        }
+        public static readonly DependencyProperty IsMouseDirectlyOverItemProperty = IsMouseDirectlyOverItemKey.DependencyProperty;
 
         //
         // UpdateOverItem:  A private RoutedEvent used to find the nearest encapsulating
         // TreeViewItem to the mouse's current position.
         //
 
-        private static readonly RoutedEvent UpdateOverItemEvent = EventManager.RegisterRoutedEvent(
-            "UpdateOverItem", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MyTreeViewHelper));
+        private static readonly RoutedEvent UpdateOverItemEvent = EventManager.RegisterRoutedEvent("UpdateOverItem",
+            RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler),
+            typeof(MyTreeViewHelper));
 
         //
         // Class constructor
@@ -64,11 +47,34 @@ namespace WDE.Solutions.Explorer.Helpers
         static MyTreeViewHelper()
         {
             // Get all Mouse enter/leave events for TreeViewItem.
-            EventManager.RegisterClassHandler(typeof(TreeViewItem), TreeViewItem.MouseEnterEvent, new MouseEventHandler(OnMouseTransition), true);
-            EventManager.RegisterClassHandler(typeof(TreeViewItem), TreeViewItem.MouseLeaveEvent, new MouseEventHandler(OnMouseTransition), true);
+            EventManager.RegisterClassHandler(typeof(TreeViewItem),
+                UIElement.MouseEnterEvent,
+                new MouseEventHandler(OnMouseTransition),
+                true);
+            EventManager.RegisterClassHandler(typeof(TreeViewItem),
+                UIElement.MouseLeaveEvent,
+                new MouseEventHandler(OnMouseTransition),
+                true);
 
             // Listen for the UpdateOverItemEvent on all TreeViewItem's.
             EventManager.RegisterClassHandler(typeof(TreeViewItem), UpdateOverItemEvent, new RoutedEventHandler(OnUpdateOverItem));
+        }
+
+        // A strongly-typed getter for the property.
+        public static bool GetIsMouseDirectlyOverItem(DependencyObject obj)
+        {
+            return (bool) obj.GetValue(IsMouseDirectlyOverItemProperty);
+        }
+
+        // A coercion method for the property
+        private static object CalculateIsMouseDirectlyOverItem(DependencyObject item, object value)
+        {
+            // This method is called when the IsMouseDirectlyOver property is being calculated
+            // for a TreeViewItem.  
+
+            if (item == currentItem)
+                return true;
+            return false;
         }
 
 
@@ -77,14 +83,14 @@ namespace WDE.Solutions.Explorer.Helpers
         // it means that the sender is the closest TreeViewItem to the mouse (closest in the sense of the tree,
         // not geographically).
 
-        static void OnUpdateOverItem(object sender, RoutedEventArgs args)
+        private static void OnUpdateOverItem(object sender, RoutedEventArgs args)
         {
             // Mark this object as the tree view item over which the mouse
             // is currently positioned.
-            _currentItem = sender as TreeViewItem;
+            currentItem = sender as TreeViewItem;
 
             // Tell that item to re-calculate the IsMouseDirectlyOverItem property
-            _currentItem.InvalidateProperty(IsMouseDirectlyOverItemProperty);
+            currentItem.InvalidateProperty(IsMouseDirectlyOverItemProperty);
 
             // Prevent this event from notifying other tree view items higher in the tree.
             args.Handled = true;
@@ -96,15 +102,15 @@ namespace WDE.Solutions.Explorer.Helpers
         // the IsMouseDirectlyOverItem property on the previous TreeViewItem and the new
         // TreeViewItem.
 
-        static void OnMouseTransition(object sender, MouseEventArgs args)
+        private static void OnMouseTransition(object sender, MouseEventArgs args)
         {
             lock (IsMouseDirectlyOverItemProperty)
             {
-                if (_currentItem != null)
+                if (currentItem != null)
                 {
                     // Tell the item that previously had the mouse that it no longer does.
-                    DependencyObject oldItem = _currentItem;
-                    _currentItem = null;
+                    DependencyObject oldItem = currentItem;
+                    currentItem = null;
                     oldItem.InvalidateProperty(IsMouseDirectlyOverItemProperty);
                 }
 
@@ -118,9 +124,8 @@ namespace WDE.Solutions.Explorer.Helpers
                     // Raise an event from that point.  If a TreeViewItem is anywhere above this point
                     // in the tree, it will receive this event and update _currentItem.
 
-                    RoutedEventArgs newItemArgs = new RoutedEventArgs(UpdateOverItemEvent);
+                    RoutedEventArgs newItemArgs = new(UpdateOverItemEvent);
                     currentPosition.RaiseEvent(newItemArgs);
-
                 }
             }
         }

@@ -1,20 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace WDE.Blueprints.Editor.DisignTimeViewModels
 {
     internal class NodePickerViewModel
     {
-        private CollectionViewSource items { get; }
+        public NodePickerViewModel()
+        {
+            Items = new CollectionViewSource();
+            Items.Source = allItems;
+            Items.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
+        }
 
-        public ICollectionView AllItems => items.View;
+        private CollectionViewSource Items { get; }
 
-        private IEnumerable<NodePickerItemViewModel> _allItems =>
+        public ICollectionView AllItems => Items.View;
+
+        private IEnumerable<NodePickerItemViewModel> allItems =>
             new[]
             {
                 new NodePickerItemViewModel("On spell hit", "Events"),
@@ -28,26 +31,19 @@ namespace WDE.Blueprints.Editor.DisignTimeViewModels
                 new NodePickerItemViewModel("If (branch)", "Actions"),
 
                 new NodePickerItemViewModel("Me", "Expressions"),
-                new NodePickerItemViewModel("Get position", "Expressions"),
+                new NodePickerItemViewModel("Get position", "Expressions")
             };
-
-        public NodePickerViewModel()
-        {
-            items = new CollectionViewSource();
-            items.Source = _allItems;
-            items.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
-        }
     }
 
     internal class NodePickerItemViewModel
     {
-        public string Header { get; }
-        public string Category { get; }
-
         public NodePickerItemViewModel(string header, string category)
         {
             Header = header;
             Category = category;
         }
+
+        public string Header { get; }
+        public string Category { get; }
     }
 }

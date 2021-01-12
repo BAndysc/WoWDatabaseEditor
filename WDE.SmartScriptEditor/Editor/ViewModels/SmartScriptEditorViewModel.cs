@@ -67,22 +67,26 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 foreach (SmartEvent e in Events)
                 {
                     if (!e.IsSelected)
+                    {
                         foreach (SmartAction a in e.Actions)
                             a.IsSelected = false;
+                    }
                 }
             });
             DeselectAll = new DelegateCommand(() =>
             {
                 foreach (SmartEvent e in Events)
                 {
-                    foreach (SmartAction a in e.Actions) a.IsSelected = false;
+                    foreach (SmartAction a in e.Actions)
+                        a.IsSelected = false;
 
                     e.IsSelected = false;
                 }
             });
             DeselectAllEvents = new DelegateCommand(() =>
             {
-                foreach (SmartEvent e in Events) e.IsSelected = false;
+                foreach (SmartEvent e in Events)
+                    e.IsSelected = false;
             });
             OnDropItems = new DelegateCommand<int?>(destIndex =>
             {
@@ -104,7 +108,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (d == -1)
                         d = 0;
                     selected.Reverse();
-                    foreach (SmartEvent s in selected) script.Events.Insert(d++, s);
+                    foreach (SmartEvent s in selected)
+                        script.Events.Insert(d++, s);
                 }
             });
             OnDropActions = new DelegateCommand<DropActionsArgs>(data =>
@@ -129,7 +134,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     }
 
                     selected.Reverse();
-                    foreach (SmartAction s in selected) Events[data.EventIndex].Actions.Insert(d++, s);
+                    foreach (SmartAction s in selected)
+                        Events[data.EventIndex].Actions.Insert(d++, s);
                 }
             });
             EditAction = new DelegateCommand<SmartAction>(action => EditActionCommand(action));
@@ -223,8 +229,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var selectedActions = Events.SelectMany(e => e.Actions).Where(e => e.IsSelected).ToList();
                     if (selectedActions.Count > 0)
                     {
-                        SmartEvent fakeEvent = new SmartEvent(-1) {ReadableHint = ""};
-                        foreach (SmartAction a in selectedActions) fakeEvent.AddAction(a.Copy());
+                        SmartEvent fakeEvent = new(-1) {ReadableHint = ""};
+                        foreach (SmartAction a in selectedActions)
+                            fakeEvent.AddAction(a.Copy());
 
                         string lines = string.Join("\n",
                             fakeEvent.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, 0).Select(s => s.ToSqlString()));
@@ -258,7 +265,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         {
                             for (var i = 0; i < Events.Count - 1; ++i)
                             {
-                                if (Events[i].IsSelected) eventIndex = i;
+                                if (Events[i].IsSelected)
+                                    eventIndex = i;
 
                                 for (int j = Events[i].Actions.Count - 1; j >= 0; j--)
                                 {
@@ -369,7 +377,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     DeselectAll.Execute();
                     Events[actionEventIndex.eventIndex].IsSelected = true;
                 }
-                else if (!AnyEventSelected && !AnyActionSelected) selectionUpDown(false, -1);
+                else if (!AnyEventSelected && !AnyActionSelected)
+                    selectionUpDown(false, -1);
             });
             SelectionRight = new DelegateCommand(() =>
             {
@@ -388,7 +397,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SelectAll = new DelegateCommand(() =>
             {
-                foreach (SmartEvent e in Events) e.IsSelected = true;
+                foreach (SmartEvent e in Events)
+                    e.IsSelected = true;
             });
 
             History.PropertyChanged += (sender, args) =>
@@ -477,7 +487,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Save => SaveCommand;
         public ICommand CloseCommand { get; set; }
 
-        public void Dispose() { token.Dispose(); }
+        public void Dispose()
+        {
+            token.Dispose();
+        }
 
         internal void SetSolutionItem(SmartScriptSolutionItem item)
         {
@@ -494,8 +507,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             script.Events.CollectionChanged += (sender, args) =>
             {
                 if (args.Action == NotifyCollectionChangedAction.Add)
+                {
                     foreach (SmartEvent t in args.NewItems)
                         Together.Add(new CollectionContainer {Collection = t.Actions});
+                }
                 else if (args.Action == NotifyCollectionChangedAction.Remove)
                 {
                     foreach (SmartEvent t in args.OldItems)
@@ -511,7 +526,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     }
                 }
             };
-            foreach (SmartEvent t in script.Events) Together.Add(new CollectionContainer {Collection = t.Actions});
+            foreach (SmartEvent t in script.Events)
+                Together.Add(new CollectionContainer {Collection = t.Actions});
 
             History.AddHandler(new SaiHistoryHandler(script));
         }
@@ -526,7 +542,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
         }
 
-        private void DeleteActionCommand(SmartAction obj) { obj.Parent.Actions.Remove(obj); }
+        private void DeleteActionCommand(SmartAction obj)
+        {
+            obj.Parent.Actions.Remove(obj);
+        }
 
         private void AddActionCommand(NewActionViewModel obj)
         {
@@ -608,7 +627,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private bool EditActionCommand(SmartAction originalAction)
         {
             //@todo: constructing view in place is veeery ugly
-            ParametersEditView v = new ParametersEditView();
+            ParametersEditView v = new();
             SmartAction obj = originalAction.Copy();
 
             var paramss = new List<KeyValuePair<Parameter, string>>();
@@ -640,7 +659,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 paramss.Add(new KeyValuePair<Parameter, string>(wrapper, "Target"));
             }
 
-            ParametersEditViewModel viewModel = new ParametersEditViewModel(itemFromListProvider, obj, paramss);
+            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, paramss);
             v.DataContext = viewModel;
             bool result = v.ShowDialog() ?? false;
             if (result)
@@ -676,7 +695,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             //@todo: constructing view in place is veeery ugly
             SmartEvent ev = originalEvent.ShallowCopy();
 
-            ParametersEditView v = new ParametersEditView();
+            ParametersEditView v = new();
             var paramss = new List<KeyValuePair<Parameter, string>>();
             paramss.Add(new KeyValuePair<Parameter, string>(ev.Chance, "General"));
             paramss.Add(new KeyValuePair<Parameter, string>(ev.Flags, "General"));
@@ -690,7 +709,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     paramss.Add(new KeyValuePair<Parameter, string>(ev.GetParameter(i), "Event specific"));
             }
 
-            ParametersEditViewModel viewModel = new ParametersEditViewModel(itemFromListProvider, ev, paramss);
+            ParametersEditViewModel viewModel = new(itemFromListProvider, ev, paramss);
             v.DataContext = viewModel;
             bool result = v.ShowDialog() ?? false;
             if (result)

@@ -3,7 +3,7 @@
 namespace WDE.TrinityMySqlDatabase.Views
 {
     /// <summary>
-    /// Interaction logic for DatabaseConfigView
+    ///     Interaction logic for DatabaseConfigView
     /// </summary>
     public partial class DatabaseConfigView : UserControl
     {

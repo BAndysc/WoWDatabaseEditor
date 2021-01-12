@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-
 using WDE.Common;
-using Prism.Ioc;
+using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
-    [WDE.Module.Attributes.AutoRegister]
+    [AutoRegister]
     public class NewItemService : INewItemService
     {
         private readonly Lazy<INewItemWindowViewModel> viewModel;

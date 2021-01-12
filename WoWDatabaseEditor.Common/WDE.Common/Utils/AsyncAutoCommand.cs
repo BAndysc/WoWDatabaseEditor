@@ -9,35 +9,41 @@ namespace WDE.Common.Utils
 {
     public class AsyncAutoCommand : ICommand
     {
-        private bool _isBusy = false;
+        private bool isBusy;
 
-        private bool isBusy
-        {
-            get => _isBusy;
-            set
-            {
-                _isBusy = value;
-                Application.Current.Dispatcher.Invoke(() => command.RaiseCanExecuteChanged());
-            }
-        }
-        
-        private AsyncCommand command;
-        public AsyncAutoCommand([NotNull] Func<Task> execute,
-            [CanBeNull] Func<object?, bool>? canExecute = null, 
-            [CanBeNull] Action<Exception>? onException = null, 
+        private readonly AsyncCommand command;
+
+        public AsyncAutoCommand([NotNull]
+            Func<Task> execute,
+            [CanBeNull]
+            Func<object?, bool>? canExecute = null,
+            [CanBeNull]
+            Action<Exception>? onException = null,
             bool continueOnCapturedContext = false)
         {
             command = new AsyncCommand(async () =>
                 {
-                    isBusy = true;
+                    IsBusy = true;
                     await execute();
-                    isBusy = false;
-                }, (a) => !isBusy && (canExecute?.Invoke(a) ?? true),
+                    IsBusy = false;
+                },
+                a => !isBusy && (canExecute?.Invoke(a) ?? true),
                 e =>
                 {
-                    isBusy = false;
+                    IsBusy = false;
                     onException?.Invoke(e);
-                }, continueOnCapturedContext);
+                },
+                continueOnCapturedContext);
+        }
+
+        public bool IsBusy
+        {
+            get => isBusy;
+            private set
+            {
+                isBusy = value;
+                Application.Current.Dispatcher.Invoke(() => command.RaiseCanExecuteChanged());
+            }
         }
 
         public bool CanExecute(object? parameter)
@@ -47,13 +53,13 @@ namespace WDE.Common.Utils
 
         public void Execute(object? parameter)
         {
-            ((ICommand)command).Execute(parameter);
+            ((ICommand) command).Execute(parameter);
         }
 
         public event EventHandler? CanExecuteChanged
         {
-            add { command.CanExecuteChanged += value; }
-            remove { command.CanExecuteChanged -= value; }
+            add => command.CanExecuteChanged += value;
+            remove => command.CanExecuteChanged -= value;
         }
     }
 }

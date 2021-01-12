@@ -1,17 +1,10 @@
-﻿
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Windows;
 using Prism.Events;
 using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using WDE.Common.Events;
 using WDE.Common.History;
-using Prism.Ioc;
 using WDE.Common.Managers;
 
 namespace WDE.HistoryWindow.ViewModels
@@ -24,54 +17,54 @@ namespace WDE.HistoryWindow.ViewModels
 
     internal class HistoryViewModel : BindableBase, ITool
     {
-        public ObservableCollection<HistoryEvent> Items { get; set; } = new ObservableCollection<HistoryEvent>();
+        private Visibility visibility;
 
         private IDocument previousDocument;
 
-        public string Title => "History";
-        private Visibility _visibility;
-        public Visibility Visibility
-        {
-            get => _visibility;
-            set => SetProperty(ref _visibility, value);
-        }
         public HistoryViewModel(IEventAggregator eventAggregator)
         {
-            eventAggregator.GetEvent<EventActiveDocumentChanged>().Subscribe(doc =>
-            {
-                Items.Clear();
-
-                if (previousDocument != null)
+            eventAggregator.GetEvent<EventActiveDocumentChanged>()
+                .Subscribe(doc =>
                 {
-                    previousDocument.History.Past.CollectionChanged -= HistoryCollectionChanged;
-                    previousDocument.History.Future.CollectionChanged -= HistoryCollectionChanged;
-                    previousDocument = null;
-                }
+                    Items.Clear();
 
-                if (doc == null || doc.History == null)
-                    return;
+                    if (previousDocument != null)
+                    {
+                        previousDocument.History.Past.CollectionChanged -= HistoryCollectionChanged;
+                        previousDocument.History.Future.CollectionChanged -= HistoryCollectionChanged;
+                        previousDocument = null;
+                    }
 
-                previousDocument = doc;
+                    if (doc == null || doc.History == null)
+                        return;
 
-                doc.History.Past.CollectionChanged += HistoryCollectionChanged;
-                doc.History.Future.CollectionChanged += HistoryCollectionChanged;
+                    previousDocument = doc;
 
-                HistoryCollectionChanged(null, null);
-            });
+                    doc.History.Past.CollectionChanged += HistoryCollectionChanged;
+                    doc.History.Future.CollectionChanged += HistoryCollectionChanged;
+
+                    HistoryCollectionChanged(null, null);
+                });
+        }
+
+        public ObservableCollection<HistoryEvent> Items { get; set; } = new();
+
+        public string Title => "History";
+
+        public Visibility Visibility
+        {
+            get => visibility;
+            set => SetProperty(ref visibility, value);
         }
 
         private void HistoryCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             Items.Clear();
-            foreach (var past in previousDocument.History.Past)
-            {
-                Items.Add(new HistoryEvent() { Name = past.GetDescription(), IsFromFuture = false });
-            }
+            foreach (IHistoryAction past in previousDocument.History.Past)
+                Items.Add(new HistoryEvent {Name = past.GetDescription(), IsFromFuture = false});
 
-            foreach (var past in previousDocument.History.Future)
-            {
-                Items.Add(new HistoryEvent() { Name = past.GetDescription(), IsFromFuture = true });
-            }
+            foreach (IHistoryAction past in previousDocument.History.Future)
+                Items.Add(new HistoryEvent {Name = past.GetDescription(), IsFromFuture = true});
         }
     }
 }

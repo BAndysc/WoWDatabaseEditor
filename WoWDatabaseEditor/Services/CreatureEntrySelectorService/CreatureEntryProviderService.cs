@@ -1,42 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Module.Attributes;
 using WoWDatabaseEditor.Extensions;
-using Prism.Ioc;
 
 namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 {
-    [WDE.Module.Attributes.AutoRegister]
+    [AutoRegister]
     public abstract class GenericDatabaseProviderService<T>
     {
-        private readonly Func<T, uint> _entryGetter;
-        private readonly Func<T, string> _index;
+        private readonly Func<T, uint> entryGetter;
+        private readonly Func<T, string> index;
 
         protected GenericDatabaseProviderService(Func<T, uint> entryGetter, Func<T, string> index)
         {
-            _entryGetter = entryGetter;
-            _index = index;
+            this.entryGetter = entryGetter;
+            this.index = index;
         }
 
         protected abstract IEnumerable<T> GetList();
 
         public uint? GetEntryFromService()
         {
-            CreatureEntrySelectorWindow window = new CreatureEntrySelectorWindow();
+            CreatureEntrySelectorWindow window = new();
 
-            List<ColumnDescriptor> columns = new List<ColumnDescriptor>()
+            List<ColumnDescriptor> columns = new()
             {
-                new ColumnDescriptor(headerText: "Entry", displayMember: "Entry"),
-                new ColumnDescriptor(headerText: "Name", displayMember: "Name"),
+                new ColumnDescriptor("Entry", "Entry"),
+                new ColumnDescriptor("Name", "Name")
             };
-            
-            var context = new GenericSelectorWindowViewModel<T>(columns, GetList(), _entryGetter, _index);
+
+            var context = new GenericSelectorWindowViewModel<T>(columns, GetList(), entryGetter, index);
             window.DataContext = context;
 
             if (window.ShowDialog() ?? false)
@@ -46,24 +43,25 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
         }
     }
 
-    public class CreatureEntryProviderService :  GenericDatabaseProviderService<ICreatureTemplate>, ICreatureEntryProviderService
+    public class CreatureEntryProviderService : GenericDatabaseProviderService<ICreatureTemplate>, ICreatureEntryProviderService
     {
         private readonly IDatabaseProvider database;
-        public CreatureEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t=> t.Name + " "+t.Entry)
+
+        public CreatureEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry)
         {
             this.database = database;
         }
 
         protected override IEnumerable<ICreatureTemplate> GetList()
         {
-            return database.GetCreatureTemplates()
-                            .OrderBy(template => template.Entry);
+            return database.GetCreatureTemplates().OrderBy(template => template.Entry);
         }
     }
 
     public class GameobjectEntryProviderService : GenericDatabaseProviderService<IGameObjectTemplate>, IGameobjectEntryProviderService
     {
         private readonly IDatabaseProvider database;
+
         public GameobjectEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry)
         {
             this.database = database;
@@ -71,8 +69,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
         protected override IEnumerable<IGameObjectTemplate> GetList()
         {
-            return database.GetGameObjectTemplates()
-                            .OrderBy(template => template.Entry);
+            return database.GetGameObjectTemplates().OrderBy(template => template.Entry);
         }
     }
 
@@ -80,14 +77,14 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
     {
         private readonly IDatabaseProvider database;
 
-        public QuestEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry) {
+        public QuestEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry)
+        {
             this.database = database;
         }
 
         protected override IEnumerable<IQuestTemplate> GetList()
         {
-            return database.GetQuestTemplates()
-                            .OrderBy(template => template.Entry);
+            return database.GetQuestTemplates().OrderBy(template => template.Entry);
         }
     }
 
@@ -107,16 +104,17 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
     {
         private readonly ISpellStore spellStore;
 
-        public SpellEntryProviderService(ISpellStore spellStore) : base(t => t.Entry, t => t.Name + " " + t.Entry) {
+        public SpellEntryProviderService(ISpellStore spellStore) : base(t => t.Entry, t => t.Name + " " + t.Entry)
+        {
             this.spellStore = spellStore;
         }
 
         protected override IEnumerable<SpellMiniEntry> GetList()
         {
-            List<SpellMiniEntry> spells = new List<SpellMiniEntry>();
+            List<SpellMiniEntry> spells = new();
 
-            foreach (var spellId in spellStore.Spells)
-                spells.Add(new SpellMiniEntry(entry: spellId, name: spellStore.GetName(spellId)));
+            foreach (uint spellId in spellStore.Spells)
+                spells.Add(new SpellMiniEntry(spellId, spellStore.GetName(spellId)));
 
             return spells;
         }

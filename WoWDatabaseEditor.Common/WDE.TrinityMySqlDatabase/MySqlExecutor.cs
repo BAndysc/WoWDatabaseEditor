@@ -8,20 +8,21 @@ using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase
 {
-    [AutoRegister, SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class MySqlExecutor : IMySqlExecutor
     {
         private readonly MySqlSettings settings;
-        
+
         public MySqlExecutor(IConnectionSettingsProvider connectionSettingsProvider)
         {
             settings = new MySqlSettings(connectionSettingsProvider.GetSettings());
         }
-        
+
         public async Task ExecuteSql(string query)
         {
             string connStr = settings.ConnectionStrings.First().ConnectionString;
-            MySqlConnection conn = new MySqlConnection(connStr);
+            MySqlConnection conn = new(connStr);
             MySqlTransaction transaction;
             try
             {
@@ -35,7 +36,7 @@ namespace WDE.TrinityMySqlDatabase
 
             try
             {
-                MySqlCommand cmd = new MySqlCommand(query, conn, transaction);
+                MySqlCommand cmd = new(query, conn, transaction);
                 await cmd.ExecuteNonQueryAsync();
                 await transaction.CommitAsync();
             }
@@ -45,6 +46,7 @@ namespace WDE.TrinityMySqlDatabase
                 await conn.CloseAsync();
                 throw new IMySqlExecutor.QueryFailedDatabaseException(ex);
             }
+
             await conn.CloseAsync();
         }
     }

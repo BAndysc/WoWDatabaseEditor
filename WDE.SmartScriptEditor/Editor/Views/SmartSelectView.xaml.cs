@@ -8,7 +8,10 @@ namespace WDE.SmartScriptEditor.Editor.Views
     /// </summary>
     public partial class SmartSelectView : Window
     {
-        public SmartSelectView() { InitializeComponent(); }
+        public SmartSelectView()
+        {
+            InitializeComponent();
+        }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
@@ -31,6 +34,7 @@ namespace WDE.SmartScriptEditor.Editor.Views
         private void TextBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
+            {
                 if (Items.Items.Count > 0)
                 {
                     if (Items.SelectedIndex == -1)
@@ -38,6 +42,7 @@ namespace WDE.SmartScriptEditor.Editor.Views
 
                     Control_OnMouseDoubleClick(null, null);
                 }
+            }
         }
     }
 }

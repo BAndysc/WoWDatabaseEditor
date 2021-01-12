@@ -24,14 +24,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             this.predicate = predicate;
             string group = null;
-            foreach (var line in File.ReadLines("SmartData/" + file))
+            foreach (string line in File.ReadLines("SmartData/" + file))
+            {
                 if (line.IndexOf(" ", StringComparison.Ordinal) == 0)
                 {
                     if (!smartDataManager.Contains(type, line.Trim()))
                         continue;
 
-                    var i = new SmartItem();
-                    var data = smartDataManager.GetDataByName(type, line.Trim());
+                    SmartItem i = new();
+                    SmartGenericJsonData data = smartDataManager.GetDataByName(type, line.Trim());
 
                     i.Group = group;
                     i.Name = data.NameReadable;
@@ -43,14 +44,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     allItems.Add(i);
                 }
                 else
-                    @group = line;
+                    group = line;
+            }
 
             items = new CollectionViewSource();
             items.Source = allItems;
             items.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
             items.Filter += ItemsOnFilter;
 
-            if (items.View.MoveCurrentToFirst()) SelectedItem = items.View.CurrentItem as SmartItem;
+            if (items.View.MoveCurrentToFirst())
+                SelectedItem = items.View.CurrentItem as SmartItem;
         }
 
         public ICollectionView AllItems => items.View;
@@ -73,13 +76,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
         {
-            var item = filterEventArgs.Item as SmartItem;
+            SmartItem item = filterEventArgs.Item as SmartItem;
 
             if (predicate != null && !predicate(item.Data))
                 filterEventArgs.Accepted = false;
             else
-                filterEventArgs.Accepted =
-                    string.IsNullOrEmpty(SearchBox) || item.Name.ToLower().Contains(SearchBox.ToLower());
+                filterEventArgs.Accepted = string.IsNullOrEmpty(SearchBox) || item.Name.ToLower().Contains(SearchBox.ToLower());
         }
     }
 

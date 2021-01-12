@@ -1,168 +1,149 @@
 ﻿#region License
+
 // From the CodeProject article by Ashley Davis: 
 // http://www.codeproject.com/Articles/85603/A-WPF-custom-control-for-zooming-and-panning
 // Licensed under the Code Project Open License (CPOL): 
 // http://www.codeproject.com/info/cpol10.aspx
+
 #endregion
 
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace GeminiGraphEditor
 {
     /// <summary>
-    /// This is an extension to the ZoomAndPanControol class that implements
-    /// the IScrollInfo interface properties and functions.
-    /// 
-    /// IScrollInfo is implemented to allow ZoomAndPanControl to be wrapped (in XAML)
-    /// in a ScrollViewer.  IScrollInfo allows the ScrollViewer and ZoomAndPanControl to 
-    /// communicate important information such as the horizontal and vertical scrollbar offsets.
-    /// 
-    /// There is a good series of articles showing how to implement IScrollInfo starting here:
+    ///     This is an extension to the ZoomAndPanControol class that implements
+    ///     the IScrollInfo interface properties and functions.
+    ///     IScrollInfo is implemented to allow ZoomAndPanControl to be wrapped (in XAML)
+    ///     in a ScrollViewer.  IScrollInfo allows the ScrollViewer and ZoomAndPanControl to
+    ///     communicate important information such as the horizontal and vertical scrollbar offsets.
+    ///     There is a good series of articles showing how to implement IScrollInfo starting here:
     ///     http://blogs.msdn.com/bencon/archive/2006/01/05/509991.aspx
-    ///     
     /// </summary>
     public partial class ZoomAndPanControl
     {
         /// <summary>
-        /// Set to 'true' when the vertical scrollbar is enabled.
+        ///     Set to 'true' when the vertical scrollbar is enabled.
         /// </summary>
         public bool CanVerticallyScroll { get; set; }
 
         /// <summary>
-        /// Set to 'true' when the vertical scrollbar is enabled.
+        ///     Set to 'true' when the vertical scrollbar is enabled.
         /// </summary>
         public bool CanHorizontallyScroll { get; set; }
 
         /// <summary>
-        /// The width of the content (with 'ContentScale' applied).
+        ///     The width of the content (with 'ContentScale' applied).
         /// </summary>
-        public double ExtentWidth
-        {
-            get { return _unScaledExtent.Width * ContentScale; }
-        }
+        public double ExtentWidth => unScaledExtent.Width * ContentScale;
 
         /// <summary>
-        /// The height of the content (with 'ContentScale' applied).
+        ///     The height of the content (with 'ContentScale' applied).
         /// </summary>
-        public double ExtentHeight
-        {
-            get { return _unScaledExtent.Height * ContentScale; }
-        }
+        public double ExtentHeight => unScaledExtent.Height * ContentScale;
 
         /// <summary>
-        /// Get the width of the viewport onto the content.
+        ///     Get the width of the viewport onto the content.
         /// </summary>
-        public double ViewportWidth
-        {
-            get { return _viewport.Width; }
-        }
+        public double ViewportWidth => viewport.Width;
 
         /// <summary>
-        /// Get the height of the viewport onto the content.
+        ///     Get the height of the viewport onto the content.
         /// </summary>
-        public double ViewportHeight
-        {
-            get { return _viewport.Height; }
-        }
+        public double ViewportHeight => viewport.Height;
 
         /// <summary>
-        /// Reference to the ScrollViewer that is wrapped (in XAML) around the ZoomAndPanControl.
-        /// Or set to null if there is no ScrollViewer.
+        ///     Reference to the ScrollViewer that is wrapped (in XAML) around the ZoomAndPanControl.
+        ///     Or set to null if there is no ScrollViewer.
         /// </summary>
         public ScrollViewer ScrollOwner { get; set; }
 
         /// <summary>
-        /// The offset of the horizontal scrollbar.
+        ///     The offset of the horizontal scrollbar.
         /// </summary>
-        public double HorizontalOffset
-        {
-            get { return ContentOffsetX * ContentScale; }
-        }
+        public double HorizontalOffset => ContentOffsetX * ContentScale;
 
         /// <summary>
-        /// The offset of the vertical scrollbar.
+        ///     The offset of the vertical scrollbar.
         /// </summary>
-        public double VerticalOffset
-        {
-            get { return ContentOffsetY * ContentScale; }
-        }
+        public double VerticalOffset => ContentOffsetY * ContentScale;
 
         /// <summary>
-        /// Called when the offset of the horizontal scrollbar has been set.
+        ///     Called when the offset of the horizontal scrollbar has been set.
         /// </summary>
         public void SetHorizontalOffset(double offset)
         {
-            if (_disableScrollOffsetSync)
+            if (disableScrollOffsetSync)
                 return;
 
             try
             {
-                _disableScrollOffsetSync = true;
+                disableScrollOffsetSync = true;
 
                 ContentOffsetX = offset / ContentScale;
             }
             finally
             {
-                _disableScrollOffsetSync = false;
+                disableScrollOffsetSync = false;
             }
         }
 
         /// <summary>
-        /// Called when the offset of the vertical scrollbar has been set.
+        ///     Called when the offset of the vertical scrollbar has been set.
         /// </summary>
         public void SetVerticalOffset(double offset)
         {
-            if (_disableScrollOffsetSync)
+            if (disableScrollOffsetSync)
                 return;
 
             try
             {
-                _disableScrollOffsetSync = true;
+                disableScrollOffsetSync = true;
 
                 ContentOffsetY = offset / ContentScale;
             }
             finally
             {
-                _disableScrollOffsetSync = false;
+                disableScrollOffsetSync = false;
             }
         }
 
         /// <summary>
-        /// Shift the content offset one line up.
+        ///     Shift the content offset one line up.
         /// </summary>
         public void LineUp()
         {
-            ContentOffsetY -= (ContentViewportHeight / 10);
+            ContentOffsetY -= ContentViewportHeight / 10;
         }
 
         /// <summary>
-        /// Shift the content offset one line down.
+        ///     Shift the content offset one line down.
         /// </summary>
         public void LineDown()
         {
-            ContentOffsetY += (ContentViewportHeight / 10);
+            ContentOffsetY += ContentViewportHeight / 10;
         }
 
         /// <summary>
-        /// Shift the content offset one line left.
+        ///     Shift the content offset one line left.
         /// </summary>
         public void LineLeft()
         {
-            ContentOffsetX -= (ContentViewportWidth / 10);
+            ContentOffsetX -= ContentViewportWidth / 10;
         }
 
         /// <summary>
-        /// Shift the content offset one line right.
+        ///     Shift the content offset one line right.
         /// </summary>
         public void LineRight()
         {
-            ContentOffsetX += (ContentViewportWidth / 10);
+            ContentOffsetX += ContentViewportWidth / 10;
         }
 
         /// <summary>
-        /// Shift the content offset one page up.
+        ///     Shift the content offset one page up.
         /// </summary>
         public void PageUp()
         {
@@ -170,7 +151,7 @@ namespace GeminiGraphEditor
         }
 
         /// <summary>
-        /// Shift the content offset one page down.
+        ///     Shift the content offset one page down.
         /// </summary>
         public void PageDown()
         {
@@ -178,7 +159,7 @@ namespace GeminiGraphEditor
         }
 
         /// <summary>
-        /// Shift the content offset one page left.
+        ///     Shift the content offset one page left.
         /// </summary>
         public void PageLeft()
         {
@@ -186,7 +167,7 @@ namespace GeminiGraphEditor
         }
 
         /// <summary>
-        /// Shift the content offset one page right.
+        ///     Shift the content offset one page right.
         /// </summary>
         public void PageRight()
         {
@@ -194,8 +175,8 @@ namespace GeminiGraphEditor
         }
 
         /// <summary>
-        /// Don't handle mouse wheel input from the ScrollViewer, the mouse wheel is
-        /// used for zooming in and out, not for manipulating the scrollbars.
+        ///     Don't handle mouse wheel input from the ScrollViewer, the mouse wheel is
+        ///     used for zooming in and out, not for manipulating the scrollbars.
         /// </summary>
         public void MouseWheelDown()
         {
@@ -204,8 +185,8 @@ namespace GeminiGraphEditor
         }
 
         /// <summary>
-        /// Don't handle mouse wheel input from the ScrollViewer, the mouse wheel is
-        /// used for zooming in and out, not for manipulating the scrollbars.
+        ///     Don't handle mouse wheel input from the ScrollViewer, the mouse wheel is
+        ///     used for zooming in and out, not for manipulating the scrollbars.
         /// </summary>
         public void MouseWheelLeft()
         {
@@ -214,8 +195,8 @@ namespace GeminiGraphEditor
         }
 
         /// <summary>
-        /// Don't handle mouse wheel input from the ScrollViewer, the mouse wheel is
-        /// used for zooming in and out, not for manipulating the scrollbars.
+        ///     Don't handle mouse wheel input from the ScrollViewer, the mouse wheel is
+        ///     used for zooming in and out, not for manipulating the scrollbars.
         /// </summary>
         public void MouseWheelRight()
         {
@@ -224,8 +205,8 @@ namespace GeminiGraphEditor
         }
 
         /// <summary>
-        /// Don't handle mouse wheel input from the ScrollViewer, the mouse wheel is
-        /// used for zooming in and out, not for manipulating the scrollbars.
+        ///     Don't handle mouse wheel input from the ScrollViewer, the mouse wheel is
+        ///     used for zooming in and out, not for manipulating the scrollbars.
         /// </summary>
         public void MouseWheelUp()
         {
@@ -234,14 +215,14 @@ namespace GeminiGraphEditor
         }
 
         /// <summary>
-        /// Bring the specified rectangle to view.
+        ///     Bring the specified rectangle to view.
         /// </summary>
         public Rect MakeVisible(Visual visual, Rect rectangle)
         {
-            if (_content.IsAncestorOf(visual))
+            if (content.IsAncestorOf(visual))
             {
-                Rect transformedRect = visual.TransformToAncestor(_content).TransformBounds(rectangle);
-                Rect viewportRect = new Rect(ContentOffsetX, ContentOffsetY, ContentViewportWidth, ContentViewportHeight);
+                Rect transformedRect = visual.TransformToAncestor(content).TransformBounds(rectangle);
+                Rect viewportRect = new(ContentOffsetX, ContentOffsetY, ContentViewportWidth, ContentViewportHeight);
                 if (!transformedRect.Contains(viewportRect))
                 {
                     double horizOffset = 0;
@@ -280,8 +261,8 @@ namespace GeminiGraphEditor
                     SnapContentOffsetTo(new Point(ContentOffsetX + horizOffset, ContentOffsetY + vertOffset));
                 }
             }
+
             return rectangle;
         }
-
     }
 }

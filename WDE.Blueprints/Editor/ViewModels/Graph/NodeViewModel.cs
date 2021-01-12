@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using WDE.Blueprints.Enums;
 
 namespace WDE.Blueprints.Editor.ViewModels
@@ -14,16 +9,15 @@ namespace WDE.Blueprints.Editor.ViewModels
         {
             Name = name;
 
-            nodeType = node;
+            NodeType = node;
 
-            for (int i = 0; i < inputs; ++i)
-                AddInputConnector($"Input {i+1}", i == 0 ? IOType.Exec : IOType.Int, Colors.DarkSeaGreen);
-            for (int i = 0; i < outputs; ++i)
+            for (var i = 0; i < inputs; ++i)
+                AddInputConnector($"Input {i + 1}", i == 0 ? IoType.Exec : IoType.Int, Colors.DarkSeaGreen);
+            for (var i = 0; i < outputs; ++i)
 
-                AddOutputConnector($"Ooutput {i+1}", i == 0 ? IOType.Exec : IOType.Int, Colors.DarkSeaGreen);
+                AddOutputConnector($"Ooutput {i + 1}", i == 0 ? IoType.Exec : IoType.Int, Colors.DarkSeaGreen);
         }
 
-        private NodeType nodeType;
-        public override NodeType NodeType => nodeType;
+        public override NodeType NodeType { get; }
     }
 }

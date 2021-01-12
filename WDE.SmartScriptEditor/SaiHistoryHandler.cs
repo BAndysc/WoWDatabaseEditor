@@ -17,7 +17,7 @@ namespace WDE.SmartScriptEditor
             this.script.BulkEditingStarted += OnBulkEditingStarted;
             this.script.BulkEditingFinished += OnBulkEditingFinished;
 
-            foreach (var ev in this.script.Events)
+            foreach (SmartEvent ev in this.script.Events)
                 BindEvent(ev);
         }
 
@@ -31,16 +31,20 @@ namespace WDE.SmartScriptEditor
         private void Events_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
-                foreach (var ev in e.NewItems)
+            {
+                foreach (object ev in e.NewItems)
                     AddedEvent(ev as SmartEvent, e.NewStartingIndex);
+            }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
-                foreach (var ev in e.OldItems)
+            {
+                foreach (object ev in e.OldItems)
                     RemovedEvent(ev as SmartEvent, e.OldStartingIndex);
+            }
         }
 
         private void UnbindEvent(SmartEvent smartEvent)
         {
-            foreach (var act in smartEvent.Actions)
+            foreach (SmartAction act in smartEvent.Actions)
                 UnbindAction(act);
 
             smartEvent.Actions.CollectionChanged -= Actions_CollectionChanged;
@@ -134,22 +138,32 @@ namespace WDE.SmartScriptEditor
 
             smartEvent.Actions.CollectionChanged += Actions_CollectionChanged;
 
-            foreach (var smartAction in smartEvent.Actions)
+            foreach (SmartAction smartAction in smartEvent.Actions)
                 BindAction(smartAction);
         }
 
-        private void OnBulkEditingFinished(string editName) { EndBulkEdit(editName); }
+        private void OnBulkEditingFinished(string editName)
+        {
+            EndBulkEdit(editName);
+        }
 
-        private void OnBulkEditingStarted() { StartBulkEdit(); }
+        private void OnBulkEditingStarted()
+        {
+            StartBulkEdit();
+        }
 
         private void Actions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
-                foreach (var ev in e.NewItems)
+            {
+                foreach (object ev in e.NewItems)
                     AddedAction(ev as SmartAction, (ev as SmartAction).Parent, e.NewStartingIndex);
+            }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
-                foreach (var ac in e.OldItems)
+            {
+                foreach (object ac in e.OldItems)
                     RemovedAction(ac as SmartAction, (ac as SmartAction).Parent, e.OldStartingIndex);
+            }
         }
 
 
@@ -184,9 +198,15 @@ namespace WDE.SmartScriptEditor
                 return "Added event " + readable;
             }
 
-            public void Redo() { script.Events.Insert(index, smartEvent); }
+            public void Redo()
+            {
+                script.Events.Insert(index, smartEvent);
+            }
 
-            public void Undo() { script.Events.Remove(smartEvent); }
+            public void Undo()
+            {
+                script.Events.Remove(smartEvent);
+            }
         }
 
         private class EventRemovedAction : IHistoryAction
@@ -208,9 +228,15 @@ namespace WDE.SmartScriptEditor
                 return "Removed event " + smartEvent.Readable;
             }
 
-            public void Redo() { script.Events.Remove(smartEvent); }
+            public void Redo()
+            {
+                script.Events.Remove(smartEvent);
+            }
 
-            public void Undo() { script.Events.Insert(index, smartEvent); }
+            public void Undo()
+            {
+                script.Events.Insert(index, smartEvent);
+            }
         }
 
         private class GenericParameterChangedAction<T> : IHistoryAction
@@ -232,14 +258,22 @@ namespace WDE.SmartScriptEditor
                 return "Changed " + param.Name + " from " + old + " to " + @new;
             }
 
-            public void Redo() { param.SetValue(@new); }
+            public void Redo()
+            {
+                param.SetValue(@new);
+            }
 
-            public void Undo() { param.SetValue(old); }
+            public void Undo()
+            {
+                param.SetValue(old);
+            }
         }
 
         private class ParameterChangedAction : GenericParameterChangedAction<int>
         {
-            public ParameterChangedAction(GenericBaseParameter<int> param, int old, int @new) : base(param, old, @new) { }
+            public ParameterChangedAction(GenericBaseParameter<int> param, int old, int @new) : base(param, old, @new)
+            {
+            }
         }
     }
 
@@ -262,9 +296,15 @@ namespace WDE.SmartScriptEditor
             return "Added action " + smartAction.Readable;
         }
 
-        public void Redo() { parent.Actions.Insert(index, smartAction); }
+        public void Redo()
+        {
+            parent.Actions.Insert(index, smartAction);
+        }
 
-        public void Undo() { parent.Actions.Remove(smartAction); }
+        public void Undo()
+        {
+            parent.Actions.Remove(smartAction);
+        }
     }
 
 
@@ -281,10 +321,19 @@ namespace WDE.SmartScriptEditor
             this.index = index;
         }
 
-        public string GetDescription() { return "Removed action " + smartAction.Readable; }
+        public string GetDescription()
+        {
+            return "Removed action " + smartAction.Readable;
+        }
 
-        public void Redo() { parent.Actions.Remove(smartAction); }
+        public void Redo()
+        {
+            parent.Actions.Remove(smartAction);
+        }
 
-        public void Undo() { parent.Actions.Insert(index, smartAction); }
+        public void Undo()
+        {
+            parent.Actions.Insert(index, smartAction);
+        }
     }
 }

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WDBXEditor.Storage;
-using System.Data;
-using System.Diagnostics;
+﻿using System.IO;
 
 namespace WDBXEditor.Reader.FileTypes
 {
@@ -38,13 +30,12 @@ namespace WDBXEditor.Reader.FileTypes
                 StringLengths = new short[diff];
 
                 //Populate the arrays
-                for (int i = 0; i < diff; i++)
+                for (var i = 0; i < diff; i++)
                     IndexMap[i] = dbReader.ReadInt32();
 
-                for (int i = 0; i < diff; i++)
+                for (var i = 0; i < diff; i++)
                     StringLengths[i] = dbReader.ReadInt16();
             }
         }
-        
     }
 }

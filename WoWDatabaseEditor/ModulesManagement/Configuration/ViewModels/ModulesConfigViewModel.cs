@@ -1,26 +1,25 @@
-﻿using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using Prism.Mvvm;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditor.ModulesManagement.Configuration.ViewModels
 {
     [AutoRegister]
-    class ModulesConfigViewModel : BindableBase
+    internal class ModulesConfigViewModel : BindableBase
     {
-        public ObservableCollection<ModuleConfigModel> Items { get; }
-
         public ModulesConfigViewModel(IModulesManager modulesManager)
         {
             Items = new ObservableCollection<ModuleConfigModel>();
 
-            Items.AddRange(modulesManager.Modules.Select(m => new ModuleConfigModel(isEnabled: true, name: m.Assembly.GetName().Name ?? "Unknown name", isLoaded: m.IsLoaded, details: GenerateDetailFor(m.ConflictingAssembly))));
+            Items.AddRange(modulesManager.Modules.Select(m => new ModuleConfigModel(true,
+                m.Assembly.GetName().Name ?? "Unknown name",
+                m.IsLoaded,
+                GenerateDetailFor(m.ConflictingAssembly))));
         }
+
+        public ObservableCollection<ModuleConfigModel> Items { get; }
 
         private string GenerateDetailFor(Assembly? conflictingAssembly)
         {
@@ -31,7 +30,7 @@ namespace WoWDatabaseEditor.ModulesManagement.Configuration.ViewModels
         }
     }
 
-    class ModuleConfigModel
+    internal class ModuleConfigModel
     {
         public ModuleConfigModel(bool isEnabled, string name, bool isLoaded, string details)
         {

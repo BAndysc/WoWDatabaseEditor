@@ -12,23 +12,27 @@ namespace WDE.SmartScriptEditor.Models
         {
             Description = data.Description;
             if (data.Conditions != null)
-                foreach (var condition in data.Conditions)
+            {
+                foreach (SmartConditionalJsonData condition in data.Conditions)
                 {
-                    var conditional = new ParameterConditionalCompareAny(condition);
+                    ParameterConditionalCompareAny conditional = new(condition);
 
                     inverted = condition.Invert;
 
                     Conditionals.Add(conditional);
                 }
+            }
         }
 
         public string Description { get; }
 
         public bool Matches(DescriptionParams paramz)
         {
-            foreach (var condition in Conditionals)
+            foreach (ParameterConditionalCompareAny condition in Conditionals)
+            {
                 if (!condition.Validate(paramz))
                     return false;
+            }
 
             return true;
         }

@@ -6,54 +6,63 @@ namespace GeminiGraphEditor
 {
     public class ElementItem : ListBoxItem
     {
-        private Point _lastMousePosition;
-        private bool _isLeftMouseButtonDown;
-        private bool _isDragging;
+        private bool isDragging;
+        private bool isLeftMouseButtonDown;
+        private Point lastMousePosition;
 
         static ElementItem()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ElementItem),
-                new FrameworkPropertyMetadata(typeof(ElementItem)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ElementItem), new FrameworkPropertyMetadata(typeof(ElementItem)));
+        }
+
+        private GraphControl ParentGraphControl => VisualTreeUtility.FindParent<GraphControl>(this);
+
+        public void BringToFront()
+        {
+            GraphControl parentGraphControl = ParentGraphControl;
+            if (parentGraphControl == null)
+                return;
+
+            int maxZ = parentGraphControl.GetMaxZIndex();
+            ZIndex = maxZ + 1;
         }
 
         #region Dependency properties
 
-        public static readonly DependencyProperty XProperty = DependencyProperty.Register(
-            "X", typeof(double), typeof(ElementItem),
+        public static readonly DependencyProperty XProperty = DependencyProperty.Register("X",
+            typeof(double),
+            typeof(ElementItem),
             new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public double X
         {
-            get { return (double) GetValue(XProperty); }
-            set { SetValue(XProperty, value); }
+            get => (double) GetValue(XProperty);
+            set => SetValue(XProperty, value);
         }
 
-        public static readonly DependencyProperty YProperty = DependencyProperty.Register(
-            "Y", typeof(double), typeof(ElementItem),
+        public static readonly DependencyProperty YProperty = DependencyProperty.Register("Y",
+            typeof(double),
+            typeof(ElementItem),
             new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public double Y
         {
-            get { return (double) GetValue(YProperty); }
-            set { SetValue(YProperty, value); }
+            get => (double) GetValue(YProperty);
+            set => SetValue(YProperty, value);
         }
 
-        public static readonly DependencyProperty ZIndexProperty = DependencyProperty.Register(
-            "ZIndex", typeof(int), typeof(ElementItem),
+        public static readonly DependencyProperty ZIndexProperty = DependencyProperty.Register("ZIndex",
+            typeof(int),
+            typeof(ElementItem),
             new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public int ZIndex
         {
-            get { return (int) GetValue(ZIndexProperty); }
-            set { SetValue(ZIndexProperty, value); }
+            get => (int) GetValue(ZIndexProperty);
+            set => SetValue(ZIndexProperty, value);
         }
 
         #endregion
-
-        private GraphControl ParentGraphControl
-        {
-            get { return VisualTreeUtility.FindParent<GraphControl>(this); }
-        }
 
         #region Mouse input
 
@@ -63,21 +72,21 @@ namespace GeminiGraphEditor
             base.OnMouseDown(e);
         }
 
-        private double _startX;
-        private double _startY;
+        private double startX;
+        private double startY;
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             DoSelection();
 
-            var parentGraphControl = ParentGraphControl;
+            GraphControl parentGraphControl = ParentGraphControl;
             if (parentGraphControl != null)
-                _lastMousePosition = e.GetPosition(parentGraphControl);
+                lastMousePosition = e.GetPosition(parentGraphControl);
 
-            _startX = X;
-            _startY = Y;
+            startX = X;
+            startY = Y;
 
-            _isLeftMouseButtonDown = true;
+            isLeftMouseButtonDown = true;
 
             e.Handled = true;
 
@@ -86,7 +95,7 @@ namespace GeminiGraphEditor
 
         private void DoSelection()
         {
-            var parentGraphControl = ParentGraphControl;
+            GraphControl parentGraphControl = ParentGraphControl;
             if (parentGraphControl == null)
                 return;
 
@@ -96,22 +105,23 @@ namespace GeminiGraphEditor
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (_isDragging)
+            if (isDragging)
             {
-                var newMousePosition = e.GetPosition(ParentGraphControl);
-                var delta = newMousePosition - _lastMousePosition;
+                Point newMousePosition = e.GetPosition(ParentGraphControl);
+                Vector delta = newMousePosition - lastMousePosition;
 
-                X = _startX + delta.X;// delta.X;
-                Y = _startY + delta.Y;//
-                
+                X = startX + delta.X; // delta.X;
+                Y = startY + delta.Y; //
+
                 X -= (X + ActualWidth / 2) % 25;
                 Y -= Y % 25;
 
                 // _lastMousePosition = newMousePosition;
             }
-            if (_isLeftMouseButtonDown)
+
+            if (isLeftMouseButtonDown)
             {
-                _isDragging = true;
+                isDragging = true;
                 CaptureMouse();
             }
 
@@ -122,14 +132,14 @@ namespace GeminiGraphEditor
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            if (_isLeftMouseButtonDown)
+            if (isLeftMouseButtonDown)
             {
-                _isLeftMouseButtonDown = false;
+                isLeftMouseButtonDown = false;
 
-                if (_isDragging)
+                if (isDragging)
                 {
                     ReleaseMouseCapture();
-                    _isDragging = false;
+                    isDragging = false;
                 }
             }
 
@@ -139,15 +149,5 @@ namespace GeminiGraphEditor
         }
 
         #endregion
-
-        public void BringToFront()
-        {
-            var parentGraphControl = ParentGraphControl;
-            if (parentGraphControl == null)
-                return;
-
-            var maxZ = parentGraphControl.GetMaxZIndex();
-            ZIndex = maxZ + 1;
-        }
     }
 }

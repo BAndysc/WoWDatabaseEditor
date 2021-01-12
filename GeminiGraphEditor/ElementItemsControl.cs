@@ -5,6 +5,11 @@ namespace GeminiGraphEditor
 {
     public class ElementItemsControl : ListBox
     {
+        public ElementItemsControl()
+        {
+            SelectionMode = SelectionMode.Extended;
+        }
+
         protected override DependencyObject GetContainerForItemOverride()
         {
             return new ElementItem();
@@ -12,12 +17,7 @@ namespace GeminiGraphEditor
 
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
-            return item is ElementItem; 
-        }
-
-        public ElementItemsControl()
-        {
-            SelectionMode = SelectionMode.Extended;
+            return item is ElementItem;
         }
     }
 }

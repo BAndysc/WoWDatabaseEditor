@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using WDE.Blueprints.Enums;
 
@@ -10,38 +6,39 @@ namespace WDE.Blueprints.Editor.ViewModels
 {
     public class InputConnectorViewModel : ConnectorViewModel
     {
-        public event EventHandler SourceChanged;
+        private ConnectionViewModel connection;
+
+        public InputConnectorViewModel(ElementViewModel element, IoType iotype, string name, Color color) : base(element,
+            iotype,
+            name,
+            color)
+        {
+        }
 
         public override ConnectorDirection ConnectorDirection => ConnectorDirection.Input;
 
-        private ConnectionViewModel _connection;
         public ConnectionViewModel Connection
         {
-            get { return _connection; }
+            get => connection;
             set
             {
-                if (_connection != null && _connection.From != null)
-                    _connection.From.Element.OutputChanged -= OnSourceElementOutputChanged;
-                _connection = value;
-                if (_connection != null && _connection.From != null)
-                    _connection.From.Element.OutputChanged += OnSourceElementOutputChanged;
+                if (connection != null && connection.From != null)
+                    connection.From.Element.OutputChanged -= OnSourceElementOutputChanged;
+                connection = value;
+                if (connection != null && connection.From != null)
+                    connection.From.Element.OutputChanged += OnSourceElementOutputChanged;
                 RaiseSourceChanged();
                 RaisePropertyChanged();
                 RaisePropertyChanged("NonEmpty");
             }
         }
 
-        public override bool NonEmpty => _connection != null && _connection.From != null;
+        public override bool NonEmpty => connection != null && connection.From != null;
+        public event EventHandler SourceChanged;
 
         private void OnSourceElementOutputChanged(object sender, EventArgs e)
         {
             RaiseSourceChanged();
-        }
-
-        public InputConnectorViewModel(ElementViewModel element, IOType iotype, string name, Color color)
-            : base(element, iotype, name, color)
-        {
-
         }
 
         private void RaiseSourceChanged()

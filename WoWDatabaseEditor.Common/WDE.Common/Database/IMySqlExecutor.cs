@@ -11,17 +11,23 @@ namespace WDE.Common.Database
 
         public class DatabaseExecutorException : Exception
         {
-            protected DatabaseExecutorException(string message, Exception inner) : base(message, inner) { }
+            protected DatabaseExecutorException(string message, Exception inner) : base(message, inner)
+            {
+            }
         }
 
         public class CannotConnectToDatabaseException : DatabaseExecutorException
         {
-            public CannotConnectToDatabaseException(Exception inner) : base("Cannot connect to database", inner) { }
+            public CannotConnectToDatabaseException(Exception inner) : base("Cannot connect to database", inner)
+            {
+            }
         }
-        
+
         public class QueryFailedDatabaseException : DatabaseExecutorException
         {
-            public QueryFailedDatabaseException(Exception inner) : base("Failed to execute query", inner) { }
+            public QueryFailedDatabaseException(Exception inner) : base("Failed to execute query", inner)
+            {
+            }
         }
     }
 }

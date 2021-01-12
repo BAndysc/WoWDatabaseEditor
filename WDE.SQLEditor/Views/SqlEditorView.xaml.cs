@@ -1,9 +1,15 @@
-﻿using System.Windows.Controls;
+﻿using System.IO;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using System.Xml;
+using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 
 namespace WDE.SQLEditor.Views
 {
     /// <summary>
-    /// Interaction logic for SqlEditorView
+    ///     Interaction logic for SqlEditorView
     /// </summary>
     public partial class SqlEditorView : UserControl
     {
@@ -12,15 +18,13 @@ namespace WDE.SQLEditor.Views
             InitializeComponent();
         }
 
-        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("WDE.SQLEditor.Resources.sql.xshd"))
+            using (Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("WDE.SQLEditor.Resources.sql.xshd"))
             {
-                using (var reader = new System.Xml.XmlTextReader(stream))
+                using (XmlTextReader reader = new XmlTextReader(stream))
                 {
-                    MyAvalonEdit.SyntaxHighlighting =
-                        ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(reader,
-                        ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
+                    MyAvalonEdit.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
                 }
             }
         }

@@ -1,18 +1,27 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using Prism.Mvvm;
 
 namespace WDE.Blueprints.Editor.ViewModels
 {
     public class GraphViewModel : BindableBase
     {
+        private bool connectingTo;
+        private Point currentDragPoint;
+
+        public ConnectionViewModel PendingConnection;
+
+        public GraphViewModel()
+        {
+            Elements = new ObservableCollection<ElementViewModel>();
+            Connections = new ObservableCollection<ConnectionViewModel>();
+        }
+
         public ObservableCollection<ElementViewModel> Elements { get; }
-        
+
         public ObservableCollection<ConnectionViewModel> Connections { get; }
 
         public IEnumerable<ElementViewModel> SelectedElements => Elements.Where(x => x.IsSelected);
@@ -20,12 +29,6 @@ namespace WDE.Blueprints.Editor.ViewModels
         public IEnumerable<ConnectionViewModel> SelectedConnections => Connections.Where(x => x.IsSelected);
 
         public event Action<ConnectionViewModel> RequestNodePickerWindow = delegate { };
-
-        public GraphViewModel()
-        {
-            Elements = new ObservableCollection<ElementViewModel>();
-            Connections = new ObservableCollection<ConnectionViewModel>();
-        }
 
         public ElementViewModel AddElement(ElementViewModel model, double x, double y)
         {
@@ -35,13 +38,12 @@ namespace WDE.Blueprints.Editor.ViewModels
             return model;
         }
 
-        private bool connectingTo = false;
         public ConnectionViewModel OnConnectionDragStarted(ConnectorViewModel sourceConnector, Point currentDragPoint)
         {
             if (sourceConnector is OutputConnectorViewModel)
             {
                 connectingTo = true;
-                var connection = new ConnectionViewModel((OutputConnectorViewModel)sourceConnector)
+                ConnectionViewModel connection = new((OutputConnectorViewModel) sourceConnector)
                 {
                     ToPosition = currentDragPoint
                 };
@@ -51,20 +53,21 @@ namespace WDE.Blueprints.Editor.ViewModels
                 return connection;
             }
 
-            else if (sourceConnector is InputConnectorViewModel)
+            if (sourceConnector is InputConnectorViewModel)
             {
                 connectingTo = false;
-                var connection = new ConnectionViewModel((InputConnectorViewModel)sourceConnector)
+                ConnectionViewModel connection = new((InputConnectorViewModel) sourceConnector)
                 {
                     FromPosition = currentDragPoint
                 };
 
-                if (((InputConnectorViewModel)sourceConnector).Connection != null)
-                    Connections.Remove(((InputConnectorViewModel)sourceConnector).Connection);
+                if (((InputConnectorViewModel) sourceConnector).Connection != null)
+                    Connections.Remove(((InputConnectorViewModel) sourceConnector).Connection);
                 Connections.Add(connection);
 
                 return connection;
             }
+
             return null;
         }
 
@@ -76,26 +79,24 @@ namespace WDE.Blueprints.Editor.ViewModels
             if (connectingTo)
                 nearbyConnector = FindNearbyInputConnector(connection, currentDragPoint);
             else
-                nearbyConnector = FindNearbyOutputConnector(connection, currentDragPoint); 
+                nearbyConnector = FindNearbyOutputConnector(connection, currentDragPoint);
 
-            Point pnt = (nearbyConnector != null)
-                    ? nearbyConnector.Position
-                    : currentDragPoint;
+            Point pnt = nearbyConnector != null ? nearbyConnector.Position : currentDragPoint;
 
             if (connectingTo)
                 connection.ToPosition = pnt;
             else
                 connection.FromPosition = pnt;
         }
-        
-        public ConnectionViewModel pendingConnection;
-        Point CurrentDragPoint;
-        public void OnConnectionDragCompleted(Point currentDragPoint, ConnectionViewModel newConnection, ConnectorViewModel sourceConnector)
+
+        public void OnConnectionDragCompleted(Point currentDragPoint,
+            ConnectionViewModel newConnection,
+            ConnectorViewModel sourceConnector)
         {
-            CurrentDragPoint = currentDragPoint;
+            this.currentDragPoint = currentDragPoint;
             if (connectingTo)
             {
-                var nearbyConnector = FindNearbyInputConnector(newConnection, currentDragPoint);
+                InputConnectorViewModel nearbyConnector = FindNearbyInputConnector(newConnection, currentDragPoint);
 
                 if (nearbyConnector == null)
                 {
@@ -110,7 +111,7 @@ namespace WDE.Blueprints.Editor.ViewModels
                     return;
                 }
 
-                var existingConnection = nearbyConnector.Connection;
+                ConnectionViewModel existingConnection = nearbyConnector.Connection;
                 if (existingConnection != null)
                     Connections.Remove(existingConnection);
 
@@ -118,9 +119,9 @@ namespace WDE.Blueprints.Editor.ViewModels
             }
             else
             {
-                var nearbyConnector = FindNearbyOutputConnector(newConnection, currentDragPoint);
+                OutputConnectorViewModel nearbyConnector = FindNearbyOutputConnector(newConnection, currentDragPoint);
 
-                foreach (var con in Connections.Where(c => c.To == newConnection.To && c.From != null).ToList())
+                foreach (ConnectionViewModel con in Connections.Where(c => c.To == newConnection.To && c.From != null).ToList())
                     Connections.Remove(con);
 
                 if (nearbyConnector == null)
@@ -142,13 +143,15 @@ namespace WDE.Blueprints.Editor.ViewModels
 
         private InputConnectorViewModel FindNearbyInputConnector(ConnectionViewModel connection, Point mousePosition)
         {
-            return Elements.SelectMany(x => x.InputConnectors).Where(x => x.IOType == (connection.To == null ? connection.From.IOType : connection.To.IOType))
+            return Elements.SelectMany(x => x.InputConnectors)
+                .Where(x => x.IoType == (connection.To == null ? connection.From.IoType : connection.To.IoType))
                 .FirstOrDefault(x => AreClose(x.Position, mousePosition, 10));
         }
 
         private OutputConnectorViewModel FindNearbyOutputConnector(ConnectionViewModel connection, Point mousePosition)
         {
-            return Elements.SelectMany(x => x.OutputConnectors).Where(x => x.IOType == (connection.To == null ? connection.From.IOType : connection.To.IOType))
+            return Elements.SelectMany(x => x.OutputConnectors)
+                .Where(x => x.IoType == (connection.To == null ? connection.From.IoType : connection.To.IoType))
                 .FirstOrDefault(x => AreClose(x.Position, mousePosition, 10));
         }
 
@@ -159,26 +162,23 @@ namespace WDE.Blueprints.Editor.ViewModels
 
         public void DeleteElement(ElementViewModel element)
         {
-            foreach (var item in element.AttachedConnections)
+            foreach (ConnectionViewModel item in element.AttachedConnections)
                 Connections.Remove(item);
             Elements.Remove(element);
         }
 
         public void DeleteSelectedElements()
         {
-            Elements.Where(x => x.IsSelected)
-                .ToList()
-                .ForEach(DeleteElement);
+            Elements.Where(x => x.IsSelected).ToList().ForEach(DeleteElement);
         }
 
         public void DeleteSelectedConnections()
         {
-            foreach (var connection in Connections.Where(x => x.IsSelected).ToList())
+            foreach (ConnectionViewModel connection in Connections.Where(x => x.IsSelected).ToList())
             {
                 connection.Detach();
                 Connections.Remove(connection);
             }
         }
-        
     }
 }

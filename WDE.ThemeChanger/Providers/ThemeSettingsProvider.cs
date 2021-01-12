@@ -1,45 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WDE.ThemeChanger.Data;
-using System.IO;
-using WDE.Module.Attributes;
-using System.Windows;
+﻿using System.IO;
 using Newtonsoft.Json;
 using WDE.Common.Managers;
+using WDE.Module.Attributes;
+using WDE.ThemeChanger.Data;
 
 namespace WDE.ThemeChanger.Providers
 {
-    [AutoRegister, SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class ThemeSettingsProvider : IThemeSettingsProvider
     {
-        private ThemeSettings settings { get; set;  }
-
-        public ThemeSettings GetSettings() => settings;
-
         public ThemeSettingsProvider()
         {
-            settings = new ThemeSettings(null);
+            Settings = new ThemeSettings(null);
             if (File.Exists("theme.json"))
             {
-                JsonSerializer ser = new JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
-                using (StreamReader re = new StreamReader("theme.json"))
+                JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
+                using (StreamReader re = new("theme.json"))
                 {
-                    JsonTextReader reader = new JsonTextReader(re);
-                    settings = ser.Deserialize<ThemeSettings>(reader);
+                    JsonTextReader reader = new(re);
+                    Settings = ser.Deserialize<ThemeSettings>(reader);
                 }
             }
         }
 
+        private ThemeSettings Settings { get; set; }
+
+        public ThemeSettings GetSettings()
+        {
+            return Settings;
+        }
+
         public void UpdateSettings(Theme theme)
         {
-            settings = new ThemeSettings(theme.Name);
-            JsonSerializer ser = new JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
+            Settings = new ThemeSettings(theme.Name);
+            JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
             using (StreamWriter file = File.CreateText(@"theme.json"))
             {
-                ser.Serialize(file, settings);
+                ser.Serialize(file, Settings);
             }
         }
     }

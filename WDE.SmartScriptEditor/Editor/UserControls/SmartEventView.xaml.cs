@@ -9,33 +9,25 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
     /// </summary>
     public partial class SmartEventView : UserControl
     {
-        public static DependencyProperty EditEventCommandProperty
-            = DependencyProperty.Register(
-                "EditEventCommand",
-                typeof(ICommand),
-                typeof(SmartEventView));
+        public static DependencyProperty EditEventCommandProperty =
+            DependencyProperty.Register("EditEventCommand", typeof(ICommand), typeof(SmartEventView));
 
 
-        public static DependencyProperty DeselectAllRequestProperty
-            = DependencyProperty.Register(
-                nameof(DeselectAllRequest),
-                typeof(ICommand),
-                typeof(SmartEventView));
+        public static DependencyProperty DeselectAllRequestProperty =
+            DependencyProperty.Register(nameof(DeselectAllRequest), typeof(ICommand), typeof(SmartEventView));
 
-        public static DependencyProperty DeselectActionsOfDeselectedEventsRequestProperty
-            = DependencyProperty.Register(
-                nameof(DeselectActionsOfDeselectedEventsRequest),
-                typeof(ICommand),
-                typeof(SmartEventView));
+        public static DependencyProperty DeselectActionsOfDeselectedEventsRequestProperty =
+            DependencyProperty.Register(nameof(DeselectActionsOfDeselectedEventsRequest), typeof(ICommand), typeof(SmartEventView));
 
-        public static DependencyProperty IsSelectedProperty
-            = DependencyProperty.Register(
-                nameof(IsSelected),
-                typeof(bool),
-                typeof(SmartEventView),
-                new PropertyMetadata(false));
+        public static DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected),
+            typeof(bool),
+            typeof(SmartEventView),
+            new PropertyMetadata(false));
 
-        public SmartEventView() { InitializeComponent(); }
+        public SmartEventView()
+        {
+            InitializeComponent();
+        }
 
         public ICommand EditEventCommand
         {
@@ -73,7 +65,8 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                     IsSelected = true;
                 }
             }
-            else if (e.ClickCount == 2) EditEventCommand?.Execute(DataContext);
+            else if (e.ClickCount == 2)
+                EditEventCommand?.Execute(DataContext);
         }
     }
 }

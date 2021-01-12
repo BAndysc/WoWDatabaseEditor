@@ -1,24 +1,22 @@
 ﻿<Controls:MetroWindow x:Class="WoWDatabaseEditor.Views.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:prism="http://prismlibrary.com/"
-        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-        prism:ViewModelLocator.AutoWireViewModel="True"
-        xmlns:views="clr-namespace:WoWDatabaseEditor.Views"
-        xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
-        xmlns:viewModels="clr-namespace:WoWDatabaseEditor.ViewModels"
-        xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
-        xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
-        Style="{DynamicResource MainWindowStyle}"
-        Title="{Binding Title}"
-        WindowStartupLocation="CenterScreen"
-        Height="695.368" 
-        Width="959.421"
-        Icon="/icon.png"
-        Loaded="Window_Loaded"
-        Closed="Window_Closed"
-        x:Name="rootWindow"
-        >
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:prism="http://prismlibrary.com/"
+                      xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      prism:ViewModelLocator.AutoWireViewModel="True"
+                      xmlns:views="clr-namespace:WoWDatabaseEditor.Views"
+                      xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
+                      xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+                      xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
+                      Style="{DynamicResource MainWindowStyle}"
+                      Title="{Binding Title}"
+                      WindowStartupLocation="CenterScreen"
+                      Height="695.368"
+                      Width="959.421"
+                      Icon="/icon.png"
+                      Loaded="Window_Loaded"
+                      Closed="Window_Closed"
+                      x:Name="rootWindow">
     <Controls:MetroWindow.WindowButtonCommands>
         <Controls:WindowButtonCommands
             LightCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
@@ -32,7 +30,7 @@
         <KeyBinding Key="Z" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Undo}" />
         <KeyBinding Key="Y" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Redo}" />
         <KeyBinding Key="Z" Modifiers="Control+Shift" Command="{Binding WindowManager.ActiveDocument.Redo}" />
-        
+
         <KeyBinding Key="C" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Copy}" />
         <KeyBinding Key="V" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Paste}" />
         <KeyBinding Key="X" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Cut}" />
@@ -47,10 +45,11 @@
                         <Separator />
                         <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}" />
                         <Separator />
-                        <MenuItem Header="_Exit"  />
+                        <MenuItem Header="_Exit" />
                     </MenuItem>
                     <MenuItem Header="_Edit">
-                        <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}" AutomationProperties.AcceleratorKey="z" />
+                        <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}"
+                                  AutomationProperties.AcceleratorKey="z" />
                         <MenuItem Header="_Redo" Command="{Binding WindowManager.ActiveDocument.Redo}" />
                         <Separator />
                         <MenuItem Header="_Copy" Command="{Binding WindowManager.ActiveDocument.Copy}" />
@@ -59,7 +58,7 @@
                     </MenuItem>
                     <MenuItem Header="_View" ItemsSource="{Binding Windows}">
                         <MenuItem.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}"  BasedOn="{StaticResource MetroMenuItem}">
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
                                 <Setter Property="Command" Value="{Binding Command}" />
                                 <Setter Property="Header" Value="{Binding Header}" />
 
@@ -69,14 +68,15 @@
                     <MenuItem Header="_Window" ItemsSource="{Binding WindowManager.OpenedDocuments}">
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
-                                <Setter Property="Header" Value="{Binding Title}"/>
-                                <Setter Property="Command" Value="{Binding ElementName=rootWindow, Path=DataContext.WindowManager.ActivateDocument}" />
+                                <Setter Property="Header" Value="{Binding Title}" />
+                                <Setter Property="Command"
+                                        Value="{Binding ElementName=rootWindow, Path=DataContext.WindowManager.ActivateDocument}" />
                                 <Setter Property="CommandParameter" Value="{Binding}" />
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
-                    <MenuItem Header="_Help" >
-                        <MenuItem Header="_About" Command="{Binding About}"></MenuItem>
+                    <MenuItem Header="_Help">
+                        <MenuItem Header="_About" Command="{Binding About}" />
                     </MenuItem>
                 </Menu>
             </StackPanel>
@@ -85,45 +85,45 @@
     <Controls:MetroWindow.TitleTemplate>
         <DataTemplate>
             <TextBlock Text="{TemplateBinding Content}"
-                   TextTrimming="CharacterEllipsis"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"
-                   FontSize="{DynamicResource WindowTitleFontSize}"
-                   FontFamily="{DynamicResource HeaderFontFamily}" />
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="{DynamicResource WindowTitleFontSize}"
+                       FontFamily="{DynamicResource HeaderFontFamily}" />
         </DataTemplate>
     </Controls:MetroWindow.TitleTemplate>
     <DockPanel>
         <views:StatusBarView DockPanel.Dock="Bottom" Height="20" DataContext="{Binding StatusBar}" />
-        <DockingManager 
-            AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager" DocumentClosed="DockingManager_OnDocumentClosed" ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
-            diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}" DocumentsSource="{Binding WindowManager.OpenedDocuments}" >
+        <DockingManager
+            AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager"
+            DocumentClosed="DockingManager_OnDocumentClosed"
+            ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
+            diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}"
+            DocumentsSource="{Binding WindowManager.OpenedDocuments}">
 
             <DockingManager.LayoutItemTemplateSelector>
                 <views:PaneDocumentTemplateSelector>
                     <views:PaneDocumentTemplateSelector.DocumentTemplate>
                         <DataTemplate>
-                            <ContentControl utils:ViewBind.Model="{Binding}">
-                            </ContentControl>
+                            <ContentControl utils:ViewBind.Model="{Binding}" />
                         </DataTemplate>
                     </views:PaneDocumentTemplateSelector.DocumentTemplate>
                     <views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
                         <DataTemplate>
-                            <ContentControl utils:ViewBind.Model="{Binding}" DataContext="{Binding Content}">
-                            </ContentControl>
+                            <ContentControl utils:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
                         </DataTemplate>
                     </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
-                </views:PaneDocumentTemplateSelector>                
+                </views:PaneDocumentTemplateSelector>
             </DockingManager.LayoutItemTemplateSelector>
             <DockingManager.LayoutItemContainerStyle>
                 <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
-                <Style TargetType="{x:Type LayoutItem}" >
+                <Style TargetType="{x:Type LayoutItem}">
                     <Setter Property="Title" Value="{Binding Model.Title}" />
                     <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
                     <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
-                    <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}"></Setter>
+                    <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}" />
                 </Style>
             </DockingManager.LayoutItemContainerStyle>
         </DockingManager>
     </DockPanel>
 </Controls:MetroWindow>
-

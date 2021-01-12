@@ -7,15 +7,11 @@ namespace WoWDatabaseEditor.Utils
 {
     public class ViewBind
     {
-        public static readonly DependencyProperty ModelProperty =
-            DependencyProperty.RegisterAttached(
-                "Model",
-                typeof(object),
-                typeof(ViewBind),
-                new PropertyMetadata(null, 
-                    OnModelChanged)
-            );
-         
+        public static readonly DependencyProperty ModelProperty = DependencyProperty.RegisterAttached("Model",
+            typeof(object),
+            typeof(ViewBind),
+            new PropertyMetadata(null, OnModelChanged));
+
         public static object GetModel(DependencyObject element)
         {
             return element.GetValue(ModelProperty);
@@ -25,27 +21,29 @@ namespace WoWDatabaseEditor.Utils
         {
             element.SetValue(ModelProperty, value);
         }
-         
-        static void OnModelChanged(DependencyObject targetLocation, DependencyPropertyChangedEventArgs args) {
-            if (args.OldValue == args.NewValue) {
-                return;
-            }
 
-            if (args.NewValue?.GetType().AssemblyQualifiedName != null) {
-                var vmType = args.NewValue.GetType();
-                var viewType = Type.GetType(vmType.AssemblyQualifiedName!.Replace("ViewModel", "View"));
-                var view = (viewType == null) ? null : Activator.CreateInstance(viewType);
+        private static void OnModelChanged(DependencyObject targetLocation, DependencyPropertyChangedEventArgs args)
+        {
+            if (args.OldValue == args.NewValue)
+                return;
+
+            if (args.NewValue?.GetType().AssemblyQualifiedName != null)
+            {
+                Type? vmType = args.NewValue.GetType();
+                Type? viewType = Type.GetType(vmType.AssemblyQualifiedName!.Replace("ViewModel", "View"));
+                object? view = viewType == null ? null : Activator.CreateInstance(viewType);
                 SetContentProperty(targetLocation, view);
             }
-            else {
+            else
                 SetContentProperty(targetLocation, args.NewValue);
-            }
         }
-        
-        static bool SetContentProperty(object targetLocation, object? view) {
-            try {
-                var type = targetLocation.GetType();
-                var contentProperty = type.GetCustomAttributes(typeof(ContentPropertyAttribute), true)
+
+        private static bool SetContentProperty(object targetLocation, object? view)
+        {
+            try
+            {
+                Type? type = targetLocation.GetType();
+                ContentPropertyAttribute? contentProperty = type.GetCustomAttributes(typeof(ContentPropertyAttribute), true)
                     .OfType<ContentPropertyAttribute>()
                     .FirstOrDefault() ?? new ContentPropertyAttribute("Content");
 
@@ -54,7 +52,7 @@ namespace WoWDatabaseEditor.Utils
 
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }

@@ -8,7 +8,7 @@ namespace WDE.Blueprints.Data
     {
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "type")]
-        public IOType Type { get; set; }
+        public IoType Type { get; set; }
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }

@@ -1,27 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Xml;
+
 #nullable disable
 namespace WoWDatabaseEditor.Extensions
 {
     //https://stackoverflow.com/questions/2643545/wpf-mvvm-how-to-bind-gridviewcolumn-to-viewmodel-collection
     public static class GridViewColumns
     {
+        // Using a DependencyProperty as the backing store for ColumnsSource.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ColumnsSourceProperty = DependencyProperty.RegisterAttached("ColumnsSource",
+            typeof(object),
+            typeof(GridViewColumns),
+            new UIPropertyMetadata(null, ColumnsSourceChanged));
+
+        // Using a DependencyProperty as the backing store for HeaderTextMember.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HeaderTextMemberProperty =
+            DependencyProperty.RegisterAttached("HeaderTextMember",
+                typeof(string),
+                typeof(GridViewColumns),
+                new UIPropertyMetadata(null));
+
+        // Using a DependencyProperty as the backing store for DisplayMember.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DisplayMemberMemberProperty =
+            DependencyProperty.RegisterAttached("DisplayMemberMember",
+                typeof(string),
+                typeof(GridViewColumns),
+                new UIPropertyMetadata(null));
+
+        public static readonly DependencyProperty CheckboxMemberProperty =
+            DependencyProperty.RegisterAttached("CheckboxMember",
+                typeof(string),
+                typeof(GridViewColumns),
+                new UIPropertyMetadata(null));
+
+        public static readonly DependencyProperty ColumnHeadStyleNameProperty =
+            DependencyProperty.RegisterAttached("ColumnHeadStyleName",
+                typeof(string),
+                typeof(GridViewColumns),
+                new UIPropertyMetadata(null));
+
+        private static readonly IDictionary<ICollectionView, List<GridView>> GridViewsByColumnsSource =
+            new Dictionary<ICollectionView, List<GridView>>();
+
         [AttachedPropertyBrowsableForType(typeof(GridView))]
         public static object GetColumnsSource(DependencyObject obj)
         {
-            return (object)obj.GetValue(ColumnsSourceProperty);
+            return obj.GetValue(ColumnsSourceProperty);
         }
 
         public static void SetColumnsSource(DependencyObject obj, object value)
@@ -29,21 +61,11 @@ namespace WoWDatabaseEditor.Extensions
             obj.SetValue(ColumnsSourceProperty, value);
         }
 
-        // Using a DependencyProperty as the backing store for ColumnsSource.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ColumnsSourceProperty =
-            DependencyProperty.RegisterAttached(
-                "ColumnsSource",
-                typeof(object),
-                typeof(GridViewColumns),
-                new UIPropertyMetadata(
-                    null,
-                    ColumnsSourceChanged));
-
 
         [AttachedPropertyBrowsableForType(typeof(GridView))]
         public static string GetHeaderTextMember(DependencyObject obj)
         {
-            return (string)obj.GetValue(HeaderTextMemberProperty);
+            return (string) obj.GetValue(HeaderTextMemberProperty);
         }
 
         public static void SetHeaderTextMember(DependencyObject obj, string value)
@@ -51,48 +73,34 @@ namespace WoWDatabaseEditor.Extensions
             obj.SetValue(HeaderTextMemberProperty, value);
         }
 
-        // Using a DependencyProperty as the backing store for HeaderTextMember.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty HeaderTextMemberProperty =
-            DependencyProperty.RegisterAttached("HeaderTextMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
-
 
         [AttachedPropertyBrowsableForType(typeof(GridView))]
         public static string GetDisplayMemberMember(DependencyObject obj)
         {
-            return (string)obj.GetValue(DisplayMemberMemberProperty);
+            return (string) obj.GetValue(DisplayMemberMemberProperty);
         }
 
         [AttachedPropertyBrowsableForType(typeof(GridView))]
         public static string GetCheckboxMember(DependencyObject obj)
         {
-            return (string)obj.GetValue(CheckboxMemberProperty);
+            return (string) obj.GetValue(CheckboxMemberProperty);
         }
-        
+
         public static void SetDisplayMemberMember(DependencyObject obj, string value)
         {
             obj.SetValue(DisplayMemberMemberProperty, value);
         }
 
-        // Using a DependencyProperty as the backing store for DisplayMember.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DisplayMemberMemberProperty =
-            DependencyProperty.RegisterAttached("DisplayMemberMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
-
-        public static readonly DependencyProperty CheckboxMemberProperty =
-           DependencyProperty.RegisterAttached("CheckboxMember", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
-
         [AttachedPropertyBrowsableForType(typeof(GridView))]
         public static string GetColumnHeadStyleName(DependencyObject obj)
         {
-            return (string)obj.GetValue(ColumnHeadStyleNameProperty);
+            return (string) obj.GetValue(ColumnHeadStyleNameProperty);
         }
 
         public static void SetColumnHeadStyleName(DependencyObject obj, string value)
         {
             obj.SetValue(ColumnHeadStyleNameProperty, value);
         }
-
-        public static readonly DependencyProperty ColumnHeadStyleNameProperty =
-            DependencyProperty.RegisterAttached("ColumnHeadStyleName", typeof(string), typeof(GridViewColumns), new UIPropertyMetadata(null));
 
         private static void ColumnsSourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
@@ -120,17 +128,15 @@ namespace WoWDatabaseEditor.Extensions
             }
         }
 
-        private static IDictionary<ICollectionView, List<GridView>> _gridViewsByColumnsSource =
-            new Dictionary<ICollectionView, List<GridView>>();
-
         private static List<GridView> GetGridViewsForColumnSource(ICollectionView columnSource)
         {
             List<GridView> gridViews;
-            if (!_gridViewsByColumnsSource.TryGetValue(columnSource, out gridViews))
+            if (!GridViewsByColumnsSource.TryGetValue(columnSource, out gridViews))
             {
                 gridViews = new List<GridView>();
-                _gridViewsByColumnsSource.Add(columnSource, gridViews);
+                GridViewsByColumnsSource.Add(columnSource, gridViews);
             }
+
             return gridViews;
         }
 
@@ -142,7 +148,7 @@ namespace WoWDatabaseEditor.Extensions
 
         private static void CreateColumns(GridView gridView, ICollectionView view)
         {
-            foreach (var item in view)
+            foreach (object item in view)
             {
                 GridViewColumn column = CreateColumn(gridView, item);
 
@@ -166,92 +172,91 @@ namespace WoWDatabaseEditor.Extensions
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var gridView in gridViews)
+                    foreach (GridView gridView in gridViews)
                     {
-                        for (int i = 0; i < e.NewItems.Count; i++)
+                        for (var i = 0; i < e.NewItems.Count; i++)
                         {
                             GridViewColumn column = CreateColumn(gridView, e.NewItems[i]);
                             gridView.Columns.Insert(e.NewStartingIndex + i, column);
                         }
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Move:
-                    foreach (var gridView in gridViews)
+                    foreach (GridView gridView in gridViews)
                     {
-                        List<GridViewColumn> columns = new List<GridViewColumn>();
-                        for (int i = 0; i < e.OldItems.Count; i++)
+                        var columns = new List<GridViewColumn>();
+                        for (var i = 0; i < e.OldItems.Count; i++)
                         {
                             GridViewColumn column = gridView.Columns[e.OldStartingIndex + i];
                             columns.Add(column);
                         }
-                        for (int i = 0; i < e.NewItems.Count; i++)
+
+                        for (var i = 0; i < e.NewItems.Count; i++)
                         {
                             GridViewColumn column = columns[i];
                             gridView.Columns.Insert(e.NewStartingIndex + i, column);
                         }
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var gridView in gridViews)
+                    foreach (GridView gridView in gridViews)
                     {
-                        for (int i = 0; i < e.OldItems.Count; i++)
-                        {
+                        for (var i = 0; i < e.OldItems.Count; i++)
                             gridView.Columns.RemoveAt(e.OldStartingIndex);
-                        }
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    foreach (var gridView in gridViews)
+                    foreach (GridView gridView in gridViews)
                     {
-                        for (int i = 0; i < e.NewItems.Count; i++)
+                        for (var i = 0; i < e.NewItems.Count; i++)
                         {
                             GridViewColumn column = CreateColumn(gridView, e.NewItems[i]);
                             gridView.Columns[e.NewStartingIndex + i] = column;
                         }
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (var gridView in gridViews)
+                    foreach (GridView gridView in gridViews)
                     {
                         gridView.Columns.Clear();
                         CreateColumns(gridView, sender as ICollectionView);
                     }
-                    break;
-                default:
+
                     break;
             }
         }
 
         private static GridViewColumn CreateColumn(GridView gridView, object columnSource)
         {
-            GridViewColumn column = new GridViewColumn();
+            GridViewColumn column = new();
             string headerTextMember = GetHeaderTextMember(gridView);
             string displayMemberMember = GetDisplayMemberMember(gridView);
             bool checkbox = (columnSource as ColumnDescriptor).CheckboxMember;
             string styleString = GetColumnHeadStyleName(gridView);
             column.Width = 90;
             if (!string.IsNullOrEmpty(headerTextMember))
-            {
                 column.Header = GetPropertyValue(columnSource, headerTextMember);
-            }
             if (!string.IsNullOrEmpty(displayMemberMember) && !checkbox)
             {
-                string propertyName = GetPropertyValue(columnSource, displayMemberMember) as string;
+                var propertyName = GetPropertyValue(columnSource, displayMemberMember) as string;
                 column.DisplayMemberBinding = new Binding(propertyName);
             }
             else if (checkbox)
             {
-                string propertyName = GetPropertyValue(columnSource, displayMemberMember) as string;
-                StringReader stringReader = new StringReader(
-                @"<DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""> 
-                    <CheckBox IsChecked=""{Binding "+ propertyName + @"}""/> 
+                var propertyName = GetPropertyValue(columnSource, displayMemberMember) as string;
+                StringReader stringReader = new(@"<DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""> 
+                    <CheckBox IsChecked=""{Binding " + propertyName + @"}""/> 
                     </DataTemplate>");
                 XmlReader xmlReader = XmlReader.Create(stringReader);
                 column.CellTemplate = XamlReader.Load(xmlReader) as DataTemplate;
                 column.Width = 24;
             }
 
-            if(!string.IsNullOrEmpty(styleString))
+            if (!string.IsNullOrEmpty(styleString))
             {
                 Style style = Application.Current.FindResource(styleString) as Style;
                 if (style != null)
@@ -271,6 +276,7 @@ namespace WoWDatabaseEditor.Extensions
                 if (prop != null)
                     return prop.GetValue(obj, null);
             }
+
             return null;
         }
     }

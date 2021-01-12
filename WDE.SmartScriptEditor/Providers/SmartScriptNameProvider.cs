@@ -19,21 +19,22 @@ namespace WDE.SmartScriptEditor.Providers
 
         public string GetName(SmartScriptSolutionItem item)
         {
-            var entry = item.Entry;
+            int entry = item.Entry;
 
             if (entry > 0)
+            {
                 switch (item.SmartType)
                 {
                     case SmartScriptType.Creature:
-                        var cr = database.GetCreatureTemplate((uint) entry);
+                        ICreatureTemplate cr = database.GetCreatureTemplate((uint) entry);
                         return cr == null || cr.Name == null ? "Creature " + entry : cr.Name;
                     case SmartScriptType.GameObject:
-                        var g = database.GetGameObjectTemplate((uint) entry);
+                        IGameObjectTemplate g = database.GetGameObjectTemplate((uint) entry);
                         return g == null || g.Name == null ? "GameObject " + entry : g.Name;
                     case SmartScriptType.AreaTrigger:
                         return "Areatrigger " + entry;
                     case SmartScriptType.Quest:
-                        var q = database.GetQuestTemplate((uint) entry);
+                        IQuestTemplate q = database.GetQuestTemplate((uint) entry);
                         return q == null || q.Name == null ? "Quest " + entry : q.Name;
                     case SmartScriptType.Spell:
                     case SmartScriptType.Aura:
@@ -45,6 +46,7 @@ namespace WDE.SmartScriptEditor.Providers
                     case SmartScriptType.Cinematic:
                         return "Cinematic " + entry;
                 }
+            }
 
             return "Guid " + entry;
         }

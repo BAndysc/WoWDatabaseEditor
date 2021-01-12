@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using WDE.Common.Solution;
 using WDE.Module.Attributes;
-using WDE.Common.Solution;
 
 namespace WDE.Blueprints.Providers
 {

@@ -31,13 +31,13 @@ namespace WDE.SmartScriptEditor.Models
         {
             int? entry = null;
             SmartScriptType? source = null;
-            var previousLink = -1;
+            int previousLink = -1;
             SmartEvent currentEvent = null;
 
             SortedDictionary<int, SmartEvent> triggerIdToActionParent = new();
             SortedDictionary<int, SmartEvent> triggerIdToEvent = new();
 
-            foreach (var line in lines)
+            foreach (ISmartScriptLine line in lines)
             {
                 if (!entry.HasValue)
                     entry = line.EntryOrGuid;
@@ -62,11 +62,9 @@ namespace WDE.SmartScriptEditor.Models
                         continue;
                 }
 
-                var comment = line.Comment.Contains(" // ")
-                    ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim()
-                    : "";
+                string comment = line.Comment.Contains(" // ") ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim() : "";
 
-                var action = SafeActionFactory(line);
+                SmartAction action = SafeActionFactory(line);
                 if (action != null)
                 {
                     if (comment != SmartConstants.CommentWait)
@@ -81,30 +79,29 @@ namespace WDE.SmartScriptEditor.Models
 
             var sortedTriggers = triggerIdToEvent.Keys.ToList();
             sortedTriggers.Reverse();
-            foreach (var triggerId in sortedTriggers)
+            foreach (int triggerId in sortedTriggers)
             {
-                var @event = triggerIdToEvent[triggerId];
+                SmartEvent @event = triggerIdToEvent[triggerId];
                 if (!triggerIdToActionParent.ContainsKey(triggerId))
                     continue;
 
-                var caller = triggerIdToActionParent[triggerId];
+                SmartEvent caller = triggerIdToActionParent[triggerId];
 
-                var lastAction = caller.Actions[caller.Actions.Count - 1];
+                SmartAction lastAction = caller.Actions[caller.Actions.Count - 1];
 
                 if (lastAction.Id != SmartConstants.ActionTriggerTimed ||
                     lastAction.GetParameter(1).Value != lastAction.GetParameter(2).Value)
                     continue;
 
-                var waitTime = lastAction.GetParameter(1).Value;
-                var waitAction =
-                    smartFactory.ActionFactory(SmartConstants.ActionWait,
-                        smartFactory.SourceFactory(SmartConstants.SourceNone),
-                        smartFactory.TargetFactory(SmartConstants.TargetNone));
+                int waitTime = lastAction.GetParameter(1).Value;
+                SmartAction waitAction = smartFactory.ActionFactory(SmartConstants.ActionWait,
+                    smartFactory.SourceFactory(SmartConstants.SourceNone),
+                    smartFactory.TargetFactory(SmartConstants.TargetNone));
                 waitAction.SetParameter(0, waitTime);
 
                 caller.Actions.RemoveAt(caller.Actions.Count - 1);
                 caller.AddAction(waitAction);
-                foreach (var a in @event.Actions)
+                foreach (SmartAction a in @event.Actions)
                     caller.AddAction(a);
                 Events.Remove(@event);
             }
@@ -114,7 +111,7 @@ namespace WDE.SmartScriptEditor.Models
         {
             SmartEvent currentEvent = null;
             var prevIndex = 0;
-            foreach (var line in lines)
+            foreach (ISmartScriptLine line in lines)
             {
                 if (currentEvent == null || prevIndex != line.Id)
                 {
@@ -125,7 +122,7 @@ namespace WDE.SmartScriptEditor.Models
 
                 if (line.ActionType != -1)
                 {
-                    var action = SafeActionFactory(line);
+                    SmartAction action = SafeActionFactory(line);
                     if (action != null)
                         currentEvent.AddAction(action);
                 }
@@ -160,7 +157,10 @@ namespace WDE.SmartScriptEditor.Models
             return null;
         }
 
-        public IDisposable BulkEdit(string name) { return new BulkEditing(this, name); }
+        public IDisposable BulkEdit(string name)
+        {
+            return new BulkEditing(this, name);
+        }
 
         private class BulkEditing : IDisposable
         {
@@ -174,7 +174,10 @@ namespace WDE.SmartScriptEditor.Models
                 this.smartScript.BulkEditingStarted.Invoke();
             }
 
-            public void Dispose() { smartScript.BulkEditingFinished.Invoke(name); }
+            public void Dispose()
+            {
+                smartScript.BulkEditingFinished.Invoke(name);
+            }
         }
     }
 }

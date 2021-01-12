@@ -1,6 +1,5 @@
 ﻿using System.Windows.Input;
 using ICSharpCode.AvalonEdit.Document;
-using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Database;
 using WDE.Common.History;
@@ -13,29 +12,33 @@ namespace WDE.SQLEditor.ViewModels
     public class SqlEditorViewModel : BindableBase, IDocument
     {
         private TextDocument code;
+
+        public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, IStatusBar statusBar, string sql)
+        {
+            Code = new TextDocument(sql);
+            ExecuteSql = new AsyncAutoCommand(async () =>
+                {
+                    statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
+                    await mySqlExecutor.ExecuteSql(Code.Text);
+                    statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
+                },
+                null,
+                e => statusBar.PublishNotification(new PlainNotification(NotificationType.Error,
+                    $"{e.Message} ({e.InnerException?.Message})")));
+        }
+
         public TextDocument Code
         {
             get => code;
             set => SetProperty(ref code, value);
         }
 
-        public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, IStatusBar statusBar, string sql)
-        {
-            Code = new TextDocument(sql);
-            ExecuteSql = new AsyncAutoCommand(async () =>
-            {
-                statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
-                await mySqlExecutor.ExecuteSql(Code.Text);
-                statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
-            }, null, e => statusBar.PublishNotification(new PlainNotification(NotificationType.Error, $"{e.Message} ({e.InnerException?.Message})")));
-        }
+        public ICommand ExecuteSql { get; }
 
         public void Dispose()
         {
         }
 
-        public ICommand ExecuteSql { get; }
-        
         public string Title { get; } = "SQL Output";
         public ICommand Undo { get; } = AlwaysDisabledCommand.Command;
         public ICommand Redo { get; } = AlwaysDisabledCommand.Command;

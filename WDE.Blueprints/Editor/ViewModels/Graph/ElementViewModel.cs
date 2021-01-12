@@ -1,53 +1,60 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
+using Prism.Mvvm;
 using WDE.Blueprints.Enums;
 
 namespace WDE.Blueprints.Editor.ViewModels
 {
     public abstract class ElementViewModel : BindableBase
     {
-        public event EventHandler OutputChanged;
-
         public const double PreviewSize = 100;
 
-        private double _x;
+        private bool isSelected;
+
+        private string name;
+
+        private double x;
+
+        private double y;
+
+        protected ElementViewModel(string name)
+        {
+            InputConnectors = new ObservableCollection<InputConnectorViewModel>();
+            OutputConnectors = new ObservableCollection<OutputConnectorViewModel>();
+            Name = name;
+        }
+
         public double X
         {
-            get { return _x; }
-            set { SetProperty(ref _x, value); }
+            get => x;
+            set => SetProperty(ref x, value);
         }
 
-        private double _y;
         public double Y
         {
-            get { return _y; }
-            set { SetProperty(ref _y, value); }
+            get => y;
+            set => SetProperty(ref y, value);
         }
 
-        private string _name;
         public string Name
         {
-            get { return _name; }
-            set { SetProperty(ref _name, value); }
+            get => name;
+            set => SetProperty(ref name, value);
         }
-        
-        private bool _isSelected;
+
         public bool IsSelected
         {
-            get { return _isSelected; }
-            set { SetProperty(ref _isSelected, value); }
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
         }
 
         public abstract NodeType NodeType { get; }
 
         public IList<InputConnectorViewModel> InputConnectors { get; }
-        
+
         public IList<OutputConnectorViewModel> OutputConnectors { get; }
 
         public IEnumerable<ConnectionViewModel> AttachedConnections
@@ -60,22 +67,17 @@ namespace WDE.Blueprints.Editor.ViewModels
             }
         }
 
-        protected ElementViewModel(string name)
-        {
-            InputConnectors = new ObservableCollection<InputConnectorViewModel>();
-            OutputConnectors = new ObservableCollection<OutputConnectorViewModel>();
-            Name = name;
-        }
+        public event EventHandler OutputChanged;
 
-        protected void AddInputConnector(string name, IOType iotype, Color color)
+        protected void AddInputConnector(string name, IoType iotype, Color color)
         {
-            var inputConnector = new InputConnectorViewModel(this, iotype, name, color);
+            InputConnectorViewModel inputConnector = new(this, iotype, name, color);
             InputConnectors.Add(inputConnector);
         }
 
-        protected void AddOutputConnector(string name, IOType iotype, Color color)
+        protected void AddOutputConnector(string name, IoType iotype, Color color)
         {
-            var outputConnector = new OutputConnectorViewModel(this, iotype, name, color);
+            OutputConnectorViewModel outputConnector = new(this, iotype, name, color);
             OutputConnectors.Add(outputConnector);
         }
 
@@ -88,6 +90,5 @@ namespace WDE.Blueprints.Editor.ViewModels
         {
             OutputChanged?.Invoke(this, EventArgs.Empty);
         }
-
     }
 }

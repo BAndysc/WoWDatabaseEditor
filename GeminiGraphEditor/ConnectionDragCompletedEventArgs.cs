@@ -4,19 +4,16 @@ namespace GeminiGraphEditor
 {
     public class ConnectionDragCompletedEventArgs : ConnectionDragEventArgs
     {
-        private readonly object _connection;
-
-        public object Connection
+        public ConnectionDragCompletedEventArgs(RoutedEvent routedEvent,
+            object source,
+            ElementItem elementItem,
+            object connection,
+            ConnectorItem sourceConnectorItem) : base(routedEvent, source, elementItem, sourceConnectorItem)
         {
-            get { return _connection; }
+            Connection = connection;
         }
 
-        public ConnectionDragCompletedEventArgs(RoutedEvent routedEvent, object source, 
-            ElementItem elementItem, object connection, ConnectorItem sourceConnectorItem)
-            : base(routedEvent, source, elementItem, sourceConnectorItem)
-        {
-            _connection = connection;
-        }
+        public object Connection { get; }
     }
 
     public delegate void ConnectionDragCompletedEventHandler(object sender, ConnectionDragCompletedEventArgs e);

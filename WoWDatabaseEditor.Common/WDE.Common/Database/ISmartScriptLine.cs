@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WDE.Common.Database
+﻿namespace WDE.Common.Database
 {
     public interface ISmartScriptLine
     {
         int EntryOrGuid { get; set; }
 
         int ScriptSourceType { get; set; }
-        
+
         int Id { get; set; }
-        
+
         int Link { get; set; }
-        
+
         int EventType { get; set; }
-        
+
         int EventPhaseMask { get; set; }
-        
+
         int EventChance { get; set; }
-        
+
         int EventFlags { get; set; }
-        
+
         int EventParam1 { get; set; }
 
         int EventParam2 { get; set; }

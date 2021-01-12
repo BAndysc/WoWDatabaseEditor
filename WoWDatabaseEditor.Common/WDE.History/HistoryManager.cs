@@ -2,69 +2,68 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using WDE.Common.History;
+using WDE.Module.Attributes;
 
 namespace WDE.History
 {
-    [WDE.Module.Attributes.AutoRegister]
+    [AutoRegister]
     public class HistoryManager : IHistoryManager, INotifyPropertyChanged
     {
-        private readonly Stack<IHistoryAction> _history;
-        private readonly Stack<IHistoryAction> _future;
+        private readonly Stack<IHistoryAction> future;
+        private readonly Stack<IHistoryAction> history;
 
-        public ObservableCollection<IHistoryAction> Past { get; } = new ObservableCollection<IHistoryAction>();
-        public ObservableCollection<IHistoryAction> Future { get; } = new ObservableCollection<IHistoryAction>();
+
+        private bool acceptNew;
+        private bool canRedo;
+        private bool canUndo;
+
+        public HistoryManager()
+        {
+            history = new Stack<IHistoryAction>();
+            future = new Stack<IHistoryAction>();
+            CanUndo = false;
+            CanRedo = false;
+            acceptNew = true;
+        }
+
+        public ObservableCollection<IHistoryAction> Past { get; } = new();
+        public ObservableCollection<IHistoryAction> Future { get; } = new();
 
         public bool CanUndo
         {
-            get { return _canUndo; }
+            get => canUndo;
             private set
             {
-                _canUndo = value;
+                canUndo = value;
                 OnPropertyChanged();
             }
         }
 
         public bool CanRedo
         {
-            get { return _canRedo; }
+            get => canRedo;
             private set
             {
-                _canRedo = value;
+                canRedo = value;
                 OnPropertyChanged();
             }
         }
 
-        public int UndoCount => _history.Count;
-        public int RedoCount => _future.Count;
-
-
-        private bool _acceptNew;
-        private bool _canUndo;
-        private bool _canRedo;
-
-        public HistoryManager()
-        {
-            _history = new Stack<IHistoryAction>();
-            _future = new Stack<IHistoryAction>();
-            CanUndo = false;
-            CanRedo = false;
-            _acceptNew = true;
-        }
+        public int UndoCount => history.Count;
+        public int RedoCount => future.Count;
 
         public void AddHandler(HistoryHandler handler)
         {
-            handler.ActionPush += (sender, action) => {
-                if (!_acceptNew)
+            handler.ActionPush += (sender, action) =>
+            {
+                if (!acceptNew)
                     return;
 
-                _history.Push(action);
+                history.Push(action);
                 Past.Add(action);
-                _future.Clear();
+                future.Clear();
                 Future.Clear();
                 CanRedo = false;
                 CanUndo = true;
@@ -73,51 +72,52 @@ namespace WDE.History
 
         public void Undo()
         {
-            if (_history.Count == 0)
+            if (history.Count == 0)
                 throw new NothingToUndoException();
 
-            IHistoryAction action = _history.Pop();
-            _future.Push(action);
+            IHistoryAction action = history.Pop();
+            future.Push(action);
             Past.RemoveAt(Past.Count - 1);
             Future.Insert(0, action);
-            _acceptNew = false;
+            acceptNew = false;
             action.Undo();
-            _acceptNew = true;
+            acceptNew = true;
 
-            CanUndo = _history.Count > 0;
+            CanUndo = history.Count > 0;
             CanRedo = true;
         }
+
+        public void Redo()
+        {
+            if (future.Count == 0)
+                throw new NothingToRedoException();
+
+            IHistoryAction action = future.Pop();
+            history.Push(action);
+            Future.RemoveAt(0);
+            Past.Add(action);
+            acceptNew = false;
+            action.Redo();
+            acceptNew = true;
+
+            CanUndo = true;
+            CanRedo = future.Count > 0;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public void Clear()
         {
             Past.Clear();
             Future.Clear();
-            _history.Clear();
-            _future.Clear();
+            history.Clear();
+            future.Clear();
             CanUndo = false;
             CanRedo = false;
         }
 
-        public void Redo()
-        {
-            if (_future.Count == 0)
-                throw new NothingToRedoException();
-
-            IHistoryAction action = _future.Pop();
-            _history.Push(action);
-            Future.RemoveAt(0);
-            Past.Add(action);
-            _acceptNew = false;
-            action.Redo();
-            _acceptNew = true;
-
-            CanUndo = true;
-            CanRedo = _future.Count > 0;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName]
+            string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -126,16 +126,10 @@ namespace WDE.History
     [Serializable]
     public class NothingToRedoException : Exception
     {
-        public NothingToRedoException()
-        {
-        }
     }
 
     [Serializable]
     public class NothingToUndoException : Exception
     {
-        public NothingToUndoException()
-        {
-        }
     }
 }

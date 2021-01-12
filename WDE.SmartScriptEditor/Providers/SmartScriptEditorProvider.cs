@@ -12,8 +12,7 @@ namespace WDE.SmartScriptEditor.Providers
         private readonly IContainerProvider containerProvider;
         private readonly ISolutionItemNameRegistry solutionItemNameRegistry;
 
-        public SmartScriptEditorProvider(ISolutionItemNameRegistry solutionItemNameRegistry,
-            IContainerProvider containerProvider)
+        public SmartScriptEditorProvider(ISolutionItemNameRegistry solutionItemNameRegistry, IContainerProvider containerProvider)
         {
             this.solutionItemNameRegistry = solutionItemNameRegistry;
             this.containerProvider = containerProvider;
@@ -21,7 +20,7 @@ namespace WDE.SmartScriptEditor.Providers
 
         public IDocument GetEditor(SmartScriptSolutionItem item)
         {
-            var vm = containerProvider.Resolve<SmartScriptEditorViewModel>();
+            SmartScriptEditorViewModel vm = containerProvider.Resolve<SmartScriptEditorViewModel>();
             vm.SetSolutionItem(item);
 
             return vm;

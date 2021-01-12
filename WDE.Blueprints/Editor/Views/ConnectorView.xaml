@@ -1,14 +1,13 @@
 ﻿<UserControl x:Class="WDE.Blueprints.Editor.Views.ConnectorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WDE.Blueprints.Editor.Views"
-             xmlns:controls="clr-namespace:GeminiGraphEditor"
              xmlns:designTimeVMs="clr-namespace:WDE.Blueprints.Editor.DisignTimeViewModels"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance designTimeVMs:ConnectorViewModel, IsDesignTimeCreatable=True}" >
+             d:DataContext="{d:DesignInstance designTimeVMs:ConnectorViewModel, IsDesignTimeCreatable=True}">
 
     <ContentControl Content="{Binding}">
         <ContentControl.Style>
@@ -21,7 +20,7 @@
                     </Setter.Value>
                 </Setter>
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding IOType}" Value="Exec">
+                    <DataTrigger Binding="{Binding IoType}" Value="Exec">
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
                                 <DataTemplate>

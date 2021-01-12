@@ -9,32 +9,24 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
     /// </summary>
     public partial class SmartActionView : UserControl
     {
-        public static DependencyProperty IsSelectedProperty
-            = DependencyProperty.Register(
-                nameof(IsSelected),
-                typeof(bool),
-                typeof(SmartActionView),
-                new PropertyMetadata(false));
+        public static DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected),
+            typeof(bool),
+            typeof(SmartActionView),
+            new PropertyMetadata(false));
 
-        public static DependencyProperty DeselectAllRequestProperty
-            = DependencyProperty.Register(
-                nameof(DeselectAllRequest),
-                typeof(ICommand),
-                typeof(SmartActionView));
+        public static DependencyProperty DeselectAllRequestProperty =
+            DependencyProperty.Register(nameof(DeselectAllRequest), typeof(ICommand), typeof(SmartActionView));
 
-        public static DependencyProperty DeselectAllEventsRequestProperty
-            = DependencyProperty.Register(
-                nameof(DeselectAllEventsRequest),
-                typeof(ICommand),
-                typeof(SmartActionView));
+        public static DependencyProperty DeselectAllEventsRequestProperty =
+            DependencyProperty.Register(nameof(DeselectAllEventsRequest), typeof(ICommand), typeof(SmartActionView));
 
-        public static DependencyProperty EditActionCommandProperty
-            = DependencyProperty.Register(
-                nameof(EditActionCommand),
-                typeof(ICommand),
-                typeof(SmartActionView));
+        public static DependencyProperty EditActionCommandProperty =
+            DependencyProperty.Register(nameof(EditActionCommand), typeof(ICommand), typeof(SmartActionView));
 
-        public SmartActionView() { InitializeComponent(); }
+        public SmartActionView()
+        {
+            InitializeComponent();
+        }
 
         public bool IsSelected
         {
@@ -73,7 +65,8 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                     IsSelected = true;
                 }
             }
-            else if (e.ClickCount == 2) EditActionCommand?.Execute(DataContext);
+            else if (e.ClickCount == 2)
+                EditActionCommand?.Execute(DataContext);
         }
     }
 }

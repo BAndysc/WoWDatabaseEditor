@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-
+﻿using System.Collections.ObjectModel;
 using Newtonsoft.Json;
-using Prism.Ioc;
-using WDE.Common.Solution;
 
 namespace WDE.Common
 {
@@ -13,10 +7,10 @@ namespace WDE.Common
     {
         bool IsContainer { get; }
         ObservableCollection<ISolutionItem> Items { get; }
-        
+
         [JsonIgnore]
         string ExtraId { get; }
-        
+
         [JsonIgnore]
         bool IsExportable { get; }
     }

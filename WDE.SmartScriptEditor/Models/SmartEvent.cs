@@ -25,8 +25,10 @@ namespace WDE.SmartScriptEditor.Models
             Actions.CollectionChanged += (sender, args) =>
             {
                 if (args.Action == NotifyCollectionChangedAction.Add)
-                    foreach (var ob in args.NewItems)
+                {
+                    foreach (object ob in args.NewItems)
                         (ob as SmartAction).Parent = this;
+                }
             };
 
             Flags = new Parameter("Flags");
@@ -114,9 +116,11 @@ namespace WDE.SmartScriptEditor.Models
         {
             get
             {
-                var readable = ReadableHint;
+                string readable = ReadableHint;
                 if (DescriptionRules != null)
-                    foreach (var rule in DescriptionRules)
+                {
+                    foreach (DescriptionRule rule in DescriptionRules)
+                    {
                         if (rule.Matches(new DescriptionParams
                         {
                             pram1 = GetParameter(0).GetValue(),
@@ -128,10 +132,12 @@ namespace WDE.SmartScriptEditor.Models
                             readable = rule.Description;
                             break;
                         }
+                    }
+                }
 
                 try
                 {
-                    var output = Smart.Format(readable,
+                    string output = Smart.Format(readable,
                         new
                         {
                             pram1 = GetParameter(0),
@@ -158,13 +164,19 @@ namespace WDE.SmartScriptEditor.Models
 
         public override int ParametersCount => 4;
 
-        private void OnParameterChanged(object sender, ParameterChangedValue<int> e) { CallOnChanged(); }
+        private void OnParameterChanged(object sender, ParameterChangedValue<int> e)
+        {
+            CallOnChanged();
+        }
 
-        public void AddAction(SmartAction smartAction) { Actions.Add(smartAction); }
+        public void AddAction(SmartAction smartAction)
+        {
+            Actions.Add(smartAction);
+        }
 
         public SmartEvent ShallowCopy()
         {
-            var se = new SmartEvent(Id);
+            SmartEvent se = new(Id);
             se.ReadableHint = ReadableHint;
             se.DescriptionRules = DescriptionRules;
             se.Chance = Chance.Clone();

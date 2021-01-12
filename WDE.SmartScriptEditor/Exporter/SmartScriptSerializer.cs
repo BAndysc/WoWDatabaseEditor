@@ -22,7 +22,7 @@ namespace WDE.SmartScriptEditor.Exporter
         {
             line = new AbstractSmartScriptLine();
 
-            var m = SaiLineRegex.Match(str);
+            Match m = SaiLineRegex.Match(str);
             if (!m.Success || m.Groups.Count != 28)
                 return false;
 
@@ -118,13 +118,13 @@ namespace WDE.SmartScriptEditor.Exporter
             var eventId = 0;
             var lines = new List<ISmartScriptLine>();
             var previousWasWait = false;
-            var nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EventTriggerTimed)
+            int nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EventTriggerTimed)
                 .Select(e => e.GetParameter(0).Value)
                 .DefaultIfEmpty(0)
                 .Max() + 1;
 
             //@todo: don't use hardcoded IDs!!!!
-            foreach (var e in script.Events)
+            foreach (SmartEvent e in script.Events)
             {
                 if (e.Actions.Count == 0)
                     continue;
@@ -133,23 +133,24 @@ namespace WDE.SmartScriptEditor.Exporter
 
                 for (var index = 0; index < e.Actions.Count; ++index)
                 {
-                    var actualEvent = e;
+                    SmartEvent actualEvent = e;
 
                     if (previousWasWait)
                     {
                         actualEvent = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
                         actualEvent.SetParameter(0, nextTriggerId++);
                     }
-                    else if (index > 0) actualEvent = smartFactory.EventFactory(SmartConstants.EventLink);
+                    else if (index > 0)
+                        actualEvent = smartFactory.EventFactory(SmartConstants.EventLink);
 
-                    var linkTo = e.Actions.Count - 1 == index ? 0 : eventId + 1;
+                    int linkTo = e.Actions.Count - 1 == index ? 0 : eventId + 1;
 
-                    var actualAction = e.Actions[index];
+                    SmartAction actualAction = e.Actions[index];
 
                     if (actualAction.Id == SmartConstants.ActionWait)
                     {
                         linkTo = 0;
-                        var waitAction = actualAction;
+                        SmartAction waitAction = actualAction;
                         actualAction = smartFactory.ActionFactory(SmartConstants.ActionTriggerTimed,
                             smartFactory.SourceFactory(SmartConstants.SourceNone),
                             smartFactory.TargetFactory(SmartConstants.TargetNone));
@@ -162,11 +163,10 @@ namespace WDE.SmartScriptEditor.Exporter
                     else
                         previousWasWait = false;
 
-                    var eventToSerialize = actualEvent.ShallowCopy();
+                    SmartEvent eventToSerialize = actualEvent.ShallowCopy();
                     eventToSerialize.Actions.Add(actualAction.Copy());
 
-                    var serialized =
-                        eventToSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, linkTo);
+                    var serialized = eventToSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, linkTo);
 
                     if (serialized.Length != 1)
                         throw new InvalidOperationException();
@@ -197,9 +197,9 @@ namespace WDE.SmartScriptEditor.Exporter
                 }
                 : e.Actions;
 
-            foreach (var a in actions)
+            foreach (SmartAction a in actions)
             {
-                var line = new AbstractSmartScriptLine
+                AbstractSmartScriptLine line = new()
                 {
                     EntryOrGuid = scriptEntryOrGuid,
                     ScriptSourceType = (int) scriptSourceType,
@@ -236,8 +236,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     TargetY = a.Target.Y,
                     TargetZ = a.Target.Z,
                     TargetO = a.Target.O,
-                    Comment = e.Readable + " - " + a.Readable +
-                              (string.IsNullOrEmpty(a.Comment) ? "" : " // " + a.Comment)
+                    Comment = e.Readable + " - " + a.Readable + (string.IsNullOrEmpty(a.Comment) ? "" : " // " + a.Comment)
                 };
                 lines.Add(line);
             }

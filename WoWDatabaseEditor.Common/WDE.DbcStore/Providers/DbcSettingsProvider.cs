@@ -1,47 +1,48 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WDE.Module.Attributes;
+﻿using System.IO;
+using System.Windows;
+using Newtonsoft.Json;
 using WDE.DbcStore.Data;
+using WDE.Module.Attributes;
 
 namespace WDE.DbcStore.Providers
 {
-    [AutoRegister, SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class DbcSettingsProvider : IDbcSettingsProvider
     {
-        private DBCSettings DBCSettings { get; set; }
-
         public DbcSettingsProvider()
         {
             if (File.Exists("dbc.json"))
             {
-                JsonSerializer ser = new Newtonsoft.Json.JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
-                using (StreamReader re = new StreamReader("dbc.json"))
+                JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
+                using (StreamReader re = new("dbc.json"))
                 {
-                    JsonTextReader reader = new JsonTextReader(re);
+                    JsonTextReader reader = new(re);
                     DBCSettings = ser.Deserialize<DBCSettings>(reader);
                 }
             }
-            
+
             if (DBCSettings == null)
                 DBCSettings = new DBCSettings();
         }
 
-        public DBCSettings GetSettings() => DBCSettings;
+        private DBCSettings DBCSettings { get; set; }
+
+        public DBCSettings GetSettings()
+        {
+            return DBCSettings;
+        }
 
         public void UpdateSettings(DBCSettings newSettings)
         {
             DBCSettings = newSettings;
-            JsonSerializer ser = new JsonSerializer() { TypeNameHandling = TypeNameHandling.Auto };
+            JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
             using (StreamWriter file = File.CreateText(@"dbc.json"))
             {
                 ser.Serialize(file, DBCSettings);
             }
-            System.Windows.MessageBox.Show("Restart the application.");
+
+            MessageBox.Show("Restart the application.");
         }
     }
 }

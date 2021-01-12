@@ -18,10 +18,19 @@ namespace WDE.SmartScriptEditor.Data
             targets = JsonConvert.DeserializeObject<List<SmartGenericJsonData>>(jsonProvider.GetTargetsJson());
         }
 
-        public IEnumerable<SmartGenericJsonData> GetActions() { return actions; }
+        public IEnumerable<SmartGenericJsonData> GetActions()
+        {
+            return actions;
+        }
 
-        public IEnumerable<SmartGenericJsonData> GetEvents() { return events; }
+        public IEnumerable<SmartGenericJsonData> GetEvents()
+        {
+            return events;
+        }
 
-        public IEnumerable<SmartGenericJsonData> GetTargets() { return targets; }
+        public IEnumerable<SmartGenericJsonData> GetTargets()
+        {
+            return targets;
+        }
     }
 }

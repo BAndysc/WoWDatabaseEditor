@@ -190,6 +190,9 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "tooltip")]
         public string Tooltip { get; set; }
 
-        public bool HasParameters() { return Parameters != null && Parameters.Count > 0; }
+        public bool HasParameters()
+        {
+            return Parameters != null && Parameters.Count > 0;
+        }
     }
 }

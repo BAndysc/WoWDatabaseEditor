@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WoWDatabaseEditor.ModulesManagement
 {
-    interface IModulesManager
+    internal interface IModulesManager
     {
+        IEnumerable<ModuleData> Modules { get; }
         void AddConflicted(Assembly conflictingAssembly, Assembly firstAssembly);
         void AddModule(Assembly module);
-        IEnumerable<ModuleData> Modules { get; }
     }
 
     public class ModuleData

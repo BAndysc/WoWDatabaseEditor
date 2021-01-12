@@ -10,7 +10,8 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var flag = false;
-            if (value is bool) flag = (bool) value;
+            if (value is bool)
+                flag = (bool) value;
             return flag ? Visibility.Visible : Visibility.Hidden;
         }
 
@@ -25,7 +26,8 @@ namespace WDE.SmartScriptEditor.Editor.Helpers
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var flag = false;
-            if (value is bool) flag = (bool) value;
+            if (value is bool)
+                flag = (bool) value;
             return flag ? Visibility.Hidden : Visibility.Visible;
         }
 

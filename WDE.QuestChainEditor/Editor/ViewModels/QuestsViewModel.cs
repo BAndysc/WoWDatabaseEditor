@@ -1,8 +1,7 @@
-﻿using Prism.Mvvm;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows.Data;
+using Prism.Mvvm;
 using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.Providers;
 
@@ -10,27 +9,46 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
 {
     public class QuestsViewModel : BindableBase
     {
-        private readonly ObservableCollection<QuestDefinition> _allItems = new ObservableCollection<QuestDefinition>();
+        private readonly ObservableCollection<QuestDefinition> allItems = new();
 
-        private CollectionViewSource _items;
-        private QuestDefinition _selectedItem;
-        private string _searchBox;
+        private readonly CollectionViewSource items;
+        private string searchBox;
+        private QuestDefinition selectedItem;
+
+        public QuestsViewModel(IQuestsProvider registry)
+        {
+            allItems.AddRange(registry.Quests);
+
+            items = new CollectionViewSource
+            {
+                Source = allItems
+            };
+            items.Filter += ItemsOnFilter;
+
+            if (items.View.MoveCurrentToFirst())
+                SelectedItem = items.View.CurrentItem as QuestDefinition;
+        }
 
         public string SearchBox
         {
-            get { return _searchBox; }
-            set { SetProperty(ref _searchBox, value); _items.View.Refresh(); }
+            get => searchBox;
+            set
+            {
+                SetProperty(ref searchBox, value);
+                items.View.Refresh();
+            }
         }
 
         public QuestDefinition SelectedItem
         {
-            get { return _selectedItem; }
-            set { SetProperty(ref _selectedItem, value); }
+            get => selectedItem;
+            set => SetProperty(ref selectedItem, value);
         }
 
         public QuestDefinition ChosenItem
         {
-            get {
+            get
+            {
                 if (SelectedItem != null)
                     return SelectedItem;
 
@@ -39,27 +57,11 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
             }
         }
 
-        public ICollectionView AllItems => _items.View;
+        public ICollectionView AllItems => items.View;
 
-        public QuestsViewModel(IQuestsProvider registry)
-        {
-            _allItems.AddRange(registry.Quests);
-
-            _items = new CollectionViewSource
-            {
-                Source = _allItems
-            };
-            _items.Filter += ItemsOnFilter;
-
-            if (_items.View.MoveCurrentToFirst())
-            {
-                SelectedItem = _items.View.CurrentItem as QuestDefinition;
-            }
-        }
-        
         private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
         {
-            var item = filterEventArgs.Item as QuestDefinition;
+            QuestDefinition item = filterEventArgs.Item as QuestDefinition;
 
             if (string.IsNullOrEmpty(SearchBox))
             {
@@ -72,7 +74,7 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
             filterEventArgs.Accepted = item.Title.ToLower().Contains(SearchBox.ToLower());
 
             if (uint.TryParse(SearchBox, out numeric))
-                filterEventArgs.Accepted |= item.Id == numeric;            
+                filterEventArgs.Accepted |= item.Id == numeric;
         }
     }
 }

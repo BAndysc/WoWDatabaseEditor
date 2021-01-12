@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Diagnostics.CodeAnalysis;
 using LinqToDB.Mapping;
 using WDE.Common.Database;
-using System.Diagnostics.CodeAnalysis;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
@@ -58,7 +52,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [PrimaryKey]
         public int NegativeCondition { get; set; }
 
-        [Column(Name = "Comment")] 
+        [Column(Name = "Comment")]
         public string Comment { get; set; } = "";
     }
 }

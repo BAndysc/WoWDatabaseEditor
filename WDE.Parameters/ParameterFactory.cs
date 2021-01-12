@@ -1,20 +1,18 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WDE.Module.Attributes;
 using WDE.Common.Parameters;
+using WDE.Module.Attributes;
 using WDE.Parameters.Models;
 
 namespace WDE.Parameters
 {
-    [AutoRegister, SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class ParameterFactory : IParameterFactory
     {
-        private readonly Dictionary<string, ParameterSpecModel> _data = new Dictionary<string, ParameterSpecModel>();
-        private readonly Dictionary<string, Func<string, Parameter> > _dynamics = new Dictionary<string, Func<string, Parameter>>();
+        private readonly Dictionary<string, ParameterSpecModel> data = new();
+        private readonly Dictionary<string, Func<string, Parameter>> dynamics = new();
 
         public Parameter Factory(string type, string name)
         {
@@ -25,14 +23,14 @@ namespace WDE.Parameters
         {
             Parameter param;
 
-            if (_dynamics.ContainsKey(type))
-                param = _dynamics[type](name);
-            else if (_data.ContainsKey(type))
+            if (dynamics.ContainsKey(type))
+                param = dynamics[type](name);
+            else if (data.ContainsKey(type))
             {
-                param = _data[type].IsFlag && _data[type].Values != null ? new FlagParameter(name) : new Parameter(name);
+                param = data[type].IsFlag && data[type].Values != null ? new FlagParameter(name) : new Parameter(name);
 
-                if (_data[type].Values != null)
-                    param.Items = _data[type].Values;
+                if (data[type].Values != null)
+                    param.Items = data[type].Values;
                 return param;
             }
             else
@@ -42,24 +40,29 @@ namespace WDE.Parameters
 
             return param;
         }
-        
+
+        public void Register(string key, Func<string, Parameter> creator)
+        {
+            dynamics.Add(key, creator);
+        }
+
         public void Add(string key, ParameterSpecModel model)
         {
             model.Key = key;
-            _data.Add(key, model);
+            data.Add(key, model);
         }
 
         public IEnumerable<string> GetKeys()
         {
-            return _data.Keys.Union(_dynamics.Keys);
+            return data.Keys.Union(dynamics.Keys);
         }
-        
+
         public ParameterSpecModel GetDefinition(string key)
         {
-            if (_dynamics.ContainsKey(key))
+            if (dynamics.ContainsKey(key))
             {
-                var param = _dynamics[key](key);
-                return new ParameterSpecModel()
+                Parameter param = dynamics[key](key);
+                return new ParameterSpecModel
                 {
                     IsFlag = param is FlagParameter,
                     Key = key,
@@ -67,13 +70,8 @@ namespace WDE.Parameters
                     Values = param.Items
                 };
             }
-            return _data[key];
-        }
 
-        public void Register(string key, Func<string, Parameter> creator)
-        {
-            _dynamics.Add(key, creator);
+            return data[key];
         }
     }
-
 }

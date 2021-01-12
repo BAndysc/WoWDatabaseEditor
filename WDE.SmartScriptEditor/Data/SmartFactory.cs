@@ -25,15 +25,16 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartEvent, id))
                 throw new NullReferenceException("No data for event id " + id);
 
-            var ev = new SmartEvent(id);
-            var raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
+            SmartEvent ev = new(id);
+            SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
             ev.Chance.SetValue(100);
             SetParameterObjects(ev, raw);
 
             if (raw.DescriptionRules != null)
             {
                 ev.DescriptionRules = new List<DescriptionRule>();
-                foreach (var rule in raw.DescriptionRules) ev.DescriptionRules.Add(new DescriptionRule(rule));
+                foreach (SmartDescriptionRulesJsonData rule in raw.DescriptionRules)
+                    ev.DescriptionRules.Add(new DescriptionRule(rule));
             }
 
             return ev;
@@ -41,7 +42,7 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartEvent EventFactory(ISmartScriptLine line)
         {
-            var ev = EventFactory(line.EventType);
+            SmartEvent ev = EventFactory(line.EventType);
 
             ev.Chance.SetValue(line.EventChance);
             ev.Phases.SetValue(line.EventPhaseMask);
@@ -60,7 +61,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartAction, id))
                 throw new NullReferenceException("No data for action id " + id);
 
-            var action = new SmartAction(id, source, target);
+            SmartAction action = new(id, source, target);
 
             SetParameterObjects(action, smartDataManager.GetRawData(SmartType.SmartAction, id));
 
@@ -69,10 +70,10 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartAction ActionFactory(ISmartScriptLine line)
         {
-            var source = SourceFactory(line);
-            var target = TargetFactory(line);
+            SmartSource source = SourceFactory(line);
+            SmartTarget target = TargetFactory(line);
 
-            var action = ActionFactory(line.ActionType, source, target);
+            SmartAction action = ActionFactory(line.ActionType, source, target);
 
             for (var i = 0; i < SmartAction.SmartActionParametersCount; ++i)
                 action.SetParameter(i, GetActionParameter(line, i));
@@ -85,7 +86,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartTarget, id))
                 throw new NullReferenceException("No data for target id " + id);
 
-            var target = new SmartTarget(id);
+            SmartTarget target = new(id);
 
             SetParameterObjects(target, smartDataManager.GetRawData(SmartType.SmartTarget, id));
 
@@ -102,7 +103,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartSource, id))
                 throw new NullReferenceException("No data for source id " + id);
 
-            var source = new SmartSource(id);
+            SmartSource source = new(id);
 
             SetParameterObjects(source, smartDataManager.GetRawData(SmartType.SmartSource, id));
 
@@ -151,7 +152,7 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartTarget TargetFactory(ISmartScriptLine line)
         {
-            var target = TargetFactory(line.TargetType);
+            SmartTarget target = TargetFactory(line.TargetType);
 
             target.X = line.TargetX;
             target.Y = line.TargetY;
@@ -184,7 +185,7 @@ namespace WDE.SmartScriptEditor.Data
 
         private SmartSource SourceFactory(ISmartScriptLine line)
         {
-            var source = SourceFactory(line.SourceType);
+            SmartSource source = SourceFactory(line.SourceType);
 
             source.Condition.SetValue(line.SourceConditionId);
 
@@ -218,7 +219,7 @@ namespace WDE.SmartScriptEditor.Data
 
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
-                var parameter = parameterFactory.Factory(data.Parameters[i].Type,
+                Parameter parameter = parameterFactory.Factory(data.Parameters[i].Type,
                     data.Parameters[i].Name,
                     data.Parameters[i].DefaultVal);
                 parameter.Description = data.Parameters[i].Description;

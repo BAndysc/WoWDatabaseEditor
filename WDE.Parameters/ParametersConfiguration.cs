@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using WDE.Common;
 using WDE.Module.Attributes;
@@ -11,7 +8,8 @@ using WDE.Parameters.Views;
 
 namespace WDE.Parameters
 {
-    [AutoRegister, SingleInstance]
+    [AutoRegister]
+    [SingleInstance]
     public class ParametersConfiguration : IConfigurable
     {
         private readonly ParameterFactory factory;
@@ -23,8 +21,8 @@ namespace WDE.Parameters
 
         public KeyValuePair<ContentControl, Action> GetConfigurationView()
         {
-            var view = new ParametersView();
-            var viewModel = new ParametersViewModel(factory);
+            ParametersView view = new ParametersView();
+            ParametersViewModel viewModel = new ParametersViewModel(factory);
             view.DataContext = viewModel;
             return new KeyValuePair<ContentControl, Action>(view, viewModel.SaveAction);
         }

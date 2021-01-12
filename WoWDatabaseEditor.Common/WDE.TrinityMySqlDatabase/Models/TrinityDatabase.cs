@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LinqToDB;
-using LinqToDB.Mapping;
+﻿using LinqToDB;
+using LinqToDB.Data;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
-    public class TrinityDatabase : LinqToDB.Data.DataConnection
+    public class TrinityDatabase : DataConnection
     {
-        public TrinityDatabase() : base("Trinity") { }
-        
+        public TrinityDatabase() : base("Trinity")
+        {
+        }
+
         public ITable<MySqlCreatureTemplate> CreatureTemplate => GetTable<MySqlCreatureTemplate>();
         public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
         public ITable<MySqlGameObjectTemplate> GameObjectTemplate => GetTable<MySqlGameObjectTemplate>();

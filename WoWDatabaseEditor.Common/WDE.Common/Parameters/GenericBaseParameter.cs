@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WDE.Common.Parameters
 {
     public class ParameterChangedValue<T> : EventArgs
     {
-        public readonly T Old;
         public readonly T New;
+        public readonly T Old;
 
         public ParameterChangedValue(T old, T nnew)
         {
@@ -21,8 +19,12 @@ namespace WDE.Common.Parameters
 
     public abstract class GenericBaseParameter<T> : INotifyPropertyChanged
     {
-        public event EventHandler<ParameterChangedValue<T>> OnValueChanged = delegate { };
-        protected T _value;
+        protected T value;
+
+        protected GenericBaseParameter(string name)
+        {
+            Name = name;
+        }
 
         public string Name { get; set; }
         public string Description { get; set; }
@@ -31,24 +33,22 @@ namespace WDE.Common.Parameters
 
         public T Value
         {
-            get { return _value; }
+            get => value;
             set
             {
                 T old = Value;
-                _value = value;
+                this.value = value;
                 if (!old.Equals(value))
                 {
                     OnValueChanged(this, new ParameterChangedValue<T>(old, Value));
-                    OnPropertyChanged("Value");
-                    OnPropertyChanged("String");
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(String));
                 }
             }
         }
 
-        protected GenericBaseParameter(string name)
-        {
-            Name = name;
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler<ParameterChangedValue<T>> OnValueChanged = delegate { };
 
         public void SetValue(T value)
         {
@@ -61,9 +61,8 @@ namespace WDE.Common.Parameters
             return Value;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName]
+            string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -71,14 +70,21 @@ namespace WDE.Common.Parameters
 
     public class SelectOption
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
         public SelectOption(string name, string description)
         {
             Name = name;
             Description = description;
         }
-        public SelectOption(string name) : this(name, null) { }
-        public SelectOption() { }
+
+        public SelectOption(string name) : this(name, null)
+        {
+        }
+
+        public SelectOption()
+        {
+        }
+
+        public string Name { get; set; }
+        public string Description { get; set; }
     }
 }

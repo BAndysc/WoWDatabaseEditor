@@ -6,21 +6,17 @@ namespace GeminiGraphEditor
 {
     public class ConnectionItem : ListBoxItem
     {
-        private Point _lastMousePosition;
-        private bool _isLeftMouseButtonDown;
-        private bool _isDragging;
+        private bool isDragging;
+        private bool isLeftMouseButtonDown;
+        private Point lastMousePosition;
 
         static ConnectionItem()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ConnectionItem),
-                new FrameworkPropertyMetadata(typeof(ConnectionItem)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ConnectionItem), new FrameworkPropertyMetadata(typeof(ConnectionItem)));
         }
-        
-        private GraphControl ParentGraphControl
-        {
-            get { return VisualTreeUtility.FindParent<GraphControl>(this); }
-        }
-                
+
+        private GraphControl ParentGraphControl => VisualTreeUtility.FindParent<GraphControl>(this);
+
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             DoSelection();
@@ -32,7 +28,7 @@ namespace GeminiGraphEditor
 
         private void DoSelection()
         {
-            var parentGraphControl = ParentGraphControl;
+            GraphControl parentGraphControl = ParentGraphControl;
             if (parentGraphControl == null)
                 return;
 

@@ -2,18 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace WDBXEditor.Reader
 {
     public class MemoryReader : IDisposable
     {
-        public ulong BaseAddress { get; private set; }
-        public IntPtr ProcessHandle { get; private set; }
-
         private Process process;
 
         public MemoryReader(Process proc)
@@ -21,7 +16,7 @@ namespace WDBXEditor.Reader
             if ((proc?.Id ?? 0) == 0)
                 throw new Exception("Invalid process");
 
-            BaseAddress = (ulong)proc.MainModule.BaseAddress;
+            BaseAddress = (ulong) proc.MainModule.BaseAddress;
             ProcessHandle = OpenProcess(ProcessAccess.AllAccess, false, proc.Id);
 
             if (ProcessHandle == IntPtr.Zero)
@@ -30,6 +25,9 @@ namespace WDBXEditor.Reader
             Process.EnterDebugMode();
             process = proc;
         }
+
+        public ulong BaseAddress { get; }
+        public IntPtr ProcessHandle { get; }
 
         public void Dispose()
         {
@@ -62,9 +60,8 @@ namespace WDBXEditor.Reader
             var buffer = new byte[0];
 
             if (typeof(T) == typeof(string))
-                return (T)(object)ReadCString(address);
-            else
-                buffer = ReadBytes(address, (uint)Marshal.SizeOf(typeof(T)));
+                return (T) (object) ReadCString(address);
+            buffer = ReadBytes(address, (uint) Marshal.SizeOf(typeof(T)));
 
             switch (Type.GetTypeCode(typeof(T)))
             {
@@ -110,21 +107,22 @@ namespace WDBXEditor.Reader
                     throw new NotSupportedException($"Unknown type {typeof(T).Name}.");
             }
 
-            return (T)ret;
+            return (T) ret;
         }
 
         public string ReadCString(IntPtr address)
         {
             var buffer = new List<byte>();
 
-            int i = 0;
-            byte current = Read<byte>((IntPtr)(address.ToInt32() + i));
+            var i = 0;
+            var current = Read<byte>((IntPtr) (address.ToInt32() + i));
             while (current != 0)
             {
                 buffer.Add(current);
                 i++;
-                current = Read<byte>((IntPtr)(address.ToInt32() + i));
+                current = Read<byte>((IntPtr) (address.ToInt32() + i));
             }
+
             return Encoding.UTF8.GetString(buffer.ToArray());
         }
 
@@ -132,10 +130,17 @@ namespace WDBXEditor.Reader
 
         [DllImport("kernel32.dll", SetLastError = true, PreserveSig = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out int lpNumberOfBytesRead);
+        private static extern bool ReadProcessMemory(IntPtr hProcess,
+            IntPtr lpBaseAddress,
+            byte[] lpBuffer,
+            uint nSize,
+            out int lpNumberOfBytesRead);
 
         [DllImport("kernel32.dll")]
-        private static extern IntPtr OpenProcess(ProcessAccess dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
+        private static extern IntPtr OpenProcess(ProcessAccess dwDesiredAccess,
+            [MarshalAs(UnmanagedType.Bool)]
+            bool bInheritHandle,
+            int dwProcessId);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -145,6 +150,7 @@ namespace WDBXEditor.Reader
         {
             AllAccess = 0x2 | 0x40 | 0x400 | 0x200 | 0x1 | 0x8 | 0x10 | 0x20 | 0x100000
         }
+
         #endregion
     }
 }

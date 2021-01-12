@@ -1,38 +1,13 @@
-﻿using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
 using System.Windows.Media;
+using Prism.Mvvm;
 
 namespace WDE.QuestChainEditor.Editor.ViewModels
 {
     public abstract class ConnectorViewModel : BindableBase
     {
-        public event EventHandler PositionChanged;
-        
-        public ElementViewModel Element { get; }
-        
-        public string Name { get; }
-                
-        public Color Color { get; }
-
-        public abstract bool NonEmpty { get; }
-        
-        private Point _position;
-        public Point Position
-        {
-            get { return _position; }
-            set
-            {
-                SetProperty(ref _position, value);
-                RaisePositionChanged();
-            }
-        }
-
-        public abstract ConnectorDirection ConnectorDirection { get; }
+        private Point position;
 
         protected ConnectorViewModel(ElementViewModel element, string name, Color color)
         {
@@ -40,6 +15,27 @@ namespace WDE.QuestChainEditor.Editor.ViewModels
             Name = name;
             Color = color;
         }
+
+        public ElementViewModel Element { get; }
+
+        public string Name { get; }
+
+        public Color Color { get; }
+
+        public abstract bool NonEmpty { get; }
+
+        public Point Position
+        {
+            get => position;
+            set
+            {
+                SetProperty(ref position, value);
+                RaisePositionChanged();
+            }
+        }
+
+        public abstract ConnectorDirection ConnectorDirection { get; }
+        public event EventHandler PositionChanged;
 
         private void RaisePositionChanged()
         {

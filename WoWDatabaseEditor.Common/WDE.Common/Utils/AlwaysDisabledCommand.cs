@@ -5,11 +5,16 @@ namespace WDE.Common.Utils
 {
     public class AlwaysDisabledCommand : ICommand
     {
-        public static AlwaysDisabledCommand Command => new AlwaysDisabledCommand();
-        
-        public bool CanExecute(object? parameter) => false;
+        public static AlwaysDisabledCommand Command => new();
 
-        public void Execute(object? parameter) {}
+        public bool CanExecute(object? parameter)
+        {
+            return false;
+        }
+
+        public void Execute(object? parameter)
+        {
+        }
 
         public event EventHandler? CanExecuteChanged;
     }
