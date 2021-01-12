@@ -20,13 +20,7 @@ namespace WDE.SQLEditor.Views
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            using (Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("WDE.SQLEditor.Resources.sql.xshd"))
-            {
-                using (XmlTextReader reader = new XmlTextReader(stream))
-                {
-                    MyAvalonEdit.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-                }
-            }
+            MyAvalonEdit.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("TSQL");
         }
     }
 }
