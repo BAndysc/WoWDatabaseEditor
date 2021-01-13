@@ -14,8 +14,6 @@
                       Height="695.368"
                       Width="959.421"
                       Icon="/icon.png"
-                      Loaded="Window_Loaded"
-                      Closed="Window_Closed"
                       x:Name="rootWindow">
     <Controls:MetroWindow.WindowButtonCommands>
         <Controls:WindowButtonCommands
