@@ -98,7 +98,9 @@
             ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}"
             DocumentsSource="{Binding WindowManager.OpenedDocuments}">
-
+            <DockingManager.LayoutUpdateStrategy>
+                <utils:LayoutInitializer />
+            </DockingManager.LayoutUpdateStrategy>
             <DockingManager.LayoutItemTemplateSelector>
                 <views:PaneDocumentTemplateSelector>
                     <views:PaneDocumentTemplateSelector.DocumentTemplate>
@@ -116,12 +118,20 @@
             <DockingManager.LayoutItemContainerStyle>
                 <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
                 <Style TargetType="{x:Type LayoutItem}">
+                    <Setter Property="ContentId" Value="{Binding Model.UniqueId}" />
                     <Setter Property="Title" Value="{Binding Model.Title}" />
                     <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
                     <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
                     <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}" />
                 </Style>
             </DockingManager.LayoutItemContainerStyle>
+            <LayoutRoot>
+                <LayoutPanel x:Name="VerticalPanel" Orientation="Vertical">
+                    <LayoutPanel x:Name="HorizontalPanel" Orientation="Horizontal">
+                        <LayoutDocumentPane />
+                    </LayoutPanel>
+                </LayoutPanel>
+            </LayoutRoot>
         </DockingManager>
     </DockPanel>
 </Controls:MetroWindow>

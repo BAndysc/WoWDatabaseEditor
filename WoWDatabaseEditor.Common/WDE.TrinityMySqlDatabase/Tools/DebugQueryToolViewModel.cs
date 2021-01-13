@@ -2,25 +2,29 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Document;
-using LinqToDB.Data;
-using LinqToDB.Tools;
 using Prism.Commands;
 using Prism.Mvvm;
-using WDE.Common.Managers;
+using WDE.Common.Windows;
+using WDE.Module.Attributes;
 using WDE.TrinityMySqlDatabase.Services;
 
 namespace WDE.TrinityMySqlDatabase.Tools
 {
+    [AutoRegister]
+    [SingleInstance]
     public class DebugQueryToolViewModel : BindableBase, ITool, ICodeEditorViewModel
     {
         private readonly IDatabaseLogger databaseLogger;
         public string Title => "Database query debugger";
+        public string UniqueId => "trinity_database_query_debugger";
         private Visibility visibility = Visibility.Hidden;
  
         public ICommand ClearConsole {get;}
  
+        public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Bottom;
+        public bool OpenOnStart => false;
+        
         public TextDocument Text { get; } = new TextDocument();
         public Visibility Visibility
         {

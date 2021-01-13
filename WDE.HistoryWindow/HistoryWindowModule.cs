@@ -9,7 +9,7 @@ namespace WDE.HistoryWindow
 {
     [AutoRegister]
     [SingleInstance]
-    public class HistoryWindowModule : ModuleBase, IToolProvider
+    public class HistoryWindowModule : ModuleBase
     {
         private readonly IEventAggregator eventAggregator;
 
@@ -17,16 +17,5 @@ namespace WDE.HistoryWindow
         {
             this.eventAggregator = eventAggregator;
         }
-
-        public bool AllowMultiple => false;
-
-        public string Name => "History view";
-
-        public ITool Provide()
-        {
-            return new HistoryViewModel(eventAggregator);
-        }
-
-        public bool CanOpenOnStart => false;
     }
 }

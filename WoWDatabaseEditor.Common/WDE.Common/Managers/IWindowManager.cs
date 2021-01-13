@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
@@ -8,11 +10,11 @@ namespace WDE.Common.Managers
     public interface IWindowManager
     {
         IDocument ActiveDocument { get; set; }
-
+        IReadOnlyList<ITool> AllTools { get; }
         ObservableCollection<IDocument> OpenedDocuments { get; }
-
         ObservableCollection<ITool> OpenedTools { get; }
         void OpenDocument(IDocument editor);
-        void OpenTool(IToolProvider provider);
+        void OpenTool<T>() where T : ITool;
+        void OpenTool(Type toolType);
     }
 }

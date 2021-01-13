@@ -1,15 +1,20 @@
-﻿using WDE.Common.Managers;
+﻿using System.Windows;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Windows
 {
     [NonUniqueProvider]
-    public interface IToolProvider
+    public interface ITool
     {
-        bool AllowMultiple { get; }
-        string Name { get; }
+        string Title { get; }
+        string UniqueId { get; }
+        Visibility Visibility { get; set; }
+        ToolPreferedPosition PreferedPosition { get; }
+        bool OpenOnStart { get; }
+    }
 
-        bool CanOpenOnStart { get; }
-        ITool Provide();
+    public enum ToolPreferedPosition
+    {
+        Left, Right, Bottom
     }
 }

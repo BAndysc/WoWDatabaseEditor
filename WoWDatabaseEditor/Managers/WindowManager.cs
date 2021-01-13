@@ -19,15 +19,24 @@ namespace WoWDatabaseEditor.Managers
     {
         private readonly IEventAggregator eventAggregator;
         private IDocument? activeDocument;
+        private Dictionary<Type, ITool> typeToToolInstance = new();
+        private List<ITool> allTools = new ();
 
-        public WindowManager(IEventAggregator eventAggregator)
+        public WindowManager(IEventAggregator eventAggregator, IEnumerable<ITool> tools)
         {
             this.eventAggregator = eventAggregator;
             ActivateDocument = new DelegateCommand<IDocument>(doc => ActiveDocument = doc);
+            foreach (var tool in tools)
+            {
+                allTools.Add(tool);
+                typeToToolInstance[tool.GetType()] = tool;
+            }
         }
 
+        public IReadOnlyList<ITool> AllTools => allTools;
+        public ObservableCollection<IDocument> OpenedDocuments { get; } = new();
+        public ObservableCollection<ITool> OpenedTools { get; } = new();
         public DelegateCommand<IDocument> ActivateDocument { get; }
-        private Dictionary<Type, ITool> Opened { get; } = new();
 
         public IDocument? ActiveDocument
         {
@@ -41,8 +50,6 @@ namespace WoWDatabaseEditor.Managers
             }
         }
 
-        public ObservableCollection<IDocument> OpenedDocuments { get; } = new();
-        public ObservableCollection<ITool> OpenedTools { get; } = new();
 
         public void OpenDocument(IDocument editor)
         {
@@ -62,23 +69,20 @@ namespace WoWDatabaseEditor.Managers
             ActiveDocument = editor;
         }
 
-        public void OpenTool(IToolProvider provider)
+        public void OpenTool<T>() where T : ITool
         {
-            if (!provider.AllowMultiple)
-            {
-                if (Opened.ContainsKey(provider.GetType()))
-                {
-                    Opened[provider.GetType()].Visibility = Visibility.Visible;
-                    return;
-                }
-            }
+            OpenTool(typeof(T));
+        }
 
-            ITool? tool = provider.Provide();
+        public void OpenTool(Type toolType)
+        {
+            if (!typeToToolInstance.TryGetValue(toolType, out var tool))
+                return;
 
-            if (!provider.AllowMultiple)
-                Opened.Add(provider.GetType(), tool);
+            if (!OpenedTools.Contains(tool))
+                OpenedTools.Add(tool);
 
-            OpenedTools.Add(tool);
+            tool.Visibility = Visibility.Visible;
         }
 
         private class Command : ICommand

@@ -92,5 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Events" />
+    <Folder Include="Tasks" />
   </ItemGroup>
 </Project>

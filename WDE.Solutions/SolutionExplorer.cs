@@ -1,5 +1,4 @@
 ﻿using WDE.Common;
-using WDE.Common.Managers;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.Solutions.Explorer.ViewModels;
@@ -8,24 +7,10 @@ namespace WDE.Solutions
 {
     [AutoRegister]
     [SingleInstance]
-    public class SolutionExplorer : ISolutionExplorer, IToolProvider
+    public class SolutionExplorer : ISolutionExplorer
     {
-        private readonly SolutionExplorerViewModel solutionExplorerViewModel;
-
-        public SolutionExplorer(SolutionExplorerViewModel solutionExplorerViewModel)
+        public SolutionExplorer()
         {
-            this.solutionExplorerViewModel = solutionExplorerViewModel;
         }
-
-        public bool AllowMultiple => false;
-
-        public string Name => "Solution explorer";
-
-        public ITool Provide()
-        {
-            return solutionExplorerViewModel;
-        }
-
-        public bool CanOpenOnStart => true;
     }
 }

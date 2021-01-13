@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using Prism.Commands;
 using Prism.Events;
@@ -12,10 +13,11 @@ using WDE.Common.Services;
 using WDE.Common.Solution;
 using WDE.Common.Windows;
 using WoWDatabaseEditor.Managers;
+using WoWDatabaseEditor.Utils;
 
 namespace WoWDatabaseEditor.ViewModels
 {
-    public class MainWindowViewModel : BindableBase
+    public class MainWindowViewModel : BindableBase, ILayoutViewModelResolver
     {
         private readonly Dictionary<ISolutionItem, IDocument> documents = new();
         private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new();
@@ -25,6 +27,7 @@ namespace WoWDatabaseEditor.ViewModels
         private readonly ISolutionManager solutionManager;
 
         private string title = "Visual Database Editor 2018";
+        private readonly Dictionary<string, ITool> toolById = new();
 
         public MainWindowViewModel(IEventAggregator eventAggregator,
             IWindowManager wndowManager,
@@ -32,7 +35,6 @@ namespace WoWDatabaseEditor.ViewModels
             INewItemService newItemService,
             ISolutionManager solutionManager,
             IStatusBar statusBar,
-            Lazy<IEnumerable<IToolProvider>> tools,
             ISolutionItemEditorRegistry solutionEditorManager)
         {
             this.eventAggregator = eventAggregator;
@@ -78,12 +80,13 @@ namespace WoWDatabaseEditor.ViewModels
 
             Windows = new ObservableCollection<MenuItemViewModel>();
 
-            foreach (var window in tools.Value)
+            foreach (var window in WindowManager.AllTools)
             {
-                MenuItemViewModel model = new(() => WindowManager.OpenTool(window), window.Name);
+                toolById[window.UniqueId] = window;
+                MenuItemViewModel model = new(() => WindowManager.OpenTool(window.GetType()), window.Title);
                 Windows.Add(model);
-                if (window.CanOpenOnStart)
-                    model.Command.Execute(null);
+                //if (window.CanOpenOnStart)
+                //    model.Command.Execute(null);
             }
 
             ShowAbout();
@@ -103,7 +106,7 @@ namespace WoWDatabaseEditor.ViewModels
         public DelegateCommand About { get; }
 
         public ObservableCollection<MenuItemViewModel> Windows { get; set; }
-
+        
         private void ShowAbout()
         {
             WindowManager.OpenDocument(new AboutViewModel());
@@ -116,9 +119,28 @@ namespace WoWDatabaseEditor.ViewModels
 
         private void New()
         {
-            ISolutionItem item = newItemService.GetNewSolutionItem();
+            ISolutionItem? item = newItemService.GetNewSolutionItem();
             if (item != null)
                 solutionManager.Items.Add(item);
+        }
+
+        public ITool? ResolveViewModel(string id)
+        {
+            if (toolById.TryGetValue(id, out var tool))
+            {
+                WindowManager.OpenedTools.Add(tool);
+                return tool;
+            }
+            return null;
+        }
+
+        public void LoadDefault()
+        {
+            foreach (var tool in toolById.Values)
+            {
+                if (tool.OpenOnStart)
+                    WindowManager.OpenTool(tool.GetType());
+            }
         }
     }
 }

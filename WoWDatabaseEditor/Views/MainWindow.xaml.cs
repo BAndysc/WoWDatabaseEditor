@@ -1,7 +1,14 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using AvalonDock;
 using MahApps.Metro.Controls;
+using WDE.Common.Managers;
+using WoWDatabaseEditor.Utils;
+using WoWDatabaseEditor.ViewModels;
 
 namespace WoWDatabaseEditor.Views
 {
@@ -16,6 +23,21 @@ namespace WoWDatabaseEditor.Views
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += OnLoaded;
+            Closing += OnClosing;
+        }
+
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            LayoutUtility.SaveLayout(DockingManager);
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ILayoutViewModelResolver layoutResolver)
+            {
+                LayoutUtility.LoadLayout(DockingManager, layoutResolver);   
+            }
         }
 
         public ICommand DocumentClosedCommand
@@ -28,5 +50,12 @@ namespace WoWDatabaseEditor.Views
         {
             DocumentClosedCommand?.Execute(e.Document.Content);
         }
+        
+        /*public void LoadLayout(Stream stream, Action<ITool> addToolCallback, Action<IDocument> addDocumentCallback,
+            Dictionary<string, ILayoutItem> itemsState)
+        {
+            LayoutUtility.LoadLayout(DockingManager, stream, addDocumentCallback, addToolCallback, itemsState);
+        }*/
+
     }
 }

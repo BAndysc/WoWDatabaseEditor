@@ -10,9 +10,13 @@ using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
+using WDE.Common.Windows;
+using WDE.Module.Attributes;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {
+    [AutoRegister]
+    [SingleInstance]
     public class SolutionExplorerViewModel : BindableBase, ITool, IDropTarget
     {
         private readonly IEventAggregator ea;
@@ -24,6 +28,10 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private SolutionItemViewModel selected;
         private Visibility visibility;
+
+        public string UniqueId => "solution_explorer";
+        public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Right;
+        public bool OpenOnStart => true;
 
         public SolutionExplorerViewModel(ISolutionItemNameRegistry itemNameRegistry,
             ISolutionManager solutionManager,

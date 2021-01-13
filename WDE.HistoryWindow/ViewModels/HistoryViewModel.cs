@@ -6,6 +6,8 @@ using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Windows;
+using WDE.Module.Attributes;
 
 namespace WDE.HistoryWindow.ViewModels
 {
@@ -15,11 +17,17 @@ namespace WDE.HistoryWindow.ViewModels
         public bool IsFromFuture { get; set; }
     }
 
+    [AutoRegister]
+    [SingleInstance]
     internal class HistoryViewModel : BindableBase, ITool
     {
         private Visibility visibility;
 
         private IDocument previousDocument;
+
+        public string UniqueId => "history_view";
+        public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Right;
+        public bool OpenOnStart => true;
 
         public HistoryViewModel(IEventAggregator eventAggregator)
         {
