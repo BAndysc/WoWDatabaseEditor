@@ -11,6 +11,7 @@ using WDE.Module.Attributes;
 using WDE.TrinityMySqlDatabase.Data;
 using WDE.TrinityMySqlDatabase.Models;
 using WDE.TrinityMySqlDatabase.Providers;
+using WDE.TrinityMySqlDatabase.Services;
 
 namespace WDE.TrinityMySqlDatabase
 {
@@ -25,17 +26,14 @@ namespace WDE.TrinityMySqlDatabase
 
         private List<MySqlQuestTemplate>? questTemplateCache;
 
-        public TrinityMysqlDatabaseProvider(IConnectionSettingsProvider settings)
+        public TrinityMysqlDatabaseProvider(IConnectionSettingsProvider settings, DatabaseLogger databaseLogger)
         {
             string? host = settings.GetSettings().Host;
             try
             {
-                DataConnection.DefaultSettings = new MySqlSettings(settings.GetSettings());
                 DataConnection.TurnTraceSwitchOn();
-                DataConnection.WriteTraceLine = (s1,s2, tl) =>
-                {
-                    System.Diagnostics.Debug.WriteLine(s1, s2);
-                };
+                DataConnection.WriteTraceLine = databaseLogger.Log;
+                DataConnection.DefaultSettings = new MySqlSettings(settings.GetSettings());
                 model = new TrinityDatabase();
                 var temp = GetCreatureTemplates().ToList();
             }
