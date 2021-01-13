@@ -48,8 +48,15 @@
                     <DataTemplate DataType="{x:Type models:SmartAction}">
                         <local:SmartActionView
                             DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
-                            DeselectAllEventsRequest="{Binding DataContext.DeselectAllEvents, ElementName=Rooot}"
+                            DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
                             EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type models:SmartCondition}">
+                        <local:SmartConditionView
+                            EditConditionCommand="{Binding DataContext.EditCondition, ElementName=Rooot}"
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
                             IsSelected="{Binding IsSelected, Mode=TwoWay}" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:NewActionViewModel}">
@@ -74,6 +81,29 @@
                             </Button.Style>
                         </Button>
                     </DataTemplate>
+                    
+                    <DataTemplate DataType="{x:Type viewModels:NewConditionViewModel}">
+                        <Button
+                            BorderThickness="0" Background="#E9EFFB"
+                            Foreground="#77000000" Content="Add condition"
+                            Command="{Binding DataContext.AddCondition, ElementName=Rooot}"
+                            CommandParameter="{Binding}"
+                            Visibility="{Binding Path=Event, Converter={StaticResource NullToVisibilityConverter}}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <ContentPresenter HorizontalAlignment="Left"
+                                                                  VerticalAlignment="Center" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </DataTemplate>
                 </ItemsControl.Resources>
 
                 <ItemsControl.ItemsPanel>
@@ -81,6 +111,7 @@
                         <local:SmartScriptPanelLayout Background="Transparent"
                                                       DropItems="{Binding OnDropItems}"
                                                       DropActions="{Binding OnDropActions}"
+                                                      DropConditions="{Binding OnDropConditions}"
                                                       IsItemsHost="True" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>

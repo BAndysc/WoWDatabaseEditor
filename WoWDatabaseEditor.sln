@@ -48,6 +48,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Module", "WoWDatabaseEd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.ThemeChanger", "WDE.ThemeChanger\WDE.ThemeChanger.csproj", "{11BFD551-37B0-45A1-9890-CB5481B64E7E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Conditions", "WDE.Conditions\WDE.Conditions.csproj", "{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -250,6 +252,18 @@ Global
 		{11BFD551-37B0-45A1-9890-CB5481B64E7E}.Release|x64.Build.0 = Release|Any CPU
 		{11BFD551-37B0-45A1-9890-CB5481B64E7E}.Release|x86.ActiveCfg = Release|Any CPU
 		{11BFD551-37B0-45A1-9890-CB5481B64E7E}.Release|x86.Build.0 = Release|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Debug|x64.Build.0 = Debug|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Debug|x86.Build.0 = Debug|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Release|x64.ActiveCfg = Release|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Release|x64.Build.0 = Release|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Release|x86.ActiveCfg = Release|Any CPU
+		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

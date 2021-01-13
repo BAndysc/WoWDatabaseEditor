@@ -54,5 +54,23 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "Comment")]
         public string Comment { get; set; } = "";
+
+        public MySqlConditionLine() { }
+
+        public MySqlConditionLine(IConditionLine otherLine)
+        {
+            SourceType = otherLine.SourceType;
+            SourceGroup = otherLine.SourceGroup;
+            SourceEntry = otherLine.SourceEntry;
+            SourceId = otherLine.SourceId;
+            ElseGroup = otherLine.ElseGroup;
+            ConditionType = otherLine.ConditionType;
+            ConditionTarget = otherLine.ConditionTarget;
+            ConditionValue1 = otherLine.ConditionValue1;
+            ConditionValue2 = otherLine.ConditionValue2;
+            ConditionValue3 = otherLine.ConditionValue3;
+            NegativeCondition = otherLine.NegativeCondition;
+            Comment = otherLine.Comment;
+        }
     }
 }

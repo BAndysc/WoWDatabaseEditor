@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Xaml.Behaviors.Core;
 using SmartFormat;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
@@ -110,13 +111,14 @@ namespace WDE.SmartScriptEditor.Exporter
             return Smart.Format(SaiSql, data);
         }
 
-        public static ISmartScriptLine[] ToWaitFreeSmartScriptLines(this SmartScript script, ISmartFactory smartFactory)
+        public static (ISmartScriptLine[], IConditionLine[]) ToWaitFreeSmartScriptLines(this SmartScript script, ISmartFactory smartFactory)
         {
             if (script.Events.Count == 0)
-                return new ISmartScriptLine[0];
+                return (new ISmartScriptLine[0], null);
 
             var eventId = 0;
             var lines = new List<ISmartScriptLine>();
+            var conditions = new List<IConditionLine>();
             var previousWasWait = false;
             int nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EventTriggerTimed)
                 .Select(e => e.GetParameter(0).Value)
@@ -167,17 +169,20 @@ namespace WDE.SmartScriptEditor.Exporter
                     eventToSerialize.Actions.Add(actualAction.Copy());
 
                     var serialized = eventToSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, linkTo);
+                    var serializedConditions = actualEvent.ToConditionLines(script.EntryOrGuid, script.SourceType, eventId);
 
                     if (serialized.Length != 1)
                         throw new InvalidOperationException();
 
                     lines.Add(serialized[0]);
+                    if (serializedConditions != null)
+                        conditions.AddRange(serializedConditions);
 
                     eventId++;
                 }
             }
 
-            return lines.ToArray();
+            return (lines.ToArray(), conditions.ToArray());
         }
 
         public static ISmartScriptLine[] ToSmartScriptLines(this SmartEvent e,
@@ -241,6 +246,41 @@ namespace WDE.SmartScriptEditor.Exporter
                 lines.Add(line);
             }
 
+            return lines.ToArray();
+        }
+        
+        public static IConditionLine[] ToConditionLines(this SmartEvent e,
+            int scriptEntryOrGuid,
+            SmartScriptType scriptSourceType,
+            int id)
+        {
+            var lines = new List<IConditionLine>();
+            var elseGroup = 0;
+
+            for (var index = 0; index < e.Conditions.Count; index++)
+            {
+                SmartCondition c = e.Conditions[index];
+                if (c.Id == SmartConstants.ConditionOr)
+                {
+                    elseGroup++;
+                    continue;
+                }
+                lines.Add(new AbstractConditionLine()
+                {
+                    SourceType = SmartConstants.ConditionSourceSmartScript,
+                    SourceGroup = id + 1,
+                    SourceEntry = scriptEntryOrGuid,
+                    SourceId = (int)scriptSourceType,
+                    ElseGroup = elseGroup,
+                    ConditionType = c.Id,
+                    ConditionTarget = c.ConditionTarget.Value,
+                    ConditionValue1 = c.GetParameter(0).Value,
+                    ConditionValue2 = c.GetParameter(1).Value,
+                    ConditionValue3 = c.GetParameter(2).Value,
+                    NegativeCondition = c.Inverted.Value,
+                    Comment = c.Readable
+                });
+            }
             return lines.ToArray();
         }
     }

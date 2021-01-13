@@ -1,6 +1,6 @@
 ﻿namespace WDE.SmartScriptEditor.Editor.UserControls
 {
-    public class DropActionsArgs
+    public class DropActionsConditionsArgs
     {
         public int ActionIndex;
         public int EventIndex;

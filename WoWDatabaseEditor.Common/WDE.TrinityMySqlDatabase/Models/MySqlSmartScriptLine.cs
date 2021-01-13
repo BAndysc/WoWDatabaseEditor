@@ -95,6 +95,42 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column]
         public string Comment { get; set; } = "";
 
+        public MySqlSmartScriptLine() { }
+
+        public MySqlSmartScriptLine(ISmartScriptLine line)
+        {
+            EntryOrGuid = line.EntryOrGuid;
+            ScriptSourceType = line.ScriptSourceType;
+            Id = line.Id;
+            Link = line.Link;
+            EventType = line.EventType;
+            EventPhaseMask = line.EventPhaseMask;
+            EventChance = line.EventChance;
+            EventFlags = line.EventFlags;
+            EventParam1 = line.EventParam1;
+            EventParam2 = line.EventParam2;
+            EventParam3 = line.EventParam3;
+            EventParam4 = line.EventParam4;
+            EventCooldownMin = line.EventCooldownMin;
+            EventCooldownMax = line.EventCooldownMax;
+            ActionType = line.ActionType;
+            ActionParam1 = line.ActionParam1;
+            ActionParam2 = line.ActionParam2;
+            ActionParam3 = line.ActionParam3;
+            ActionParam4 = line.ActionParam4;
+            ActionParam5 = line.ActionParam5;
+            ActionParam6 = line.ActionParam6;
+            TargetType = line.TargetType;
+            TargetParam1 = line.TargetParam1;
+            TargetParam2 = line.TargetParam2;
+            TargetParam3 = line.TargetParam3;
+            TargetX = line.TargetX;
+            TargetY = line.TargetY;
+            TargetZ = line.TargetZ;
+            TargetO = line.TargetO;
+            Comment = line.Comment;
+        }
+
         // those are not used on TC
         public int SourceType
         {

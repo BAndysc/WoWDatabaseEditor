@@ -37,7 +37,9 @@ namespace WDE.SmartScriptEditor.Providers
                 return args.Sql;
 
             SmartScript script = new(item, smartFactory.Value);
-            script.Load(database.Value.GetScriptFor(item.Entry, item.SmartType));
+            var lines = database.Value.GetScriptFor(item.Entry, item.SmartType);
+            var conditions = database.Value.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, item.Entry, (int)item.SmartType);
+            script.Load(lines, conditions);
             return new SmartScriptExporter(script, smartFactory.Value).GetSql();
         }
     }

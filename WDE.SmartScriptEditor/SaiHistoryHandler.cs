@@ -47,7 +47,11 @@ namespace WDE.SmartScriptEditor
             foreach (SmartAction act in smartEvent.Actions)
                 UnbindAction(act);
 
+            foreach (SmartCondition c in smartEvent.Conditions)
+                UnbindCondition(c);
+                
             smartEvent.Actions.CollectionChanged -= Actions_CollectionChanged;
+            smartEvent.Conditions.CollectionChanged -= Conditions_CollectionChanged;
 
             smartEvent.BulkEditingStarted -= OnBulkEditingStarted;
             smartEvent.BulkEditingFinished -= OnBulkEditingFinished;
@@ -64,14 +68,12 @@ namespace WDE.SmartScriptEditor
         private void AddedAction(SmartAction smartAction, SmartEvent parent, int index)
         {
             PushAction(new ActionAddedAction(parent, smartAction, index));
-
             BindAction(smartAction);
         }
 
         private void RemovedAction(SmartAction smartAction, SmartEvent parent, int index)
         {
             UnbindAction(smartAction);
-
             PushAction(new ActionRemovedAction(parent, smartAction, index));
         }
 
@@ -92,7 +94,7 @@ namespace WDE.SmartScriptEditor
             for (var i = 0; i < 4; ++i)
                 smartAction.Target.Position[i].OnValueChanged += ParameterFloat_OnValueChange;
         }
-
+        
         private void UnbindAction(SmartAction smartAction)
         {
             smartAction.BulkEditingStarted -= OnBulkEditingStarted;
@@ -111,6 +113,42 @@ namespace WDE.SmartScriptEditor
                 smartAction.Target.Position[i].OnValueChanged -= ParameterFloat_OnValueChange;
         }
 
+        private void AddedCondition(SmartCondition smartCondition, SmartEvent parent, int index)
+        {
+            PushAction(new ConditionAddedAction(parent, smartCondition, index));
+            BindCondition(smartCondition);
+        }
+
+        private void RemovedCondition(SmartCondition smartCondition, SmartEvent parent, int index)
+        {
+            UnbindCondition(smartCondition);
+            PushAction(new ConditionRemovedAction(parent, smartCondition, index));
+        }
+        
+        private void BindCondition(SmartCondition smartCondition)
+        {
+            smartCondition.BulkEditingStarted += OnBulkEditingStarted;
+            smartCondition.BulkEditingFinished += OnBulkEditingFinished;
+
+            for (var i = 0; i < smartCondition.ParametersCount; ++i)
+                smartCondition.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
+
+            smartCondition.Inverted.OnValueChanged += Parameter_OnValueChanged;
+            smartCondition.ConditionTarget.OnValueChanged += Parameter_OnValueChanged;
+        }
+
+        private void UnbindCondition(SmartCondition smartCondition)
+        {
+            smartCondition.BulkEditingStarted -= OnBulkEditingStarted;
+            smartCondition.BulkEditingFinished -= OnBulkEditingFinished;
+
+            for (var i = 0; i < smartCondition.ParametersCount; ++i)
+                smartCondition.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
+
+            smartCondition.Inverted.OnValueChanged -= Parameter_OnValueChanged;
+            smartCondition.ConditionTarget.OnValueChanged -= Parameter_OnValueChanged;
+        }
+        
         private void AddedEvent(SmartEvent smartEvent, int index)
         {
             PushAction(new EventAddedAction(script, smartEvent, index));
@@ -137,9 +175,13 @@ namespace WDE.SmartScriptEditor
                 smartEvent.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
 
             smartEvent.Actions.CollectionChanged += Actions_CollectionChanged;
+            smartEvent.Conditions.CollectionChanged += Conditions_CollectionChanged;
 
             foreach (SmartAction smartAction in smartEvent.Actions)
                 BindAction(smartAction);
+                
+            foreach (SmartCondition smartCondition in smartEvent.Conditions)
+                BindCondition(smartCondition);
         }
 
         private void OnBulkEditingFinished(string editName)
@@ -166,6 +208,19 @@ namespace WDE.SmartScriptEditor
             }
         }
 
+        private void Conditions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (object ev in e.NewItems)
+                    AddedCondition(ev as SmartCondition, (ev as SmartCondition).Parent, e.NewStartingIndex);
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (object ac in e.OldItems)
+                    RemovedCondition(ac as SmartCondition, (ac as SmartCondition).Parent, e.OldStartingIndex);
+            }
+        }
 
         private void Parameter_OnValueChanged(object sender, ParameterChangedValue<int> e)
         {
@@ -334,6 +389,64 @@ namespace WDE.SmartScriptEditor
         public void Undo()
         {
             parent.Actions.Insert(index, smartAction);
+        }
+    }
+    
+    public class ConditionRemovedAction : IHistoryAction
+    {
+        private readonly int index;
+        private readonly SmartEvent parent;
+        private readonly SmartCondition smartCondition;
+
+        public ConditionRemovedAction(SmartEvent parent, SmartCondition smartCondition, int index)
+        {
+            this.parent = parent;
+            this.smartCondition = smartCondition;
+            this.index = index;
+        }
+
+        public string GetDescription()
+        {
+            return "Removed condition " + smartCondition.Readable;
+        }
+
+        public void Redo()
+        {
+            parent.Conditions.Remove(smartCondition);
+        }
+
+        public void Undo()
+        {
+            parent.Conditions.Insert(index, smartCondition);
+        }
+    }
+    
+    public class ConditionAddedAction : IHistoryAction
+    {
+        private readonly int index;
+        private readonly SmartEvent parent;
+        private readonly SmartCondition smartCondition;
+
+        public ConditionAddedAction(SmartEvent parent, SmartCondition smartCondition, int index)
+        {
+            this.parent = parent;
+            this.smartCondition = smartCondition;
+            this.index = index;
+        }
+
+        public string GetDescription()
+        {
+            return "Added condition " + smartCondition.Readable;
+        }
+
+        public void Redo()
+        {
+            parent.Conditions.Insert(index, smartCondition);
+        }
+
+        public void Undo()
+        {
+            parent.Conditions.Remove(smartCondition);
         }
     }
 }

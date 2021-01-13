@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using WDE.Common.Database;
+using WDE.Conditions.Data;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Models
@@ -27,13 +28,14 @@ namespace WDE.SmartScriptEditor.Models
         public event Action BulkEditingStarted = delegate { };
         public event Action<string> BulkEditingFinished = delegate { };
 
-        public void Load(IEnumerable<ISmartScriptLine> lines)
+        public void Load(IEnumerable<ISmartScriptLine> lines, IEnumerable<IConditionLine> conditions)
         {
             int? entry = null;
             SmartScriptType? source = null;
             int previousLink = -1;
             SmartEvent currentEvent = null;
 
+            var conds = ParseConditions(conditions);
             SortedDictionary<int, SmartEvent> triggerIdToActionParent = new();
             SortedDictionary<int, SmartEvent> triggerIdToEvent = new();
 
@@ -56,6 +58,8 @@ namespace WDE.SmartScriptEditor.Models
                     {
                         if (currentEvent.Id == SmartConstants.EventTriggerTimed)
                             triggerIdToEvent[currentEvent.GetParameter(0).Value] = currentEvent;
+                        if (conds.TryGetValue(line.Id, out var conditionList))
+                            currentEvent.Conditions.AddRange(conditionList);
                         Events.Add(currentEvent);
                     }
                     else
@@ -107,10 +111,13 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        public void InsertFromClipboard(int index, IEnumerable<ISmartScriptLine> lines)
+        public List<SmartEvent> InsertFromClipboard(int index, IEnumerable<ISmartScriptLine> lines, IEnumerable<IConditionLine> conditions)
         {
+            List<SmartEvent> newEvents = new();
             SmartEvent currentEvent = null;
             var prevIndex = 0;
+            var conds = ParseConditions(conditions);
+
             foreach (ISmartScriptLine line in lines)
             {
                 if (currentEvent == null || prevIndex != line.Id)
@@ -118,6 +125,10 @@ namespace WDE.SmartScriptEditor.Models
                     prevIndex = line.Id;
                     currentEvent = SafeEventFactory(line);
                     Events.Insert(index++, currentEvent);
+                    newEvents.Add(currentEvent);
+                    if (conds.TryGetValue(prevIndex, out var conditionList))
+                        foreach (var cond in conditionList)
+                            currentEvent.Conditions.Add(cond);                        
                 }
 
                 if (line.ActionType != -1)
@@ -127,6 +138,36 @@ namespace WDE.SmartScriptEditor.Models
                         currentEvent.AddAction(action);
                 }
             }
+            return newEvents;
+        }
+
+        private Dictionary<int, List<SmartCondition>> ParseConditions(IEnumerable<IConditionLine> conditions)
+        {
+            Dictionary<int, List<SmartCondition>> conds = new();
+            if (conditions != null)
+            {
+                int prevElseGroup = 0;
+                foreach (IConditionLine line in conditions)
+                {
+                    SmartCondition condition = SafeConditionFactory(line);
+
+                    if (condition == null)
+                        continue;
+
+                    if (!conds.ContainsKey(line.SourceGroup - 1))
+                        conds[line.SourceGroup - 1] = new List<SmartCondition>();
+
+                    if (prevElseGroup != line.ElseGroup && conds[line.SourceGroup - 1].Count > 0)
+                    {
+                        conds[line.SourceGroup - 1].Add(SafeConditionFactory(-1));
+                        prevElseGroup = line.ElseGroup;
+                    }
+
+                    conds[line.SourceGroup - 1].Add(condition);
+                }
+            }
+
+            return conds;
         }
 
         public SmartAction SafeActionFactory(ISmartScriptLine line)
@@ -142,7 +183,35 @@ namespace WDE.SmartScriptEditor.Models
 
             return null;
         }
+        
+        public SmartCondition SafeConditionFactory(IConditionLine line)
+        {
+            try
+            {
+                return smartFactory.ConditionFactory(line);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Condition {line.ConditionType} unknown, skipping action");
+            }
 
+            return null;
+        }
+        
+        public SmartCondition SafeConditionFactory(int id)
+        {
+            try
+            {
+                return smartFactory.ConditionFactory(id);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Condition {id} unknown, skipping action");
+            }
+
+            return null;
+        }
+        
         public SmartEvent SafeEventFactory(ISmartScriptLine line)
         {
             try

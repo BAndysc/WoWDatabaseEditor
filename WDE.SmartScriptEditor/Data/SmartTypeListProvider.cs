@@ -1,4 +1,5 @@
 ﻿using System;
+using WDE.Conditions.Data;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Editor.Views;
@@ -9,16 +10,18 @@ namespace WDE.SmartScriptEditor.Data
     public class SmartTypeListProvider : ISmartTypeListProvider
     {
         private readonly ISmartDataManager smartDataManager;
+        private readonly IConditionDataManager conditionDataManager;
 
-        public SmartTypeListProvider(ISmartDataManager smartDataManager)
+        public SmartTypeListProvider(ISmartDataManager smartDataManager, IConditionDataManager conditionDataManager)
         {
             this.smartDataManager = smartDataManager;
+            this.conditionDataManager = conditionDataManager;
         }
 
         public int? Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
         {
             SmartSelectView view = new();
-            SmartSelectViewModel model = new(GetFileNameFor(type), type, predicate, smartDataManager);
+            SmartSelectViewModel model = new(GetFileNameFor(type), type, predicate, smartDataManager, conditionDataManager);
             view.DataContext = model;
 
             bool? res = view.ShowDialog();
@@ -41,6 +44,8 @@ namespace WDE.SmartScriptEditor.Data
                     return "targets.txt";
                 case SmartType.SmartSource:
                     return "targets.txt";
+                case SmartType.SmartCondition:
+                    return "conditions.txt";
             }
 
             return null;

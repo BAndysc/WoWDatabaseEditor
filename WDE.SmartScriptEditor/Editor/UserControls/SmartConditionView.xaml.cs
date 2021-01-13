@@ -7,23 +7,23 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
     /// <summary>
     ///     Interaction logic for SmartActionView.xaml
     /// </summary>
-    public partial class SmartActionView : UserControl
+    public partial class SmartConditionView : UserControl
     {
         public static DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected),
             typeof(bool),
-            typeof(SmartActionView),
+            typeof(SmartConditionView),
             new PropertyMetadata(false));
 
         public static DependencyProperty DeselectAllRequestProperty =
-            DependencyProperty.Register(nameof(DeselectAllRequest), typeof(ICommand), typeof(SmartActionView));
+            DependencyProperty.Register(nameof(DeselectAllRequest), typeof(ICommand), typeof(SmartConditionView));
 
-        public static DependencyProperty DeselectAllButActionsRequestProperty =
-            DependencyProperty.Register(nameof(DeselectAllButActionsRequest), typeof(ICommand), typeof(SmartActionView));
+        public static DependencyProperty DeselectAllButConditionsRequestProperty =
+            DependencyProperty.Register(nameof(DeselectAllButConditionsRequest), typeof(ICommand), typeof(SmartConditionView));
 
-        public static DependencyProperty EditActionCommandProperty =
-            DependencyProperty.Register(nameof(EditActionCommand), typeof(ICommand), typeof(SmartActionView));
+        public static DependencyProperty EditConditionCommandProperty =
+            DependencyProperty.Register(nameof(EditConditionCommand), typeof(ICommand), typeof(SmartConditionView));
 
-        public SmartActionView()
+        public SmartConditionView()
         {
             InitializeComponent();
         }
@@ -40,16 +40,16 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             set => SetValue(DeselectAllRequestProperty, value);
         }
 
-        public ICommand DeselectAllButActionsRequest
+        public ICommand DeselectAllButConditionsRequest
         {
-            get => (ICommand) GetValue(DeselectAllButActionsRequestProperty);
-            set => SetValue(DeselectAllButActionsRequestProperty, value);
+            get => (ICommand) GetValue(DeselectAllButConditionsRequestProperty);
+            set => SetValue(DeselectAllButConditionsRequestProperty, value);
         }
 
-        public ICommand EditActionCommand
+        public ICommand EditConditionCommand
         {
-            get => (ICommand) GetValue(EditActionCommandProperty);
-            set => SetValue(EditActionCommandProperty, value);
+            get => (ICommand) GetValue(EditConditionCommandProperty);
+            set => SetValue(EditConditionCommandProperty, value);
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -57,7 +57,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             base.OnMouseDown(e);
             if (e.ClickCount == 1)
             {
-                DeselectAllButActionsRequest?.Execute(null);
+                DeselectAllButConditionsRequest?.Execute(null);
                 if (!IsSelected)
                 {
                     if (!Keyboard.IsKeyDown(Key.LeftCtrl))
@@ -66,7 +66,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                 }
             }
             else if (e.ClickCount == 2)
-                EditActionCommand?.Execute(DataContext);
+                EditConditionCommand?.Execute(DataContext);
         }
     }
 }

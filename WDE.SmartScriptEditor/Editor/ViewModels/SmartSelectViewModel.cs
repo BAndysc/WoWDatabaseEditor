@@ -3,7 +3,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Data;
+using Microsoft.Xaml.Behaviors.Core;
 using Prism.Mvvm;
+using WDE.Conditions.Data;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
@@ -20,7 +22,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public SmartSelectViewModel(string file,
             SmartType type,
             Func<SmartGenericJsonData, bool> predicate,
-            ISmartDataManager smartDataManager)
+            ISmartDataManager smartDataManager,
+            IConditionDataManager conditionDataManager)
         {
             this.predicate = predicate;
             string group = null;
@@ -28,20 +31,35 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 if (line.IndexOf(" ", StringComparison.Ordinal) == 0)
                 {
-                    if (!smartDataManager.Contains(type, line.Trim()))
-                        continue;
+                    var typeName = line.Trim();
+                    if (smartDataManager.Contains(type, typeName))
+                    {
+                        SmartItem i = new();
+                        SmartGenericJsonData data = smartDataManager.GetDataByName(type, typeName);
 
-                    SmartItem i = new();
-                    SmartGenericJsonData data = smartDataManager.GetDataByName(type, line.Trim());
+                        i.Group = group;
+                        i.Name = data.NameReadable;
+                        i.Id = data.Id;
+                        i.Help = data.Help;
+                        i.Deprecated = data.Deprecated;
+                        i.Data = data;
 
-                    i.Group = group;
-                    i.Name = data.NameReadable;
-                    i.Id = data.Id;
-                    i.Help = data.Help;
-                    i.Deprecated = data.Deprecated;
-                    i.Data = data;
+                        allItems.Add(i);
+                    }
+                    else if (conditionDataManager.HasConditionData(typeName))
+                    {
+                        SmartItem i = new();
+                        ConditionJsonData data = conditionDataManager.GetConditionData(typeName);
 
-                    allItems.Add(i);
+                        i.Group = group;
+                        i.Name = data.NameReadable;
+                        i.Id = data.Id;
+                        i.Help = data.Help;
+                        i.Deprecated = false;
+                        i.ConditionData = data;
+
+                        allItems.Add(i);
+                    }
                 }
                 else
                     group = line;
@@ -88,6 +106,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     public class SmartItem
     {
         public SmartGenericJsonData Data;
+        public ConditionJsonData ConditionData;
         public string Name { get; set; }
         public bool Deprecated { get; set; }
         public string Help { get; set; }

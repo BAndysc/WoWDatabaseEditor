@@ -21,6 +21,7 @@ namespace WDE.SmartScriptEditor.Models
         public SmartEvent(int id) : base(SmartEventParamsCount, id)
         {
             Actions = new ObservableCollection<SmartAction>();
+            Conditions = new ObservableCollection<SmartCondition>();
 
             Actions.CollectionChanged += (sender, args) =>
             {
@@ -30,7 +31,15 @@ namespace WDE.SmartScriptEditor.Models
                         (ob as SmartAction).Parent = this;
                 }
             };
-
+            Conditions.CollectionChanged += (sender, args) =>
+            {
+                if (args.Action == NotifyCollectionChangedAction.Add)
+                {
+                    foreach (object ob in args.NewItems)
+                        (ob as SmartCondition).Parent = this;
+                }
+            };
+            
             Flags = new Parameter("Flags");
             Chance = new Parameter("Chance");
             Phases = new Parameter("Phases");
@@ -111,6 +120,7 @@ namespace WDE.SmartScriptEditor.Models
         }
 
         public ObservableCollection<SmartAction> Actions { get; }
+        public ObservableCollection<SmartCondition> Conditions { get; }
 
         public override string Readable
         {

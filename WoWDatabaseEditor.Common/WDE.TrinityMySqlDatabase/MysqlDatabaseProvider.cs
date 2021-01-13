@@ -31,6 +31,11 @@ namespace WDE.TrinityMySqlDatabase
             try
             {
                 DataConnection.DefaultSettings = new MySqlSettings(settings.GetSettings());
+                DataConnection.TurnTraceSwitchOn();
+                DataConnection.WriteTraceLine = (s1,s2, tl) =>
+                {
+                    System.Diagnostics.Debug.WriteLine(s1, s2);
+                };
                 model = new TrinityDatabase();
                 var temp = GetCreatureTemplates().ToList();
             }
@@ -119,49 +124,45 @@ namespace WDE.TrinityMySqlDatabase
             await model.SmartScript.Where(x => x.EntryOrGuid == entryOrGuid && x.ScriptSourceType == (int) type).DeleteAsync();
             if (type == SmartScriptType.Creature)
             {
-                await model.CreatureTemplate.Where(p => p.Entry == entryOrGuid)
+                await model.CreatureTemplate.Where(p => p.Entry == (uint)entryOrGuid)
                     .Set(p => p.AIName, "SmartAI")
                     .Set(p => p.ScriptName, "")
                     .UpdateAsync();
             }
 
-            foreach (var line in script)
-            {
-                MySqlSmartScriptLine sqlLine = new()
+            await model.SmartScript.BulkCopyAsync(script.Select(l => new MySqlSmartScriptLine(l)));
+
+            await model.CommitTransactionAsync();
+        }
+
+        public async Task InstallConditions(IEnumerable<IConditionLine> conditionLines, IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey? manualKey = null)
+        {
+            if (model == null)
+                return;
+
+            var conditions = conditionLines.ToList();
+            List<(int SourceType, int? SourceGroup, int? SourceEntry, int? SourceId)> keys = conditions.Select(c => 
+                (c.SourceType, 
+                    keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?)c.SourceGroup : null, 
+                    keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?)c.SourceEntry : null, 
+                    keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?)c.SourceId : null))
+                .Union(manualKey.HasValue ? new []
                 {
-                    EntryOrGuid = line.EntryOrGuid,
-                    ScriptSourceType = line.ScriptSourceType,
-                    Id = line.Id,
-                    Link = line.Link,
-                    EventType = line.EventType,
-                    EventPhaseMask = line.EventPhaseMask,
-                    EventChance = line.EventChance,
-                    EventFlags = line.EventFlags,
-                    EventParam1 = line.EventParam1,
-                    EventParam2 = line.EventParam2,
-                    EventParam3 = line.EventParam3,
-                    EventParam4 = line.EventParam4,
-                    EventCooldownMin = line.EventCooldownMin,
-                    EventCooldownMax = line.EventCooldownMax,
-                    ActionType = line.ActionType,
-                    ActionParam1 = line.ActionParam1,
-                    ActionParam2 = line.ActionParam2,
-                    ActionParam3 = line.ActionParam3,
-                    ActionParam4 = line.ActionParam4,
-                    ActionParam5 = line.ActionParam5,
-                    ActionParam6 = line.ActionParam6,
-                    TargetType = line.TargetType,
-                    TargetParam1 = line.TargetParam1,
-                    TargetParam2 = line.TargetParam2,
-                    TargetParam3 = line.TargetParam3,
-                    TargetX = line.TargetX,
-                    TargetY = line.TargetY,
-                    TargetZ = line.TargetZ,
-                    TargetO = line.TargetO,
-                    Comment = line.Comment
-                };
-                await model.InsertAsync(sqlLine);
-            }
+                    (manualKey.Value.SourceType,manualKey.Value.SourceGroup,manualKey.Value.SourceEntry,manualKey.Value.SourceId)
+                } : Array.Empty<(int, int?, int?, int?)>())
+                .Distinct()
+                .ToList();
+
+            await model.BeginTransactionAsync();
+            
+            foreach (var key in keys)
+                await model.Conditions.Where(x => x.SourceType == key.SourceType && 
+                                                  (!key.SourceGroup.HasValue || x.SourceGroup == key.SourceGroup.Value) && 
+                                                  (!key.SourceEntry.HasValue || x.SourceEntry == key.SourceEntry.Value) && 
+                                                  (!key.SourceId.HasValue || x.SourceId == key.SourceId.Value)).DeleteAsync();
+    
+            if (conditions.Count > 0)
+                await model.Conditions.BulkCopyAsync(conditions.Select(line => new MySqlConditionLine(line)));
 
             await model.CommitTransactionAsync();
         }
@@ -172,7 +173,7 @@ namespace WDE.TrinityMySqlDatabase
                 return new List<IConditionLine>();
 
             return model.Conditions.Where(line =>
-                line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId);
+                line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId).ToList();
         }
     }
 

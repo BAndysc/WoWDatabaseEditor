@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Conditions.Data;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Models;
 
@@ -13,11 +14,15 @@ namespace WDE.SmartScriptEditor.Data
     {
         private readonly IParameterFactory parameterFactory;
         private readonly ISmartDataManager smartDataManager;
+        private readonly IConditionDataManager conditionDataManager;
 
-        public SmartFactory(IParameterFactory parameterFactory, ISmartDataManager smartDataManager)
+        public SmartFactory(IParameterFactory parameterFactory, 
+            ISmartDataManager smartDataManager, 
+            IConditionDataManager conditionDataManager)
         {
             this.parameterFactory = parameterFactory;
             this.smartDataManager = smartDataManager;
+            this.conditionDataManager = conditionDataManager;
         }
 
         public SmartEvent EventFactory(int id)
@@ -56,6 +61,31 @@ namespace WDE.SmartScriptEditor.Data
             return ev;
         }
 
+        public SmartCondition ConditionFactory(int id)
+        {
+            if (!conditionDataManager.HasConditionData(id))
+                throw new NullReferenceException("No data for condition id " + id);
+
+            SmartCondition ev = new(id);
+            var raw = conditionDataManager.GetConditionData(id);
+            SetParameterObjects(ev, raw);
+
+            return ev;
+        }
+        
+        public SmartCondition ConditionFactory(IConditionLine line)
+        {
+            SmartCondition condition = ConditionFactory(line.ConditionType);
+
+            condition.Inverted.SetValue(line.NegativeCondition);
+            condition.ConditionTarget.SetValue(line.ConditionTarget);
+            condition.GetParameter(0).SetValue(line.ConditionValue1);
+            condition.GetParameter(1).SetValue(line.ConditionValue2);
+            condition.GetParameter(2).SetValue(line.ConditionValue3);
+
+            return condition;
+        }
+        
         public SmartAction ActionFactory(int id, SmartSource source, SmartTarget target)
         {
             if (!smartDataManager.Contains(SmartType.SmartAction, id))
@@ -222,6 +252,23 @@ namespace WDE.SmartScriptEditor.Data
                 Parameter parameter = parameterFactory.Factory(data.Parameters[i].Type,
                     data.Parameters[i].Name,
                     data.Parameters[i].DefaultVal);
+                parameter.Description = data.Parameters[i].Description;
+                if (data.Parameters[i].Values != null)
+                    parameter.Items = data.Parameters[i].Values;
+                element.SetParameterObject(i, parameter);
+            }
+        }
+        
+        private void SetParameterObjects(SmartBaseElement element, ConditionJsonData data)
+        {
+            element.ReadableHint = data.Description;
+            if (data.Parameters == null)
+                return;
+
+            for (var i = 0; i < data.Parameters.Count; ++i)
+            {
+                Parameter parameter = parameterFactory.Factory(data.Parameters[i].Type,
+                    data.Parameters[i].Name, 0);
                 parameter.Description = data.Parameters[i].Description;
                 if (data.Parameters[i].Values != null)
                     parameter.Items = data.Parameters[i].Values;

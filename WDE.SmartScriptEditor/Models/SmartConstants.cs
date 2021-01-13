@@ -10,5 +10,7 @@
         public const int ActionTriggerTimed = 67;
         public const int ActionWait = 9999;
         public const string CommentWait = "-meta_wait";
+        public const int ConditionSourceSmartScript = 22;
+        public const int ConditionOr = -1;
     }
 }
