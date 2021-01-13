@@ -74,6 +74,9 @@ namespace WDE.DbcStore
             if (dbcSettingsProvider.GetSettings().SkipLoading)
                 return;
 
+            if (!Directory.Exists(dbcSettingsProvider.GetSettings().Path))
+                return;
+
             Database.LoadDefinitions();
             Database.BuildNumber = (int) dbcSettingsProvider.GetSettings().DBCVersion;
 

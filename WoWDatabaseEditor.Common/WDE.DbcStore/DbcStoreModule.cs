@@ -11,9 +11,9 @@ namespace WDE.DbcStore
     {
         public override void OnInitialized(IContainerProvider containerProvider)
         {
-            containerProvider.Resolve<IEventAggregator>()
+            /*ontainerProvider.Resolve<IEventAggregator>()
                 .GetEvent<AllModulesLoaded>()
-                .Subscribe(() => { containerProvider.Resolve<DbcStore>().Load(); }, ThreadOption.PublisherThread, true);
+                .Subscribe(() => { containerProvider.Resolve<DbcStore>().Load(); }, ThreadOption.PublisherThread, true);*/
         }
     }
 }
