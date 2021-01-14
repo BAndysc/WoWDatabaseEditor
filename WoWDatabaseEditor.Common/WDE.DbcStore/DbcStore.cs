@@ -115,7 +115,7 @@ namespace WDE.DbcStore
             
             private void Load(string filename, int id, int nameIndex, Dictionary<int, string> dictionary)
             {
-                progress.Report(now, max, $"Loading {filename}");
+                progress.Report(now++, max, $"Loading {filename}");
                 DBReader r = new();
                 var path = $"{dbcSettingsProvider.GetSettings().Path}/{filename}";
 

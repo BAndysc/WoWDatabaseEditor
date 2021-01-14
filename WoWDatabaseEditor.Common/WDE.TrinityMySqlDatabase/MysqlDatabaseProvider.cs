@@ -38,12 +38,19 @@ namespace WDE.TrinityMySqlDatabase
             ITaskRunner taskRunner)
         {
             string? host = settings.GetSettings().Host;
+            if (string.IsNullOrEmpty(host))
+            {
+                model = null;
+                return;
+            }
+            
             try
             {
                 DataConnection.TurnTraceSwitchOn();
                 DataConnection.WriteTraceLine = databaseLogger.Log;
                 DataConnection.DefaultSettings = new MySqlSettings(settings.GetSettings());
                 model = new TrinityDatabase();
+                GetCreatureTemplate(0);
                 taskRunner.ScheduleTask(new DatabaseCacheTask(this));
             }
             catch (Exception e)
