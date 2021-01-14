@@ -1,6 +1,8 @@
-﻿using Prism.Mvvm;
+﻿using ControlzEx.Standard;
+using Prism.Mvvm;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
+using WoWDatabaseEditor.ViewModels;
 
 namespace WoWDatabaseEditor.Managers
 {
@@ -8,6 +10,15 @@ namespace WoWDatabaseEditor.Managers
     [SingleInstance]
     public class StatusBar : BindableBase, IStatusBar
     {
+        private readonly TasksViewModel tasksViewModel;
+
+        public StatusBar(TasksViewModel tasksViewModel)
+        {
+            this.tasksViewModel = tasksViewModel;
+        }
+
+        public TasksViewModel TasksViewModel => tasksViewModel;
+        
         private INotification? currentNotification;
 
         public INotification? CurrentNotification

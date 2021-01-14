@@ -1,9 +1,11 @@
 ﻿using System.Windows.Input;
 using ICSharpCode.AvalonEdit.Document;
+using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using IDocument = WDE.Common.Managers.IDocument;
 
@@ -13,18 +15,19 @@ namespace WDE.SQLEditor.ViewModels
     {
         private TextDocument code;
 
-        public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, IStatusBar statusBar, string sql)
+        public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, IStatusBar statusBar, ITaskRunner taskRunner, string sql)
         {
             Code = new TextDocument(sql);
-            ExecuteSql = new AsyncAutoCommand(async () =>
-                {
-                    statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
-                    await mySqlExecutor.ExecuteSql(Code.Text);
-                    statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
-                },
-                null,
-                e => statusBar.PublishNotification(new PlainNotification(NotificationType.Error,
-                    $"{e.Message} ({e.InnerException?.Message})")));
+            ExecuteSql = new DelegateCommand(() =>
+            {
+                taskRunner.ScheduleTask("Executing query",
+                    async () =>
+                    {
+                        statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
+                        await mySqlExecutor.ExecuteSql(Code.Text);
+                        statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
+                    });
+            });
         }
 
         public TextDocument Code

@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows;
+using WDE.Common.Tasks;
 using WDE.QuestChainEditor.Editor.ViewModels;
 using WDE.QuestChainEditor.Exporter;
 using WDE.QuestChainEditor.Models;
@@ -24,7 +27,7 @@ namespace QuestChainTest
 
             new TrinityMySqlDatabaseModule().OnInitialized(null);
 
-            TrinityMysqlDatabaseProvider db = new(new ConnectionSettingsProvider(), new DatabaseLogger());
+            TrinityMysqlDatabaseProvider db = new(new ConnectionSettingsProvider(), new DatabaseLogger(), new MockTaskRunner());
 
             ExampleQuestsProvider exampleQuestProvider = new();
 
@@ -45,6 +48,25 @@ namespace QuestChainTest
         private void Update()
         {
             Text.Text = new QuestChainExporter().GenerateSQL(quests);
+        }
+
+        private class MockTaskRunner : ITaskRunner
+        {
+            public void ScheduleTask(IThreadedTask threadedTask)
+            {
+            }
+
+            public void ScheduleTask(IAsyncTask task)
+            {
+            }
+
+            public void ScheduleTask(string name, Func<ITaskProgress, Task> task)
+            {
+            }
+
+            public void ScheduleTask(string name, Func<Task> task)
+            {
+            }
         }
     }
 }

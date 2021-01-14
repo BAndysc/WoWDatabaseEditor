@@ -58,10 +58,13 @@ namespace WDE.TrinityMySqlDatabase.Tools
 
         private void OnTrace(string? arg1, string? arg2, TraceLevel tl)
         {
-            Text.BeginUpdate();
-            Text.Insert(Text.TextLength, $"[{tl}]: {arg2}\n{arg1}");
-            Text.EndUpdate();
-            ScrollToEnd.Invoke();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Text.BeginUpdate();
+                Text.Insert(Text.TextLength, $"[{tl}]: {arg2}\n{arg1}");
+                Text.EndUpdate();
+                ScrollToEnd.Invoke();
+            });
         }
 
         public event Action ScrollToEnd = delegate {};

@@ -1,7 +1,9 @@
 ﻿<UserControl x:Class="WDE.SmartScriptEditor.Editor.Views.SmartScriptEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls">
+             xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
+             xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime">
     <Grid>
         <userControls:SmartScriptView userControls:DeleteEventCommand="{Binding DeleteEvent}" />
     </Grid>
