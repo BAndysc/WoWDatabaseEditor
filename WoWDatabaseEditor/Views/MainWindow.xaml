@@ -8,6 +8,9 @@
                       xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
                       xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
                       xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
+                      xmlns:system="clr-namespace:System;assembly=System.Runtime"
+                      xmlns:tasks="clr-namespace:WDE.Common.Tasks;assembly=WDE.Common"
+                      xmlns:commonUtils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
                       Style="{DynamicResource MainWindowStyle}"
                       Title="{Binding Title}"
                       WindowStartupLocation="CenterScreen"
@@ -22,12 +25,15 @@
             LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
     </Controls:MetroWindow.WindowButtonCommands>
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <helpers:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="Z" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Undo}" />
         <KeyBinding Key="Y" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Redo}" />
         <KeyBinding Key="Z" Modifiers="Control+Shift" Command="{Binding WindowManager.ActiveDocument.Redo}" />
+
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Save}" />
 
         <KeyBinding Key="C" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Copy}" />
         <KeyBinding Key="V" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Paste}" />
@@ -92,46 +98,83 @@
     </Controls:MetroWindow.TitleTemplate>
     <DockPanel>
         <views:StatusBarView DockPanel.Dock="Bottom" Height="20" DataContext="{Binding StatusBar}" />
-        <DockingManager
-            AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager"
-            DocumentClosed="DockingManager_OnDocumentClosed"
-            ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
+        <Grid>
+            <DockingManager
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager"
+                DocumentClosed="DockingManager_OnDocumentClosed"
+                ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}"
-            DocumentsSource="{Binding WindowManager.OpenedDocuments}">
-            <DockingManager.LayoutUpdateStrategy>
-                <utils:LayoutInitializer />
-            </DockingManager.LayoutUpdateStrategy>
-            <DockingManager.LayoutItemTemplateSelector>
-                <views:PaneDocumentTemplateSelector>
-                    <views:PaneDocumentTemplateSelector.DocumentTemplate>
-                        <DataTemplate>
-                            <ContentControl utils:ViewBind.Model="{Binding}" />
-                        </DataTemplate>
-                    </views:PaneDocumentTemplateSelector.DocumentTemplate>
-                    <views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
-                        <DataTemplate>
-                            <ContentControl utils:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
-                        </DataTemplate>
-                    </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
-                </views:PaneDocumentTemplateSelector>
-            </DockingManager.LayoutItemTemplateSelector>
-            <DockingManager.LayoutItemContainerStyle>
-                <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
-                <Style TargetType="{x:Type LayoutItem}">
-                    <Setter Property="ContentId" Value="{Binding Model.UniqueId}" />
-                    <Setter Property="Title" Value="{Binding Model.Title}" />
-                    <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
-                    <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
-                    <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}" />
-                </Style>
-            </DockingManager.LayoutItemContainerStyle>
-            <LayoutRoot>
-                <LayoutPanel x:Name="VerticalPanel" Orientation="Vertical">
-                    <LayoutPanel x:Name="HorizontalPanel" Orientation="Horizontal">
-                        <LayoutDocumentPane />
+                DocumentsSource="{Binding WindowManager.OpenedDocuments}">
+                <DockingManager.LayoutUpdateStrategy>
+                    <utils:LayoutInitializer />
+                </DockingManager.LayoutUpdateStrategy>
+                <DockingManager.LayoutItemTemplateSelector>
+                    <views:PaneDocumentTemplateSelector>
+                        <views:PaneDocumentTemplateSelector.DocumentTemplate>
+                            <DataTemplate>
+                                
+                                <ContentPresenter Content="{Binding}" DockPanel.Dock="Left">
+                                    <ContentPresenter.Style>
+                                        <Style TargetType="{x:Type ContentPresenter}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsLoading}">
+                                                    <DataTrigger.Value>
+                                                        <system:Boolean>True</system:Boolean>
+                                                    </DataTrigger.Value>
+                                                    <Setter Property="ContentTemplate">
+                                                        <Setter.Value>
+                                                            <DataTemplate>
+                                                                <commonUtils:LoadingSpinner Width="24" Height="24" />
+                                                            </DataTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                            <Setter Property="ContentTemplate">
+                                                <Setter.Value>
+                                                    <DataTemplate>
+                                                        <ContentControl utils:ViewBind.Model="{Binding}" />
+                                                    </DataTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ContentPresenter.Style>
+                                </ContentPresenter>
+                                
+                                
+                            </DataTemplate>
+                        </views:PaneDocumentTemplateSelector.DocumentTemplate>
+                        <views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
+                            <DataTemplate>
+                                <ContentControl utils:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
+                            </DataTemplate>
+                        </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
+                    </views:PaneDocumentTemplateSelector>
+                </DockingManager.LayoutItemTemplateSelector>
+                <DockingManager.LayoutItemContainerStyle>
+                    <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
+                    <Style TargetType="{x:Type LayoutItem}">
+                        <Setter Property="ContentId" Value="{Binding Model.UniqueId}" />
+                        <Setter Property="Title" Value="{Binding Model.Title}" />
+                        <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+                        <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
+                        <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}" />
+                    </Style>
+                </DockingManager.LayoutItemContainerStyle>
+                <LayoutRoot>
+                    <LayoutPanel x:Name="VerticalPanel" Orientation="Vertical">
+                        <LayoutPanel x:Name="HorizontalPanel" Orientation="Horizontal">
+                            <LayoutDocumentPane />
+                        </LayoutPanel>
                     </LayoutPanel>
-                </LayoutPanel>
-            </LayoutRoot>
-        </DockingManager>
+                </LayoutRoot>
+            </DockingManager>
+            <views:TasksPanel DataContext="{Binding TasksViewModel}"
+                              Margin="6"
+                              HorizontalAlignment="Right" 
+                              VerticalAlignment="Bottom"
+                              Visibility="{Binding IsPanelVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"></views:TasksPanel>
+        </Grid>
     </DockPanel>
 </Controls:MetroWindow>

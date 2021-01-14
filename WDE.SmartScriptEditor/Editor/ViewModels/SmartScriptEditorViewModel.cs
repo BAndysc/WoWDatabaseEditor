@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -19,6 +20,7 @@ using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Solution;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Conditions.Data;
 using WDE.Conditions.Exporter;
@@ -35,6 +37,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IDatabaseProvider database;
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
+        private readonly ITaskRunner taskRunner;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -46,6 +49,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private SmartScript script;
 
+        private bool isLoading = true;
+        public bool IsLoading
+        {
+            get => isLoading;
+            internal set => SetProperty(ref isLoading, value);
+        }
+        
         public SmartScriptEditorViewModel(IHistoryManager history,
             IDatabaseProvider database,
             IEventAggregator eventAggregator,
@@ -55,7 +65,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IItemFromListProvider itemFromListProvider,
             ISmartTypeListProvider smartTypeListProvider,
             IStatusBar statusbar,
-            ISolutionItemNameRegistry itemNameRegistry)
+            ISolutionItemNameRegistry itemNameRegistry,
+            ITaskRunner taskRunner)
         {
             History = history;
             this.database = database;
@@ -65,6 +76,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.smartTypeListProvider = smartTypeListProvider;
             this.statusbar = statusbar;
             this.itemNameRegistry = itemNameRegistry;
+            this.taskRunner = taskRunner;
             this.conditionDataManager = conditionDataManager;
 
             EditEvent = new DelegateCommand(EditEventCommand);
@@ -196,13 +208,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AddAction = new DelegateCommand<NewActionViewModel>(AddActionCommand);
             AddCondition = new DelegateCommand<NewConditionViewModel>(AddConditionCommand);
 
-            SaveCommand = new AsyncAutoCommand(SaveAllToDb,
+            /*SaveCommand = new AsyncAutoCommand(SaveAllToDb,
                 null,
                 e =>
                 {
                     statusbar.PublishNotification(new PlainNotification(NotificationType.Error,
                         "Error while saving script to the database: " + e.Message));
-                });
+                });*/
+            SaveCommand = new DelegateCommand(() =>
+            {
+                taskRunner.ScheduleTask("Save script to database", SaveAllToDb);
+            });
 
             DeleteAction = new DelegateCommand<SmartAction>(DeleteActionCommand);
             DeleteSelected = new DelegateCommand(() =>
@@ -685,7 +701,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand CopyCommand { get; set; }
         public DelegateCommand CutCommand { get; set; }
         public DelegateCommand PasteCommand { get; set; }
-        public AsyncAutoCommand SaveCommand { get; set; }
+        public DelegateCommand SaveCommand { get; set; }
         public DelegateCommand DeleteSelected { get; set; }
         public DelegateCommand EditSelected { get; set; }
 
@@ -720,7 +736,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public bool CanClose { get; } = true;
         public IHistoryManager History { get; }
 
-        public string Title { get; set; }
+        private string title;
+        public string Title
+        {
+            get => title;
+            set => SetProperty(ref title, value);
+        }
         public ICommand Undo => UndoCommand;
         public ICommand Redo => RedoCommand;
 
@@ -739,12 +760,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             Debug.Assert(this.item == null);
             this.item = item;
-            Title = itemNameRegistry.GetName(item);
-
-            var lines = database.GetScriptFor(this.item.Entry, this.item.SmartType);
-            var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, this.item.Entry, (int)this.item.SmartType);
+            string name = itemNameRegistry.GetName(item);
+            Title = name + " (loading)";
+            
             script = new SmartScript(this.item, smartFactory);
-            script.Load(lines, conditions);
             
             Together.Add(new CollectionContainer {Collection = script.Events});
             Together.Add(new CollectionContainer {Collection = new List<object> {new NewActionViewModel(), new NewConditionViewModel()}});
@@ -778,10 +797,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 Together.Add(new CollectionContainer {Collection = t.Actions});
                 Together.Add(new CollectionContainer {Collection = t.Conditions});
             }
-
-            History.AddHandler(new SaiHistoryHandler(script));
+            
+            taskRunner.ScheduleTask($"Loading script {name}", AsyncLoad);
         }
 
+        private async Task AsyncLoad()
+        {
+            var lines = database.GetScriptFor(this.item.Entry, this.item.SmartType);
+            var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, this.item.Entry, (int)this.item.SmartType);
+            script.Load(lines, conditions);
+            IsLoading = false;
+            Title = itemNameRegistry.GetName(item);
+            History.AddHandler(new SaiHistoryHandler(script));
+        }
+        
         private async Task SaveAllToDb()
         {
             statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));

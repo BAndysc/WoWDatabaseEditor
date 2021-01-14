@@ -35,7 +35,8 @@ namespace WoWDatabaseEditor.ViewModels
             INewItemService newItemService,
             ISolutionManager solutionManager,
             IStatusBar statusBar,
-            ISolutionItemEditorRegistry solutionEditorManager)
+            ISolutionItemEditorRegistry solutionEditorManager,
+            TasksViewModel tasksViewModel)
         {
             this.eventAggregator = eventAggregator;
             WindowManager = wndowManager;
@@ -46,6 +47,7 @@ namespace WoWDatabaseEditor.ViewModels
             ExecuteCommandNew = new DelegateCommand(New);
             ExecuteSettings = new DelegateCommand(SettingsShow);
 
+            TasksViewModel = tasksViewModel;
             About = new DelegateCommand(ShowAbout);
 
             this.eventAggregator.GetEvent<WindowManager.DocumentClosedEvent>()
@@ -94,6 +96,8 @@ namespace WoWDatabaseEditor.ViewModels
 
         public IStatusBar StatusBar { get; }
         public IWindowManager WindowManager { get; }
+        public TasksViewModel TasksViewModel { get; }
+        
 
         public string Title
         {

@@ -6,7 +6,7 @@ using WDE.Module.Attributes;
 namespace WDE.SmartScriptEditor.Providers
 {
     [AutoRegister]
-    public class SmartScriptNameProvider : ISolutionNameProvider<SmartScriptSolutionItem>
+    public class  SmartScriptNameProvider : ISolutionNameProvider<SmartScriptSolutionItem>
     {
         private readonly IDatabaseProvider database;
         private readonly ISpellStore spellStore;

@@ -716,6 +716,8 @@
     <!-- Focus style -->
     <SolidColorBrush x:Key="FocusStyle.Brush" Color="#F1F1F1" />
 
+    <SolidColorBrush x:Key="ScrollBarColor" Color="#C9C9C9" />
+
     <!-- Icons -->
     <DrawingImage x:Key="StatusBarIconNotice">
         <DrawingImage.Drawing>
