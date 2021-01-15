@@ -933,36 +933,33 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ParametersEditView v = new();
             SmartAction obj = originalAction.Copy();
 
-            var paramss = new List<KeyValuePair<Parameter, string>>();
+            var parametersList = new List<(Parameter, string)>();
+            var floatParametersList = new List<(FloatParameter, string)>();
 
             for (var i = 0; i < obj.Source.ParametersCount; ++i)
             {
                 if (!obj.Source.GetParameter(i).Name.Equals("empty"))
-                    paramss.Add(new KeyValuePair<Parameter, string>(obj.Source.GetParameter(i), "Source"));
+                    parametersList.Add((obj.Source.GetParameter(i), "Source"));
             }
 
             for (var i = 0; i < obj.ParametersCount; ++i)
             {
                 if (!obj.GetParameter(i).Name.Equals("empty"))
-                    paramss.Add(new KeyValuePair<Parameter, string>(obj.GetParameter(i), "Action"));
+                    parametersList.Add((obj.GetParameter(i), "Action"));
             }
 
             for (var i = 0; i < obj.Target.ParametersCount; ++i)
             {
                 if (!obj.Target.GetParameter(i).Name.Equals("empty"))
-                    paramss.Add(new KeyValuePair<Parameter, string>(obj.Target.GetParameter(i), "Target"));
+                    parametersList.Add((obj.Target.GetParameter(i), "Target"));
             }
 
             for (var i = 0; i < 4; ++i)
             {
-                int j = i;
-                Parameter wrapper = new FloatIntParameter(obj.Target.Position[i].Name);
-                wrapper.SetValue((int) (obj.Target.Position[i].GetValue() * 1000));
-                wrapper.OnValueChanged += (sender, value) => obj.Target.Position[j].SetValue(wrapper.GetValue() / 1000.0f);
-                paramss.Add(new KeyValuePair<Parameter, string>(wrapper, "Target"));
+                floatParametersList.Add((obj.Target.Position[i], "Target"));
             }
 
-            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, paramss);
+            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, floatParametersList);
             v.DataContext = viewModel;
             bool result = v.ShowDialog() ?? false;
             if (result)
@@ -993,18 +990,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ParametersEditView v = new();
             SmartCondition obj = originalCondition.Copy();
 
-            var paramss = new List<KeyValuePair<Parameter, string>>();
+            var parametersList = new List<(Parameter, string)>();
 
-            paramss.Add(new KeyValuePair<Parameter, string>(obj.Inverted, "General"));
-            paramss.Add(new KeyValuePair<Parameter, string>(obj.ConditionTarget, "General"));
+            parametersList.Add((obj.Inverted, "General"));
+            parametersList.Add((obj.ConditionTarget, "General"));
             
             for (var i = 0; i < obj.ParametersCount; ++i)
             {                    
                 if (!obj.GetParameter(i).Name.Equals("empty"))
-                    paramss.Add(new KeyValuePair<Parameter, string>(obj.GetParameter(i), "Condition"));
+                    parametersList.Add((obj.GetParameter(i), "Condition"));
             }
 
-            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, paramss);
+            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList);
             v.DataContext = viewModel;
             bool result = v.ShowDialog() ?? false;
             if (result)
@@ -1034,20 +1031,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SmartEvent ev = originalEvent.ShallowCopy();
 
             ParametersEditView v = new();
-            var paramss = new List<KeyValuePair<Parameter, string>>();
-            paramss.Add(new KeyValuePair<Parameter, string>(ev.Chance, "General"));
-            paramss.Add(new KeyValuePair<Parameter, string>(ev.Flags, "General"));
-            paramss.Add(new KeyValuePair<Parameter, string>(ev.Phases, "General"));
-            paramss.Add(new KeyValuePair<Parameter, string>(ev.CooldownMax, "General"));
-            paramss.Add(new KeyValuePair<Parameter, string>(ev.CooldownMin, "General"));
+            var parametersList = new List<(Parameter, string)>();
+            parametersList.Add((ev.Chance, "General"));
+            parametersList.Add((ev.Flags, "General"));
+            parametersList.Add((ev.Phases, "General"));
+            parametersList.Add((ev.CooldownMax, "General"));
+            parametersList.Add((ev.CooldownMin, "General"));
 
             for (var i = 0; i < ev.ParametersCount; ++i)
             {
                 if (!ev.GetParameter(i).Name.Equals("empty"))
-                    paramss.Add(new KeyValuePair<Parameter, string>(ev.GetParameter(i), "Event specific"));
+                    parametersList.Add((ev.GetParameter(i), "Event specific"));
             }
 
-            ParametersEditViewModel viewModel = new(itemFromListProvider, ev, paramss);
+            ParametersEditViewModel viewModel = new(itemFromListProvider, ev, parametersList);
             v.DataContext = viewModel;
             bool result = v.ShowDialog() ?? false;
             if (result)

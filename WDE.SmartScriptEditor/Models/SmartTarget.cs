@@ -1,4 +1,5 @@
-﻿using SmartFormat;
+﻿using System.Globalization;
+using SmartFormat;
 using WDE.Common.Parameters;
 
 namespace WDE.SmartScriptEditor.Models
@@ -59,10 +60,10 @@ namespace WDE.SmartScriptEditor.Models
                         pram1value = GetParameter(0).GetValue(),
                         pram2value = GetParameter(1).GetValue(),
                         pram3value = GetParameter(2).GetValue(),
-                        x = X,
-                        y = Y,
-                        z = Z,
-                        o = O,
+                        x = X.ToString(CultureInfo.InvariantCulture),
+                        y = Y.ToString(CultureInfo.InvariantCulture),
+                        z = Z.ToString(CultureInfo.InvariantCulture),
+                        o = O.ToString(CultureInfo.InvariantCulture),
                         stored = "Stored target #" + GetParameter(0).GetValue(),
                         storedPoint = "Stored point #" + GetParameter(0).GetValue()
                     });
@@ -72,7 +73,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public string GetCoords()
         {
-            return $"({X}, {Y}, {Z}, {O})";
+            return $"({X.ToString(CultureInfo.InvariantCulture)}, {Y.ToString(CultureInfo.InvariantCulture)}, {Z.ToString(CultureInfo.InvariantCulture)}, {O.ToString(CultureInfo.InvariantCulture)})";
         }
 
         private bool HasPosition()

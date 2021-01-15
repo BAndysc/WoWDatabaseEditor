@@ -5,11 +5,11 @@ using WDE.Common.Providers;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class ParameterEditorViewModel : BindableBase
+    public class ParameterEditorViewModel<T> : BindableBase
     {
         private readonly IItemFromListProvider itemFromListProvider;
 
-        public ParameterEditorViewModel(Parameter parameter, string group, IItemFromListProvider itemFromListProvider)
+        public ParameterEditorViewModel(GenericBaseParameter<T> parameter, string group, IItemFromListProvider itemFromListProvider)
         {
             Group = group;
             this.itemFromListProvider = itemFromListProvider;
@@ -17,7 +17,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SelectItemAction = new DelegateCommand(SelectItem);
         }
 
-        public Parameter Parameter { get; set; }
+        public GenericBaseParameter<T> Parameter { get; set; }
 
         public string Group { get; }
 
@@ -27,9 +27,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             if (Parameter.Items != null)
             {
-                int? val = itemFromListProvider.GetItemFromList(Parameter.Items, Parameter is FlagParameter);
-                if (val.HasValue)
-                    Parameter.Value = val.Value;
+                if (Parameter is Parameter p)
+                {
+                    int? val = itemFromListProvider.GetItemFromList(p.Items, Parameter is FlagParameter);
+                    if (val.HasValue)
+                        p.Value = val.Value;   
+                }
             }
         }
     }

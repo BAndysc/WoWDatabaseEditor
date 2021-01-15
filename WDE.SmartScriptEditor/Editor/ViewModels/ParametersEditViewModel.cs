@@ -14,26 +14,38 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     {
         private readonly SmartBaseElement element;
         private readonly CollectionViewSource items;
-
         private string readable;
+
+        public List<object> Parameters { get; } = new();
 
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             SmartBaseElement element,
-            IEnumerable<KeyValuePair<Parameter, string>> parameters)
+            IEnumerable<(Parameter parameter, string name)> parameters,
+            IEnumerable<(FloatParameter parameter, string name)> floatParameters = null)
         {
             this.element = element;
             Readable = element.Readable;
             this.element.OnChanged += ElementOnOnChanged;
 
-            foreach (var parameter in parameters)
-                Parameters.Add(new ParameterEditorViewModel(parameter.Key, parameter.Value, itemFromListProvider));
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters)
+                {
+                    Parameters.Add(new ParameterEditorViewModel<int>(parameter.parameter, parameter.name, itemFromListProvider));
+                }
+            }
 
-            items = new CollectionViewSource();
-            items.Source = Parameters;
+            if (floatParameters != null)
+            {
+                foreach (var parameter in floatParameters)
+                {
+                    Parameters.Add(new ParameterEditorViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider));
+                }   
+            }
+
+            items = new CollectionViewSource {Source = Parameters};
             items.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
         }
-
-        public ObservableCollection<ParameterEditorViewModel> Parameters { get; } = new();
 
         public string Readable
         {
