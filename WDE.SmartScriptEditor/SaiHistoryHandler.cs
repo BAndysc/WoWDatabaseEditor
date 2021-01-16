@@ -93,6 +93,8 @@ namespace WDE.SmartScriptEditor
 
             for (var i = 0; i < 4; ++i)
                 smartAction.Target.Position[i].OnValueChanged += ParameterFloat_OnValueChange;
+
+            smartAction.CommentParameter.OnValueChanged += ParameterString_OnValueChanged;
         }
         
         private void UnbindAction(SmartAction smartAction)
@@ -111,8 +113,10 @@ namespace WDE.SmartScriptEditor
 
             for (var i = 0; i < 4; ++i)
                 smartAction.Target.Position[i].OnValueChanged -= ParameterFloat_OnValueChange;
+            
+            smartAction.CommentParameter.OnValueChanged -= ParameterString_OnValueChanged;
         }
-
+        
         private void AddedCondition(SmartCondition smartCondition, SmartEvent parent, int index)
         {
             PushAction(new ConditionAddedAction(parent, smartCondition, index));
@@ -232,6 +236,11 @@ namespace WDE.SmartScriptEditor
             PushAction(new GenericParameterChangedAction<float>(sender as FloatParameter, e.Old, e.New));
         }
 
+        private void ParameterString_OnValueChanged(object? sender, ParameterChangedValue<string> e)
+        {
+            PushAction(new GenericParameterChangedAction<string>(sender as StringParameter, e.Old, e.New));
+        }
+        
         private class EventAddedAction : IHistoryAction
         {
             private readonly int index;

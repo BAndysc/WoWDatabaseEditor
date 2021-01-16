@@ -279,7 +279,8 @@
         "name_readable": "Summon creature",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": true,
+        "uses_target_position": true
     },
     {
         "id": 13,
@@ -1192,7 +1193,8 @@
         "name_readable": "Summon go",
         "uses_target": true,
         "target_is_source": true,
-        "implicit_source": false
+        "implicit_source": false,
+        "uses_target_position": true
     },
     {
         "id": 51,
@@ -1446,7 +1448,8 @@
         "name_readable": "Teleport",
         "uses_target": true,
         "target_is_source": true,
-        "implicit_source": false
+        "implicit_source": false,
+        "uses_target_position": true
     },
     {
         "id": 63,
@@ -1585,7 +1588,8 @@
         "name_readable": "Move to position",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": true,
+        "uses_target_position": true
     },
     {
         "id": 70,
@@ -2564,7 +2568,8 @@
         "name_readable": "Jump to pos",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": true,
+        "uses_target_position": true
     },
     {
         "id": 98,
@@ -2638,7 +2643,8 @@
         "name_readable": "Send home position",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": true,
+        "uses_target_position": true
     },
     {
         "id": 102,
@@ -3051,11 +3057,12 @@
     {
         "id": 114,
         "name": "SMART_ACTION_MOVE_OFFSET",
-        "description": "Use  target_x,  target_y,  target_z, With target_type=1",
+        "description": "Use target_x,  target_y,  target_z, With target_type=1",
         "name_readable": "Move offset",
         "uses_target": false,
         "target_is_source": true,
-        "implicit_source": true
+        "implicit_source": true,
+        "uses_target_position": true
     },
     {
         "id": 115,
@@ -5033,6 +5040,15 @@
         ],
         "description": "       Wait {pram1} seconds",
         "name_readable": "Wait",
+        "uses_target": false,
+        "target_is_source": false,
+        "implicit_source": true
+    },
+    {
+        "id": 9998,
+        "name": "SMART_ACTION_META_COMMENT",
+        "description": "",
+        "name_readable": "Comment",
         "uses_target": false,
         "target_is_source": false,
         "implicit_source": true

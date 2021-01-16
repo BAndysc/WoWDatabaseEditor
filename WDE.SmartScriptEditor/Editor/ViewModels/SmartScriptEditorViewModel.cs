@@ -455,8 +455,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                 actionIndex = 0;
 
                             DeselectAll.Execute();
-                            foreach (SmartAction smartAction in lines.Select(line => script.SafeActionFactory(line)))
+                            foreach (var smartLine in lines)
                             {
+                                var smartAction = script.SafeActionFactory(smartLine);
+                                smartAction.Comment = smartLine.Comment.Contains(" // ")
+                                    ? smartLine.Comment.Substring(smartLine.Comment.IndexOf(" // ") + 4).Trim()
+                                    : "";
                                 Events[eventIndex.Value].Actions.Insert(actionIndex.Value, smartAction);
                                 smartAction.IsSelected = true;
                                 actionIndex++;
@@ -817,7 +821,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));
 
-            var (lines, conditions) = script.ToWaitFreeSmartScriptLines(smartFactory);
+            var (lines, conditions) = script.ToSmartScriptLinesNoMetaActions(smartFactory);
             
             await database.InstallScriptFor(item.Entry, item.SmartType, lines);
             
@@ -937,8 +941,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ParametersEditView v = new();
             SmartAction obj = originalAction.Copy();
 
+            SmartGenericJsonData actionData = smartDataManager.GetRawData(SmartType.SmartAction, originalAction.Id);
+
             var parametersList = new List<(Parameter, string)>();
             var floatParametersList = new List<(FloatParameter, string)>();
+            var stringParametersList = new List<(StringParameter, string)>();
 
             for (var i = 0; i < obj.Source.ParametersCount; ++i)
             {
@@ -958,12 +965,22 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     parametersList.Add((obj.Target.GetParameter(i), "Target"));
             }
 
-            for (var i = 0; i < 4; ++i)
+            if (actionData.UsesTargetPosition)
             {
-                floatParametersList.Add((obj.Target.Position[i], "Target"));
+                for (var i = 0; i < 4; ++i)
+                    floatParametersList.Add((obj.Target.Position[i], "Target"));
             }
 
-            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, floatParametersList);
+            StringParameter comment = null;
+            if (actionData.Id == SmartConstants.ActionComment)
+            {
+                comment = new StringParameter("Comment");
+                comment.Value = originalAction.Comment;
+                comment.OnValueChanged += (s, v) => obj.Comment = comment.Value;
+                stringParametersList = new List<(StringParameter, string)>() {(comment, "Comment")};
+            }
+
+            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, floatParametersList, stringParametersList);
             v.DataContext = viewModel;
             bool result = v.ShowDialog() ?? false;
             if (result)
@@ -981,6 +998,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                     for (var i = 0; i < originalAction.ParametersCount; ++i)
                         originalAction.SetParameter(i, obj.GetParameter(i).Value);
+
+                    if (comment != null)
+                        originalAction.Comment = comment.Value;
                 }
             }
 

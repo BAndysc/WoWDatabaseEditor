@@ -14,7 +14,7 @@ namespace WDE.SmartScriptEditor.Exporter
     public static class SmartScriptSerializer
     {
         private static readonly Regex SaiLineRegex = new(
-            @"\(\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*"".*?""\s*\)");
+            @"\(\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*""(.*?)""\s*\)");
 
         private static readonly string SaiSql =
             "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
@@ -24,7 +24,7 @@ namespace WDE.SmartScriptEditor.Exporter
             line = new AbstractSmartScriptLine();
 
             Match m = SaiLineRegex.Match(str);
-            if (!m.Success || m.Groups.Count != 28)
+            if (!m.Success || m.Groups.Count != 29)
                 return false;
 
             line.EntryOrGuid = int.Parse(m.Groups[1].ToString());
@@ -111,7 +111,7 @@ namespace WDE.SmartScriptEditor.Exporter
             return Smart.Format(SaiSql, data);
         }
 
-        public static (ISmartScriptLine[], IConditionLine[]) ToWaitFreeSmartScriptLines(this SmartScript script, ISmartFactory smartFactory)
+        public static (ISmartScriptLine[], IConditionLine[]) ToSmartScriptLinesNoMetaActions(this SmartScript script, ISmartFactory smartFactory)
         {
             if (script.Events.Count == 0)
                 return (new ISmartScriptLine[0], null);
@@ -125,7 +125,6 @@ namespace WDE.SmartScriptEditor.Exporter
                 .DefaultIfEmpty(0)
                 .Max() + 1;
 
-            //@todo: don't use hardcoded IDs!!!!
             foreach (SmartEvent e in script.Events)
             {
                 if (e.Actions.Count == 0)
@@ -163,7 +162,17 @@ namespace WDE.SmartScriptEditor.Exporter
                         previousWasWait = true;
                     }
                     else
+                    {
+                        if (actualAction.Id == SmartConstants.ActionComment)
+                        {
+                            SmartAction commentAction = actualAction;
+                            actualAction = smartFactory.ActionFactory(SmartConstants.ActionNone,
+                                smartFactory.SourceFactory(SmartConstants.SourceNone),
+                                smartFactory.TargetFactory(SmartConstants.TargetNone));
+                            actualAction.Comment = commentAction.Comment;
+                        }
                         previousWasWait = false;
+                    }
 
                     SmartEvent eventToSerialize = actualEvent.ShallowCopy();
                     eventToSerialize.Actions.Add(actualAction.Copy());

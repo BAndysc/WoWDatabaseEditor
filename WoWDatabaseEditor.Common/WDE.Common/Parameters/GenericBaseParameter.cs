@@ -38,7 +38,7 @@ namespace WDE.Common.Parameters
             {
                 T old = Value;
                 this.value = value;
-                if (!old.Equals(value))
+                if (old == null || !old.Equals(value))
                 {
                     OnValueChanged(this, new ParameterChangedValue<T>(old, Value));
                     OnPropertyChanged();

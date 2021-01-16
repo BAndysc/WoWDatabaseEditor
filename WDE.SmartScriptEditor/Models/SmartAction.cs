@@ -2,15 +2,14 @@
 using System.ComponentModel;
 using SmartFormat;
 using SmartFormat.Core.Parsing;
+using WDE.Common.Parameters;
 
 namespace WDE.SmartScriptEditor.Models
 {
     public class SmartAction : SmartBaseElement
     {
         public static readonly int SmartActionParametersCount = 6;
-
-        private string comment;
-
+        
         private bool isSelected;
 
         private SmartEvent parent;
@@ -19,6 +18,8 @@ namespace WDE.SmartScriptEditor.Models
 
         private SmartTarget target;
 
+        private StringParameter comment;
+
         public SmartAction(int id, SmartSource source, SmartTarget target) : base(SmartActionParametersCount, id)
         {
             if (source == null || target == null)
@@ -26,6 +27,8 @@ namespace WDE.SmartScriptEditor.Models
 
             Source = source;
             Target = target;
+            comment = new StringParameter("Comment");
+            comment.OnValueChanged += (sender, o) => CallOnChanged();
         }
 
         public SmartEvent Parent
@@ -64,14 +67,17 @@ namespace WDE.SmartScriptEditor.Models
 
         public string Comment
         {
-            get => comment;
+            get => comment.Value;
             set
             {
-                comment = value;
+                comment.Value = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(Readable));
             }
         }
 
+        public StringParameter CommentParameter => comment;
+        
         public SmartTarget Target
         {
             get => target;
@@ -116,8 +122,8 @@ namespace WDE.SmartScriptEditor.Models
                             pram3value = GetParameter(2).GetValue(),
                             pram4value = GetParameter(3).GetValue(),
                             pram5value = GetParameter(4).GetValue(),
-                            pram6value = GetParameter(5).GetValue()
-                            //comment = Comment
+                            pram6value = GetParameter(5).GetValue(),
+                            comment = Comment
                         });
                     return output;
                 }

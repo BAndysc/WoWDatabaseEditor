@@ -21,7 +21,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             SmartBaseElement element,
             IEnumerable<(Parameter parameter, string name)> parameters,
-            IEnumerable<(FloatParameter parameter, string name)> floatParameters = null)
+            IEnumerable<(FloatParameter parameter, string name)> floatParameters = null,
+            IEnumerable<(StringParameter parameter, string name)> stringParameters = null)
         {
             this.element = element;
             Readable = element.Readable;
@@ -41,6 +42,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 {
                     Parameters.Add(new ParameterEditorViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider));
                 }   
+            }
+
+            if (stringParameters != null)
+            {
+                foreach (var parameter in stringParameters)
+                {
+                    Parameters.Add(new ParameterEditorViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider));
+                }
             }
 
             items = new CollectionViewSource {Source = Parameters};

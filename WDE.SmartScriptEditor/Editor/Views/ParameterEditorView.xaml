@@ -19,9 +19,8 @@
                     <Setter Property="Text" Value="{Binding Parameter.String, Mode=OneWay}" />
                     <Style.Triggers>
                         <Trigger Property="IsFocused" Value="true">
-                            <Setter Property="Text" Value="{Binding Parameter.Value}" />
+                            <Setter Property="Text" Value="{Binding Parameter.Value, Mode=TwoWay}" />
                         </Trigger>
-
                     </Style.Triggers>
                 </Style>
             </TextBox.Style>

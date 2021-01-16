@@ -63,7 +63,7 @@
                                         <Label Content="{Binding TaskName}" FontWeight="Bold"></Label>
                                         <ProgressBar Value="{Binding Progress}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}"></ProgressBar>
                                         
-                                        <Label Content="{Binding CurrentTask}"></Label>
+                                        <Label Content="{Binding CurrentTask, TargetNullValue={}}"></Label>
                                     </StackPanel>
                                 </DockPanel>
                                 

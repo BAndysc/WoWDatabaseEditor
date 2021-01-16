@@ -62,6 +62,18 @@ namespace WDE.Common.Parameters
             return GetValue().ToString(CultureInfo.InvariantCulture);
         }
     }
+    
+    public class StringParameter : GenericBaseParameter<string>
+    {
+        public StringParameter(string name) : base(name)
+        {
+        }
+
+        public override string ToString()
+        {
+            return GetValue();
+        }
+    }
 
     public class FlagParameter : Parameter
     {

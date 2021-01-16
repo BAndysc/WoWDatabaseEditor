@@ -68,6 +68,11 @@ namespace WDE.SmartScriptEditor.Models
 
                 string comment = line.Comment.Contains(" // ") ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim() : "";
 
+                if (!string.IsNullOrEmpty(comment) && line.ActionType == SmartConstants.ActionNone)
+                {
+                    line.ActionType = SmartConstants.ActionComment;
+                }
+
                 SmartAction action = SafeActionFactory(line);
                 if (action != null)
                 {
@@ -135,7 +140,12 @@ namespace WDE.SmartScriptEditor.Models
                 {
                     SmartAction action = SafeActionFactory(line);
                     if (action != null)
+                    {
+                        action.Comment = line.Comment.Contains(" // ")
+                            ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim()
+                            : "";
                         currentEvent.AddAction(action);
+                    }
                 }
             }
             return newEvents;

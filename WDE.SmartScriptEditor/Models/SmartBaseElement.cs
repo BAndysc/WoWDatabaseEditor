@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Models
             for (var i = 0; i < parametersCount; ++i)
                 SetParameterObject(i, new NullParameter());
 
-            OnChanged += (sender, args) => OnPropertyChanged("Readable");
+            OnChanged += (sender, args) => OnPropertyChanged(nameof(Readable));
         }
 
         public List<DescriptionRule> DescriptionRules { get; set; }
