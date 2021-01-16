@@ -652,6 +652,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 UndoCommand.RaiseCanExecuteChanged();
                 RedoCommand.RaiseCanExecuteChanged();
+                RaisePropertyChanged(nameof(IsModified));
             };
 
             token = eventAggregator.GetEvent<EventRequestGenerateSql>()
@@ -742,6 +743,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             get => title;
             set => SetProperty(ref title, value);
         }
+
+        public bool IsModified => !History.IsSaved;
         public ICommand Undo => UndoCommand;
         public ICommand Redo => RedoCommand;
 
@@ -761,7 +764,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Debug.Assert(this.item == null);
             this.item = item;
             string name = itemNameRegistry.GetName(item);
-            Title = name + " (loading)";
+            Title = name;
             
             script = new SmartScript(this.item, smartFactory);
             
@@ -807,7 +810,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, this.item.Entry, (int)this.item.SmartType);
             script.Load(lines, conditions);
             IsLoading = false;
-            Title = itemNameRegistry.GetName(item);
             History.AddHandler(new SaiHistoryHandler(script));
         }
         
@@ -824,6 +826,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript, null, item.Entry, (int)item.SmartType));
 
             statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
+            
+            History.MarkAsSaved();
         }
 
         private void DeleteActionCommand(SmartAction obj)

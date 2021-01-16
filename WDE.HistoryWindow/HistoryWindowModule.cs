@@ -1,7 +1,9 @@
 ﻿using Prism.Events;
+using Prism.Services.Dialogs;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
 using WDE.HistoryWindow.ViewModels;
+using WDE.HistoryWindow.Views;
 using WDE.Module;
 using WDE.Module.Attributes;
 
@@ -11,11 +13,8 @@ namespace WDE.HistoryWindow
     [SingleInstance]
     public class HistoryWindowModule : ModuleBase
     {
-        private readonly IEventAggregator eventAggregator;
-
-        public HistoryWindowModule(IEventAggregator eventAggregator)
+        public HistoryWindowModule()
         {
-            this.eventAggregator = eventAggregator;
         }
     }
 }

@@ -13,19 +13,20 @@ namespace WDE.History
     {
         private readonly Stack<IHistoryAction> future;
         private readonly Stack<IHistoryAction> history;
-
-
+        
+        private IHistoryAction savedPoint;
         private bool acceptNew;
         private bool canRedo;
         private bool canUndo;
+        private bool isSaved;
 
         public HistoryManager()
         {
             history = new Stack<IHistoryAction>();
             future = new Stack<IHistoryAction>();
-            CanUndo = false;
-            CanRedo = false;
+            savedPoint = null;
             acceptNew = true;
+            RecalculateValues();
         }
 
         public ObservableCollection<IHistoryAction> Past { get; } = new();
@@ -51,6 +52,16 @@ namespace WDE.History
             }
         }
 
+        public bool IsSaved
+        {
+            get => isSaved;
+            private set
+            {
+                isSaved = value;
+                OnPropertyChanged();
+            }
+        }
+
         public int UndoCount => history.Count;
         public int RedoCount => future.Count;
 
@@ -65,8 +76,7 @@ namespace WDE.History
                 Past.Add(action);
                 future.Clear();
                 Future.Clear();
-                CanRedo = false;
-                CanUndo = true;
+                RecalculateValues();
             };
         }
 
@@ -83,8 +93,7 @@ namespace WDE.History
             action.Undo();
             acceptNew = true;
 
-            CanUndo = history.Count > 0;
-            CanRedo = true;
+            RecalculateValues();
         }
 
         public void Redo()
@@ -100,8 +109,14 @@ namespace WDE.History
             action.Redo();
             acceptNew = true;
 
-            CanUndo = true;
-            CanRedo = future.Count > 0;
+            RecalculateValues();
+        }
+
+        public void MarkAsSaved()
+        {
+            if (history.Count > 0)
+                savedPoint = history.Peek();
+            RecalculateValues();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -114,6 +129,13 @@ namespace WDE.History
             future.Clear();
             CanUndo = false;
             CanRedo = false;
+        }
+
+        private void RecalculateValues()
+        {
+            CanUndo = history.Count > 0;
+            CanRedo = future.Count > 0;
+            IsSaved = (history.Count == 0 && savedPoint == null) || (history.Count > 0 && savedPoint == history.Peek());
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName]

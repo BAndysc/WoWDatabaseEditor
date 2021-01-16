@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.ComponentModel;
+using System.Windows.Input;
 using ICSharpCode.AvalonEdit.Document;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -51,6 +52,7 @@ namespace WDE.SQLEditor.ViewModels
         public ICommand Save { get; } = AlwaysDisabledCommand.Command;
         public ICommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
+        public bool IsModified { get; } = false;
         public IHistoryManager History { get; } = null;
     }
 }

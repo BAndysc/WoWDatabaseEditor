@@ -15,6 +15,7 @@ namespace WDE.Common.Managers
         ICommand Save { get; }
         ICommand CloseCommand { get; set; }
         bool CanClose { get; }
+        bool IsModified { get; }
         IHistoryManager History { get; }
     }
 }

@@ -20,6 +20,7 @@ namespace WoWDatabaseEditor.ViewModels
         public ICommand Save { get; } = new DisabledCommand();
         public ICommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
+        public bool IsModified { get; } = false;
         public IHistoryManager? History { get; } = null;
     }
 

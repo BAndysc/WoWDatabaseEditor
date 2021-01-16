@@ -29,7 +29,14 @@ namespace WoWDatabaseEditor.Views
 
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            LayoutUtility.SaveLayout(DockingManager);
+            if (DataContext is ICloseAwareViewModel closeAwareViewModel)
+            {
+                if (!closeAwareViewModel.CanClose())
+                    e.Cancel = true;
+            }
+            
+            if (!e.Cancel)
+                LayoutUtility.SaveLayout(DockingManager);
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)

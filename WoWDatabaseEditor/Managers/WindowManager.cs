@@ -8,6 +8,7 @@ using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
@@ -18,13 +19,17 @@ namespace WoWDatabaseEditor.Managers
     public class WindowManager : BindableBase, IWindowManager
     {
         private readonly IEventAggregator eventAggregator;
+        private readonly IMessageBoxService messageBoxService;
         private IDocument? activeDocument;
         private Dictionary<Type, ITool> typeToToolInstance = new();
         private List<ITool> allTools = new ();
 
-        public WindowManager(IEventAggregator eventAggregator, IEnumerable<ITool> tools)
+        public WindowManager(IEventAggregator eventAggregator, 
+            IMessageBoxService messageBoxService,
+            IEnumerable<ITool> tools)
         {
             this.eventAggregator = eventAggregator;
+            this.messageBoxService = messageBoxService;
             ActivateDocument = new DelegateCommand<IDocument>(doc => ActiveDocument = doc);
             foreach (var tool in tools)
             {
@@ -58,9 +63,31 @@ namespace WoWDatabaseEditor.Managers
                 ICommand? origCommand = editor.CloseCommand;
                 editor.CloseCommand = new Command(() =>
                     {
-                        origCommand?.Execute(null);
-                        OpenedDocuments.Remove(editor);
-                        eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
+                        bool close = true;
+                        if (editor.IsModified)
+                        {
+                            MessageBoxButtonType result = messageBoxService.ShowDialog(
+                                new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Document is modified")
+                                .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
+                                .SetContent("Your changes will be lost if you don't save them.")
+                                .SetIcon(MessageBoxIcon.Warning)
+                                .WithYesButton(MessageBoxButtonType.Ok)
+                                .WithNoButton(MessageBoxButtonType.No)
+                                .WithCancelButton(MessageBoxButtonType.Cancel)
+                                .Build());
+ 
+                            if (result == MessageBoxButtonType.Cancel)
+                                close = false;
+                            if (result == MessageBoxButtonType.Yes)
+                                editor.Save.Execute(null);
+                        }
+
+                        if (close)
+                        {
+                            origCommand?.Execute(null);
+                            OpenedDocuments.Remove(editor);
+                            eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);   
+                        }
                     },
                     () => origCommand?.CanExecute(null) ?? true);
                 OpenedDocuments.Add(editor);

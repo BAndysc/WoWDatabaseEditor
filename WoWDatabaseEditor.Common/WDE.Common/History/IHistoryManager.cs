@@ -7,6 +7,7 @@ namespace WDE.Common.History
     {
         bool CanUndo { get; }
         bool CanRedo { get; }
+        bool IsSaved { get; }
 
         int UndoCount { get; }
         int RedoCount { get; }
@@ -16,6 +17,7 @@ namespace WDE.Common.History
 
         void Redo();
         void Undo();
+        void MarkAsSaved();
 
         void AddHandler(HistoryHandler handler);
     }

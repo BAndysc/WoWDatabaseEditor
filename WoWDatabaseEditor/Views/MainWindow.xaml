@@ -27,6 +27,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <helpers:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+        <helpers:DocumentOrToolToTitleConverter x:Key="DocumentOrToolToTitleConverter" />
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="Z" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Undo}" />
@@ -156,12 +157,38 @@
                     <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
                     <Style TargetType="{x:Type LayoutItem}">
                         <Setter Property="ContentId" Value="{Binding Model.UniqueId}" />
-                        <Setter Property="Title" Value="{Binding Model.Title}" />
+                        <Setter Property="Title">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource DocumentOrToolToTitleConverter}">
+                                    <Binding Path="Model.Title"/>
+                                    <Binding Path="Model.IsModified"/>
+                                    <Binding Path="Model.IsLoading"/>
+                                </MultiBinding>
+                            </Setter.Value>
+                            </Setter>
                         <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
                         <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
                         <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}" />
                     </Style>
                 </DockingManager.LayoutItemContainerStyle>
+                <DockingManager.DocumentHeaderTemplate>                
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Content.IsModified}">
+                                            <DataTrigger.Value>
+                                                <system:Boolean>True</system:Boolean>
+                                            </DataTrigger.Value>
+                                            <Setter Property="FontWeight" Value="Bold"></Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DataTemplate>
+                </DockingManager.DocumentHeaderTemplate>  
                 <LayoutRoot>
                     <LayoutPanel x:Name="VerticalPanel" Orientation="Vertical">
                         <LayoutPanel x:Name="HorizontalPanel" Orientation="Horizontal">

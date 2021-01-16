@@ -10,6 +10,7 @@ using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Windows;
 using WoWDatabaseEditor.Managers;
@@ -17,7 +18,7 @@ using WoWDatabaseEditor.Utils;
 
 namespace WoWDatabaseEditor.ViewModels
 {
-    public class MainWindowViewModel : BindableBase, ILayoutViewModelResolver
+    public class MainWindowViewModel : BindableBase, ILayoutViewModelResolver, ICloseAwareViewModel
     {
         private readonly Dictionary<ISolutionItem, IDocument> documents = new();
         private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new();
@@ -25,6 +26,7 @@ namespace WoWDatabaseEditor.ViewModels
         private readonly INewItemService newItemService;
         private readonly IConfigureService settings;
         private readonly ISolutionManager solutionManager;
+        private readonly IMessageBoxService messageBoxService;
 
         private string title = "Visual Database Editor 2018";
         private readonly Dictionary<string, ITool> toolById = new();
@@ -35,6 +37,7 @@ namespace WoWDatabaseEditor.ViewModels
             INewItemService newItemService,
             ISolutionManager solutionManager,
             IStatusBar statusBar,
+            IMessageBoxService messageBoxService,
             ISolutionItemEditorRegistry solutionEditorManager,
             TasksViewModel tasksViewModel)
         {
@@ -44,6 +47,7 @@ namespace WoWDatabaseEditor.ViewModels
             this.settings = settings;
             this.newItemService = newItemService;
             this.solutionManager = solutionManager;
+            this.messageBoxService = messageBoxService;
             ExecuteCommandNew = new DelegateCommand(New);
             ExecuteSettings = new DelegateCommand(SettingsShow);
 
@@ -145,6 +149,64 @@ namespace WoWDatabaseEditor.ViewModels
                 if (tool.OpenOnStart)
                     WindowManager.OpenTool(tool.GetType());
             }
+        }
+
+        public bool CanClose()
+        {
+            var modifiedDocuments = WindowManager.OpenedDocuments.Where(d => d.IsModified).ToList();
+
+            if (modifiedDocuments.Count > 0)
+            {
+                while (modifiedDocuments.Count > 0)
+                {
+                    var editor = modifiedDocuments[^1];
+                    var message = new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Document is modified")
+                        .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
+                        .SetContent("Your changes will be lost if you don't save them.")
+                        .SetIcon(MessageBoxIcon.Warning)
+                        .WithYesButton(MessageBoxButtonType.Ok)
+                        .WithNoButton(MessageBoxButtonType.No)
+                        .WithCancelButton(MessageBoxButtonType.Cancel);
+
+                    if (modifiedDocuments.Count > 1)
+                    {
+                        message.SetExpandedInformation("Other modified documents:\n" +
+                                                       string.Join("\n", modifiedDocuments.SkipLast(1).Select(d => d.Title)));
+                        message.WithButton("Yes to all", MessageBoxButtonType.CustomA)
+                            .WithButton("No to all", MessageBoxButtonType.CustomB);
+                    }
+                    
+                    MessageBoxButtonType result = messageBoxService.ShowDialog(message.Build());
+
+                    if (result == MessageBoxButtonType.Cancel)
+                        return false;
+
+                    if (result == MessageBoxButtonType.Yes)
+                    {
+                        editor.Save.Execute(null);
+                        modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
+                        WindowManager.OpenedDocuments.Remove(editor);
+                    }
+                    else if (result == MessageBoxButtonType.No)
+                    {
+                        modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
+                        WindowManager.OpenedDocuments.Remove(editor);
+                    }
+                    else if (result == MessageBoxButtonType.CustomA)
+                    {
+                        foreach (var m in modifiedDocuments)
+                            m.Save.Execute(null);
+                        modifiedDocuments.Clear();
+                    }
+                    else if (result == MessageBoxButtonType.CustomB)
+                    {
+                        modifiedDocuments.Clear();
+                    }
+                }
+            }
+            WindowManager.OpenedDocuments.Clear();
+
+            return true;
         }
     }
 }

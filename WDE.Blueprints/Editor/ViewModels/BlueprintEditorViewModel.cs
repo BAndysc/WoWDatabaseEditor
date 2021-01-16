@@ -57,6 +57,7 @@ namespace WDE.Blueprints.Editor.ViewModels
         public ICommand Save { get; } = AlwaysDisabledCommand.Command;
         public ICommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
+        public bool IsModified { get; } = false;
         public IHistoryManager History { get; } = null;
 
         public void PickerResponse(NodeDefinition def)
