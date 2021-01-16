@@ -7,5 +7,6 @@
         public int? Port { get; set; } = 3306;
         public string? User { get; set; }
         public string? Database { get; set; }
+        public bool IsEmpty => string.IsNullOrEmpty(Host) || string.IsNullOrEmpty(Database) || string.IsNullOrEmpty(User);
     }
 }

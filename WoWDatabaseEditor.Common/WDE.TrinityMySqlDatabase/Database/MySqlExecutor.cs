@@ -6,7 +6,7 @@ using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.TrinityMySqlDatabase.Providers;
 
-namespace WDE.TrinityMySqlDatabase
+namespace WDE.TrinityMySqlDatabase.Database
 {
     [AutoRegister]
     [SingleInstance]
@@ -21,6 +21,8 @@ namespace WDE.TrinityMySqlDatabase
 
         public async Task ExecuteSql(string query)
         {
+            using var writeLock = await MySqlSingleWriteLock.WriteLock();
+            
             string connStr = settings.ConnectionStrings.First().ConnectionString;
             MySqlConnection conn = new(connStr);
             MySqlTransaction transaction;

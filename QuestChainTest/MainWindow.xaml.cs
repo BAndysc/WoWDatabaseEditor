@@ -7,6 +7,7 @@ using WDE.QuestChainEditor.Exporter;
 using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.Providers;
 using WDE.TrinityMySqlDatabase;
+using WDE.TrinityMySqlDatabase.Database;
 using WDE.TrinityMySqlDatabase.Providers;
 using WDE.TrinityMySqlDatabase.Services;
 
@@ -27,7 +28,7 @@ namespace QuestChainTest
 
             new TrinityMySqlDatabaseModule().OnInitialized(null);
 
-            TrinityMysqlDatabaseProvider db = new(new ConnectionSettingsProvider(), new DatabaseLogger(), new MockTaskRunner());
+            TrinityMySqlDatabaseProvider db = new(new ConnectionSettingsProvider(), new DatabaseLogger(), new MockTaskRunner());
 
             ExampleQuestsProvider exampleQuestProvider = new();
 
