@@ -23,28 +23,10 @@ namespace WDE.SmartScriptEditor.Data
 
         public int? Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
         {
-            SmartSelectViewModel model = new(GetFileNameFor(type), type, predicate, smartDataManager, conditionDataManager);
+            SmartSelectViewModel model = new(type, predicate, smartDataManager, conditionDataManager);
+            
             if (windowManager.ShowDialog(model))
                 return model.SelectedItem.Id;
-
-            return null;
-        }
-
-        private string GetFileNameFor(SmartType type)
-        {
-            switch (type)
-            {
-                case SmartType.SmartEvent:
-                    return "events.txt";
-                case SmartType.SmartAction:
-                    return "actions.txt";
-                case SmartType.SmartTarget:
-                    return "targets.txt";
-                case SmartType.SmartSource:
-                    return "targets.txt";
-                case SmartType.SmartCondition:
-                    return "conditions.txt";
-            }
 
             return null;
         }

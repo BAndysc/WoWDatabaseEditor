@@ -90,4 +90,13 @@ namespace WDE.Conditions.Data
         [JsonProperty(PropertyName = "name_readable")]
         public string NameReadable { get; set; }
     }
+
+    [ExcludeFromCodeCoverage]
+    public struct ConditionGroupsJsonData
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+        [JsonProperty(PropertyName = "group_members")]
+        public IList<string> Members { get; set; }
+    }
 }

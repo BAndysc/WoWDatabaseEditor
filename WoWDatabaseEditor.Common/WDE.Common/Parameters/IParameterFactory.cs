@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Parameters
@@ -9,5 +10,7 @@ namespace WDE.Common.Parameters
         IParameter<int> Factory(string type);
         bool IsRegistered(string type);
         void Register(string key, IParameter<int> parameter);
+        
+        IEnumerable<string> GetKeys();
     }
 }

@@ -18,6 +18,7 @@ namespace WDE.Conditions.Data
     {
         ConditionJsonData GetConditionData(int id);
         ConditionJsonData GetConditionData(string name);
+        IEnumerable<ConditionGroupsJsonData> GetConditionGroups();
 
         bool HasConditionData(int id);
         bool HasConditionData(string typeName);
@@ -35,8 +36,11 @@ namespace WDE.Conditions.Data
         Dictionary<int, ConditionSourcesJsonData> conditionSourceData = new ();
         Dictionary<string, ConditionSourcesJsonData> conditionSourceDataByName = new ();
 
+        private readonly IConditionDataProvider provider;
+
         public ConditionDataManager(IConditionDataProvider provider)
         {
+            this.provider = provider;
             LoadConditions(provider.GetConditions());
             LoadConditionSources(provider.GetConditionSources());
         }
@@ -100,5 +104,7 @@ namespace WDE.Conditions.Data
 
             return conditionSourceDataByName[name];
         }
+
+        public IEnumerable<ConditionGroupsJsonData> GetConditionGroups() => provider.GetConditionGroups();
     }
 }

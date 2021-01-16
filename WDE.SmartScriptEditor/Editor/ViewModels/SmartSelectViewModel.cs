@@ -22,52 +22,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private string searchBox;
         private SmartItem selectedItem;
 
-        public SmartSelectViewModel(string file,
-            SmartType type,
+        public SmartSelectViewModel(SmartType type,
             Func<SmartGenericJsonData, bool> predicate,
             ISmartDataManager smartDataManager,
             IConditionDataManager conditionDataManager)
         {
             this.predicate = predicate;
-            string group = null;
-            foreach (string line in File.ReadLines("SmartData/" + file))
-            {
-                if (line.IndexOf(" ", StringComparison.Ordinal) == 0)
-                {
-                    var typeName = line.Trim();
-                    if (smartDataManager.Contains(type, typeName))
-                    {
-                        SmartItem i = new();
-                        SmartGenericJsonData data = smartDataManager.GetDataByName(type, typeName);
-
-                        i.Group = group;
-                        i.Name = data.NameReadable;
-                        i.Id = data.Id;
-                        i.Help = data.Help;
-                        i.IsTimed = data.IsTimed;
-                        i.Deprecated = data.Deprecated;
-                        i.Data = data;
-
-                        allItems.Add(i);
-                    }
-                    else if (conditionDataManager.HasConditionData(typeName))
-                    {
-                        SmartItem i = new();
-                        ConditionJsonData data = conditionDataManager.GetConditionData(typeName);
-
-                        i.Group = group;
-                        i.Name = data.NameReadable;
-                        i.Id = data.Id;
-                        i.Help = data.Help;
-                        i.Deprecated = false;
-                        i.ConditionData = data;
-
-                        allItems.Add(i);
-                    }
-                }
-                else
-                    group = line;
-            }
+            MakeItems(type, smartDataManager, conditionDataManager);
 
             items = new CollectionViewSource();
             items.Source = allItems;
@@ -113,6 +74,51 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 filterEventArgs.Accepted = false;
             else
                 filterEventArgs.Accepted = string.IsNullOrEmpty(SearchBox) || item.Name.ToLower().Contains(SearchBox.ToLower());
+        }
+
+        private void MakeItems(SmartType type, ISmartDataManager smartDataManager, IConditionDataManager conditionDataManager)
+        {
+            foreach (var smartDataGroup in smartDataManager.GetGroupsData(type))
+            {
+                foreach (var member in smartDataGroup.Members)
+                {
+                    if (smartDataManager.Contains(type, member))
+                    {
+                        SmartItem i = new();
+                        SmartGenericJsonData data = smartDataManager.GetDataByName(type, member);
+                        i.Group = smartDataGroup.Name;
+                        i.Name = data.NameReadable;
+                        i.Id = data.Id;
+                        i.Help = data.Help;
+                        i.IsTimed = data.IsTimed;
+                        i.Deprecated = data.Deprecated;
+                        i.Data = data;
+
+                        allItems.Add(i);
+                    }
+                }
+            }
+
+            foreach (var conditionDataGroup in conditionDataManager.GetConditionGroups())
+            {
+                foreach (var member in conditionDataGroup.Members)
+                {
+                    if (conditionDataManager.HasConditionData(member))
+                    {
+                        SmartItem i = new();
+                        ConditionJsonData data = conditionDataManager.GetConditionData(member);
+
+                        i.Group = conditionDataGroup.Name;
+                        i.Name = data.NameReadable;
+                        i.Id = data.Id;
+                        i.Help = data.Help;
+                        i.Deprecated = false;
+                        i.ConditionData = data;
+
+                        allItems.Add(i);
+                    }
+                }
+            }
         }
 
         public DelegateCommand Accept { get; }

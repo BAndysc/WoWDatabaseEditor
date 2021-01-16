@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWDatabaseEditorCore", "WoWDatabaseEditor\WoWDatabaseEditorCore.csproj", "{99C9E82C-C594-446D-AA59-8FFBC43AD226}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoWDatabaseEditorCore", "WoWDatabaseEditor\WoWDatabaseEditorCore.csproj", "{99C9E82C-C594-446D-AA59-8FFBC43AD226}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C6BE1E01-CF2F-4FE5-A67C-AC783EB9D3F7} = {C6BE1E01-CF2F-4FE5-A67C-AC783EB9D3F7}
 		{4A11961B-85AD-464E-B881-C90F8CAC5647} = {4A11961B-85AD-464E-B881-C90F8CAC5647}
@@ -18,37 +18,37 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWDatabaseEditorCore", "Wo
 		{B060C7F1-97B0-4A26-B7A8-E47C9AF08D07} = {B060C7F1-97B0-4A26-B7A8-E47C9AF08D07}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SmartScriptEditor", "WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj", "{B060C7F1-97B0-4A26-B7A8-E47C9AF08D07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.SmartScriptEditor", "WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj", "{B060C7F1-97B0-4A26-B7A8-E47C9AF08D07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common", "WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj", "{9D1A4E14-2FE1-403A-A042-ED7E49DB0438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Common", "WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj", "{9D1A4E14-2FE1-403A-A042-ED7E49DB0438}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Solutions", "WDE.Solutions\WDE.Solutions.csproj", "{ACD1C8BC-B91A-40E8-865D-D6826758E7CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Solutions", "WDE.Solutions\WDE.Solutions.csproj", "{ACD1C8BC-B91A-40E8-865D-D6826758E7CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Parameters", "WDE.Parameters\WDE.Parameters.csproj", "{3CD1E251-D9BF-4061-A8D5-4AC65106C896}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Parameters", "WDE.Parameters\WDE.Parameters.csproj", "{3CD1E251-D9BF-4061-A8D5-4AC65106C896}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DbcStore", "WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj", "{A6109F89-0148-4C39-8631-206FFEFBA055}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.DbcStore", "WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj", "{A6109F89-0148-4C39-8631-206FFEFBA055}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.History", "WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj", "{BC7E0845-C750-4DAF-8869-9170211465E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.History", "WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj", "{BC7E0845-C750-4DAF-8869-9170211465E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SQLEditor", "WDE.SQLEditor\WDE.SQLEditor.csproj", "{7E0DE187-A45C-406B-AAAE-608F40237CE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.SQLEditor", "WDE.SQLEditor\WDE.SQLEditor.csproj", "{7E0DE187-A45C-406B-AAAE-608F40237CE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.HistoryWindow", "WDE.HistoryWindow\WDE.HistoryWindow.csproj", "{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.HistoryWindow", "WDE.HistoryWindow\WDE.HistoryWindow.csproj", "{CF6D62D2-2332-4223-8499-ABF1CEDF3FC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.TrinityMySqlDatabase", "WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj", "{C6BE1E01-CF2F-4FE5-A67C-AC783EB9D3F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.TrinityMySqlDatabase", "WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj", "{C6BE1E01-CF2F-4FE5-A67C-AC783EB9D3F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Blueprints", "WDE.Blueprints\WDE.Blueprints.csproj", "{4A11961B-85AD-464E-B881-C90F8CAC5647}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Blueprints", "WDE.Blueprints\WDE.Blueprints.csproj", "{4A11961B-85AD-464E-B881-C90F8CAC5647}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeminiGraphEditor", "GeminiGraphEditor\GeminiGraphEditor.csproj", "{99F6C079-A4C1-4167-992C-B02EBAA70219}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeminiGraphEditor", "GeminiGraphEditor\GeminiGraphEditor.csproj", "{99F6C079-A4C1-4167-992C-B02EBAA70219}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.QuestChainEditor", "WDE.QuestChainEditor\WDE.QuestChainEditor.csproj", "{F9373E23-7E19-44D2-8EC9-E638ED1243AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.QuestChainEditor", "WDE.QuestChainEditor\WDE.QuestChainEditor.csproj", "{F9373E23-7E19-44D2-8EC9-E638ED1243AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuestChainTest", "QuestChainTest\QuestChainTest.csproj", "{8F5E8C3A-422A-47C6-AFC3-4A62997E5D27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuestChainTest", "QuestChainTest\QuestChainTest.csproj", "{8F5E8C3A-422A-47C6-AFC3-4A62997E5D27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Module", "WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj", "{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Module", "WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj", "{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.ThemeChanger", "WDE.ThemeChanger\WDE.ThemeChanger.csproj", "{11BFD551-37B0-45A1-9890-CB5481B64E7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.ThemeChanger", "WDE.ThemeChanger\WDE.ThemeChanger.csproj", "{11BFD551-37B0-45A1-9890-CB5481B64E7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Conditions", "WDE.Conditions\WDE.Conditions.csproj", "{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Conditions", "WDE.Conditions\WDE.Conditions.csproj", "{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

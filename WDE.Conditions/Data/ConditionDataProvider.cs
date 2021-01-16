@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
 using WDE.Module.Attributes;
 
 namespace WDE.Conditions.Data
@@ -9,21 +8,17 @@ namespace WDE.Conditions.Data
     {
         private readonly List<ConditionJsonData> conditions;
         private readonly List<ConditionSourcesJsonData> condition_sources;
+        private readonly List<ConditionGroupsJsonData> conditionGroups;
 
-        public ConditionDataProvider(IConditionDataJsonProvider provider)
+        public ConditionDataProvider(IConditionDataJsonProvider provider, IConditionDataSerializationProvider serializationProvider)
         {
-            conditions = JsonConvert.DeserializeObject<List<ConditionJsonData>>(provider.GetConditionsJson());
-            condition_sources = JsonConvert.DeserializeObject<List<ConditionSourcesJsonData>>(provider.GetConditionSourcesJson());
+            conditions = serializationProvider.DeserializeConditionData<ConditionJsonData>(provider.GetConditionsJson());
+            condition_sources = serializationProvider.DeserializeConditionData<ConditionSourcesJsonData>(provider.GetConditionSourcesJson());
+            conditionGroups = serializationProvider.DeserializeConditionData<ConditionGroupsJsonData>(provider.GetConditionGroupsJson());
         }
 
-        public IEnumerable<ConditionJsonData> GetConditions()
-        {
-            return conditions;
-        }
-
-        public IEnumerable<ConditionSourcesJsonData> GetConditionSources()
-        {
-            return condition_sources;
-        }
+        public IEnumerable<ConditionJsonData> GetConditions() => conditions;
+        public IEnumerable<ConditionSourcesJsonData> GetConditionSources() => condition_sources;
+        public IEnumerable<ConditionGroupsJsonData> GetConditionGroups() => conditionGroups;
     }
 }

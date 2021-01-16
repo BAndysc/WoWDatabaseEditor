@@ -1,0 +1,93 @@
+[
+    {
+        "name": "Script",
+        "group_members": [
+            "CONDITION_NONE",
+            "CONDITION_LOGICAL_OR"
+        ]
+    },
+    {
+        "name": "Quest",
+        "group_members": [
+            "CONDITION_QUESTREWARDED",
+            "CONDITION_QUESTTAKEN",
+            "CONDITION_QUEST_COMPLETE",
+            "CONDITION_QUEST_NONE"
+        ]
+    },
+    {
+        "name": "Map and area",
+        "group_members": [
+            "CONDITION_MAPID",
+            "CONDITION_AREAID",
+            "CONDITION_ZONEID",
+            "CONDITION_TERRAIN_SWAP"
+        ]
+    },
+    {
+        "name": "Unit",
+        "group_members": [
+            "CONDITION_CLASS",
+            "CONDITION_RACE",
+            "CONDITION_LEVEL",
+            "CONDITION_UNIT_STATE",
+            "CONDITION_TYPE_MASK",
+            "CONDITION_OBJECT_ENTRY_GUID",
+            "CONDITION_CREATURE_TYPE"
+        ]
+    },
+    {
+        "name": "World",
+        "group_members": [
+            "CONDITION_WORLD_STATE",
+            "CONDITION_ACTIVE_EVENT",
+            "CONDITION_INSTANCE_INFO"
+        ]
+    },
+    {
+        "name": "Auras",
+        "group_members": [
+            "CONDITION_AURA"
+        ]
+    },
+    {
+        "name": "Player",
+        "group_members": [
+            "CONDITION_ACHIEVEMENT",
+            "CONDITION_TITLE",
+            "CONDITION_ITEM",
+            "CONDITION_ITEM_EQUIPPED",
+            "CONDITION_REPUTATION_RANK",
+            "CONDITION_TEAM",
+            "CONDITION_GENDER",
+            "CONDITION_SKILL",
+            "CONDITION_DRUNKENSTATE",
+            "CONDITION_SPELL"
+        ]
+    },
+    {
+        "name": "Distance",
+        "group_members": [
+            "CONDITION_NEAR_CREATURE",
+            "CONDITION_NEAR_GAMEOBJECT",
+            "CONDITION_DISTANCE_TO"
+        ]
+    },
+    {
+        "name": "HP",
+        "group_members": [
+            "CONDITION_ALIVE",
+            "CONDITION_HP_VAL",
+            "CONDITION_HP_PCT"
+        ]
+    },
+    {
+        "name": "Misc",
+        "group_members": [
+            "CONDITION_SPAWNMASK",
+            "CONDITION_PHASEID",
+            "CONDITION_RELATION_TO",
+            "CONDITION_REACTION_TO"
+        ]
+    }
+]
