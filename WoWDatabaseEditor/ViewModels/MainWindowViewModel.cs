@@ -129,7 +129,10 @@ namespace WoWDatabaseEditor.ViewModels
         {
             ISolutionItem? item = newItemService.GetNewSolutionItem();
             if (item != null)
+            {
                 solutionManager.Items.Add(item);
+                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
+            }
         }
 
         public ITool? ResolveViewModel(string id)
