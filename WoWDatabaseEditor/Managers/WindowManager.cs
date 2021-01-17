@@ -110,6 +110,7 @@ namespace WoWDatabaseEditor.Managers
                 OpenedTools.Add(tool);
 
             tool.Visibility = Visibility.Visible;
+            tool.IsSelected = true;
         }
 
         private class Command : ICommand

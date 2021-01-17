@@ -59,6 +59,13 @@ namespace WDE.HistoryWindow.ViewModels
 
         public string Title => "History";
 
+        private bool isSelected;
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
+        }
+        
         public Visibility Visibility
         {
             get => visibility;

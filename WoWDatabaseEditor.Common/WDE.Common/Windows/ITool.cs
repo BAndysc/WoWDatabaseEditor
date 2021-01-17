@@ -11,6 +11,7 @@ namespace WDE.Common.Windows
         Visibility Visibility { get; set; }
         ToolPreferedPosition PreferedPosition { get; }
         bool OpenOnStart { get; }
+        bool IsSelected { get; set; }
     }
 
     public enum ToolPreferedPosition

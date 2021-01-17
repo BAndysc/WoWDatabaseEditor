@@ -24,7 +24,7 @@ namespace WDE.TrinityMySqlDatabase.Tools
  
         public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Bottom;
         public bool OpenOnStart => false;
-        
+
         public TextDocument Text { get; } = new TextDocument();
         public Visibility Visibility
         {
@@ -45,6 +45,13 @@ namespace WDE.TrinityMySqlDatabase.Tools
             }
         }
 
+        private bool isSelected;
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
+        }
+        
         public DebugQueryToolViewModel(IDatabaseLogger databaseLogger)
         {
             this.databaseLogger = databaseLogger;

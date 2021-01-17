@@ -183,7 +183,14 @@ namespace WDE.Solutions.Explorer.ViewModels
                 destList.Insert(Math.Clamp(destPosition, 0, destList.Count), sourceItem.Item);
             }
         }
-
+        
+        private bool isSelected;
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
+        }
+        
         public string Title { get; } = "Solution explorer";
 
         public Visibility Visibility

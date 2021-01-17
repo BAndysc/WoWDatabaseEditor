@@ -153,24 +153,34 @@
                         </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
                     </views:PaneDocumentTemplateSelector>
                 </DockingManager.LayoutItemTemplateSelector>
-                <DockingManager.LayoutItemContainerStyle>
-                    <!-- you can add additional bindings from the layoutitem to the DockWindowViewModel -->
-                    <Style TargetType="{x:Type LayoutItem}">
-                        <Setter Property="ContentId" Value="{Binding Model.UniqueId}" />
-                        <Setter Property="Title">
-                            <Setter.Value>
-                                <MultiBinding Converter="{StaticResource DocumentOrToolToTitleConverter}">
-                                    <Binding Path="Model.Title"/>
-                                    <Binding Path="Model.IsModified"/>
-                                    <Binding Path="Model.IsLoading"/>
-                                </MultiBinding>
-                            </Setter.Value>
-                            </Setter>
-                        <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
-                        <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
-                        <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}" />
-                    </Style>
-                </DockingManager.LayoutItemContainerStyle>
+
+                <DockingManager.LayoutItemContainerStyleSelector>
+                    <helpers:PanesStyleSelector>
+                        <helpers:PanesStyleSelector.ToolStyle>
+                            <Style TargetType="{x:Type LayoutAnchorableItem}">
+                                <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}" />
+                                <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}" />
+                                <Setter Property="ContentId" Value="{Binding Model.UniqueId}" />
+                                <Setter Property="Title" Value="{Binding Model.Title}" />
+                            </Style>
+                        </helpers:PanesStyleSelector.ToolStyle>
+                        <helpers:PanesStyleSelector.DocumentStyle>
+                            <Style TargetType="{x:Type LayoutItem}">
+                                <Setter Property="Title">
+                                    <Setter.Value>
+                                        <MultiBinding Converter="{StaticResource DocumentOrToolToTitleConverter}">
+                                            <Binding Path="Model.Title"/>
+                                            <Binding Path="Model.IsModified"/>
+                                            <Binding Path="Model.IsLoading"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+                                <Setter Property="CanClose" Value="{Binding Model.CanClose}" />
+                            </Style>
+                        </helpers:PanesStyleSelector.DocumentStyle>
+                    </helpers:PanesStyleSelector>
+                </DockingManager.LayoutItemContainerStyleSelector>
                 <DockingManager.DocumentHeaderTemplate>                
                     <DataTemplate>
                         <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis">
