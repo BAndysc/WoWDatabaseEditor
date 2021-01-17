@@ -150,7 +150,7 @@ namespace WoWDatabaseEditor.Extensions
         {
             foreach (object item in view)
             {
-                GridViewColumn column = CreateColumn(gridView, item);
+                GridViewColumn column = CreateColumn(gridView, item as ColumnDescriptor);
 
                 gridView.Columns.Add(column);
             }
@@ -176,7 +176,7 @@ namespace WoWDatabaseEditor.Extensions
                     {
                         for (var i = 0; i < e.NewItems.Count; i++)
                         {
-                            GridViewColumn column = CreateColumn(gridView, e.NewItems[i]);
+                            GridViewColumn column = CreateColumn(gridView, e.NewItems[i] as ColumnDescriptor);
                             gridView.Columns.Insert(e.NewStartingIndex + i, column);
                         }
                     }
@@ -213,7 +213,7 @@ namespace WoWDatabaseEditor.Extensions
                     {
                         for (var i = 0; i < e.NewItems.Count; i++)
                         {
-                            GridViewColumn column = CreateColumn(gridView, e.NewItems[i]);
+                            GridViewColumn column = CreateColumn(gridView, e.NewItems[i] as ColumnDescriptor);
                             gridView.Columns[e.NewStartingIndex + i] = column;
                         }
                     }
@@ -230,12 +230,13 @@ namespace WoWDatabaseEditor.Extensions
             }
         }
 
-        private static GridViewColumn CreateColumn(GridView gridView, object columnSource)
+        private static GridViewColumn CreateColumn(GridView gridView, ColumnDescriptor columnSource)
         {
             GridViewColumn column = new();
+            
             string headerTextMember = GetHeaderTextMember(gridView);
             string displayMemberMember = GetDisplayMemberMember(gridView);
-            bool checkbox = (columnSource as ColumnDescriptor).CheckboxMember;
+            bool checkbox = columnSource.CheckboxMember;
             string styleString = GetColumnHeadStyleName(gridView);
             column.Width = 90;
             if (!string.IsNullOrEmpty(headerTextMember))
@@ -263,8 +264,13 @@ namespace WoWDatabaseEditor.Extensions
                     column.HeaderContainerStyle = style;
             }
 
-            // Set Widht to NaN in order to stretch it to match conent
-            column.Width = double.NaN;
+            if (columnSource.PreferredWidth.HasValue)
+                column.Width = columnSource.PreferredWidth.Value;
+            else
+            {
+                // Set Widht to NaN in order to stretch it to match conent
+                column.Width = double.NaN;
+            }
             return column;
         }
 

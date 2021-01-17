@@ -26,13 +26,13 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
-                new("Key", "Key"),
+                new("Key", "Key", 50),
                 new("Name", "Value.Name"),
                 new("Description", "Value.Description")
             };
 
             if (asFlags)
-                Columns.Insert(0, new ColumnDescriptor("", "Value.IsChecked", true));
+                Columns.Insert(0, new ColumnDescriptor("", "Value.IsChecked", null, true));
 
             this.items = new CollectionViewSource();
             this.items.Source = RawItems;

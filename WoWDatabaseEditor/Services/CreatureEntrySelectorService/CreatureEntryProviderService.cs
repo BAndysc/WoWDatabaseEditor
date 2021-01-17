@@ -29,7 +29,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
             List<ColumnDescriptor> columns = new()
             {
-                new ColumnDescriptor("Entry", "Entry"),
+                new ColumnDescriptor("Entry", "Entry", 50),
                 new ColumnDescriptor("Name", "Name")
             };
 
