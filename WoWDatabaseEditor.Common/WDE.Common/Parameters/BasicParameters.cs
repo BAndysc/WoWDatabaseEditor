@@ -100,7 +100,7 @@ namespace WDE.Common.Parameters
 
         public override Parameter Clone()
         {
-            return new FlagParameter(Name) {Value = value};
+            return new FlagParameter(Name) {Value = value, Items = Items};
         }
     }
 }

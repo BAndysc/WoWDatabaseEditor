@@ -32,6 +32,8 @@ namespace WDE.Parameters
             factory.Register("GameobjectParameter", s => new GameobjectParameter(s, database));
 
             factory.Register("BoolParameter", s => new BoolParameter(s));
+            
+            factory.Register("FlagParameter", s => new FlagParameter(s));
         }
     }
 
