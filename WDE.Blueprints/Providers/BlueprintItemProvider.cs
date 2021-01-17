@@ -6,7 +6,7 @@ using WDE.Module.Attributes;
 
 namespace WDE.Blueprints.Providers
 {
-    [AutoRegister]
+    //[AutoRegister]
     public class BlueprintItemProvider : ISolutionItemProvider
     {
         public ISolutionItem CreateSolutionItem()
