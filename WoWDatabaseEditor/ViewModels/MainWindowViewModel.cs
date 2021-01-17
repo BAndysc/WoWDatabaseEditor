@@ -71,14 +71,24 @@ namespace WoWDatabaseEditor.ViewModels
                             WindowManager.OpenDocument(documents[item]);
                         else
                         {
-                            IDocument? editor = solutionEditorManager.GetEditor(item);
-                            if (editor == null)
-                                MessageBox.Show("Editor for " + item.GetType() + " not registered.");
-                            else
+                            try
                             {
+                                IDocument editor = solutionEditorManager.GetEditor(item);
                                 WindowManager.OpenDocument(editor);
                                 documents[item] = editor;
                                 documentToSolution[editor] = item;
+                            }
+                            catch (SolutionItemEditorNotFoundException e)
+                            {
+                                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Editor not found")
+                                    .SetMainInstruction("Couldn't open item, because there is no editor registered for type " +
+                                                        item.GetType().Name)
+                                    #if DEBUG
+                                    .SetContent($"There should be class that implements ISolutionItemEditorProvider<{item.GetType().Name}> and this class should be registered in containerRegister in module.")
+                                    #endif
+                                    .SetIcon(MessageBoxIcon.Warning)
+                                    .WithOkButton(true)
+                                    .Build());
                             }
                         }
                     },

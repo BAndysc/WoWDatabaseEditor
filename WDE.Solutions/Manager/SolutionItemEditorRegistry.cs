@@ -31,8 +31,9 @@ namespace WDE.Solutions.Manager
 
         private IDocument GetEditor<T>(T item) where T : ISolutionItem
         {
-            var x = editorProviders[item.GetType()] as ISolutionItemEditorProvider<T>;
-            return x.GetEditor(item);
+            if (!editorProviders.TryGetValue(item.GetType(), out var editor))
+                throw new SolutionItemEditorNotFoundException(item);
+            return (editor as ISolutionItemEditorProvider<T>).GetEditor(item);
         }
     }
 }
