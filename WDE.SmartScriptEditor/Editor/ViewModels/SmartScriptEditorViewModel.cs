@@ -924,6 +924,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private void AddEventCommand()
         {
+            DeselectAll.Execute();
             int? id = smartTypeListProvider.Get(SmartType.SmartEvent,
                 data => { return data.ValidTypes == null || data.ValidTypes.Contains(script.SourceType); });
 

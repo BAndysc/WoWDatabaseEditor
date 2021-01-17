@@ -25,8 +25,8 @@
     <SolidColorBrush x:Key="SmartScripts.Action.Selected.Background" Color="#FFF2BF" />
     <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="#282828" />
     
-    <SolidColorBrush x:Key="SmartScripts.Comment.Background" Color="#E4E5CC4F" />
-    <SolidColorBrush x:Key="SmartScripts.Comment.Border" Color="#CD9920" />
+    <SolidColorBrush x:Key="SmartScripts.Comment.Background" Color="#E1F3C9" />
+    <SolidColorBrush x:Key="SmartScripts.Comment.Border" Color="#D1E577" />
     <SolidColorBrush x:Key="SmartScripts.Comment.Foreground" Color="#282828" />
     <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Border" Color="#F5C61F" />
     <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Background" Color="#FFF2BF" />

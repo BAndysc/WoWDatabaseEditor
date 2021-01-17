@@ -32,7 +32,11 @@
         <KeyBinding Key="Left" Command="{Binding SelectionLeft}" />
     </UserControl.InputBindings>
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-        <DockPanel Background="{DynamicResource SmartScripts.Background}" LastChildFill="True">
+        <Grid Background="{DynamicResource SmartScripts.Background}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MinHeight="30" />
+            </Grid.RowDefinitions>
             <ItemsControl ItemsSource="{Binding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
                           Margin="7,0,7,0">
                 <ItemsControl.Resources>
@@ -122,33 +126,28 @@
                     </Style>
                 </ItemsControl.ItemContainerStyle>
             </ItemsControl>
-            <Canvas Background="Transparent" MinHeight="30">
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="MouseDown">
-                        <b:InvokeCommandAction Command="{Binding DeselectAll}" />
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
-                <Button
-                    BorderThickness="0" Background="#E9EFFB"
-                    Foreground="#BFCCDE" Content="Add event"
-                    Margin="4,0,0,0"
-                    VerticalAlignment="Top"
-                    Command="{Binding AddEvent}">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="OverridesDefaultStyle" Value="True" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <ContentPresenter HorizontalAlignment="Left"
-                                                          VerticalAlignment="Center" />
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </Canvas>
-        </DockPanel>
+            <Button
+                Grid.Row="1" 
+                BorderThickness="0" Background="#E9EFFB"
+                Foreground="#BFCCDE" Content="Add event"
+                Margin="4,0,0,0"
+                VerticalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                VerticalContentAlignment="Top"
+                Command="{Binding AddEvent}">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="OverridesDefaultStyle" Value="True" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
     </ScrollViewer>
 </UserControl>
