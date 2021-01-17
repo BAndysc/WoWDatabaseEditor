@@ -21,7 +21,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
             <RowDefinition />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <TextBlock Text="{Binding Readable}" Margin="0,0,0,10" />
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
@@ -62,10 +62,14 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-        <DockPanel Grid.Row="2" Margin="0,10,0,0" LastChildFill="True">
-            <Button Command="{StaticResource CloseDialogCommand}" Content="  Cancel  " DockPanel.Dock="Left" />
-            <Button Command="{StaticResource AcceptDialogCommand}" Content="  Ok  " DockPanel.Dock="Right" />
-            <Label />
-        </DockPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Command="{StaticResource CloseDialogCommand}" Content="Cancel" IsCancel="True" />
+            <Button Command="{StaticResource AcceptDialogCommand}" Grid.Column="2" Content="Ok" />
+        </Grid>
     </Grid>
 </Window>

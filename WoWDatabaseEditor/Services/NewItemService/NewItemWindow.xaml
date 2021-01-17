@@ -10,12 +10,12 @@
             LightMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
             LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
     </Metro:MetroWindow.WindowButtonCommands>
-    <DockPanel Margin="10">
-        <WrapPanel FlowDirection="RightToLeft" DockPanel.Dock="Bottom" Margin="0,10,0,0">
-            <Button Content="Cancel" IsCancel="True" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75"
-                    Margin="0,0,19,0" />
-            <Button Content="OK" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="Button_Click" />
-        </WrapPanel>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
         <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectedItem="{Binding SelectedPrototype}"
                   ItemsSource="{Binding ItemPrototypes}" HorizontalContentAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" IsSynchronizedWithCurrentItem="True"
@@ -39,6 +39,14 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-
-    </DockPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" IsCancel="True" />
+            <Button Grid.Column="2" Content="OK" Click="Button_Click" />
+        </Grid>
+    </Grid>
 </Metro:MetroWindow>

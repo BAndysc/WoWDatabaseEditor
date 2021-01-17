@@ -42,8 +42,9 @@
                 "compare_type": "LOWER_OR_EQUALS"
             }
         ],
-        "description": "When in combat and timer at the begining between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
-        "name_readable": "Every X seconds (in combat)",
+      "is_timed": true,
+      "description": "When in combat and timer at the begining between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+      "name_readable": "Every X seconds (in combat)",
     "description_rules": [
       {
         "description": "After {pram1} seconds",
@@ -265,6 +266,7 @@
             "Gameobject",
             "Instance"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_UPDATE_OOC",
         "parameters": [
             {
@@ -523,6 +525,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_HEALT_PCT",
         "parameters": [
             {
@@ -568,6 +571,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_MANA_PCT",
         "parameters": [
             {
@@ -719,6 +723,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_RANGE",
         "parameters": [
             {
@@ -844,6 +849,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_TARGET_HEALTH_PCT",
         "parameters": [
             {
@@ -889,6 +895,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_VICTIM_CASTING",
         "parameters": [
             {
@@ -923,6 +930,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_FRIENDLY_HEALTH",
         "parameters": [
             {
@@ -962,6 +970,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_FRIENDLY_IS_CC",
         "parameters": [
             {
@@ -996,6 +1005,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_FRIENDLY_MISSING_BUFF",
         "parameters": [
             {
@@ -1070,6 +1080,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_TARGET_MANA_PCT",
         "parameters": [
             {
@@ -1193,6 +1204,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_HAS_AURA",
         "parameters": [
             {
@@ -1232,6 +1244,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_TARGET_BUFFED",
         "parameters": [
             {
@@ -2089,6 +2102,7 @@
                 "description": ""
             }
         ],
+        "is_timed": true,
         "description": "Every {pram3} and {pram4} ms (for the first time, timer between {pram1} and {pram2} ms)",
         "name_readable": "Every X seconds",
     "description_rules": [
@@ -2397,6 +2411,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_IS_BEHIND_TARGET",
         "parameters": [
             {
@@ -2531,6 +2546,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT",
         "parameters": [
             {
@@ -2576,6 +2592,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_DISTANCE_CREATURE",
         "parameters": [
             {
@@ -2607,6 +2624,7 @@
         "valid_types": [
             "Creature"
         ],
+        "is_timed": true,
         "name": "SMART_EVENT_DISTANCE_GAMEOBJECT",
         "parameters": [
             {

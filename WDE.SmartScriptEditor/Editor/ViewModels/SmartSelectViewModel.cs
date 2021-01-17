@@ -41,6 +41,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         i.Name = data.NameReadable;
                         i.Id = data.Id;
                         i.Help = data.Help;
+                        i.IsTimed = data.IsTimed;
                         i.Deprecated = data.Deprecated;
                         i.Data = data;
 
@@ -112,5 +113,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public string Help { get; set; }
         public int Id { get; set; }
         public string Group { get; set; }
+        public bool IsTimed { get; set; }
     }
 }

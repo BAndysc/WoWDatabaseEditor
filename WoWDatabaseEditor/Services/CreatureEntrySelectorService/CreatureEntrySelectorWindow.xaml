@@ -11,7 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <TextBox Margin="0,0,0,6" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
         <ListView VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
@@ -25,7 +25,12 @@
                           ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}" />
             </ListView.View>
         </ListView>
-        <Button Grid.Row="2" HorizontalAlignment="Right" VerticalContentAlignment="Stretch" Content="Ok" Width="63"
-                Click="Button_Click" />
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Click="Button_Click" Grid.Column="1" Content="Ok" />
+        </Grid>
     </Grid>
 </Window>
