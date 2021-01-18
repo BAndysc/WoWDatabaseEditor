@@ -3,14 +3,17 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Data;
+using System.Windows.Input;
 using Microsoft.Xaml.Behaviors.Core;
+using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common.Managers;
 using WDE.Conditions.Data;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class SmartSelectViewModel : BindableBase
+    public class SmartSelectViewModel : BindableBase, IDialog
     {
         private readonly ObservableCollection<SmartItem> allItems = new();
 
@@ -73,6 +76,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             if (items.View.MoveCurrentToFirst())
                 SelectedItem = items.View.CurrentItem as SmartItem;
+
+            Accept = new DelegateCommand(() =>
+            {
+                CloseOk?.Invoke();
+            }, () => selectedItem != null);
         }
 
         public ICollectionView AllItems => items.View;
@@ -90,7 +98,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public SmartItem SelectedItem
         {
             get => selectedItem;
-            set => SetProperty(ref selectedItem, value);
+            set
+            {
+                SetProperty(ref selectedItem, value);
+                Accept?.RaiseCanExecuteChanged();
+            }
         }
 
         private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
@@ -102,8 +114,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             else
                 filterEventArgs.Accepted = string.IsNullOrEmpty(SearchBox) || item.Name.ToLower().Contains(SearchBox.ToLower());
         }
-    }
 
+        public DelegateCommand Accept { get; }
+        public int DesiredWidth => 750;
+        public int DesiredHeight => 650;
+        public string Title => "Pick";
+        public bool Resizeable => true;
+        public event Action CloseCancel;
+        public event Action CloseOk;
+    }
+    
     public class SmartItem
     {
         public SmartGenericJsonData Data;

@@ -96,4 +96,9 @@
   <ItemGroup>
     <Folder Include="Events" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>C:\Users\bkorczyn\.nuget\packages\microsoft.xaml.behaviors.wpf\1.1.19\lib\netcoreapp3.0\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

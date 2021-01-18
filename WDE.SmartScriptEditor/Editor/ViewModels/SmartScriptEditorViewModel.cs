@@ -43,6 +43,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ISmartFactory smartFactory;
         private readonly ISmartTypeListProvider smartTypeListProvider;
         private readonly IStatusBar statusbar;
+        private readonly IWindowManager windowManager;
         private readonly SubscriptionToken token;
 
         private SmartScriptSolutionItem item;
@@ -65,6 +66,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IItemFromListProvider itemFromListProvider,
             ISmartTypeListProvider smartTypeListProvider,
             IStatusBar statusbar,
+            IWindowManager windowManager,
             ISolutionItemNameRegistry itemNameRegistry,
             ITaskRunner taskRunner)
         {
@@ -75,6 +77,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.itemFromListProvider = itemFromListProvider;
             this.smartTypeListProvider = smartTypeListProvider;
             this.statusbar = statusbar;
+            this.windowManager = windowManager;
             this.itemNameRegistry = itemNameRegistry;
             this.taskRunner = taskRunner;
             this.conditionDataManager = conditionDataManager;
@@ -938,8 +941,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private bool EditActionCommand(SmartAction originalAction)
         {
-            //@todo: constructing view in place is veeery ugly
-            ParametersEditView v = new();
             SmartAction obj = originalAction.Copy();
 
             SmartGenericJsonData actionData = smartDataManager.GetRawData(SmartType.SmartAction, originalAction.Id);
@@ -982,8 +983,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, floatParametersList, stringParametersList);
-            v.DataContext = viewModel;
-            bool result = v.ShowDialog() ?? false;
+
+            var result = windowManager.ShowDialog(viewModel);
             if (result)
             {
                 using (originalAction.BulkEdit("Edit action " + obj.Readable))
@@ -1011,8 +1012,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private bool EditConditionCommand(SmartCondition originalCondition)
         {
-            //@todo: constructing view in place is veeery ugly
-            ParametersEditView v = new();
             SmartCondition obj = originalCondition.Copy();
 
             var parametersList = new List<(Parameter, string)>();
@@ -1027,8 +1026,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList);
-            v.DataContext = viewModel;
-            bool result = v.ShowDialog() ?? false;
+            bool result = windowManager.ShowDialog(viewModel);
             if (result)
             {
                 using (originalCondition.BulkEdit("Edit condition " + obj.Readable))
@@ -1052,10 +1050,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private bool EditEventCommand(SmartEvent originalEvent)
         {
-            //@todo: constructing view in place is veeery ugly
             SmartEvent ev = originalEvent.ShallowCopy();
 
-            ParametersEditView v = new();
             var parametersList = new List<(Parameter, string)>();
             parametersList.Add((ev.Chance, "General"));
             parametersList.Add((ev.Flags, "General"));
@@ -1070,8 +1066,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, ev, parametersList);
-            v.DataContext = viewModel;
-            bool result = v.ShowDialog() ?? false;
+            bool result = windowManager.ShowDialog(viewModel);
             if (result)
             {
                 using (originalEvent.BulkEdit("Edit event " + ev.Readable))

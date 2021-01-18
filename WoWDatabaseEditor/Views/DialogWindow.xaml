@@ -1,0 +1,30 @@
+﻿<mah:MetroWindow x:Class="WoWDatabaseEditor.Views.DialogWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:local="clr-namespace:WoWDatabaseEditor.Views"
+                      xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
+                      xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                      xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
+                      mc:Ignorable="d"
+                      WindowStyle="ToolWindow"
+                      ShowInTaskbar="False"
+                      WindowTransitionsEnabled="False"
+                      Style="{DynamicResource MainWindowStyle}"
+                      WindowStartupLocation="CenterOwner"
+                      utils:ViewBind.Model="{Binding}"
+                      Title="{Binding Title}" >
+    <mah:MetroWindow.Resources>
+        <helpers:BoolToResizeModeConverter x:Key="BoolToResizeModeConverter" />
+    </mah:MetroWindow.Resources>
+    <mah:MetroWindow.ResizeMode>
+        <Binding Path="Resizeable" Converter="{StaticResource BoolToResizeModeConverter}"/>
+    </mah:MetroWindow.ResizeMode>
+    <mah:MetroWindow.WindowButtonCommands>
+        <mah:WindowButtonCommands
+            LightCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+            LightMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
+            LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
+    </mah:MetroWindow.WindowButtonCommands>
+</mah:MetroWindow>

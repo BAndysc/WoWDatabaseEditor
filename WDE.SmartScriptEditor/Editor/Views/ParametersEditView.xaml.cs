@@ -8,7 +8,7 @@ namespace WDE.SmartScriptEditor.Editor.Views
     /// <summary>
     ///     Interaction logic for ParametersEditView.xaml
     /// </summary>
-    public partial class ParametersEditView : Window
+    public partial class ParametersEditView : UserControl
     {
         public ParametersEditView()
         {
@@ -39,18 +39,6 @@ namespace WDE.SmartScriptEditor.Editor.Views
             }
 
             return null;
-        }
-
-        private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            DialogResult = false;
-            Close();
-        }
-
-        private void AcceptCommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            DialogResult = true;
-            Close();
         }
     }
 }

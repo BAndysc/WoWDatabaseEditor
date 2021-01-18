@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
 using WDE.Module.Attributes;
@@ -7,16 +10,21 @@ using WDE.Module.Attributes;
 namespace WoWDatabaseEditor.Services.NewItemService
 {
     [AutoRegister]
-    public class NewItemWindowViewModel : BindableBase, INewItemWindowViewModel
+    public class NewItemDialogViewModel : BindableBase, INewItemDialogViewModel
     {
         private NewItemPrototypeInfo? selectedPrototype;
 
-        public NewItemWindowViewModel(IEnumerable<ISolutionItemProvider> items)
+        public NewItemDialogViewModel(IEnumerable<ISolutionItemProvider> items)
         {
             ItemPrototypes = new ObservableCollection<NewItemPrototypeInfo>();
 
             foreach (var item in items)
                 ItemPrototypes.Add(new NewItemPrototypeInfo(item));
+
+            Accept = new DelegateCommand(() =>
+            {
+                CloseOk?.Invoke();
+            });
         }
 
         public ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; }
@@ -26,5 +34,13 @@ namespace WoWDatabaseEditor.Services.NewItemService
             get => selectedPrototype;
             set => SetProperty(ref selectedPrototype, value);
         }
+    
+        public ICommand Accept { get; }
+        public int DesiredWidth => 600;
+        public int DesiredHeight => 430;
+        public string Title => "New item";
+        public bool Resizeable => false;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 }

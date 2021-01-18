@@ -4,6 +4,7 @@ using System.Linq;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.Managers;
 using WDE.Module.Attributes;
 using WoWDatabaseEditor.Extensions;
 
@@ -14,29 +15,28 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
     {
         private readonly Func<T, uint> entryGetter;
         private readonly Func<T, string> index;
+        private readonly IWindowManager windowManager;
 
-        protected GenericDatabaseProviderService(Func<T, uint> entryGetter, Func<T, string> index)
+        protected GenericDatabaseProviderService(IWindowManager windowManager, Func<T, uint> entryGetter, Func<T, string> index)
         {
             this.entryGetter = entryGetter;
             this.index = index;
+            this.windowManager = windowManager;
         }
 
         protected abstract IEnumerable<T> GetList();
 
         public uint? GetEntryFromService()
         {
-            CreatureEntrySelectorWindow window = new();
-
             List<ColumnDescriptor> columns = new()
             {
                 new ColumnDescriptor("Entry", "Entry", 50),
                 new ColumnDescriptor("Name", "Name")
             };
 
-            var context = new GenericSelectorWindowViewModel<T>(columns, GetList(), entryGetter, index);
-            window.DataContext = context;
+            var context = new GenericSelectorDialogViewModel<T>(columns, GetList(), entryGetter, index);
 
-            if (window.ShowDialog() ?? false)
+            if (windowManager.ShowDialog(context))
                 return context.GetEntry();
 
             return null;
@@ -47,7 +47,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
     {
         private readonly IDatabaseProvider database;
 
-        public CreatureEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry)
+        public CreatureEntryProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager, t => t.Entry, t => t.Name + " " + t.Entry)
         {
             this.database = database;
         }
@@ -62,7 +62,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
     {
         private readonly IDatabaseProvider database;
 
-        public GameobjectEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry)
+        public GameobjectEntryProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager,t => t.Entry, t => t.Name + " " + t.Entry)
         {
             this.database = database;
         }
@@ -77,7 +77,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
     {
         private readonly IDatabaseProvider database;
 
-        public QuestEntryProviderService(IDatabaseProvider database) : base(t => t.Entry, t => t.Name + " " + t.Entry)
+        public QuestEntryProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager, t => t.Entry, t => t.Name + " " + t.Entry)
         {
             this.database = database;
         }
@@ -104,7 +104,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
     {
         private readonly ISpellStore spellStore;
 
-        public SpellEntryProviderService(ISpellStore spellStore) : base(t => t.Entry, t => t.Name + " " + t.Entry)
+        public SpellEntryProviderService(IWindowManager windowManager, ISpellStore spellStore) : base(windowManager, t => t.Entry, t => t.Name + " " + t.Entry)
         {
             this.spellStore = spellStore;
         }

@@ -1,12 +1,13 @@
-﻿<Window x:Class="WDE.SmartScriptEditor.Editor.Views.SmartSelectView"
+﻿<UserControl x:Class="WDE.SmartScriptEditor.Editor.Views.SmartSelectView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Helpers"
         xmlns:system="clr-namespace:System;assembly=System.Runtime"
-        WindowStyle="ToolWindow"
-        Height="650" Width="750" WindowStartupLocation="CenterScreen" helpers:FocusBehavior.FocusFirst="true"
+        xmlns:mvvm="http://prismlibrary.com/"
+        helpers:FocusBehavior.FocusFirst="true"
+        mvvm:ViewModelLocator.AutoWireViewModel="False"
         Background="{DynamicResource SmartScripts.Background}">
-    <Window.Resources>
+    <UserControl.Resources>
         
         <DrawingImage x:Key="cogIcon">
             <DrawingImage.Drawing>
@@ -41,7 +42,7 @@
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
-    </Window.Resources>
+    </UserControl.Resources>
     <Grid Margin="6">
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
@@ -58,7 +59,7 @@
             <TextBox KeyUp="TextBox_KeyUp" Grid.Column="1" Text="{Binding SearchBox, UpdateSourceTrigger=PropertyChanged}"
                      VerticalContentAlignment="Center" />
         </Grid>
-        <ListView x:Name="Items" MouseDoubleClick="Control_OnMouseDoubleClick"
+        <ListView x:Name="Items"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                       Margin="0,6,0,6" Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding AllItems}">
             <ListView.ItemsPanel>
@@ -87,7 +88,7 @@
             </ListView.GroupStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" MouseDown="UIElement_OnMouseDown">
                         <Image Margin="0,0,4,0">
                             <Image.Style>
                                 <Style TargetType="Image">
@@ -125,8 +126,8 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="80" />
             </Grid.ColumnDefinitions>
-            <Button Click="Cancel_OnClick"  Content="Cancel" IsCancel="True" />
-            <Button Click="ButtonBase_OnClick" Grid.Column="2" Content="Next" />
+            <Button Content="Cancel" IsCancel="True" />
+            <Button Command="{Binding Accept}" Grid.Column="2" Content="Next" />
         </Grid>
     </Grid>
-</Window>
+</UserControl>

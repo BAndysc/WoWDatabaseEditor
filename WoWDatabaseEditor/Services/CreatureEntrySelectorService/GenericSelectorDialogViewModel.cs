@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common.Managers;
 using WoWDatabaseEditor.Extensions;
 
 namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 {
-    public class GenericSelectorWindowViewModel<T> : BindableBase
+    public class GenericSelectorDialogViewModel<T> : BindableBase, IDialog
     {
         private readonly Func<T, uint> entryGetter;
         private readonly Func<T, string> index;
@@ -17,7 +20,7 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
 
         private string search = "";
 
-        public GenericSelectorWindowViewModel(IEnumerable<ColumnDescriptor> columns,
+        public GenericSelectorDialogViewModel(IEnumerable<ColumnDescriptor> columns,
             IEnumerable<T> collection,
             Func<T, uint> entryGetter,
             Func<T, string> index)
@@ -37,6 +40,8 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
             items = new CollectionViewSource();
             items.Source = RawItems;
             items.Filter += ItemsOnFilter;
+
+            Accept = new DelegateCommand(() => CloseOk?.Invoke());
         }
 
         public ObservableCollection<T> RawItems { get; set; }
@@ -71,5 +76,14 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
             uint.TryParse(SearchText, out res);
             return res;
         }
+
+        public ICommand Accept { get; }
+        
+        public int DesiredWidth => 380;
+        public int DesiredHeight => 500;
+        public string Title => "Picker";
+        public bool Resizeable => true;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using WDE.Common;
+using WDE.Common.Managers;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditor.Services.NewItemService
@@ -7,17 +8,22 @@ namespace WoWDatabaseEditor.Services.NewItemService
     [AutoRegister]
     public class NewItemService : INewItemService
     {
-        private readonly Lazy<INewItemWindowViewModel> viewModel;
+        private readonly Func<INewItemDialogViewModel> viewModel;
+        private readonly IWindowManager windowManager;
 
-        public NewItemService(Lazy<INewItemWindowViewModel> newItemWindowViewModel)
+        public NewItemService(Func<INewItemDialogViewModel> newItemWindowViewModel, IWindowManager windowManager)
         {
             viewModel = newItemWindowViewModel;
+            this.windowManager = windowManager;
         }
 
         public ISolutionItem? GetNewSolutionItem()
         {
-            if (new NewItemWindow(viewModel.Value).ShowDialog() ?? false)
-                return viewModel.Value.SelectedPrototype!.CreateSolutionItem();
+            var vm = viewModel();
+            if (windowManager.ShowDialog(vm))
+            {
+                return vm.SelectedPrototype!.CreateSolutionItem();
+            }
             return null;
         }
     }

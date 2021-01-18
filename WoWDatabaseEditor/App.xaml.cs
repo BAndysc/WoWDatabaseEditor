@@ -11,9 +11,13 @@ using Prism.Modularity;
 using Prism.Unity;
 using Unity;
 using Unity.RegistrationByConvention;
+using WDE.Common.Database;
 using WDE.Common.Events;
+using WDE.Common.Windows;
 using WDE.Module.Attributes;
+using WoWDatabaseEditor.Managers;
 using WoWDatabaseEditor.ModulesManagement;
+using WoWDatabaseEditor.Services.CreatureEntrySelectorService;
 using WoWDatabaseEditor.Views;
 
 namespace WoWDatabaseEditor
@@ -26,6 +30,8 @@ namespace WoWDatabaseEditor
         private IModulesManager? modulesManager;
         private SplashScreenView? splash;
 
+        public static IContainerProvider? GlobalContainer;
+        
         public App()
         {
             /*
@@ -86,6 +92,7 @@ namespace WoWDatabaseEditor
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            GlobalContainer = Container;
             containerRegistry.RegisterInstance(Container);
             modulesManager = new ModulesManager();
             containerRegistry.RegisterInstance(modulesManager);

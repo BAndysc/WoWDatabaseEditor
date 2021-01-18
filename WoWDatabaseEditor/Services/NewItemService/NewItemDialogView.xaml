@@ -1,15 +1,8 @@
-﻿<Metro:MetroWindow x:Class="WoWDatabaseEditor.Services.NewItemService.NewItemWindow"
+﻿<UserControl x:Class="WoWDatabaseEditor.Services.NewItemService.NewItemDialogView"
                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                   xmlns:Metro="http://metro.mahapps.com/winfx/xaml/controls"
-                   Style="{DynamicResource MainWindowStyle}"
-                   Title="New item" Height="430" Width="600" WindowStartupLocation="CenterScreen" Margin="0,9,0,0">
-    <Metro:MetroWindow.WindowButtonCommands>
-        <Metro:WindowButtonCommands
-            LightCloseButtonStyle="{DynamicResource MetroWindowButtonStyle}"
-            LightMinButtonStyle="{DynamicResource MetroWindowButtonStyle}"
-            LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
-    </Metro:MetroWindow.WindowButtonCommands>
+                   xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                   Margin="0,9,0,0">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -19,10 +12,10 @@
         <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectedItem="{Binding SelectedPrototype}"
                   ItemsSource="{Binding ItemPrototypes}" HorizontalContentAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" IsSynchronizedWithCurrentItem="True"
-                  MouseDoubleClick="ListView_MouseDoubleClick">
+                  KeyDown="UIElement_OnKeyDown">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid MouseDown="UIElement_OnMouseDown">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -46,7 +39,7 @@
                 <ColumnDefinition Width="80" />
             </Grid.ColumnDefinitions>
             <Button Content="Cancel" IsCancel="True" />
-            <Button Grid.Column="2" Content="OK" Click="Button_Click" />
+            <Button Grid.Column="2" Content="OK" Command="{Binding Accept}" />
         </Grid>
     </Grid>
-</Metro:MetroWindow>
+</UserControl>

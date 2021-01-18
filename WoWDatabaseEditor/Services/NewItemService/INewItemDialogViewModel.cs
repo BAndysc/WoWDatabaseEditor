@@ -1,10 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Media;
 using WDE.Common;
+using WDE.Common.Managers;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
-    public interface INewItemWindowViewModel
+    public interface INewItemDialogViewModel : IDialog
     {
         ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; }
         NewItemPrototypeInfo? SelectedPrototype { get; }

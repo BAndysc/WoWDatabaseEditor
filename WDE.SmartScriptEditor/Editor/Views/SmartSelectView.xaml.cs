@@ -1,34 +1,18 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using WDE.SmartScriptEditor.Editor.ViewModels;
 
 namespace WDE.SmartScriptEditor.Editor.Views
 {
     /// <summary>
     ///     Interaction logic for SmartSelectView.xaml
     /// </summary>
-    public partial class SmartSelectView : Window
+    public partial class SmartSelectView : UserControl
     {
         public SmartSelectView()
         {
             InitializeComponent();
-        }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;
-            Close();
-        }
-
-        private void Cancel_OnClick(object sender, RoutedEventArgs e)
-        {
-            DialogResult = false;
-            Close();
-        }
-
-        private void Control_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            DialogResult = Items.SelectedItem != null;
-            Close();
         }
 
         private void TextBox_KeyUp(object sender, KeyEventArgs e)
@@ -40,9 +24,16 @@ namespace WDE.SmartScriptEditor.Editor.Views
                     if (Items.SelectedIndex == -1)
                         Items.SelectedIndex = 0;
 
-                    Control_OnMouseDoubleClick(null, null);
+                    if (DataContext is SmartSelectViewModel vm)
+                        vm.Accept.Execute();
                 }
             }
+        }
+
+        private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2 && DataContext is SmartSelectViewModel vm)
+                vm.Accept.Execute();
         }
     }
 }

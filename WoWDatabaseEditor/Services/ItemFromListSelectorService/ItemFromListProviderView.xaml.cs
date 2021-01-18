@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
@@ -6,23 +7,11 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
     /// <summary>
     ///     Interaction logic for ItemFromListProviderView.xaml
     /// </summary>
-    public partial class ItemFromListProviderView : Window
+    public partial class ItemFromListProviderView : UserControl
     {
         public ItemFromListProviderView()
         {
             InitializeComponent();
-        }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;
-            Close();
-        }
-
-        private void Control_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            DialogResult = true;
-            Close();
         }
     }
 }

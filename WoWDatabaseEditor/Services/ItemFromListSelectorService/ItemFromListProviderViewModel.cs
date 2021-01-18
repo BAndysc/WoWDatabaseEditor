@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WoWDatabaseEditor.Extensions;
 
 namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 {
-    public class ItemFromListProviderViewModel : BindableBase
+    public class ItemFromListProviderViewModel : BindableBase, IDialog
     {
         private readonly bool asFlags;
 
@@ -37,6 +41,8 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             this.items = new CollectionViewSource();
             this.items.Source = RawItems;
             this.items.Filter += ItemsOnFilter;
+
+            Accept = new DelegateCommand(() => CloseOk?.Invoke());
         }
 
         public ObservableCollection<KeyValuePair<int, CheckableSelectOption>> RawItems { get; set; }
@@ -84,6 +90,14 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             int.TryParse(SearchText, out res);
             return res;
         }
+
+        public ICommand Accept { get; }
+        public int DesiredWidth => 400;
+        public int DesiredHeight => 470;
+        public string Title => "Picker";
+        public bool Resizeable => true;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 
     public class CheckableSelectOption : SelectOption

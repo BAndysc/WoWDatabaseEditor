@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
+using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class ParametersEditViewModel : BindableBase, IDisposable
+    public class ParametersEditViewModel : BindableBase, IDisposable, IDialog
     {
         private readonly SmartBaseElement element;
         private readonly CollectionViewSource items;
@@ -54,6 +56,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             items = new CollectionViewSource {Source = Parameters};
             items.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
+
+            Accept = new DelegateCommand(() => CloseOk?.Invoke());
+            Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
         }
 
         public string Readable
@@ -73,5 +78,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             Readable = element.Readable;
         }
+
+        public DelegateCommand Accept { get; }
+        public DelegateCommand Cancel { get; }
+        public int DesiredWidth => 455;
+        public int DesiredHeight => 485;
+        public string Title => "Edit";
+        public bool Resizeable => true;
+        public event Action CloseCancel;
+        public event Action CloseOk;
     }
 }

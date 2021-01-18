@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
+using WDE.Common.Windows;
 
 namespace WoWDatabaseEditor.Utils
 {
@@ -27,15 +28,15 @@ namespace WoWDatabaseEditor.Utils
             if (args.OldValue == args.NewValue)
                 return;
 
-            if (args.NewValue?.GetType().AssemblyQualifiedName != null)
+            var locator = App.GlobalContainer?.Resolve(typeof(IViewLocator)) as IViewLocator;
+            
+            if (locator!.TryResolve(args.NewValue?.GetType(), out var viewType))
             {
-                Type? vmType = args.NewValue.GetType();
-                Type? viewType = Type.GetType(vmType.AssemblyQualifiedName!.Replace("ViewModel", "View"));
-                object? view = viewType == null ? null : Activator.CreateInstance(viewType);
+                object? view = Activator.CreateInstance(viewType);
                 SetContentProperty(targetLocation, view);
             }
             else
-                SetContentProperty(targetLocation, args.NewValue);
+                SetContentProperty(targetLocation, null);
         }
 
         private static bool SetContentProperty(object targetLocation, object? view)
