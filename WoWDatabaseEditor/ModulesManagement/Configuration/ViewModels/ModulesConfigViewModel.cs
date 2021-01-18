@@ -1,13 +1,16 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditor.ModulesManagement.Configuration.ViewModels
 {
     [AutoRegister]
-    internal class ModulesConfigViewModel : BindableBase
+    internal class ModulesConfigViewModel : BindableBase, IConfigurable
     {
         public ModulesConfigViewModel(IModulesManager modulesManager)
         {
@@ -17,6 +20,8 @@ namespace WoWDatabaseEditor.ModulesManagement.Configuration.ViewModels
                 m.Assembly.GetName().Name ?? "Unknown name",
                 m.IsLoaded,
                 GenerateDetailFor(m.ConflictingAssembly))));
+
+            Save = new DelegateCommand(() => { });
         }
 
         public ObservableCollection<ModuleConfigModel> Items { get; }
@@ -28,6 +33,10 @@ namespace WoWDatabaseEditor.ModulesManagement.Configuration.ViewModels
 
             return $"Conflicts with {conflictingAssembly.GetName().Name} ({conflictingAssembly.Location})";
         }
+
+        public string Name => "Modules";
+        public ICommand Save { get; }
+        public bool IsModified => false;
     }
 
     internal class ModuleConfigModel

@@ -1,6 +1,11 @@
 ﻿<UserControl x:Class="WoWDatabaseEditor.Views.AboutView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"></Setter>
+        </Style>
+    </UserControl.Resources>
     <Grid Margin="20">
         <StackPanel>
             <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">

@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Controls;
+using System.ComponentModel;
+using System.Windows.Input;
 using WDE.Module.Attributes;
 
 namespace WDE.Common
 {
     [NonUniqueProvider]
-    public interface IConfigurable
+    public interface IConfigurable : INotifyPropertyChanged
     {
-        KeyValuePair<ContentControl, Action> GetConfigurationView();
-        string GetName();
+        ICommand Save { get; }
+        string Name { get; }
+        bool IsModified { get; }
     }
 }

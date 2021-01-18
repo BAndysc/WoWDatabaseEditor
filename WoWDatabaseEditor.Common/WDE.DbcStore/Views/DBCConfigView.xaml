@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:data="clr-namespace:WDE.DbcStore"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:mvvm="http://prismlibrary.com/"
+             mvvm:ViewModelLocator.AutoWireViewModel="False"
              mc:Ignorable="d">
 
     <UserControl.Resources>

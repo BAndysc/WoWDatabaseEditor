@@ -15,7 +15,7 @@
         <Label HorizontalAlignment="Right" Content="{Binding Parameter.Name, Mode=OneWay}" />
         <TextBox Grid.Column="1" VerticalContentAlignment="Center" FontFamily="Consolas">
             <TextBox.Style>
-                <Style TargetType="{x:Type TextBox}">
+                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
                     <Setter Property="Text" Value="{Binding Parameter.String, Mode=OneWay}" />
                     <Style.Triggers>
                         <Trigger Property="IsFocused" Value="true">
@@ -27,13 +27,12 @@
         </TextBox>
         <Button Grid.Column="2" Content="  ...  " Command="{Binding SelectItemAction}">
             <Button.Style>
-                <Style TargetType="{x:Type Button}">
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Parameter.Items, Converter={StaticResource IsNullConverter}}"
                                      Value="True">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
-
                     </Style.Triggers>
                 </Style>
             </Button.Style>

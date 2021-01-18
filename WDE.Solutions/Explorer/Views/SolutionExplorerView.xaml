@@ -7,7 +7,7 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:helpers="clr-namespace:WDE.Solutions.Explorer.Helpers"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             prism:ViewModelLocator.AutoWireViewModel="True" x:Name="UC">
+             prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
     <UserControl.Resources>
 
         <SolidColorBrush x:Key="GlyphBrush" Color="#444" />

@@ -71,7 +71,7 @@ namespace WoWDatabaseEditor.Managers
                                 .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
                                 .SetContent("Your changes will be lost if you don't save them.")
                                 .SetIcon(MessageBoxIcon.Warning)
-                                .WithYesButton(MessageBoxButtonType.Ok)
+                                .WithYesButton(MessageBoxButtonType.Yes)
                                 .WithNoButton(MessageBoxButtonType.No)
                                 .WithCancelButton(MessageBoxButtonType.Cancel)
                                 .Build());

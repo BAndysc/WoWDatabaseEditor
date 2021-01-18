@@ -1,10 +1,14 @@
-﻿using System;
+﻿using System.Windows.Input;
+using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common;
+using WDE.Module.Attributes;
 using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase.ViewModels
 {
-    public class DatabaseConfigViewModel : BindableBase
+    [AutoRegister]
+    public class DatabaseConfigViewModel : BindableBase, IConfigurable
     {
         private readonly IConnectionSettingsProvider settings;
         private string? database;
@@ -16,53 +20,82 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
 
         public DatabaseConfigViewModel(IConnectionSettingsProvider settings)
         {
-            SaveAction = Save;
-            Database = settings.GetSettings().Database;
-            Port = (settings.GetSettings().Port ?? 3306).ToString();
-            User = settings.GetSettings().User;
-            Password = settings.GetSettings().Password;
-            Host = settings.GetSettings().Host;
+            database = settings.GetSettings().Database;
+            port = (settings.GetSettings().Port ?? 3306).ToString();
+            user = settings.GetSettings().User;
+            pass = settings.GetSettings().Password;
+            host = settings.GetSettings().Host;
             this.settings = settings;
-        }
 
-        public Action SaveAction { get; set; }
+            Save = new DelegateCommand(() =>
+            {
+                int? port = null;
+                if (int.TryParse(Port, out int port_))
+                    port = port_;
+                settings.UpdateSettings(User, Password, Host, port, Database);
+                IsModified = false;
+            });
+        }
 
         public string? Host
         {
             get => host;
-            set => SetProperty(ref host, value);
+            set
+            {
+                IsModified = true;
+                SetProperty(ref host, value);
+            }
         }
 
         public string? Port
         {
             get => port;
-            set => SetProperty(ref port, value);
+            set
+            {
+                IsModified = true;
+                SetProperty(ref port, value);
+            }
         }
 
         public string? User
         {
             get => user;
-            set => SetProperty(ref user, value);
+            set
+            {
+                IsModified = true;
+                SetProperty(ref user, value);
+            }
         }
 
         public string? Password
         {
             get => pass;
-            set => SetProperty(ref pass, value);
+            set
+            {
+                IsModified = true;
+                SetProperty(ref pass, value);
+            }
         }
 
         public string? Database
         {
             get => database;
-            set => SetProperty(ref database, value);
+            set
+            {
+                IsModified = true;
+                SetProperty(ref database, value);
+            }
         }
 
-        private void Save()
+        public ICommand Save { get; }
+
+        public string Name => "TrinityCore Database";
+        
+        private bool isModified;
+        public bool IsModified
         {
-            int? port = null;
-            if (int.TryParse(Port, out int port_))
-                port = port_;
-            settings.UpdateSettings(User, Password, Host, port, Database);
+            get => isModified;
+            private set => SetProperty(ref isModified, value);
         }
     }
 }

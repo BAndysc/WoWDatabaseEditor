@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common;
+using WDE.Module.Attributes;
 using WDE.Parameters.Models;
 
 namespace WDE.Parameters.ViewModels
 {
-    public class ParametersViewModel : BindableBase
+    [AutoRegister]
+    public class ParametersViewModel : BindableBase, IConfigurable
     {
         private bool hasSelected = true;
         private ParameterSpecModel selected;
 
         public ParametersViewModel(ParameterFactory factory)
         {
-            SaveAction = Save;
-
             foreach (string key in factory.GetKeys())
                 Parameters.Add(factory.GetDefinition(key));
             if (Parameters.Count > 0)
                 Selected = Parameters[0];
+            
+            Save = new DelegateCommand(() => { });
         }
 
         public ObservableCollection<ParameterSpecModel> Parameters { get; } = new();
@@ -34,10 +39,10 @@ namespace WDE.Parameters.ViewModels
             set => SetProperty(ref hasSelected, value);
         }
 
-        public Action SaveAction { get; set; }
+        public ICommand Save { get; }
 
-        private void Save()
-        {
-        }
+        public string Name => "Parameters browser";
+        
+        public bool IsModified => false;
     }
 }

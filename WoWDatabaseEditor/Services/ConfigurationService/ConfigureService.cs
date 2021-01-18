@@ -1,6 +1,10 @@
-﻿using WDE.Common.Services;
+﻿using System;
+using System.Windows.Input;
+using Prism.Commands;
+using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
-using WoWDatabaseEditor.Services.ConfigurationService.Views;
+using WoWDatabaseEditor.Services.ConfigurationService.ViewModels;
 
 namespace WoWDatabaseEditor.Services.ConfigurationService
 {
@@ -8,10 +12,31 @@ namespace WoWDatabaseEditor.Services.ConfigurationService
     [SingleInstance]
     public class ConfigureService : IConfigureService
     {
+        private readonly IWindowManager windowManager;
+        private readonly Func<ConfigurationPanelViewModel> settings;
+
+        private ConfigurationPanelViewModel? openedPanel = null;
+
+        public ConfigureService(IWindowManager windowManager, Func<ConfigurationPanelViewModel> settings)
+        {
+            this.windowManager = windowManager;
+            this.settings = settings;
+        }
+
         public void ShowSettings()
         {
-            ConfigurationWindow view = new();
-            view.ShowDialog();
+            if (openedPanel == null)
+            {
+                openedPanel = settings();
+                ICommand? origCommand = openedPanel.CloseCommand;
+                openedPanel.CloseCommand = new DelegateCommand(() =>
+                {
+                    origCommand?.Execute(null);
+                    openedPanel = null;
+                });
+            }
+            
+            windowManager.OpenDocument(openedPanel);
         }
     }
 }

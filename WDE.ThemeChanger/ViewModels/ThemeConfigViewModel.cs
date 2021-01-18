@@ -1,40 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common;
 using WDE.Common.Managers;
+using WDE.Module.Attributes;
 using WDE.ThemeChanger.Providers;
 
 namespace WDE.ThemeChanger.ViewModels
 {
-    public class ThemeConfigViewModel : BindableBase
+    [AutoRegister]
+    public class ThemeConfigViewModel : BindableBase, IConfigurable
     {
-        private readonly IThemeSettingsProvider settings;
-        private readonly IThemeManager themeManager;
-
         private Theme name;
         private List<Theme> themes;
 
-        public ThemeConfigViewModel(IThemeSettingsProvider s, IThemeManager themeManager)
+        public ThemeConfigViewModel(IThemeSettingsProvider settings, IThemeManager themeManager)
         {
-            this.themeManager = themeManager;
-            SaveAction = Save;
-
             name = themeManager.CurrentTheme;
             themes = themeManager.Themes.ToList();
 
-            settings = s;
+            Save = new DelegateCommand(() =>
+            {
+                themeManager.SetTheme(ThemeName);
+                settings.UpdateSettings(ThemeName);
+                IsModified = false;
+            });
         }
 
-        public Action SaveAction { get; set; }
-
-        public Theme Name
+        public Theme ThemeName
         {
             get => name;
             set
             {
+                IsModified = true;
                 SetProperty(ref name, value);
-                themeManager.SetTheme(value);
             }
         }
 
@@ -44,9 +46,14 @@ namespace WDE.ThemeChanger.ViewModels
             set => SetProperty(ref themes, value);
         }
 
-        private void Save()
+        public ICommand Save { get; }
+        public string Name => "Appearance";
+
+        private bool isModified;
+        public bool IsModified
         {
-            settings.UpdateSettings(Name);
+            get => isModified;
+            private set => SetProperty(ref isModified, value);
         }
     }
 }
