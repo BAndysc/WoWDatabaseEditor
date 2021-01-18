@@ -32,7 +32,7 @@ namespace WoWDatabaseEditor.ViewModels
         private readonly Dictionary<string, ITool> toolById = new();
 
         public MainWindowViewModel(IEventAggregator eventAggregator,
-            IWindowManager wndowManager,
+            IDocumentManager documentManager,
             IConfigureService settings,
             INewItemService newItemService,
             ISolutionManager solutionManager,
@@ -42,7 +42,7 @@ namespace WoWDatabaseEditor.ViewModels
             TasksViewModel tasksViewModel)
         {
             this.eventAggregator = eventAggregator;
-            WindowManager = wndowManager;
+            DocumentManager = documentManager;
             StatusBar = statusBar;
             this.settings = settings;
             this.newItemService = newItemService;
@@ -54,7 +54,7 @@ namespace WoWDatabaseEditor.ViewModels
             TasksViewModel = tasksViewModel;
             About = new DelegateCommand(ShowAbout);
 
-            this.eventAggregator.GetEvent<WindowManager.DocumentClosedEvent>()
+            this.eventAggregator.GetEvent<DocumentManager.DocumentClosedEvent>()
                 .Subscribe(document =>
                 {
                     if (!documentToSolution.ContainsKey(document))
@@ -68,13 +68,13 @@ namespace WoWDatabaseEditor.ViewModels
                 .Subscribe(item =>
                     {
                         if (documents.ContainsKey(item))
-                            WindowManager.OpenDocument(documents[item]);
+                            DocumentManager.OpenDocument(documents[item]);
                         else
                         {
                             try
                             {
                                 IDocument editor = solutionEditorManager.GetEditor(item);
-                                WindowManager.OpenDocument(editor);
+                                DocumentManager.OpenDocument(editor);
                                 documents[item] = editor;
                                 documentToSolution[editor] = item;
                             }
@@ -96,10 +96,10 @@ namespace WoWDatabaseEditor.ViewModels
 
             Windows = new ObservableCollection<MenuItemViewModel>();
 
-            foreach (var window in WindowManager.AllTools)
+            foreach (var window in DocumentManager.AllTools)
             {
                 toolById[window.UniqueId] = window;
-                MenuItemViewModel model = new(() => WindowManager.OpenTool(window.GetType()), window.Title);
+                MenuItemViewModel model = new(() => DocumentManager.OpenTool(window.GetType()), window.Title);
                 Windows.Add(model);
                 //if (window.CanOpenOnStart)
                 //    model.Command.Execute(null);
@@ -109,7 +109,7 @@ namespace WoWDatabaseEditor.ViewModels
         }
 
         public IStatusBar StatusBar { get; }
-        public IWindowManager WindowManager { get; }
+        public IDocumentManager DocumentManager { get; }
         public TasksViewModel TasksViewModel { get; }
         
 
@@ -127,7 +127,7 @@ namespace WoWDatabaseEditor.ViewModels
         
         private void ShowAbout()
         {
-            WindowManager.OpenDocument(new AboutViewModel());
+            DocumentManager.OpenDocument(new AboutViewModel());
         }
 
         private void SettingsShow()
@@ -149,7 +149,7 @@ namespace WoWDatabaseEditor.ViewModels
         {
             if (toolById.TryGetValue(id, out var tool))
             {
-                WindowManager.OpenedTools.Add(tool);
+                DocumentManager.OpenedTools.Add(tool);
                 return tool;
             }
             return null;
@@ -160,13 +160,13 @@ namespace WoWDatabaseEditor.ViewModels
             foreach (var tool in toolById.Values)
             {
                 if (tool.OpenOnStart)
-                    WindowManager.OpenTool(tool.GetType());
+                    DocumentManager.OpenTool(tool.GetType());
             }
         }
 
         public bool CanClose()
         {
-            var modifiedDocuments = WindowManager.OpenedDocuments.Where(d => d.IsModified).ToList();
+            var modifiedDocuments = DocumentManager.OpenedDocuments.Where(d => d.IsModified).ToList();
 
             if (modifiedDocuments.Count > 0)
             {
@@ -198,12 +198,12 @@ namespace WoWDatabaseEditor.ViewModels
                     {
                         editor.Save.Execute(null);
                         modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
-                        WindowManager.OpenedDocuments.Remove(editor);
+                        DocumentManager.OpenedDocuments.Remove(editor);
                     }
                     else if (result == MessageBoxButtonType.No)
                     {
                         modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
-                        WindowManager.OpenedDocuments.Remove(editor);
+                        DocumentManager.OpenedDocuments.Remove(editor);
                     }
                     else if (result == MessageBoxButtonType.CustomA)
                     {
@@ -217,7 +217,7 @@ namespace WoWDatabaseEditor.ViewModels
                     }
                 }
             }
-            WindowManager.OpenedDocuments.Clear();
+            DocumentManager.OpenedDocuments.Clear();
 
             return true;
         }

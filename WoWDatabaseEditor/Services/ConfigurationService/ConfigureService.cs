@@ -12,14 +12,14 @@ namespace WoWDatabaseEditor.Services.ConfigurationService
     [SingleInstance]
     public class ConfigureService : IConfigureService
     {
-        private readonly IWindowManager windowManager;
+        private readonly IDocumentManager documentManager;
         private readonly Func<ConfigurationPanelViewModel> settings;
 
         private ConfigurationPanelViewModel? openedPanel = null;
 
-        public ConfigureService(IWindowManager windowManager, Func<ConfigurationPanelViewModel> settings)
+        public ConfigureService(IDocumentManager documentManager, Func<ConfigurationPanelViewModel> settings)
         {
-            this.windowManager = windowManager;
+            this.documentManager = documentManager;
             this.settings = settings;
         }
 
@@ -36,7 +36,7 @@ namespace WoWDatabaseEditor.Services.ConfigurationService
                 });
             }
             
-            windowManager.OpenDocument(openedPanel);
+            documentManager.OpenDocument(openedPanel);
         }
     }
 }

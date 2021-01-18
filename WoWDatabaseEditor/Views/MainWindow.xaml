@@ -30,15 +30,15 @@
         <helpers:DocumentOrToolToTitleConverter x:Key="DocumentOrToolToTitleConverter" />
     </Window.Resources>
     <Window.InputBindings>
-        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Undo}" />
-        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Redo}" />
-        <KeyBinding Key="Z" Modifiers="Control+Shift" Command="{Binding WindowManager.ActiveDocument.Redo}" />
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Undo}" />
+        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
+        <KeyBinding Key="Z" Modifiers="Control+Shift" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
 
-        <KeyBinding Key="S" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Save}" />
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Save}" />
 
-        <KeyBinding Key="C" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Copy}" />
-        <KeyBinding Key="V" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Paste}" />
-        <KeyBinding Key="X" Modifiers="Control" Command="{Binding WindowManager.ActiveDocument.Cut}" />
+        <KeyBinding Key="C" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Copy}" />
+        <KeyBinding Key="V" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
+        <KeyBinding Key="X" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
     </Window.InputBindings>
     <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands>
@@ -46,20 +46,20 @@
                 <Menu DockPanel.Dock="Top" Margin="2">
                     <MenuItem Header="_File">
                         <MenuItem Header="_Load" Command="{Binding ExecuteCommandNew}" />
-                        <MenuItem Header="_Save" Command="{Binding WindowManager.ActiveDocument.Save}" />
+                        <MenuItem Header="_Save" Command="{Binding DocumentManager.ActiveDocument.Save}" />
                         <Separator />
                         <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}" />
                         <Separator />
                         <MenuItem Header="_Exit" />
                     </MenuItem>
                     <MenuItem Header="_Edit">
-                        <MenuItem Header="_Undo" Command="{Binding WindowManager.ActiveDocument.Undo}"
+                        <MenuItem Header="_Undo" Command="{Binding DocumentManager.ActiveDocument.Undo}"
                                   AutomationProperties.AcceleratorKey="z" />
-                        <MenuItem Header="_Redo" Command="{Binding WindowManager.ActiveDocument.Redo}" />
+                        <MenuItem Header="_Redo" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
                         <Separator />
-                        <MenuItem Header="_Copy" Command="{Binding WindowManager.ActiveDocument.Copy}" />
-                        <MenuItem Header="Cu_t" Command="{Binding WindowManager.ActiveDocument.Cut}" />
-                        <MenuItem Header="_Paste" Command="{Binding WindowManager.ActiveDocument.Paste}" />
+                        <MenuItem Header="_Copy" Command="{Binding DocumentManager.ActiveDocument.Copy}" />
+                        <MenuItem Header="Cu_t" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
+                        <MenuItem Header="_Paste" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
                     </MenuItem>
                     <MenuItem Header="_View" ItemsSource="{Binding Windows}">
                         <MenuItem.ItemContainerStyle>
@@ -70,12 +70,12 @@
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
-                    <MenuItem Header="_Window" ItemsSource="{Binding WindowManager.OpenedDocuments}">
+                    <MenuItem Header="_Window" ItemsSource="{Binding DocumentManager.OpenedDocuments}">
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
                                 <Setter Property="Header" Value="{Binding Title}" />
                                 <Setter Property="Command"
-                                        Value="{Binding ElementName=rootWindow, Path=DataContext.WindowManager.ActivateDocument}" />
+                                        Value="{Binding ElementName=rootWindow, Path=DataContext.DocumentManager.ActivateDocument}" />
                                 <Setter Property="CommandParameter" Value="{Binding}" />
                             </Style>
                         </MenuItem.ItemContainerStyle>
@@ -102,11 +102,11 @@
         <Grid>
             <DockingManager
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                AnchorablesSource="{Binding WindowManager.OpenedTools}" x:Name="DockingManager"
+                AnchorablesSource="{Binding DocumentManager.OpenedTools}" x:Name="DockingManager"
                 DocumentClosed="DockingManager_OnDocumentClosed"
-                ActiveContent="{Binding WindowManager.ActiveDocument,Mode=TwoWay, 
+                ActiveContent="{Binding DocumentManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}"
-                DocumentsSource="{Binding WindowManager.OpenedDocuments}">
+                DocumentsSource="{Binding DocumentManager.OpenedDocuments}">
                 <DockingManager.LayoutUpdateStrategy>
                     <utils:LayoutInitializer />
                 </DockingManager.LayoutUpdateStrategy>

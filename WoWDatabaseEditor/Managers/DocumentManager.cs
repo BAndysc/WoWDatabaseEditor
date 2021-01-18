@@ -16,7 +16,7 @@ namespace WoWDatabaseEditor.Managers
 {
     [AutoRegister]
     [SingleInstance]
-    public class WindowManager : BindableBase, IWindowManager
+    public class DocumentManager : BindableBase, IDocumentManager
     {
         private readonly IEventAggregator eventAggregator;
         private readonly IMessageBoxService messageBoxService;
@@ -24,7 +24,7 @@ namespace WoWDatabaseEditor.Managers
         private Dictionary<Type, ITool> typeToToolInstance = new();
         private List<ITool> allTools = new ();
 
-        public WindowManager(IEventAggregator eventAggregator, 
+        public DocumentManager(IEventAggregator eventAggregator, 
             IMessageBoxService messageBoxService,
             IEnumerable<ITool> tools)
         {

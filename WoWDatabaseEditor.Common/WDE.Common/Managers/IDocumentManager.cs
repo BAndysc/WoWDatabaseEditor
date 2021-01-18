@@ -7,7 +7,7 @@ using WDE.Module.Attributes;
 namespace WDE.Common.Managers
 {
     [UniqueProvider]
-    public interface IWindowManager
+    public interface IDocumentManager
     {
         IDocument ActiveDocument { get; set; }
         IReadOnlyList<ITool> AllTools { get; }
