@@ -5,88 +5,50 @@ namespace WDE.Common.Parameters
 {
     public class Parameter : GenericBaseParameter<int>
     {
-        public Parameter(string name) : base(name)
+        public override string ToString(int key)
         {
+            SelectOption option = null;
+            if (Items?.TryGetValue(key, out option) ?? false)
+                return option.Name;
+            return key.ToString();
         }
 
-        public override string ToString()
-        {
-            if (Items != null && Items.ContainsKey(Value))
-                return Items[Value].Name;
-            return Value.ToString();
-        }
-
-        public virtual Parameter Clone()
-        {
-            return new(Name) {Value = value, Items = Items, Description = Description};
-        }
+        public static Parameter Instance { get; } = new Parameter();
     }
-
-    public class NullParameter : Parameter
-    {
-        public NullParameter() : base("empty")
-        {
-        }
-
-        public override Parameter Clone()
-        {
-            return new NullParameter {Value = value};
-        }
-    }
-
+    
     public class FloatIntParameter : Parameter
     {
-        public FloatIntParameter(string name) : base(name)
+        public override string ToString(int value)
         {
-        }
-
-        public override string ToString()
-        {
-            return (GetValue() / 1000.0f).ToString(CultureInfo.InvariantCulture);
-        }
-
-        public override Parameter Clone()
-        {
-            return new FloatIntParameter(Name) {Value = value};
+            return (value / 1000.0f).ToString(CultureInfo.InvariantCulture);
         }
     }
 
     public class FloatParameter : GenericBaseParameter<float>
     {
-        public FloatParameter(string name) : base(name)
+        public static FloatParameter Instance { get; } = new FloatParameter();
+        
+        public override string ToString(float value)
         {
-        }
-
-        public override string ToString()
-        {
-            return GetValue().ToString(CultureInfo.InvariantCulture);
+            return value.ToString(CultureInfo.InvariantCulture);
         }
     }
     
     public class StringParameter : GenericBaseParameter<string>
     {
-        public StringParameter(string name) : base(name)
-        {
-        }
-
-        public override string ToString()
-        {
-            return GetValue();
-        }
+        public override string ToString(string value) => value;
     }
 
     public class FlagParameter : Parameter
     {
-        public FlagParameter(string name) : base(name)
-        {
-        }
-
-        public override string ToString()
+        public override string ToString(int value)
         {
             var flags = new List<string>();
+            if (value == 0 && Items.TryGetValue(0, out var zero))
+                return zero.Name;
             for (var i = 0; i < 31; ++i)
             {
-                if (((1 << i) & GetValue()) > 0)
+                if (((1 << i) & value) > 0)
                 {
                     if (Items.ContainsKey(1 << i))
                         flags.Add(Items[1 << i].Name);
@@ -96,11 +58,6 @@ namespace WDE.Common.Parameters
             }
 
             return string.Join(", ", flags);
-        }
-
-        public override Parameter Clone()
-        {
-            return new FlagParameter(Name) {Value = value, Items = Items};
         }
     }
 }

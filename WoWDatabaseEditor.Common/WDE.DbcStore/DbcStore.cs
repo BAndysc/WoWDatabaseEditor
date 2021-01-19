@@ -144,12 +144,12 @@ namespace WDE.DbcStore
                 store.AchievementStore = AchievementStore;
                 store.ItemStore = ItemStore;
                 
-                parameterFactory.Register("SpellParameter", name => new DbcParameter(name, SpellStore));
-                parameterFactory.Register("ItemParameter", name => new DbcParameter(name, ItemStore));
-                parameterFactory.Register("EmoteParameter", name => new DbcParameter(name, EmoteStore));
-                parameterFactory.Register("SoundParameter", name => new DbcParameter(name, SoundStore));
-                parameterFactory.Register("ZoneParameter", name => new DbcParameter(name, AreaStore));
-                parameterFactory.Register("PhaseParameter", name => new DbcParameter(name, PhaseStore));
+                parameterFactory.Register("SpellParameter", new DbcParameter(SpellStore));
+                parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
+                parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
+                parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore));
+                parameterFactory.Register("ZoneParameter", new DbcParameter(AreaStore));
+                parameterFactory.Register("PhaseParameter", new DbcParameter(PhaseStore));
             }
 
             private int max = 0;
@@ -213,26 +213,11 @@ namespace WDE.DbcStore
 
     public class DbcParameter : Parameter
     {
-        private readonly Dictionary<int, string> storage;
-
-        public DbcParameter(string name, Dictionary<int, string> storage) : base(name)
+        public DbcParameter(Dictionary<int, string> storage)
         {
-            this.storage = storage;
             Items = new Dictionary<int, SelectOption>();
             foreach (int key in storage.Keys)
                 Items.Add(key, new SelectOption(storage[key]));
-        }
-
-        public override string ToString()
-        {
-            if (!storage.ContainsKey(GetValue()))
-                return GetValue().ToString();
-            return storage[GetValue()];
-        }
-
-        public override Parameter Clone()
-        {
-            return new DbcParameter(Name, storage) {Value = value};
         }
     }
 }

@@ -945,9 +945,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartGenericJsonData actionData = smartDataManager.GetRawData(SmartType.SmartAction, originalAction.Id);
 
-            var parametersList = new List<(Parameter, string)>();
-            var floatParametersList = new List<(FloatParameter, string)>();
-            var stringParametersList = new List<(StringParameter, string)>();
+            var parametersList = new List<(ParameterValueHolder<int>, string)>();
+            var floatParametersList = new List<(ParameterValueHolder<float>, string)>();
+            List<(ParameterValueHolder<string>, string)> stringParametersList = null;
 
             for (var i = 0; i < obj.Source.ParametersCount; ++i)
             {
@@ -976,10 +976,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             StringParameter comment = null;
             if (actionData.Id == SmartConstants.ActionComment)
             {
-                comment = new StringParameter("Comment");
-                comment.Value = originalAction.Comment;
-                comment.OnValueChanged += (s, v) => obj.Comment = comment.Value;
-                stringParametersList = new List<(StringParameter, string)>() {(comment, "Comment")};
+                stringParametersList = new List<(ParameterValueHolder<string>, string)>() {(obj.CommentParameter, "Comment")};
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, floatParametersList, stringParametersList);
@@ -993,16 +990,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         originalAction.Target.Position[i].Value = obj.Target.Position[i].Value;
 
                     for (var i = 0; i < originalAction.Target.ParametersCount; ++i)
-                        originalAction.Target.SetParameter(i, obj.Target.GetParameter(i).Value);
+                        originalAction.Target.GetParameter(i).Value = obj.Target.GetParameter(i).Value;
 
                     for (var i = 0; i < originalAction.Source.ParametersCount; ++i)
-                        originalAction.Source.SetParameter(i, obj.Source.GetParameter(i).Value);
+                        originalAction.Source.GetParameter(i).Value = obj.Source.GetParameter(i).Value;
 
                     for (var i = 0; i < originalAction.ParametersCount; ++i)
-                        originalAction.SetParameter(i, obj.GetParameter(i).Value);
+                        originalAction.GetParameter(i).Value = obj.GetParameter(i).Value;
 
-                    if (comment != null)
-                        originalAction.Comment = comment.Value;
+                    originalAction.Comment = obj.Comment;
                 }
             }
 
@@ -1014,7 +1010,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             SmartCondition obj = originalCondition.Copy();
 
-            var parametersList = new List<(Parameter, string)>();
+            var parametersList = new List<(ParameterValueHolder<int>, string)>();
 
             parametersList.Add((obj.Inverted, "General"));
             parametersList.Add((obj.ConditionTarget, "General"));
@@ -1031,10 +1027,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 using (originalCondition.BulkEdit("Edit condition " + obj.Readable))
                 {
-                    originalCondition.Inverted.SetValue(obj.Inverted.Value);
-                    originalCondition.ConditionTarget.SetValue(obj.ConditionTarget.Value);
+                    originalCondition.Inverted.Value = (obj.Inverted.Value);
+                    originalCondition.ConditionTarget.Value = (obj.ConditionTarget.Value);
                     for (var i = 0; i < originalCondition.ParametersCount; ++i)
-                        originalCondition.SetParameter(i, obj.GetParameter(i).Value);
+                        originalCondition.GetParameter(i).Value = obj.GetParameter(i).Value;
                 }
             }
 
@@ -1052,7 +1048,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             SmartEvent ev = originalEvent.ShallowCopy();
 
-            var parametersList = new List<(Parameter, string)>();
+            var parametersList = new List<(ParameterValueHolder<int>, string)>();
             parametersList.Add((ev.Chance, "General"));
             parametersList.Add((ev.Flags, "General"));
             parametersList.Add((ev.Phases, "General"));
@@ -1071,13 +1067,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 using (originalEvent.BulkEdit("Edit event " + ev.Readable))
                 {
-                    originalEvent.Chance.SetValue(ev.Chance.Value);
-                    originalEvent.Flags.SetValue(ev.Flags.Value);
-                    originalEvent.Phases.SetValue(ev.Phases.Value);
-                    originalEvent.CooldownMax.SetValue(ev.CooldownMax.Value);
-                    originalEvent.CooldownMin.SetValue(ev.CooldownMin.Value);
+                    originalEvent.Chance.Value = (ev.Chance.Value);
+                    originalEvent.Flags.Value = (ev.Flags.Value);
+                    originalEvent.Phases.Value = (ev.Phases.Value);
+                    originalEvent.CooldownMax.Value = (ev.CooldownMax.Value);
+                    originalEvent.CooldownMin.Value = (ev.CooldownMin.Value);
                     for (var i = 0; i < originalEvent.ParametersCount; ++i)
-                        originalEvent.SetParameter(i, ev.GetParameter(i).Value);
+                        originalEvent.GetParameter(i).Value = ev.GetParameter(i).Value;
                 }
             }
 

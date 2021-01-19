@@ -1,4 +1,6 @@
-﻿namespace WDE.Common.Database
+﻿using System;
+
+namespace WDE.Common.Database
 {
     public interface ISmartScriptLine
     {
@@ -113,5 +115,76 @@
         public float TargetZ { get; set; }
         public float TargetO { get; set; }
         public string Comment { get; set; }
+    }
+
+    public static class SmartScriptLineExtensions
+    {
+        public static int GetEventParam(this ISmartScriptLine line, int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return line.EventParam1;
+                case 1:
+                    return line.EventParam2;
+                case 2:
+                    return line.EventParam3;
+                case 3:
+                    return line.EventParam4;
+            }
+
+            throw new IndexOutOfRangeException();
+        }
+        
+        public static int GetActionParam(this ISmartScriptLine line, int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return line.ActionParam1;
+                case 1:
+                    return line.ActionParam2;
+                case 2:
+                    return line.ActionParam3;
+                case 3:
+                    return line.ActionParam4;
+                case 4:
+                    return line.ActionParam5;
+                case 5:
+                    return line.ActionParam6;
+            }
+
+            throw new IndexOutOfRangeException();
+        }
+        
+        public static int GetSourceParam(this ISmartScriptLine line, int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return line.SourceParam1;
+                case 1:
+                    return line.SourceParam2;
+                case 2:
+                    return line.SourceParam3;
+            }
+
+            throw new IndexOutOfRangeException();
+        }
+        
+        public static int GetTargetParam(this ISmartScriptLine line, int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return line.TargetParam1;
+                case 1:
+                    return line.TargetParam2;
+                case 2:
+                    return line.TargetParam3;
+            }
+
+            throw new IndexOutOfRangeException();
+        }
     }
 }

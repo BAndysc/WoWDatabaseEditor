@@ -17,29 +17,27 @@ namespace WDE.SmartScriptEditor.Models
         public static readonly int SmartConditionParametersCount = 3;
 
         private string comment;
-
         private bool isSelected;
-
         private SmartEvent parent;
+        private ParameterValueHolder<int> inverted;
+        private ParameterValueHolder<int> conditionTarget;
 
-        private Parameter inverted;
-        
-        private Parameter conditionTarget;
-        
         public SmartCondition(int id) : base(SmartConditionParametersCount, id)
         {
-            inverted = new Parameter("Inverted");
-            inverted.Items = new Dictionary<int, SelectOption>() {[0] = new("False"), [1] = new("True")};
+            var invertedParam = new Parameter();
+            invertedParam.Items = new Dictionary<int, SelectOption>() {[0] = new("False"), [1] = new("True")};
             
-            conditionTarget = new Parameter("Condition target");
-            conditionTarget.Items = new Dictionary<int, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
-            
-            inverted.OnValueChanged += ((sender, value) =>
+            var conditionTargetParam = new Parameter();
+            conditionTargetParam.Items = new Dictionary<int, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
+
+            inverted = new ParameterValueHolder<int>("Inverted", invertedParam);
+            conditionTarget = new ParameterValueHolder<int>("Condition target", conditionTargetParam);
+            inverted.PropertyChanged += ((sender, value) =>
             {
                 CallOnChanged();
                 OnPropertyChanged(nameof(IsInverted));
             });
-            conditionTarget.OnValueChanged += ((sender, value) => CallOnChanged());
+            conditionTarget.PropertyChanged += ((sender, value) => CallOnChanged());
         }
 
         public SmartEvent Parent
@@ -64,12 +62,12 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        public bool IsInverted => inverted.GetValue() == 1;
+        public bool IsInverted => inverted.Value == 1;
 
-        public Parameter Inverted => inverted;
+        public ParameterValueHolder<int> Inverted => inverted;
         
-        public Parameter ConditionTarget => conditionTarget;
-
+        public ParameterValueHolder<int> ConditionTarget => conditionTarget;
+        
         public string Comment
         {
             get => comment;
@@ -92,15 +90,13 @@ namespace WDE.SmartScriptEditor.Models
                     pram1 = GetParameter(0).ToString(),
                     pram2 = GetParameter(1).ToString(),
                     pram3 = GetParameter(2).ToString(),
-                    datapram1 = GetParameter(0).GetValue(),
-                    pram1value = GetParameter(0).GetValue(),
-                    pram2value = GetParameter(1).GetValue(),
-                    pram3value = GetParameter(2).GetValue(),
+                    datapram1 = GetParameter(0).Value,
+                    pram1value = GetParameter(0).Value,
+                    pram2value = GetParameter(1).Value,
+                    pram3value = GetParameter(2).Value,
                 });
             }
         }
-
-        public override int ParametersCount => SmartConditionParametersCount;
 
         private void ParentPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -119,10 +115,12 @@ namespace WDE.SmartScriptEditor.Models
             se.Comment = Comment;
             se.ReadableHint = ReadableHint;
             se.DescriptionRules = DescriptionRules;
-            se.inverted.SetValue(inverted.Value);
-            se.conditionTarget.SetValue(conditionTarget.Value);
-            for (var i = 0; i < ParametersCount; ++i)
-                se.SetParameterObject(i, GetParameter(i).Clone());
+            se.inverted.Value = inverted.Value;
+            se.conditionTarget.Value = conditionTarget.Value;
+            for (var i = 0; i < SmartConditionParametersCount; ++i)
+            {
+                se.GetParameter(i).Copy(GetParameter(i));
+            }
             return se;
         }
     }

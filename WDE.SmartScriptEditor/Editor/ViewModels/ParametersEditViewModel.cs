@@ -22,9 +22,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             SmartBaseElement element,
-            IEnumerable<(Parameter parameter, string name)> parameters,
-            IEnumerable<(FloatParameter parameter, string name)> floatParameters = null,
-            IEnumerable<(StringParameter parameter, string name)> stringParameters = null)
+            IEnumerable<(ParameterValueHolder<int> parameter, string name)> parameters,
+            IEnumerable<(ParameterValueHolder<float> parameter, string name)> floatParameters = null,
+            IEnumerable<(ParameterValueHolder<string> parameter, string name)> stringParameters = null)
         {
             this.element = element;
             Readable = element.Readable;

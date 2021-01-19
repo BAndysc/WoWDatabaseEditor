@@ -4,62 +4,44 @@ using Newtonsoft.Json;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using WDE.Parameters.Providers;
 
 namespace WDE.Parameters
 {
     public class ParameterLoader
     {
         private readonly IDatabaseProvider database;
+        private readonly IParameterDefinitionProvider parameterDefinitionProvider;
 
-        public ParameterLoader(IDatabaseProvider database)
+        public ParameterLoader(IDatabaseProvider database, IParameterDefinitionProvider parameterDefinitionProvider)
         {
             this.database = database;
+            this.parameterDefinitionProvider = parameterDefinitionProvider;
         }
 
         public void Load(ParameterFactory factory)
         {
-            string data = File.ReadAllText("Data/parameters.json");
-            var models = JsonConvert.DeserializeObject<Dictionary<string, ParameterSpecModel>>(data);
-            foreach (string key in models.Keys)
-                factory.Add(key, models[key]);
+            foreach (var pair in parameterDefinitionProvider.Parameters)
+            {
+                Parameter p = pair.Value.IsFlag ? new FlagParameter() : new Parameter();
+                p.Items = pair.Value.Values;
+                factory.Register(pair.Key, p);
+            }
 
-            factory.Register("FloatParameter", s => new FloatIntParameter(s));
-
-            factory.Register("CreatureParameter", s => new CreatureParameter(s, database));
-
-            factory.Register("QuestParameter", s => new QuestParameter(s, database));
-
-            factory.Register("GameobjectParameter", s => new GameobjectParameter(s, database));
-
-            factory.Register("BoolParameter", s => new BoolParameter(s));
-            
-            factory.Register("FlagParameter", s => new FlagParameter(s));
+            factory.Register("FloatParameter", new FloatIntParameter());
+            factory.Register("CreatureParameter", new CreatureParameter(database));
+            factory.Register("QuestParameter", new QuestParameter(database));
+            factory.Register("GameobjectParameter", new GameobjectParameter(database));
+            factory.Register("BoolParameter", new BoolParameter());
+            factory.Register("FlagParameter", new FlagParameter());
         }
     }
 
-    public class SwitchParameter : Parameter
+    public class BoolParameter : Parameter
     {
-        public SwitchParameter(string name, Dictionary<int, SelectOption> options) : base(name)
+        public BoolParameter()
         {
-            Items = options;
-        }
-
-        public override Parameter Clone()
-        {
-            return new SwitchParameter(Name, Items) {Value = value};
-        }
-    }
-
-    public class BoolParameter : SwitchParameter
-    {
-        public BoolParameter(string name) : base(name,
-            new Dictionary<int, SelectOption> {{0, new SelectOption("No")}, {1, new SelectOption("Yes")}})
-        {
-        }
-
-        public override Parameter Clone()
-        {
-            return new BoolParameter(Name) {Value = value};
+            Items = new Dictionary<int, SelectOption> {{0, new SelectOption("No")}, {1, new SelectOption("Yes")}};
         }
     }
 
@@ -67,17 +49,20 @@ namespace WDE.Parameters
     {
         private readonly IDatabaseProvider database;
 
-        public CreatureParameter(string name, IDatabaseProvider database) : base(name)
+        public CreatureParameter(IDatabaseProvider database)
         {
             this.database = database;
-            Items = new Dictionary<int, SelectOption>();
-            foreach (ICreatureTemplate item in database.GetCreatureTemplates())
-                Items.Add((int) item.Entry, new SelectOption(item.Name));
         }
 
-        public override Parameter Clone()
+        public override string ToString(int key)
         {
-            return new CreatureParameter(Name, database) {Value = value};
+            if (Items == null)
+            {
+                Items = new Dictionary<int, SelectOption>();
+                foreach (ICreatureTemplate item in database.GetCreatureTemplates())
+                    Items.Add((int) item.Entry, new SelectOption(item.Name));
+            }
+            return base.ToString(key);
         }
     }
 
@@ -85,17 +70,20 @@ namespace WDE.Parameters
     {
         private readonly IDatabaseProvider database;
 
-        public QuestParameter(string name, IDatabaseProvider database) : base(name)
+        public QuestParameter(IDatabaseProvider database)
         {
             this.database = database;
-            Items = new Dictionary<int, SelectOption>();
-            foreach (IQuestTemplate item in database.GetQuestTemplates())
-                Items.Add((int) item.Entry, new SelectOption(item.Name));
         }
 
-        public override Parameter Clone()
+        public override string ToString(int key)
         {
-            return new QuestParameter(Name, database) {Value = value};
+            if (Items == null)
+            {
+                Items = new Dictionary<int, SelectOption>();
+                foreach (IQuestTemplate item in database.GetQuestTemplates())
+                    Items.Add((int) item.Entry, new SelectOption(item.Name));
+            }
+            return base.ToString(key);
         }
     }
 
@@ -103,17 +91,20 @@ namespace WDE.Parameters
     {
         private readonly IDatabaseProvider database;
 
-        public GameobjectParameter(string name, IDatabaseProvider database) : base(name)
+        public GameobjectParameter(IDatabaseProvider database)
         {
             this.database = database;
-            Items = new Dictionary<int, SelectOption>();
-            foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
-                Items.Add((int) item.Entry, new SelectOption(item.Name));
         }
 
-        public override Parameter Clone()
+        public override string ToString(int key)
         {
-            return new GameobjectParameter(Name, database) {Value = value};
+            if (Items == null)
+            {
+                Items = new Dictionary<int, SelectOption>();
+                foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
+                    Items.Add((int) item.Entry, new SelectOption(item.Name));
+            }
+            return base.ToString(key);
         }
     }
 }

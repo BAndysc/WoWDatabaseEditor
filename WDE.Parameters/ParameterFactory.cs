@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.Parameters;
 using WDE.Module.Attributes;
@@ -12,56 +11,34 @@ namespace WDE.Parameters
     public class ParameterFactory : IParameterFactory
     {
         private readonly Dictionary<string, ParameterSpecModel> data = new();
-        private readonly Dictionary<string, Func<string, Parameter>> dynamics = new();
+        private readonly Dictionary<string, IParameter<int>> parameters = new();
 
-        public Parameter Factory(string type, string name)
+        public IParameter<int> Factory(string type)
         {
-            return Factory(type, name, 0);
+            if (parameters.TryGetValue(type, out var parameter))
+                return parameter;
+            return Parameter.Instance;
         }
 
-        public Parameter Factory(string type, string name, int defaultValue)
+        public bool IsRegistered(string type)
         {
-            Parameter param;
-
-            if (dynamics.ContainsKey(type))
-                param = dynamics[type](name);
-            else if (data.ContainsKey(type))
-            {
-                param = data[type].IsFlag && data[type].Values != null ? new FlagParameter(name) : new Parameter(name);
-
-                if (data[type].Values != null)
-                    param.Items = data[type].Values;
-                return param;
-            }
-            else
-                param = new Parameter(name);
-
-            param.SetValue(defaultValue);
-
-            return param;
+            return parameters.ContainsKey(type);
         }
 
-        public void Register(string key, Func<string, Parameter> creator)
+        public void Register(string key, IParameter<int> parameter)
         {
-            dynamics.Add(key, creator);
-        }
-
-        public void Add(string key, ParameterSpecModel model)
-        {
-            model.Key = key;
-            data.Add(key, model);
+            parameters.Add(key, parameter);
         }
 
         public IEnumerable<string> GetKeys()
         {
-            return data.Keys.Union(dynamics.Keys);
+            return data.Keys.Union(parameters.Keys);
         }
 
         public ParameterSpecModel GetDefinition(string key)
         {
-            if (dynamics.ContainsKey(key))
+            if (parameters.TryGetValue(key, out var param))
             {
-                Parameter param = dynamics[key](key);
                 return new ParameterSpecModel
                 {
                     IsFlag = param is FlagParameter,

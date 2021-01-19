@@ -106,7 +106,7 @@ namespace WDE.SmartScriptEditor.Models
                 SmartAction waitAction = smartFactory.ActionFactory(SmartConstants.ActionWait,
                     smartFactory.SourceFactory(SmartConstants.SourceNone),
                     smartFactory.TargetFactory(SmartConstants.TargetNone));
-                waitAction.SetParameter(0, waitTime);
+                waitAction.GetParameter(0).Value = waitTime;
 
                 caller.Actions.RemoveAt(caller.Actions.Count - 1);
                 caller.AddAction(waitAction);

@@ -32,7 +32,7 @@ namespace WDE.SmartScriptEditor.Data
 
             SmartEvent ev = new(id);
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
-            ev.Chance.SetValue(100);
+            ev.Chance.Value = 100;
             SetParameterObjects(ev, raw);
 
             if (raw.DescriptionRules != null)
@@ -49,14 +49,16 @@ namespace WDE.SmartScriptEditor.Data
         {
             SmartEvent ev = EventFactory(line.EventType);
 
-            ev.Chance.SetValue(line.EventChance);
-            ev.Phases.SetValue(line.EventPhaseMask);
-            ev.Flags.SetValue(line.EventFlags);
-            ev.CooldownMin.SetValue(line.EventCooldownMin);
-            ev.CooldownMax.SetValue(line.EventCooldownMax);
+            ev.Chance.Value = line.EventChance;
+            ev.Phases.Value = line.EventPhaseMask;
+            ev.Flags.Value = line.EventFlags;
+            ev.CooldownMin.Value = line.EventCooldownMin;
+            ev.CooldownMax.Value = line.EventCooldownMax;
 
             for (var i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
-                ev.SetParameter(i, GetEventParameter(line, i));
+            {
+                ev.GetParameter(i).Value = line.GetEventParam(i);
+            }
 
             return ev;
         }
@@ -77,11 +79,11 @@ namespace WDE.SmartScriptEditor.Data
         {
             SmartCondition condition = ConditionFactory(line.ConditionType);
 
-            condition.Inverted.SetValue(line.NegativeCondition);
-            condition.ConditionTarget.SetValue(line.ConditionTarget);
-            condition.GetParameter(0).SetValue(line.ConditionValue1);
-            condition.GetParameter(1).SetValue(line.ConditionValue2);
-            condition.GetParameter(2).SetValue(line.ConditionValue3);
+            condition.Inverted.Value = line.NegativeCondition;
+            condition.ConditionTarget.Value = line.ConditionTarget;
+            condition.GetParameter(0).Value = line.ConditionValue1;
+            condition.GetParameter(1).Value = line.ConditionValue2;
+            condition.GetParameter(2).Value = line.ConditionValue3;
 
             return condition;
         }
@@ -106,7 +108,7 @@ namespace WDE.SmartScriptEditor.Data
             SmartAction action = ActionFactory(line.ActionType, source, target);
 
             for (var i = 0; i < SmartAction.SmartActionParametersCount; ++i)
-                action.SetParameter(i, GetActionParameter(line, i));
+                action.GetParameter(i).Value = line.GetActionParam(i);
 
             return action;
         }
@@ -139,47 +141,7 @@ namespace WDE.SmartScriptEditor.Data
 
             return source;
         }
-
-        private int GetEventParameter(ISmartScriptLine line, int i)
-        {
-            // ugly but DB is in such form
-            switch (i)
-            {
-                case 0:
-                    return line.EventParam1;
-                case 1:
-                    return line.EventParam2;
-                case 2:
-                    return line.EventParam3;
-                case 3:
-                    return line.EventParam4;
-            }
-
-            throw new ArgumentException("Event parameter out of range");
-        }
-
-        private int GetActionParameter(ISmartScriptLine line, int i)
-        {
-            // ugly but DB is in such form
-            switch (i)
-            {
-                case 0:
-                    return line.ActionParam1;
-                case 1:
-                    return line.ActionParam2;
-                case 2:
-                    return line.ActionParam3;
-                case 3:
-                    return line.ActionParam4;
-                case 4:
-                    return line.ActionParam5;
-                case 5:
-                    return line.ActionParam6;
-            }
-
-            throw new ArgumentException("Action parameter out of range");
-        }
-
+        
         public SmartTarget TargetFactory(ISmartScriptLine line)
         {
             SmartTarget target = TargetFactory(line.TargetType);
@@ -189,10 +151,10 @@ namespace WDE.SmartScriptEditor.Data
             target.Z = line.TargetZ;
             target.O = line.TargetO;
 
-            target.Condition.SetValue(line.TargetConditionId);
+            target.Condition.Value = (line.TargetConditionId);
 
             for (var i = 0; i < SmartSource.SmartSourceParametersCount; ++i)
-                target.SetParameter(i, GetTargetParameter(line, i));
+                target.GetParameter(i).Value = line.GetTargetParam(i);
 
             return target;
         }
@@ -217,10 +179,10 @@ namespace WDE.SmartScriptEditor.Data
         {
             SmartSource source = SourceFactory(line.SourceType);
 
-            source.Condition.SetValue(line.SourceConditionId);
+            source.Condition.Value = line.SourceConditionId;
 
             for (var i = 0; i < SmartSource.SmartSourceParametersCount; ++i)
-                source.SetParameter(i, GetSourceParameter(line, i));
+                source.GetParameter(i).Value = line.GetSourceParam(i);
 
             return source;
         }
@@ -249,13 +211,18 @@ namespace WDE.SmartScriptEditor.Data
 
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
-                Parameter parameter = parameterFactory.Factory(data.Parameters[i].Type,
-                    data.Parameters[i].Name,
-                    data.Parameters[i].DefaultVal);
-                parameter.Description = data.Parameters[i].Description;
+                string key = data.Parameters[i].Type;
                 if (data.Parameters[i].Values != null)
-                    parameter.Items = data.Parameters[i].Values;
-                element.SetParameterObject(i, parameter);
+                {
+                    key = $"{data.Name}_{i}";
+                    if (!parameterFactory.IsRegistered(key))
+                        parameterFactory.Register(key, new Parameter(){Items = data.Parameters[i].Values});
+                }
+                
+                IParameter<int> parameter = parameterFactory.Factory(key);
+                element.GetParameter(i).Name = data.Parameters[i].Name;
+                element.GetParameter(i).Value = data.Parameters[i].DefaultVal;
+                element.GetParameter(i).Parameter = parameter;
             }
         }
         
@@ -267,12 +234,18 @@ namespace WDE.SmartScriptEditor.Data
 
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
-                Parameter parameter = parameterFactory.Factory(data.Parameters[i].Type,
-                    data.Parameters[i].Name, 0);
-                parameter.Description = data.Parameters[i].Description;
+                string key = data.Parameters[i].Type;
                 if (data.Parameters[i].Values != null)
-                    parameter.Items = data.Parameters[i].Values;
-                element.SetParameterObject(i, parameter);
+                {
+                    key = $"{data.Name}_{i}";
+                    if (!parameterFactory.IsRegistered(key))
+                        parameterFactory.Register(key, new Parameter(){Items = data.Parameters[i].Values});
+                }
+                
+                IParameter<int> parameter = parameterFactory.Factory(key);
+
+                element.GetParameter(i).Name = data.Parameters[i].Name;
+                element.GetParameter(i).Parameter = parameter;
             }
         }
     }

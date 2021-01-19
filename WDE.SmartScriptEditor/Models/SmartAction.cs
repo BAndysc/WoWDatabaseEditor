@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Models
 
         private SmartTarget target;
 
-        private StringParameter comment;
+        private ParameterValueHolder<string> comment;
 
         public SmartAction(int id, SmartSource source, SmartTarget target) : base(SmartActionParametersCount, id)
         {
@@ -27,8 +27,12 @@ namespace WDE.SmartScriptEditor.Models
 
             Source = source;
             Target = target;
-            comment = new StringParameter("Comment");
-            comment.OnValueChanged += (sender, o) => CallOnChanged();
+            comment = new ParameterValueHolder<string>("Comment", new StringParameter());
+            comment.PropertyChanged += (_, _) =>
+            {
+                CallOnChanged();
+                OnPropertyChanged(nameof(Comment));
+            };
         }
 
         public SmartEvent Parent
@@ -76,7 +80,7 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        public StringParameter CommentParameter => comment;
+        public ParameterValueHolder<string> CommentParameter => comment;
         
         public SmartTarget Target
         {
@@ -110,19 +114,19 @@ namespace WDE.SmartScriptEditor.Models
                             pram4 = GetParameter(3),
                             pram5 = GetParameter(4),
                             pram6 = GetParameter(5),
-                            datapram1 = "data #" + GetParameter(0).GetValue(),
-                            stored = "stored target #" + GetParameter(0).GetValue(),
-                            storedPoint = "stored point #" + GetParameter(0).GetValue(),
-                            timed1 = "timed event #" + GetParameter(0).GetValue(),
-                            timed4 = "timed event #" + GetParameter(0).GetValue(),
-                            function1 = "function #" + GetParameter(0).GetValue(),
-                            action1 = "action #" + GetParameter(0).GetValue(),
-                            pram1value = GetParameter(0).GetValue(),
-                            pram2value = GetParameter(1).GetValue(),
-                            pram3value = GetParameter(2).GetValue(),
-                            pram4value = GetParameter(3).GetValue(),
-                            pram5value = GetParameter(4).GetValue(),
-                            pram6value = GetParameter(5).GetValue(),
+                            datapram1 = "data #" + GetParameter(0).Value,
+                            stored = "stored target #" + GetParameter(0).Value,
+                            storedPoint = "stored point #" + GetParameter(0).Value,
+                            timed1 = "timed event #" + GetParameter(0).Value,
+                            timed4 = "timed event #" + GetParameter(0).Value,
+                            function1 = "function #" + GetParameter(0).Value,
+                            action1 = "action #" + GetParameter(0).Value,
+                            pram1value = GetParameter(0).Value,
+                            pram2value = GetParameter(1).Value,
+                            pram3value = GetParameter(2).Value,
+                            pram4value = GetParameter(3).Value,
+                            pram5value = GetParameter(4).Value,
+                            pram6value = GetParameter(5).Value,
                             comment = Comment
                         });
                     return output;
@@ -133,8 +137,6 @@ namespace WDE.SmartScriptEditor.Models
                 }
             }
         }
-
-        public override int ParametersCount => 6;
 
         private void ParentPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
@@ -155,8 +157,10 @@ namespace WDE.SmartScriptEditor.Models
             se.Comment = Comment;
             se.ReadableHint = ReadableHint;
             se.DescriptionRules = DescriptionRules;
-            for (var i = 0; i < ParametersCount; ++i)
-                se.SetParameterObject(i, GetParameter(i).Clone());
+            for (var i = 0; i < SmartActionParametersCount; ++i)
+            {
+                se.GetParameter(i).Copy(GetParameter(i));
+            }
             return se;
         }
     }

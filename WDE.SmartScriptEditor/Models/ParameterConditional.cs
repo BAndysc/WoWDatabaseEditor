@@ -14,13 +14,13 @@ namespace WDE.SmartScriptEditor.Models
             Description = description;
         }
 
-        protected ParameterConditional(Parameter compared, WarningType warningType)
+        protected ParameterConditional(ParameterValueHolder<int> compared, WarningType warningType)
         {
             Compared = compared;
             WarningType = warningType;
         }
 
-        protected ParameterConditional(Parameter compared, Parameter compareTo, WarningType warningType, string description = null)
+        protected ParameterConditional(ParameterValueHolder<int> compared, ParameterValueHolder<int> compareTo, WarningType warningType, string description = null)
         {
             Compared = compared;
             CompareTo = compareTo;
@@ -28,46 +28,11 @@ namespace WDE.SmartScriptEditor.Models
             Description = description;
         }
 
-        protected ParameterConditional(Parameter compared, int value, WarningType warningType, string description = null) : this(
-            compared,
-            new Parameter(value.ToString()),
-            warningType,
-            description)
-        {
-        }
-
-        public Parameter CompareTo { get; set; }
-        public Parameter Compared { get; set; }
+        public ParameterValueHolder<int> CompareTo { get; set; }
+        public ParameterValueHolder<int> Compared { get; set; }
         public WarningType WarningType { get; set; }
         public string Description { get; set; }
 
-        public void SetCompareTo(Parameter parameter)
-        {
-            CompareTo = parameter;
-        }
-
-        public void SetCompareTo(int parametr)
-        {
-            SetCompareTo(new Parameter(parametr.ToString()));
-        }
-
-        public void SetDescription(string error)
-        {
-            Description = Smart.Format(error, new {compared = Compared.Name, compareto = CompareTo.Name});
-        }
-
-        public abstract bool Validate();
-
-        public static ParameterConditional Factory(string type, Parameter parameter = null)
-        {
-            switch (type)
-            {
-                case "CompareValue":
-                    return new ParameterConditionalCompareValue(parameter);
-            }
-
-            return null;
-        }
     }
 
     public class ParameterConditionalCompareAny : ParameterConditional
@@ -144,19 +109,14 @@ namespace WDE.SmartScriptEditor.Models
 
             return compareSource;
         }
-
-        public override bool Validate()
-        {
-            return false;
-        }
     }
 
-    public class ParameterConditionalCompareValue : ParameterConditional
+    /*public class ParameterConditionalCompareValue : ParameterConditional
     {
         private readonly int max;
         private CompareType compareType;
 
-        public ParameterConditionalCompareValue(Parameter compared) : base(compared, WarningType.INVALID_VALUE)
+        public ParameterConditionalCompareValue(ParameterValueHolder<int> compared) : base(compared, WarningType.INVALID_VALUE)
         {
         }
 
@@ -206,19 +166,19 @@ namespace WDE.SmartScriptEditor.Models
             switch (compareType)
             {
                 case CompareType.EQUALS:
-                    return Compared.GetValue() == CompareTo.GetValue();
+                    return Compared.Value == CompareTo.Value;
                 case CompareType.NOT_EQUALS:
-                    return Compared.GetValue() != CompareTo.GetValue();
+                    return Compared.Value != CompareTo.Value;
                 case CompareType.LOWER_THAN:
-                    return Compared.GetValue() < CompareTo.GetValue();
+                    return Compared.Value < CompareTo.Value;
                 case CompareType.GREATER_THAN:
-                    return Compared.GetValue() > CompareTo.GetValue();
+                    return Compared.Value > CompareTo.Value;
                 case CompareType.LOWER_OR_EQUALS:
-                    return Compared.GetValue() <= CompareTo.GetValue();
+                    return Compared.Value <= CompareTo.Value;
                 case CompareType.GREATER_OR_EQUALS:
-                    return Compared.GetValue() >= CompareTo.GetValue();
+                    return Compared.Value >= CompareTo.Value;
                 case CompareType.BETWEEN:
-                    return Compared.GetValue() >= CompareTo.GetValue() && Compared.GetValue() <= max;
+                    return Compared.Value >= CompareTo.Value && Compared.Value <= max;
             }
 
             return false;
@@ -236,7 +196,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public override bool Validate()
         {
-            int value = Compared.GetValue();
+            int value = Compared.Value;
             foreach (int flag in flags)
                 value = value & ~flag;
             if (value > 0)
@@ -296,5 +256,5 @@ namespace WDE.SmartScriptEditor.Models
         {
             return !conditional.Validate();
         }
-    }
+    }*/
 }

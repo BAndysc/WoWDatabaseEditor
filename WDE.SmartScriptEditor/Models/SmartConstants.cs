@@ -15,5 +15,7 @@
         public const string CommentComment = "-meta_comment";
         public const int ConditionSourceSmartScript = 22;
         public const int ConditionOr = -1;
+        public const string SmartEventFlagsParameter = "SmartEventFlagsParameter";
+        public const string SmartEventPhaseParameter = "SmartEventPhaseParameter";
     }
 }

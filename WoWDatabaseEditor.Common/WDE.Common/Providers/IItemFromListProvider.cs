@@ -7,6 +7,6 @@ namespace WDE.Common.Providers
     [UniqueProvider]
     public interface IItemFromListProvider
     {
-        int? GetItemFromList(Dictionary<int, SelectOption> items, bool flag);
+        int? GetItemFromList(Dictionary<int, SelectOption> items, bool flag, int? current = null);
     }
 }

@@ -226,19 +226,19 @@ namespace WDE.SmartScriptEditor
             }
         }
 
-        private void Parameter_OnValueChanged(object sender, ParameterChangedValue<int> e)
+        private void Parameter_OnValueChanged(ParameterValueHolder<int> sender, int old, int @new)
         {
-            PushAction(new ParameterChangedAction(sender as Parameter, e.Old, e.New));
+            PushAction(new ParameterChangedAction(sender, old, @new));
         }
 
-        private void ParameterFloat_OnValueChange(object sender, ParameterChangedValue<float> e)
+        private void ParameterFloat_OnValueChange(ParameterValueHolder<float> sender, float old, float @new)
         {
-            PushAction(new GenericParameterChangedAction<float>(sender as FloatParameter, e.Old, e.New));
+            PushAction(new GenericParameterChangedAction<float>(sender, old, @new));
         }
 
-        private void ParameterString_OnValueChanged(object? sender, ParameterChangedValue<string> e)
+        private void ParameterString_OnValueChanged(ParameterValueHolder<string> sender, string old, string @new)
         {
-            PushAction(new GenericParameterChangedAction<string>(sender as StringParameter, e.Old, e.New));
+            PushAction(new GenericParameterChangedAction<string>(sender, old, @new));
         }
         
         private class EventAddedAction : IHistoryAction
@@ -307,9 +307,9 @@ namespace WDE.SmartScriptEditor
         {
             private readonly T @new;
             private readonly T old;
-            private readonly GenericBaseParameter<T> param;
+            private readonly ParameterValueHolder<T> param;
 
-            public GenericParameterChangedAction(GenericBaseParameter<T> param, T old, T @new)
+            public GenericParameterChangedAction(ParameterValueHolder<T> param, T old, T @new)
             {
                 this.param = param;
                 this.old = old;
@@ -319,23 +319,23 @@ namespace WDE.SmartScriptEditor
             public string GetDescription()
             {
                 // @Todo: how to localize this?
-                return "Changed " + param.Name + " from " + old + " to " + @new;
+                return "Changed " + /*param.Name +*/ " from " + old + " to " + @new;
             }
 
             public void Redo()
             {
-                param.SetValue(@new);
+                param.Value = @new;
             }
 
             public void Undo()
             {
-                param.SetValue(old);
+                param.Value = old;
             }
         }
 
         private class ParameterChangedAction : GenericParameterChangedAction<int>
         {
-            public ParameterChangedAction(GenericBaseParameter<int> param, int old, int @new) : base(param, old, @new)
+            public ParameterChangedAction(ParameterValueHolder<int> param, int old, int @new) : base(param, old, @new)
             {
             }
         }

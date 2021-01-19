@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -9,7 +10,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     {
         private readonly IItemFromListProvider itemFromListProvider;
 
-        public ParameterEditorViewModel(GenericBaseParameter<T> parameter, string group, IItemFromListProvider itemFromListProvider)
+        public ParameterEditorViewModel(ParameterValueHolder<T> parameter, string group, IItemFromListProvider itemFromListProvider)
         {
             Group = group;
             this.itemFromListProvider = itemFromListProvider;
@@ -17,7 +18,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SelectItemAction = new DelegateCommand(SelectItem);
         }
 
-        public GenericBaseParameter<T> Parameter { get; set; }
+        public ParameterValueHolder<T> Parameter { get; set; }
 
         public string Group { get; }
 
@@ -25,11 +26,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private void SelectItem()
         {
-            if (Parameter.Items != null)
+            if (Parameter.Parameter.Items != null)
             {
-                if (Parameter is Parameter p)
+                if (Parameter is ParameterValueHolder<int> p)
                 {
-                    int? val = itemFromListProvider.GetItemFromList(p.Items, Parameter is FlagParameter);
+                    int? val = itemFromListProvider.GetItemFromList(p.Parameter.Items, Parameter.Parameter is FlagParameter, p.Value);
                     if (val.HasValue)
                         p.Value = val.Value;   
                 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace WDE.Common.Parameters
 {
@@ -17,55 +15,11 @@ namespace WDE.Common.Parameters
         }
     }
 
-    public abstract class GenericBaseParameter<T> : INotifyPropertyChanged
+    public abstract class GenericBaseParameter<T> : IParameter<T>
     {
-        protected T value;
-
-        protected GenericBaseParameter(string name)
-        {
-            Name = name;
-        }
-
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string String => ToString();
         public Dictionary<T, SelectOption> Items { get; set; }
-
-        public T Value
-        {
-            get => value;
-            set
-            {
-                T old = Value;
-                this.value = value;
-                if (old == null || !old.Equals(value))
-                {
-                    OnValueChanged(this, new ParameterChangedValue<T>(old, Value));
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(String));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler<ParameterChangedValue<T>> OnValueChanged = delegate { };
-
-        public void SetValue(T value)
-        {
-            if (Comparer<T>.Default.Compare(value, Value) != 0)
-                Value = value;
-        }
-
-        public T GetValue()
-        {
-            return Value;
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public abstract string ToString(T value);
+        public bool HasItems => Items != null && Items.Count > 0;
     }
 
     public class SelectOption

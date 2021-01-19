@@ -8,53 +8,38 @@ namespace WDE.SmartScriptEditor.Models
 {
     public abstract class SmartBaseElement : INotifyPropertyChanged
     {
-        private readonly Parameter[] @params;
+        private readonly ParameterValueHolder<int>[] @params;
         public string ReadableHint;
+        
+        public int ParametersCount { get; }
 
         protected SmartBaseElement(int parametersCount, int id)
         {
+            ParametersCount = parametersCount;
             Id = id;
-            @params = new Parameter[parametersCount];
-            for (var i = 0; i < parametersCount; ++i)
-                SetParameterObject(i, new NullParameter());
-
+            @params = new ParameterValueHolder<int>[parametersCount];
+            for (int i = 0; i < parametersCount; ++i)
+            {
+                @params[i] = new ParameterValueHolder<int>("empty", Parameter.Instance);
+                @params[i].PropertyChanged += (_, _) => CallOnChanged();
+            }
             OnChanged += (sender, args) => OnPropertyChanged(nameof(Readable));
         }
 
         public List<DescriptionRule> DescriptionRules { get; set; }
         public int Id { get; }
-
         public abstract string Readable { get; }
-        public abstract int ParametersCount { get; }
         public event PropertyChangedEventHandler PropertyChanged;
         public event Action BulkEditingStarted = delegate { };
         public event Action<string> BulkEditingFinished = delegate { };
         public event EventHandler OnChanged = delegate { };
-
-        public void SetParameterObject(int index, Parameter parameter)
-        {
-            if (@params[index] != null)
-                @params[index].OnValueChanged -= SmartBaseElement_OnValueChanged;
-            @params[index] = parameter;
-            parameter.OnValueChanged += SmartBaseElement_OnValueChanged;
-        }
-
-        public void SetParameter(int index, int value)
-        {
-            @params[index].SetValue(value);
-        }
-
-        public Parameter GetParameter(int index)
+        
+        public ParameterValueHolder<int> GetParameter(int index)
         {
             return @params[index];
         }
 
-        private void SmartBaseElement_OnValueChanged(object sender, ParameterChangedValue<int> e)
-        {
-            CallOnChanged();
-        }
-
-        protected void CallOnChanged(SmartBaseElement smartEvent = null, ParameterChangedValue<int> e = null)
+        protected void CallOnChanged()
         {
             OnChanged(this, null);
         }

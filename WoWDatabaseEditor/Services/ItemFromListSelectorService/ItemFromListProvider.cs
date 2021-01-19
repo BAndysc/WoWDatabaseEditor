@@ -16,9 +16,9 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             this.windowManager = windowManager;
         }
         
-        public int? GetItemFromList(Dictionary<int, SelectOption> items, bool flags)
+        public int? GetItemFromList(Dictionary<int, SelectOption> items, bool flags, int? current = null)
         {
-            ItemFromListProviderViewModel vm = new(items, flags);
+            ItemFromListProviderViewModel vm = new(items, flags, current);
             if (windowManager.ShowDialog(vm))
                 return vm.GetEntry();
             return null;

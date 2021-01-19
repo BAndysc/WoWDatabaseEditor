@@ -89,7 +89,7 @@
                 "name": "Distance"
             }
         ],
-        "description": "{target}: Play {pram2value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {target}|{target}}",
+        "description": "{target}: Play {pram3value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {target}|{target}}",
         "name_readable": "Sound",
         "uses_target": true,
         "target_is_source": true,

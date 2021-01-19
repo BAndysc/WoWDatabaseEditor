@@ -139,7 +139,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     if (previousWasWait)
                     {
                         actualEvent = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
-                        actualEvent.SetParameter(0, nextTriggerId++);
+                        actualEvent.GetParameter(0).Value = nextTriggerId++;
                     }
                     else if (index > 0)
                         actualEvent = smartFactory.EventFactory(SmartConstants.EventLink);
@@ -155,9 +155,9 @@ namespace WDE.SmartScriptEditor.Exporter
                         actualAction = smartFactory.ActionFactory(SmartConstants.ActionTriggerTimed,
                             smartFactory.SourceFactory(SmartConstants.SourceNone),
                             smartFactory.TargetFactory(SmartConstants.TargetNone));
-                        actualAction.SetParameter(0, nextTriggerId);
-                        actualAction.SetParameter(1, waitAction.GetParameter(0).GetValue());
-                        actualAction.SetParameter(2, waitAction.GetParameter(0).GetValue());
+                        actualAction.GetParameter(0).Value = nextTriggerId;
+                        actualAction.GetParameter(1).Value = waitAction.GetParameter(0).Value;
+                        actualAction.GetParameter(2).Value = waitAction.GetParameter(0).Value;
                         actualAction.Comment = SmartConstants.CommentWait;
                         previousWasWait = true;
                     }

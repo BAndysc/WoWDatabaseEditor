@@ -1,6 +1,5 @@
 ﻿using Prism.Events;
 using Prism.Ioc;
-using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Module;
 using WDE.Module.Attributes;
@@ -16,7 +15,7 @@ namespace WDE.Parameters
                 .GetEvent<AllModulesLoaded>()
                 .Subscribe(() =>
                     {
-                        new ParameterLoader(containerProvider.Resolve<IDatabaseProvider>()).Load(containerProvider
+                        containerProvider.Resolve<ParameterLoader>().Load(containerProvider
                             .Resolve<ParameterFactory>());
                     },
                     ThreadOption.PublisherThread,

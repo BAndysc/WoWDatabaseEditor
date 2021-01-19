@@ -20,13 +20,16 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 
         private string search = "";
 
-        public ItemFromListProviderViewModel(Dictionary<int, SelectOption> items, bool asFlags)
+        public ItemFromListProviderViewModel(Dictionary<int, SelectOption> items, bool asFlags, int? current = null)
         {
             this.asFlags = asFlags;
             RawItems = new ObservableCollection<KeyValuePair<int, CheckableSelectOption>>();
 
             foreach (int key in items.Keys)
-                RawItems.Add(new KeyValuePair<int, CheckableSelectOption>(key, new CheckableSelectOption(items[key])));
+            {
+                bool isSelected = current.HasValue && ((current == 0 && key == 0) || (key > 0) && (current & key) == key);
+                RawItems.Add(new KeyValuePair<int, CheckableSelectOption>(key, new CheckableSelectOption(items[key], isSelected)));
+            }
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
@@ -102,10 +105,11 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
 
     public class CheckableSelectOption : SelectOption
     {
-        public CheckableSelectOption(SelectOption selectOption)
+        public CheckableSelectOption(SelectOption selectOption, bool isChecked)
         {
             Name = selectOption.Name;
             Description = selectOption.Description;
+            IsChecked = isChecked;
         }
 
         public bool IsChecked { get; set; }

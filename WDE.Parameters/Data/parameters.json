@@ -1,4 +1,40 @@
 {
+	"SmartEventFlagsParameter": {
+		"isflag": true,
+		"name": "Event flags",
+		"prefix": "SMART_EVENT_FLAG",
+		"values": {
+			"1": { "name": "NOT_REPEATABLE" },
+			"2": { "name": "DIFFICULTY_0" },
+			"4": { "name": "DIFFICULTY_1" },
+			"8": { "name": "DIFFICULTY_2" },
+			"16": { "name": "DIFFICULTY_3" },
+
+			"128": { "name": "DEBUG_ONLY" },
+			"256": { "name": "DONT_RESET" },
+			"512": { "name": "WHILE_CHARMED" }
+		}
+	},
+	"SmartEventPhaseParameter": {
+		"isflag": true,
+		"name": "Event phase",
+		"prefix": "SMART_EVENT_PHASE",
+		"values": {
+			"0": { "name": "Always" },
+			"1": { "name": "Phase 1" },
+			"2": { "name": "Phase 2" },
+			"4": { "name": "Phase 3" },
+			"8": { "name": "Phase 4" },
+			"16": { "name": "Phase 5" },
+			"32": { "name": "Phase 6" },
+			"64": { "name": "Phase 7" },
+			"128": { "name": "Phase 8" },
+			"256": { "name": "Phase 9" },
+			"512": { "name": "Phase 10" },
+			"1024": { "name": "Phase 11" },
+			"2048": { "name": "Phase 12" }
+		}
+	},
   "SpellEffectIndexParameter": {
     "isflag": false,
     "name": "Spell effect index",
