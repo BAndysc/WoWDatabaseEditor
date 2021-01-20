@@ -27,14 +27,12 @@
         <None Update="SmartData\conditions.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="SmartData\conditions_groups.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="SmartData\condition_sources.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
-    <ItemGroup>
-        <Content Include="SmartData\conditions.txt">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AsyncAwaitBestPractices.MVVM">

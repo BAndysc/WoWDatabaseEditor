@@ -26,6 +26,10 @@ namespace WDE.SmartScriptEditor.Data
         SmartGenericJsonData GetRawData(SmartType type, int id);
 
         SmartGenericJsonData GetDataByName(SmartType type, string name);
+
+        IEnumerable<SmartGroupsJsonData> GetGroupsData(SmartType type);
+
+        void Reload(SmartType smartType);
     }
 
     [SingleInstance]
@@ -34,12 +38,13 @@ namespace WDE.SmartScriptEditor.Data
     {
         private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new();
         private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> smartNameData = new();
-
+        private readonly SmartDataProvider provider;
         public SmartDataManager(SmartDataProvider provider)
         {
             Load(SmartType.SmartEvent, provider.GetEvents());
             Load(SmartType.SmartAction, provider.GetActions());
             Load(SmartType.SmartTarget, provider.GetTargets());
+            this.provider = provider;
         }
 
         public bool Contains(SmartType type, int id)
@@ -72,6 +77,22 @@ namespace WDE.SmartScriptEditor.Data
                 throw new NullReferenceException();
 
             return smartNameData[type][name];
+        }
+
+        public IEnumerable<SmartGroupsJsonData> GetGroupsData(SmartType type)
+        {
+            switch(type)
+            {
+                case SmartType.SmartEvent:
+                    return provider.GetEventsGroups();
+                case SmartType.SmartAction:
+                    return provider.GetActionsGroups();
+                case SmartType.SmartTarget:
+                case SmartType.SmartSource:
+                    return provider.GetTargetsGroups();
+                default:
+                    return new List<SmartGroupsJsonData>();
+            }
         }
 
         private void Load(SmartType type, IEnumerable<SmartGenericJsonData> data)
@@ -107,6 +128,27 @@ namespace WDE.SmartScriptEditor.Data
                 ActualAdd(SmartType.SmartSource, data);
 
             ActualAdd(type, data);
+        }
+
+        public void Reload(SmartType smartType)
+        {
+            smartIdData.Remove(smartType);
+            smartNameData.Remove(smartType);
+            switch (smartType)
+            {
+                case SmartType.SmartEvent:
+                    Load(smartType, provider.GetEvents());
+                    break;
+                case SmartType.SmartAction:
+                    Load(smartType, provider.GetActions());
+                    break;
+                case SmartType.SmartTarget:
+                case SmartType.SmartSource:
+                    smartIdData.Remove(SmartType.SmartSource);
+                    smartNameData.Remove(SmartType.SmartSource);
+                    Load(smartType, provider.GetTargets());
+                    break;
+            }
         }
     }
 

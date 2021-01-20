@@ -106,10 +106,22 @@ namespace WDE.SmartScriptEditor.Data
     public struct SmartDescriptionRulesJsonData
     {
         [JsonProperty(PropertyName = "description")]
-        public string Description;
+        public string Description { get; set; }
 
         [JsonProperty(PropertyName = "conditions")]
         public IList<SmartConditionalJsonData> Conditions { get; set; }
+    }
+    
+    // Kind of hackfix due to lack of string enums in C# :<
+    public struct SmartTargetTypes
+    {
+        private const string Self = "Self";
+        private const string Creature = "Creature";
+        private const string GameObject = "GameObject";
+        private const string Player = "Player";
+        private const string Position = "Position";
+
+        public static List<string> GetAllTypes() => new() {Self, Creature, GameObject, Player, Position};
     }
 
     [ExcludeFromCodeCoverage]
@@ -197,5 +209,15 @@ namespace WDE.SmartScriptEditor.Data
         {
             return Parameters != null && Parameters.Count > 0;
         }
+    }
+
+    [ExcludeFromCodeCoverage]
+    public struct SmartGroupsJsonData
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "group_members")]
+        public IList<string> Members { get; set; }
     }
 }

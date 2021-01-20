@@ -11,6 +11,8 @@
 
     <Style x:Key="GridViewColumnHeader" TargetType="{x:Type GridViewColumnHeader}" />
 
+    <Style x:Key="ListViewItemStyle" TargetType="{x:Type ListViewItem}" />
+
     <!-- Style used by code call in GridViewColumns.cs line 329 -->
     <Style x:Key="GridColumnHeaderStyle" TargetType="{x:Type GridViewColumnHeader}" />
 

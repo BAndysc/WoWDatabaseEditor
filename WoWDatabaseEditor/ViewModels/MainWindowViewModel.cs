@@ -13,8 +13,10 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Windows;
+using WDE.Common.Providers;
 using WoWDatabaseEditor.Managers;
 using WoWDatabaseEditor.Utils;
+using System.Diagnostics;
 
 namespace WoWDatabaseEditor.ViewModels
 {
@@ -22,6 +24,7 @@ namespace WoWDatabaseEditor.ViewModels
     {
         private readonly Dictionary<ISolutionItem, IDocument> documents = new();
         private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new();
+        private readonly IEnumerable<IDataDefinitionsProvider> definitionsProviders;
         private readonly IEventAggregator eventAggregator;
         private readonly INewItemService newItemService;
         private readonly IConfigureService settings;
@@ -39,7 +42,8 @@ namespace WoWDatabaseEditor.ViewModels
             IStatusBar statusBar,
             IMessageBoxService messageBoxService,
             ISolutionItemEditorRegistry solutionEditorManager,
-            TasksViewModel tasksViewModel)
+            TasksViewModel tasksViewModel,
+            IEnumerable<IDataDefinitionsProvider> definitionsProviders)
         {
             this.eventAggregator = eventAggregator;
             DocumentManager = documentManager;
@@ -48,11 +52,15 @@ namespace WoWDatabaseEditor.ViewModels
             this.newItemService = newItemService;
             this.solutionManager = solutionManager;
             this.messageBoxService = messageBoxService;
+            this.definitionsProviders = definitionsProviders;
             ExecuteCommandNew = new DelegateCommand(New);
             ExecuteSettings = new DelegateCommand(SettingsShow);
+            OpenDefinitionEditor = new DelegateCommand<IDataDefinitionEditor>(ShowDefinitionEditor);
 
             TasksViewModel = tasksViewModel;
             About = new DelegateCommand(ShowAbout);
+            
+            DefinitionPresenters = definitionsProviders.SelectMany(p => p.GetDataDefinitionEditors()).ToList();
 
             this.eventAggregator.GetEvent<DocumentManager.DocumentClosedEvent>()
                 .Subscribe(document =>
@@ -111,7 +119,7 @@ namespace WoWDatabaseEditor.ViewModels
         public IStatusBar StatusBar { get; }
         public IDocumentManager DocumentManager { get; }
         public TasksViewModel TasksViewModel { get; }
-        
+        public List<IDataDefinitionEditor> DefinitionPresenters { get; }
 
         public string Title
         {
@@ -122,12 +130,18 @@ namespace WoWDatabaseEditor.ViewModels
         public DelegateCommand ExecuteCommandNew { get; }
         public DelegateCommand ExecuteSettings { get; }
         public DelegateCommand About { get; }
+        public DelegateCommand<IDataDefinitionEditor> OpenDefinitionEditor { get; }
 
         public ObservableCollection<MenuItemViewModel> Windows { get; set; }
         
         private void ShowAbout()
         {
             DocumentManager.OpenDocument(new AboutViewModel());
+        }
+
+        private void ShowDefinitionEditor(IDataDefinitionEditor editor)
+        {
+            DocumentManager.OpenDocument(editor.Editor);
         }
 
         private void SettingsShow()

@@ -82,6 +82,15 @@
                     <MenuItem Header="_Help">
                         <MenuItem Header="_About" Command="{Binding About}" />
                     </MenuItem>
+                    <MenuItem Header="_Definitions Editors" ItemsSource="{Binding DefinitionPresenters}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
+                                <Setter Property="Command" Value="{Binding ElementName=rootWindow, Path=DataContext.OpenDefinitionEditor}" />
+                                <Setter Property="CommandParameter" Value="{Binding }" />
+                                <Setter Property="Header" Value="{Binding EditorName}" />
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
                 </Menu>
             </StackPanel>
         </Controls:WindowCommands>

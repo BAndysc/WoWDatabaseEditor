@@ -6,6 +6,11 @@
              mc:Ignorable="d" xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="False"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <ListView ItemsSource="{Binding Items}" BorderThickness="0"
                   ItemContainerStyle="{DynamicResource ListViewItemStyle}">

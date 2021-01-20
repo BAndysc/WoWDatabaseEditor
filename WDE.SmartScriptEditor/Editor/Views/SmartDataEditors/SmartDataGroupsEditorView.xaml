@@ -1,0 +1,87 @@
+﻿<UserControl x:Class="WDE.SmartScriptEditor.Editor.Views.SmartDataGroupsEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WDE.SmartScriptEditor.Editor.Views"
+             xmlns:helpers="clr-namespace:WDE.Common.ViewHelpers;assembly=WDE.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             xmlns:datas="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels"
+             x:Name="rootWindow">
+    <UserControl.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding Save}" />
+    </UserControl.InputBindings>
+    <DockPanel Background="{DynamicResource SmartScripts.Background}" LastChildFill="True" HorizontalAlignment="Stretch">
+        <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <!--#region Top Bar-->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" >
+                <Button Content="Add group" Command="{Binding AddGroup}" Height="30"/>
+                <Button Content="Save to file" Command="{Binding Save}" Height="30" Margin="10, 0, 0, 0"/>
+            </StackPanel>
+            <!--#endregion-->
+            <!--#region Content View-->
+            <helpers:StretchedTreeView Grid.Row="1" ItemsSource="{Binding SourceItems}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type datas:SmartDataGroupsEditorData}" ItemsSource="{Binding Members}">
+                        <Grid HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="150" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="{Binding Name, Mode=TwoWay}" Foreground="{DynamicResource TreeView.Static.Text}" Width="Auto"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button Command="{Binding ElementName=rootWindow, Path=DataContext.EditItem}" CommandParameter="{Binding}" MinWidth="50" Height="30">
+                                    <Path x:Name="EditIcon" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
+                                        <Path.Data>
+                                            <PathGeometry Figures="m 383.625 41.667969 c -5.37109 0 -10.66016 2.03125 -14.73047 6.101562 l -35.5625 35.5625 83.33594 83.335939 35.5625 -35.5625 c 8.13672 -8.14063 8.13672 -21.32422 0 -29.46094 l -53.875 -53.874999 C 394.28516 43.699219 388.99609 41.667969 383.625 41.667969 Z M 302.08203 114.58203 62.5 354.16797 V 437.5 h 83.33203 L 385.41797 197.91797 Z" FillRule="NonZero"/>
+                                        </Path.Data>
+                                    </Path>
+                                </Button>
+                                <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddMember}" CommandParameter="{Binding}" MinWidth="50" Height="30">
+                                    <Path x:Name="Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                        Data="M3.875,0 L5.125,0 5.125,3.875 9,3.875 9,5.125 5.125,5.125 5.125,9 3.875,9 3.875,5.125 0,5.125 0,3.875 3.875,3.875 3.875,0 z" />
+                                </Button>
+                                <Button Command="{Binding ElementName=rootWindow, Path=DataContext.DeleteItem}" 
+                                        CommandParameter="{Binding}" Margin="0, 0, 10, 0" MinWidth="50" Height="30" >
+                                    <Path Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
+                                        <Path.Data>
+                                            <GeometryGroup>
+                                                <LineGeometry StartPoint="4,4" EndPoint="10,10"/>
+                                                <LineGeometry StartPoint="10,4" EndPoint="4,10"/>
+                                            </GeometryGroup>
+                                        </Path.Data>
+                                    </Path>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type datas:SmartDataGroupsEditorDataNode}">
+                        <Grid HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="50" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="{Binding Name}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                            <Button Grid.Column="1" Command="{Binding ElementName=rootWindow, Path=DataContext.DeleteItem}" CommandParameter="{Binding}">
+                                <Path Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
+                                    <Path.Data>
+                                        <GeometryGroup>
+                                            <LineGeometry StartPoint="4,4" EndPoint="10,10"/>
+                                            <LineGeometry StartPoint="10,4" EndPoint="4,10"/>
+                                        </GeometryGroup>
+                                    </Path.Data>
+                                </Path>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </helpers:StretchedTreeView>
+            <!--#endregion-->
+        </Grid>
+    </DockPanel>
+</UserControl>

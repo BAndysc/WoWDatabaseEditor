@@ -28,13 +28,22 @@
     <None Update="SmartData\actions.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="SmartData\actions_groups.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="SmartData\events.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SmartData\events_groups.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="SmartData\parameters.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="SmartData\targets.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SmartData\targets_groups.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -49,17 +58,6 @@
     <Resource Include="Resources\SmartScriptQuestIcon.png" />
     <Resource Include="Resources\SmartScriptSpellIcon.png" />
     <Resource Include="Resources\SmartScriptTimedActionListIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="SmartData\actions.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SmartData\events.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SmartData\targets.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AsyncAwaitBestPractices.MVVM">

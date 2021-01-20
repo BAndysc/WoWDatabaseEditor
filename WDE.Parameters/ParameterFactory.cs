@@ -30,10 +30,7 @@ namespace WDE.Parameters
             parameters.Add(key, parameter);
         }
 
-        public IEnumerable<string> GetKeys()
-        {
-            return data.Keys.Union(parameters.Keys);
-        }
+        public IEnumerable<string> GetKeys() => data.Keys.Union(parameters.Keys);
 
         public ParameterSpecModel GetDefinition(string key)
         {
