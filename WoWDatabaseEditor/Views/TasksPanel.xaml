@@ -14,7 +14,7 @@
     <Border.Effect>
         <DropShadowEffect ShadowDepth="0" Opacity="0.5" Direction="0" BlurRadius="10" />
     </Border.Effect>
-    <Grid Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label DockPanel.Dock="Top">Running tasks</Label>
             <ScrollViewer VerticalScrollBarVisibility="Auto">

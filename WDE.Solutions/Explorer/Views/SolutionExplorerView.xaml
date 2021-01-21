@@ -23,7 +23,7 @@
                     <ControlTemplate TargetType="ToggleButton">
                         <Grid Width="15" Height="13" Background="Transparent">
                             <Path x:Name="ExpandPath" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                  Margin="1,1,1,1" Stroke="{StaticResource GlyphBrush}" Data="M 4 0 L 8 4 L 4 8 Z" />
+                                  Margin="1,1,1,1" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" Data="M 4 0 L 8 4 L 4 8 Z" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <MultiTrigger>
@@ -31,23 +31,23 @@
                                     <Condition Property="IsChecked" Value="True" />
                                     <Condition Property="IsMouseOver" Value="False" />
                                 </MultiTrigger.Conditions>
-                                <Setter Property="Fill" TargetName="ExpandPath" Value="{StaticResource GlyphBrush}" />
-                                <Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource GlyphBrush}" />
+                                <Setter Property="Fill" TargetName="ExpandPath" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                                <Setter Property="Stroke" TargetName="ExpandPath" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
                             </MultiTrigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsChecked" Value="True" />
                                     <Condition Property="IsMouseOver" Value="True" />
                                 </MultiTrigger.Conditions>
-                                <Setter Property="Fill" TargetName="ExpandPath" Value="{StaticResource GlyphBrush2}" />
-                                <Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource GlyphBrush2}" />
+                                <Setter Property="Fill" TargetName="ExpandPath" Value="{DynamicResource Highlight.Over.Foreground}" />
+                                <Setter Property="Stroke" TargetName="ExpandPath" Value="{DynamicResource Highlight.Over.Foreground}" />
                             </MultiTrigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsChecked" Value="False" />
                                     <Condition Property="IsMouseOver" Value="True" />
                                 </MultiTrigger.Conditions>
-                                <Setter Property="Stroke" TargetName="ExpandPath" Value="{StaticResource GlyphBrush2}" />
+                                <Setter Property="Stroke" TargetName="ExpandPath" Value="{DynamicResource Highlight.Over.Foreground}" />
                             </MultiTrigger>
 
                             <Trigger Property="IsChecked" Value="True">
@@ -138,14 +138,12 @@
                                 <Setter TargetName="PART_Header" Property="MinHeight" Value="19" />
                             </MultiTrigger>
                             <Trigger Property="helpers:MyTreeViewHelper.IsMouseDirectlyOverItem" Value="true">
-                                <Setter TargetName="Bd" Property="Background" Value="#c9def5" />
-                                <!--{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>-->
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Highlight.Over.Background}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Highlight.Over.Foreground}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="true">
-                                <Setter TargetName="Bd" Property="Background" Value="#3399ff" />
-                                <!--{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>-->
-                                <Setter Property="Foreground"
-                                        Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Highlight.Background}" />
+                                <Setter Property="Foreground" Value="{DynamicResource Highlight.Foreground}" />
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>

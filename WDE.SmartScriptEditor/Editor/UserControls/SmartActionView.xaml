@@ -33,9 +33,18 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <Label Content="{Binding Comment}"
-                           FontFamily="Consolas"
-                           Foreground="{DynamicResource SmartScripts.Comment.Foreground}"></Label>
+                    <TextBlock Text="{Binding Comment}" FontFamily="Consolas" Padding="3" TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Comment.Foreground}" />
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </Border>
             </Grid>
         </DataTemplate>
@@ -66,38 +75,18 @@
                     </Border.Style>
 
                     <TextBlock Padding="2" TextWrapping="WrapWithOverflow">
-                        <Run Foreground="{DynamicResource SmartScripts.Source.Foreground}">
+                        <Run Text="{Binding Readable, Mode=OneWay}">
                             <Run.Style>
                                 <Style TargetType="{x:Type Run}">
-                                    <Setter Property="Run.Text" Value="{Binding Source.Readable, Mode=OneWay}" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Id}" Value="187">
-                                            <Setter Property="Run.Text" Value="      " />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source.Id}" Value="0">
-                                            <Setter Property="Run.Text" Value="" />
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Action.Selected.Foreground}"></Setter>
                                         </DataTrigger>
                                     </Style.Triggers>
+                                    <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Action.Foreground}"></Setter>
                                 </Style>
                             </Run.Style>
                         </Run>
-                        <Run Foreground="{DynamicResource SmartScripts.Action.Foreground}">
-                            <Run.Style>
-                                <Style TargetType="{x:Type Run}">
-                                    <Setter Property="Run.Text" Value=": " />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Source.Id}" Value="187">
-                                            <Setter Property="Run.Text" Value="" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source.Id}" Value="0">
-                                            <Setter Property="Run.Text" Value="" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Run.Style>
-                        </Run>
-                        <Run Text="{Binding Readable, Mode=OneWay}"
-                             Foreground="{DynamicResource SmartScripts.Action.Foreground}" />
                     </TextBlock>
                 </Border>
             </Grid>

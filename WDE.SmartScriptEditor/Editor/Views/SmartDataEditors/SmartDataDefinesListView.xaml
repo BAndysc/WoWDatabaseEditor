@@ -14,11 +14,6 @@
         <KeyBinding Key="Delete" Command="{Binding DeleteItem}" />
         <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding Save}" />
     </UserControl.InputBindings>
-    <UserControl.Resources>
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
-        </Style>
-    </UserControl.Resources>
     <DockPanel Background="{DynamicResource SmartScripts.Background}" LastChildFill="True">
         <Grid DockPanel.Dock="Top">
             <Grid.RowDefinitions>
@@ -38,7 +33,7 @@
             <!--#region Content List-->
             <ListView Grid.Row="1" VerticalContentAlignment="Stretch" ItemsSource="{Binding DefinesItems}" SelectedIndex="{Binding SelectedItemIndex}">
                 <ListView.View>
-                    <GridView ColumnHeaderContainerStyle="{DynamicResource GridColumnHeaderStyle}">
+                    <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}">
                         <GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Id}" />
                         <GridViewColumn Header="Name" Width="Auto" DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn Header="Readable Name" Width="Auto" DisplayMemberBinding="{Binding NameReadable}" />

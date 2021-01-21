@@ -7,7 +7,6 @@
         xmlns:mvvm="http://prismlibrary.com/"
         mvvm:ViewModelLocator.AutoWireViewModel="False"
         mc:Ignorable="d"
-        Height="180" Width="340"
         Background="{DynamicResource WindowBackgroundBrush}">
     <Grid>
         <Grid.RowDefinitions>

@@ -3,18 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="False">
-    <UserControl.Resources>
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
-        </Style>
-    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <ListBox ItemsSource="{Binding Parameters}" SelectedItem="{Binding Selected}" />
+        <ListBox BorderBrush="Transparent" ItemsSource="{Binding Parameters}" SelectedItem="{Binding Selected}" />
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
         <Grid Grid.Column="2" IsEnabled="{Binding HasSelected}">
             <Grid.RowDefinitions>

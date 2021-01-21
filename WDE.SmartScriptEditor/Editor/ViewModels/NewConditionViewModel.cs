@@ -14,10 +14,25 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             get => @event;
             set
             {
+                if (@event != null)
+                    @event.PropertyChanged -= EventOnPropertyChanged;
                 @event = value;
+                if (@event != null)
+                    @event.PropertyChanged += EventOnPropertyChanged;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsSelected));
             }
         }
+
+        private void EventOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SmartEvent.IsSelected))
+                OnPropertyChanged(nameof(IsSelected));
+        }
+
+        public bool IsSelected { get => Event?.IsSelected ?? false;
+            set { }
+        } 
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

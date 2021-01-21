@@ -13,6 +13,12 @@
 
     <Style x:Key="ListViewItemStyle" TargetType="{x:Type ListViewItem}" />
 
+    <!-- highlight -->
+    <SolidColorBrush x:Key="Highlight.Background" Color="#3399ff" />
+    <SolidColorBrush x:Key="Highlight.Over.Background" Color="#c9def5" />
+    <SolidColorBrush x:Key="Highlight.Foreground" Color="White" />
+    <SolidColorBrush x:Key="Highlight.Over.Foreground" Color="Black" />
+    
     <!-- Style used by code call in GridViewColumns.cs line 329 -->
     <Style x:Key="GridColumnHeaderStyle" TargetType="{x:Type GridViewColumnHeader}" />
 
@@ -42,6 +48,7 @@
     <SolidColorBrush x:Key="SmartScripts.Event.Selected.Border" Color="#FFF5C61F" />
     
     <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0" />
+    <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77000000" />
     <!-- Content -->
     <SolidColorBrush x:Key="ContentSpecialBackground" Color="#FFD8D8DC" />
     <SolidColorBrush x:Key="ContentSpecialForeground" Color="#FF252529" />
@@ -201,6 +208,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+    
     <DrawingImage x:Key="Folder">
         <DrawingImage.Drawing>
             <DrawingGroup ClipGeometry="M0,0 V20 H20 V0 H0 Z">

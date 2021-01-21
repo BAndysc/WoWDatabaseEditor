@@ -99,25 +99,28 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
             }
 
-            foreach (var conditionDataGroup in conditionDataManager.GetConditionGroups())
+            if (type == SmartType.SmartCondition)
             {
-                foreach (var member in conditionDataGroup.Members)
+                foreach (var conditionDataGroup in conditionDataManager.GetConditionGroups())
                 {
-                    if (conditionDataManager.HasConditionData(member))
+                    foreach (var member in conditionDataGroup.Members)
                     {
-                        SmartItem i = new();
-                        ConditionJsonData data = conditionDataManager.GetConditionData(member);
+                        if (conditionDataManager.HasConditionData(member))
+                        {
+                            SmartItem i = new();
+                            ConditionJsonData data = conditionDataManager.GetConditionData(member);
 
-                        i.Group = conditionDataGroup.Name;
-                        i.Name = data.NameReadable;
-                        i.Id = data.Id;
-                        i.Help = data.Help;
-                        i.Deprecated = false;
-                        i.ConditionData = data;
+                            i.Group = conditionDataGroup.Name;
+                            i.Name = data.NameReadable;
+                            i.Id = data.Id;
+                            i.Help = data.Help;
+                            i.Deprecated = false;
+                            i.ConditionData = data;
 
-                        allItems.Add(i);
+                            allItems.Add(i);
+                        }
                     }
-                }
+                }   
             }
         }
 

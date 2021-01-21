@@ -15,11 +15,26 @@
     </UserControl.InputBindings>
     <StackPanel Orientation="Vertical" Margin="0, 10, 10, 0">
         <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Content="Target ID:" />
+            
+            <TextBlock Margin="2" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Text="Target ID:" />
             <TextBox Grid.Column="1" Grid.Row="0" TextAlignment="Left" VerticalAlignment="Center" Name="actionIdInput" Validation.Error="actionIdInput_Error">
                 <TextBox.Text>
                     <Binding Path="Source.Id" Mode="TwoWay" NotifyOnValidationError="True">
@@ -29,64 +44,50 @@
                     </Binding>
                 </TextBox.Text>
             </TextBox>
-        </Grid>
-        <Separator Margin="0, 10, 10, 10" />
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Content="Target Name:" />
-            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Source.Name, Mode=TwoWay}" TextAlignment="Left" VerticalAlignment="Center" />
-        </Grid>
-        <Separator Margin="0, 10, 10, 10" />
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="130"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Content="Target Display Name:" />
-            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Source.NameReadable, Mode=TwoWay}" TextAlignment="Left" VerticalAlignment="Center" />
-        </Grid>
-        <Separator Margin="0, 10, 10, 10" />
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="120" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="70" />
-            </Grid.RowDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Content="Target Description:" VerticalAlignment="Center" />
-            <ScrollViewer Grid.Column="1" Grid.Row="0">
+            
+
+            <Separator Grid.Row="1" Grid.ColumnSpan="2" Margin="0, 10, 10, 10" />
+
+
+            <TextBlock Margin="2" TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Text="Target Name:" />
+            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Source.Name, Mode=TwoWay}" TextAlignment="Left" VerticalAlignment="Center" />
+
+            <Separator Grid.Row="3" Grid.ColumnSpan="2" Margin="0, 10, 10, 10" />
+
+            <TextBlock Margin="2" TextWrapping="Wrap" Grid.Column="0" Grid.Row="4" Text="Target Display Name:" />
+            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Source.NameReadable, Mode=TwoWay}" TextAlignment="Left" VerticalAlignment="Center" />
+
+            <Separator Grid.Row="5" Grid.ColumnSpan="2" Margin="0, 10, 10, 10" />
+
+            <TextBlock Margin="2" TextWrapping="Wrap" Grid.Column="0" Grid.Row="6" Text="Target Description:" VerticalAlignment="Center" />
+            <ScrollViewer Grid.Column="1" Grid.Row="6" Height="70">
                 <TextBox Text="{Binding Source.Description, Mode=TwoWay}" TextWrapping="Wrap" 
-                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                         VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
             </ScrollViewer>
+            
+            <Separator Grid.Row="7" Grid.ColumnSpan="2" Margin="0, 10, 10, 10" />
+
+            <TextBlock Margin="2" TextWrapping="Wrap" Grid.Column="0" Grid.Row="8" Text="Help Text:" />
+            <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding Source.Help, Mode=TwoWay}"/>
+
+            <Separator Grid.Row="9" Grid.ColumnSpan="2" Margin="0, 10, 10, 10" />
+
+            <ListView Grid.Row="10" Grid.ColumnSpan="2" ItemsSource="{Binding TargetTypes}" MaxHeight="100">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                  HorizontalAlignment="Stretch" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="Focusable" Value="False" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+            
+            <Separator Grid.Row="11" Grid.ColumnSpan="2" Margin="0, 10, 10, 10" />
         </Grid>
-        <Separator Margin="0, 10, 10, 10"/>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Grid.Row="0" Content="Help Text:" />
-            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Source.Help, Mode=TwoWay}"/>
-        </Grid>
-        <Separator Margin="0, 10, 10, 10" />
-        <ListView ItemsSource="{Binding TargetTypes}" MaxHeight="100">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                              HorizontalAlignment="Stretch" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="Focusable" Value="False" />
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
-        <Separator Margin="0, 10, 10, 10" />
         <Label Content="Parameters:" />
         <Button VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Command="{Binding AddParameter}" 
                 Width="25" Height="25" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10, 0, 0, 10">
