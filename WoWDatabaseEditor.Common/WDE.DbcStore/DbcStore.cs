@@ -35,7 +35,8 @@ namespace WDE.DbcStore
 
             Load();
         }
-
+        
+        public Dictionary<int, string> FactionStore { get; internal set; } = new();
         public Dictionary<int, string> SpellStore { get; internal set; } = new();
         public Dictionary<int, string> SkillStore { get; internal set;} = new();
         public Dictionary<int, string> LanguageStore { get; internal set;} = new();
@@ -89,6 +90,7 @@ namespace WDE.DbcStore
             private readonly IParameterFactory parameterFactory;
             private readonly DbcStore store;
 
+            private Dictionary<int, string> FactionStore { get; } = new();
             private Dictionary<int, string> SpellStore { get; } = new();
             public Dictionary<int, string> SkillStore { get; } = new();
             public Dictionary<int, string> LanguageStore { get; } = new();
@@ -130,6 +132,7 @@ namespace WDE.DbcStore
             
             public void FinishMainThread()
             {
+                store.FactionStore = FactionStore;
                 store.SpellStore = SpellStore;
                 store.SkillStore = SkillStore;
                 store.LanguageStore = LanguageStore;
@@ -144,11 +147,17 @@ namespace WDE.DbcStore
                 store.AchievementStore = AchievementStore;
                 store.ItemStore = ItemStore;
                 
+                parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
+                parameterFactory.Register("FactionParameter", new DbcParameter(FactionStore));
                 parameterFactory.Register("SpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
+                parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore));
+                parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
+                parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore));
                 parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore));
                 parameterFactory.Register("ZoneParameter", new DbcParameter(AreaStore));
+                parameterFactory.Register("MapParameter", new DbcParameter(MapStore));
                 parameterFactory.Register("PhaseParameter", new DbcParameter(PhaseStore));
             }
 
@@ -177,8 +186,12 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 9;
+                        max = 13;
+                        Load("SkillLine.dbc", 0, 2, SkillStore);
+                        Load("Faction.dbc", 0, 23, FactionStore);
                         Load("Spell.dbc", 0, 21, SpellStore);
+                        Load("Movie.dbc", 0, 1, MovieStore);
+                        Load("Map.dbc", 0, 6, MapStore);
                         Load("Achievement.dbc", 0, 4, AchievementStore);
                         Load("AreaTable.dbc", 0, 11, AreaStore);
                         Load("chrClasses.dbc", 0, 3, ClassStore);
