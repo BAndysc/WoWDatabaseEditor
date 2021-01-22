@@ -94,6 +94,7 @@
         "description": "({x}, {y}, {z}{o:choose(0):|, {o}})",
         "help": "Absolute world position, use xyz from event params",
         "name_readable": "Absolute position",
+        "is_only_target": true,
         "types": [
             "Position"
         ]
