@@ -6,7 +6,7 @@
         "name_readable": "None",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 1,
@@ -28,11 +28,10 @@
                 "description": "Talker will target {target}"
             }
         ],
-        "description": "{targetid:choose(0):Self: Talk {pram1} to invoker|{pram3value:choose(0):{target}: Talk {pram1} to invoker|Self: Talk {pram1} to {target}}}",
+        "description": "{sourceid:choose(0):Self: Talk {pram1} to invoker|{pram3value:choose(0):{source}: Talk {pram1} to invoker|Self: Talk {pram1} to {target}}}",
         "name_readable": "Talk",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 2,
@@ -44,11 +43,10 @@
                 "description": "Use 0 to reset"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Reset faction|Set faction to {pram1}}",
+        "description": "{source}: {pram1value:choose(0):Reset faction|Set faction to {pram1}}",
         "name_readable": "Set faction",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 3,
@@ -65,11 +63,10 @@
                 "description": "Use 0 for both to reset"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):{pram2value:choose(0):Demorph|Morph to model {pram2}}|{pram2value:choose(0):Morph to model from creature {pram1}|Invalid morph ({pram1}, {pram2}}}",
+        "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Demorph|Morph to model {pram2}}|{pram2value:choose(0):Morph to model from creature {pram1}|Invalid morph ({pram1}, {pram2}}}",
         "name_readable": "Morph to entry or model",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 4,
@@ -89,11 +86,10 @@
                 "name": "Distance"
             }
         ],
-        "description": "{target}: Play {pram3value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {target}|{target}}",
+        "description": "{source}: Play {pram3value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {source}|{source}}",
         "name_readable": "Sound",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 5,
@@ -105,11 +101,10 @@
                 "description": "Emote id to play"
             }
         ],
-        "description": "{target}: Play emote {pram1}",
+        "description": "{source}: Play emote {pram1}",
         "name_readable": "Play emote",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 6,
@@ -121,11 +116,10 @@
                 "description": "Quest ID to mark as failed. Only for players"
             }
         ],
-        "description": "{target}: Fail quest {pram1}",
+        "description": "{source}: Fail quest {pram1}",
         "name_readable": "Fail quest",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 7,
@@ -142,11 +136,10 @@
                 "description": "True - quest is added to questlog instantly, false - Quest Window pops up"
             }
         ],
-        "description": "{target}: {pram2value:choose(0):Add quest {pram1} to quest log|Offer quest {pram1}}",
+        "description": "{source}: {pram2value:choose(0):Add quest {pram1} to quest log|Offer quest {pram1}}",
         "name_readable": "Add quest",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 8,
@@ -168,20 +161,18 @@
                 }
             }
         ],
-        "description": "{target}: Set react state to {pram1}",
+        "description": "{source}: Set react state to {pram1}",
         "name_readable": "Set react state",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 9,
         "name": "SMART_ACTION_ACTIVATE_GOBJECT",
-        "description": "{target}: Activate (only gameobject)",
+        "description": "{source}: Activate (only gameobject)",
         "name_readable": "Activate gobject",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 10,
@@ -218,11 +209,10 @@
                 "description": "If 0, the emote will be skipped"
             }
         ],
-        "description": "{target}: Play random emote: {pram1value:choose(0):|{pram1}, }{pram2value:choose(0):|{pram2}, }{pram3value:choose(0):|{pram3}, }{pram4value:choose(0):|{pram4}, }{pram5value:choose(0):|{pram5}, }{pram6value:choose(0):|{pram6}}",
+        "description": "{source}: Play random emote: {pram1value:choose(0):|{pram1}, }{pram2value:choose(0):|{pram2}, }{pram3value:choose(0):|{pram3}, }{pram4value:choose(0):|{pram4}, }{pram5value:choose(0):|{pram5}, }{pram6value:choose(0):|{pram6}}",
         "name_readable": "Random emote",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 11,
@@ -246,11 +236,11 @@
                 "name": "TargetsLimit"
             }
         ],
-        "description": "Self: Cast spell {pram1} on{pram4value:choose(0):| random {pram4}} {target}",
+        "description": "{source}: Cast spell {pram1} on{pram4value:choose(0):| random {pram4}} {target}",
         "name_readable": "Cast",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 12,
@@ -275,11 +265,11 @@
                 "name": "Attack Invoker"
             }
         ],
-        "description": "Self: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}}{pram5value:choose(0):| and attack {target}}",
+        "description": "{source}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}}{pram5value:choose(0):| and attack {target}}",
         "name_readable": "Summon creature",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true,
+        "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
     },
     {
@@ -297,11 +287,11 @@
                 "description": "Modify threat of target by %"
             }
         ],
-        "description": "Self: {pram1value:choose(0):Decrement|Increment} threat of {target} by {pram1value:choose(0):{pram2}|{pram1}}",
+        "description": "{source}: {pram1value:choose(0):Decrement|Increment} threat of {target} by {pram1value:choose(0):{pram2}|{pram1}}",
         "name_readable": "Threat single pct",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 14,
@@ -318,11 +308,11 @@
                 "description": "Modify threat of all units in threat list by %"
             }
         ],
-        "description": "Self: {pram1value:choose(0):Decrement|Increment} threat of all units in threat list by {pram1value:choose(0):{pram2}|{pram1}}",
+        "description": "{source}: {pram1value:choose(0):Decrement|Increment} threat of all units in threat list by {pram1value:choose(0):{pram2}|{pram1}}",
         "name_readable": "Threat all pct",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 15,
@@ -334,11 +324,10 @@
                 "description": "Trigger quest group event. Also complete the quest"
             }
         ],
-        "description": "{target}: Call quest {pram1} group event happened",
+        "description": "{source}: Call quest {pram1} group event happened",
         "name_readable": "Call areaexploredoreventhappens",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 16,
@@ -355,11 +344,10 @@
                 "description": "true - PhaseGroup {pram1} is applied, false - true - PhaseGroup {pram1} is removed"
             }
         ],
-        "description": "{target}: {pram2value:choose(0):Remove|Add} phasegroup {pram1}",
+        "description": "{source}: {pram2value:choose(0):Remove|Add} phasegroup {pram1}",
         "name_readable": "Set ingame phase group",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 17,
@@ -370,11 +358,10 @@
                 "name": "Emote ID"
             }
         ],
-        "description": "{target}: Set emote state (UNIT_NPC_EMOTESTATE) to {pram1}",
+        "description": "{source}: Set emote state (UNIT_NPC_EMOTESTATE) to {pram1}",
         "name_readable": "Set emote state",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 18,
@@ -507,11 +494,10 @@
                 }
             }
         ],
-        "description": "{target}: Set {pram2value:choose(0):UNIT_FLAGS to {pram1}|UNIT_FLAGS_2 to {pram1value}}",
+        "description": "{source}: Set {pram2value:choose(0):UNIT_FLAGS to {pram1}|UNIT_FLAGS_2 to {pram1value}}",
         "name_readable": "Set unit flag",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 19,
@@ -644,11 +630,10 @@
                 }
             }
         ],
-        "description": "{target}: Remove {pram2value:choose(0):UNIT_FLAGS to {pram1}|UNIT_FLAGS_2 to {pram1value}}",
+        "description": "{source}: Remove {pram2value:choose(0):UNIT_FLAGS to {pram1}|UNIT_FLAGS_2 to {pram1value}}",
         "name_readable": "Remove unit flag",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 20,
@@ -660,11 +645,11 @@
                 "description": "0 = stop attack, 1 = attack"
             }
         ],
-        "description": "Self: {pram1value:choose(0):Disable|Enable} auto attack",
+        "description": "{source}: {pram1value:choose(0):Disable|Enable} auto attack",
         "name_readable": "Auto attack",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 21,
@@ -676,11 +661,11 @@
                 "description": "0 = stop combat based movement, 1 = enable combat movement"
             }
         ],
-        "description": "Self: {pram1value:choose(0):Disable|Enable} combat based movement",
+        "description": "{source}: {pram1value:choose(0):Disable|Enable} combat based movement",
         "name_readable": "Allow combat movement",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 22,
@@ -692,11 +677,11 @@
                 "description": "Note: This is Smart AI event phase, not actual creature phasemask"
             }
         ],
-        "description": "Self: Set event phase to {pram1}",
+        "description": "{source}: Set event phase to {pram1}",
         "name_readable": "Set event phase",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 23,
@@ -711,20 +696,20 @@
                 "name": "Decrement"
             }
         ],
-        "description": "Self: Increment phase by {pram1} and decrement by {pram2}",
+        "description": "{source}: Increment phase by {pram1} and decrement by {pram2}",
         "name_readable": "Increment event phase",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 24,
         "name": "SMART_ACTION_EVADE",
-        "description": "Self: Evade",
+        "description": "{source}: Evade",
         "name_readable": "Evade",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 25,
@@ -736,11 +721,11 @@
                 "description": "If set, creature will flee for assist with emote"
             }
         ],
-        "description": "Self: Flee for assist",
+        "description": "{source}: Flee for assist",
         "name_readable": "Flee for assist",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 26,
@@ -751,11 +736,10 @@
                 "name": "Quest"
             }
         ],
-        "description": "{target}: Call event happened from quest {pram1} for the whole group",
+        "description": "{source}: Call event happened from quest {pram1} for the whole group",
         "name_readable": "Call groupeventhappens",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 28,
@@ -772,11 +756,10 @@
                 "description": "If 0 all charges are removed"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
+        "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
         "name_readable": "Remove aura",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 29,
@@ -815,11 +798,11 @@
                 }
             }
         ],
-        "description": "Self: Follow {target} by distance {pram1}, angle {pram2}",
+        "description": "{source}: Follow {target} by distance {pram1}, angle {pram2}",
         "name_readable": "Follow",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 30,
@@ -850,11 +833,11 @@
                 "name": "Phase Id 6"
             }
         ],
-        "description": "Self: Set random event phase between: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
+        "description": "{source}: Set random event phase between: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
         "name_readable": "Random phase",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 31,
@@ -871,20 +854,19 @@
                 "description": "Maximum phase to random between (SAI phase)"
             }
         ],
-        "description": "Self: Set random event phase between range {pram1} and {pram2}",
+        "description": "{source}: Set random event phase between range {pram1} and {pram2}",
         "name_readable": "Random phase range",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 32,
         "name": "SMART_ACTION_RESET_GOBJECT",
-        "description": "{target}: Reset (gameobject)",
+        "description": "{source}: Reset (gameobject)",
         "name_readable": "Reset gobject",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 33,
@@ -895,11 +877,10 @@
                 "name": "Creature"
             }
         ],
-        "description": "{target}: Give kill credit {pram1}",
+        "description": "{source}: Give kill credit {pram1}",
         "name_readable": "Give killed monster credit",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 34,
@@ -930,7 +911,7 @@
         "name_readable": "Set instance data",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 35,
@@ -945,7 +926,7 @@
         "name_readable": "Set instance guid",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 36,
@@ -960,29 +941,27 @@
                 "name": "UpdateLevel"
             }
         ],
-        "description": "{target}: Update template{pram2value:choose(0):| and level} as if it was creature {pram1}",
+        "description": "{source}: Update template{pram2value:choose(0):| and level} as if it was creature {pram1}",
         "name_readable": "Update NPC template",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 37,
         "name": "SMART_ACTION_DIE",
-        "description": "Self: Die",
+        "description": "{source}: Die",
         "name_readable": "Die",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 38,
         "name": "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE",
-        "description": "Self: Set in combat with current zone",
+        "description": "{target}: Set in combat with current zone",
         "name_readable": "Set in combat with zone",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true
+        "uses_target": true,
+        "target_is_source": true
     },
     {
         "id": 39,
@@ -997,11 +976,10 @@
                 "name": "WithEmote"
             }
         ],
-        "description": "{target}: Call for help within {pram1} yards{pram2value:choose(0):| with emote}",
+        "description": "{source}: Call for help within {pram1} yards{pram2value:choose(0):| with emote}",
         "name_readable": "Call for help",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 40,
@@ -1023,11 +1001,11 @@
                 }
             }
         ],
-        "description": "Self: Set sheath to {pram1}",
+        "description": "{source}: Set sheath to {pram1}",
         "name_readable": "Set sheath",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 41,
@@ -1042,11 +1020,10 @@
                 "name": "ForeRespawnTimer"
             }
         ],
-        "description": "{target}: Despawn {pram1value:choose(0):instantly|in {pram1} ms}{pram2value:choose(0):| respawn in {pram2} seconds}",
+        "description": "{source}: Despawn {pram1value:choose(0):instantly|in {pram1} ms}{pram2value:choose(0):| respawn in {pram2} seconds}",
         "name_readable": "Force despawn",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 42,
@@ -1061,11 +1038,10 @@
                 "name": "Max"
             }
         ],
-        "description": "Self: Set invincibility hp",
+        "description": "{target}: Set invincibility HP",
         "name_readable": "Set invincibility hp level",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true
+        "uses_target": true,
+        "target_is_source": true
     },
     {
         "id": 43,
@@ -1080,11 +1056,10 @@
                 "name": "Model Id"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):{pram2value:choose(0):Dismount|Mount to model {pram2}}|{pram2value:choose(0):Mount to creature {pram1}|Invalid mount ({pram1}, {pram2}}}",
+        "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Dismount|Mount to model {pram2}}|{pram2value:choose(0):Mount to creature {pram1}|Invalid mount ({pram1}, {pram2}}}",
         "name_readable": "Mount to entry or model",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 44,
@@ -1099,11 +1074,10 @@
                 "name": "Apply"
             }
         ],
-        "description": "{target}: {pram2value:choose(0):Remove phase id {pram1}|Add phase id to {pram1}}",
+        "description": "{source}: {pram2value:choose(0):Remove phase id {pram1}|Add phase id to {pram1}}",
         "name_readable": "Add/Remove phase id",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 45,
@@ -1118,11 +1092,10 @@
                 "name": "Data"
             }
         ],
-        "description": "{target}: Set creature data #{pram1} to {pram2}",
+        "description": "{source}: Set creature data #{pram1} to {pram2}",
         "name_readable": "Set data",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 47,
@@ -1133,11 +1106,10 @@
                 "name": "Visible"
             }
         ],
-        "description": "Self: Set {pram1value:choose(0):in|}visible",
+        "description": "{target}: Set {pram1value:choose(0):in|}visible",
         "name_readable": "Set visibility",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true
+        "uses_target": true,
+        "target_is_source": true
     },
     {
         "id": 48,
@@ -1148,20 +1120,19 @@
                 "name": "Active"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Disable active|Set active}",
+        "description": "{source}: {pram1value:choose(0):Disable active|Set active}",
         "name_readable": "Set active",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 49,
         "name": "SMART_ACTION_ATTACK_START",
-        "description": "Self: Attack {target}",
+        "description": "{source}}: Attack {target}",
         "name_readable": "Attack start",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 50,
@@ -1189,21 +1160,19 @@
                 }
             }
         ],
-        "description": "{target}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
+        "description": "{source}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
         "name_readable": "Summon go",
         "uses_target": true,
         "target_is_source": true,
-        "implicit_source": false,
         "uses_target_position": true
     },
     {
         "id": 51,
         "name": "SMART_ACTION_KILL_UNIT",
-        "description": "{target}: Kill self ({target})",
+        "description": "{source}: Kill self ({source})",
         "name_readable": "Kill unit",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 52,
@@ -1214,11 +1183,10 @@
                 "name": "Taxi ID"
             }
         ],
-        "description": "{target}: Take taxi {pram1}",
+        "description": "{source}: Take taxi {pram1}",
         "name_readable": "Activate taxi",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 53,
@@ -1271,11 +1239,11 @@
                 }
             }
         ],
-        "description": "Self: Start path #{pram2}, {pram1value:choose(0):walk|run}, {pram3value:choose(0):do not repeat|repeat}, {pram6}",
+        "description": "{source}: Start path #{pram2}, {pram1value:choose(0):walk|run}, {pram3value:choose(0):do not repeat|repeat}, {pram6}",
         "name_readable": "Waypoint path start",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 54,
@@ -1287,11 +1255,11 @@
                 "description": "Miliseconds to wait before resuming path"
             }
         ],
-        "description": "Self: Pause path for {pram1} ms",
+        "description": "{source}: Pause path for {pram1} ms",
         "name_readable": "Waypoint path pause",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 55,
@@ -1321,11 +1289,11 @@
                 }
             }
         ],
-        "description": "Self: Stop path{pram1value:choose(0):, despawn instantly|, despawn in {pram1} ms}{pram2value:choose(0):|{pram3value:choose(0):, complete|, fail} quest {pram2}}",
+        "description": "{source}: Stop path{pram1value:choose(0):, despawn instantly|, despawn in {pram1} ms}{pram2value:choose(0):|{pram3value:choose(0):, complete|, fail} quest {pram2}}",
         "name_readable": "Waypoint path stop",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 56,
@@ -1340,11 +1308,10 @@
                 "name": "Count"
             }
         ],
-        "description": "{target}: Add item {pram2}x{pram1}",
+        "description": "{source}: Add item {pram2}x{pram1}",
         "name_readable": "Add item",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 57,
@@ -1359,11 +1326,10 @@
                 "name": "Count"
             }
         ],
-        "description": "{target}: Remove item {pram2}x{pram1}",
+        "description": "{source}: Remove item {pram2}x{pram1}",
         "name_readable": "Remove item",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 58,
@@ -1374,11 +1340,11 @@
                 "name": "AITemplateID"
             }
         ],
-        "description": "Self: Install AI Template {pram1}",
+        "description": "{source}: Install AI Template {pram1}",
         "name_readable": "Install AI template",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 59,
@@ -1397,11 +1363,11 @@
                 }
             }
         ],
-        "description": "Self: {pram1value:choose(0):Set walk|Set run}",
+        "description": "{source}: {pram1value:choose(0):Set walk|Set run}",
         "name_readable": "Set run",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 60,
@@ -1413,11 +1379,11 @@
                 "description": "If true, gravity is disabled"
             }
         ],
-        "description": "Self: {pram1value:choose(0):Enable|Disable} gravity",
+        "description": "{source}: {pram1value:choose(0):Enable|Disable} gravity",
         "name_readable": "Disable Gravity",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 61,
@@ -1429,11 +1395,11 @@
                 "description": "If true, swimming will be enabled"
             }
         ],
-        "description": "Self: {pram1value:choose(0):Disable|Enable} swimming",
+        "description": "{source}: {pram1value:choose(0):Disable|Enable} swimming",
         "name_readable": "Set swim",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 62,
@@ -1444,11 +1410,10 @@
                 "name": "Map ID"
             }
         ],
-        "description": "Teleport {target} to {targetcoords} on map {pram1}",
+        "description": "{source}: Teleport to {targetcoords} on map {pram1}",
         "name_readable": "Teleport",
         "uses_target": true,
         "target_is_source": true,
-        "implicit_source": false,
         "uses_target_position": true
     },
     {
@@ -1468,11 +1433,11 @@
                 "name": "Reset"
             }
         ],
-        "description": "Self: Variable_{pram1} = {pram2}",
+        "description": "{source}: Variable_{pram1} = {pram2}",
         "name_readable": "Set counter",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 64,
@@ -1483,29 +1448,29 @@
                 "name": "Variable ID"
             }
         ],
-        "description": "Self: Target_{pram1} = {target}",
+        "description": "{source}: Target_{pram1} = {target}",
         "name_readable": "Store target list",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 65,
         "name": "SMART_ACTION_WP_RESUME",
-        "description": "Self: Resume path",
+        "description": "{source}: Resume path",
         "name_readable": "Waypoint path resume",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 66,
         "name": "SMART_ACTION_SET_ORIENTATION",
-        "description": "Self: {targetid:choose(1|8):Look at home position|Look at {targetcoords}|Look at {target}}",
+        "description": "{source}: {targetid:choose(1|8):Look at home position|Look at {targetcoords}|Look at {target}}",
         "name_readable": "Set orientation",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 67,
@@ -1545,7 +1510,7 @@
         "name_readable": "Create timed event",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 68,
@@ -1556,11 +1521,10 @@
                 "name": "Entry"
             }
         ],
-        "description": "{target}: Play movie {pram1}",
+        "description": "{source}: Play movie {pram1}",
         "name_readable": "Play movie",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 69,
@@ -1584,11 +1548,11 @@
                 "description": "If > 0 contact distance + combatreach"
             }
         ],
-        "description": "Self: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target} with offset {targetcoords}{pram4value:choose(0):| in {pram4} yd distance}} (point id {pram1}){pram3value:choose(0):| without pathfinding}",
+        "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target} with offset {targetcoords}{pram4value:choose(0):| in {pram4} yd distance}} (point id {pram1}){pram3value:choose(0):| without pathfinding}",
         "name_readable": "Move to position",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true,
+        "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
     },
     {
@@ -1601,11 +1565,10 @@
                 "description": "in ms"
             }
         ],
-        "description": "{target}: enabled for {pram1} ms",
+        "description": "{source}: enabled for {pram1} ms",
         "name_readable": "Enable Temp Gobject",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 71,
@@ -1637,20 +1600,18 @@
                 "description": "Only if equipement id is 0"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Equip items {pram3}, {pram4}, {pram5}|Eqipt items from creature {pram1}}",
+        "description": "{source}: {pram1value:choose(0):Equip items {pram3}, {pram4}, {pram5}|Eqipt items from creature {pram1}}",
         "name_readable": "Equip item",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 72,
         "name": "SMART_ACTION_CLOSE_GOSSIP",
-        "description": "{target}: Close gossip",
+        "description": "{source}: Close gossip",
         "name_readable": "Close gossip",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 73,
@@ -1662,11 +1623,11 @@
                 "description": "Must be greater or equal than 1"
             }
         ],
-        "description": "Self: Trigger timed event {pram1}",
+        "description": "Trigger timed event {pram1}",
         "name_readable": "Trigger timed event",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 74,
@@ -1678,11 +1639,11 @@
                 "description": "Must be greater or equal than 1"
             }
         ],
-        "description": "Self: Remove timed event {pram1}",
+        "description": "Remove timed event {pram1}",
         "name_readable": "Remove timed event",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 75,
@@ -1693,11 +1654,10 @@
                 "name": "Spell"
             }
         ],
-        "description": "{target}: Add aura {pram1}",
+        "description": "{source}: Add aura {pram1}",
         "name_readable": "Add aura",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 76,
@@ -1706,7 +1666,7 @@
         "name_readable": "Override script base object",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 77,
@@ -1715,16 +1675,16 @@
         "name_readable": "Reset script base object",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 78,
         "name": "SMART_ACTION_CALL_SCRIPT_RESET",
-        "description": "Self: Call OnReset() event",
+        "description": "{source}: Call OnReset() event",
         "name_readable": "Do Reset()",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 79,
@@ -1739,11 +1699,10 @@
                 "name": "angle"
             }
         ],
-        "description": "{target}: Chase its victim in {pram1} yards (angle {pram2}\u00b0)",
+        "description": "{source}: Chase its victim in {pram1} yards (angle {pram2}\u00b0)",
         "name_readable": "Set ranged movement ",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 80,
@@ -1759,7 +1718,7 @@
         "name_readable": "Call timed action list",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 81,
@@ -1861,11 +1820,10 @@
                 }
             }
         ],
-        "description": "{target}: Set npc flags {pram1}",
+        "description": "{source}: Set npc flags {pram1}",
         "name_readable": "Set NPC flags",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 82,
@@ -1967,11 +1925,10 @@
                 }
             }
         ],
-        "description": "{target}: Add npc flags {pram1}",
+        "description": "{source}: Add npc flags {pram1}",
         "name_readable": "Add NPC flag",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 83,
@@ -2073,11 +2030,10 @@
                 }
             }
         ],
-        "description": "{target}: Remove npc flags {pram1}",
+        "description": "{source}: Remove npc flags {pram1}",
         "name_readable": "Remove NPC flag",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 84,
@@ -2089,11 +2045,10 @@
                 "description": "Makes target say its line from creature_text. If player, line from creature_text from this entry will be said. Doesn't trigger TEXT_OVER"
             }
         ],
-        "description": "{target}: Talk {pram1}",
+        "description": "{source}: Talk {pram1}",
         "name_readable": "Simple talk",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 85,
@@ -2120,8 +2075,7 @@
         "description": "{pram4value:choose(0):| Random {pram4}} {target}: Cast spell {pram1} on self",
         "name_readable": "Invoker cast",
         "uses_target": true,
-        "target_is_source": false,
-        "implicit_source": false
+        "target_is_source": false
     },
     {
         "id": 86,
@@ -2241,7 +2195,7 @@
         "name_readable": "Cross cast",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 87,
@@ -2272,11 +2226,10 @@
                 "name": "Action List ID 6"
             }
         ],
-        "description": "{target}: Call random timed action list: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
+        "description": "{source}: Call random timed action list: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
         "name_readable": "Call random timed actionlist",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 88,
@@ -2291,11 +2244,10 @@
                 "name": "Action List ID max"
             }
         ],
-        "description": "{target}: Call random timed action list between range {pram1} and {pram2}",
+        "description": "{source}: Call random timed action list between range {pram1} and {pram2}",
         "name_readable": "Call random range timed actionlist",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 89,
@@ -2307,11 +2259,10 @@
                 "description": "If 0, creature will stay idle in place"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Stay in place|Move in radius {pram1} yards}",
+        "description": "{source}: {pram1value:choose(0):Stay in place|Move in radius {pram1} yards}",
         "name_readable": "Random move",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 90,
@@ -2341,11 +2292,10 @@
                 }
             }
         ],
-        "description": "{target}: Set UNIT_FIELD_BYTES_1 with Type {pram2} to {pram1}",
+        "description": "{source}: Set UNIT_FIELD_BYTES_1 with Type {pram2} to {pram1}",
         "name_readable": "Set UNIT_FIELD_BYTES_1",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 91,
@@ -2375,11 +2325,10 @@
                 }
             }
         ],
-        "description": "{target}: Remove {pram1} bytes from UNIT_FIELD_BYTES_1 with Type {pram2}",
+        "description": "{source}: Remove {pram1} bytes from UNIT_FIELD_BYTES_1 with Type {pram2}",
         "name_readable": "Remove UNIT_FIELD_BYTES_1",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 92,
@@ -2398,11 +2347,10 @@
                 "name": "Instant"
             }
         ],
-        "description": "{target}: Interrupt casted spell {pram2}",
+        "description": "{source}: Interrupt casted spell {pram2}",
         "name_readable": "Interrupt spell",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 93,
@@ -2413,11 +2361,10 @@
                 "name": "Animation id"
             }
         ],
-        "description": "{target}: Play custom animation (only gameobject)",
+        "description": "{source}: Play custom animation (only gameobject)",
         "name_readable": "Send gameobject custom animation",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 94,
@@ -2457,11 +2404,10 @@
                 }
             }
         ],
-        "description": "{target}: Set dynamic flags to {pram1}",
+        "description": "{source}: Set dynamic flags to {pram1}",
         "name_readable": "Set dynamic flag",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 95,
@@ -2501,11 +2447,10 @@
                 }
             }
         ],
-        "description": "{target}: Add {pram1} dynamic flag",
+        "description": "{source}: Add {pram1} dynamic flag",
         "name_readable": "Add dynamic flag",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 96,
@@ -2545,11 +2490,10 @@
                 }
             }
         ],
-        "description": "{target}: Remove {pram1} dynamic flags",
+        "description": "{source}: Remove {pram1} dynamic flags",
         "name_readable": "Remove dynamic flag",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 97,
@@ -2564,11 +2508,10 @@
                 "name": "Speed Z"
             }
         ],
-        "description": "Self: Jump to pos {targetcoords} with speed XY {pram1} and speed Z {pram2}",
+        "description": "{source}: Jump to pos {targetcoords} with speed XY {pram1} and speed Z {pram2}",
         "name_readable": "Jump to pos",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true,
+        "uses_target": true,
+        "target_is_source": true,
         "uses_target_position": true
     },
     {
@@ -2586,11 +2529,10 @@
                 "description": "From npc_text"
             }
         ],
-        "description": "{target}: Send gossip ID {pram1} with text {pram2}",
+        "description": "{source}: Send gossip ID {pram1} with text {pram2}",
         "name_readable": "Send gossip menu",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 99,
@@ -2615,11 +2557,10 @@
                 }
             }
         ],
-        "description": "{target}: Set loot state {pram1} (only gameobjects)",
+        "description": "{source}: Set loot state {pram1} (only gameobjects)",
         "name_readable": "Set gameobject loot state",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 100,
@@ -2630,20 +2571,19 @@
                 "name": "Variable ID"
             }
         ],
-        "description": "Self: Send stored target {pram1} to {target}",
+        "description": "Send stored target {pram1} to {target}",
         "name_readable": "Send target to source",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 101,
         "name": "SMART_ACTION_SET_HOME_POS",
-        "description": "Self: Set home position to {targetid:choose(1|8):current position|{targetcoords}|position of {target}}",
+        "description": "{source}: Set home position to {targetid:choose(1|8):current position|{targetcoords}|position of {target}}",
         "name_readable": "Send home position",
         "uses_target": true,
-        "target_is_source": false,
-        "implicit_source": true,
+        "target_is_source": true,
         "uses_target_position": true
     },
     {
@@ -2655,11 +2595,10 @@
                 "name": "Regenerate HP"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Do not regenerate HP|Regenerate HP}",
+        "description": "{source}: {pram1value:choose(0):Do not regenerate HP|Regenerate HP}",
         "name_readable": "Set health regeneration",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 103,
@@ -2670,11 +2609,10 @@
                 "name": "SetRoot"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Remove|Set} rooted",
+        "description": "{source}: {pram1value:choose(0):Remove|Set} rooted",
         "name_readable": "Set/Remove rooted",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 104,
@@ -2714,11 +2652,10 @@
                 }
             }
         ],
-        "description": "{target}: Set game object flags {pram1}",
+        "description": "{source}: Set game object flags {pram1}",
         "name_readable": "Set gameobject flags",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 105,
@@ -2758,11 +2695,10 @@
                 }
             }
         ],
-        "description": "{target}: Add game object flag {pram1}",
+        "description": "{source}: Add game object flag {pram1}",
         "name_readable": "Add gameobject flags",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 106,
@@ -2802,11 +2738,10 @@
                 }
             }
         ],
-        "description": "{target}: Remove game object flag {pram1}",
+        "description": "{source}: Remove game object flag {pram1}",
         "name_readable": "Remove gameobject flags",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 107,
@@ -2821,11 +2756,11 @@
                 "name": "Attack me"
             }
         ],
-        "description": "Self: Summon creature group {pram1}",
+        "description": "{source}: Summon creature group {pram1}",
         "name_readable": "Summon creature group",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 108,
@@ -2875,11 +2810,10 @@
                 "name": "New Power"
             }
         ],
-        "description": "{target}: Set power type to {pram1} with value {pram2}",
+        "description": "{source}: Set power type to {pram1} with value {pram2}",
         "name_readable": "Set power",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 109,
@@ -2929,11 +2863,10 @@
                 "name": "Value"
             }
         ],
-        "description": "{target}: Add {pram2} to power {pram1}",
+        "description": "{source}: Add {pram2} to power {pram1}",
         "name_readable": "Add power",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 110,
@@ -2983,11 +2916,10 @@
                 "name": "Value"
             }
         ],
-        "description": "{target}: Remove {pram2} from power {pram1}",
+        "description": "{source}: Remove {pram2} from power {pram1}",
         "name_readable": "Remove power",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 111,
@@ -2998,11 +2930,10 @@
                 "name": "Event ID"
             }
         ],
-        "description": "{target}: Stop game event {pram1}",
+        "description": "{source}: Stop game event {pram1}",
         "name_readable": "Stop game event",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 112,
@@ -3013,11 +2944,10 @@
                 "name": "Event ID"
             }
         ],
-        "description": "{target}: Start game event {pram1}",
+        "description": "{source}: Start game event {pram1}",
         "name_readable": "Start game event",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 113,
@@ -3048,20 +2978,18 @@
                 "name": "Path 6"
             }
         ],
-        "description": "{target}: Start closest path: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
+        "description": "{source}: Start closest path: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
         "name_readable": "Start closest path",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 114,
         "name": "SMART_ACTION_MOVE_OFFSET",
         "description": "Use target_x,  target_y,  target_z, With target_type=1",
-        "name_readable": "Move offset",
-        "uses_target": false,
+        "name_readable": "{source}: Move by offset {targetcoords}",
+        "uses_target": true,
         "target_is_source": true,
-        "implicit_source": true,
         "uses_target_position": true
     },
     {
@@ -3069,19 +2997,19 @@
         "name": "SMART_ACTION_RANDOM_SOUND",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "SoundParameter",
                 "name": "SoundId 1"
             },
             {
-                "type": "Parameter",
+                "type": "SoundParameter",
                 "name": "SoundId 2"
             },
             {
-                "type": "Parameter",
+                "type": "SoundParameter",
                 "name": "SoundId 3"
             },
             {
-                "type": "Parameter",
+                "type": "SoundParameter",
                 "name": "SoundId 4"
             },
             {
@@ -3093,11 +3021,10 @@
                 "name": "DistanceSound"
             }
         ],
-        "description": "{target}: Play random {pram6value:choose(0):direct|distance} sound one of: {pram1}, {pram2}, {pram3}, {pram4} {pram6value:choose(0):of all|only self}",
+        "description": "{source}: Play random {pram6value:choose(0):direct|distance} sound one of: {pram1}, {pram2}, {pram3}, {pram4} {pram6value:choose(0):of all|only self}",
         "name_readable": "Play random sound",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 116,
@@ -3108,11 +3035,10 @@
                 "name": "Timer"
             }
         ],
-        "description": "Sets corpse delay of {target} to {pram1}ms",
+        "description": "{source}: Sets corpse delay to {pram1}ms",
         "name_readable": "Set corpse delay",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 117,
@@ -3123,12 +3049,11 @@
                 "name": "DisableEvade"
             }
         ],
-        "description": "{target}: Evade {pram1value:choose(0):enabled|disabled}",
+        "description": "{source}: Evade {pram1value:choose(0):enabled|disabled}",
         "help": "disable evade = True / re-enable = False",
         "name_readable": "Disable evade",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 118,
@@ -3156,11 +3081,10 @@
                 }
             }
         ],
-        "description": "{target} state set to {pram1}",
+        "description": "{source} state set to {pram1}",
         "name_readable": "Set gameobject state",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 119,
@@ -3171,11 +3095,10 @@
                 "name": "CanFly"
             }
         ],
-        "description": "{target}: {pram1value:choose(0):Can not|Can} Fly}",
+        "description": "{source}: {pram1value:choose(0):Can not|Can} Fly}",
         "name_readable": "Set can fly",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 120,
@@ -4661,11 +4584,10 @@
                 }
             }
         ],
-        "description": "{target}: Remove Auras with Auratype  {pram1}",
+        "description": "{source}: Remove Auras with Auratype  {pram1}",
         "name_readable": "Remove auras of auratype",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 121,
@@ -4676,11 +4598,10 @@
                 "name": "Distance"
             }
         ],
-        "description": "{target}: Sight distance set to {pram1} yards",
+        "description": "{source}: Sight distance set to {pram1} yards",
         "name_readable": "Set sight distance",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 122,
@@ -4691,11 +4612,10 @@
                 "name": "FleeTime"
             }
         ],
-        "description": "{target} flees for {pram1} ms",
+        "description": "{source} flees for {pram1} ms",
         "name_readable": "Flee",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 123,
@@ -4710,11 +4630,11 @@
                 "name": "Threath negation"
             }
         ],
-        "description": "Adds {pram1}, negates {pram2}",
+        "description": "{source}: Adds {pram1}, negates {pram2} threat against {target}",
         "name_readable": "Add threat",
-        "uses_target": false,
+        "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 124,
@@ -4729,11 +4649,10 @@
                 "name": "Force"
             }
         ],
-        "description": "{target}: {pram2value:choose(0):Load|Force load} EquipmentId {pram1}",
+        "description": "{source}: {pram2value:choose(0):Load|Force load} EquipmentId {pram1}",
         "name_readable": "Load equipement",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 125,
@@ -4752,16 +4671,15 @@
         "name_readable": "Trigger random timed event",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 126,
         "name": "SMART_ACTION_REMOVE_ALL_GAMEOBJECTS",
-        "description": "Removes all GObjects",
+        "description": "{source}: Removes gameobjects",
         "name_readable": "Remove all gameobjects",
-        "uses_target": false,
-        "target_is_source": false,
-        "implicit_source": true
+        "uses_target": true,
+        "target_is_source": true
     },
     {
         "id": 127,
@@ -4776,11 +4694,10 @@
                 "name": "movementExpired"
             }
         ],
-        "description": "{target}: Stop movement",
+        "description": "{source}: Stop movement",
         "name_readable": "Stop motion",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 128,
@@ -4809,11 +4726,10 @@
                 }
             }
         ],
-        "description": "{target}: Plays Anim with ID {pram1}",
+        "description": "{source}: Plays Anim with ID {pram1}",
         "name_readable": "Play animkit",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 129,
@@ -4824,11 +4740,10 @@
                 "name": "SceneId"
             }
         ],
-        "description": "{target}: Starts playing scene with Id: {pram1}",
+        "description": "{source}: Starts playing scene with Id: {pram1}",
         "name_readable": "Play scene",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 130,
@@ -4839,11 +4754,10 @@
                 "name": "SceneId"
             }
         ],
-        "description": "{target}: Stops playing scene with Id: {pram1}",
+        "description": "{source}: Stops playing scene with Id: {pram1}",
         "name_readable": "Cancel scene",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 131,
@@ -4872,11 +4786,11 @@
                 }
             }
         ],
-        "description": "Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
+        "description": "{source}: Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
         "name_readable": "Spawn Spawngroup",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 132,
@@ -4905,11 +4819,11 @@
                 }
             }
         ],
-        "description": "Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
+        "description": "{source}: Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
         "name_readable": "Despawn Spawngroup",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 133,
@@ -4932,7 +4846,7 @@
         "name_readable": "Respawn by SpawnID",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 134,
@@ -4951,11 +4865,11 @@
                 "name": "triggeredFlags"
             }
         ],
-        "description": "Invoker: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}",
+        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}",
         "name_readable": "Invoker Cast",
         "uses_target": true,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_ACTION_INVOKER"
     },
     {
         "id": 135,
@@ -4966,11 +4880,10 @@
                 "name": "Entry"
             }
         ],
-        "description": "{target}: Plays Cinematic with Entry: {pram1}",
+        "description": "{source}: Plays Cinematic with Entry: {pram1}",
         "name_readable": "Play Cinematic",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 136,
@@ -5000,11 +4913,10 @@
                 "name": "SpeedFraction"
             }
         ],
-        "description": "{target}: Set movement {pram1} speed to {pram2value}.{pram3.value}",
+        "description": "{source}: Set movement {pram1} speed to {pram2value}.{pram3.value}",
         "name_readable": "Set Movement speed",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 137,
@@ -5023,11 +4935,10 @@
                 "name": "Duration"
             }
         ],
-        "description": "{target}: Plays SpellVisual with SpellVisualKitId: {pram1}, KitType: {pram2} for {pram3} ms",
+        "description": "{source}: Plays SpellVisual with SpellVisualKitId: {pram1}, KitType: {pram2} for {pram3} ms",
         "name_readable": "Play Spellvisual kit",
         "uses_target": true,
-        "target_is_source": true,
-        "implicit_source": false
+        "target_is_source": true
     },
     {
         "id": 9999,
@@ -5042,7 +4953,7 @@
         "name_readable": "Wait",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 9998,
@@ -5051,6 +4962,6 @@
         "name_readable": "Comment",
         "uses_target": false,
         "target_is_source": false,
-        "implicit_source": true
+        "implicit_source": "SMART_TARGET_NONE"
     }
 ]

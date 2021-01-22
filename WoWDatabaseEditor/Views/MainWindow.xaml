@@ -115,6 +115,11 @@
                 ActiveContent="{Binding DocumentManager.ActiveDocument,Mode=TwoWay, 
             diag:PresentationTraceSources.TraceLevel=High,Converter={StaticResource ActiveDocumentConverter}}"
                 DocumentsSource="{Binding DocumentManager.OpenedDocuments}">
+                <DockingManager.Resources>
+                    <Style TargetType="LayoutDocumentControl" BasedOn="{StaticResource {x:Type LayoutDocumentControl}}">
+                        <Setter Property="Focusable" Value="False"></Setter>
+                    </Style>
+                </DockingManager.Resources>
                 <DockingManager.LayoutUpdateStrategy>
                     <utils:LayoutInitializer />
                 </DockingManager.LayoutUpdateStrategy>
@@ -122,7 +127,6 @@
                     <views:PaneDocumentTemplateSelector>
                         <views:PaneDocumentTemplateSelector.DocumentTemplate>
                             <DataTemplate>
-                                
                                 <ContentPresenter Content="{Binding}" DockPanel.Dock="Left">
                                     <ContentPresenter.Style>
                                         <Style TargetType="{x:Type ContentPresenter}">
@@ -143,20 +147,18 @@
                                             <Setter Property="ContentTemplate">
                                                 <Setter.Value>
                                                     <DataTemplate>
-                                                        <ContentControl utils:ViewBind.Model="{Binding}" />
+                                                        <ContentControl Focusable="False" utils:ViewBind.Model="{Binding}" />
                                                     </DataTemplate>
                                                 </Setter.Value>
                                             </Setter>
                                         </Style>
                                     </ContentPresenter.Style>
                                 </ContentPresenter>
-                                
-                                
                             </DataTemplate>
                         </views:PaneDocumentTemplateSelector.DocumentTemplate>
                         <views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
                             <DataTemplate>
-                                <ContentControl utils:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
+                                <ContentControl Focusable="False" utils:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
                             </DataTemplate>
                         </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
                     </views:PaneDocumentTemplateSelector>

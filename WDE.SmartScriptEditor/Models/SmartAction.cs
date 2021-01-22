@@ -25,8 +25,10 @@ namespace WDE.SmartScriptEditor.Models
             if (source == null || target == null)
                 throw new ArgumentNullException("Source or target is null");
 
-            Source = source;
-            Target = target;
+            this.source = source;
+            this.target = target;
+            source.OnChanged += SourceOnOnChanged;
+            target.OnChanged += SourceOnOnChanged;
             comment = new ParameterValueHolder<string>("Comment", new StringParameter());
             comment.PropertyChanged += (_, _) =>
             {
@@ -47,17 +49,7 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        public SmartSource Source
-        {
-            get => source;
-            set
-            {
-                if (source != null)
-                    source.OnChanged -= SourceOnOnChanged;
-                source = value;
-                source.OnChanged += SourceOnOnChanged;
-            }
-        }
+        public SmartSource Source => source;
 
         public bool IsSelected
         {
@@ -81,18 +73,8 @@ namespace WDE.SmartScriptEditor.Models
         }
 
         public ParameterValueHolder<string> CommentParameter => comment;
-        
-        public SmartTarget Target
-        {
-            get => target;
-            set
-            {
-                if (target != null)
-                    target.OnChanged -= SourceOnOnChanged;
-                target = value;
-                target.OnChanged += SourceOnOnChanged;
-            }
-        }
+
+        public SmartTarget Target => target;
 
         public override string Readable
         {
@@ -108,6 +90,7 @@ namespace WDE.SmartScriptEditor.Models
                             targetcoords = Target.GetCoords(),
                             target_position = Target.GetPosition(),
                             targetid = Target.Id,
+                            sourceid = Source.Id,
                             pram1 = GetParameter(0),
                             pram2 = GetParameter(1),
                             pram3 = GetParameter(2),
@@ -154,13 +137,11 @@ namespace WDE.SmartScriptEditor.Models
         public SmartAction Copy()
         {
             SmartAction se = new(Id, Source.Copy(), Target.Copy());
-            se.Comment = Comment;
             se.ReadableHint = ReadableHint;
             se.DescriptionRules = DescriptionRules;
             for (var i = 0; i < SmartActionParametersCount; ++i)
-            {
                 se.GetParameter(i).Copy(GetParameter(i));
-            }
+            se.comment.Copy(comment);
             return se;
         }
     }

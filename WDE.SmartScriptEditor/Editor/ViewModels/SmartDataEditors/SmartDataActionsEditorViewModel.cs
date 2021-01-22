@@ -6,6 +6,9 @@ using Prism.Commands;
 using WDE.SmartScriptEditor.Data;
 using WDE.Common.Parameters;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Editor.Views;
 
@@ -89,7 +92,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public event Action CloseOk;
     }
 
-    class SmartDataActionsEditorData
+    class SmartDataActionsEditorData : INotifyPropertyChanged
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -98,7 +101,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public string Description { get; set; }
         public bool UsesTarget { get; set; }
         public bool TargetIsSource { get; set; }
-        public bool ImplicitSource { get; set; }
+        private bool isImplicitSource;
+        public bool IsImplicitSource
+        {
+            get => isImplicitSource;
+            set
+            {
+                isImplicitSource = value;
+                OnPropertyChanged();
+            }
+        }
+        public string ImplicitSource { get; set; }
         public bool UsesTargetPosition { get; set; }
         public ObservableCollection<SmartParameterJsonData> Parameters { get; set; }
 
@@ -113,6 +126,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Description = source.Description;
             UsesTarget = source.UsesTarget;
             TargetIsSource = source.TargetIsSource;
+            IsImplicitSource = source.ImplicitSource != null;
             ImplicitSource = source.ImplicitSource;
             UsesTargetPosition = source.UsesTargetPosition;
             if (source.Parameters != null)
@@ -131,7 +145,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             obj.Description = Description;
             obj.UsesTarget = UsesTarget;
             obj.TargetIsSource = TargetIsSource;
-            obj.ImplicitSource = ImplicitSource;
+            obj.ImplicitSource = IsImplicitSource ? ImplicitSource : null;
             obj.UsesTargetPosition = UsesTargetPosition;
             if (Parameters.Count > 0)
                 obj.Parameters = Parameters.ToList();
@@ -139,5 +153,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         }
 
         public bool IsEmpty() => string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(NameReadable);
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName]
+            string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

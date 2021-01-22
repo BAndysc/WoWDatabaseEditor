@@ -40,7 +40,27 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        public string Name { get; set; }
+        private bool isUsed;
+        public bool IsUsed
+        {
+            get => isUsed; 
+            set
+            {
+                isUsed = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string name;
+        public string Name
+        {
+            get => name; 
+            set
+            {
+                name = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string String => ToString();
 
@@ -49,15 +69,24 @@ namespace WDE.SmartScriptEditor.Models
             return parameter.ToString(value);
         }
 
+        public ParameterValueHolder(IParameter<T> parameter)
+        {
+            IsUsed = false;
+            Name = null;
+            this.parameter = parameter;
+        }
+
         public ParameterValueHolder(string name, IParameter<T> parameter)
         {
             Name = name;
+            IsUsed = true;
             this.parameter = parameter;
         }
 
         public void Copy(ParameterValueHolder<T> other)
         {
             Name = other.Name;
+            IsUsed = other.IsUsed;
             Value = other.Value;
             Parameter = other.Parameter;
         }

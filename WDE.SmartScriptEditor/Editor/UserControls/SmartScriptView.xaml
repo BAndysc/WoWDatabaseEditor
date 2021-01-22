@@ -37,7 +37,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" MinHeight="30" />
             </Grid.RowDefinitions>
-            <ItemsControl ItemsSource="{Binding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
+            <ItemsControl Focusable="False" ItemsSource="{Binding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
                           Margin="7,0,7,0">
                 <ItemsControl.Resources>
                     <DataTemplate DataType="{x:Type models:SmartEvent}">

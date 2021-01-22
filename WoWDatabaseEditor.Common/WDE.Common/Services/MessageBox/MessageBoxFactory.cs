@@ -121,7 +121,10 @@ namespace WDE.Common.Services.MessageBox
                 ExpandedInformation = expandedInformation;
                 Footer = footer;
                 FooterIcon = footerIcon;
-                Buttons = buttons.ToList();
+                if ((buttons?.Count ?? 0) == 0)
+                    Buttons = new List<IMessageBoxButton<T>>() {new MessageBoxButton("Ok", default)};
+                else
+                    Buttons = buttons.ToList();
             }
 
             public string Title { get; }

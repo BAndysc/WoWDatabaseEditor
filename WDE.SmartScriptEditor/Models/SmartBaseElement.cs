@@ -8,32 +8,55 @@ namespace WDE.SmartScriptEditor.Models
 {
     public abstract class SmartBaseElement : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event Action BulkEditingStarted = delegate { };
+        public event Action<string> BulkEditingFinished = delegate { };
+        public event EventHandler OnChanged = delegate { };
+        public event Action<SmartBaseElement, int, int> OnIdChanged = delegate { };
+
         private readonly ParameterValueHolder<int>[] @params;
-        public string ReadableHint;
+
+        private string readableHint;
+        public string ReadableHint
+        {
+            get => readableHint;
+            set
+            {
+                readableHint = value;
+                CallOnChanged();
+            }
+        }
         
+        private int id;
+        public int Id
+        {
+            get => id;
+            set
+            {
+                var old = id;
+                id = value;
+                OnIdChanged?.Invoke(this, old, id);
+                OnPropertyChanged();
+            }
+        }
+        
+        public List<DescriptionRule> DescriptionRules { get; set; }
+        public abstract string Readable { get; }
         public int ParametersCount { get; }
 
         protected SmartBaseElement(int parametersCount, int id)
         {
-            ParametersCount = parametersCount;
             Id = id;
+            ParametersCount = parametersCount;
             @params = new ParameterValueHolder<int>[parametersCount];
             for (int i = 0; i < parametersCount; ++i)
             {
-                @params[i] = new ParameterValueHolder<int>("empty", Parameter.Instance);
+                @params[i] = new ParameterValueHolder<int>(Parameter.Instance);
                 @params[i].PropertyChanged += (_, _) => CallOnChanged();
             }
             OnChanged += (sender, args) => OnPropertyChanged(nameof(Readable));
         }
 
-        public List<DescriptionRule> DescriptionRules { get; set; }
-        public int Id { get; }
-        public abstract string Readable { get; }
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event Action BulkEditingStarted = delegate { };
-        public event Action<string> BulkEditingFinished = delegate { };
-        public event EventHandler OnChanged = delegate { };
-        
         public ParameterValueHolder<int> GetParameter(int index)
         {
             return @params[index];

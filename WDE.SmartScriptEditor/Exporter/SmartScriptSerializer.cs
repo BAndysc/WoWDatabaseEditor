@@ -111,7 +111,7 @@ namespace WDE.SmartScriptEditor.Exporter
             return Smart.Format(SaiSql, data);
         }
 
-        public static (ISmartScriptLine[], IConditionLine[]) ToSmartScriptLinesNoMetaActions(this SmartScript script, ISmartFactory smartFactory)
+        public static (ISmartScriptLine[], IConditionLine[]) ToSmartScriptLinesNoMetaActions(this SmartScript script, ISmartFactory smartFactory, ISmartDataManager smartDataManager)
         {
             if (script.Events.Count == 0)
                 return (new ISmartScriptLine[0], null);
@@ -146,7 +146,7 @@ namespace WDE.SmartScriptEditor.Exporter
 
                     int linkTo = e.Actions.Count - 1 == index ? 0 : eventId + 1;
 
-                    SmartAction actualAction = e.Actions[index];
+                    SmartAction actualAction = e.Actions[index].Copy();
 
                     if (actualAction.Id == SmartConstants.ActionWait)
                     {
@@ -174,8 +174,22 @@ namespace WDE.SmartScriptEditor.Exporter
                         previousWasWait = false;
                     }
 
+                    var actionData = smartDataManager.GetRawData(SmartType.SmartAction, actualAction.Id);
+                    
+                    if (actionData.TargetIsSource)
+                    {
+                        smartFactory.UpdateTarget(actualAction.Target, actualAction.Source.Id);
+                        for (int i = 0; i < actualAction.Target.ParametersCount; ++i)
+                            actualAction.Target.GetParameter(i).Copy(actualAction.Source.GetParameter(i));
+                        
+                        smartFactory.UpdateSource(actualAction.Source, 0);
+                    }
+                    
+                    if (actionData.ImplicitSource != null)
+                        smartFactory.UpdateSource(actualAction.Source, smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource).Id);
+
                     SmartEvent eventToSerialize = actualEvent.ShallowCopy();
-                    eventToSerialize.Actions.Add(actualAction.Copy());
+                    eventToSerialize.Actions.Add(actualAction);
 
                     var serialized = eventToSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, linkTo);
                     var serializedConditions = actualEvent.ToConditionLines(script.EntryOrGuid, script.SourceType, eventId);

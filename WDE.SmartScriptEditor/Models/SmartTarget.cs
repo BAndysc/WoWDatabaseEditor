@@ -101,16 +101,15 @@ namespace WDE.SmartScriptEditor.Models
             {
                 ReadableHint = ReadableHint,
                 DescriptionRules = DescriptionRules,
-                X = X,
-                Y = Y,
-                Z = Z,
-                O = O,
                 IsPosition = IsPosition
             };
+            
             for (var i = 0; i < SmartSourceParametersCount; ++i)
-            {
                 se.GetParameter(i).Copy(GetParameter(i));
-            }
+            
+            for (var i = 0; i < Position.Length; ++i)
+                se.Position[i].Copy(Position[i]);
+            
             return se;
         }
     }

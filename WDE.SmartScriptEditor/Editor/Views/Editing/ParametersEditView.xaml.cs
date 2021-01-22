@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace WDE.SmartScriptEditor.Editor.Views
+namespace WDE.SmartScriptEditor.Editor.Views.Editing
 {
     /// <summary>
     ///     Interaction logic for ParametersEditView.xaml

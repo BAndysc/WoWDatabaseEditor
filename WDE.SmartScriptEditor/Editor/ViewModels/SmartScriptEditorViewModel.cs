@@ -17,16 +17,17 @@ using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
-using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
-using WDE.Common.Utils;
 using WDE.Conditions.Data;
 using WDE.Conditions.Exporter;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.UserControls;
-using WDE.SmartScriptEditor.Editor.Views;
+using WDE.SmartScriptEditor.Editor.ViewModels.Editing;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 
@@ -44,6 +45,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ISmartTypeListProvider smartTypeListProvider;
         private readonly IStatusBar statusbar;
         private readonly IWindowManager windowManager;
+        private readonly IMessageBoxService messageBoxService;
         private readonly SubscriptionToken token;
 
         private SmartScriptSolutionItem item;
@@ -67,6 +69,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ISmartTypeListProvider smartTypeListProvider,
             IStatusBar statusbar,
             IWindowManager windowManager,
+            IMessageBoxService messageBoxService,
             ISolutionItemNameRegistry itemNameRegistry,
             ITaskRunner taskRunner)
         {
@@ -78,6 +81,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.smartTypeListProvider = smartTypeListProvider;
             this.statusbar = statusbar;
             this.windowManager = windowManager;
+            this.messageBoxService = messageBoxService;
             this.itemNameRegistry = itemNameRegistry;
             this.taskRunner = taskRunner;
             this.conditionDataManager = conditionDataManager;
@@ -379,7 +383,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (string.IsNullOrEmpty(Clipboard.GetText()))
                     return;
                 
-                var content = (Clipboard.GetText() ?? "");
+                var content = Clipboard.GetText() ?? "";
                 List<IConditionLine> conditions = null;
                 
                 if (content.StartsWith("conditions:"))
@@ -669,7 +673,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     {
                         SmartScriptSolutionItem itemm = args.Item as SmartScriptSolutionItem;
                         if (itemm.Entry == item.Entry && itemm.SmartType == item.SmartType)
-                            args.Sql = new SmartScriptExporter(script, smartFactory).GetSql();
+                            args.Sql = new SmartScriptExporter(script, smartFactory, smartDataManager).GetSql();
                     }
                 });
         }
@@ -817,14 +821,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, this.item.Entry, (int)this.item.SmartType);
             script.Load(lines, conditions);
             IsLoading = false;
-            History.AddHandler(new SaiHistoryHandler(script));
+            History.AddHandler(new SaiHistoryHandler(script, smartFactory));
         }
         
         private async Task SaveAllToDb()
         {
             statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));
 
-            var (lines, conditions) = script.ToSmartScriptLinesNoMetaActions(smartFactory);
+            var (lines, conditions) = script.ToSmartScriptLinesNoMetaActions(smartFactory, smartDataManager);
             
             await database.InstallScriptFor(item.Entry, item.SmartType, lines);
             
@@ -847,25 +851,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SmartEvent e = obj.Event;
             if (e == null)
                 return;
-            int? sourceId = smartTypeListProvider.Get(SmartType.SmartSource,
-                data =>
-                {
-                    if (data.IsOnlyTarget)
-                        return false;
-
-                    return data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType);
-                });
+            int? sourceId = ShowSourcePicker();
 
             if (!sourceId.HasValue)
                 return;
 
-            int? actionId = smartTypeListProvider.Get(SmartType.SmartAction,
-                data =>
-                {
-                    return (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
-                           (!data.ImplicitSource || sourceId.Value <= 1 /* @todo: remove this const: this is none or self */
-                           );
-                });
+            int? actionId = ShowActionPicker(sourceId.Value);
 
             if (!actionId.HasValue)
                 return;
@@ -876,29 +867,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             if (actionData.UsesTarget && !actionData.TargetIsSource)
             {
-                int? targetId = smartTypeListProvider.Get(SmartType.SmartTarget,
-                    data =>
-                    {
-                        return (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
-                               (actionData.Targets == null || actionData.Targets.Intersect(data.Types).Any());
-                    });
+                int? targetId = ShowTargetPicker(actionData);
 
                 if (!targetId.HasValue)
                     return;
 
                 target = smartFactory.TargetFactory(targetId.Value);
             }
-            else if (actionData.TargetIsSource)
-            {
-                target = smartFactory.TargetFactory(sourceId.Value);
-                sourceId = 0;
-            }
-            else
+            else 
                 target = smartFactory.TargetFactory(0);
-
-            if (actionData.ImplicitSource)
-                sourceId = 0;
-
+            
             SmartSource source = smartFactory.SourceFactory(sourceId.Value);
 
             SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
@@ -912,8 +890,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (e == null)
                 return;
 
-            int? conditionId = smartTypeListProvider.Get(SmartType.SmartCondition, _ => true);
-
+            int? conditionId = ShowConditionPicker();
+            
             if (!conditionId.HasValue)
                 return;
 
@@ -925,11 +903,53 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 e.Conditions.Add(ev);
         }
 
+        private int? ShowConditionPicker()
+        {
+            return smartTypeListProvider.Get(SmartType.SmartCondition, _ => true);
+        }
+        
+        private int? ShowEventPicker()
+        {
+            return smartTypeListProvider.Get(SmartType.SmartEvent,
+                data => data.ValidTypes == null || data.ValidTypes.Contains(script.SourceType));
+        }
+
+        private int? ShowTargetPicker(SmartGenericJsonData actionData)
+        {
+            return smartTypeListProvider.Get(SmartType.SmartTarget,
+                data => (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
+                        (actionData.Targets == null || actionData.Targets.Intersect(data.Types).Any()));
+        }
+
+        private int? ShowSourcePicker()
+        {
+            return smartTypeListProvider.Get(SmartType.SmartSource,
+                data =>
+                {
+                    if (data.IsOnlyTarget)
+                        return false;
+
+                    return data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType);
+                });
+        }
+
+        private bool IsSourceCompatibleWithAction(int sourceId, SmartGenericJsonData actionData)
+        {
+            return actionData.ImplicitSource == null || sourceId == smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource).Id;
+        }
+        
+        private int? ShowActionPicker(int sourceId, bool showCommentMetaAction = true)
+        {
+            return smartTypeListProvider.Get(SmartType.SmartAction,
+                data => (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
+                        IsSourceCompatibleWithAction(sourceId, data) && 
+                        (showCommentMetaAction || data.Id != SmartConstants.ActionComment));
+        }
+
         private void AddEventCommand()
         {
             DeselectAll.Execute();
-            int? id = smartTypeListProvider.Get(SmartType.SmartEvent,
-                data => { return data.ValidTypes == null || data.ValidTypes.Contains(script.SourceType); });
+            int? id = ShowEventPicker();
 
             if (id.HasValue)
             {
@@ -942,50 +962,90 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private bool EditActionCommand(SmartAction originalAction)
         {
             SmartAction obj = originalAction.Copy();
-
             SmartGenericJsonData actionData = smartDataManager.GetRawData(SmartType.SmartAction, originalAction.Id);
-
+            
             var parametersList = new List<(ParameterValueHolder<int>, string)>();
             var floatParametersList = new List<(ParameterValueHolder<float>, string)>();
-            List<(ParameterValueHolder<string>, string)> stringParametersList = null;
-
+            var actionList = new List<EditableActionData>();
+            var stringParametersList = new List<(ParameterValueHolder<string>, string)>() {(obj.CommentParameter, "Comment")};
+            
             for (var i = 0; i < obj.Source.ParametersCount; ++i)
-            {
-                if (!obj.Source.GetParameter(i).Name.Equals("empty"))
-                    parametersList.Add((obj.Source.GetParameter(i), "Source"));
-            }
+                parametersList.Add((obj.Source.GetParameter(i), "Source"));
 
             for (var i = 0; i < obj.ParametersCount; ++i)
-            {
-                if (!obj.GetParameter(i).Name.Equals("empty"))
-                    parametersList.Add((obj.GetParameter(i), "Action"));
-            }
+                parametersList.Add((obj.GetParameter(i), "Action"));
 
             for (var i = 0; i < obj.Target.ParametersCount; ++i)
+                parametersList.Add((obj.Target.GetParameter(i), "Target"));
+
+            for (var i = 0; i < 4; ++i)
+                floatParametersList.Add((obj.Target.Position[i], "Target"));
+
+            var canPickTarget = obj.ToObservable(e => e.Id)
+                .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id)).Select(actionData => actionData.UsesTarget && !actionData.TargetIsSource);
+
+            if (actionData.Id != SmartConstants.ActionComment)
             {
-                if (!obj.Target.GetParameter(i).Name.Equals("empty"))
-                    parametersList.Add((obj.Target.GetParameter(i), "Target"));
+                actionList.Add(new EditableActionData("Type", "Source", () =>
+                {
+                    int? newSourceIndex = ShowSourcePicker();
+                    if (!newSourceIndex.HasValue)
+                        return;
+
+                    var actionData = smartDataManager.GetRawData(SmartType.SmartAction, obj.Id);
+                    if (!IsSourceCompatibleWithAction(newSourceIndex.Value, actionData))
+                    {
+                        var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, newSourceIndex.Value);
+                        messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Incorrect source for chosen action")
+                            .SetMainInstruction(
+                                $"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.NameReadable}")
+                            .SetContent(
+                                $"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}")
+                            .SetIcon(MessageBoxIcon.Information)
+                            .Build());
+                    }
+                    
+                    smartFactory.UpdateSource(obj.Source, newSourceIndex.Value);
+                }, obj.Source.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartSource, id).Name)));
+
+                actionList.Add(new EditableActionData("Type", "Action", () =>
+                {
+                    int? newActionIndex = ShowActionPicker(obj.Source.Id, false);
+                    if (!newActionIndex.HasValue)
+                        return;
+
+                    smartFactory.UpdateAction(obj, newActionIndex.Value);
+                }, obj.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id).Name)));
+            
+                actionList.Add(new EditableActionData("Type", "Target", () =>
+                {
+                    int? newTargetIndex = ShowTargetPicker(smartDataManager.GetRawData(SmartType.SmartAction, obj.Id));
+                    if (!newTargetIndex.HasValue)
+                        return;
+
+                    smartFactory.UpdateTarget(obj.Target, newTargetIndex.Value);
+                },  obj.Target.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartTarget, id).Name), canPickTarget.Not()));   
             }
 
-            if (actionData.UsesTargetPosition)
-            {
-                for (var i = 0; i < 4; ++i)
-                    floatParametersList.Add((obj.Target.Position[i], "Target"));
-            }
-
-            StringParameter comment = null;
-            if (actionData.Id == SmartConstants.ActionComment)
-            {
-                stringParametersList = new List<(ParameterValueHolder<string>, string)>() {(obj.CommentParameter, "Comment")};
-            }
-
-            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, floatParametersList, stringParametersList);
+            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, floatParametersList, stringParametersList, actionList);
 
             var result = windowManager.ShowDialog(viewModel);
             if (result)
             {
+                actionData = smartDataManager.GetRawData(SmartType.SmartAction, obj.Id);
                 using (originalAction.BulkEdit("Edit action " + obj.Readable))
                 {
+                    if (actionData.ImplicitSource != null)
+                        smartFactory.UpdateSource(originalAction.Source, smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource).Id);
+                    else if (obj.Source.Id != originalAction.Source.Id)
+                        smartFactory.UpdateSource(originalAction.Source, obj.Source.Id);
+                    
+                    if (obj.Target.Id != originalAction.Target.Id)
+                        smartFactory.UpdateTarget(originalAction.Target, obj.Target.Id);
+
+                    if (obj.Id != originalAction.Id)
+                        smartFactory.UpdateAction(originalAction, obj.Id);
+                    
                     for (var i = 0; i < originalAction.Target.Position.Length; ++i)
                         originalAction.Target.Position[i].Value = obj.Target.Position[i].Value;
 
@@ -1010,6 +1070,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             SmartCondition obj = originalCondition.Copy();
 
+            var actionList = new List<EditableActionData>();
             var parametersList = new List<(ParameterValueHolder<int>, string)>();
 
             parametersList.Add((obj.Inverted, "General"));
@@ -1017,18 +1078,29 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             for (var i = 0; i < obj.ParametersCount; ++i)
             {                    
-                if (!obj.GetParameter(i).Name.Equals("empty"))
-                    parametersList.Add((obj.GetParameter(i), "Condition"));
+                parametersList.Add((obj.GetParameter(i), "Condition"));
             }
 
-            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList);
+            actionList.Add(new EditableActionData("Condition", "General", () =>
+            {
+                int? newConditionId = ShowConditionPicker();
+                if (!newConditionId.HasValue)
+                    return;
+
+                smartFactory.UpdateCondition(obj, newConditionId.Value);
+            }, obj.ToObservable(e => e.Id).Select(id => conditionDataManager.GetConditionData(id).Name)));
+            
+            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, null, null, actionList);
             bool result = windowManager.ShowDialog(viewModel);
             if (result)
             {
                 using (originalCondition.BulkEdit("Edit condition " + obj.Readable))
                 {
-                    originalCondition.Inverted.Value = (obj.Inverted.Value);
-                    originalCondition.ConditionTarget.Value = (obj.ConditionTarget.Value);
+                    if (obj.Id != originalCondition.Id)
+                        smartFactory.UpdateCondition(originalCondition, obj.Id);
+                    
+                    originalCondition.Inverted.Value = obj.Inverted.Value;
+                    originalCondition.ConditionTarget.Value = obj.ConditionTarget.Value;
                     for (var i = 0; i < originalCondition.ParametersCount; ++i)
                         originalCondition.GetParameter(i).Value = obj.GetParameter(i).Value;
                 }
@@ -1048,30 +1120,44 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             SmartEvent ev = originalEvent.ShallowCopy();
 
-            var parametersList = new List<(ParameterValueHolder<int>, string)>();
-            parametersList.Add((ev.Chance, "General"));
-            parametersList.Add((ev.Flags, "General"));
-            parametersList.Add((ev.Phases, "General"));
-            parametersList.Add((ev.CooldownMax, "General"));
-            parametersList.Add((ev.CooldownMin, "General"));
-
-            for (var i = 0; i < ev.ParametersCount; ++i)
+            var actionList = new List<EditableActionData>();
+            var parametersList = new List<(ParameterValueHolder<int>, string)>
             {
-                if (!ev.GetParameter(i).Name.Equals("empty"))
-                    parametersList.Add((ev.GetParameter(i), "Event specific"));
-            }
+                (ev.Chance, "General"),
+                (ev.Flags, "General"),
+                (ev.Phases, "General"),
+                //(ev.CooldownMax, "General"),
+                //(ev.CooldownMin, "General")
+            };
 
-            ParametersEditViewModel viewModel = new(itemFromListProvider, ev, parametersList);
+            actionList.Add(new EditableActionData("Event", "General", () =>
+            {
+                int? newEventIndex = ShowEventPicker();
+                if (!newEventIndex.HasValue)
+                    return;
+
+                smartFactory.UpdateEvent(ev, newEventIndex.Value);
+            }, ev.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartEvent, id).Name)));
+            
+            for (var i = 0; i < ev.ParametersCount; ++i)
+                parametersList.Add((ev.GetParameter(i), "Event specific"));
+
+            ParametersEditViewModel viewModel = new(itemFromListProvider, ev, parametersList, null, null, actionList);
             bool result = windowManager.ShowDialog(viewModel);
             if (result)
             {
                 using (originalEvent.BulkEdit("Edit event " + ev.Readable))
                 {
-                    originalEvent.Chance.Value = (ev.Chance.Value);
-                    originalEvent.Flags.Value = (ev.Flags.Value);
-                    originalEvent.Phases.Value = (ev.Phases.Value);
-                    originalEvent.CooldownMax.Value = (ev.CooldownMax.Value);
-                    originalEvent.CooldownMin.Value = (ev.CooldownMin.Value);
+                    if (originalEvent.Id != ev.Id)
+                    {
+                        smartFactory.UpdateEvent(originalEvent, ev.Id);
+                    }
+                    
+                    originalEvent.Chance.Value = ev.Chance.Value;
+                    originalEvent.Flags.Value = ev.Flags.Value;
+                    originalEvent.Phases.Value = ev.Phases.Value;
+                    originalEvent.CooldownMax.Value = ev.CooldownMax.Value;
+                    originalEvent.CooldownMin.Value = ev.CooldownMin.Value;
                     for (var i = 0; i < originalEvent.ParametersCount; ++i)
                         originalEvent.GetParameter(i).Value = ev.GetParameter(i).Value;
                 }

@@ -31,20 +31,21 @@ namespace WDE.SmartScriptEditor.Data
                 throw new NullReferenceException("No data for event id " + id);
 
             SmartEvent ev = new(id);
-            SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
             ev.Chance.Value = 100;
+            SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
             SetParameterObjects(ev, raw);
-
-            if (raw.DescriptionRules != null)
-            {
-                ev.DescriptionRules = new List<DescriptionRule>();
-                foreach (SmartDescriptionRulesJsonData rule in raw.DescriptionRules)
-                    ev.DescriptionRules.Add(new DescriptionRule(rule));
-            }
-
             return ev;
         }
+        
+        public void UpdateEvent(SmartEvent ev, int id)
+        {
+            if (ev.Id == id)
+                return;
 
+            SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
+            SetParameterObjects(ev, raw, true);
+        }
+        
         public SmartEvent EventFactory(ISmartScriptLine line)
         {
             SmartEvent ev = EventFactory(line.EventType);
@@ -74,7 +75,15 @@ namespace WDE.SmartScriptEditor.Data
 
             return ev;
         }
-        
+
+        public void UpdateCondition(SmartCondition smartCondition, int id)
+        {
+            if (smartCondition.Id == id)
+                return;
+
+            SetParameterObjects(smartCondition, conditionDataManager.GetConditionData(id));
+        }
+
         public SmartCondition ConditionFactory(IConditionLine line)
         {
             SmartCondition condition = ConditionFactory(line.ConditionType);
@@ -87,23 +96,51 @@ namespace WDE.SmartScriptEditor.Data
 
             return condition;
         }
-        
+
         public SmartAction ActionFactory(int id, SmartSource source, SmartTarget target)
         {
             if (!smartDataManager.Contains(SmartType.SmartAction, id))
                 throw new NullReferenceException("No data for action id " + id);
 
             SmartAction action = new(id, source, target);
-
-            SetParameterObjects(action, smartDataManager.GetRawData(SmartType.SmartAction, id));
+            var raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
+            action.CommentParameter.IsUsed = id == SmartConstants.ActionComment;
+            foreach (var t in action.Target.Position)
+                t.IsUsed = raw.UsesTargetPosition;
+            SetParameterObjects(action, raw);
 
             return action;
+        }
+
+        public void UpdateAction(SmartAction smartAction, int id)
+        {
+            if (smartAction.Id == id)
+                return;
+            
+            SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
+            smartAction.CommentParameter.IsUsed = id == SmartConstants.ActionComment;
+            foreach (var t in smartAction.Target.Position)
+                t.IsUsed = raw.UsesTargetPosition;
+            SetParameterObjects(smartAction, raw, true);
         }
 
         public SmartAction ActionFactory(ISmartScriptLine line)
         {
             SmartSource source = SourceFactory(line);
             SmartTarget target = TargetFactory(line);
+
+            var raw = smartDataManager.GetRawData(SmartType.SmartAction, line.ActionType);
+
+            if (raw.TargetIsSource)
+            {
+                UpdateSource(source, target.Id);
+                for (int i = 0; i < source.ParametersCount; ++i)
+                    source.GetParameter(i).Copy(target.GetParameter(i));
+                UpdateTarget(target, 0);
+            }
+            
+            if (raw.ImplicitSource != null)
+                UpdateSource(source, smartDataManager.GetDataByName(SmartType.SmartSource, raw.ImplicitSource).Id);
 
             SmartAction action = ActionFactory(line.ActionType, source, target);
 
@@ -130,6 +167,15 @@ namespace WDE.SmartScriptEditor.Data
             return target;
         }
 
+        public void UpdateTarget(SmartTarget smartTarget, int id)
+        {
+            if (smartTarget.Id == id)
+                return;
+
+            SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartTarget, id);
+            SetParameterObjects(smartTarget, raw, true);
+        }
+
         public SmartSource SourceFactory(int id)
         {
             if (!smartDataManager.Contains(SmartType.SmartSource, id))
@@ -140,6 +186,15 @@ namespace WDE.SmartScriptEditor.Data
             SetParameterObjects(source, smartDataManager.GetRawData(SmartType.SmartSource, id));
 
             return source;
+        }
+        
+        public void UpdateSource(SmartSource smartSource, int id)
+        {
+            if (smartSource.Id == id)
+                return;
+            
+            SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartSource, id);
+            SetParameterObjects(smartSource, raw, true);
         }
         
         public SmartTarget TargetFactory(ISmartScriptLine line)
@@ -159,22 +214,6 @@ namespace WDE.SmartScriptEditor.Data
             return target;
         }
 
-        private int GetSourceParameter(ISmartScriptLine line, int i)
-        {
-            // ugly but DB is in such form
-            switch (i)
-            {
-                case 0:
-                    return line.SourceParam1;
-                case 1:
-                    return line.SourceParam2;
-                case 2:
-                    return line.SourceParam3;
-            }
-
-            throw new ArgumentException("Source parameter out of range");
-        }
-
         private SmartSource SourceFactory(ISmartScriptLine line)
         {
             SmartSource source = SourceFactory(line.SourceType);
@@ -187,25 +226,23 @@ namespace WDE.SmartScriptEditor.Data
             return source;
         }
 
-        private int GetTargetParameter(ISmartScriptLine line, int i)
+        private void SetParameterObjects(SmartBaseElement element, SmartGenericJsonData data, bool update = false)
         {
-            // ugly but DB is in such form
-            switch (i)
+            if (data.DescriptionRules != null)
             {
-                case 0:
-                    return line.TargetParam1;
-                case 1:
-                    return line.TargetParam2;
-                case 2:
-                    return line.TargetParam3;
+                element.DescriptionRules = new List<DescriptionRule>();
+                foreach (SmartDescriptionRulesJsonData rule in data.DescriptionRules)
+                    element.DescriptionRules.Add(new DescriptionRule(rule));
             }
+            else
+                element.DescriptionRules = null;
 
-            throw new ArgumentException("Target parameter out of range");
-        }
-
-        private void SetParameterObjects(SmartBaseElement element, SmartGenericJsonData data)
-        {
+            element.Id = data.Id;
             element.ReadableHint = data.Description;
+            
+            for (var i = 0; i < element.ParametersCount; ++i)
+                element.GetParameter(i).IsUsed = false;
+            
             if (data.Parameters == null)
                 return;
 
@@ -221,14 +258,21 @@ namespace WDE.SmartScriptEditor.Data
                 
                 IParameter<int> parameter = parameterFactory.Factory(key);
                 element.GetParameter(i).Name = data.Parameters[i].Name;
-                element.GetParameter(i).Value = data.Parameters[i].DefaultVal;
+                if (!update)
+                    element.GetParameter(i).Value = data.Parameters[i].DefaultVal;
                 element.GetParameter(i).Parameter = parameter;
+                element.GetParameter(i).IsUsed = true;
             }
         }
         
         private void SetParameterObjects(SmartBaseElement element, ConditionJsonData data)
         {
+            element.Id = data.Id;
             element.ReadableHint = data.Description;
+
+            for (var i = 0; i < element.ParametersCount; ++i)
+                element.GetParameter(i).IsUsed = false;
+
             if (data.Parameters == null)
                 return;
 
@@ -245,6 +289,7 @@ namespace WDE.SmartScriptEditor.Data
                 IParameter<int> parameter = parameterFactory.Factory(key);
 
                 element.GetParameter(i).Name = data.Parameters[i].Name;
+                element.GetParameter(i).IsUsed = true;
                 element.GetParameter(i).Parameter = parameter;
             }
         }
