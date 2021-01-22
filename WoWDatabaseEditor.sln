@@ -52,6 +52,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Conditions", "WDE.Condi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.MVVM", "WDE.MVVM\WDE.MVVM.csproj", "{0913A384-D1CD-4531-8077-E53C2B15C193}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.MVVM.Test", "WDE.MVVM.Test\WDE.MVVM.Test.csproj", "{978E01E8-6BCF-4866-9567-301E7B6E6988}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

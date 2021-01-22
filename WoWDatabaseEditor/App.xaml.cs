@@ -131,7 +131,7 @@ namespace WoWDatabaseEditor
             string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             if (path == null)
                 return ArraySegment<string>.Empty;
-            return Directory.GetFiles(path, "WDE*.dll");
+            return Directory.GetFiles(path, "WDE*.dll").Where(path => !path.Contains("Test.dll"));
         }
 
         private IList<Conflict> DetectConflicts(List<Assembly> allAssemblies)
