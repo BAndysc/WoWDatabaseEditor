@@ -14,17 +14,17 @@ namespace WDE.SmartScriptEditor.Exporter
     public static class SmartScriptSerializer
     {
         private static readonly Regex SaiLineRegex = new(
-            @"\(\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*""(.*?)""\s*\)");
+            @"\(\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*""(.*?)""\s*\)");
 
-        private static readonly string SaiSql =
-            "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
+        private static readonly string SerializedStringFormat =
+            "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {source_id}, {source_param1}, {source_param2}, {source_param3}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
 
         public static bool TryToISmartScriptLine(this string str, out ISmartScriptLine line)
         {
             line = new AbstractSmartScriptLine();
 
             Match m = SaiLineRegex.Match(str);
-            if (!m.Success || m.Groups.Count != 29)
+            if (!m.Success || m.Groups.Count != 33)
                 return false;
 
             line.EntryOrGuid = int.Parse(m.Groups[1].ToString());
@@ -46,20 +46,24 @@ namespace WDE.SmartScriptEditor.Exporter
             line.ActionParam4 = int.Parse(m.Groups[17].ToString());
             line.ActionParam5 = int.Parse(m.Groups[18].ToString());
             line.ActionParam6 = int.Parse(m.Groups[19].ToString());
-            line.TargetType = int.Parse(m.Groups[20].ToString());
-            line.TargetParam1 = int.Parse(m.Groups[21].ToString());
-            line.TargetParam2 = int.Parse(m.Groups[22].ToString());
-            line.TargetParam3 = int.Parse(m.Groups[23].ToString());
-            line.TargetX = float.Parse(m.Groups[24].ToString(), CultureInfo.InvariantCulture);
-            line.TargetY = float.Parse(m.Groups[25].ToString(), CultureInfo.InvariantCulture);
-            line.TargetZ = float.Parse(m.Groups[26].ToString(), CultureInfo.InvariantCulture);
-            line.TargetO = float.Parse(m.Groups[27].ToString(), CultureInfo.InvariantCulture);
-            line.Comment = m.Groups[28].ToString();
+            line.SourceType = int.Parse(m.Groups[20].ToString());
+            line.SourceParam1 = int.Parse(m.Groups[21].ToString());
+            line.SourceParam2 = int.Parse(m.Groups[22].ToString());
+            line.SourceParam3 = int.Parse(m.Groups[23].ToString());
+            line.TargetType = int.Parse(m.Groups[24].ToString());
+            line.TargetParam1 = int.Parse(m.Groups[25].ToString());
+            line.TargetParam2 = int.Parse(m.Groups[26].ToString());
+            line.TargetParam3 = int.Parse(m.Groups[27].ToString());
+            line.TargetX = float.Parse(m.Groups[28].ToString(), CultureInfo.InvariantCulture);
+            line.TargetY = float.Parse(m.Groups[29].ToString(), CultureInfo.InvariantCulture);
+            line.TargetZ = float.Parse(m.Groups[30].ToString(), CultureInfo.InvariantCulture);
+            line.TargetO = float.Parse(m.Groups[31].ToString(), CultureInfo.InvariantCulture);
+            line.Comment = m.Groups[32].ToString();
 
             return true;
         }
 
-        public static string ToSqlString(this ISmartScriptLine line)
+        public static string SerializeToString(this ISmartScriptLine line)
         {
             object data = new
             {
@@ -88,7 +92,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 action_param5 = line.ActionParam5.ToString(),
                 action_param6 = line.ActionParam6.ToString(),
 
-                action_source_id = line.SourceType.ToString(),
+                source_id = line.SourceType.ToString(),
                 source_param1 = line.SourceParam1.ToString(),
                 source_param2 = line.SourceParam2.ToString(),
                 source_param3 = line.SourceParam3.ToString(),
@@ -108,7 +112,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 comment = line.Comment
             };
 
-            return Smart.Format(SaiSql, data);
+            return Smart.Format(SerializedStringFormat, data);
         }
 
         public static (ISmartScriptLine[], IConditionLine[]) ToSmartScriptLinesNoMetaActions(this SmartScript script, ISmartFactory smartFactory, ISmartDataManager smartDataManager)

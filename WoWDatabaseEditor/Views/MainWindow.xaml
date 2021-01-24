@@ -147,7 +147,7 @@
                                             <Setter Property="ContentTemplate">
                                                 <Setter.Value>
                                                     <DataTemplate>
-                                                        <ContentControl Focusable="False" utils:ViewBind.Model="{Binding}" />
+                                                        <ContentControl Focusable="False" commonUtils:ViewBind.Model="{Binding}" />
                                                     </DataTemplate>
                                                 </Setter.Value>
                                             </Setter>
@@ -158,7 +158,7 @@
                         </views:PaneDocumentTemplateSelector.DocumentTemplate>
                         <views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
                             <DataTemplate>
-                                <ContentControl Focusable="False" utils:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
+                                <ContentControl Focusable="False" commonUtils:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
                             </DataTemplate>
                         </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
                     </views:PaneDocumentTemplateSelector>

@@ -39,7 +39,7 @@ namespace WDE.SmartScriptEditor.Providers
             if (args.Sql != null)
                 return args.Sql;
 
-            SmartScript script = new(item, smartFactory.Value);
+            SmartScript script = new(item, smartFactory.Value, smartDataManager.Value);
             var lines = database.Value.GetScriptFor(item.Entry, item.SmartType);
             var conditions = database.Value.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, item.Entry, (int)item.SmartType);
             script.Load(lines, conditions);

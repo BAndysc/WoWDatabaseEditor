@@ -7,26 +7,46 @@ using System.Windows;
 using WDE.Common.Database;
 using WDE.Conditions.Data;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
 {
     public class SmartScript
     {
-        public readonly int EntryOrGuid;
-        public readonly ObservableCollection<SmartEvent> Events;
         private readonly ISmartFactory smartFactory;
+        private readonly ISmartDataManager smartDataManager;
+        
+        public readonly int EntryOrGuid;
         public readonly SmartScriptType SourceType;
+        public readonly ObservableCollection<SmartEvent> Events;
+        
+        private readonly SmartSelectionHelper selectionHelper;
 
-        public SmartScript(SmartScriptSolutionItem item, ISmartFactory smartFactory)
+        public event Action ScriptSelectedChanged;
+        
+        public ObservableCollection<object> AllSmartObjectsFlat { get; } 
+        
+        ~SmartScript()
         {
+            selectionHelper.Dispose();
+        }
+        
+        public SmartScript(SmartScriptSolutionItem item, ISmartFactory smartFactory, ISmartDataManager smartDataManager)
+        {
+            this.smartFactory = smartFactory;
+            this.smartDataManager = smartDataManager;
             EntryOrGuid = item.Entry;
             SourceType = item.SmartType;
             Events = new ObservableCollection<SmartEvent>();
-            this.smartFactory = smartFactory;
+            selectionHelper = new SmartSelectionHelper(this);
+            selectionHelper.ScriptSelectedChanged += CallScriptSelectedChanged;
+            AllSmartObjectsFlat = selectionHelper.AllSmartObjectsFlat;
         }
 
-        public event Action BulkEditingStarted = delegate { };
-        public event Action<string> BulkEditingFinished = delegate { };
+        private void CallScriptSelectedChanged()
+        {
+            ScriptSelectedChanged?.Invoke();
+        }
 
         public void Load(IEnumerable<ISmartScriptLine> lines, IEnumerable<IConditionLine> conditions)
         {
@@ -74,8 +94,18 @@ namespace WDE.SmartScriptEditor.Models
                 }
 
                 SmartAction action = SafeActionFactory(line);
+                
                 if (action != null)
                 {
+                    var raw = smartDataManager.GetRawData(SmartType.SmartAction, line.ActionType);
+                    if (raw.TargetIsSource)
+                    {
+                        smartFactory.UpdateSource(action.Source, action.Target.Id);
+                        for (int i = 0; i < action.Source.ParametersCount; ++i)
+                            action.Source.GetParameter(i).Copy(action.Target.GetParameter(i));
+                        smartFactory.UpdateTarget(action.Target, 0);
+                    }
+                    
                     if (comment != SmartConstants.CommentWait)
                         action.Comment = comment;
                     if (action.Id == SmartConstants.ActionTriggerTimed && comment == SmartConstants.CommentWait)
@@ -110,9 +140,9 @@ namespace WDE.SmartScriptEditor.Models
 
                 caller.Actions.RemoveAt(caller.Actions.Count - 1);
                 caller.AddAction(waitAction);
+                Events.Remove(@event);
                 foreach (SmartAction a in @event.Actions)
                     caller.AddAction(a);
-                Events.Remove(@event);
             }
         }
 
@@ -235,6 +265,9 @@ namespace WDE.SmartScriptEditor.Models
 
             return null;
         }
+
+        public event Action BulkEditingStarted = delegate { };
+        public event Action<string> BulkEditingFinished = delegate { };
 
         public IDisposable BulkEdit(string name)
         {

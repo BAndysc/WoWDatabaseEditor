@@ -34,6 +34,7 @@ namespace WoWDatabaseEditor.Managers
             foreach (var tool in tools)
             {
                 allTools.Add(tool);
+                tool.Visibility = Visibility.Collapsed;
                 typeToToolInstance[tool.GetType()] = tool;
             }
         }
@@ -62,34 +63,37 @@ namespace WoWDatabaseEditor.Managers
             {
                 ICommand? origCommand = editor.CloseCommand;
                 editor.CloseCommand = new Command(() =>
+                {
+                    bool close = true;
+                    if (editor.IsModified)
                     {
-                        bool close = true;
-                        if (editor.IsModified)
-                        {
-                            MessageBoxButtonType result = messageBoxService.ShowDialog(
-                                new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Document is modified")
-                                .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
-                                .SetContent("Your changes will be lost if you don't save them.")
-                                .SetIcon(MessageBoxIcon.Warning)
-                                .WithYesButton(MessageBoxButtonType.Yes)
-                                .WithNoButton(MessageBoxButtonType.No)
-                                .WithCancelButton(MessageBoxButtonType.Cancel)
-                                .Build());
- 
-                            if (result == MessageBoxButtonType.Cancel)
-                                close = false;
-                            if (result == MessageBoxButtonType.Yes)
-                                editor.Save.Execute(null);
-                        }
+                        MessageBoxButtonType result = messageBoxService.ShowDialog(
+                            new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Document is modified")
+                            .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
+                            .SetContent("Your changes will be lost if you don't save them.")
+                            .SetIcon(MessageBoxIcon.Warning)
+                            .WithYesButton(MessageBoxButtonType.Yes)
+                            .WithNoButton(MessageBoxButtonType.No)
+                            .WithCancelButton(MessageBoxButtonType.Cancel)
+                            .Build());
 
-                        if (close)
-                        {
-                            origCommand?.Execute(null);
-                            OpenedDocuments.Remove(editor);
-                            eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);   
-                        }
-                    },
-                    () => origCommand?.CanExecute(null) ?? true);
+                        if (result == MessageBoxButtonType.Cancel)
+                            close = false;
+                        if (result == MessageBoxButtonType.Yes)
+                            editor.Save.Execute(null);
+                    }
+
+                    if (close)
+                    {
+                        origCommand?.Execute(null);
+                        OpenedDocuments.Remove(editor);
+                        if (ActiveDocument == editor)
+                            ActiveDocument = OpenedDocuments.Count > 0 ? OpenedDocuments[0] : null;
+                        eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
+                        editor.CloseCommand = origCommand;
+                    }
+                },
+                () => origCommand?.CanExecute(null) ?? true);
                 OpenedDocuments.Add(editor);
             }
 

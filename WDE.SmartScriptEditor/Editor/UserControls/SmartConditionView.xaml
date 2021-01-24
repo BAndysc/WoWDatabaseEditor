@@ -5,35 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <Grid.Style>
-            <Style TargetType="Grid">
+    <Border BorderThickness="1">
+        <Border.Style>
+            <Style TargetType="Border">
                 <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Border}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding IsSelected}" Value="true">
                         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Selected.Background}" />
+                        <Setter Property="BorderBrush"
+                                Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-        </Grid.Style>
+        </Border.Style>
 
-        <Border BorderThickness="1">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Border}" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsSelected}" Value="true">
-                            <Setter Property="BorderBrush"
-                                    Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-
-            <TextBlock Padding="2" TextWrapping="WrapWithOverflow">
-                <Run Text="{Binding Readable, Mode=OneWay}"
-                     Foreground="{DynamicResource SmartScripts.Action.Foreground}" />
-            </TextBlock>
-        </Border>
-    </Grid>
+        <TextBlock Padding="2" TextWrapping="WrapWithOverflow" Text="{Binding Readable, Mode=OneWay}" />
+    </Border>
 </UserControl>

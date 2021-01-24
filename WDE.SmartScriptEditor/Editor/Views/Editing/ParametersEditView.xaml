@@ -7,7 +7,7 @@
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              Background="{DynamicResource SmartScripts.Background}">
     <UserControl.InputBindings>
-        <KeyBinding Key="Enter" Command="{Binding Accept}" />
+        <KeyBinding Key="Enter" Command="{Binding Accept}"/>
         <KeyBinding Key="Escape" Command="{Binding Cancel}" />
     </UserControl.InputBindings>
     <Grid Margin="6">
@@ -52,6 +52,15 @@
             </Grid.ColumnDefinitions>
             <Button  Content="Cancel" IsCancel="True" />
             <Button Command="{Binding Accept}" Grid.Column="2" Content="Ok" />
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ShowCloseButtons}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
         </Grid>
     </Grid>
 </UserControl>

@@ -18,13 +18,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             SmartBaseElement element,
+            bool focusFirst,
             IEnumerable<(ParameterValueHolder<int> parameter, string name)> parameters,
             IEnumerable<(ParameterValueHolder<float> parameter, string name)> floatParameters = null,
             IEnumerable<(ParameterValueHolder<string> parameter, string name)> stringParameters = null,
-            IEnumerable<EditableActionData> actionParameters = null)
+            IEnumerable<EditableActionData> actionParameters = null,
+            System.Action saveAction = null)
         {
             Link(element, e => e.Readable, () => Readable);
 
+            FocusFirst = focusFirst;
+            
             if (actionParameters != null)
                 foreach (EditableActionData act in actionParameters)
                     Parameters.Add(new EditableParameterActionViewModel(act));
@@ -62,7 +66,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             items = new CollectionViewSource {Source = FilteredParameters};
             items.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
 
-            Accept = new DelegateCommand(() => CloseOk?.Invoke());
+            Accept = new DelegateCommand(() =>
+            {
+                BeforeAccept?.Invoke();
+                saveAction?.Invoke();
+                CloseOk?.Invoke();
+            });
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
         }
 
@@ -70,6 +79,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ObservableCollection<IEditableParameterViewModel> FilteredParameters { get; } = new();
         public string Readable { get; private set; }
         public ICollectionView AllItems => items.View;
+        public bool ShowCloseButtons { get; set; } = true;
 
         public DelegateCommand Accept { get; }
         public DelegateCommand Cancel { get; }
@@ -77,7 +87,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public int DesiredHeight => 485;
         public string Title => "Edit";
         public bool Resizeable => true;
+        public bool FocusFirst { get; }
+
         public event Action CloseCancel;
         public event Action CloseOk;
+        public event Action BeforeAccept;
     }
 }

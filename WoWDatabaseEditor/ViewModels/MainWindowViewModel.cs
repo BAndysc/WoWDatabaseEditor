@@ -61,7 +61,7 @@ namespace WoWDatabaseEditor.ViewModels
             About = new DelegateCommand(ShowAbout);
             
             DefinitionPresenters = definitionsProviders.SelectMany(p => p.GetDataDefinitionEditors()).ToList();
-
+            
             this.eventAggregator.GetEvent<DocumentManager.DocumentClosedEvent>()
                 .Subscribe(document =>
                 {

@@ -60,6 +60,8 @@ namespace WDE.SmartScriptEditor.Models
             get => isSelected;
             set
             {
+                if (value == isSelected)
+                    return;
                 isSelected = value;
                 OnPropertyChanged();
             }

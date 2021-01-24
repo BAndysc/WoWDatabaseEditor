@@ -356,8 +356,7 @@ namespace WDE.SmartScriptEditor
 
             public string GetDescription()
             {
-                // @Todo: how to localize this?
-                return "Changed " + /*param.Name +*/ " from " + old + " to " + @new;
+                return "Changed " + param.Name + " from " + param.Parameter.ToString(old) + " to " + param.Parameter.ToString(@new);
             }
 
             public void Redo()

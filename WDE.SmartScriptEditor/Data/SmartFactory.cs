@@ -131,14 +131,6 @@ namespace WDE.SmartScriptEditor.Data
 
             var raw = smartDataManager.GetRawData(SmartType.SmartAction, line.ActionType);
 
-            if (raw.TargetIsSource)
-            {
-                UpdateSource(source, target.Id);
-                for (int i = 0; i < source.ParametersCount; ++i)
-                    source.GetParameter(i).Copy(target.GetParameter(i));
-                UpdateTarget(target, 0);
-            }
-            
             if (raw.ImplicitSource != null)
                 UpdateSource(source, smartDataManager.GetDataByName(SmartType.SmartSource, raw.ImplicitSource).Id);
 

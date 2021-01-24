@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -33,12 +34,13 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class SmartScriptEditorViewModel : BindableBase, IDocument, IDisposable
+    public class SmartScriptEditorViewModel : ObservableBase, IDocument, IDisposable
     {
         private readonly IDatabaseProvider database;
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
         private readonly ITaskRunner taskRunner;
+        private readonly IToolSmartEditorViewModel smartEditorViewModel;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -46,7 +48,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IStatusBar statusbar;
         private readonly IWindowManager windowManager;
         private readonly IMessageBoxService messageBoxService;
-        private readonly SubscriptionToken token;
 
         private SmartScriptSolutionItem item;
 
@@ -57,6 +58,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             get => isLoading;
             internal set => SetProperty(ref isLoading, value);
+        }
+
+        public SmartScript Script
+        {
+            get => script;
+            set => SetProperty(ref script, value);
         }
         
         public SmartScriptEditorViewModel(IHistoryManager history,
@@ -71,7 +78,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IWindowManager windowManager,
             IMessageBoxService messageBoxService,
             ISolutionItemNameRegistry itemNameRegistry,
-            ITaskRunner taskRunner)
+            ITaskRunner taskRunner,
+            IToolSmartEditorViewModel smartEditorViewModel)
         {
             History = history;
             this.database = database;
@@ -84,8 +92,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.messageBoxService = messageBoxService;
             this.itemNameRegistry = itemNameRegistry;
             this.taskRunner = taskRunner;
+            this.smartEditorViewModel = smartEditorViewModel;
             this.conditionDataManager = conditionDataManager;
 
+            CloseCommand = new DelegateCommand(() =>
+            {
+                if (smartEditorViewModel.CurrentScript == Script)
+                    smartEditorViewModel.ShowEditor(null, null);
+            });
             EditEvent = new DelegateCommand(EditEventCommand);
             DeselectActions = new DelegateCommand(() =>
             {
@@ -334,7 +348,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 {
                     string eventLines = string.Join("\n",
                         selectedEvents.SelectMany((e, index) => e.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, index))
-                            .Select(s => s.ToSqlString()));
+                            .Select(s => s.SerializeToString()));
                     string conditionLines = string.Join("\n",
                         selectedEvents.SelectMany((e, index) => e.ToConditionLines(script.EntryOrGuid, script.SourceType, index))
                             .Select(s => s.ToSqlString())); 
@@ -354,7 +368,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             fakeEvent.AddAction(a.Copy());
 
                         string lines = string.Join("\n",
-                            fakeEvent.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, 0).Select(s => s.ToSqlString()));
+                            fakeEvent.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, 0).Select(s => s.SerializeToString()));
                         Clipboard.SetText(lines);
                     }
                 }
@@ -666,7 +680,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 RaisePropertyChanged(nameof(IsModified));
             };
 
-            token = eventAggregator.GetEvent<EventRequestGenerateSql>()
+            AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(args =>
                 {
                     if (args.Item is SmartScriptSolutionItem)
@@ -675,14 +689,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         if (itemm.Entry == item.Entry && itemm.SmartType == item.SmartType)
                             args.Sql = new SmartScriptExporter(script, smartFactory, smartDataManager).GetSql();
                     }
-                });
+                }));
         }
 
         public string Name => itemNameRegistry.GetName(item);
 
         public ObservableCollection<SmartEvent> Events => script.Events;
 
-        public CompositeCollection Together { get; } = new();
+        public ObservableCollection<object> Together { get; } = new();
 
         public SmartEvent SelectedItem => Events.FirstOrDefault(ev => ev.IsSelected);
 
@@ -764,55 +778,80 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Paste => PasteCommand;
         public ICommand Save => SaveCommand;
         public ICommand CloseCommand { get; set; }
-
-        public void Dispose()
-        {
-            token.Dispose();
-        }
-
+        
         internal void SetSolutionItem(SmartScriptSolutionItem item)
         {
             Debug.Assert(this.item == null);
             this.item = item;
-            string name = itemNameRegistry.GetName(item);
-            Title = name;
+            Title = itemNameRegistry.GetName(item);
             
-            script = new SmartScript(this.item, smartFactory);
+            Script = new SmartScript(this.item, smartFactory, smartDataManager);
+            Script.ScriptSelectedChanged += EventChildrenSelectionChanged;
             
-            Together.Add(new CollectionContainer {Collection = script.Events});
-            Together.Add(new CollectionContainer {Collection = new List<object> {new NewActionViewModel(), new NewConditionViewModel()}});
-            script.Events.CollectionChanged += (sender, args) =>
+            Together.Add(new NewActionViewModel());
+            Together.Add(new NewConditionViewModel());
+            
+            AutoDispose(script.AllSmartObjectsFlat.ToStream().Subscribe((e) =>
             {
-                if (args.Action == NotifyCollectionChangedAction.Add)
-                {
-                    foreach (SmartEvent t in args.NewItems)
-                    {
-                        Together.Add(new CollectionContainer {Collection = t.Actions});
-                        Together.Add(new CollectionContainer {Collection = t.Conditions});
-                    }
-                }
-                else if (args.Action == NotifyCollectionChangedAction.Remove)
-                {
-                    foreach (SmartEvent t in args.OldItems)
-                    {
-                        foreach (CollectionContainer a in Together)
-                        {
-                            if (a.Collection == t.Actions || a.Collection == t.Conditions)
-                            {
-                                Together.Remove(a);
-                                break;
-                            }
-                        }
-                    }
-                }
-            };
-            foreach (SmartEvent t in script.Events)
+                if (e.Type == CollectionEventType.Add)
+                    Together.Add(e.Item);
+                else
+                    Together.Remove(e.Item);
+            }));
+            
+            taskRunner.ScheduleTask($"Loading script {Title}", AsyncLoad);
+        }
+
+        private SmartBaseElement currentlyPreviewedElement = null;
+        private ParametersEditViewModel currentlyPreviewedViewModel = null;
+
+        private void EventChildrenSelectionChanged()
+        {
+            if (!smartEditorViewModel.IsOpened)
+                return;
+            
+            SmartBaseElement newPreviewedElement = null;
+                
+            if (AnyEventSelected)
             {
-                Together.Add(new CollectionContainer {Collection = t.Actions});
-                Together.Add(new CollectionContainer {Collection = t.Conditions});
+                if (!MultipleEventsSelected)
+                    newPreviewedElement = script.Events[FirstSelectedIndex];
             }
-            
-            taskRunner.ScheduleTask($"Loading script {name}", AsyncLoad);
+            else if (AnyConditionSelected)
+            {
+                if (!MultipleConditionsSelected)
+                    newPreviewedElement = script.Events[FirstSelectedConditionIndex.eventIndex]
+                        .Conditions[FirstSelectedConditionIndex.conditionIndex];
+            }
+            else if (AnyActionSelected)
+            {
+                if (!MultipleActionsSelected)
+                    newPreviewedElement = script.Events[FirstSelectedActionIndex.eventIndex]
+                        .Actions[FirstSelectedActionIndex.actionIndex];
+            }
+
+            if (newPreviewedElement != currentlyPreviewedElement)
+            {
+                currentlyPreviewedViewModel?.Dispose();
+                currentlyPreviewedViewModel = null;
+                currentlyPreviewedElement = newPreviewedElement;
+
+                if (currentlyPreviewedElement == null)
+                {
+                        
+                }
+                else if (currentlyPreviewedElement is SmartEvent ee)
+                    currentlyPreviewedViewModel = EventEditViewModel(ee, true);
+                else if (currentlyPreviewedElement is SmartAction aa)
+                    currentlyPreviewedViewModel = ActionEditViewModel(aa, true);
+                else if (currentlyPreviewedElement is SmartCondition cc)
+                    currentlyPreviewedViewModel = ConditionEditViewModel(cc, true);
+
+                if (currentlyPreviewedViewModel != null)
+                    currentlyPreviewedViewModel.ShowCloseButtons = false;
+                
+                smartEditorViewModel.ShowEditor(Script, currentlyPreviewedViewModel);
+            }
         }
 
         private async Task AsyncLoad()
@@ -959,9 +998,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        private bool EditActionCommand(SmartAction originalAction)
+        private ParametersEditViewModel ActionEditViewModel(SmartAction originalAction, bool editOriginal = false)
         {
-            SmartAction obj = originalAction.Copy();
+            SmartAction obj = editOriginal ? originalAction : originalAction.Copy();
             SmartGenericJsonData actionData = smartDataManager.GetRawData(SmartType.SmartAction, originalAction.Id);
             
             var parametersList = new List<(ParameterValueHolder<int>, string)>();
@@ -1027,48 +1066,61 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 },  obj.Target.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartTarget, id).Name), canPickTarget.Not()));   
             }
 
-            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, floatParametersList, stringParametersList, actionList);
-
-            var result = windowManager.ShowDialog(viewModel);
-            if (result)
-            {
-                actionData = smartDataManager.GetRawData(SmartType.SmartAction, obj.Id);
-                using (originalAction.BulkEdit("Edit action " + obj.Readable))
+            ParametersEditViewModel viewModel = new(itemFromListProvider, 
+                obj, 
+                !editOriginal,
+                parametersList, 
+                floatParametersList, 
+                stringParametersList, 
+                actionList,
+                () =>
                 {
-                    if (actionData.ImplicitSource != null)
-                        smartFactory.UpdateSource(originalAction.Source, smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource).Id);
-                    else if (obj.Source.Id != originalAction.Source.Id)
-                        smartFactory.UpdateSource(originalAction.Source, obj.Source.Id);
+                    actionData = smartDataManager.GetRawData(SmartType.SmartAction, obj.Id);
+                    var actionName = "Edit action " + obj.Readable;
+                    if (originalAction.Id == SmartConstants.ActionComment)
+                        actionName = "Edit comment";
+                    using (originalAction.BulkEdit(actionName))
+                    {
+                        if (actionData.ImplicitSource != null)
+                            smartFactory.UpdateSource(originalAction.Source, smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource).Id);
+                        else if (obj.Source.Id != originalAction.Source.Id)
+                            smartFactory.UpdateSource(originalAction.Source, obj.Source.Id);
                     
-                    if (obj.Target.Id != originalAction.Target.Id)
-                        smartFactory.UpdateTarget(originalAction.Target, obj.Target.Id);
+                        if (obj.Target.Id != originalAction.Target.Id)
+                            smartFactory.UpdateTarget(originalAction.Target, obj.Target.Id);
 
-                    if (obj.Id != originalAction.Id)
-                        smartFactory.UpdateAction(originalAction, obj.Id);
+                        if (obj.Id != originalAction.Id)
+                            smartFactory.UpdateAction(originalAction, obj.Id);
                     
-                    for (var i = 0; i < originalAction.Target.Position.Length; ++i)
-                        originalAction.Target.Position[i].Value = obj.Target.Position[i].Value;
+                        for (var i = 0; i < originalAction.Target.Position.Length; ++i)
+                            originalAction.Target.Position[i].Value = obj.Target.Position[i].Value;
 
-                    for (var i = 0; i < originalAction.Target.ParametersCount; ++i)
-                        originalAction.Target.GetParameter(i).Value = obj.Target.GetParameter(i).Value;
+                        for (var i = 0; i < originalAction.Target.ParametersCount; ++i)
+                            originalAction.Target.GetParameter(i).Value = obj.Target.GetParameter(i).Value;
 
-                    for (var i = 0; i < originalAction.Source.ParametersCount; ++i)
-                        originalAction.Source.GetParameter(i).Value = obj.Source.GetParameter(i).Value;
+                        for (var i = 0; i < originalAction.Source.ParametersCount; ++i)
+                            originalAction.Source.GetParameter(i).Value = obj.Source.GetParameter(i).Value;
 
-                    for (var i = 0; i < originalAction.ParametersCount; ++i)
-                        originalAction.GetParameter(i).Value = obj.GetParameter(i).Value;
+                        for (var i = 0; i < originalAction.ParametersCount; ++i)
+                            originalAction.GetParameter(i).Value = obj.GetParameter(i).Value;
 
-                    originalAction.Comment = obj.Comment;
-                }
-            }
+                        originalAction.Comment = obj.Comment;
+                    }
+                });
+            return viewModel;
+        }
 
+        private bool EditActionCommand(SmartAction smartAction)
+        {
+            var viewModel = ActionEditViewModel(smartAction);
+            var result = windowManager.ShowDialog(viewModel);
             viewModel.Dispose();
             return result;
         }
 
-        private bool EditConditionCommand(SmartCondition originalCondition)
+        private ParametersEditViewModel ConditionEditViewModel(SmartCondition originalCondition, bool editOriginal = false)
         {
-            SmartCondition obj = originalCondition.Copy();
+            SmartCondition obj = editOriginal? originalCondition : originalCondition.Copy();
 
             var actionList = new List<EditableActionData>();
             var parametersList = new List<(ParameterValueHolder<int>, string)>();
@@ -1090,22 +1142,34 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 smartFactory.UpdateCondition(obj, newConditionId.Value);
             }, obj.ToObservable(e => e.Id).Select(id => conditionDataManager.GetConditionData(id).Name)));
             
-            ParametersEditViewModel viewModel = new(itemFromListProvider, obj, parametersList, null, null, actionList);
-            bool result = windowManager.ShowDialog(viewModel);
-            if (result)
-            {
-                using (originalCondition.BulkEdit("Edit condition " + obj.Readable))
+            ParametersEditViewModel viewModel = new(itemFromListProvider, 
+                obj, 
+                !editOriginal,
+                parametersList, 
+                null, 
+                null, 
+                actionList,
+                () =>
                 {
-                    if (obj.Id != originalCondition.Id)
-                        smartFactory.UpdateCondition(originalCondition, obj.Id);
+                    using (originalCondition.BulkEdit("Edit condition " + obj.Readable))
+                    {
+                        if (obj.Id != originalCondition.Id)
+                            smartFactory.UpdateCondition(originalCondition, obj.Id);
                     
-                    originalCondition.Inverted.Value = obj.Inverted.Value;
-                    originalCondition.ConditionTarget.Value = obj.ConditionTarget.Value;
-                    for (var i = 0; i < originalCondition.ParametersCount; ++i)
-                        originalCondition.GetParameter(i).Value = obj.GetParameter(i).Value;
-                }
-            }
+                        originalCondition.Inverted.Value = obj.Inverted.Value;
+                        originalCondition.ConditionTarget.Value = obj.ConditionTarget.Value;
+                        for (var i = 0; i < originalCondition.ParametersCount; ++i)
+                            originalCondition.GetParameter(i).Value = obj.GetParameter(i).Value;
+                    }
+                });
+            
+            return viewModel;
+        }
 
+        private bool EditConditionCommand(SmartCondition originalCondition)
+        {
+            var viewModel = ConditionEditViewModel(originalCondition);
+            bool result = windowManager.ShowDialog(viewModel);
             viewModel.Dispose();
             return result;
         }
@@ -1116,9 +1180,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 EditEventCommand(SelectedItem);
         }
 
-        private bool EditEventCommand(SmartEvent originalEvent)
+        private ParametersEditViewModel EventEditViewModel(SmartEvent originalEvent, bool editOriginal = false)
         {
-            SmartEvent ev = originalEvent.ShallowCopy();
+            SmartEvent ev = editOriginal ? originalEvent : originalEvent.ShallowCopy();
 
             var actionList = new List<EditableActionData>();
             var parametersList = new List<(ParameterValueHolder<int>, string)>
@@ -1142,27 +1206,37 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             for (var i = 0; i < ev.ParametersCount; ++i)
                 parametersList.Add((ev.GetParameter(i), "Event specific"));
 
-            ParametersEditViewModel viewModel = new(itemFromListProvider, ev, parametersList, null, null, actionList);
-            bool result = windowManager.ShowDialog(viewModel);
-            if (result)
-            {
-                using (originalEvent.BulkEdit("Edit event " + ev.Readable))
-                {
-                    if (originalEvent.Id != ev.Id)
+            ParametersEditViewModel viewModel = new(itemFromListProvider, 
+                ev,
+                !editOriginal,
+                parametersList,
+                null, 
+                null, 
+                actionList,
+                () =>
                     {
-                        smartFactory.UpdateEvent(originalEvent, ev.Id);
-                    }
-                    
-                    originalEvent.Chance.Value = ev.Chance.Value;
-                    originalEvent.Flags.Value = ev.Flags.Value;
-                    originalEvent.Phases.Value = ev.Phases.Value;
-                    originalEvent.CooldownMax.Value = ev.CooldownMax.Value;
-                    originalEvent.CooldownMin.Value = ev.CooldownMin.Value;
-                    for (var i = 0; i < originalEvent.ParametersCount; ++i)
-                        originalEvent.GetParameter(i).Value = ev.GetParameter(i).Value;
-                }
-            }
+                        using (originalEvent.BulkEdit("Edit event " + ev.Readable))
+                        {
+                            if (originalEvent.Id != ev.Id)
+                                smartFactory.UpdateEvent(originalEvent, ev.Id);
+                            
+                            originalEvent.Chance.Value = ev.Chance.Value;
+                            originalEvent.Flags.Value = ev.Flags.Value;
+                            originalEvent.Phases.Value = ev.Phases.Value;
+                            originalEvent.CooldownMax.Value = ev.CooldownMax.Value;
+                            originalEvent.CooldownMin.Value = ev.CooldownMin.Value;
+                            for (var i = 0; i < originalEvent.ParametersCount; ++i)
+                                originalEvent.GetParameter(i).Value = ev.GetParameter(i).Value;
+                        }
+                    });
 
+            return viewModel;
+        }
+        
+        private bool EditEventCommand(SmartEvent originalEvent)
+        {
+            var viewModel = EventEditViewModel(originalEvent);
+            bool result = windowManager.ShowDialog(viewModel);
             viewModel.Dispose();
             return result;
         }

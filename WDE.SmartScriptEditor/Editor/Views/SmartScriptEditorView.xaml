@@ -4,7 +4,5 @@
              xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
              xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
              xmlns:system="clr-namespace:System;assembly=System.Runtime">
-    <Grid>
-        <userControls:SmartScriptView userControls:DeleteEventCommand="{Binding DeleteEvent}" />
-    </Grid>
+    <userControls:SmartScriptView userControls:DeleteEventCommand="{Binding DeleteEvent}" />
 </UserControl>

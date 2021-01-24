@@ -1,10 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Input;
 using WDE.Common.History;
 
 namespace WDE.Common.Managers
 {
-    public interface IDocument : IDisposable
+    public interface IDocument : IDisposable, INotifyPropertyChanged
     {
         string Title { get; }
         ICommand Undo { get; }

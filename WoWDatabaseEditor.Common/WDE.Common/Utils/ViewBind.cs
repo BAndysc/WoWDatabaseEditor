@@ -2,12 +2,15 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
+using Prism.Ioc;
 using WDE.Common.Windows;
 
-namespace WoWDatabaseEditor.Utils
+namespace WDE.Common.Utils
 {
     public class ViewBind
     {
+        public static IViewLocator? AppViewLocator { get; set; }
+        
         public static readonly DependencyProperty ModelProperty = DependencyProperty.RegisterAttached("Model",
             typeof(object),
             typeof(ViewBind),
@@ -27,10 +30,8 @@ namespace WoWDatabaseEditor.Utils
         {
             if (args.OldValue == args.NewValue)
                 return;
-
-            var locator = App.GlobalContainer?.Resolve(typeof(IViewLocator)) as IViewLocator;
             
-            if (locator!.TryResolve(args.NewValue?.GetType(), out var viewType))
+            if (AppViewLocator != null && AppViewLocator.TryResolve(args.NewValue?.GetType(), out var viewType))
             {
                 object? view = Activator.CreateInstance(viewType);
                 SetContentProperty(targetLocation, view);

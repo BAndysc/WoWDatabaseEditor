@@ -122,6 +122,7 @@
                                                       DropItems="{Binding OnDropItems}"
                                                       DropActions="{Binding OnDropActions}"
                                                       DropConditions="{Binding OnDropConditions}"
+                                                      Script="{Binding Script}"
                                                       IsItemsHost="True" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>

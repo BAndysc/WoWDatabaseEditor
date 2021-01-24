@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Input;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -22,6 +23,7 @@ namespace WoWDatabaseEditor.ViewModels
         public bool CanClose { get; } = true;
         public bool IsModified { get; } = false;
         public IHistoryManager? History { get; } = null;
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 
     public class DisabledCommand : ICommand

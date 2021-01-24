@@ -7,16 +7,12 @@
              xmlns:helpers1="clr-namespace:WDE.SmartScriptEditor.Editor.Views.Helpers"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Background="{DynamicResource SmartScripts.Background}" x:Name="root">
-    <Grid>
-        <Grid.Resources>
+    <DockPanel>
+        <DockPanel.Resources>
             <helpers:IsNullConverter x:Key="IsNullConverter" />
-        </Grid.Resources>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Label HorizontalAlignment="Right" Content="{Binding Name, Mode=OneWay}" />
-        <ContentPresenter Grid.Column="1" Content="{Binding}">
+        </DockPanel.Resources>
+        <Label Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" Content="{Binding Name, Mode=OneWay}" />
+        <ContentPresenter Content="{Binding}">
             <ContentPresenter.ContentTemplateSelector>
                 <helpers1:ParameterDataTemplateSelector>
                     <helpers1:ParameterDataTemplateSelector.Generic>
@@ -57,13 +53,11 @@
                     </helpers1:ParameterDataTemplateSelector.Generic>
                     <helpers1:ParameterDataTemplateSelector.BoolParameter>
                         <DataTemplate>
-                            <Grid>
-                                <CheckBox Focusable="True" TabIndex="0" VerticalContentAlignment="Center" IsChecked="{Binding BoolIsChecked}">
-                                    <b:Interaction.Behaviors>
-                                        <helpers1:MoveFocusOnArrowsCheckBox />
-                                    </b:Interaction.Behaviors>
-                                </CheckBox>
-                            </Grid>
+                            <CheckBox Focusable="True" TabIndex="0" VerticalContentAlignment="Center" IsChecked="{Binding BoolIsChecked}">
+                                <b:Interaction.Behaviors>
+                                    <helpers1:MoveFocusOnArrowsCheckBox />
+                                </b:Interaction.Behaviors>
+                            </CheckBox>
                         </DataTemplate>
                     </helpers1:ParameterDataTemplateSelector.BoolParameter>
                     <helpers1:ParameterDataTemplateSelector.ButtonParameter>
@@ -74,5 +68,5 @@
                 </helpers1:ParameterDataTemplateSelector>
             </ContentPresenter.ContentTemplateSelector>
         </ContentPresenter>
-    </Grid>
+    </DockPanel>
 </UserControl>

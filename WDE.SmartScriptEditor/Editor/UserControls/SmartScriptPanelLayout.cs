@@ -319,13 +319,16 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             float y = EventSpacing;
 
             float selectedHeight = 0;
-            foreach (ContentPresenter child in Events())
+            foreach (SmartEvent ev in Script.Events)
             {
-                float height = Math.Max(MeasureActions(child), (float) child.DesiredSize.Height + MeasureConditions(child));
+                if (!eventToPresenter.TryGetValue(ev, out var eventPresenter))
+                    continue;
+                
+                float height = Math.Max(MeasureActions(eventPresenter), (float) eventPresenter.DesiredSize.Height + MeasureConditions(eventPresenter));
                 eventHeights.Add(y + (height + EventSpacing) / 2);
                 y += height + EventSpacing;
 
-                if (!draggingEvents || !GetSelected(child))
+                if (!draggingEvents || !GetSelected(eventPresenter))
                     continue;
                 selectedHeight += height + EventSpacing;
             }
@@ -345,20 +348,24 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                 addActionViewModel.Event = null;
             if (addConditionViewModel != null)
                 addConditionViewModel.Event = null;
-            foreach (ContentPresenter child in Events())
+            
+            foreach (SmartEvent ev in Script.Events)
             {
-                var height = (float) child.DesiredSize.Height;
-                if (!draggingEvents || !GetSelected(child))
+                if (!eventToPresenter.TryGetValue(ev, out var eventPresenter))
+                    continue;
+                
+                var height = (float) eventPresenter.DesiredSize.Height;
+                if (!draggingEvents || !GetSelected(eventPresenter))
                 {
-                    float actionHeight = ArrangeActions(eventIndex, 0, finalSize, child, y, height);
-                    float conditionsHeight = ArrangeConditions(eventIndex, 0, finalSize, child, y, height);
+                    float actionHeight = ArrangeActions(eventIndex, 0, finalSize, eventPresenter, y, height);
+                    float conditionsHeight = ArrangeConditions(eventIndex, 0, finalSize, eventPresenter, y, height);
                     float eventsConditionsHeight = height + conditionsHeight;
                     height = Math.Max(eventsConditionsHeight, actionHeight);
-                    child.Arrange(new Rect(0, y, EventWidth, height));
+                    eventPresenter.Arrange(new Rect(0, y, EventWidth, height));
 
                     if (mouseY > y && mouseY < y + height && !draggingActions && !draggingEvents)
                     {
-                        if (presenterToEvent.TryGetValue(child, out SmartEvent smartEvent))
+                        if (presenterToEvent.TryGetValue(eventPresenter, out SmartEvent smartEvent))
                         {
                             if (addActionViewModel != null)
                                 addActionViewModel.Event = smartEvent;
@@ -390,8 +397,10 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             }
 
             eventIndex = 0;
-            foreach (ContentPresenter eventPresenter in Events())
+            foreach (SmartEvent ev in Script.Events)
             {
+                if (!eventToPresenter.TryGetValue(ev, out var eventPresenter))
+                    continue;
                 var height = (float) eventPresenter.DesiredSize.Height;
                 if (draggingEvents && GetSelected(eventPresenter))
                 {
@@ -553,6 +562,19 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             typeof(SmartScriptPanelLayout),
             new PropertyMetadata(0));
 
+        
+        public SmartScript Script
+        {
+            get => (SmartScript) GetValue(ScriptProperty);
+            set => SetValue(ScriptProperty, value);
+        }
+
+        public static readonly DependencyProperty ScriptProperty = DependencyProperty.Register(nameof(Script),
+            typeof(SmartScript),
+            typeof(SmartScriptPanelLayout),
+            new PropertyMetadata(null));
+
+        
         public float EventSpacing
         {
             get => (float) GetValue(EventSpacingProperty);

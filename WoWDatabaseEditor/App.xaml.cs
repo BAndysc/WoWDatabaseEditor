@@ -11,13 +11,11 @@ using Prism.Modularity;
 using Prism.Unity;
 using Unity;
 using Unity.RegistrationByConvention;
-using WDE.Common.Database;
 using WDE.Common.Events;
+using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
-using WoWDatabaseEditor.Managers;
 using WoWDatabaseEditor.ModulesManagement;
-using WoWDatabaseEditor.Services.CreatureEntrySelectorService;
 using WoWDatabaseEditor.Views;
 
 namespace WoWDatabaseEditor
@@ -30,8 +28,6 @@ namespace WoWDatabaseEditor
         private IModulesManager? modulesManager;
         private SplashScreenView? splash;
 
-        public static IContainerProvider? GlobalContainer;
-        
         public App()
         {
             /*
@@ -92,7 +88,6 @@ namespace WoWDatabaseEditor
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            GlobalContainer = Container;
             containerRegistry.RegisterInstance(Container);
             modulesManager = new ModulesManager();
             containerRegistry.RegisterInstance(modulesManager);
@@ -189,6 +184,7 @@ namespace WoWDatabaseEditor
 
         protected override void OnInitialized()
         {
+            ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
             // have no idea if it makes sense, but works
             MainWindow? mainWindow = Container.Resolve<MainWindow>();
 

@@ -7,13 +7,14 @@
                       xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
                       xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:helpers="clr-namespace:WoWDatabaseEditor.Views.Helpers"
+                      xmlns:utils1="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
                       mc:Ignorable="d"
                       WindowStyle="ToolWindow"
                       ShowInTaskbar="False"
                       WindowTransitionsEnabled="False"
                       Style="{DynamicResource MainWindowStyle}"
                       WindowStartupLocation="CenterOwner"
-                      utils:ViewBind.Model="{Binding}"
+                      utils1:ViewBind.Model="{Binding}"
                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                       Title="{Binding Title}" >
     <mah:MetroWindow.Resources>

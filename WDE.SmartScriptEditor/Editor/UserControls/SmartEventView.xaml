@@ -5,58 +5,49 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" x:Name="uc"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <Grid.Resources>
-
-        </Grid.Resources>
-        <Grid MouseDown="UIElement_OnMouseDown">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Border BorderThickness="1">
-                <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Readable}" Padding="3">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
-                            <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Event.Foreground}" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected}" Value="true">
-                                    <Setter Property="Background"
-                                            Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
-                                    <Setter Property="Foreground"
-                                            Value="{DynamicResource SmartScripts.Event.Selected.Foreground}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Border}" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSelected}" Value="true">
-                                <Setter Property="BorderBrush"
-                                        Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
-            </Border>
-            <Canvas Margin="20,0,0,0" Grid.Row="1">
-                <Canvas.Style>
-                    <Style TargetType="Canvas">
-                        <Setter Property="Background" Value="{DynamicResource SmartScripts.Condition.Background}" />
+    <DockPanel MouseDown="UIElement_OnMouseDown" LastChildFill="True">
+        <Border BorderThickness="1" DockPanel.Dock="Top">
+            <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Readable}" Padding="3">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
+                        <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Event.Foreground}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsSelected}" Value="true">
                                 <Setter Property="Background"
-                                        Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
+                                        Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
+                                <Setter Property="Foreground"
+                                        Value="{DynamicResource SmartScripts.Event.Selected.Foreground}" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </Canvas.Style>
-            </Canvas>
-        </Grid>
-    </Grid>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Border}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                            <Setter Property="BorderBrush"
+                                    Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
+        <Canvas Margin="20,0,0,0" Grid.Row="1">
+            <Canvas.Style>
+                <Style TargetType="Canvas">
+                    <Setter Property="Background" Value="{DynamicResource SmartScripts.Condition.Background}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                            <Setter Property="Background"
+                                    Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Canvas.Style>
+        </Canvas>
+    </DockPanel>
 </UserControl>
