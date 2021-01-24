@@ -176,6 +176,7 @@
             "SMART_ACTION_SET_SHEATH",
             "SMART_ACTION_SET_VISIBILITY",
             "SMART_ACTION_SET_ACTIVE",
+            "SMART_ACTION_SET_HOVER",
             "SMART_ACTION_FORCE_DESPAWN",
             "SMART_ACTION_MOUNT_TO_ENTRY_OR_MODEL",
             "SMART_ACTION_SET_CORPSE_DELAY",
@@ -200,7 +201,8 @@
         "name": "Health",
         "group_members": [
             "SMART_ACTION_SET_HEALTH_REGEN",
-            "SMART_ACTION_SET_INVINCIBILITY_HP_LEVEL"
+            "SMART_ACTION_SET_INVINCIBILITY_HP_LEVEL",
+            "SMART_ACTION_SET_HEALTH_PCT"
         ]
     },
     {
@@ -240,7 +242,9 @@
             "SMART_ACTION_SET_SIGHT_DIST",
             "SMART_ACTION_REMOVE_ALL_GAMEOBJECTS",
             "SMART_ACTION_NONE",
-            "SMART_ACTION_PLAY_CINEMATIC"
+            "SMART_ACTION_PLAY_CINEMATIC",
+            "SMART_ACTION_OVERRIDE_LIGHT",
+            "SMART_ACTION_OVERRIDE_WEATHER"
         ]
     },
     {

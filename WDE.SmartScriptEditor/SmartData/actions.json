@@ -2905,6 +2905,98 @@
         "target_is_source": true
     },
     {
+        "id": 138,
+        "name": "SMART_ACTION_OVERRIDE_LIGHT",
+        "parameters": [
+            {
+                "type": "ZoneAreaParameter",
+                "name": "Zone or area"
+            },
+            {
+                "type": "Parameter",
+                "name": "Area Light ID"
+            },
+            {
+                "type": "Parameter",
+                "name": "Override light ID"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Transition time"
+            }
+        ],
+        "description": "Override light {pram2} with light {pram3} in zone {pram1} in {pram4} seconds",
+        "name_readable": "Override light",
+        "uses_target": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 139,
+        "name": "SMART_ACTION_OVERRIDE_WEATHER",
+        "parameters": [
+            {
+                "type": "ZoneAreaParameter",
+                "name": "Zone or area"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Weather state",
+                "values": {
+                    "0": {"name": "FINE"},
+                    "1": {"name": "FOG"},
+                    "3": {"name": "LIGHT_RAIN"},
+                    "4": {"name": "MEDIUM_RAIN"},
+                    "5": {"name": "HEAVY_RAIN"},
+                    "6": {"name": "LIGHT_SNOW"},
+                    "7": {"name": "MEDIUM_SNOW"},
+                    "8": {"name": "HEAVY_SNOW"},
+                    "22": {"name": "LIGHT_SANDSTORM"},
+                    "41": {"name": "MEDIUM_SANDSTORM"},
+                    "42": {"name": "HEAVY_SANDSTORM"},
+                    "86": {"name": "THUNDERS"},
+                    "90": {"name": "BLACKRAIN"},
+                    "106": {"name": "BLACKSNOW"}
+                }
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Intense"
+            }
+        ],
+        "description": "Override weather in zone {pram1} to {pram2} with {pram3value} intensity",
+        "name_readable": "Override weather",
+        "uses_target": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 141,
+        "name": "SMART_ACTION_SET_HOVER",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Enable"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable hover|Enable hover}",
+        "name_readable": "Set hover",
+        "uses_target": true,
+        "target_is_source": true
+    },
+    {
+        "id": 142,
+        "name": "SMART_ACTION_SET_HEALTH_PCT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Percent"
+            }
+        ],
+        "description": "{source}: Set current health to {pram1}%",
+        "name_readable": "Set health",
+        "uses_target": true,
+        "target_is_source": true
+    },
+    {
         "id": 9999,
         "name": "SMART_ACTION_META_WAIT",
         "parameters": [
