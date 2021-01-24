@@ -15,7 +15,7 @@ namespace WDE.MVVM.Observable
             get => value;
             set
             {
-                if (Comparer<T>.Default.Compare(value, Value) == 0)
+                if (EqualityComparer<T>.Default.Equals(this.value, value))
                     return;
                 
                 this.value = value;
