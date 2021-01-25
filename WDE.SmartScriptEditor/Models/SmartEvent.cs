@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using SmartFormat;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using WDE.Common.Parameters;
 
@@ -119,8 +121,14 @@ namespace WDE.SmartScriptEditor.Models
                         });
                     return output;
                 }
-                catch (ParsingErrors)
+                catch (ParsingErrors e)
                 {
+                    Console.WriteLine(e.ToString());
+                    return $"Event {Id} has invalid Readable format in events.json";
+                }
+                catch (FormattingException e)
+                {
+                    Console.WriteLine(e.ToString());
                     return $"Event {Id} has invalid Readable format in events.json";
                 }
             }

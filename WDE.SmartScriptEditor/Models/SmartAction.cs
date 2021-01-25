@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using SmartFormat;
+using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using WDE.Common.Parameters;
 
@@ -116,8 +117,14 @@ namespace WDE.SmartScriptEditor.Models
                         });
                     return output;
                 }
-                catch (ParsingErrors)
+                catch (ParsingErrors e)
                 {
+                    Console.WriteLine(e.ToString());
+                    return $"Action {Id} has invalid Readable format in actions.json";
+                }
+                catch (FormattingException e)
+                {
+                    Console.WriteLine(e.ToString());
                     return $"Action {Id} has invalid Readable format in actions.json";
                 }
             }
