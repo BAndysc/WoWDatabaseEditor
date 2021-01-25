@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,7 @@ using Prism.Unity;
 using Unity;
 using Unity.RegistrationByConvention;
 using WDE.Common.Events;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
@@ -184,6 +186,7 @@ namespace WoWDatabaseEditor
 
         protected override void OnInitialized()
         {
+            IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
             // have no idea if it makes sense, but works
             MainWindow? mainWindow = Container.Resolve<MainWindow>();
@@ -193,7 +196,35 @@ namespace WoWDatabaseEditor
 
             splash!.Close();
 
-            mainWindow.ShowDialog();
+            #if DEBUG
+                mainWindow.ShowDialog();
+            #else
+                try
+                {
+                    mainWindow.ShowDialog();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    var logPath = Path.GetTempFileName() + ".WDE.log.txt";
+                    File.WriteAllText(logPath, e.ToString());
+
+                    var choice = messageBoxService.ShowDialog(new MessageBoxFactory<int>().SetIcon(MessageBoxIcon.Error)
+                        .SetTitle("Fatal error")
+                        .SetMainInstruction("Sorry, fatal error has occured and the program had to stop")
+                        .SetContent("You are welcome to report the bug at github. Reason: " + e.Message)
+                        .SetFooter("Log file saved at: " + logPath)
+                        .WithButton("Copy log path to clipboard", 2)
+                        .WithButton("Open log file", 1)
+                        .WithButton("Close", 0)
+                        .Build());
+                    if (choice == 2)
+                        Clipboard.SetText(logPath);
+                    else if (choice == 1)
+                        Process.Start("explorer", logPath);
+                }
+            #endif
+
             Current.Shutdown();
         }
 
