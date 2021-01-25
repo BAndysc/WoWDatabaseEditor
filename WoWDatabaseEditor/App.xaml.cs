@@ -205,9 +205,10 @@ namespace WoWDatabaseEditor
                 }
                 catch (Exception e)
                 {
+                    var commitHash = File.Exists("COMMIT_HASH") ? File.ReadAllText("COMMIT_HASH") : "unknown";
                     Console.WriteLine(e.ToString());
                     var logPath = Path.GetTempFileName() + ".WDE.log.txt";
-                    File.WriteAllText(logPath, e.ToString());
+                    File.WriteAllText(logPath, "Commit: " + commitHash + "\n\n" + e.ToString());
 
                     var choice = messageBoxService.ShowDialog(new MessageBoxFactory<int>().SetIcon(MessageBoxIcon.Error)
                         .SetTitle("Fatal error")
