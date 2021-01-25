@@ -79,7 +79,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                 ISolutionItem item = newItemService.GetNewSolutionItem();
                 if (item != null)
                 {
-                    if (selected == null)
+                    if (selected == null || selected.Item.Items == null)
                         solutionManager.Items.Add(item);
                     else
                         selected.Item.Items.Add(item);

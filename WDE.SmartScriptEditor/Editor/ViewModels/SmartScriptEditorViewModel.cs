@@ -479,6 +479,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             foreach (var smartLine in lines)
                             {
                                 var smartAction = script.SafeActionFactory(smartLine);
+                                if (smartAction == null)
+                                    continue;
                                 smartAction.Comment = smartLine.Comment.Contains(" // ")
                                     ? smartLine.Comment.Substring(smartLine.Comment.IndexOf(" // ") + 4).Trim()
                                     : "";
