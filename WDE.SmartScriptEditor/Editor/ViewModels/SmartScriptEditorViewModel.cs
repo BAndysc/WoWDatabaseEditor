@@ -794,7 +794,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AutoDispose(script.AllSmartObjectsFlat.ToStream().Subscribe((e) =>
             {
                 if (e.Type == CollectionEventType.Add)
-                    Together.Add(e.Item);
+                    Together.Insert(Together.Count - 1, e.Item);
                 else
                     Together.Remove(e.Item);
             }));

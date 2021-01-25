@@ -11,7 +11,7 @@
         <DockPanel.Resources>
             <helpers:IsNullConverter x:Key="IsNullConverter" />
         </DockPanel.Resources>
-        <Label Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" Content="{Binding Name, Mode=OneWay}" />
+        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
         <ContentPresenter Content="{Binding}">
             <ContentPresenter.ContentTemplateSelector>
                 <helpers1:ParameterDataTemplateSelector>

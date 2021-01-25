@@ -241,6 +241,8 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
         {
             base.OnMouseMove(e);
             mouseY = (float) e.GetPosition(this).Y;
+            if (e.LeftButton != MouseButtonState.Pressed)
+                mouseStartPosition = e.GetPosition(this);
             if (e.LeftButton == MouseButtonState.Pressed && !draggingActions && !draggingEvents && !draggingConditions)
             {
                 var dist = (float) Point.Subtract(mouseStartPosition, e.GetPosition(this)).Length;

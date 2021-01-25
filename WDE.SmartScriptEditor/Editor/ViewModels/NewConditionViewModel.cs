@@ -14,6 +14,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 Dispose();
                 Watch(@event, e => e.IsSelected, nameof(IsSelected));
                 @event = value;
+                RaisePropertyChanged();
             }
         }
 

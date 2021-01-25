@@ -7,11 +7,10 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
     /// <summary>
     ///     Interaction logic for SmartEventView.xaml
     /// </summary>
-    public partial class SmartEventView : UserControl
+    public class SmartEventView : Control
     {
         public static DependencyProperty EditEventCommandProperty =
             DependencyProperty.Register("EditEventCommand", typeof(ICommand), typeof(SmartEventView));
-
 
         public static DependencyProperty DeselectAllRequestProperty =
             DependencyProperty.Register(nameof(DeselectAllRequest), typeof(ICommand), typeof(SmartEventView));
@@ -23,10 +22,10 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             typeof(bool),
             typeof(SmartEventView),
             new PropertyMetadata(false));
-
-        public SmartEventView()
+        
+        static SmartEventView()
         {
-            InitializeComponent();
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(SmartEventView), new FrameworkPropertyMetadata(typeof(SmartEventView)));
         }
 
         public ICommand EditEventCommand
@@ -53,7 +52,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             set => SetValue(IsSelectedProperty, value);
         }
 
-        private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
+        protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             if (e.ClickCount == 1)
             {
@@ -64,9 +63,14 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                         DeselectAllRequest?.Execute(null);
                     IsSelected = true;
                 }
+                e.Handled = true;
             }
             else if (e.ClickCount == 2)
+            {
                 EditEventCommand?.Execute(DataContext);
+                e.Handled = true;
+            }
+            base.OnPreviewMouseDown(e);
         }
     }
 }

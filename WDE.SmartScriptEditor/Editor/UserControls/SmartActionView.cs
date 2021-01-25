@@ -7,7 +7,7 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
     /// <summary>
     ///     Interaction logic for SmartActionView.xaml
     /// </summary>
-    public partial class SmartActionView : UserControl
+    public class SmartActionView : Control
     {
         public static DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected),
             typeof(bool),
@@ -23,11 +23,12 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
         public static DependencyProperty EditActionCommandProperty =
             DependencyProperty.Register(nameof(EditActionCommand), typeof(ICommand), typeof(SmartActionView));
 
-        public SmartActionView()
+        
+        static SmartActionView()
         {
-            InitializeComponent();
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(SmartActionView), new FrameworkPropertyMetadata(typeof(SmartActionView)));
         }
-
+        
         public bool IsSelected
         {
             get => (bool) GetValue(IsSelectedProperty);
