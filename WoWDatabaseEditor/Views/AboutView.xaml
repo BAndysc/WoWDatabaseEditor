@@ -5,7 +5,10 @@
     <Grid Margin="20">
         <StackPanel>
             <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
-                <TextBlock FontSize="28" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <Image Source="/Icon.ico" Width="56" Height="56" />
+                    <TextBlock VerticalAlignment="Bottom" FontSize="34" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
+                </StackPanel>
             </Border>
             <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">
                 <Run FontWeight="Bold" Text="WoW Database Editor" /><Run Text=" " />
@@ -13,7 +16,7 @@
             </TextBlock>
             <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">
                 <Run Text="To start work, add new &quot;file&quot; to the solution " />
-                <Run Text="- File -&gt; Add. " />
+                <Run Text="- File -&gt; Load. " />
                 <Run Text="To edit script, double click on selected item in Solution Explorer." />
             </TextBlock>
             <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">

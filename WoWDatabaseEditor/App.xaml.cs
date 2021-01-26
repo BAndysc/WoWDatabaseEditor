@@ -194,7 +194,7 @@ namespace WoWDatabaseEditor
             IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<AllModulesLoaded>().Publish();
 
-            splash!.Close();
+            mainWindow.ContentRendered += MainWindowOnContentRendered;
 
             #if DEBUG
                 mainWindow.ShowDialog();
@@ -227,6 +227,12 @@ namespace WoWDatabaseEditor
             #endif
 
             Current.Shutdown();
+        }
+
+        private void MainWindowOnContentRendered(object? sender, EventArgs e)
+        {
+            splash!.Close();
+            (sender! as MainWindow)!.ContentRendered -= MainWindowOnContentRendered;
         }
 
         private class Conflict

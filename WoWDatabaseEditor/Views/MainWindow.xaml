@@ -9,14 +9,13 @@
                       xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
                       xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
                       xmlns:system="clr-namespace:System;assembly=System.Runtime"
-                      xmlns:tasks="clr-namespace:WDE.Common.Tasks;assembly=WDE.Common"
                       xmlns:commonUtils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
                       Style="{DynamicResource MainWindowStyle}"
                       Title="{Binding Title}"
                       WindowStartupLocation="CenterScreen"
                       Height="695.368"
                       Width="959.421"
-                      Icon="/icon.png"
+                      Icon="/Icon.ico"
                       x:Name="rootWindow">
     <Controls:MetroWindow.WindowButtonCommands>
         <Controls:WindowButtonCommands
@@ -40,6 +39,19 @@
         <KeyBinding Key="V" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
         <KeyBinding Key="X" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
     </Window.InputBindings>
+    <Controls:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <Grid Width="{TemplateBinding Width}"
+                  Height="{TemplateBinding Height}"
+                  Margin="5"
+                  Background="Transparent"
+                  RenderOptions.EdgeMode="Aliased"
+                  RenderOptions.BitmapScalingMode="HighQuality">
+                <Image Source="/Icon.ico" />
+            </Grid>
+        </DataTemplate>
+    </Controls:MetroWindow.IconTemplate>
+    
     <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands>
             <StackPanel Name="menuHolder" Orientation="Horizontal">
