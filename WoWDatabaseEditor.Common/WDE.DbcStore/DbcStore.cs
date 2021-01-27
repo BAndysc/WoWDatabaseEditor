@@ -174,8 +174,12 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 7;
-                        Load("Spell.dbc", 0, 136, SpellStore);
+                        max = 11;
+                        Load("SkillLine.dbc", 0, 3, SkillStore);
+                        Load("Faction.dbc", 0, 23, FactionStore);
+                        Load("Spell.dbc", 0, 134, SpellStore);
+                        Load("Movie.dbc", 0, 1, MovieStore);
+                        Load("Map.dbc", 0, 5, MapStore);
                         Load("Achievement.dbc", 0, 4, AchievementStore);
                         Load("AreaTable.dbc", 0, 11, AreaStore);
                         Load("chrClasses.dbc", 0, 4, ClassStore);
