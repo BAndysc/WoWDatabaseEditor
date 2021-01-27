@@ -9,7 +9,7 @@ namespace WDE.Common.Parameters
         {
             SelectOption option = null;
             if (Items?.TryGetValue(key, out option) ?? false)
-                return option.Name;
+                return option.Name + " (" + key + ")";
             return key.ToString();
         }
 

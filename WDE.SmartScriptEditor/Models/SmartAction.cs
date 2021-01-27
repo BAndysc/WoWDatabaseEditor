@@ -36,6 +36,9 @@ namespace WDE.SmartScriptEditor.Models
                 CallOnChanged();
                 OnPropertyChanged(nameof(Comment));
             };
+            
+            Context.Add(new MetaSmartSourceTargetEdit(this, true));
+            Context.Add(new MetaSmartSourceTargetEdit(this, false));
         }
 
         public SmartEvent Parent
@@ -88,18 +91,18 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(ReadableHint,
                         new
                         {
-                            target = Target.Readable,
-                            source = Source.Readable,
-                            targetcoords = Target.GetCoords(),
+                            target = "[s=7]" + Target.Readable + "[/s]",
+                            source = "[s=6]" + Source.Readable + "[/s]",
+                            targetcoords = "[p]" + Target.GetCoords() + "[/p]",
                             target_position = Target.GetPosition(),
                             targetid = Target.Id,
                             sourceid = Source.Id,
-                            pram1 = GetParameter(0),
-                            pram2 = GetParameter(1),
-                            pram3 = GetParameter(2),
-                            pram4 = GetParameter(3),
-                            pram5 = GetParameter(4),
-                            pram6 = GetParameter(5),
+                            pram1 = "[p=0]" + GetParameter(0) + "[/p]",
+                            pram2 = "[p=1]" + GetParameter(1) + "[/p]",
+                            pram3 = "[p=2]" + GetParameter(2) + "[/p]",
+                            pram4 = "[p=3]" + GetParameter(3) + "[/p]",
+                            pram5 = "[p=4]" + GetParameter(4) + "[/p]",
+                            pram6 = "[p=5]" + GetParameter(5) + "[/p]",
                             datapram1 = "data #" + GetParameter(0).Value,
                             stored = "stored target #" + GetParameter(0).Value,
                             storedPoint = "stored point #" + GetParameter(0).Value,
@@ -152,6 +155,18 @@ namespace WDE.SmartScriptEditor.Models
                 se.GetParameter(i).Copy(GetParameter(i));
             se.comment.Copy(comment);
             return se;
+        }
+    }
+
+    public class MetaSmartSourceTargetEdit
+    {
+        public readonly SmartAction RelatedAction;
+        public readonly bool IsSource;
+
+        public MetaSmartSourceTargetEdit(SmartAction relatedAction, bool isSource)
+        {
+            RelatedAction = relatedAction;
+            IsSource = isSource;
         }
     }
 }

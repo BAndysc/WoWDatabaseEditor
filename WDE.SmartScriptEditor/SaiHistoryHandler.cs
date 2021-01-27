@@ -4,6 +4,7 @@ using WDE.Common.History;
 using WDE.MVVM;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
+using WDE.SmartScriptEditor.Utils;
 
 namespace WDE.SmartScriptEditor
 {
@@ -228,7 +229,7 @@ namespace WDE.SmartScriptEditor
 
         private void OnBulkEditingFinished(string editName)
         {
-            EndBulkEdit(editName);
+            EndBulkEdit(editName.RemoveTags());
         }
 
         private void OnBulkEditingStarted()
@@ -296,8 +297,7 @@ namespace WDE.SmartScriptEditor
 
             public string GetDescription()
             {
-                // @Todo: how to localize this?
-                return "Added event " + readable;
+                return "Added event " + readable.RemoveTags();
             }
 
             public void Redo()
@@ -326,8 +326,7 @@ namespace WDE.SmartScriptEditor
 
             public string GetDescription()
             {
-                // @Todo: how to localize this?
-                return "Removed event " + smartEvent.Readable;
+                return "Removed event " + smartEvent.Readable.RemoveTags();
             }
 
             public void Redo()
@@ -393,8 +392,7 @@ namespace WDE.SmartScriptEditor
 
         public string GetDescription()
         {
-            // @Todo: how to localize this?
-            return "Added action " + smartAction.Readable;
+            return "Added action " + smartAction.Readable.RemoveTags();
         }
 
         public void Redo()
@@ -424,7 +422,7 @@ namespace WDE.SmartScriptEditor
 
         public string GetDescription()
         {
-            return "Removed action " + smartAction.Readable;
+            return "Removed action " + smartAction.Readable.RemoveTags();
         }
 
         public void Redo()
@@ -453,7 +451,7 @@ namespace WDE.SmartScriptEditor
 
         public string GetDescription()
         {
-            return "Removed condition " + smartCondition.Readable;
+            return "Removed condition " + smartCondition.Readable.RemoveTags();
         }
 
         public void Redo()
@@ -510,7 +508,7 @@ namespace WDE.SmartScriptEditor
 
         public string GetDescription()
         {
-            return "Added condition " + smartCondition.Readable;
+            return "Added condition " + smartCondition.Readable.RemoveTags();
         }
 
         public void Redo()

@@ -176,7 +176,7 @@
                 "description": "Stored through action STORE_TARGET target ID"
             }
         ],
-        "description": "storedTarget[{pram1}]",
+        "description": "storedTarget\\\\[{pram1}\\\\]",
         "name_readable": "Stored object",
         "types": [
             "Creature",

@@ -4,19 +4,29 @@
              xmlns:views="clr-namespace:WDE.SmartScriptEditor.Editor.Views"
              xmlns:mvvm="http://prismlibrary.com/"
              xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Editor.Views.Editing"
+             xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Views.Helpers"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              Background="{DynamicResource SmartScripts.Background}">
+    <UserControl.Resources>
+        <ResourceDictionary Source="../../../Themes/Generic.xaml"></ResourceDictionary>
+    </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding Accept}"/>
         <KeyBinding Key="Escape" Command="{Binding Cancel}" />
     </UserControl.InputBindings>
     <Grid Margin="6">
         <Grid.RowDefinitions>
-            <RowDefinition Height="32" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding Readable}" Margin="0,0,0,10" />
+        <TextBlock
+            TextWrapping="Wrap"
+            IsHitTestVisible="False"
+            helpers:SmartFormattedText.SourceStyle="{DynamicResource SourceTextStyle}" 
+            helpers:SmartFormattedText.ParamStyle="{DynamicResource ParameterTextStyle}" 
+            helpers:SmartFormattedText.SmartFormattedText="{Binding Readable}"
+            Margin="0,0,0,10" />
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
             <ItemsControl Focusable="False" ItemsSource="{Binding AllItems}" x:Name="Parameters">
                 <ItemsControl.GroupStyle>

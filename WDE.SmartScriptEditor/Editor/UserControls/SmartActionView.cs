@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.UserControls
 {
@@ -22,7 +24,9 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
 
         public static DependencyProperty EditActionCommandProperty =
             DependencyProperty.Register(nameof(EditActionCommand), typeof(ICommand), typeof(SmartActionView));
-
+        
+        public static DependencyProperty DirectEditParameterProperty =
+            DependencyProperty.Register(nameof(DirectEditParameter), typeof(ICommand), typeof(SmartActionView));
         
         static SmartActionView()
         {
@@ -52,13 +56,30 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             get => (ICommand) GetValue(EditActionCommandProperty);
             set => SetValue(EditActionCommandProperty, value);
         }
+        
+        public ICommand DirectEditParameter
+        {
+            get => (ICommand) GetValue(DirectEditParameterProperty);
+            set => SetValue(DirectEditParameterProperty, value);
+        }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
             if (e.ClickCount == 1)
             {
+                if (DirectEditParameter != null)
+                {
+                    if (e.OriginalSource is Run originalRun && originalRun.DataContext != null &&
+                        originalRun.DataContext != DataContext)
+                    {
+                        DirectEditParameter.Execute(originalRun.DataContext);
+                        return;
+                    }
+                }
+
                 DeselectAllButActionsRequest?.Execute(null);
+               
                 if (!IsSelected)
                 {
                     if (!Keyboard.IsKeyDown(Key.LeftCtrl))

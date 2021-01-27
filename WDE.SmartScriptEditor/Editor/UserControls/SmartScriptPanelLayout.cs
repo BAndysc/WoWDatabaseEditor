@@ -236,14 +236,20 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
         {
             return eventToPresenter.Keys.Any(a => a.IsSelected);
         }
-        
+
+        private bool mouseStartPositionValid = false;
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
             mouseY = (float) e.GetPosition(this).Y;
             if (e.LeftButton != MouseButtonState.Pressed)
+            {
                 mouseStartPosition = e.GetPosition(this);
-            if (e.LeftButton == MouseButtonState.Pressed && !draggingActions && !draggingEvents && !draggingConditions)
+                mouseStartPositionValid = true;
+            }
+            if (mouseStartPositionValid && 
+                e.LeftButton == MouseButtonState.Pressed &&
+                !draggingActions && !draggingEvents && !draggingConditions)
             {
                 var dist = (float) Point.Subtract(mouseStartPosition, e.GetPosition(this)).Length;
                 if (dist > 10)
@@ -257,8 +263,12 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
                     }
                     else
                         draggingActions = AnyActionSelected();
+
                     if (draggingEvents || draggingActions || draggingConditions)
+                    {
+                        mouseStartPositionValid = false;
                         CaptureMouse();
+                    }
                 }
             }
 
@@ -311,6 +321,12 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             }
             
             InvalidateArrange();
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            base.OnMouseLeave(e);
+            mouseStartPositionValid = false;
         }
 
         protected override Size ArrangeOverride(Size finalSize)

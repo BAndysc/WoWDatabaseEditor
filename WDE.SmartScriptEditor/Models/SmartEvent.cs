@@ -106,10 +106,10 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(readable,
                         new
                         {
-                            pram1 = GetParameter(0),
-                            pram2 = GetParameter(1),
-                            pram3 = GetParameter(2),
-                            pram4 = GetParameter(3),
+                            pram1 = "[p=0]" + GetParameter(0) + "[/p]",
+                            pram2 = "[p=1]" + GetParameter(1) + "[/p]",
+                            pram3 = "[p=2]" + GetParameter(2) + "[/p]",
+                            pram4 = "[p=3]" + GetParameter(3) + "[/p]",
                             datapram1 = GetParameter(0),
                             timed1 = GetParameter(0),
                             function1 = GetParameter(0),

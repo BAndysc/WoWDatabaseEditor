@@ -445,7 +445,6 @@
     
     <!-- SmartScripts -->
     <SolidColorBrush x:Key="SmartScripts.Background" Color="#303030" />
-    <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#00B1CC" />
     
     <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="#383838" />
     <SolidColorBrush x:Key="SmartScripts.Action.Background" Color="#383838" />
@@ -454,6 +453,9 @@
     <SolidColorBrush x:Key="SmartScripts.Action.Selected.Border" Color="#F5C61F" />
     <SolidColorBrush x:Key="SmartScripts.Action.Selected.Background" Color="#FFF2BF" />
     <SolidColorBrush x:Key="SmartScripts.Action.Selected.Foreground" Color="#3B3B3B" />
+    
+    <SolidColorBrush x:Key="SmartScripts.Parameter.Foreground" Color="#5EC3F8" />
+    <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#2FCA8B" /> <!-- #00B1CC -->
     
     <SolidColorBrush x:Key="SmartScripts.Comment.Background" Color="#1E501B" />
     <SolidColorBrush x:Key="SmartScripts.Comment.Border" Color="#1E501B" />
@@ -472,6 +474,8 @@
     <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#404040" />
     <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77FFFFFF" />
     <SolidColorBrush x:Key="SmartScripts.Condition.Selected.Foreground" Color="#3B3B3B" />
+    
+    
     <!-- Content -->
     <SolidColorBrush x:Key="ContentSpecialBackground" Color="#FF000000" />
     <SolidColorBrush x:Key="ContentSpecialForeground" Color="#FFFFFFFF" />

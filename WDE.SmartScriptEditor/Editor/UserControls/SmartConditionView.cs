@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace WDE.SmartScriptEditor.Editor.UserControls
@@ -22,6 +23,9 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
 
         public static DependencyProperty EditConditionCommandProperty =
             DependencyProperty.Register(nameof(EditConditionCommand), typeof(ICommand), typeof(SmartConditionView));
+
+        public static DependencyProperty DirectEditParameterProperty =
+            DependencyProperty.Register(nameof(DirectEditParameter), typeof(ICommand), typeof(SmartConditionView));
 
         static SmartConditionView()
         {
@@ -51,12 +55,28 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             get => (ICommand) GetValue(EditConditionCommandProperty);
             set => SetValue(EditConditionCommandProperty, value);
         }
+        
+        public ICommand DirectEditParameter
+        {
+            get => (ICommand) GetValue(DirectEditParameterProperty);
+            set => SetValue(DirectEditParameterProperty, value);
+        }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
             if (e.ClickCount == 1)
             {
+                if (DirectEditParameter != null)
+                {
+                    if (e.OriginalSource is Run originalRun && originalRun.DataContext != null &&
+                        originalRun.DataContext != DataContext)
+                    {
+                        DirectEditParameter.Execute(originalRun.DataContext);
+                        return;
+                    }
+                }
+                
                 DeselectAllButConditionsRequest?.Execute(null);
                 if (!IsSelected)
                 {

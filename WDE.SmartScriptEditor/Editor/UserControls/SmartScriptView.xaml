@@ -44,6 +44,7 @@
                         <local:SmartEventView
                             PreviewMouseDown="UIElement_OnMouseDown"
                             IsHitTestVisible="True"
+                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                             IsSelected="{Binding IsSelected, Mode=TwoWay}"
                             DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectActions, ElementName=Rooot}"
                             DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
@@ -51,6 +52,7 @@
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type models:SmartAction}">
                         <local:SmartActionView
+                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                             DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                             DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
                             EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
@@ -58,6 +60,7 @@
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type models:SmartCondition}">
                         <local:SmartConditionView
+                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                             EditConditionCommand="{Binding DataContext.EditCondition, ElementName=Rooot}"
                             DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                             DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
@@ -73,6 +76,7 @@
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="Cursor" Value="Hand" />
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
@@ -96,6 +100,7 @@
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="OverridesDefaultStyle" Value="True" />
+                                    <Setter Property="Cursor" Value="Hand" />
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">

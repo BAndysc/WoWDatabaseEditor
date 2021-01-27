@@ -28,7 +28,10 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             foreach (int key in items.Keys)
             {
                 bool isSelected = current.HasValue && ((current == 0 && key == 0) || (key > 0) && (current & key) == key);
-                RawItems.Add(new KeyValuePair<int, CheckableSelectOption>(key, new CheckableSelectOption(items[key], isSelected)));
+                var item = new KeyValuePair<int, CheckableSelectOption>(key, new CheckableSelectOption(items[key], isSelected));
+                if (isSelected)
+                    SelectedItem = item;
+                RawItems.Add(item);
             }
 
             Columns = new ObservableCollection<ColumnDescriptor>
@@ -45,7 +48,13 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             this.items.Source = RawItems;
             this.items.Filter += ItemsOnFilter;
 
+            if (items.Count == 0)
+                SearchText = current.HasValue ? current.Value.ToString() : "";
+
+            ShowItemsList = items.Count > 0;
+            DesiredHeight = ShowItemsList ? 470 : 130;
             Accept = new DelegateCommand(() => CloseOk?.Invoke());
+            Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
         }
 
         public ObservableCollection<KeyValuePair<int, CheckableSelectOption>> RawItems { get; set; }
@@ -90,13 +99,23 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
                 return SelectedItem.Value.Key;
 
             int res;
-            int.TryParse(SearchText, out res);
-            return res;
+            if (int.TryParse(SearchText, out res))
+                return res;
+            
+            if (!AllItems.IsEmpty)
+            {
+                AllItems.MoveCurrentToFirst();
+                return (AllItems.CurrentItem as KeyValuePair<int, CheckableSelectOption>?)?.Key ?? 0;
+            }
+
+            return 0;
         }
 
+        public bool ShowItemsList { get; }
         public ICommand Accept { get; }
+        public ICommand Cancel { get; }
         public int DesiredWidth => 400;
-        public int DesiredHeight => 470;
+        public int DesiredHeight { get; }
         public string Title => "Picker";
         public bool Resizeable => true;
         public event Action? CloseCancel;

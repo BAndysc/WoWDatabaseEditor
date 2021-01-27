@@ -38,6 +38,7 @@ namespace WDE.SmartScriptEditor.Models
                 OnPropertyChanged(nameof(IsInverted));
             });
             conditionTarget.PropertyChanged += ((sender, value) => CallOnChanged());
+            Context.Add(conditionTarget);
         }
 
         public SmartEvent Parent
@@ -88,10 +89,10 @@ namespace WDE.SmartScriptEditor.Models
                     return "";
                 return Smart.Format(readable, new
                 {
-                    target = conditionTarget.ToString(),
-                    pram1 = GetParameter(0).ToString(),
-                    pram2 = GetParameter(1).ToString(),
-                    pram3 = GetParameter(2).ToString(),
+                    target = "[p=3]" + conditionTarget + "[/p]",
+                    pram1 = "[p=0]" + GetParameter(0) + "[/p]",
+                    pram2 = "[p=1]" + GetParameter(1) + "[/p]",
+                    pram3 = "[p=2]" + GetParameter(2) + "[/p]",
                     datapram1 = GetParameter(0).Value,
                     pram1value = GetParameter(0).Value,
                     pram2value = GetParameter(1).Value,

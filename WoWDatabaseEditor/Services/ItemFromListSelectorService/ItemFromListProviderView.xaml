@@ -5,21 +5,25 @@
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         extensions:FocusBehavior.FocusFirst="true"
         Background="{DynamicResource MenuDefaultBackground}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+    <UserControl.InputBindings>
+        <KeyBinding Key="Enter" Command="{Binding Accept}"/>
+        <KeyBinding Key="Escape" Command="{Binding Cancel}" />
+    </UserControl.InputBindings>
     <Grid Margin="6">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        <TextBox Margin="0,0,0,6" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-        <ListView VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+        <TextBox x:Name="SearchBox" Margin="0,0,0,6" Padding="2,4" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+        <ListView x:Name="ListView" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
                   SelectedItem="{Binding SelectedItem}" ItemsSource="{Binding AllItems}" Grid.Row="1" Margin="0,0,0,6"
-                  ItemContainerStyle="{DynamicResource ListViewItemStyle}">
-            <b:Interaction.Triggers>
-                <b:EventTrigger EventName="MouseDoubleClick">
-                    <b:InvokeCommandAction Command="{Binding Accept}" />
-                </b:EventTrigger>
-            </b:Interaction.Triggers>
+                  ItemContainerStyle="{DynamicResource ListViewItemStyle}"
+                  PreviewMouseDoubleClick="ListView_DoubleClick"
+                  Visibility="{Binding ShowItemsList, Converter={StaticResource BooleanToVisibilityConverter}}">
             <ListView.View>
                 <GridView extensions:GridViewColumns.HeaderTextMember="HeaderText"
                           extensions:GridViewColumns.DisplayMemberMember="DisplayMember"

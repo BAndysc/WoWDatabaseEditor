@@ -1,6 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.UserControls
 {
@@ -17,6 +20,9 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
 
         public static DependencyProperty DeselectActionsOfDeselectedEventsRequestProperty =
             DependencyProperty.Register(nameof(DeselectActionsOfDeselectedEventsRequest), typeof(ICommand), typeof(SmartEventView));
+
+        public static DependencyProperty DirectEditParameterProperty =
+            DependencyProperty.Register(nameof(DirectEditParameter), typeof(ICommand), typeof(SmartEventView));
 
         public static DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected),
             typeof(bool),
@@ -45,6 +51,12 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
             get => (ICommand) GetValue(DeselectActionsOfDeselectedEventsRequestProperty);
             set => SetValue(DeselectActionsOfDeselectedEventsRequestProperty, value);
         }
+        
+        public ICommand DirectEditParameter
+        {
+            get => (ICommand) GetValue(DirectEditParameterProperty);
+            set => SetValue(DirectEditParameterProperty, value);
+        }
 
         public bool IsSelected
         {
@@ -56,7 +68,18 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
         {
             if (e.ClickCount == 1)
             {
+                if (DirectEditParameter != null)
+                {
+                    if (e.OriginalSource is Run originalRun && originalRun.DataContext != null &&
+                        originalRun.DataContext != DataContext)
+                    {
+                        DirectEditParameter.Execute(originalRun.DataContext);
+                        return;
+                    }
+                }
+
                 DeselectActionsOfDeselectedEventsRequest?.Execute(null);
+
                 if (!IsSelected)
                 {
                     if (!Keyboard.IsKeyDown(Key.LeftCtrl))

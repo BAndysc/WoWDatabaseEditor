@@ -28,7 +28,7 @@
                 "description": "Talker will target {target}"
             }
         ],
-        "description": "{pram3value:choose(0):{sourceid:choose(0):Self|{source}}: Talk {pram1} to invoker|Self: Talk {pram1} to {source}}",
+        "description": "{pram3value:choose(0):{sourceid:choose(0):[s]Self[/s]|{source}}: Talk {pram1} to invoker|[s]Self[/s]: Talk {pram1} to {source}}",
         "name_readable": "Talk",
         "uses_target": true,
         "target_is_source": true

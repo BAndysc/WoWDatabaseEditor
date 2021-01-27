@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using WDE.Common.Parameters;
 
@@ -40,6 +41,7 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
         
+        public IList<object> Context { get; }
         public List<DescriptionRule> DescriptionRules { get; set; }
         public abstract string Readable { get; }
         public int ParametersCount { get; }
@@ -54,6 +56,8 @@ namespace WDE.SmartScriptEditor.Models
                 @params[i] = new ParameterValueHolder<int>(Parameter.Instance);
                 @params[i].PropertyChanged += (_, _) => CallOnChanged();
             }
+
+            Context = @params.Select(p => (object)p).ToList();
             OnChanged += (sender, args) => OnPropertyChanged(nameof(Readable));
         }
 

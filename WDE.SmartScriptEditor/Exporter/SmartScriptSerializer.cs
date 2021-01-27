@@ -8,6 +8,7 @@ using SmartFormat;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
+using WDE.SmartScriptEditor.Utils;
 
 namespace WDE.SmartScriptEditor.Exporter
 {
@@ -268,7 +269,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     TargetY = a.Target.Y,
                     TargetZ = a.Target.Z,
                     TargetO = a.Target.O,
-                    Comment = e.Readable + " - " + a.Readable + (string.IsNullOrEmpty(a.Comment) ? "" : " // " + a.Comment)
+                    Comment = e.Readable.RemoveTags() + " - " + a.Readable.RemoveTags() + (string.IsNullOrEmpty(a.Comment) ? "" : " // " + a.Comment)
                 };
                 lines.Add(line);
             }

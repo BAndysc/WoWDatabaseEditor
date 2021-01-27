@@ -1,4 +1,6 @@
-﻿using Prism.Commands;
+﻿using System;
+using Prism.Commands;
+using WDE.Common.Managers;
 using WDE.MVVM;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
@@ -6,7 +8,7 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 {
-    public class EditableParameterViewModel<T> : ObservableBase, IEditableParameterViewModel
+    public class EditableParameterViewModel<T> : ObservableBase, IEditableParameterViewModel, IDialog
     {
         private readonly IItemFromListProvider itemFromListProvider;
 
@@ -62,5 +64,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 }
             }
         }
+
+        public int DesiredWidth { get; } = 300;
+        public int DesiredHeight { get; } = 50;
+        public string Title { get; } = "Editing";
+        public bool Resizeable { get; } = false;
+        public event Action CloseCancel;
+        public event Action CloseOk;
     }
 }

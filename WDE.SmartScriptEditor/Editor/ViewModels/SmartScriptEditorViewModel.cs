@@ -18,6 +18,7 @@ using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
@@ -229,6 +230,32 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AddAction = new DelegateCommand<NewActionViewModel>(AddActionCommand);
             AddCondition = new DelegateCommand<NewConditionViewModel>(AddConditionCommand);
 
+            DirectEditParameter = new DelegateCommand<object>(obj =>
+            {
+                if (obj is ParameterValueHolder<int> param)
+                {
+                    int? val = itemFromListProvider.GetItemFromList(param.Parameter.Items ?? new Dictionary<int, SelectOption>(), param.Parameter is FlagParameter, param.Value);
+                    if (val.HasValue)
+                        param.Value = val.Value;   
+                } 
+                else if (obj is MetaSmartSourceTargetEdit sourceTargetEdit)
+                {
+                    var actionData = smartDataManager.GetRawData(SmartType.SmartAction, sourceTargetEdit.RelatedAction.Id);
+                    if (sourceTargetEdit.IsSource)
+                    {
+                        int? newSource = ShowSourcePicker(actionData);
+                        if (newSource.HasValue)
+                            smartFactory.UpdateSource(sourceTargetEdit.RelatedAction.Source, newSource.Value);                        
+                    }
+                    else
+                    {
+                        int? newTarget = ShowTargetPicker(actionData);
+                        if (newTarget.HasValue)
+                            smartFactory.UpdateTarget(sourceTargetEdit.RelatedAction.Target, newTarget.Value);   
+                    }
+                }
+            });
+            
             /*SaveCommand = new AsyncAutoCommand(SaveAllToDb,
                 null,
                 e =>
@@ -709,6 +736,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand DeselectAllButActions { get; set; }
         public DelegateCommand DeselectActions { get; set; }
 
+        public DelegateCommand<object> DirectEditParameter { get; }
         public DelegateCommand<DropActionsConditionsArgs> OnDropConditions { get; set; }
         public DelegateCommand<DropActionsConditionsArgs> OnDropActions { get; set; }
         public DelegateCommand<int?> OnDropItems { get; set; }
@@ -962,12 +990,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         (actionData.Targets == null || actionData.Targets.Intersect(data.Types).Any()));
         }
 
-        private int? ShowSourcePicker()
+        private int? ShowSourcePicker(SmartGenericJsonData? actionData = null)
         {
             return smartTypeListProvider.Get(SmartType.SmartSource,
                 data =>
                 {
                     if (data.IsOnlyTarget)
+                        return false;
+
+                    if (actionData.HasValue && !IsSourceCompatibleWithAction(data.Id, actionData.Value))
                         return false;
 
                     return data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType);
