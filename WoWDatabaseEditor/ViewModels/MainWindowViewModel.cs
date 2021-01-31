@@ -17,146 +17,61 @@ using WDE.Common.Providers;
 using WoWDatabaseEditor.Managers;
 using WoWDatabaseEditor.Utils;
 using System.Diagnostics;
+using WDE.Common.Menu;
 
 namespace WoWDatabaseEditor.ViewModels
 {
     public class MainWindowViewModel : BindableBase, ILayoutViewModelResolver, ICloseAwareViewModel
     {
-        private readonly Dictionary<ISolutionItem, IDocument> documents = new();
-        private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new();
-        private readonly IEnumerable<IDataDefinitionsProvider> definitionsProviders;
-        private readonly IEventAggregator eventAggregator;
-        private readonly INewItemService newItemService;
-        private readonly IConfigureService settings;
-        private readonly ISolutionManager solutionManager;
         private readonly IMessageBoxService messageBoxService;
 
         private string title = "Visual Database Editor 2018";
         private readonly Dictionary<string, ITool> toolById = new();
 
-        public MainWindowViewModel(IEventAggregator eventAggregator,
-            IDocumentManager documentManager,
-            IConfigureService settings,
-            INewItemService newItemService,
-            ISolutionManager solutionManager,
+        public MainWindowViewModel(IDocumentManager documentManager,
             IStatusBar statusBar,
             IMessageBoxService messageBoxService,
-            ISolutionItemEditorRegistry solutionEditorManager,
             TasksViewModel tasksViewModel,
-            IEnumerable<IDataDefinitionsProvider> definitionsProviders)
+            IEnumerable<IMainMenuItem> menuItemProviders)
         {
-            this.eventAggregator = eventAggregator;
             DocumentManager = documentManager;
             StatusBar = statusBar;
-            this.settings = settings;
-            this.newItemService = newItemService;
-            this.solutionManager = solutionManager;
             this.messageBoxService = messageBoxService;
-            this.definitionsProviders = definitionsProviders;
-            ExecuteCommandNew = new DelegateCommand(New);
-            ExecuteSettings = new DelegateCommand(SettingsShow);
-            OpenDefinitionEditor = new DelegateCommand<IDataDefinitionEditor>(ShowDefinitionEditor);
+            OpenDocument = new DelegateCommand<IDocument>(ShowDocument);
 
             TasksViewModel = tasksViewModel;
-            About = new DelegateCommand(ShowAbout);
-            
-            DefinitionPresenters = definitionsProviders.SelectMany(p => p.GetDataDefinitionEditors()).ToList();
-            
-            this.eventAggregator.GetEvent<DocumentManager.DocumentClosedEvent>()
-                .Subscribe(document =>
-                {
-                    if (!documentToSolution.ContainsKey(document))
-                        return;
 
-                    documents.Remove(documentToSolution[document]);
-                    documentToSolution.Remove(document);
-                });
+            MenuItemProviders = PrepareMenuItems(menuItemProviders);
 
-            this.eventAggregator.GetEvent<EventRequestOpenItem>()
-                .Subscribe(item =>
-                    {
-                        if (documents.ContainsKey(item))
-                            DocumentManager.OpenDocument(documents[item]);
-                        else
-                        {
-                            try
-                            {
-                                IDocument editor = solutionEditorManager.GetEditor(item);
-                                DocumentManager.OpenDocument(editor);
-                                documents[item] = editor;
-                                documentToSolution[editor] = item;
-                            }
-                            catch (SolutionItemEditorNotFoundException e)
-                            {
-                                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Editor not found")
-                                    .SetMainInstruction("Couldn't open item, because there is no editor registered for type " +
-                                                        item.GetType().Name)
-                                    #if DEBUG
-                                    .SetContent($"There should be class that implements ISolutionItemEditorProvider<{item.GetType().Name}> and this class should be registered in containerRegister in module.")
-                                    #endif
-                                    .SetIcon(MessageBoxIcon.Warning)
-                                    .WithOkButton(true)
-                                    .Build());
-                            }
-                        }
-                    },
-                    true);
-
-            Windows = new ObservableCollection<MenuItemViewModel>();
-
-            foreach (var window in DocumentManager.AllTools)
-            {
+            foreach (var window in documentManager.AllTools)
                 toolById[window.UniqueId] = window;
-                MenuItemViewModel model = new(() => DocumentManager.OpenTool(window.GetType()), window.Title);
-                Windows.Add(model);
-                //if (window.CanOpenOnStart)
-                //    model.Command.Execute(null);
-            }
 
             ShowAbout();
         }
 
         public IStatusBar StatusBar { get; }
         public IDocumentManager DocumentManager { get; }
+
         public TasksViewModel TasksViewModel { get; }
-        public List<IDataDefinitionEditor> DefinitionPresenters { get; }
+        
+        public List<IMainMenuItem> MenuItemProviders { get; }
 
         public string Title
         {
             get => title;
             set => SetProperty(ref title, value);
         }
-
-        public DelegateCommand ExecuteCommandNew { get; }
-        public DelegateCommand ExecuteSettings { get; }
-        public DelegateCommand About { get; }
-        public DelegateCommand<IDataDefinitionEditor> OpenDefinitionEditor { get; }
-
-        public ObservableCollection<MenuItemViewModel> Windows { get; set; }
         
+        public DelegateCommand<IDocument> OpenDocument { get; }
+
         private void ShowAbout()
         {
             DocumentManager.OpenDocument(new AboutViewModel());
         }
 
-        private void ShowDefinitionEditor(IDataDefinitionEditor editor)
+        private void ShowDocument(IDocument document)
         {
-            DocumentManager.OpenDocument(editor.Editor);
-        }
-
-        private void SettingsShow()
-        {
-            settings.ShowSettings();
-        }
-
-        private void New()
-        {
-            ISolutionItem? item = newItemService.GetNewSolutionItem();
-            if (item != null)
-            {
-                solutionManager.Items.Add(item);
-                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
-            }
+            DocumentManager.OpenDocument(document);
         }
 
         public ITool? ResolveViewModel(string id)
@@ -166,6 +81,7 @@ namespace WoWDatabaseEditor.ViewModels
                 DocumentManager.OpenedTools.Add(tool);
                 return tool;
             }
+
             return null;
         }
 
@@ -198,11 +114,12 @@ namespace WoWDatabaseEditor.ViewModels
                     if (modifiedDocuments.Count > 1)
                     {
                         message.SetExpandedInformation("Other modified documents:\n" +
-                                                       string.Join("\n", modifiedDocuments.SkipLast(1).Select(d => d.Title)));
+                                                       string.Join("\n",
+                                                           modifiedDocuments.SkipLast(1).Select(d => d.Title)));
                         message.WithButton("Yes to all", MessageBoxButtonType.CustomA)
                             .WithButton("No to all", MessageBoxButtonType.CustomB);
                     }
-                    
+
                     MessageBoxButtonType result = messageBoxService.ShowDialog(message.Build());
 
                     if (result == MessageBoxButtonType.Cancel)
@@ -231,9 +148,46 @@ namespace WoWDatabaseEditor.ViewModels
                     }
                 }
             }
+
             DocumentManager.OpenedDocuments.Clear();
 
             return true;
         }
+
+        private List<IMainMenuItem> PrepareMenuItems(IEnumerable<IMainMenuItem> menuItemProviders)
+        {
+            var itemsDict = new Dictionary<string, IMainMenuItem>();
+            foreach (var menuItem in menuItemProviders)
+            {
+                if (itemsDict.ContainsKey(menuItem.ItemName) &&
+                    itemsDict[menuItem.ItemName] is MainMenuSubItemsAggregator aggregator)
+                    aggregator.AddSubItems(menuItem.SubItems);
+                else
+                    itemsDict.Add(menuItem.ItemName,
+                        new MainMenuSubItemsAggregator(menuItem.ItemName, menuItem.SortPriority, menuItem.SubItems.ToList()));
+            }
+
+            var list = itemsDict.Values.ToList();
+            list.Sort(new MainMenuItemComparer());
+            return list;
+        }
+    }
+    
+    internal class MainMenuSubItemsAggregator: IMainMenuItem
+    {
+        public string ItemName { get; }
+        private List<IMenuItem> subItems;
+        public MainMenuItemSortPriority SortPriority { get; }
+
+        internal MainMenuSubItemsAggregator(string itemName, MainMenuItemSortPriority sortPriority, List<IMenuItem> subItems)
+        {
+            this.subItems = subItems;
+            SortPriority = sortPriority;
+            ItemName = itemName; 
+        }
+
+        public void AddSubItems(List<IMenuItem> subItems) => this.subItems.AddRange(subItems);
+
+        public List<IMenuItem> SubItems => subItems;
     }
 }

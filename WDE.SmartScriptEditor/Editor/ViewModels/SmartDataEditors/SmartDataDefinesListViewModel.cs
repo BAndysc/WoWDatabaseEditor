@@ -56,7 +56,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 IsModified = false;
                 taskRunner.ScheduleTask("Saving modified SmartData defines", SaveDataToFile);
-            });
+            }, () => IsModified);
             SelectedItemIndex = -1;
         }
 

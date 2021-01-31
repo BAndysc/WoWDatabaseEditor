@@ -10,6 +10,8 @@
                       xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
                       xmlns:system="clr-namespace:System;assembly=System.Runtime"
                       xmlns:commonUtils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
+                      xmlns:viewHelpers="clr-namespace:WDE.Common.ViewHelpers;assembly=WDE.Common"
+                      xmlns:menuItems="clr-namespace:WDE.Common.Providers;assembly=WDE.Common"
                       Style="{DynamicResource MainWindowStyle}"
                       Title="{Binding Title}"
                       WindowStartupLocation="CenterScreen"
@@ -55,54 +57,47 @@
     <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands>
             <StackPanel Name="menuHolder" Orientation="Horizontal">
-                <Menu DockPanel.Dock="Top" Margin="2">
-                    <MenuItem Header="_File">
-                        <MenuItem Header="_Load" Command="{Binding ExecuteCommandNew}" />
-                        <MenuItem Header="_Save" Command="{Binding DocumentManager.ActiveDocument.Save}" />
-                        <Separator />
-                        <MenuItem Header="_Settings" Command="{Binding ExecuteSettings}" />
-                        <Separator />
-                        <MenuItem Header="_Exit" />
-                    </MenuItem>
-                    <MenuItem Header="_Edit">
-                        <MenuItem Header="_Undo" Command="{Binding DocumentManager.ActiveDocument.Undo}"
-                                  AutomationProperties.AcceleratorKey="z" />
-                        <MenuItem Header="_Redo" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
-                        <Separator />
-                        <MenuItem Header="_Copy" Command="{Binding DocumentManager.ActiveDocument.Copy}" />
-                        <MenuItem Header="Cu_t" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
-                        <MenuItem Header="_Paste" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
-                    </MenuItem>
-                    <MenuItem Header="_View" ItemsSource="{Binding Windows}">
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
-                                <Setter Property="Command" Value="{Binding Command}" />
-                                <Setter Property="Header" Value="{Binding Header}" />
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
-                    <MenuItem Header="_Window" ItemsSource="{Binding DocumentManager.OpenedDocuments}">
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
-                                <Setter Property="Header" Value="{Binding Title}" />
-                                <Setter Property="Command"
-                                        Value="{Binding ElementName=rootWindow, Path=DataContext.DocumentManager.ActivateDocument}" />
-                                <Setter Property="CommandParameter" Value="{Binding}" />
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
-                    <MenuItem Header="_Help">
-                        <MenuItem Header="_About" Command="{Binding About}" />
-                    </MenuItem>
-                    <MenuItem Header="_Definitions Editors" ItemsSource="{Binding DefinitionPresenters}">
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
-                                <Setter Property="Command" Value="{Binding ElementName=rootWindow, Path=DataContext.OpenDefinitionEditor}" />
-                                <Setter Property="CommandParameter" Value="{Binding }" />
-                                <Setter Property="Header" Value="{Binding EditorName}" />
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
+                <Menu DockPanel.Dock="Top" Margin="2" ItemsSource="{Binding MenuItemProviders}">
+                    <Menu.ItemContainerStyleSelector>
+                        <helpers:DynamicMenuItemStyleSelector>
+                            <helpers:DynamicMenuItemStyleSelector.MainMenuItemStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
+                                    <Setter Property="Header" Value="{Binding ItemName}"/>
+                                    <Setter Property="ItemsSource" Value="{Binding SubItems}" />
+                                </Style>
+                            </helpers:DynamicMenuItemStyleSelector.MainMenuItemStyle>
+                            <helpers:DynamicMenuItemStyleSelector.CategoryItemStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
+                                    <Setter Property="Header" Value="{Binding ItemName}"/>
+                                    <Setter Property="ItemsSource" Value="{Binding CategoryItems}" />
+                                </Style>
+                            </helpers:DynamicMenuItemStyleSelector.CategoryItemStyle>
+                            <helpers:DynamicMenuItemStyleSelector.DocumentItemStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
+                                    <Setter Property="Header" Value="{Binding ItemName}"/>
+                                    <Setter Property="Command" Value="{Binding ElementName=rootWindow, Path=DataContext.OpenDocument}" />
+                                    <Setter Property="CommandParameter" Value="{Binding EditorDocument}" />
+                                </Style>
+                            </helpers:DynamicMenuItemStyleSelector.DocumentItemStyle>
+                            <helpers:DynamicMenuItemStyleSelector.CommandItemStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
+                                    <Setter Property="Header" Value="{Binding ItemName}"/>
+                                    <Setter Property="Command" Value="{Binding ItemCommand}" />
+                                </Style>
+                            </helpers:DynamicMenuItemStyleSelector.CommandItemStyle>
+                            <helpers:DynamicMenuItemStyleSelector.SeparatorItemStyle>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Separator />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </helpers:DynamicMenuItemStyleSelector.SeparatorItemStyle>
+                        </helpers:DynamicMenuItemStyleSelector>
+                    </Menu.ItemContainerStyleSelector>
                 </Menu>
             </StackPanel>
         </Controls:WindowCommands>
