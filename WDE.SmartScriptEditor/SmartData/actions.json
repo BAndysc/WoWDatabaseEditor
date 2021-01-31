@@ -793,7 +793,7 @@
         "name": "SMART_ACTION_FORCE_DESPAWN",
         "parameters": [
             {
-                "type": "FloatIntParameter",
+                "type": "FloatParameter",
                 "name": "Delay"
             },
             {
@@ -2470,11 +2470,15 @@
         "name": "SMART_ACTION_SET_CORPSE_DELAY",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "Timer"
+                "type": "FloatParameter",
+                "name": "Decay time"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Multiply by decay ratio"
             }
         ],
-        "description": "{source}: Sets corpse delay to {pram1}ms",
+        "description": "{source}: Sets corpse delay to {pram1} s{pram2value:choose(0):| (multiplied by server corpse decay ratio)}",
         "name_readable": "Set corpse delay",
         "uses_target": true,
         "target_is_source": true
