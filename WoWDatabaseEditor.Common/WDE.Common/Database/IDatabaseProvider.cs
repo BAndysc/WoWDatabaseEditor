@@ -17,6 +17,8 @@ namespace WDE.Common.Database
         IQuestTemplate GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
 
+        IEnumerable<IGameEvent> GetGameEvents();
+
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
 
         Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script);

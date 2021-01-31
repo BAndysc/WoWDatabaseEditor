@@ -17,6 +17,8 @@ namespace WDE.TrinityMySqlDatabase.Database
         private List<MySqlQuestTemplate>? questTemplateCache;
         private Dictionary<uint, MySqlQuestTemplate> questTemplateByEntry = new();
 
+        private List<MySqlGameEvent>? gameEventsCache;
+        
         private TrinityMySqlDatabaseProvider trinityDatabase;
         private readonly ITaskRunner taskRunner;
 
@@ -80,6 +82,14 @@ namespace WDE.TrinityMySqlDatabase.Database
             return trinityDatabase.GetQuestTemplates();
         }
 
+        public IEnumerable<IGameEvent> GetGameEvents()
+        {
+            if (gameEventsCache != null)
+                return gameEventsCache;
+
+            return trinityDatabase.GetGameEvents();
+        }
+
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
             return trinityDatabase.GetScriptFor(entryOrGuid, type);
@@ -115,13 +125,16 @@ namespace WDE.TrinityMySqlDatabase.Database
 
             public async Task Run(ITaskProgress progress)
             {
-                progress.Report(0, 3, "Loading creatures");
+                progress.Report(0, 4, "Loading creatures");
                 cache.creatureTemplateCache = await cache.trinityDatabase.GetCreatureTemplatesAsync();
 
-                progress.Report(1, 3, "Loading gameobjects");
+                progress.Report(1, 4, "Loading gameobjects");
                 cache.gameObjectTemplateCache = await cache.trinityDatabase.GetGameObjectTemplatesAsync();
 
-                progress.Report(2, 3, "Loading quests");
+                progress.Report(2, 4, "Loading game events");
+                cache.gameEventsCache = await cache.trinityDatabase.GetGameEventsAsync();
+                
+                progress.Report(3, 4, "Loading quests");
 
                 cache.questTemplateCache = await cache.trinityDatabase.GetQuestTemplatesAsync();
 

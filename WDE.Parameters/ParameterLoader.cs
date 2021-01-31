@@ -29,6 +29,7 @@ namespace WDE.Parameters
             }
 
             factory.Register("FloatParameter", new FloatIntParameter());
+            factory.Register("GameEventParameter", new GameEventParameter(database));
             factory.Register("CreatureParameter", new CreatureParameter(database));
             factory.Register("QuestParameter", new QuestParameter(database));
             factory.Register("GameobjectParameter", new GameobjectParameter(database));
@@ -82,6 +83,27 @@ namespace WDE.Parameters
                 Items = new Dictionary<int, SelectOption>();
                 foreach (IQuestTemplate item in database.GetQuestTemplates())
                     Items.Add((int) item.Entry, new SelectOption(item.Name));
+            }
+            return base.ToString(key);
+        }
+    }
+    
+    public class GameEventParameter : Parameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public GameEventParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+
+        public override string ToString(int key)
+        {
+            if (Items == null)
+            {
+                Items = new Dictionary<int, SelectOption>();
+                foreach (IGameEvent item in database.GetGameEvents())
+                    Items.Add(item.Entry, new SelectOption(item.Description));
             }
             return base.ToString(key);
         }
