@@ -2445,8 +2445,8 @@
         "name": "SMART_EVENT_GAME_EVENT_START",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "Event ID",
+                "type": "GameEventParameter",
+                "name": "Event",
                 "description": "From table game_event.Entry"
             }
         ],
@@ -2462,8 +2462,8 @@
         "name": "SMART_EVENT_GAME_EVENT_END",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "Event ID",
+                "type": "GameEventParameter",
+                "name": "Event",
                 "description": "From table game_event.Entry"
             }
         ],

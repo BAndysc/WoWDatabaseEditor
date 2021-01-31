@@ -2365,28 +2365,28 @@
         "name": "SMART_ACTION_GAME_EVENT_STOP",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "Event ID"
+                "type": "GameEventParameter",
+                "name": "Event"
             }
         ],
-        "description": "{source}: Stop game event {pram1}",
+        "description": "Stop game event {pram1}",
         "name_readable": "Stop game event",
-        "uses_target": true,
-        "target_is_source": true
+        "uses_target": false,
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 112,
         "name": "SMART_ACTION_GAME_EVENT_START",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "Event ID"
+                "type": "GameEventParameter",
+                "name": "Event"
             }
         ],
-        "description": "{source}: Start game event {pram1}",
+        "description": "Start game event {pram1}",
         "name_readable": "Start game event",
-        "uses_target": true,
-        "target_is_source": true
+        "uses_target": false,
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 113,
