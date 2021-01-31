@@ -1007,7 +1007,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private bool IsSourceCompatibleWithAction(int sourceId, SmartGenericJsonData actionData)
         {
-            return actionData.ImplicitSource == null || sourceId == smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource).Id;
+            if (actionData.ImplicitSource == null)
+                return true;
+
+            var actionImplicitSource = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource).Id;
+
+            if (sourceId == actionImplicitSource)
+                return true;
+
+            // kinda hack to show actions with NONE source with user pick SELF source
+            // because it is natural for users to use SELF source for those actions
+            return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf;
         }
         
         private int? ShowActionPicker(int sourceId, bool showCommentMetaAction = true)
