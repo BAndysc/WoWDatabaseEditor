@@ -1,7 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
-                    xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Views.Helpers">
+                    xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.Editor.Views.Helpers"
+                    xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Editor.Views.Editing"
+                    xmlns:b="http://schemas.microsoft.com/xaml/behaviors">
 
     <Style x:Key="ParameterTextStyle" TargetType="Run">
         <Setter Property="FontFamily" Value="Consolas"/>
@@ -206,6 +208,71 @@
                         </Canvas>
                     </DockPanel>
                     
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="ParameterTextBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Text" Value="{Binding String, Mode=OneWay}" />
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="true">
+                <Setter Property="Text" Value="{Binding Value, Mode=TwoWay}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <DataTemplate x:Key="GenericParameterView">
+        <DockPanel LastChildFill="True">
+            <Button DockPanel.Dock="Right" Content="  ...  " Command="{Binding SelectItemAction}" Margin="3,0,0,0">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasItems}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <TextBox TabIndex="0" 
+                     VerticalContentAlignment="Center" 
+                     FontFamily="Consolas" 
+                     DataContext="{Binding Parameter}"
+                     Style="{StaticResource ParameterTextBoxStyle}">
+                <b:Interaction.Behaviors>
+                    <helpers:MoveFocusOnArrowsTextBox />
+                </b:Interaction.Behaviors>
+            </TextBox>
+        </DockPanel>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="BoolParameterView">
+        <CheckBox Focusable="True" TabIndex="0" VerticalContentAlignment="Center" IsChecked="{Binding BoolIsChecked}">
+            <b:Interaction.Behaviors>
+                <helpers:MoveFocusOnArrowsCheckBox />
+            </b:Interaction.Behaviors>
+        </CheckBox>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="ButtonParameterView">
+        <Button Command="{Binding Command}" Content="{Binding ActionName}"></Button>
+    </DataTemplate>
+    
+    <Style TargetType="editing:ParameterEditorView">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <DockPanel>
+                        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
+                        <ContentPresenter Content="{Binding}">
+                            <ContentPresenter.ContentTemplateSelector>
+                                <helpers:ParameterDataTemplateSelector Generic="{StaticResource GenericParameterView}"
+                                                                       BoolParameter="{StaticResource BoolParameterView}"
+                                                                       ButtonParameter="{StaticResource ButtonParameterView}"/>
+                            </ContentPresenter.ContentTemplateSelector>
+                        </ContentPresenter>
+                    </DockPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

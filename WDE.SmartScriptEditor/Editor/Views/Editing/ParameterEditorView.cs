@@ -7,17 +7,13 @@ namespace WDE.SmartScriptEditor.Editor.Views.Editing
     /// <summary>
     ///     Interaction logic for ParameterEditorView
     /// </summary>
-    public partial class ParameterEditorView : UserControl
+    public class ParameterEditorView : Control
     {
         static ParameterEditorView()
         {
             FocusableProperty.OverrideMetadata(typeof(ParameterEditorView), new FrameworkPropertyMetadata(false));
             KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(ParameterEditorView), new FrameworkPropertyMetadata(KeyboardNavigationMode.Local));
-        }
-        
-        public ParameterEditorView()
-        {
-            InitializeComponent();
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(ParameterEditorView), new FrameworkPropertyMetadata(typeof(ParameterEditorView)));
         }
     }
 }
