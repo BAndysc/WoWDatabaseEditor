@@ -23,7 +23,7 @@ namespace WDE.SmartScriptEditor.Providers
         public string ItemName { get; } = "Editors";
         public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityNormal;
 
-        public SmartDataEditorsProvider(ISmartDataProvider smartDataProvider, IParameterFactory parameterFactory, ISmartDataManager smartDataManager,
+        public SmartDataEditorsProvider(ISmartRawDataProvider smartDataProvider, IParameterFactory parameterFactory, ISmartDataManager smartDataManager,
             ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager)
         {
             var editors = new List<IMenuDocumentItem> {

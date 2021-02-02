@@ -8,6 +8,7 @@
             "SMART_TARGET_ACTION_INVOKER_VEHICLE",
             "SMART_TARGET_INVOKER_PARTY",
             "SMART_TARGET_POSITION",
+            "SMART_TARGET_RANDOM_POINT_AC",
             "SMART_TARGET_STORED"
         ]
     },
@@ -44,7 +45,9 @@
         "group_members": [
             "SMART_TARGET_PLAYER_RANGE",
             "SMART_TARGET_PLAYER_DISTANCE",
-            "SMART_TARGET_CLOSEST_PLAYER"
+            "SMART_TARGET_CLOSEST_PLAYER",
+            "SMART_TARGET_ROLE_SELECTION_AC",
+            "SMART_TARGET_PLAYER_WITH_AURA_AC"
         ]
     },
     {

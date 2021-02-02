@@ -1,72 +1,73 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor.Data
 {
     [AutoRegister]
+    [SingleInstance]
     public class SmartDataProvider : ISmartDataProvider
     {
-        private List<SmartGenericJsonData> actions;
-        private List<SmartGenericJsonData> events;
-        private List<SmartGenericJsonData> targets;
-        private List<SmartGroupsJsonData> eventsGroups;
-        private List<SmartGroupsJsonData> actionsGroups;
-        private List<SmartGroupsJsonData> targetsGroups;
+        private readonly List<SmartGenericJsonData> actions;
+        private readonly List<SmartGenericJsonData> events;
+        private readonly List<SmartGenericJsonData> targets;
+        private readonly List<SmartGroupsJsonData> eventsGroups;
+        private readonly List<SmartGroupsJsonData> actionsGroups;
+        private readonly List<SmartGroupsJsonData> targetsGroups;
 
-        private readonly ISmartDataJsonProvider jsonProvider;
-        private readonly ISmartDataSerializationProvider serializationProvider;
+        private readonly ICurrentCoreVersion coreVersion;
 
-        public SmartDataProvider(ISmartDataJsonProvider jsonProvider, ISmartDataSerializationProvider serializationProvider)
+        public SmartDataProvider(ISmartRawDataProvider smartRawDataProvider,
+            ICurrentCoreVersion coreVersion)
         {
-            this.jsonProvider = jsonProvider;
-            this.serializationProvider = serializationProvider;
-            actions = serializationProvider.DeserializeSmartData<SmartGenericJsonData>(jsonProvider.GetActionsJson());
-            events = serializationProvider.DeserializeSmartData<SmartGenericJsonData>(jsonProvider.GetEventsJson());
-            targets = serializationProvider.DeserializeSmartData<SmartGenericJsonData>(jsonProvider.GetTargetsJson());
-            eventsGroups = serializationProvider.DeserializeSmartData<SmartGroupsJsonData>(jsonProvider.GetEventsGroupsJson());
-            actionsGroups = serializationProvider.DeserializeSmartData<SmartGroupsJsonData>(jsonProvider.GetActionsGroupsJson());
-            targetsGroups = serializationProvider.DeserializeSmartData<SmartGroupsJsonData>(jsonProvider.GetTargetsGroupsJson());
+            this.coreVersion = coreVersion;
+
+            actions = smartRawDataProvider.GetActions().Where(IsSmartValidForCore).ToList();
+            events = smartRawDataProvider.GetEvents().Where(IsSmartValidForCore).ToList();
+            targets = smartRawDataProvider.GetTargets().Where(IsSmartValidForCore).ToList();
+
+            var actionKeys = actions.Select(g => g.Name).ToHashSet();
+            var eventKeys = events.Select(g => g.Name).ToHashSet();
+            var targetKeys = targets.Select(g => g.Name).ToHashSet();
+
+            eventsGroups = smartRawDataProvider.GetEventsGroups().Select(group =>
+                    new SmartGroupsJsonData()
+                    {
+                        Name = group.Name,
+                        Members = group.Members.Where(name => eventKeys.Contains(name)).ToList()
+                    })
+                .ToList();
+            
+            actionsGroups = smartRawDataProvider.GetActionsGroups().Select(group =>
+                    new SmartGroupsJsonData()
+                    {
+                        Name = group.Name,
+                        Members = group.Members.Where(name => actionKeys.Contains(name)).ToList()
+                    })
+                .ToList();
+            
+            targetsGroups = smartRawDataProvider.GetTargetsGroups().Select(group =>
+                new SmartGroupsJsonData()
+                    {
+                        Name = group.Name,
+                        Members = group.Members.Where(name => targetKeys.Contains(name)).ToList()
+                    })
+                .ToList();
         }
 
+        private bool IsSmartValidForCore(SmartGenericJsonData data)
+        {
+            return data.Tags == null || data.Tags.Contains(coreVersion.Current.Tag);
+        }
+        
         public IEnumerable<SmartGenericJsonData> GetActions() => actions;
         public IEnumerable<SmartGenericJsonData> GetEvents() => events;
         public IEnumerable<SmartGenericJsonData> GetTargets() => targets;
         public IEnumerable<SmartGroupsJsonData> GetEventsGroups() => eventsGroups;
         public IEnumerable<SmartGroupsJsonData> GetActionsGroups() => actionsGroups;
         public IEnumerable<SmartGroupsJsonData> GetTargetsGroups() => targetsGroups;
-
-
-        public async Task SaveEvents(List<SmartGenericJsonData> events)
-        {
-            await jsonProvider.SaveEventsAsync(serializationProvider.SerializeSmartData(events));
-            this.events = events;
-        }
-        public async Task SaveActions(List<SmartGenericJsonData> actions)
-        {
-            await jsonProvider.SaveActionsAsync(serializationProvider.SerializeSmartData(actions));
-            this.actions = actions;
-        }
-        public async Task SaveTargets(List<SmartGenericJsonData> targets)
-        {
-            await jsonProvider.SaveTargetsAsync(serializationProvider.SerializeSmartData(targets));
-            this.targets = targets;
-        }
-        public async Task SaveEventGroups(List<SmartGroupsJsonData> groups)
-        {
-            await jsonProvider.SaveEventsGroupsAsync(serializationProvider.SerializeSmartData(groups));
-            eventsGroups = groups;
-        }
-        public async Task SaveActionsGroups(List<SmartGroupsJsonData> groups)
-        {
-            await jsonProvider.SaveActionsGroupsAsync(serializationProvider.SerializeSmartData(groups));
-            actionsGroups = groups;
-        }
-        public async Task SaveTargetsGroups(List<SmartGroupsJsonData> groups)
-        {
-            await jsonProvider.SaveTargetsGroupsAsync(serializationProvider.SerializeSmartData(groups));
-            targetsGroups = groups;
-        }
     }
 }

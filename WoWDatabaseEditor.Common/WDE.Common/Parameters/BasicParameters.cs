@@ -18,9 +18,16 @@ namespace WDE.Common.Parameters
     
     public class FloatIntParameter : Parameter
     {
+        private readonly float divider;
+
+        public FloatIntParameter(float divider)
+        {
+            this.divider = divider;
+        }
+        
         public override string ToString(int value)
         {
-            return (value / 1000.0f).ToString(CultureInfo.InvariantCulture);
+            return (value / divider).ToString(CultureInfo.InvariantCulture);
         }
     }
 

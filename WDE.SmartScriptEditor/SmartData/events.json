@@ -2690,5 +2690,65 @@
         ],
         "description": "On counter {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
         "name_readable": "On couter set"
+    },
+    {
+        "id": 101,
+        "name": "SMART_EVENT_NEAR_PLAYERS_AC",
+        "name_readable": "When at least x players nearby",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Minimum number of players to trigger event"
+            },
+            {
+                "type": "Parameter",
+                "name": "Radius"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "First check cooldown"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Check cooldown"
+            }
+        ],
+        "valid_types": [
+            "Creature",
+            "Gameobject"
+        ],
+        "is_timed": true,
+        "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby (check every {pram4} seconds)"
+    },
+    {
+        "id": 102,
+        "name": "SMART_EVENT_NEAR_PLAYERS_NEGATION_AC",
+        "name_readable": "When at most x players nearby",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Maximum number of players to trigger event"
+            },
+            {
+                "type": "Parameter",
+                "name": "Radius"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "First check cooldown"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Check cooldown"
+            }
+        ],
+        "valid_types": [
+            "Creature",
+            "Gameobject"
+        ],
+        "is_timed": true,
+        "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby (check every {pram4} seconds)"
     }
 ]

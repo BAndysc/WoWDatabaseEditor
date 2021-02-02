@@ -27,8 +27,9 @@ namespace WDE.Parameters
                 p.Items = pair.Value.Values;
                 factory.Register(pair.Key, p);
             }
-
-            factory.Register("FloatParameter", new FloatIntParameter());
+            
+            factory.Register("FloatParameter", new FloatIntParameter(1000));
+            factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", new GameEventParameter(database));
             factory.Register("CreatureParameter", new CreatureParameter(database));
             factory.Register("QuestParameter", new QuestParameter(database));

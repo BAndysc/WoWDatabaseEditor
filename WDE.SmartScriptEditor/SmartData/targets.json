@@ -484,6 +484,7 @@
     {
         "id": 29,
         "name": "SMART_TARGET_VEHICLE_ACCESSORY",
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -495,6 +496,76 @@
         "name_readable": "Vehicle passenger",
         "types": [
             "Creature",
+            "Player"
+        ]
+    },
+    {
+        "id": 201,
+        "name": "SMART_TARGET_PLAYER_WITH_AURA_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Negation"
+            },
+            {
+                "type": "Distance",
+                "name": "Maximum distance"
+            }
+        ],
+        "description": "Players {pram1}",
+        "name_readable": "Players {pram2value:choose(0):with|without} aura {pram1} withing distance {pram3}",
+        "types": [
+            "Player"
+        ]
+    },
+    {
+        "id": 202,
+        "name": "SMART_TARGET_RANDOM_POINT_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Range"
+            }
+        ],
+        "description": "random point withing {pram1} yd around ({x}, {y}, {z}{o:choose(0):|, {o}})",
+        "name_readable": "Random position",
+        "is_only_target": true,
+        "types": [
+            "Position"
+        ]
+    },
+    {
+        "id": 203,
+        "name": "SMART_TARGET_ROLE_SELECTION_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Maximum distance"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Role",
+                "values": {
+                    "1": {"name": "Tanks"},
+                    "2": {"name": "Healers"},
+                    "4": {"name": "Damage"}
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Max targets"
+            }
+        ],
+        "description": "Players in range {pram1} yd with role {pram2}{pram3value:choose(0):| (limit to {pram3} targets)}",
+        "name_readable": "Players by role",
+        "types": [
             "Player"
         ]
     }

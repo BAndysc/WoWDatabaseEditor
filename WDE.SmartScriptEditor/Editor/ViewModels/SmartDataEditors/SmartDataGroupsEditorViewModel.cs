@@ -21,12 +21,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartDataGroupsEditorViewModel: BindableBase, IDocument
     {
-        private readonly ISmartDataProvider smartDataProvider;
+        private readonly ISmartRawDataProvider smartDataProvider;
         private readonly SmartDataSourceMode dataSourceMode;
         private readonly IMessageBoxService messageBoxService;
         private readonly IWindowManager windowManager;
         
-        public SmartDataGroupsEditorViewModel(ISmartDataProvider smartDataProvider, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
+        public SmartDataGroupsEditorViewModel(ISmartRawDataProvider smartDataProvider, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IWindowManager windowManager, SmartDataSourceMode dataSourceMode)
         {
             this.smartDataProvider = smartDataProvider;

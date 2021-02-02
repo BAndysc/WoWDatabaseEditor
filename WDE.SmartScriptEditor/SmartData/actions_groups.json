@@ -16,7 +16,10 @@
             "SMART_ACTION_SET_EMOTE_STATE",
             "SMART_ACTION_SOUND",
             "SMART_ACTION_PLAYMOVIE",
-            "SMART_ACTION_RANDOM_SOUND"
+            "SMART_ACTION_RANDOM_SOUND",
+            "SMART_ACTION_MUSIC_AC",
+            "SMART_ACTION_RANDOM_MUSIC_AC",
+            "SMART_ACTION_PLAYER_TALK_AC"
         ]
     },
     {
@@ -26,7 +29,8 @@
             "SMART_ACTION_OFFER_QUEST",
             "SMART_ACTION_CALL_KILLEDMONSTER",
             "SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS",
-            "SMART_ACTION_CALL_GROUPEVENTHAPPENS"
+            "SMART_ACTION_CALL_GROUPEVENTHAPPENS",
+            "SMART_ACTION_CALL_GROUPEVENTHAPPENS_AC"
         ]
     },
     {
@@ -40,15 +44,19 @@
             "SMART_ACTION_INTERRUPT_SPELL",
             "SMART_ACTION_REMOVE_AURAS_BY_TYPE",
             "SMART_ACTION_PLAY_SPELL_VISUAL_KIT",
-            "SMART_ACTION_INVOKER_CAST"
+            "SMART_ACTION_INVOKER_CAST",
+            "SMART_ACTION_CUSTOM_CAST_AC",
+            "SMART_ACTION_CU_ENCOUNTER_START_AC"
         ]
     },
     {
         "name": "Movement",
         "group_members": [
             "SMART_ACTION_EVADE",
+            "SMART_ACTION_EVADE_AC",
             "SMART_ACTION_FOLLOW",
             "SMART_ACTION_MOVE_TO_POS",
+            "SMART_ACTION_MOVE_TO_POS_TARGET_AC",
             "SMART_ACTION_JUMP_TO_POS",
             "SMART_ACTION_RANDOM_MOVE",
             "SMART_ACTION_FLEE_FOR_ASSIST",
@@ -56,10 +64,14 @@
             "SMART_ACTION_WP_PAUSE",
             "SMART_ACTION_WP_RESUME",
             "SMART_ACTION_WP_STOP",
+            "SMART_ACTION_FALL_AC",
+            "SMART_ACTION_STOP_MOTION_AC",
             "SMART_ACTION_SET_ORIENTATION",
             "SMART_ACTION_ALLOW_COMBAT_MOVEMENT",
             "SMART_ACTION_SET_RUN",
-            "SMART_ACTION_SET_FLY",
+            "SMART_ACTION_SET_RUN_AC",
+            "SMART_ACTION_SET_DISABLE_GRAVITY",
+            "SMART_ACTION_SET_FLY_AC",
             "SMART_ACTION_SET_SWIM",
             "SMART_ACTION_TELEPORT",
             "SMART_ACTION_SET_RANGED_MOVEMENT",
@@ -69,7 +81,8 @@
             "SMART_ACTION_SET_CAN_FLY",
             "SMART_ACTION_FLEE",
             "SMART_ACTION_STOP_MOTION",
-            "SMART_ACTION_SET_MOVEMENT_SPEED"
+            "SMART_ACTION_SET_MOVEMENT_SPEED",
+            "SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS_AC"
         ]
     },
     {
@@ -132,7 +145,9 @@
         "group_members": [
             "SMART_ACTION_SUMMON_CREATURE",
             "SMART_ACTION_SUMMON_GO",
-            "SMART_ACTION_SUMMON_CREATURE_GROUP"
+            "SMART_ACTION_SUMMON_CREATURE_GROUP",
+            "SMART_ACTION_CONE_SUMMON_AC",
+            "SMART_ACTION_VORTEX_SUMMON_AC"
         ]
     },
     {
@@ -171,12 +186,14 @@
     {
         "name": "Unit",
         "group_members": [
+            "SMART_ACTION_EXIT_VEHICLE_AC",
             "SMART_ACTION_SET_REACT_STATE",
             "SMART_ACTION_SET_ROOT",
             "SMART_ACTION_SET_SHEATH",
             "SMART_ACTION_SET_VISIBILITY",
             "SMART_ACTION_SET_ACTIVE",
             "SMART_ACTION_SET_HOVER",
+            "SMART_ACTION_SET_HOVER_AC",
             "SMART_ACTION_FORCE_DESPAWN",
             "SMART_ACTION_MOUNT_TO_ENTRY_OR_MODEL",
             "SMART_ACTION_SET_CORPSE_DELAY",
@@ -184,7 +201,12 @@
             "SMART_ACTION_LOAD_EQUIPMENT",
             "SMART_ACTION_RESPAWN_BY_SPAWNID",
             "SMART_ACTION_DESPAWN_SPAWNGROUP",
-            "SMART_ACTION_SPAWN_SPAWNGROUP"
+            "SMART_ACTION_SPAWN_SPAWNGROUP",
+            "SMART_ACTION_SET_COMBAT_DISTANCE_AC",
+            "SMART_ACTION_SET_CASTER_COMBAT_DIST_AC",
+            "SMART_ACTION_ADD_IMMUNITY_AC",
+            "SMART_ACTION_REMOVE_IMMUNITY_AC",
+            "SMART_ACTION_NO_ENVIRONMENT_UPDATE_AC"
         ]
     },
     {
@@ -209,6 +231,7 @@
         "name": "Gameobject",
         "group_members": [
             "SMART_ACTION_ACTIVATE_GOBJECT",
+            "SMART_ACTION_SET_GO_STATE_AC",
             "SMART_ACTION_ADD_GO_FLAG",
             "SMART_ACTION_REMOVE_GO_FLAG",
             "SMART_ACTION_SEND_GO_CUSTOM_ANIM",
@@ -234,6 +257,9 @@
     {
         "name": "Miscellaneous",
         "group_members": [
+            "SMART_ACTION_ZONE_UNDER_ATTACK_AC",
+            "SMART_ACTION_LOAD_GRID_AC",
+            "SMART_ACTION_SET_EVENT_FLAG_RESET_AC",
             "SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT",
             "SMART_ACTION_RESET_SCRIPT_BASE_OBJECT",
             "SMART_ACTION_CALL_SCRIPT_RESET",

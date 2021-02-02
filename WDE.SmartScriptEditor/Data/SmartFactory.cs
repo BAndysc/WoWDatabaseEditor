@@ -245,7 +245,7 @@ namespace WDE.SmartScriptEditor.Data
                 {
                     key = $"{data.Name}_{i}";
                     if (!parameterFactory.IsRegistered(key))
-                        parameterFactory.Register(key, new Parameter(){Items = data.Parameters[i].Values});
+                        parameterFactory.Register(key, data.Parameters[i].Type == "FlagParameter" ? new FlagParameter(){Items = data.Parameters[i].Values} : new Parameter(){Items = data.Parameters[i].Values});
                 }
                 
                 IParameter<int> parameter = parameterFactory.Factory(key);

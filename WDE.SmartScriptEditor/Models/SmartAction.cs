@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
@@ -116,6 +117,8 @@ namespace WDE.SmartScriptEditor.Models
                             pram4value = GetParameter(3).Value,
                             pram5value = GetParameter(4).Value,
                             pram6value = GetParameter(5).Value,
+                            target_x = target.X.ToString(CultureInfo.InvariantCulture),
+                            target_y = target.Y.ToString(CultureInfo.InvariantCulture),
                             comment = Comment
                         });
                     return output;

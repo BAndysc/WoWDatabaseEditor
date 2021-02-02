@@ -172,6 +172,9 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "incompatible")]
         public IList<int> Incompatible { get; set; }
 
+        [JsonProperty(PropertyName = "tags")]
+        public IList<string> Tags { get; set; }
+        
         [JsonProperty(PropertyName = "do_not_propose_target")]
         public bool DoNotProposeTarget { get; set; }
 
@@ -189,9 +192,6 @@ namespace WDE.SmartScriptEditor.Data
 
         [JsonProperty(PropertyName = "is_timed")]
         public bool IsTimed { get; set; }
-
-        [JsonProperty(PropertyName = "tags")]
-        public string Tags { get; set; }
 
         [JsonProperty(PropertyName = "usable_with_events")]
         public IList<int> UsableWithEvents { get; set; }

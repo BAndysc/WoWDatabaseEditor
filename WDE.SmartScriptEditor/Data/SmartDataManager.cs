@@ -38,8 +38,9 @@ namespace WDE.SmartScriptEditor.Data
     {
         private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new();
         private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> smartNameData = new();
-        private readonly SmartDataProvider provider;
-        public SmartDataManager(SmartDataProvider provider)
+        private readonly ISmartDataProvider provider;
+        
+        public SmartDataManager(ISmartDataProvider provider)
         {
             Load(SmartType.SmartEvent, provider.GetEvents());
             Load(SmartType.SmartAction, provider.GetActions());

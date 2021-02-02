@@ -238,6 +238,71 @@
             "2": {"name": "Set"}
         }
 	},
+	"SpellImmunityTypeParameter": {
+		"name": "Spell immunity type",
+		"prefix": "IMMUNITY_",
+		"values": {
+			"0": {"name": "effect", "description": "SpellEffects"},
+			"1": {"name": "state", "description": "AuraType"},
+			"2": {"name": "school", "description": "SpellSchoolMask"},
+			"3": {"name": "damage", "description": "SpellSchoolMask"},
+			"4": {"name": "dispel", "description": "DispelType"},
+			"5": {"name": "mechanic", "description": "Mechanics"},
+			"6": {"name": "id"}
+		}
+	},
+	"MovementFlagParameter": {
+		"isflag": true,
+		"inmenu": true,
+		"name": "Movement flag",
+		"prefix": "MOVEMENT_FLAG_",
+		"values": {
+			"0": {"name": "NONE"},
+			"1": {"name": "FORWARD"},
+			"2": {"name": "BACKWARD"},
+			"4": {"name": "STRAFE_LEFT"},
+			"8": {"name": "STRAFE_RIGHT"},
+			"16": {"name": "LEFT"},
+			"32": {"name": "RIGHT"},
+			"64": {"name": "PITCH_UP"},
+			"128": {"name": "PITCH_DOWN"},
+			"256": {"name": "WALKING", "description": "Walking"},
+			"512": {"name": "ONTRANSPORT", "description": "Used for flying on some creatures"},
+			"1024": {"name": "DISABLE_GRAVITY", "description": "Former MOVEMENTFLAG_LEVITATING. This is used when walking is not possible."},
+			"2048": {"name": "ROOT", "description": "Must not be set along with MOVEMENTFLAG_MASK_MOVING"},
+			"4096": {"name": "FALLING", "description": "damage dealt on that type of falling"},
+			"8192": {"name": "FALLING_FAR"},
+			"16384": {"name": "PENDING_STOP"},
+			"32768": {"name": "PENDING_STRAFE_STOP"},
+			"65536": {"name": "PENDING_FORWARD"},
+			"131072": {"name": "PENDING_BACKWARD"},
+			"262144": {"name": "PENDING_STRAFE_LEFT"},
+			"524288": {"name": "PENDING_STRAFE_RIGHT"},
+			"1048576": {"name": "PENDING_ROOT"},
+			"2097152": {"name": "SWIMMING", "description": "appears with fly flag also"},
+			"4194304": {"name": "ASCENDING", "description": "press \"space\" when flying"},
+			"8388608": {"name": "DESCENDING"},
+			"16777216": {"name": "CAN_FLY", "description": "Appears when unit can fly AND also walk"},
+			"33554432": {"name": "FLYING", "description": "unit is actually flying. pretty sure this is only used for players. creatures use disable_gravity"},
+			"67108864": {"name": "SPLINE_ELEVATION", "description": "used for flight paths"},
+			"134217728": {"name": "SPLINE_ENABLED", "description": "used for flight paths"},
+			"268435456": {"name": "WATERWALKING", "description": "prevent unit from falling through water"},
+			"536870912": {"name": "FALLING_SLOW", "description": "active rogue safe fall spell (passive)"},
+			"1073741824": {"name": "HOVER", "description": "hover, cannot jump"}			
+		}
+	},
+	"SmartCastFlagsParameter": {
+		"isflag": true,
+		"inmenu": true,
+		"name": "Smart cast flags",
+		"prefix": "SMARTCAST_",
+		"values": {
+			"1": {"name": "interrupt previous", "description": "Interrupt any spell casting"},
+			"2": {"name": "triggered", "description": "Triggered (this makes spell cost zero mana and have no cast time)"},
+			"32": {"name": "aura not present", "description": "only cast if target does not have aura from spell"},
+			"64": {"name": "combat move", "description": "Prevents combat movement if cast successful. Allows movement on range, OOM, LOS"}
+		}
+	},
 	"ExtraFlagParameter": {
 		"isflag": true,
 		"inmenu": true,

@@ -18,14 +18,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartDataDefinesListViewModel : BindableBase, IDocument
     {
-        private readonly ISmartDataProvider smartDataProvider;
+        private readonly ISmartRawDataProvider smartDataProvider;
         private readonly IParameterFactory parameterFactory;
         private readonly SmartDataSourceMode dataSourceMode;
         private readonly ISmartDataManager smartDataManager;
         private readonly IMessageBoxService messageBoxService;
         private readonly IWindowManager windowManager;
 
-        public SmartDataDefinesListViewModel(ISmartDataProvider smartDataProvider, ISmartDataManager smartDataManager, IParameterFactory parameterFactory,
+        public SmartDataDefinesListViewModel(ISmartRawDataProvider smartDataProvider, ISmartDataManager smartDataManager, IParameterFactory parameterFactory,
             ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager, SmartDataSourceMode dataSourceMode)
         {
             this.smartDataProvider = smartDataProvider;

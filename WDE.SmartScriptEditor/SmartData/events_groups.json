@@ -139,7 +139,9 @@
         "group_members": [
             "SMART_EVENT_DISTANCE_CREATURE",
             "SMART_EVENT_DISTANCE_GAMEOBJECT",
-            "SMART_EVENT_IS_BEHIND_TARGET"
+            "SMART_EVENT_IS_BEHIND_TARGET",
+            "SMART_EVENT_NEAR_PLAYERS_AC",
+            "SMART_EVENT_NEAR_PLAYERS_NEGATION_AC"
         ]
     },
     {
