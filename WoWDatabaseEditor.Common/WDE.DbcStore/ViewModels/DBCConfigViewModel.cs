@@ -69,5 +69,7 @@ namespace WDE.DbcStore.ViewModels
         public string Name => "DBC";
 
         public ICommand Save { get; }
+
+        public bool IsRestartRequired => true;
     }
 }

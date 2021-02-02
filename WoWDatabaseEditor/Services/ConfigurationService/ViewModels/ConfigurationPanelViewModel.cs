@@ -8,14 +8,18 @@ using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 
 namespace WoWDatabaseEditor.Services.ConfigurationService.ViewModels
 {
     public class ConfigurationPanelViewModel : BindableBase, IDocument
     {
-        public ConfigurationPanelViewModel(Func<IEnumerable<IConfigurable>> configs)
+        private readonly IMessageBoxService messageBoxService;
+
+        public ConfigurationPanelViewModel(Func<IEnumerable<IConfigurable>> configs, IMessageBoxService messageBoxService)
         {
+            this.messageBoxService = messageBoxService;
             ContainerTabItems = new ObservableCollection<IConfigurable>();
 
             ContainerTabItems.AddRange(configs());
@@ -40,10 +44,24 @@ namespace WoWDatabaseEditor.Services.ConfigurationService.ViewModels
 
         private void SaveAll()
         {
+            bool restartRequired = false;
             foreach (var tab in ContainerTabItems)
             {
                 if (tab.IsModified)
+                {
                     tab.Save.Execute(null);
+                    restartRequired |= tab.IsRestartRequired;
+                }
+            }
+
+            if (restartRequired)
+            {
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Settings updated")
+                    .SetMainInstruction("Restart is required")
+                    .SetContent("To apply new settings, you have to restart the application")
+                    .SetIcon(MessageBoxIcon.Information)
+                    .WithOkButton(true)
+                    .Build());
             }
         }
 

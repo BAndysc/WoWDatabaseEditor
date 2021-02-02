@@ -48,6 +48,7 @@ namespace WDE.ThemeChanger.ViewModels
 
         public ICommand Save { get; }
         public string Name => "Appearance";
+        public bool IsRestartRequired => false;
 
         private bool isModified;
         public bool IsModified

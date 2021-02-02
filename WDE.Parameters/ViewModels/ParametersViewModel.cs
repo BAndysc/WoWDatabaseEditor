@@ -44,5 +44,7 @@ namespace WDE.Parameters.ViewModels
         public string Name => "Parameters browser";
         
         public bool IsModified => false;
+
+        public bool IsRestartRequired => false;
     }
 }

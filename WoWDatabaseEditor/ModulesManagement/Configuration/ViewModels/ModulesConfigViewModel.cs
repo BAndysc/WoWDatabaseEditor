@@ -37,6 +37,7 @@ namespace WoWDatabaseEditor.ModulesManagement.Configuration.ViewModels
         public string Name => "Modules";
         public ICommand Save { get; }
         public bool IsModified => false;
+        public bool IsRestartRequired => false;
     }
 
     internal class ModuleConfigModel

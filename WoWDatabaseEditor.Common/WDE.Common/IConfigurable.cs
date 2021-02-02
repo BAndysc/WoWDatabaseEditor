@@ -12,5 +12,6 @@ namespace WDE.Common
         ICommand Save { get; }
         string Name { get; }
         bool IsModified { get; }
+        bool IsRestartRequired { get; }
     }
 }

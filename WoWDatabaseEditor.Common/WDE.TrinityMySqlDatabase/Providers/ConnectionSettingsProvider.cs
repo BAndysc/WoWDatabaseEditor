@@ -48,8 +48,6 @@ namespace WDE.TrinityMySqlDatabase.Providers
             {
                 ser.Serialize(file, DbAccess);
             }
-
-            MessageBox.Show("Restart the application.");
         }
     }
 }

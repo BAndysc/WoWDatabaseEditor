@@ -32,8 +32,11 @@
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <ContentControl utils1:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
-                                    VerticalContentAlignment="Stretch" />
+                    <DockPanel LastChildFill="True" Margin="7,5">
+                        <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontSize="32" FontWeight="Light" />
+                        <ContentControl utils1:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch" />
+                    </DockPanel>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>

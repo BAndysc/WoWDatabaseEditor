@@ -41,8 +41,6 @@ namespace WDE.DbcStore.Providers
             {
                 ser.Serialize(file, DBCSettings);
             }
-
-            MessageBox.Show("Restart the application.");
         }
     }
 }

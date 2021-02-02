@@ -97,5 +97,7 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
             get => isModified;
             private set => SetProperty(ref isModified, value);
         }
+
+        public bool IsRestartRequired => true;
     }
 }
