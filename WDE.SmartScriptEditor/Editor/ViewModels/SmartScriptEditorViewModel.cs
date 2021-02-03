@@ -815,7 +815,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.item = item;
             Title = itemNameRegistry.GetName(item);
             
-            Script = new SmartScript(this.item, smartFactory, smartDataManager);
+            Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService);
             Script.ScriptSelectedChanged += EventChildrenSelectionChanged;
             
             Together.Add(new NewActionViewModel());
@@ -886,8 +886,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task AsyncLoad()
         {
-            var lines = database.GetScriptFor(this.item.Entry, this.item.SmartType);
-            var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, this.item.Entry, (int)this.item.SmartType);
+            var lines = database.GetScriptFor(this.item.Entry, this.item.SmartType).ToList();
+            var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, this.item.Entry, (int)this.item.SmartType).ToList();
             script.Load(lines, conditions);
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));

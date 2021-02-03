@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using WDE.Common.Database;
+using WDE.Common.Services.MessageBox;
 using WDE.Conditions.Data;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models.Helpers;
@@ -15,7 +16,8 @@ namespace WDE.SmartScriptEditor.Models
     {
         private readonly ISmartFactory smartFactory;
         private readonly ISmartDataManager smartDataManager;
-        
+        private readonly IMessageBoxService messageBoxService;
+
         public readonly int EntryOrGuid;
         public readonly SmartScriptType SourceType;
         public readonly ObservableCollection<SmartEvent> Events;
@@ -31,10 +33,14 @@ namespace WDE.SmartScriptEditor.Models
             selectionHelper.Dispose();
         }
         
-        public SmartScript(SmartScriptSolutionItem item, ISmartFactory smartFactory, ISmartDataManager smartDataManager)
+        public SmartScript(SmartScriptSolutionItem item, 
+            ISmartFactory smartFactory,
+            ISmartDataManager smartDataManager,
+            IMessageBoxService messageBoxService)
         {
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
+            this.messageBoxService = messageBoxService;
             EntryOrGuid = item.Entry;
             SourceType = item.SmartType;
             Events = new ObservableCollection<SmartEvent>();
@@ -48,19 +54,40 @@ namespace WDE.SmartScriptEditor.Models
             ScriptSelectedChanged?.Invoke();
         }
 
-        public void Load(IEnumerable<ISmartScriptLine> lines, IEnumerable<IConditionLine> conditions)
+        public void Load(IList<ISmartScriptLine> lines, IList<IConditionLine> conditions)
         {
             int? entry = null;
             SmartScriptType? source = null;
-            int previousLink = -1;
-            SmartEvent currentEvent = null;
 
             var conds = ParseConditions(conditions);
             SortedDictionary<int, SmartEvent> triggerIdToActionParent = new();
             SortedDictionary<int, SmartEvent> triggerIdToEvent = new();
+            Dictionary<int, SmartEvent> linkToSmartEventParent = new();
 
+            // find double links (multiple events linking to same event, this is not supported by design)
+            var doubleLinks = lines
+                .Where(line => line.Link > 0)
+                .GroupBy(link => link.Link)
+                .Where(pair => pair.Count() > 1)
+                .Select(pair => pair.Key)
+                .ToHashSet();
+            
+            Dictionary<int, int> linkToTriggerTimedEventId = null;
+            if (doubleLinks.Count > 0)
+            {
+                int nextFreeTriggerTimedEvent = lines.Where(e => e.Id == SmartConstants.EventTriggerTimed)
+                    .Select(e => e.EventParam1)
+                    .DefaultIfEmpty(0)
+                    .Max() + 1;
+
+                linkToTriggerTimedEventId = doubleLinks.Select(linkId => (linkId, nextFreeTriggerTimedEvent++))
+                    .ToDictionary(pair => pair.linkId, pair => pair.Item2);
+            }
+            
             foreach (ISmartScriptLine line in lines)
             {
+                SmartEvent currentEvent = null;
+                
                 if (!entry.HasValue)
                     entry = line.EntryOrGuid;
                 else
@@ -71,21 +98,29 @@ namespace WDE.SmartScriptEditor.Models
                 else
                     Debug.Assert((int) source.Value == line.ScriptSourceType);
 
-                if (previousLink != line.Id)
+                if (!linkToSmartEventParent.TryGetValue(line.Id, out currentEvent))
                 {
                     currentEvent = SafeEventFactory(line);
+                        
                     if (currentEvent != null)
                     {
                         if (currentEvent.Id == SmartConstants.EventTriggerTimed)
                             triggerIdToEvent[currentEvent.GetParameter(0).Value] = currentEvent;
+                        else if (currentEvent.Id == SmartConstants.EventLink && doubleLinks.Contains(line.Id))
+                        {
+                            smartFactory.UpdateEvent(currentEvent, SmartConstants.EventTriggerTimed);
+                            currentEvent.GetParameter(0).Value = linkToTriggerTimedEventId![line.Id];
+                        }
+
                         if (conds.TryGetValue(line.Id, out var conditionList))
                             currentEvent.Conditions.AddRange(conditionList);
+                        
                         Events.Add(currentEvent);
                     }
                     else
                         continue;
                 }
-
+                
                 string comment = line.Comment.Contains(" // ") ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim() : "";
 
                 if (!string.IsNullOrEmpty(comment) && line.ActionType == SmartConstants.ActionNone)
@@ -112,8 +147,19 @@ namespace WDE.SmartScriptEditor.Models
                         triggerIdToActionParent[action.GetParameter(0).Value] = currentEvent;
                     currentEvent.AddAction(action);
                 }
-
-                previousLink = line.Link;
+                
+                if (line.Link != 0 && !doubleLinks.Contains(line.Link))
+                {
+                    linkToSmartEventParent[line.Link] = currentEvent;
+                }
+                else if (line.Link != 0)
+                {
+                    var actionCallLinkedAsTrigger = smartFactory.ActionFactory(SmartConstants.ActionTriggerTimed,
+                        smartFactory.SourceFactory(SmartConstants.ActionNone),
+                        smartFactory.TargetFactory(SmartConstants.TargetNone));
+                    actionCallLinkedAsTrigger.GetParameter(0).Value = linkToTriggerTimedEventId![line.Link];
+                    currentEvent.AddAction(actionCallLinkedAsTrigger);
+                }
             }
 
             var sortedTriggers = triggerIdToEvent.Keys.ToList();
@@ -143,6 +189,18 @@ namespace WDE.SmartScriptEditor.Models
                 Events.Remove(@event);
                 foreach (SmartAction a in @event.Actions)
                     caller.AddAction(a);
+            }
+
+            if (doubleLinks.Count > 0)
+            {
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Script modified")
+                    .SetMainInstruction("Script with multiple links")
+                    .SetContent(
+                        "This script contains multiple events pointing to the same event (at least two events have the same `link` field). This is not supported by design in this editor. Therefore those links has been replaced with trigger_timed_event for you. The effect of the script should be the same")
+                    .SetFooter("Nothing has been saved nowhere yet. This is just an note about loaded script.")
+                    .WithOkButton(false)
+                    .SetIcon(MessageBoxIcon.Warning)
+                    .Build());
             }
         }
 

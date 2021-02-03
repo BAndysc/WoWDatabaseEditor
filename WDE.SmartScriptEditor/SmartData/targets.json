@@ -139,7 +139,7 @@
                 "description": "It is used only to confirm found GUID is of this entry. Can be left to 0."
             }
         ],
-        "description": "Creature {pram1}",
+        "description": "Creature{pram2value:choose(0):| {pram2}} with guid {pram1}",
         "name_readable": "Creature by spawnId",
         "types": [
             "Creature"
@@ -225,7 +225,7 @@
                 "description": "It is used only to confirm found GUID is of this entry. Can be left to 0."
             }
         ],
-        "description": "Gameobject {pram1}",
+        "description": "Gameobject{pram2value:choose(0):| {pram2}} with guid {pram1}",
         "name_readable": "Gameobject by spawnId",
         "types": [
             "GameObject"

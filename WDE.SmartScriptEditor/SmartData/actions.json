@@ -1318,7 +1318,30 @@
     {
         "id": 66,
         "name": "SMART_ACTION_SET_ORIENTATION",
-        "description": "{source}: {targetid:choose(1|8):Look at home position|Look at {targetcoords}|Look at {target}}",
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
+        "description": "{source}: {targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}",
+        "name_readable": "Set orientation",
+        "uses_target": true,
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 66,
+        "name": "SMART_ACTION_SET_ORIENTATION_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Instant change",
+                "description": "Calls also Unit::SetOrientation (beside Unit::SetFacingTo)"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Random"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):{targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}|Set random orientation}{pram1value:choose(0):| (instant change)}",
         "name_readable": "Set orientation",
         "uses_target": true,
         "target_is_source": false,
@@ -1411,15 +1434,30 @@
     {
         "id": 70,
         "name": "SMART_ACTION_ENABLE_TEMP_GOBJ",
+        "tags": ["TrinityWrath", "TrinityCata"],
         "parameters": [
             {
                 "type": "Parameter",
-                "name": "Duration",
-                "description": "in ms"
+                "name": "Duration"
             }
         ],
-        "description": "{source}: enabled for {pram1} ms",
+        "description": "{source}: Enable for {pram1} ms",
         "name_readable": "Enable Temp Gobject",
+        "uses_target": true,
+        "target_is_source": true
+    },
+    {
+        "id": 70,
+        "name": "SMART_ACTION_RESPAWN_TARGET",
+        "tags": ["Azeroth", "TrinityMaster"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Duration"
+            }
+        ],
+        "description": "{source}: Set respawn timer to {pram1} ms",
+        "name_readable": "Set respawn timer/respawn",
         "uses_target": true,
         "target_is_source": true
     },

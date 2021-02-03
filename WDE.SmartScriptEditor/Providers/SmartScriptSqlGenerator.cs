@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Events;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Data;
@@ -39,11 +41,16 @@ namespace WDE.SmartScriptEditor.Providers
             if (args.Sql != null)
                 return args.Sql;
 
-            SmartScript script = new(item, smartFactory.Value, smartDataManager.Value);
-            var lines = database.Value.GetScriptFor(item.Entry, item.SmartType);
-            var conditions = database.Value.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, item.Entry, (int)item.SmartType);
+            SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService());
+            var lines = database.Value.GetScriptFor(item.Entry, item.SmartType).ToList();
+            var conditions = database.Value.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, item.Entry, (int)item.SmartType).ToList();
             script.Load(lines, conditions);
             return new SmartScriptExporter(script, smartFactory.Value, smartDataManager.Value).GetSql();
+        }
+
+        private class EmptyMessageboxService : IMessageBoxService
+        {
+            public T ShowDialog<T>(IMessageBox<T> messageBox) => default;
         }
     }
 }

@@ -119,6 +119,8 @@ namespace WDE.SmartScriptEditor.Models
                             pram6value = GetParameter(5).Value,
                             target_x = target.X.ToString(CultureInfo.InvariantCulture),
                             target_y = target.Y.ToString(CultureInfo.InvariantCulture),
+                            target_z = target.Z.ToString(CultureInfo.InvariantCulture),
+                            target_o = target.O.ToString(CultureInfo.InvariantCulture),
                             comment = Comment
                         });
                     return output;
