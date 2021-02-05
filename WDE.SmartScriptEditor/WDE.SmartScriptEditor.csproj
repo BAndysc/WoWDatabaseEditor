@@ -39,9 +39,6 @@
     <None Update="SmartData\events_groups.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="SmartData\parameters.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="SmartData\targets.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
