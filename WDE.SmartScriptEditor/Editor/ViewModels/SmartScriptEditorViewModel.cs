@@ -390,7 +390,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var selectedActions = Events.SelectMany(e => e.Actions).Where(e => e.IsSelected).ToList();
                     if (selectedActions.Count > 0)
                     {
-                        SmartEvent fakeEvent = new(-1) {ReadableHint = ""};
+                        SmartEvent fakeEvent = new(-1) {ReadableHint = "", Parent = script};
                         foreach (SmartAction a in selectedActions)
                             fakeEvent.AddAction(a.Copy());
 
@@ -404,7 +404,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var selectedConditions = Events.SelectMany(e => e.Conditions).Where(e => e.IsSelected).ToList();
                     if (selectedConditions.Count > 0)
                     {
-                        SmartEvent fakeEvent = new(-1) {ReadableHint = ""};
+                        SmartEvent fakeEvent = new(-1) {ReadableHint = "", Parent = script};
                         foreach (SmartCondition c in selectedConditions)
                             fakeEvent.Conditions.Add(c.Copy());
 
@@ -949,6 +949,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SmartSource source = smartFactory.SourceFactory(sourceId.Value);
 
             SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
+            ev.Parent = e;
             if (EditActionCommand(ev))
                 e.Actions.Add(ev);
         }
@@ -967,6 +968,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var conditionData = conditionDataManager.GetConditionData(conditionId.Value);
 
             SmartCondition ev = smartFactory.ConditionFactory(conditionId.Value);
+            ev.Parent = e;
             
             if ((conditionData.Parameters?.Count ?? 0) == 0 || EditConditionCommand(ev))
                 e.Conditions.Add(ev);
@@ -1036,6 +1038,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (id.HasValue)
             {
                 SmartEvent ev = smartFactory.EventFactory(id.Value);
+                ev.Parent = script;
                 if (EditEventCommand(ev))
                     script.Events.Add(ev);
             }
@@ -1044,6 +1047,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private ParametersEditViewModel ActionEditViewModel(SmartAction originalAction, bool editOriginal = false)
         {
             SmartAction obj = editOriginal ? originalAction : originalAction.Copy();
+            if (!editOriginal)
+                obj.Parent = originalAction.Parent; // fake parent
             SmartGenericJsonData actionData = smartDataManager.GetRawData(SmartType.SmartAction, originalAction.Id);
             
             var parametersList = new List<(ParameterValueHolder<int>, string)>();
@@ -1164,7 +1169,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private ParametersEditViewModel ConditionEditViewModel(SmartCondition originalCondition, bool editOriginal = false)
         {
             SmartCondition obj = editOriginal? originalCondition : originalCondition.Copy();
-
+            if (!editOriginal)
+                obj.Parent = originalCondition.Parent; // fake parent
+            
             var actionList = new List<EditableActionData>();
             var parametersList = new List<(ParameterValueHolder<int>, string)>();
 
@@ -1226,7 +1233,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private ParametersEditViewModel EventEditViewModel(SmartEvent originalEvent, bool editOriginal = false)
         {
             SmartEvent ev = editOriginal ? originalEvent : originalEvent.ShallowCopy();
-
+            if (!editOriginal)
+                ev.Parent = originalEvent.Parent; // fake parent
+            
             var actionList = new List<EditableActionData>();
             var parametersList = new List<(ParameterValueHolder<int>, string)>
             {

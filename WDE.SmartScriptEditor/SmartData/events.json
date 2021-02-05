@@ -124,8 +124,8 @@
           },
           {
             "warning_type": "NOT_SET",
-            "compare_type": "EQUALS",
-            "type": "EQUALS",
+            "compare_type": "NOT_EQUALS",
+            "type": "NOT_EQUALS",
             "compared_any_param": "pram1",
             "compared_to_any_param": "pram2"
           }
@@ -385,8 +385,8 @@
           },
           {
             "warning_type": "NOT_SET",
-            "compare_type": "EQUALS",
-            "type": "EQUALS",
+            "compare_type": "NOT_EQUALS",
+            "type": "NOT_EQUALS",
             "compared_any_param": "pram1",
             "compared_to_any_param": "pram2"
           }
@@ -2142,8 +2142,8 @@
           },
           {
             "warning_type": "NOT_SET",
-            "compare_type": "EQUALS",
-            "type": "EQUALS",
+            "compare_type": "NOT_EQUALS",
+            "type": "NOT_EQUALS",
             "compared_any_param": "pram1",
             "compared_to_any_param": "pram2"
           }

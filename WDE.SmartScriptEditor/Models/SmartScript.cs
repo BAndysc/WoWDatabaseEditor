@@ -7,6 +7,7 @@ using System.Windows;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Conditions.Data;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models.Helpers;
 
@@ -47,6 +48,13 @@ namespace WDE.SmartScriptEditor.Models
             selectionHelper = new SmartSelectionHelper(this);
             selectionHelper.ScriptSelectedChanged += CallScriptSelectedChanged;
             AllSmartObjectsFlat = selectionHelper.AllSmartObjectsFlat;
+            
+            Events.ToStream()
+                .Subscribe((e) =>
+                {
+                    if (e.Type == CollectionEventType.Add)
+                        e.Item.Parent = this;
+                });
         }
 
         private void CallScriptSelectedChanged()

@@ -19,6 +19,8 @@ namespace WDE.SmartScriptEditor.Models
         private ParameterValueHolder<int> cooldownMin;
         private ParameterValueHolder<int> flags;
         private ParameterValueHolder<int> phases;
+        
+        public SmartScript Parent { get; set; }
 
         public SmartEvent(int id) : base(SmartEventParamsCount, id)
         {
@@ -92,7 +94,8 @@ namespace WDE.SmartScriptEditor.Models
                             pram1 = GetParameter(0).Value,
                             pram2 = GetParameter(1).Value,
                             pram3 = GetParameter(2).Value,
-                            pram4 = GetParameter(3).Value
+                            pram4 = GetParameter(3).Value,
+                            source_type = (int?)Parent?.SourceType ?? 0
                         }))
                         {
                             readable = rule.Description;

@@ -194,6 +194,7 @@ namespace WDE.SmartScriptEditor.Exporter
                         smartFactory.UpdateSource(actualAction.Source, smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource).Id);
 
                     SmartEvent eventToSerialize = actualEvent.ShallowCopy();
+                    eventToSerialize.Parent = script;
                     eventToSerialize.Actions.Add(actualAction);
 
                     var serialized = eventToSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, linkTo);
@@ -225,7 +226,8 @@ namespace WDE.SmartScriptEditor.Exporter
                 {
                     new(-1, new SmartSource(-1) {ReadableHint = ""}, new SmartTarget(-1) {ReadableHint = ""})
                     {
-                        ReadableHint = ""
+                        ReadableHint = "",
+                        Parent = e
                     }
                 }
                 : e.Actions;
