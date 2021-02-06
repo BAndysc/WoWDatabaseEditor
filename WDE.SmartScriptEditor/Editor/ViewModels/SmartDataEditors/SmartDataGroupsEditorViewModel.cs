@@ -30,7 +30,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly SmartDataGroupsHistory historyHandler;
         
         public SmartDataGroupsEditorViewModel(ISmartRawDataProvider smartDataProvider, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IWindowManager windowManager, IHistoryManager historyManager, SmartDataSourceMode dataSourceMode)
+            IWindowManager windowManager, Func<IHistoryManager> historyCreator, SmartDataSourceMode dataSourceMode)
         {
             this.smartDataProvider = smartDataProvider;
             this.messageBoxService = messageBoxService;
@@ -40,14 +40,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AddGroup = new DelegateCommand(AddGroupToSource);
             Save = new DelegateCommand(() =>
             {
-                IsModified = false;
                 taskRunner.ScheduleTask("Saving Group Definitions to file", SaveGroupsToFile);
             });
             DeleteItem = new DelegateCommand<object>(DeleteItemFromSource);
             AddMember = new DelegateCommand<SmartDataGroupsEditorData>(AddItemToGroup);
             EditItem = new DelegateCommand<SmartDataGroupsEditorData>(EditSourceItem);
             // history setup
-            History = historyManager;
+            History = historyCreator();
             historyHandler = new SmartDataGroupsHistory(SourceItems);
             UndoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             RedoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
@@ -80,13 +79,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private void DeleteItemFromSource(object obj)
         {
             if (obj is SmartDataGroupsEditorData source)
-            {
-                IsModified = true;
                 SourceItems.Remove(source);
-            }
             else if (obj is SmartDataGroupsEditorDataNode node)
             {
-                IsModified = true;
                 node.Owner.Members.Remove(node);
                 node.Owner = null;
             }
@@ -97,10 +92,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var result = "";
             OpenNameEditingWindow(GetNewItemNamePrefix(), out result);
             if (!string.IsNullOrWhiteSpace(result))
-            {
-                IsModified = true;
                 data.Members.Add(new SmartDataGroupsEditorDataNode(result, data));
-            }
         }
 
         private void EditSourceItem(SmartDataGroupsEditorData data)
@@ -118,17 +110,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (windowManager.ShowDialog(vm))
             {
                 if (!string.IsNullOrWhiteSpace(vm.Name))
-                {
-                    IsModified = true;
                     name = vm.Name;
-                }
                 else
                 {
                     messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
-                                    .SetMainInstruction($"Group name cannot be empty!")
-                                    .SetIcon(MessageBoxIcon.Error)
-                                    .WithOkButton(true)
-                                    .Build());
+                        .SetMainInstruction($"Group name cannot be empty!")
+                        .SetIcon(MessageBoxIcon.Error)
+                        .WithOkButton(true)
+                        .Build());
                 }
             }
         }

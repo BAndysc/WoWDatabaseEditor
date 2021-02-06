@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using WDE.Common.History;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 
@@ -10,42 +11,33 @@ namespace WDE.SmartScriptEditor.History
     public class SmartDataGroupsHistory: HistoryHandler, IDisposable
     {
         private readonly ObservableCollection<SmartDataGroupsEditorData> groupsData;
+        private readonly IDisposable groupsDataSubscription;
 
         public SmartDataGroupsHistory(ObservableCollection<SmartDataGroupsEditorData> groupsData)
         {
             this.groupsData = groupsData;
-            groupsData.CollectionChanged += OnDataCollectionChanged;
-            foreach (var data in groupsData)
-                BindGroupData(data);
+            groupsDataSubscription = groupsData.ToStream().Subscribe(e =>
+            {
+                if (e.Type == CollectionEventType.Add)
+                {
+                    PushAction(new SmartDataGroupHistoryAction(e.Item, e.Index,
+                        GroupHistoryActionMode.ActionAdd, groupsData));
+                    BindGroupData(e.Item);
+                }
+                else if (e.Type == CollectionEventType.Remove)
+                {
+                    UnbindGroupData(e.Item);
+                    PushAction(new SmartDataGroupHistoryAction(e.Item, e.Index,
+                        GroupHistoryActionMode.ActionRemove, groupsData));
+                }
+            });
         }
         
         public void Dispose()
         {
-            groupsData.CollectionChanged -= OnDataCollectionChanged;
+            groupsDataSubscription.Dispose();
             foreach (var data in groupsData)
                 UnbindGroupData(data);
-        }
-
-        private void OnDataCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                if (e.NewItems != null)
-                {
-                    foreach(var item in e.NewItems)
-                        PushAction(new SmartDataGroupHistoryAction(item as SmartDataGroupsEditorData, e.NewStartingIndex,
-                            GroupHistoryActionMode.ACTION_ADD, groupsData));
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                if (e.OldItems != null)
-                {
-                    foreach(var item in e.OldItems)
-                        PushAction(new SmartDataGroupHistoryAction(item as SmartDataGroupsEditorData, e.OldStartingIndex,
-                            GroupHistoryActionMode.ACTION_REMOVE, groupsData));
-                }
-            }
         }
 
         private void OnDataNameChanged(SmartDataGroupsEditorData data, string newName, string oldName)
@@ -63,7 +55,7 @@ namespace WDE.SmartScriptEditor.History
                     {
                         var node = item as SmartDataGroupsEditorDataNode;
                         PushAction(new SmartDataGroupMemberHistoryAction(node, e.NewStartingIndex,
-                            GroupHistoryActionMode.ACTION_ADD, node.Owner, node.Owner.Members));
+                            GroupHistoryActionMode.ActionAdd, node.Owner, node.Owner.Members));
                     }
                 }
             }
@@ -75,7 +67,7 @@ namespace WDE.SmartScriptEditor.History
                     {
                         var node = item as SmartDataGroupsEditorDataNode;
                         PushAction(new SmartDataGroupMemberHistoryAction(node, e.OldStartingIndex,
-                            GroupHistoryActionMode.ACTION_REMOVE, node.Owner, node.Owner.Members));
+                            GroupHistoryActionMode.ActionRemove, node.Owner, node.Owner.Members));
                     }
                 }
             }
@@ -96,8 +88,8 @@ namespace WDE.SmartScriptEditor.History
 
     internal enum GroupHistoryActionMode 
     {
-        ACTION_ADD,
-        ACTION_REMOVE,
+        ActionAdd,
+        ActionRemove,
     }
     
     internal class SmartDataGroupHistoryAction : IHistoryAction
@@ -118,7 +110,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Undo()
         {
-            if (actionMode == GroupHistoryActionMode.ACTION_ADD)
+            if (actionMode == GroupHistoryActionMode.ActionAdd)
                 Change(true);
             else
                 Change(false);
@@ -126,7 +118,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Redo()
         {
-            if (actionMode == GroupHistoryActionMode.ACTION_ADD)
+            if (actionMode == GroupHistoryActionMode.ActionAdd)
                 Change(false);
             else
                 Change(true);
@@ -142,7 +134,7 @@ namespace WDE.SmartScriptEditor.History
 
         public string GetDescription()
         {
-            return $"{(actionMode == GroupHistoryActionMode.ACTION_ADD ? "Added to" : "Removed from")} group {element.Name}";
+            return $"{(actionMode == GroupHistoryActionMode.ActionAdd ? "Added to" : "Removed from")} group {element.Name}";
         }
     }
 
@@ -186,7 +178,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Undo()
         {
-            if (actionMode == GroupHistoryActionMode.ACTION_ADD)
+            if (actionMode == GroupHistoryActionMode.ActionAdd)
                 Change(true);
             else
                 Change(false);
@@ -194,7 +186,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Redo()
         {
-            if (actionMode == GroupHistoryActionMode.ACTION_ADD)
+            if (actionMode == GroupHistoryActionMode.ActionAdd)
                 Change(false);
             else
                 Change(true);
@@ -216,7 +208,7 @@ namespace WDE.SmartScriptEditor.History
 
         public string GetDescription()
         {
-            bool isAdd = actionMode == GroupHistoryActionMode.ACTION_ADD;
+            bool isAdd = actionMode == GroupHistoryActionMode.ActionAdd;
             return $"{(isAdd ? "Added" : "Removed")} {element.Name} {(isAdd ? "to" : "from")} group {elementOwner.Name}";
         }
     }
