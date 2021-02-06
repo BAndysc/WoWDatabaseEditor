@@ -32,7 +32,7 @@ namespace WDE.SmartScriptEditor.Providers
                         IGameObjectTemplate g = database.GetGameObjectTemplate((uint) entry);
                         return g == null || g.Name == null ? "GameObject " + entry : g.Name;
                     case SmartScriptType.AreaTrigger:
-                        return "Areatrigger " + entry;
+                        return "Clientside area trigger " + entry;
                     case SmartScriptType.Quest:
                         IQuestTemplate q = database.GetQuestTemplate((uint) entry);
                         return q == null || q.Name == null ? "Quest " + entry : q.Name;
@@ -43,8 +43,10 @@ namespace WDE.SmartScriptEditor.Providers
                         return (item.SmartType == SmartScriptType.Aura ? "Aura " : "Spell ") + entry;
                     case SmartScriptType.TimedActionList:
                         return "Timed list " + entry;
-                    case SmartScriptType.Cinematic:
-                        return "Cinematic " + entry;
+                    case SmartScriptType.AreaTriggerEntity:
+                        return "Area trigger entity " + entry;
+                    case SmartScriptType.AreaTriggerEntityServerSide:
+                        return "Serverside area trigger entity " + entry;
                 }
             }
 

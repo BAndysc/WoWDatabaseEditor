@@ -17,6 +17,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         private List<MySqlQuestTemplate>? questTemplateCache;
         private Dictionary<uint, MySqlQuestTemplate> questTemplateByEntry = new();
 
+        private List<MySqlAreaTriggerTemplate>? areaTriggerTemplates;
         private List<MySqlGameEvent>? gameEventsCache;
         
         private TrinityMySqlDatabaseProvider trinityDatabase;
@@ -82,13 +83,10 @@ namespace WDE.TrinityMySqlDatabase.Database
             return trinityDatabase.GetQuestTemplates();
         }
 
-        public IEnumerable<IGameEvent> GetGameEvents()
-        {
-            if (gameEventsCache != null)
-                return gameEventsCache;
+        public IEnumerable<IGameEvent> GetGameEvents() => gameEventsCache ?? trinityDatabase.GetGameEvents();
 
-            return trinityDatabase.GetGameEvents();
-        }
+        public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
+            areaTriggerTemplates ?? trinityDatabase.GetAreaTriggerTemplates();
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
@@ -125,16 +123,21 @@ namespace WDE.TrinityMySqlDatabase.Database
 
             public async Task Run(ITaskProgress progress)
             {
-                progress.Report(0, 4, "Loading creatures");
+                int steps = 5;
+                
+                progress.Report(0, steps, "Loading creatures");
                 cache.creatureTemplateCache = await cache.trinityDatabase.GetCreatureTemplatesAsync();
 
-                progress.Report(1, 4, "Loading gameobjects");
+                progress.Report(1, steps, "Loading gameobjects");
                 cache.gameObjectTemplateCache = await cache.trinityDatabase.GetGameObjectTemplatesAsync();
 
-                progress.Report(2, 4, "Loading game events");
+                progress.Report(2, steps, "Loading game events");
                 cache.gameEventsCache = await cache.trinityDatabase.GetGameEventsAsync();
                 
-                progress.Report(3, 4, "Loading quests");
+                progress.Report(3, steps, "Loading areatrigger templates");
+                cache.areaTriggerTemplates = await cache.trinityDatabase.GetAreaTriggerTemplatesAsync();
+                
+                progress.Report(4, steps, "Loading quests");
 
                 cache.questTemplateCache = await cache.trinityDatabase.GetQuestTemplatesAsync();
 

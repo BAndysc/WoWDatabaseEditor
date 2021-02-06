@@ -47,6 +47,7 @@ namespace WDE.TrinityMySqlDatabase
         public IGameObjectTemplate GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => impl.GetGameObjectTemplates();
         public IQuestTemplate GetQuestTemplate(uint entry) => impl.GetQuestTemplate(entry);
+        public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => impl.GetAreaTriggerTemplates();
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) =>

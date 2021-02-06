@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LinqToDB;
 using LinqToDB.Configuration;
 using LinqToDB.Data;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Tasks;
 using WDE.TrinityMySqlDatabase.Data;
@@ -17,10 +18,13 @@ namespace WDE.TrinityMySqlDatabase.Database
 {
     public class TrinityMySqlDatabaseProvider : IDatabaseProvider
     {
+        private readonly ICurrentCoreVersion currentCoreVersion;
+
         public TrinityMySqlDatabaseProvider(IConnectionSettingsProvider settings,
             DatabaseLogger databaseLogger,
-            ITaskRunner taskRunner)
+            ICurrentCoreVersion currentCoreVersion)
         {
+            this.currentCoreVersion = currentCoreVersion;
             string? host = settings.GetSettings().Host;
             DataConnection.TurnTraceSwitchOn();
             DataConnection.WriteTraceLine = databaseLogger.Log;
@@ -63,6 +67,23 @@ namespace WDE.TrinityMySqlDatabase.Database
         {
             using var model = new TrinityDatabase();
             return await (from t in model.GameEvents orderby t.Entry select t).ToListAsync();
+        }
+        
+        
+        public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
+        {
+            var task = GetAreaTriggerTemplatesAsync();
+            task.Wait();
+            return task.Result;
+        }
+        
+        public async Task<List<MySqlAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
+                return new List<MySqlAreaTriggerTemplate>();
+
+            using var model = new TrinityDatabase();
+            return await (from t in model.AreaTriggerTemplate orderby t.Id select t).ToListAsync();
         }
         
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
@@ -116,12 +137,35 @@ namespace WDE.TrinityMySqlDatabase.Database
 
             await model.BeginTransactionAsync(IsolationLevel.ReadCommitted);
             await model.SmartScript.Where(x => x.EntryOrGuid == entryOrGuid && x.ScriptSourceType == (int) type).DeleteAsync();
-            if (type == SmartScriptType.Creature)
+
+            switch (type)
             {
-                await model.CreatureTemplate.Where(p => p.Entry == (uint) entryOrGuid)
-                    .Set(p => p.AIName, "SmartAI")
-                    .Set(p => p.ScriptName, "")
-                    .UpdateAsync();
+                case SmartScriptType.Creature:
+                    await model.CreatureTemplate.Where(p => p.Entry == (uint) entryOrGuid)
+                        .Set(p => p.AIName, "SmartAI")
+                        .Set(p => p.ScriptName, "")
+                        .UpdateAsync();
+                    break;
+                case SmartScriptType.GameObject:
+                    await model.GameObjectTemplate.Where(p => p.Entry == (uint)entryOrGuid)
+                        .Set(p => p.AIName, "SmartAI")
+                        .Set(p => p.ScriptName, "")
+                        .UpdateAsync();
+                    break;
+                case SmartScriptType.AreaTrigger:
+                    await model.AreaTriggerScript.Where(p => p.Id == entryOrGuid).DeleteAsync();
+                    await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Id = entryOrGuid, ScriptName = "SmartTrigger"});
+                    break;
+                case SmartScriptType.AreaTriggerEntity:
+                    await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == false)
+                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
+                        .UpdateAsync();
+                    break;
+                case SmartScriptType.AreaTriggerEntityServerSide:
+                    await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == true)
+                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
+                        .UpdateAsync();
+                    break;
             }
             
             await model.SmartScript.BulkCopyAsync(script.Select(l => new MySqlSmartScriptLine(l)));

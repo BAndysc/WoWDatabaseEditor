@@ -36,6 +36,7 @@ namespace WDE.DbcStore
             Load();
         }
         
+        public Dictionary<int, string> AreaTriggerStore { get; internal set; } = new();
         public Dictionary<int, string> FactionStore { get; internal set; } = new();
         public Dictionary<int, string> SpellStore { get; internal set; } = new();
         public Dictionary<int, string> SkillStore { get; internal set;} = new();
@@ -90,6 +91,7 @@ namespace WDE.DbcStore
             private readonly IParameterFactory parameterFactory;
             private readonly DbcStore store;
 
+            private Dictionary<int, string> AreaTriggerStore { get; } = new();
             private Dictionary<int, string> FactionStore { get; } = new();
             private Dictionary<int, string> SpellStore { get; } = new();
             public Dictionary<int, string> SkillStore { get; } = new();
@@ -132,6 +134,7 @@ namespace WDE.DbcStore
             
             public void FinishMainThread()
             {
+                store.AreaTriggerStore = AreaTriggerStore;
                 store.FactionStore = FactionStore;
                 store.SpellStore = SpellStore;
                 store.SkillStore = SkillStore;
@@ -174,7 +177,8 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 11;
+                        max = 12;
+                        Load("AreaTrigger.dbc", 0, 0, AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 3, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
                         Load("Spell.dbc", 0, 134, SpellStore);
@@ -190,7 +194,8 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 13;
+                        max = 14;
+                        Load("AreaTrigger.dbc", 0, 0,  AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
                         Load("Spell.dbc", 0, 21, SpellStore);
@@ -208,7 +213,8 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.LEGION_26972:
                     {
-                        max = 9;
+                        max = 10;
+                        Load("AreaTrigger.db2", 16, 16, AreaTriggerStore);
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
                         Load("AreaTable.db2", 0, 2, AreaStore);

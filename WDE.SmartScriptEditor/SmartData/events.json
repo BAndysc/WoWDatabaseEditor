@@ -1838,7 +1838,9 @@
     {
         "id": 46,
         "valid_types": [
-            "AreaTrigger"
+            "AreaTrigger",
+            "AreaTriggerEntity",
+            "AreaTriggerEntityServerSide"
         ],
         "name": "SMART_EVENT_AREATRIGGER_ONTRIGGER",
         "parameters": [

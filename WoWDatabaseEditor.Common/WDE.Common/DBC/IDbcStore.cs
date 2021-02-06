@@ -6,6 +6,7 @@ namespace WDE.Common.DBC
     [UniqueProvider]
     public interface IDbcStore
     {
+        Dictionary<int, string> AreaTriggerStore { get; }
         Dictionary<int, string> SkillStore { get; }
         Dictionary<int, string> LanguageStore { get; }
         Dictionary<int, string> PhaseStore { get; }

@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 
 namespace WDE.Blueprints.Providers
@@ -9,6 +10,8 @@ namespace WDE.Blueprints.Providers
     //[AutoRegister]
     public class BlueprintItemProvider : ISolutionItemProvider
     {
+        public bool IsCompatibleWithCore(ICoreVersion core) => false;
+        
         public ISolutionItem CreateSolutionItem()
         {
             return new BlueprintSolutionItem();

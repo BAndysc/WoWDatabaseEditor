@@ -14,6 +14,8 @@ namespace WDE.Common.Database
         IGameObjectTemplate GetGameObjectTemplate(uint entry);
         IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
 
+        IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates();
+
         IQuestTemplate GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
 

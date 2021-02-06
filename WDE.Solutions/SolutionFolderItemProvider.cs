@@ -3,6 +3,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualBasic;
 using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 
 namespace WDE.Solutions
@@ -10,6 +11,8 @@ namespace WDE.Solutions
     [AutoRegister]
     public class SolutionFolderItemProvider : ISolutionItemProvider
     {
+        public bool IsCompatibleWithCore(ICoreVersion core) => true;
+        
         public string GetName()
         {
             return "Folder";

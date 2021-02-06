@@ -12,5 +12,11 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "name")]
         public string Name { get; set; } = "";
+
+        [Column(Name = "AIName")]
+        public string? AIName { get; set; }
+
+        [Column(Name = "ScriptName")]
+        public string? ScriptName { get; set; }
     }
 }
