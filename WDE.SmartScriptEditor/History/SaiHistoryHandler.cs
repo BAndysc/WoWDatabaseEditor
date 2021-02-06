@@ -6,7 +6,7 @@ using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.Utils;
 
-namespace WDE.SmartScriptEditor
+namespace WDE.SmartScriptEditor.History
 {
     public class SaiHistoryHandler : HistoryHandler, IDisposable
     {

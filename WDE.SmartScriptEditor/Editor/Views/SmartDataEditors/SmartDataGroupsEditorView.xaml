@@ -11,6 +11,8 @@
              x:Name="rootWindow">
     <UserControl.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding Save}" />
+        <KeyBinding Modifiers="Control" Key="Z" Command="{Binding Undo}" />
+        <KeyBinding Modifiers="Control" Key="Y" Command="{Binding Redo}" />
     </UserControl.InputBindings>
     <DockPanel Background="{DynamicResource SmartScripts.Background}" LastChildFill="True" HorizontalAlignment="Stretch">
         <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">

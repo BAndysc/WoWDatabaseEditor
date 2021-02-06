@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Threading.Tasks;
+using System.Linq;
 using Prism.Mvvm;
 using Prism.Commands;
 using WDE.Common.Managers;
@@ -10,9 +11,8 @@ using WDE.Common.Parameters;
 using WDE.Common.Tasks;
 using WDE.Common.Services.MessageBox;
 using WDE.SmartScriptEditor.Data;
-using WDE.SmartScriptEditor.Editor.Views;
 using WDE.SmartScriptEditor.Providers;
-using System.Linq;
+using WDE.SmartScriptEditor.History;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -24,9 +24,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ISmartDataManager smartDataManager;
         private readonly IMessageBoxService messageBoxService;
         private readonly IWindowManager windowManager;
+        private readonly SmartDataListHistoryHandler historyHandler;
 
         public SmartDataDefinesListViewModel(ISmartRawDataProvider smartDataProvider, ISmartDataManager smartDataManager, IParameterFactory parameterFactory,
-            ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager, SmartDataSourceMode dataSourceMode)
+            ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager, IHistoryManager history, SmartDataSourceMode dataSourceMode)
         {
             this.smartDataProvider = smartDataProvider;
             this.parameterFactory = parameterFactory;
@@ -49,6 +50,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     DefinesItems = new ObservableCollection<SmartGenericJsonData>();
                     break;
             }
+
             OnItemSelected = new DelegateCommand<SmartGenericJsonData?>(ShowEditorWindow);
             CreateNew = new DelegateCommand(CreateNewItem);
             DeleteItem = new DelegateCommand(DeleteSelectedItem);
@@ -58,12 +60,27 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 taskRunner.ScheduleTask("Saving modified SmartData defines", SaveDataToFile);
             }, () => IsModified);
             SelectedItemIndex = -1;
+            // history setup
+            History = history;
+            historyHandler = new SmartDataListHistoryHandler(DefinesItems);
+            UndoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
+            RedoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
+            History.PropertyChanged += (sender, args) =>
+            {
+                UndoCommand.RaiseCanExecuteChanged();
+                RedoCommand.RaiseCanExecuteChanged();
+                IsModified = !History.IsSaved;
+                RaisePropertyChanged(nameof(IsModified));
+            };
+            History.AddHandler(historyHandler);
         }
 
         public int SelectedItemIndex { get; set; }
         public DelegateCommand<SmartGenericJsonData?> OnItemSelected { get; }
         public DelegateCommand CreateNew { get; }
         public DelegateCommand DeleteItem { get; }
+        private DelegateCommand UndoCommand;
+        private DelegateCommand RedoCommand;
 
         public ObservableCollection<SmartGenericJsonData> DefinesItems { get; }
 
@@ -128,7 +145,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     infoSourceName = "Targets";
                     break;
             }
-
+            History.MarkAsSaved();
             messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Success!")
                                     .SetMainInstruction($"Editor successfully saved definitions of Smart {infoSourceName}! Also remember to modify SmartData Group file via Editor if you modified list!")
                                     .SetIcon(MessageBoxIcon.Information)
@@ -151,15 +168,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         }
 
         public string Title => "Smart Data Editor";
-        public ICommand Undo => AlwaysDisabledCommand.Command;
-        public ICommand Redo => AlwaysDisabledCommand.Command;
+        public ICommand Undo => UndoCommand;
+        public ICommand Redo => RedoCommand;
         public ICommand Copy => AlwaysDisabledCommand.Command;
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
         public ICommand Save { get; private set; }
         public ICommand CloseCommand { get; set; } = null;
         public bool CanClose => true;
-        public IHistoryManager History => null;
+        public IHistoryManager History { get; }
         private bool isModified = false;
         public bool IsModified
         {
@@ -169,7 +186,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public void Dispose()
         {
-            
+            historyHandler.Dispose();
         }
     }
 }

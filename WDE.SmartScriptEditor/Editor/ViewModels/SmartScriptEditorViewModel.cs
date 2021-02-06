@@ -32,6 +32,7 @@ using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Editor.ViewModels.Editing;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
+using WDE.SmartScriptEditor.History;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
