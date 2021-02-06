@@ -151,8 +151,6 @@ namespace WDE.SmartScriptEditor.History
         private readonly SmartDataGroupsEditorData element;
         private readonly string oldName;
         private readonly string newName;
-        // private readonly int index;
-        // private readonly ObservableCollection<SmartDataGroupsEditorData> collection;
 
         public SmartDataGroupNameHistoryModifedAction(SmartDataGroupsEditorData element, string oldName, string newName)
         {
@@ -222,36 +220,4 @@ namespace WDE.SmartScriptEditor.History
             return $"{(isAdd ? "Added" : "Removed")} {element.Name} {(isAdd ? "to" : "from")} group {elementOwner.Name}";
         }
     }
-    
-    // internal class SmartDataGroupHistoryModifedAction: IHistoryAction
-    // {
-    //     private readonly SmartDataGroupsEditorData oldElement;
-    //     private readonly SmartDataGroupsEditorData newElement;
-    //     private readonly int index;
-    //     private readonly ObservableCollection<SmartDataGroupsEditorData> collection;
-    //
-    //     public SmartDataGroupHistoryModifedAction(SmartDataGroupsEditorData oldElement, SmartDataGroupsEditorData newElement, int index, 
-    //         ObservableCollection<SmartDataGroupsEditorData> collection)
-    //     {
-    //         this.oldElement = oldElement;
-    //         this.newElement = newElement;
-    //         this.index = index;
-    //         this.collection = collection;
-    //     }
-    //
-    //     public void Undo()
-    //     {
-    //         
-    //     }
-    //
-    //     public void Redo()
-    //     {
-    //         
-    //     }
-    //
-    //     public string GetDescription()
-    //     {
-    //         return $"Modified group {oldElement.Name}";
-    //     }
-    // }
 }
