@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using WDE.Common.History;
 using WDE.Module.Attributes;
 using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Models;
@@ -24,21 +25,21 @@ namespace WDE.SmartScriptEditor.Providers
         public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityNormal;
 
         public SmartDataEditorsProvider(ISmartRawDataProvider smartDataProvider, IParameterFactory parameterFactory, ISmartDataManager smartDataManager,
-            ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager)
+            ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager, IHistoryManager history)
         {
             var editors = new List<IMenuDocumentItem> {
                 new SmartDataCategoryMenuItemProvider<SmartDataDefinesListViewModel>("Events", new object[] { smartDataProvider, smartDataManager, parameterFactory,
-                    taskRunner, messageBoxService, windowManager, SmartDataSourceMode.SD_SOURCE_EVENTS }),
+                    taskRunner, messageBoxService, windowManager, history, SmartDataSourceMode.SD_SOURCE_EVENTS }),
                 new SmartDataCategoryMenuItemProvider<SmartDataDefinesListViewModel>("Actions", new object[] { smartDataProvider, smartDataManager, parameterFactory,
-                    taskRunner, messageBoxService, windowManager, SmartDataSourceMode.SD_SOURCE_ACTIONS }),
+                    taskRunner, messageBoxService, windowManager, history, SmartDataSourceMode.SD_SOURCE_ACTIONS }),
                 new SmartDataCategoryMenuItemProvider<SmartDataDefinesListViewModel>("Targets", new object[] { smartDataProvider, smartDataManager, parameterFactory,
-                    taskRunner, messageBoxService, windowManager, SmartDataSourceMode.SD_SOURCE_TARGETS }),
+                    taskRunner, messageBoxService, windowManager, history, SmartDataSourceMode.SD_SOURCE_TARGETS }),
                 new SmartDataCategoryMenuItemProvider<SmartDataGroupsEditorViewModel>("Event Groups", new object[] { smartDataProvider, taskRunner, 
-                    messageBoxService, windowManager, SmartDataSourceMode.SD_SOURCE_EVENTS }),
+                    messageBoxService, windowManager, history, SmartDataSourceMode.SD_SOURCE_EVENTS }),
                 new SmartDataCategoryMenuItemProvider<SmartDataGroupsEditorViewModel>("Action Groups", new object[] { smartDataProvider, taskRunner, 
-                    messageBoxService, windowManager, SmartDataSourceMode.SD_SOURCE_ACTIONS }),
+                    messageBoxService, windowManager, history, SmartDataSourceMode.SD_SOURCE_ACTIONS }),
                 new SmartDataCategoryMenuItemProvider<SmartDataGroupsEditorViewModel>("Target Groups", new object[] { smartDataProvider, taskRunner, 
-                    messageBoxService, windowManager, SmartDataSourceMode.SD_SOURCE_TARGETS }),
+                    messageBoxService, windowManager, history, SmartDataSourceMode.SD_SOURCE_TARGETS }),
             };
             
             IMenuCategoryItem obj = new SmartDataCategoryItem("Smart Data", editors.ToArray());
