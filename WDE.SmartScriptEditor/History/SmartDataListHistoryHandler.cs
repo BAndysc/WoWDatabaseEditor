@@ -28,7 +28,7 @@ namespace WDE.SmartScriptEditor.History
                 if (e.NewItems != null)
                 {
                     foreach (SmartGenericJsonData data in e.NewItems)
-                        PushAction(new SmartDataListHistoryAction(in data, e.NewStartingIndex, ListHistoryActionMode.ITEM_ADDED, smartDataList));
+                        PushAction(new SmartDataListHistoryAction(in data, e.NewStartingIndex, ListHistoryActionMode.ActionAdd, smartDataList));
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -36,7 +36,7 @@ namespace WDE.SmartScriptEditor.History
                 if (e.OldItems != null)
                 {
                     foreach(SmartGenericJsonData data in e.OldItems)
-                        PushAction(new SmartDataListHistoryAction(in data, e.OldStartingIndex, ListHistoryActionMode.ITEM_REMOVED, smartDataList));
+                        PushAction(new SmartDataListHistoryAction(in data, e.OldStartingIndex, ListHistoryActionMode.ActionRemove, smartDataList));
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Replace)
@@ -56,8 +56,8 @@ namespace WDE.SmartScriptEditor.History
 
     internal enum ListHistoryActionMode
     {
-        ITEM_ADDED,
-        ITEM_REMOVED,
+        ActionAdd,
+        ActionRemove,
     }
     
     internal class SmartDataListHistoryAction : IHistoryAction
@@ -77,7 +77,7 @@ namespace WDE.SmartScriptEditor.History
         
         public void Undo()
         {
-            if (actionMode == ListHistoryActionMode.ITEM_ADDED)
+            if (actionMode == ListHistoryActionMode.ActionAdd)
                Change(true);
             else
                 Change(false);
@@ -85,7 +85,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Redo()
         {
-            if (actionMode == ListHistoryActionMode.ITEM_ADDED)
+            if (actionMode == ListHistoryActionMode.ActionAdd)
                 Change(false);
             else
                 Change(true);
@@ -101,7 +101,7 @@ namespace WDE.SmartScriptEditor.History
 
         public string GetDescription()
         {
-            return $"{(actionMode == ListHistoryActionMode.ITEM_ADDED ? "Added " : "Removed")} {element.Name}";
+            return $"{(actionMode == ListHistoryActionMode.ActionAdd ? "Added " : "Removed")} {element.Name}";
         }
     }
 

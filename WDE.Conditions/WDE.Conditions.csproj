@@ -59,4 +59,10 @@
             <Version>5.11.1</Version>
         </PackageReference>
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="History" />
+      <Folder Include="MenuItems" />
+      <Folder Include="ViewModels" />
+      <Folder Include="Views" />
+    </ItemGroup>
 </Project>

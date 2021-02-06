@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Threading.Tasks;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly SmartDataListHistoryHandler historyHandler;
 
         public SmartDataDefinesListViewModel(ISmartRawDataProvider smartDataProvider, ISmartDataManager smartDataManager, IParameterFactory parameterFactory,
-            ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager, IHistoryManager history, SmartDataSourceMode dataSourceMode)
+            ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager, Func<IHistoryManager> historyCreator, SmartDataSourceMode dataSourceMode)
         {
             this.smartDataProvider = smartDataProvider;
             this.parameterFactory = parameterFactory;
@@ -56,12 +57,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             DeleteItem = new DelegateCommand(DeleteSelectedItem);
             Save = new DelegateCommand(() =>
             {
-                IsModified = false;
                 taskRunner.ScheduleTask("Saving modified SmartData defines", SaveDataToFile);
             }, () => IsModified);
             SelectedItemIndex = -1;
             // history setup
-            History = history;
+            History = historyCreator();
             historyHandler = new SmartDataListHistoryHandler(DefinesItems);
             UndoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             RedoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
@@ -100,10 +100,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private void DeleteSelectedItem()
         {
             if (SelectedItemIndex >= 0)
-            {
                 DefinesItems.RemoveAt(SelectedItemIndex);
-                IsModified = true;
-            }
         }
 
         private void OpenEditor(SmartGenericJsonData item, bool isCreating)
@@ -111,7 +108,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var vm = GetEditorViewModel(in item, isCreating);
             if (windowManager.ShowDialog(vm as IDialog) && !vm.IsSourceEmpty())
             {
-                IsModified = true;
                 if (vm.InsertOnSave)
                     DefinesItems.Add(vm.GetSource());
                 else
