@@ -149,6 +149,12 @@ namespace WDE.SmartScriptEditor.Exporter
                     sql.AppendLine("DELETE FROM areatrigger_scripts WHERE entry = @ENTRY;");
                     sql.AppendLine("INSERT INTO areatrigger_scripts(entry, ScriptName) VALUES(@ENTRY, \"SmartTrigger\");");
                     break;
+                case SmartScriptType.AreaTriggerEntityServerSide:
+                    sql.AppendLine("UPDATE areatrigger_template SET ScriptName = \"SmartAreaTriggerAI\" WHERE Id = @ENTRY AND IsServerSide = 1;");
+                    break;
+                case SmartScriptType.AreaTriggerEntity:
+                    sql.AppendLine("UPDATE areatrigger_template SET ScriptName = \"SmartAreaTriggerAI\" WHERE Id = @ENTRY AND IsServerSide = 0;");
+                    break;
             }
         }
 

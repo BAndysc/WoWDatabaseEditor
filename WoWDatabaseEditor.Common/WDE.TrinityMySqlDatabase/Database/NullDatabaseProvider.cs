@@ -18,7 +18,9 @@ namespace WDE.TrinityMySqlDatabase.Database
         public IQuestTemplate? GetQuestTemplate(uint entry) => null;
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => Enumerable.Empty<IQuestTemplate>();
-        
+
+        public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => Enumerable.Empty<IAreaTriggerTemplate>();
+
         public IEnumerable<IGameEvent> GetGameEvents() => Enumerable.Empty<IGameEvent>();
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();

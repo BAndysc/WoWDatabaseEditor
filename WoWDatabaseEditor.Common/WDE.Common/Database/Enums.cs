@@ -12,7 +12,10 @@
         Transport = 7,
         Instance = 8,
         TimedActionList = 9,
-        Aura = 10,
-        Cinematic = 11
+        Scene = 10,
+        AreaTriggerEntity = 11,
+        AreaTriggerEntityServerSide = 12,
+        Aura = 13, // do not exists on TC
+        Cinematic = 14 // do not exists on TC
     }
 }

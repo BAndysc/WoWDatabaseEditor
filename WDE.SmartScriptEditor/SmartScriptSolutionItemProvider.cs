@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.DBC;
+using WDE.Common.Parameters;
+using WDE.Common.Providers;
 using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor
@@ -36,6 +41,9 @@ namespace WDE.SmartScriptEditor
         {
             return desc;
         }
+        
+        public bool IsCompatibleWithCore(ICoreVersion core) => 
+            core.SmartScriptFeatures.SupportedTypes.Contains(type);
 
         public abstract ISolutionItem CreateSolutionItem();
     }
@@ -171,5 +179,102 @@ namespace WDE.SmartScriptEditor
                 return null;
             return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.TimedActionList);
         }
+    }
+    
+    [AutoRegister]
+    public class SmartScriptClientAreaTriggerEntityListProvider : SmartScriptSolutionItemProvider
+    {
+        private readonly Lazy<IItemFromListProvider> itemFromListProvider;
+        private readonly Lazy<IDbcStore> dbcStore;
+
+        public SmartScriptClientAreaTriggerEntityListProvider(
+            Lazy<IItemFromListProvider> itemFromListProvider,
+            Lazy<IDbcStore> dbcStore
+        ) : base("Client Area Trigger",
+            "The script from AreaTrigger from client database (DBC)",
+            "SmartScriptGeneric",
+            SmartScriptType.AreaTrigger)
+        {
+            this.itemFromListProvider = itemFromListProvider;
+            this.dbcStore = dbcStore;
+        }
+
+        public override ISolutionItem CreateSolutionItem()
+        {
+            var areaTriggers =
+                dbcStore.Value.AreaTriggerStore.ToDictionary(at => at.Key, at => new SelectOption($"Client areatrigger {at.Key}"));
+            int? entry = itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
+            if (!entry.HasValue)
+                return null;
+            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.AreaTrigger);
+        }
+    }
+    
+    public abstract class SmartScriptAreaTriggerEntityListProviderBase : SmartScriptSolutionItemProvider
+    {
+        private readonly Lazy<IItemFromListProvider> itemFromListProvider;
+        private readonly Lazy<IDatabaseProvider> database;
+        private readonly SmartScriptType type;
+        private readonly bool serverSide;
+
+        public SmartScriptAreaTriggerEntityListProviderBase(
+            Lazy<IItemFromListProvider> itemFromListProvider,
+            Lazy<IDatabaseProvider> database,
+            string name,
+            string desc,
+            string icon,
+            SmartScriptType type,
+            bool serverSide
+        ) : base(name, desc, icon, type)
+        {
+            this.itemFromListProvider = itemFromListProvider;
+            this.database = database;
+            this.type = type;
+            this.serverSide = serverSide;
+        }
+
+        public override ISolutionItem CreateSolutionItem()
+        {
+            var areaTriggers = database.Value.GetAreaTriggerTemplates()
+                .Where(trigger => trigger.IsServerSide == serverSide)
+                .ToDictionary(at => (int)at.Id, at => new SelectOption($"Area trigger {at.Id}"));
+
+            int? entry = itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
+            if (!entry.HasValue)
+                return null;
+            return new SmartScriptSolutionItem(entry.Value, type);
+        }
+    }
+    
+    [AutoRegister]
+    public class SmartScriptAreaTriggerEntityListProvider : SmartScriptAreaTriggerEntityListProviderBase
+    {
+        public SmartScriptAreaTriggerEntityListProvider(
+            Lazy<IItemFromListProvider> itemFromListProvider,
+            Lazy<IDatabaseProvider> database
+        ) : base(
+            itemFromListProvider,
+            database,
+            "Area Trigger Entity",
+            "The script from AreaTrigger defined in areatrigger_template",
+            "SmartScriptGeneric",
+            SmartScriptType.AreaTriggerEntity,
+            false) {}
+    }
+    
+    [AutoRegister]
+    public class SmartScriptServerSideAreaTriggerEntityListProvider : SmartScriptAreaTriggerEntityListProviderBase
+    {
+        public SmartScriptServerSideAreaTriggerEntityListProvider(
+            Lazy<IItemFromListProvider> itemFromListProvider,
+            Lazy<IDatabaseProvider> database
+        ) : base(
+            itemFromListProvider,
+            database,
+            "Area Trigger Server-side Entity",
+            "The script from server side AreaTrigger defined in areatrigger_template",
+            "SmartScriptGeneric",
+            SmartScriptType.AreaTriggerEntityServerSide,
+            true) {}
     }
 }

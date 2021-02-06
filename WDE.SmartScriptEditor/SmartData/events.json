@@ -1655,7 +1655,9 @@
         "id": 37,
         "valid_types": [
             "Creature",
-            "Gameobject"
+            "Gameobject",
+            "AreaTriggerEntity",
+            "AreaTriggerEntityServerSide"
         ],
         "name": "SMART_EVENT_AI_INIT",
         "description": "On AI initialize",
@@ -1838,7 +1840,9 @@
     {
         "id": 46,
         "valid_types": [
-            "AreaTrigger"
+            "AreaTrigger",
+            "AreaTriggerEntity",
+            "AreaTriggerEntityServerSide"
         ],
         "name": "SMART_EVENT_AREATRIGGER_ONTRIGGER",
         "parameters": [
@@ -2077,7 +2081,9 @@
         "id": 60,
         "valid_types": [
             "Creature",
-            "Gameobject"
+            "Gameobject",
+            "AreaTriggerEntity",
+            "AreaTriggerEntityServerSide"
         ],
         "name": "SMART_EVENT_UPDATE",
         "parameters": [
@@ -2362,7 +2368,9 @@
         "id": 63,
         "valid_types": [
             "Creature",
-            "Gameobject"
+            "Gameobject",
+            "AreaTriggerEntity",
+            "AreaTriggerEntityServerSide"
         ],
         "name": "SMART_EVENT_JUST_CREATED",
         "description": "When just created",

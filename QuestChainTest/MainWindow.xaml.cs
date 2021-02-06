@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
+using WDE.Common.CoreVersion;
+using WDE.Common.Database;
 using WDE.Common.Tasks;
 using WDE.QuestChainEditor.Editor.ViewModels;
 using WDE.QuestChainEditor.Exporter;
@@ -28,7 +31,7 @@ namespace QuestChainTest
 
             new TrinityMySqlDatabaseModule().OnInitialized(null);
 
-            TrinityMySqlDatabaseProvider db = new(new ConnectionSettingsProvider(), new DatabaseLogger(), new MockTaskRunner());
+            TrinityMySqlDatabaseProvider db = new(new ConnectionSettingsProvider(), new DatabaseLogger(), new MockCoreVersion());
 
             ExampleQuestsProvider exampleQuestProvider = new();
 
@@ -44,6 +47,17 @@ namespace QuestChainTest
 
             foreach (Quest q in quests)
                 q.RequiredQuests.CollectionChanged += (sender, e) => { Update(); };
+        }
+
+        public class MockCoreVersion : ICurrentCoreVersion, ICoreVersion, IDatabaseFeatures,ISmartScriptFeatures
+        {
+            public ICoreVersion Current => this;
+            public string Tag => "mock";
+            public string FriendlyName => "mock";
+            public IDatabaseFeatures DatabaseFeatures => this;
+            public ISmartScriptFeatures SmartScriptFeatures => this;
+            public ISet<Type> UnsupportedTables => new HashSet<Type>();
+            public ISet<SmartScriptType> SupportedTypes => null;
         }
 
         private void Update()
