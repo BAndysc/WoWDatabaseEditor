@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -16,6 +17,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.SmartScriptEditor.Providers;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.Views;
+using WDE.SmartScriptEditor.History;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -25,9 +27,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly SmartDataSourceMode dataSourceMode;
         private readonly IMessageBoxService messageBoxService;
         private readonly IWindowManager windowManager;
+        private readonly SmartDataGroupsHistory historyHandler;
         
         public SmartDataGroupsEditorViewModel(ISmartRawDataProvider smartDataProvider, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IWindowManager windowManager, SmartDataSourceMode dataSourceMode)
+            IWindowManager windowManager, Func<IHistoryManager> historyCreator, SmartDataSourceMode dataSourceMode)
         {
             this.smartDataProvider = smartDataProvider;
             this.messageBoxService = messageBoxService;
@@ -37,12 +40,24 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AddGroup = new DelegateCommand(AddGroupToSource);
             Save = new DelegateCommand(() =>
             {
-                IsModified = false;
                 taskRunner.ScheduleTask("Saving Group Definitions to file", SaveGroupsToFile);
             });
             DeleteItem = new DelegateCommand<object>(DeleteItemFromSource);
             AddMember = new DelegateCommand<SmartDataGroupsEditorData>(AddItemToGroup);
             EditItem = new DelegateCommand<SmartDataGroupsEditorData>(EditSourceItem);
+            // history setup
+            History = historyCreator();
+            historyHandler = new SmartDataGroupsHistory(SourceItems);
+            UndoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
+            RedoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
+            History.PropertyChanged += (sender, args) =>
+            {
+                UndoCommand.RaiseCanExecuteChanged();
+                RedoCommand.RaiseCanExecuteChanged();
+                IsModified = !History.IsSaved;
+                RaisePropertyChanged(nameof(IsModified));
+            };
+            History.AddHandler(historyHandler);
         }
 
         public ObservableCollection<SmartDataGroupsEditorData> SourceItems { get; private set; }
@@ -51,6 +66,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand<object> DeleteItem { get; }
         public DelegateCommand<SmartDataGroupsEditorData> AddMember { get; }
         public DelegateCommand<SmartDataGroupsEditorData> EditItem { get; }
+        private DelegateCommand UndoCommand;
+        private DelegateCommand RedoCommand;
 
         public void AddGroupToSource()
         {
@@ -62,13 +79,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private void DeleteItemFromSource(object obj)
         {
             if (obj is SmartDataGroupsEditorData source)
-            {
-                IsModified = true;
                 SourceItems.Remove(source);
-            }
             else if (obj is SmartDataGroupsEditorDataNode node)
             {
-                IsModified = true;
                 node.Owner.Members.Remove(node);
                 node.Owner = null;
             }
@@ -79,10 +92,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var result = "";
             OpenNameEditingWindow(GetNewItemNamePrefix(), out result);
             if (!string.IsNullOrWhiteSpace(result))
-            {
-                IsModified = true;
                 data.Members.Add(new SmartDataGroupsEditorDataNode(result, data));
-            }
         }
 
         private void EditSourceItem(SmartDataGroupsEditorData data)
@@ -90,7 +100,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var result = data.Name;
             OpenNameEditingWindow(data.Name, out result);
             if (!string.IsNullOrEmpty(result))
-                data.UpdateName(result);
+                data.Name = result;
         }
 
         private void OpenNameEditingWindow(string source, out string name)
@@ -100,17 +110,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (windowManager.ShowDialog(vm))
             {
                 if (!string.IsNullOrWhiteSpace(vm.Name))
-                {
-                    IsModified = true;
                     name = vm.Name;
-                }
                 else
                 {
                     messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
-                                    .SetMainInstruction($"Group name cannot be empty!")
-                                    .SetIcon(MessageBoxIcon.Error)
-                                    .WithOkButton(true)
-                                    .Build());
+                        .SetMainInstruction($"Group name cannot be empty!")
+                        .SetIcon(MessageBoxIcon.Error)
+                        .WithOkButton(true)
+                        .Build());
                 }
             }
         }
@@ -133,7 +140,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     infoSourceName = "Targets";
                     break;
             }
-
+            History.MarkAsSaved();
             messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Success!")
                                     .SetMainInstruction($"Editor successfully saved definitions of {infoSourceName} Groups!")
                                     .SetIcon(MessageBoxIcon.Information)
@@ -181,15 +188,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         }
 
         public string Title => "SmartData Groups Editor";
-        public ICommand Undo => AlwaysDisabledCommand.Command;
-        public ICommand Redo => AlwaysDisabledCommand.Command;
+        public ICommand Undo => UndoCommand;
+        public ICommand Redo => RedoCommand;
         public ICommand Copy => AlwaysDisabledCommand.Command;
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
         public ICommand Save { get; private set; }
         public ICommand CloseCommand { get; set; } = null;
         public bool CanClose => true;
-        public IHistoryManager History => null;
+        public IHistoryManager History { get; }
         private bool isModified = false;
         public bool IsModified
         {
@@ -199,18 +206,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public void Dispose()
         {
-
+            historyHandler.Dispose();
         }
     }
 
     public class SmartDataGroupsEditorData: INotifyPropertyChanged
     {
-        public string Name { get; set; }
+        private string name;
         public ObservableCollection<SmartDataGroupsEditorDataNode> Members { get; set; }
+        public event Action<SmartDataGroupsEditorData, string, string> OnNameChanged = delegate {  };
 
         public SmartDataGroupsEditorData(in SmartGroupsJsonData source)
         {
-            Name = source.Name;
+            name = source.Name;
             if (source.Members != null)
             {
                 Members = new ObservableCollection<SmartDataGroupsEditorDataNode>();
@@ -221,16 +229,21 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 Members = new ObservableCollection<SmartDataGroupsEditorDataNode>();
         }
 
-        public SmartDataGroupsEditorData(string Name)
+        public SmartDataGroupsEditorData(string name)
         {
-            this.Name = Name;
+            this.name = name;
             Members = new ObservableCollection<SmartDataGroupsEditorDataNode>();
         }
 
-        public void UpdateName(string name)
+        public string Name
         {
-            Name = name;
-            OnPropertyChanged("Name");
+            get => name;
+            set
+            {
+                OnNameChanged.Invoke(this, value, name);
+                name = value;
+                OnPropertyChanged(nameof(Name));
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
