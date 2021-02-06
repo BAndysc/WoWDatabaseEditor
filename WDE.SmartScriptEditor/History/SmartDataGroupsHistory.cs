@@ -31,8 +31,6 @@ namespace WDE.SmartScriptEditor.History
                         GroupHistoryActionMode.ActionRemove, groupsData));
                 }
             });
-            foreach (var data in groupsData)
-                BindGroupData(data);
         }
         
         public void Dispose()
