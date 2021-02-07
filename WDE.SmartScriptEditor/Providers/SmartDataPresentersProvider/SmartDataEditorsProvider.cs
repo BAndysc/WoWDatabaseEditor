@@ -28,7 +28,7 @@ namespace WDE.SmartScriptEditor.Providers
         public SmartDataEditorsProvider(ISmartRawDataProvider smartDataProvider, IParameterFactory parameterFactory, ISmartDataManager smartDataManager,
             ITaskRunner taskRunner, IMessageBoxService messageBoxService, IWindowManager windowManager, Func<IHistoryManager> historyCreator)
         {
-            var editors = new List<IMenuDocumentItem> {
+            var editors = new List<IMenuItem> {
                 new SmartDataCategoryMenuItemProvider<SmartDataDefinesListViewModel>("Events", new object[] { smartDataProvider, smartDataManager, parameterFactory,
                     taskRunner, messageBoxService, windowManager, historyCreator, SmartDataSourceMode.SD_SOURCE_EVENTS }),
                 new SmartDataCategoryMenuItemProvider<SmartDataDefinesListViewModel>("Actions", new object[] { smartDataProvider, smartDataManager, parameterFactory,
@@ -43,7 +43,7 @@ namespace WDE.SmartScriptEditor.Providers
                     messageBoxService, windowManager, historyCreator, SmartDataSourceMode.SD_SOURCE_TARGETS }),
             };
             
-            IMenuCategoryItem obj = new SmartDataCategoryItem("Smart Data", editors.ToArray());
+            IMenuCategoryItem obj = new SmartDataCategoryItem("Smart Data", editors);
             SubItems = new List<IMenuItem>() {obj};
         }
 
@@ -53,9 +53,9 @@ namespace WDE.SmartScriptEditor.Providers
     internal class SmartDataCategoryItem : IMenuCategoryItem
     {
         public string ItemName { get; }
-        public IMenuItem[] CategoryItems { get; }
+        public List<IMenuItem> CategoryItems { get; }
 
-        public SmartDataCategoryItem(string itemName, IMenuItem[] categoryItemDocuments)
+        public SmartDataCategoryItem(string itemName, List<IMenuItem> categoryItemDocuments)
         {
             ItemName = itemName;
             CategoryItems = categoryItemDocuments;
