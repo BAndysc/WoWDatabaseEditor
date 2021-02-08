@@ -13,6 +13,7 @@ using Prism.Unity;
 using Unity;
 using Unity.RegistrationByConvention;
 using WDE.Common.Events;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
@@ -187,6 +188,7 @@ namespace WoWDatabaseEditor
         protected override void OnInitialized()
         {
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
+            IClipboardService clipboardService = Container.Resolve<IClipboardService>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
             // have no idea if it makes sense, but works
             MainWindow? mainWindow = Container.Resolve<MainWindow>();
@@ -220,7 +222,7 @@ namespace WoWDatabaseEditor
                         .WithButton("Close", 0)
                         .Build());
                     if (choice == 2)
-                        Clipboard.SetText(logPath);
+                        clipboardService.SetText(logPath);
                     else if (choice == 1)
                         Process.Start("explorer", logPath);
                 }

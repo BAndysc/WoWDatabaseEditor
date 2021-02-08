@@ -1,25 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Events;
-using Prism.Mvvm;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
@@ -81,6 +75,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IMessageBoxService messageBoxService,
             ISolutionItemNameRegistry itemNameRegistry,
             ITaskRunner taskRunner,
+            IClipboardService clipboard,
             IToolSmartEditorViewModel smartEditorViewModel)
         {
             History = history;
@@ -382,9 +377,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             .Select(s => s.ToSqlString())); 
                     
                     if (string.IsNullOrEmpty(conditionLines))
-                        Clipboard.SetText(eventLines);
+                        clipboard.SetText(eventLines);
                     else
-                        Clipboard.SetText($"conditions:\n{conditionLines}\nevents:\n{eventLines}");
+                        clipboard.SetText($"conditions:\n{conditionLines}\nevents:\n{eventLines}");
                 }
                 else if (AnyActionSelected)
                 {
@@ -397,7 +392,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         string lines = string.Join("\n",
                             fakeEvent.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, 0).Select(s => s.SerializeToString()));
-                        Clipboard.SetText(lines);
+                        clipboard.SetText(lines);
                     }
                 }
                 else if (AnyConditionSelected)
@@ -411,7 +406,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         string lines = string.Join("\n",
                             fakeEvent.ToConditionLines(script.EntryOrGuid, script.SourceType, 0).Select(s => s.ToSqlString()));
-                        Clipboard.SetText("conditions:\n" + lines);
+                        clipboard.SetText("conditions:\n" + lines);
                     }
                 }
             });
@@ -422,10 +417,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             });
             PasteCommand = new DelegateCommand(() =>
             {
-                if (string.IsNullOrEmpty(Clipboard.GetText()))
+                if (string.IsNullOrEmpty(clipboard.GetText()))
                     return;
                 
-                var content = Clipboard.GetText() ?? "";
+                var content = clipboard.GetText() ?? "";
                 List<IConditionLine> conditions = null;
                 
                 if (content.StartsWith("conditions:"))
