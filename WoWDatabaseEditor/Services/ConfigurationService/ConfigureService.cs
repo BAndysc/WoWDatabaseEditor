@@ -4,9 +4,9 @@ using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
-using WoWDatabaseEditor.Services.ConfigurationService.ViewModels;
+using WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels;
 
-namespace WoWDatabaseEditor.Services.ConfigurationService
+namespace WoWDatabaseEditorCore.Services.ConfigurationService
 {
     [AutoRegister]
     [SingleInstance]

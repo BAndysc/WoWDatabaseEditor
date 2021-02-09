@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 
-namespace WoWDatabaseEditor.ModulesManagement
+namespace WoWDatabaseEditorCore.ModulesManagement
 {
-    internal class ModulesManager : IModulesManager
+    public class ModulesManager : IModulesManager
     {
         private readonly List<ModuleData> modules = new();
 

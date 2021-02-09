@@ -1,26 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using Prism.Commands;
-using Prism.Events;
 using Prism.Mvvm;
-using WDE.Common;
-using WDE.Common.Events;
 using WDE.Common.Managers;
-using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
-using WDE.Common.Solution;
 using WDE.Common.Windows;
-using WDE.Common.Providers;
-using WoWDatabaseEditor.Managers;
-using WoWDatabaseEditor.Utils;
-using System.Diagnostics;
 using WDE.Common.Menu;
 using WoWDatabaseEditor.Providers;
 
-namespace WoWDatabaseEditor.ViewModels
+namespace WoWDatabaseEditorCore.ViewModels
 {
     public class MainWindowViewModel : BindableBase, ILayoutViewModelResolver, ICloseAwareViewModel
     {

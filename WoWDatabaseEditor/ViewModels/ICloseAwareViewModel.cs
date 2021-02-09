@@ -1,4 +1,4 @@
-﻿namespace WoWDatabaseEditor.ViewModels
+﻿namespace WoWDatabaseEditorCore.ViewModels
 {
     public interface ICloseAwareViewModel
     {

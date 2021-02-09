@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
 using WDE.Common.Menu;
 
-namespace WoWDatabaseEditor.Providers
+namespace WoWDatabaseEditorCore.Providers
 {
     public class ModuleMenuItem: IMenuCommandItem
     {

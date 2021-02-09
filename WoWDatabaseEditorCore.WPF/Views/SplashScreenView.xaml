@@ -1,0 +1,30 @@
+﻿<Window x:Class="WoWDatabaseEditorCore.WPF.Views.SplashScreenView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Icon="/Icon.ico"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        Title="SplashScreenView" 
+        Height="300" Width="300" 
+        AllowsTransparency="True"
+        WindowStyle="None" WindowStartupLocation="CenterScreen">
+    <Border BorderThickness="14" BorderBrush="#0081FF">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#004A8F" Offset="0.0" />
+                <GradientStop Color="#003466" Offset="1.0" />
+            </LinearGradientBrush>
+        </Border.Background>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+            <Label Foreground="#00C4F9" FontFamily="Consolas" FontSize="172" Content="Db" FontWeight="ExtraBold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Label Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" FontSize="12" Foreground="#00C4F9">Loading WoW Database Editor :)</Label>
+        </Grid>
+
+    </Border>
+</Window>

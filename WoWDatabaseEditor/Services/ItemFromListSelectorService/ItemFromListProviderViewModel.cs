@@ -2,51 +2,66 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Data;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows.Input;
+using DynamicData;
 using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
-using WoWDatabaseEditor.Extensions;
+using WDE.Common.Utils;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
+using WoWDatabaseEditorCore.Extensions;
 
-namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
+namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 {
-    public class ItemFromListProviderViewModel : BindableBase, IDialog
+    public class ItemFromListProviderViewModel : ObservableBase, IDialog
     {
+        private ReactiveProperty<Func<CheckableSelectOption, bool>> currentFilter;
+        private SourceList<CheckableSelectOption> items;
         private readonly bool asFlags;
-
-        private readonly CollectionViewSource items;
-
         private string search = "";
-
+        
         public ItemFromListProviderViewModel(Dictionary<int, SelectOption> items, bool asFlags, int? current = null)
         {
             this.asFlags = asFlags;
-            RawItems = new ObservableCollection<KeyValuePair<int, CheckableSelectOption>>();
-
-            foreach (int key in items.Keys)
+            
+            this.items = AutoDispose(new SourceList<CheckableSelectOption>());
+            ReadOnlyObservableCollection<CheckableSelectOption> outFilteredList;
+            currentFilter = AutoDispose(new ReactiveProperty<Func<CheckableSelectOption, bool>>(_ => true,
+                Compare.Create<Func<CheckableSelectOption, bool>>((_, _) => false, _ => 0)));
+            AutoDispose(this.items.Connect()
+                .Filter(currentFilter)
+                .Sort(Comparer<CheckableSelectOption>.Create((x, y) => x.Entry.CompareTo(y.Entry)))
+                .Bind(out outFilteredList)
+                .Subscribe());
+            FilteredItems = outFilteredList;
+            
+            this.items.Edit(list =>
             {
-                bool isSelected = current.HasValue && ((current == 0 && key == 0) || (key > 0) && (current & key) == key);
-                var item = new KeyValuePair<int, CheckableSelectOption>(key, new CheckableSelectOption(items[key], isSelected));
-                if (isSelected)
-                    SelectedItem = item;
-                RawItems.Add(item);
-            }
+                foreach (int key in items.Keys)
+                {
+                    bool isSelected = current.HasValue && ((current == 0 && key == 0) || (key > 0) && (current & key) == key);
+                    var item = new CheckableSelectOption(key, items[key], isSelected);
+                    if (isSelected)
+                        SelectedItem = item;
+                    list.Add(item);
+                }
+            });
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
-                new("Key", "Key", 50),
-                new("Name", "Value.Name"),
-                new("Description", "Value.Description")
+                new("Key", "Entry", 50),
+                new("Name", "Name"),
+                new("Description", "Description")
             };
 
             if (asFlags)
-                Columns.Insert(0, new ColumnDescriptor("", "Value.IsChecked", null, true));
-
-            this.items = new CollectionViewSource();
-            this.items.Source = RawItems;
-            this.items.Filter += ItemsOnFilter;
+                Columns.Insert(0, new ColumnDescriptor("", "IsChecked", null, true));
 
             if (items.Count == 0)
                 SearchText = current.HasValue ? current.Value.ToString() : "";
@@ -57,12 +72,10 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
         }
 
-        public ObservableCollection<KeyValuePair<int, CheckableSelectOption>> RawItems { get; set; }
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
+        public ReadOnlyObservableCollection<CheckableSelectOption> FilteredItems { get; }
 
-        public ICollectionView AllItems => items.View;
-
-        public KeyValuePair<int, CheckableSelectOption>? SelectedItem { get; set; }
+        public CheckableSelectOption? SelectedItem { get; set; }
 
         public string SearchText
         {
@@ -70,42 +83,37 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
             set
             {
                 SetProperty(ref search, value);
-                items.View.Refresh();
+                if (string.IsNullOrEmpty(SearchText))
+                    currentFilter.Value = _ => true;
+                else
+                   currentFilter.Value = model => model.Name.ToLower().Contains(SearchText.ToLower());
             }
         }
-
-        private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
-        {
-            var model = filterEventArgs.Item as KeyValuePair<int, CheckableSelectOption>?;
-            filterEventArgs.Accepted = string.IsNullOrEmpty(SearchText) ||
-                                       model != null && model.Value.Value.Name.ToLower().Contains(SearchText.ToLower());
-        }
-
+        
         public int GetEntry()
         {
             if (asFlags)
             {
                 var val = 0;
-                foreach (var item in RawItems)
+                foreach (var item in items.Items)
                 {
-                    if (item.Value.IsChecked)
-                        val |= item.Key;
+                    if (item.IsChecked)
+                        val |= item.Entry;
                 }
 
                 return val;
             }
 
             if (SelectedItem != null)
-                return SelectedItem.Value.Key;
+                return SelectedItem.Entry;
 
             int res;
             if (int.TryParse(SearchText, out res))
                 return res;
             
-            if (!AllItems.IsEmpty)
+            if (items.Count > 0)
             {
-                AllItems.MoveCurrentToFirst();
-                return (AllItems.CurrentItem as KeyValuePair<int, CheckableSelectOption>?)?.Key ?? 0;
+                return items.Items.First().Entry;
             }
 
             return 0;
@@ -122,15 +130,20 @@ namespace WoWDatabaseEditor.Services.ItemFromListSelectorService
         public event Action? CloseOk;
     }
 
-    public class CheckableSelectOption : SelectOption
+    public class CheckableSelectOption : INotifyPropertyChanged
     {
-        public CheckableSelectOption(SelectOption selectOption, bool isChecked)
+        public CheckableSelectOption(int entry, SelectOption selectOption, bool isChecked)
         {
+            Entry = entry;
             Name = selectOption.Name;
             Description = selectOption.Description;
             IsChecked = isChecked;
         }
 
         public bool IsChecked { get; set; }
+        public int Entry { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

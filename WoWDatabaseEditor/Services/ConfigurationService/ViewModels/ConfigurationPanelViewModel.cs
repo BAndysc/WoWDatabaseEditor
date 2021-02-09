@@ -10,8 +10,9 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
+using WoWDatabaseEditorCore.Extensions;
 
-namespace WoWDatabaseEditor.Services.ConfigurationService.ViewModels
+namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
 {
     public class ConfigurationPanelViewModel : BindableBase, IDocument
     {

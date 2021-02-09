@@ -2,15 +2,14 @@
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
-using System.Windows;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
-using WoWDatabaseEditor.Tasks;
+using WoWDatabaseEditorCore.Tasks;
 
-namespace WoWDatabaseEditor.ViewModels
+namespace WoWDatabaseEditorCore.ViewModels
 {
     [UniqueProvider]
     [AutoRegister]

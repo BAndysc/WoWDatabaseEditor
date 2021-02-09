@@ -6,7 +6,7 @@ using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
-namespace WoWDatabaseEditor.CoreVersion.ViewModels
+namespace WoWDatabaseEditorCore.CoreVersion.ViewModels
 {
     [AutoRegister]
     public class CoreVersionConfigViewModel : ObservableBase, IConfigurable

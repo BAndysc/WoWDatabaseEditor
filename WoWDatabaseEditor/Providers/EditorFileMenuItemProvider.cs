@@ -8,16 +8,15 @@ using WDE.Common.Annotations;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Menu;
-using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
-using WoWDatabaseEditor.Managers;
-using WoWDatabaseEditor.ViewModels;
+using WoWDatabaseEditorCore.Managers;
+using WoWDatabaseEditorCore.ViewModels;
 
-namespace WoWDatabaseEditor.Providers
+namespace WoWDatabaseEditorCore.Providers
 {
     [AutoRegister]
     public class EditorFileMenuItemProvider: IMainMenuItem, INotifyPropertyChanged

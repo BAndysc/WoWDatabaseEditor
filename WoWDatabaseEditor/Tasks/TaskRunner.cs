@@ -4,19 +4,24 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
 using SmartFormat.Utilities;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditor.Tasks
+namespace WoWDatabaseEditorCore.Tasks
 {
     [AutoRegister]
     [UniqueProvider]
     [SingleInstance]
     public class TaskRunner : ITaskRunner
     {
+        private readonly IMainThread mainThread;
+
+        public TaskRunner(IMainThread mainThread)
+        {
+            this.mainThread = mainThread;
+        }
+        
         public ObservableCollection<(ITask, ITaskProgress)> Tasks { get; } =
             new ObservableCollection<(ITask, ITaskProgress)>();
 
@@ -26,7 +31,7 @@ namespace WoWDatabaseEditor.Tasks
         public event Action? ActivePendingTasksChanged;
         public int ActivePendingTasksCount => activeTasks.Count + pendingTasks.Count;
 
-        public void ScheduleTask(IThreadedTask threadedTask) => ScheduleTask(threadedTask, new TaskProgressSync());
+        public void ScheduleTask(IThreadedTask threadedTask) => ScheduleTask(threadedTask, new TaskProgressSync(mainThread));
 
         public void ScheduleTask(IAsyncTask task) => ScheduleTask(task, new TaskProgressAsync());
 
@@ -52,7 +57,7 @@ namespace WoWDatabaseEditor.Tasks
                     })
                     .ContinueWith(t =>
                     {
-                        Application.Current.Dispatcher.Invoke(() =>
+                        mainThread.Dispatch(() =>
                         {
                             if (t.IsCompletedSuccessfully)
                             {
@@ -180,9 +185,16 @@ namespace WoWDatabaseEditor.Tasks
 
         private class TaskProgressSync : TaskProgress
         {
+            private readonly IMainThread mainThread;
+
+            public TaskProgressSync(IMainThread mainThread)
+            {
+                this.mainThread = mainThread;
+            }
+            
             protected override void CallCallbacksOnMainThread()
             {
-                Application.Current.Dispatcher.Invoke(InvokeUpdatedEvent);
+                mainThread.Dispatch(InvokeUpdatedEvent);
             }
         }
 

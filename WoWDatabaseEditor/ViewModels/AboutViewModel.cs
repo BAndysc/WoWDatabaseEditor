@@ -4,7 +4,7 @@ using System.Windows.Input;
 using WDE.Common.History;
 using WDE.Common.Managers;
 
-namespace WoWDatabaseEditor.ViewModels
+namespace WoWDatabaseEditorCore.ViewModels
 {
     public class AboutViewModel : IDocument
     {

@@ -1,6 +1,6 @@
 ﻿using WDE.Common.CoreVersion;
 
-namespace WoWDatabaseEditor.CoreVersion
+namespace WoWDatabaseEditorCore.CoreVersion
 {
     public interface ICurrentCoreSettings
     {

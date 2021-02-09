@@ -5,10 +5,9 @@ using Prism.Commands;
 using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Menu;
-using WDE.Common.Providers;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditor.Providers
+namespace WoWDatabaseEditorCore.Providers
 {
     [AutoRegister]
     public class EditorEditMenuItemProvider: IMainMenuItem, INotifyPropertyChanged

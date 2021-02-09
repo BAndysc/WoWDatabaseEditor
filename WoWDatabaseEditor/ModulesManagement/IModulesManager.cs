@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 
-namespace WoWDatabaseEditor.ModulesManagement
+namespace WoWDatabaseEditorCore.ModulesManagement
 {
-    internal interface IModulesManager
+    public interface IModulesManager
     {
         IEnumerable<ModuleData> Modules { get; }
         void AddConflicted(Assembly conflictingAssembly, Assembly firstAssembly);

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 
-namespace WoWDatabaseEditor.CoreVersion
+namespace WoWDatabaseEditorCore.CoreVersion
 {
     public interface ICoreVersionsProvider
     {

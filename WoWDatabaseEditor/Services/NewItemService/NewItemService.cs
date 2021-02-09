@@ -3,7 +3,7 @@ using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditor.Services.NewItemService
+namespace WoWDatabaseEditorCore.Services.NewItemService
 {
     [AutoRegister]
     public class NewItemService : INewItemService

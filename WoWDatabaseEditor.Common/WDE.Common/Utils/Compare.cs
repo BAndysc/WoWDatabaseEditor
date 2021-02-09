@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace WDE.Common.Utils
+{
+    public static class Compare
+    {
+        public static IEqualityComparer<TSource> By<TSource, TIdentity>(System.Func<TSource, TIdentity> identitySelector)
+        {
+            return new DelegateComparer<TSource, TIdentity>(identitySelector);
+        }
+
+        private class DelegateComparer<T, TIdentity> : IEqualityComparer<T>
+        {
+            private readonly System.Func<T, TIdentity> identitySelector;
+
+            public DelegateComparer(Func<T, TIdentity> identitySelector)
+            {
+                this.identitySelector = identitySelector;
+            }
+
+            public bool Equals(T x, T y)
+            {
+                return Equals(identitySelector(x), identitySelector(y));
+            }
+
+            public int GetHashCode(T obj)
+            {
+                return identitySelector(obj).GetHashCode();
+            }
+        }
+        
+        public static IEqualityComparer<TSource> Create<TSource>(Func<TSource, TSource, bool> equals, Func<TSource, int> hashcode)
+        {
+            return new DelegateEqualityComparer<TSource>(equals, hashcode);
+        }
+
+        private class DelegateEqualityComparer<T> : IEqualityComparer<T>
+        {
+            private readonly Func<T, T, bool> @equals;
+            private readonly Func<T, int> hashcode;
+
+            public DelegateEqualityComparer(Func<T, T, bool> equals, Func<T, int> hashcode)
+            {
+                this.@equals = @equals;
+                this.hashcode = hashcode;
+            }
+
+            public bool Equals(T x, T y)
+            {
+                return @equals(x, y);
+            }
+
+            public int GetHashCode(T obj)
+            {
+                return hashcode(obj);
+            }
+        }
+    }
+}

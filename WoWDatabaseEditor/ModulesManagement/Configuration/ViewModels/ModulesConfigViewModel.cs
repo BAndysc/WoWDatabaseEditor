@@ -6,8 +6,9 @@ using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.Extensions;
 
-namespace WoWDatabaseEditor.ModulesManagement.Configuration.ViewModels
+namespace WoWDatabaseEditorCore.ModulesManagement.Configuration.ViewModels
 {
     [AutoRegister]
     internal class ModulesConfigViewModel : BindableBase, IConfigurable

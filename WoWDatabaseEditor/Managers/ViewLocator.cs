@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditor.Managers
+namespace WoWDatabaseEditorCore.Managers
 {
     [SingleInstance]
     [AutoRegister]
@@ -36,8 +36,15 @@ namespace WoWDatabaseEditor.Managers
 
             if (viewModel.AssemblyQualifiedName == null)
                 return false;
-            
-            view = Type.GetType(viewModel.AssemblyQualifiedName!.Replace("ViewModel", "View"));
+
+            var viewString = viewModel.AssemblyQualifiedName!.Replace("ViewModel", "View");
+            view = Type.GetType(viewString);
+
+            if (view == null) // try WPF version
+            {
+                var assemblyName = viewModel.Assembly.GetName().Name;
+                view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + ".WPF"));
+            }
 
             if (view != null)
                 staticBinding[viewModel] = view;

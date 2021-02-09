@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.WPF.Services.ItemFromListSelectorService.ItemFromListProviderView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.WPF.Extensions"
+        extensions:FocusBehavior.FocusFirst="true"
+        Background="{DynamicResource MenuDefaultBackground}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+    <UserControl.InputBindings>
+        <KeyBinding Key="Enter" Command="{Binding Accept}"/>
+        <KeyBinding Key="Escape" Command="{Binding Cancel}" />
+    </UserControl.InputBindings>
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <TextBox x:Name="SearchBox" Margin="0,0,0,6" Padding="2,4" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+        <ListView x:Name="ListView" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                  SelectedItem="{Binding SelectedItem}" ItemsSource="{Binding FilteredItems}" Grid.Row="1" Margin="0,0,0,6"
+                  ItemContainerStyle="{DynamicResource ListViewItemStyle}"
+                  PreviewMouseDoubleClick="ListView_DoubleClick"
+                  Visibility="{Binding ShowItemsList, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ListView.View>
+                <GridView extensions:GridViewColumns.HeaderTextMember="HeaderText"
+                          extensions:GridViewColumns.DisplayMemberMember="DisplayMember"
+                          extensions:GridViewColumns.ColumnsSource="{Binding Columns}"
+                          ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}" />
+            </ListView.View>
+        </ListView>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding Accept}" Grid.Column="1" Content="Ok" />
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,10 +1,9 @@
-﻿using ControlzEx.Standard;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
-using WoWDatabaseEditor.ViewModels;
+using WoWDatabaseEditorCore.ViewModels;
 
-namespace WoWDatabaseEditor.Managers
+namespace WoWDatabaseEditorCore.Managers
 {
     [AutoRegister]
     [SingleInstance]

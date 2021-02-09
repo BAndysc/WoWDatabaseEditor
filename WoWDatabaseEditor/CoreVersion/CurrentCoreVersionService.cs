@@ -4,7 +4,7 @@ using WDE.Common.CoreVersion;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditor.CoreVersion
+namespace WoWDatabaseEditorCore.CoreVersion
 {
     [SingleInstance]
     [AutoRegister]

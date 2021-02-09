@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditor.CoreVersion
+namespace WoWDatabaseEditorCore.CoreVersion
 {
     [SingleInstance]
     [AutoRegister]

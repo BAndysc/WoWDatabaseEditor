@@ -9,7 +9,7 @@ using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditor.Services.NewItemService
+namespace WoWDatabaseEditorCore.Services.NewItemService
 {
     [AutoRegister]
     public class NewItemDialogViewModel : BindableBase, INewItemDialogViewModel

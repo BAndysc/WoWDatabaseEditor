@@ -6,9 +6,9 @@ using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
-using WoWDatabaseEditor.Extensions;
+using WoWDatabaseEditorCore.Extensions;
 
-namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
+namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 {
     [AutoRegister]
     public abstract class GenericDatabaseProviderService<T>

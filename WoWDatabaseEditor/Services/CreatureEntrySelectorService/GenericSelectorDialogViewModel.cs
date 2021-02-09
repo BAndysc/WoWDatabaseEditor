@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Data;
 using System.Windows.Input;
+using DynamicData;
+using DynamicData.Binding;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
-using WoWDatabaseEditor.Extensions;
+using WDE.Common.Utils;
+using WDE.MVVM.Observable;
+using WoWDatabaseEditorCore.Extensions;
+using WoWDatabaseEditorCore.Services.ItemFromListSelectorService;
 
-namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
+namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 {
     public class GenericSelectorDialogViewModel<T> : BindableBase, IDialog
     {
         private readonly Func<T, uint> entryGetter;
         private readonly Func<T, string> index;
-
-        private readonly CollectionViewSource items;
-
+        private ReactiveProperty<Func<T, bool>> currentFilter;
+        private SourceList<T> items;
         private string search = "";
 
         public GenericSelectorDialogViewModel(IEnumerable<ColumnDescriptor> columns,
@@ -27,27 +29,29 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
         {
             this.entryGetter = entryGetter;
             this.index = index;
-            RawItems = new ObservableCollection<T>();
+            items = new SourceList<T>();
+            ReadOnlyObservableCollection<T> l;
+            currentFilter = new ReactiveProperty<Func<T, bool>>(_ => true, Compare.Create<Func<T, bool>>((_, _) => false, _ => 0));
+            items
+                .Connect()
+                .Filter(currentFilter)
+                .Sort(Comparer<T>.Create((x, y) => entryGetter(x).CompareTo(entryGetter(y))))
+                .Bind(out l)
+                .Subscribe();
+            FilteredItems = l;
 
             Columns = new ObservableCollection<ColumnDescriptor>();
 
             foreach (var column in columns)
                 Columns.Add(column);
 
-            foreach (T item in collection)
-                RawItems.Add(item);
-
-            items = new CollectionViewSource();
-            items.Source = RawItems;
-            items.Filter += ItemsOnFilter;
+            items.AddRange(collection);
 
             Accept = new DelegateCommand(() => CloseOk?.Invoke());
         }
 
-        public ObservableCollection<T> RawItems { get; set; }
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
-
-        public ICollectionView AllItems => items.View;
+        public ReadOnlyObservableCollection<T> FilteredItems { get; }
 
         public T? SelectedItem { get; set; }
 
@@ -57,15 +61,14 @@ namespace WoWDatabaseEditor.Services.CreatureEntrySelectorService
             set
             {
                 SetProperty(ref search, value);
-                items.View.Refresh();
+                
+                if (string.IsNullOrEmpty(SearchText))
+                    currentFilter.Value = _ => true;
+                else
+                    currentFilter.Value = model => index(model).ToLower().Contains(SearchText.ToLower());
             }
         }
 
-        private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
-        {
-            T model = (T) filterEventArgs.Item;
-            filterEventArgs.Accepted = string.IsNullOrEmpty(SearchText) || index(model).ToLower().Contains(SearchText.ToLower());
-        }
 
         public uint GetEntry()
         {

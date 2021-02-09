@@ -7,15 +7,17 @@ namespace WDE.MVVM.Observable
 {
     public class ReactiveProperty<T> : IObservable<T>, System.IDisposable
     {
+        private readonly IEqualityComparer<T> comparer;
         private bool isFinished;
         private List<Subscription> subscriptions = new();
         private T value;
+
         public T Value
         {
             get => value;
             set
             {
-                if (EqualityComparer<T>.Default.Equals(this.value, value))
+                if (comparer.Equals(this.value, value))
                     return;
                 
                 this.value = value;
@@ -27,9 +29,12 @@ namespace WDE.MVVM.Observable
             }
         }
 
-        public ReactiveProperty(T value)
+        public ReactiveProperty(T value, IEqualityComparer<T>? comparer = null)
         {
+            if (comparer == null)
+                comparer = EqualityComparer<T>.Default;
             this.value = value;
+            this.comparer = comparer;
         }
 
         public IDisposable Subscribe(IObserver<T> observer)

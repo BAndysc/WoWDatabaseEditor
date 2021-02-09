@@ -1,10 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Media;
 using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Types;
 
-namespace WoWDatabaseEditor.Services.NewItemService
+namespace WoWDatabaseEditorCore.Services.NewItemService
 {
     public interface INewItemDialogViewModel : IDialog
     {

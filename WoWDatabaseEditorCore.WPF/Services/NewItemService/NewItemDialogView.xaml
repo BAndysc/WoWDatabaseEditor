@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.WPF.Services.NewItemService.NewItemDialogView"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                   xmlns:components="clr-namespace:WDE.Common.WPF.Components;assembly=WDE.Common.WPF"
+                   Margin="0,9,0,0">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectedItem="{Binding SelectedPrototype}"
+                  ItemsSource="{Binding ItemPrototypes}" HorizontalContentAlignment="Stretch"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" IsSynchronizedWithCurrentItem="True"
+                  KeyDown="UIElement_OnKeyDown">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid MouseDown="UIElement_OnMouseDown">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <components:WdeImage Image="{Binding Image}" Width="32" Grid.RowSpan="2" />
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Grid.Column="1" />
+                        <TextBlock Text="{Binding Description}" TextWrapping="WrapWithOverflow" Grid.Column="1"
+                                   Grid.Row="1" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" IsCancel="True" />
+            <Button Grid.Column="2" Content="OK" Command="{Binding Accept}" />
+        </Grid>
+    </Grid>
+</UserControl>
