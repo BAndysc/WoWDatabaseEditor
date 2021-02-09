@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
-    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator">

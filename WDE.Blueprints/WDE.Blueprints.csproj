@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\GeminiGraphEditor\GeminiGraphEditor.csproj" />
     <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
-    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="BlueprintData\nodes.json">

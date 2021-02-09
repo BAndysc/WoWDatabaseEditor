@@ -2,6 +2,7 @@
 using System.Linq;
 using Prism.Ioc;
 using Prism.Modularity;
+using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
 namespace WDE.Module
@@ -10,13 +11,16 @@ namespace WDE.Module
     {
         public virtual void OnInitialized(IContainerProvider containerProvider)
         {
+            RegisterViews(containerProvider.Resolve<IViewLocator>());
         }
 
         public virtual void RegisterTypes(IContainerRegistry containerRegistry)
         {
             AutoRegisterByConvention(containerRegistry);
         }
-
+        
+        public virtual void RegisterViews(IViewLocator viewLocator) { }
+        
         private void AutoRegisterByConvention(IContainerRegistry containerRegistry)
         {
             var defaultRegisters = GetType().Assembly.GetTypes().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));

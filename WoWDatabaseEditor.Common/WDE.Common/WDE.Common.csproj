@@ -19,9 +19,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WDE.Module\WDE.Module.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="AsyncAwaitBestPractices.MVVM">
       <Version>5.0.2</Version>
     </PackageReference>

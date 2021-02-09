@@ -47,8 +47,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.QuestChainEditor", "WDE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuestChainTest", "QuestChainTest\QuestChainTest.csproj", "{8F5E8C3A-422A-47C6-AFC3-4A62997E5D27}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Module", "WoWDatabaseEditor.Common\WDE.Module\WDE.Module.csproj", "{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.ThemeChanger", "WDE.ThemeChanger\WDE.ThemeChanger.csproj", "{11BFD551-37B0-45A1-9890-CB5481B64E7E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Conditions", "WDE.Conditions\WDE.Conditions.csproj", "{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}"
@@ -64,6 +62,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common.WPF", "WDE.Common.WPF\WDE.Common.WPF.csproj", "{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWDatabaseEditorCore.WPF", "WoWDatabaseEditorCore.WPF\WoWDatabaseEditorCore.WPF.csproj", "{60AB9143-F815-4240-9316-B0CBC8AE457A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.CommonViews.WPF", "WDE.CommonViews.WPF\WDE.CommonViews.WPF.csproj", "{CF05DD30-40F3-435E-BA74-6A4D088483C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -243,18 +243,6 @@ Global
 		{8F5E8C3A-422A-47C6-AFC3-4A62997E5D27}.Release|x64.Build.0 = Release|Any CPU
 		{8F5E8C3A-422A-47C6-AFC3-4A62997E5D27}.Release|x86.ActiveCfg = Release|Any CPU
 		{8F5E8C3A-422A-47C6-AFC3-4A62997E5D27}.Release|x86.Build.0 = Release|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Debug|x64.Build.0 = Debug|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Debug|x86.Build.0 = Debug|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Release|x64.ActiveCfg = Release|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Release|x64.Build.0 = Release|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Release|x86.ActiveCfg = Release|Any CPU
-		{034D29B2-FAAA-4FEA-A77E-5532AA2B0FB1}.Release|x86.Build.0 = Release|Any CPU
 		{11BFD551-37B0-45A1-9890-CB5481B64E7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11BFD551-37B0-45A1-9890-CB5481B64E7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11BFD551-37B0-45A1-9890-CB5481B64E7E}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -351,6 +339,18 @@ Global
 		{60AB9143-F815-4240-9316-B0CBC8AE457A}.Release|x64.Build.0 = Release|Any CPU
 		{60AB9143-F815-4240-9316-B0CBC8AE457A}.Release|x86.ActiveCfg = Release|Any CPU
 		{60AB9143-F815-4240-9316-B0CBC8AE457A}.Release|x86.Build.0 = Release|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Debug|x64.Build.0 = Debug|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Debug|x86.Build.0 = Debug|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Release|x64.ActiveCfg = Release|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Release|x64.Build.0 = Release|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Release|x86.ActiveCfg = Release|Any CPU
+		{CF05DD30-40F3-435E-BA74-6A4D088483C4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
