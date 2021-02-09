@@ -8,6 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              xmlns:datas="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels"
+             xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
              x:Name="rootWindow">
     <UserControl.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding Save}" />
@@ -27,7 +28,7 @@
             </StackPanel>
             <!--#endregion-->
             <!--#region Content View-->
-            <helpers:StretchedTreeView Grid.Row="1" ItemsSource="{Binding SourceItems}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <viewHelpers:StretchedTreeView Grid.Row="1" ItemsSource="{Binding SourceItems}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type datas:SmartDataGroupsEditorData}" ItemsSource="{Binding Members}">
                         <Grid HorizontalAlignment="Stretch">
@@ -75,7 +76,7 @@
                         </Grid>
                     </DataTemplate>
                 </TreeView.Resources>
-            </helpers:StretchedTreeView>
+            </viewHelpers:StretchedTreeView>
             <!--#endregion-->
         </Grid>
     </DockPanel>

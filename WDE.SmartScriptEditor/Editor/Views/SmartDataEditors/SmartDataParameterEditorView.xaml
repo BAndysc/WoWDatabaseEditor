@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:WDE.SmartScriptEditor.Editor.Views"
         xmlns:helpers="clr-namespace:WDE.Common.ViewHelpers;assembly=WDE.Common"
         xmlns:mvvm="http://prismlibrary.com/"
+        xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
         mvvm:ViewModelLocator.AutoWireViewModel="False"
         mc:Ignorable="d"
         Height="666" Width="453"
@@ -55,7 +56,7 @@
                 <TextBox.Text>
                     <Binding Path="Source.DefaultVal" Mode="TwoWay" NotifyOnValidationError="True">
                         <Binding.ValidationRules>
-                            <helpers:IntInputValidationRule />
+                            <viewHelpers:IntInputValidationRule />
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>

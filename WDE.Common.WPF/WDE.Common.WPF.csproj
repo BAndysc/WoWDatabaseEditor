@@ -1,16 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net5.0;net5.0-windows7.0</TargetFrameworks>
+        <TargetFramework>net5.0-windows7.0</TargetFramework>
         <OutputType>Library</OutputType>
+        <UseWPF>true</UseWPF>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Prism.Core">
-        <Version>8.0.0.1909</Version>
-      </PackageReference>
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
 
 </Project>

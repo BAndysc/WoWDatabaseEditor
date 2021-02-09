@@ -4,6 +4,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.VisualBasic;
 using WDE.Common;
 using WDE.Common.CoreVersion;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.Solutions
@@ -12,21 +13,12 @@ namespace WDE.Solutions
     public class SolutionFolderItemProvider : ISolutionItemProvider
     {
         public bool IsCompatibleWithCore(ICoreVersion core) => true;
-        
-        public string GetName()
-        {
-            return "Folder";
-        }
 
-        public ImageSource GetImage()
-        {
-            return new BitmapImage(new Uri("/WDE.Solutions;component/Resources/folder.png", UriKind.Relative));
-        }
+        public string GetName() => "Folder";
 
-        public string GetDescription()
-        {
-            return "Container for solutions";
-        }
+        public ImageUri GetImage() => new ("Resources/folder.png");
+
+        public string GetDescription() => "Container for solutions";
 
         public ISolutionItem CreateSolutionItem()
         {

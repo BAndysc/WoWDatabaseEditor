@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:WoWDatabaseEditor.Views"
              xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
              xmlns:tasks="clr-namespace:WDE.Common.Tasks;assembly=WDE.Common"
+             xmlns:utils1="clr-namespace:WDE.Common.WPF.Utils;assembly=WDE.Common.WPF"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <Border BorderThickness="1"
@@ -33,7 +34,7 @@
                                                 <Image Width="24" Height="24" Source="{DynamicResource StatusBarIconError}"></Image>
                                             </DataTemplate>
                                             <DataTemplate x:Key="InProgress">
-                                                <utils:LoadingSpinner Width="24" Height="24" />
+                                                <utils1:LoadingSpinner Width="24" Height="24" />
                                             </DataTemplate>
                                         </ContentPresenter.Resources>
 

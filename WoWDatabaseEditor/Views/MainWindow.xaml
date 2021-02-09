@@ -12,6 +12,7 @@
                       xmlns:commonUtils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
                       xmlns:viewHelpers="clr-namespace:WDE.Common.ViewHelpers;assembly=WDE.Common"
                       xmlns:menuItems="clr-namespace:WDE.Common.Providers;assembly=WDE.Common"
+                      xmlns:utils1="clr-namespace:WDE.Common.WPF.Utils;assembly=WDE.Common.WPF"
                       Style="{DynamicResource MainWindowStyle}"
                       Title="{Binding Title}"
                       WindowStartupLocation="CenterScreen"
@@ -26,6 +27,7 @@
             LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
     </Controls:MetroWindow.WindowButtonCommands>
     <Window.Resources>
+        <helpers:BooleanToHiddenVisibilityConverter x:Key="BooleanToHiddenVisibilityConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <helpers:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
         <helpers:DocumentOrToolToTitleConverter x:Key="DocumentOrToolToTitleConverter" />
@@ -145,7 +147,7 @@
                                                     <Setter Property="ContentTemplate">
                                                         <Setter.Value>
                                                             <DataTemplate>
-                                                                <commonUtils:LoadingSpinner Width="24" Height="24" />
+                                                                <utils1:LoadingSpinner Width="24" Height="24" />
                                                             </DataTemplate>
                                                         </Setter.Value>
                                                     </Setter>
@@ -154,7 +156,7 @@
                                             <Setter Property="ContentTemplate">
                                                 <Setter.Value>
                                                     <DataTemplate>
-                                                        <ContentControl Focusable="False" commonUtils:ViewBind.Model="{Binding}" />
+                                                        <ContentControl Focusable="False" utils1:ViewBind.Model="{Binding}" />
                                                     </DataTemplate>
                                                 </Setter.Value>
                                             </Setter>
@@ -165,7 +167,7 @@
                         </views:PaneDocumentTemplateSelector.DocumentTemplate>
                         <views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
                             <DataTemplate>
-                                <ContentControl Focusable="False" commonUtils:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
+                                <ContentControl Focusable="False" utils1:ViewBind.Model="{Binding}" DataContext="{Binding Content}" />
                             </DataTemplate>
                         </views:PaneDocumentTemplateSelector.AnchorableDocumentTemplate>
                     </views:PaneDocumentTemplateSelector>
@@ -176,7 +178,7 @@
                         <helpers:PanesStyleSelector.ToolStyle>
                             <Style TargetType="{x:Type LayoutAnchorableItem}">
                                 <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}" />
-                                <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay}" />
+                                <Setter Property="Visibility" Value="{Binding Model.Visibility, Mode=TwoWay, Converter={StaticResource BooleanToHiddenVisibilityConverter}}" />
                                 <Setter Property="ContentId" Value="{Binding Model.UniqueId}" />
                                 <Setter Property="Title" Value="{Binding Model.Title}" />
                             </Style>

@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0-windows</TargetFramework>
+        <TargetFrameworks>net5.0;net5.0-windows7.0</TargetFrameworks>
         <OutputType>Library</OutputType>
-        <UseWPF>true</UseWPF>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>

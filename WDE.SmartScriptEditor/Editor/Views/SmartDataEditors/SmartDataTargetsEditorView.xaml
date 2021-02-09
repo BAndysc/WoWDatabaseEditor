@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:WDE.SmartScriptEditor.Editor.Views"
         xmlns:helpers="clr-namespace:WDE.Common.ViewHelpers;assembly=WDE.Common"
         xmlns:mvvm="http://prismlibrary.com/"
+        xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
         mvvm:ViewModelLocator.AutoWireViewModel="False"
         mc:Ignorable="d"
         Height="666" Width="473"
@@ -39,7 +40,7 @@
                 <TextBox.Text>
                     <Binding Path="Source.Id" Mode="TwoWay" NotifyOnValidationError="True">
                         <Binding.ValidationRules>
-                            <helpers:IntInputValidationRule />
+                            <viewHelpers:IntInputValidationRule />
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
@@ -111,8 +112,8 @@
             </ListView.ItemTemplate>
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="helpers:ViewItemDoubleClickCommand.Command" Value="{Binding ElementName=rootWindow, Path=DataContext.EditParameter}" />
-                    <Setter Property="helpers:ViewItemDoubleClickCommand.CommandParameter" Value="{Binding}" />
+                    <Setter Property="viewHelpers:ViewItemDoubleClickCommand.Command" Value="{Binding ElementName=rootWindow, Path=DataContext.EditParameter}" />
+                    <Setter Property="viewHelpers:ViewItemDoubleClickCommand.CommandParameter" Value="{Binding}" />
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>

@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
-using Prism.Ioc;
 using WDE.Common.Windows;
 
-namespace WDE.Common.Utils
+namespace WDE.Common.WPF.Utils
 {
     public class ViewBind
     {

@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net5.0-windows</TargetFramework>
+        <TargetFrameworks>net5.0;net5.0-windows7.0</TargetFrameworks>
         <OutputType>Library</OutputType>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <UseWPF>true</UseWPF>
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -37,28 +36,8 @@
         </None>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="AsyncAwaitBestPractices.MVVM">
-            <Version>5.0.2</Version>
-        </PackageReference>
-        <PackageReference Include="CommonServiceLocator">
-            <Version>2.0.5</Version>
-        </PackageReference>
-        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-        <PackageReference Include="Prism.Wpf">
-            <Version>8.0.0.1909</Version>
-        </PackageReference>
         <PackageReference Include="SmartFormat.NET">
             <Version>2.5.3</Version>
-        </PackageReference>
-        <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-        <PackageReference Include="Unity.Abstractions">
-            <Version>5.11.6</Version>
-        </PackageReference>
-        <PackageReference Include="Unity.Container">
-            <Version>5.11.10</Version>
-        </PackageReference>
-        <PackageReference Include="Unity.RegistrationByConvention">
-            <Version>5.11.1</Version>
         </PackageReference>
     </ItemGroup>
 </Project>

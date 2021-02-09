@@ -21,7 +21,7 @@ namespace WDE.HistoryWindow.ViewModels
     [SingleInstance]
     internal class HistoryViewModel : BindableBase, ITool
     {
-        private Visibility visibility;
+        private bool visibility;
 
         private IDocument previousDocument;
 
@@ -66,7 +66,7 @@ namespace WDE.HistoryWindow.ViewModels
             set => SetProperty(ref isSelected, value);
         }
         
-        public Visibility Visibility
+        public bool Visibility
         {
             get => visibility;
             set => SetProperty(ref visibility, value);

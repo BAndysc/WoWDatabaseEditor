@@ -69,7 +69,7 @@ namespace WDBXEditor.Storage
             //Column name check
             if (TableStructure.Fields.GroupBy(x => x.Name).Any(y => y.Count() > 1))
             {
-                MessageBox.Show($"Duplicate column names for {FileName} - {Build} definition");
+                //MessageBox.Show($"Duplicate column names for {FileName} - {Build} definition");
                 return;
             }
 

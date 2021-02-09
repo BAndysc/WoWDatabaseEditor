@@ -7,6 +7,7 @@
              xmlns:data="clr-namespace:WDE.SmartScriptEditor.Data"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:helpers="clr-namespace:WDE.Common.ViewHelpers;assembly=WDE.Common"
+             xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="definesListWindow">
@@ -44,8 +45,8 @@
                 </ListView.View>
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource ListViewItemStyle}">
-                        <Setter Property="helpers:ViewItemDoubleClickCommand.Command" Value="{Binding ElementName=definesListWindow, Path=DataContext.OnItemSelected}" />
-                        <Setter Property="helpers:ViewItemDoubleClickCommand.CommandParameter" Value="{Binding}" />
+                        <Setter Property="viewHelpers:ViewItemDoubleClickCommand.Command" Value="{Binding ElementName=definesListWindow, Path=DataContext.OnItemSelected}" />
+                        <Setter Property="viewHelpers:ViewItemDoubleClickCommand.CommandParameter" Value="{Binding}" />
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>

@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.Annotations;
+using WDE.Common.Tasks;
 
 namespace WDE.Common.Utils
 {
@@ -43,7 +44,7 @@ namespace WDE.Common.Utils
             private set
             {
                 isBusy = value;
-                Application.Current.Dispatcher.Invoke(() => command.RaiseCanExecuteChanged());
+                GlobalApplication.MainThread.Dispatch(command.RaiseCanExecuteChanged);
             }
         }
 

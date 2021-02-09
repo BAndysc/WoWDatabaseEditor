@@ -8,6 +8,7 @@ using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor
@@ -15,7 +16,7 @@ namespace WDE.SmartScriptEditor
     public abstract class SmartScriptSolutionItemProvider : ISolutionItemProvider
     {
         private readonly string desc;
-        private readonly ImageSource icon;
+        private readonly ImageUri icon;
         private readonly string name;
         private readonly SmartScriptType type;
 
@@ -24,7 +25,7 @@ namespace WDE.SmartScriptEditor
             this.name = name;
             this.desc = desc;
             this.type = type;
-            this.icon = new BitmapImage(new Uri($"/WDE.SmartScriptEditor;component/Resources/{icon}.png", UriKind.Relative));
+            this.icon = new ImageUri($"Resources/{icon}.png");
         }
 
         public string GetName()
@@ -32,7 +33,7 @@ namespace WDE.SmartScriptEditor
             return name;
         }
 
-        public ImageSource GetImage()
+        public ImageUri GetImage()
         {
             return icon;
         }

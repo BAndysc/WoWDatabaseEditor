@@ -17,6 +17,7 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
+using WDE.Common.WPF.Utils;
 using WDE.Module.Attributes;
 using WoWDatabaseEditor.ModulesManagement;
 using WoWDatabaseEditor.Views;

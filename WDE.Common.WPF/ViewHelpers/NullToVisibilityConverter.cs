@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace WDE.Common.ViewHelpers
+namespace WDE.Common.WPF.ViewHelpers
 {
     public class NullToVisibilityConverter : IValueConverter
     {

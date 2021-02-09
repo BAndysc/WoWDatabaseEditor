@@ -282,9 +282,13 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.ActionFactory(line);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                MessageBox.Show($"Action {line.ActionType} unknown, skipping action");
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetIcon(MessageBoxIcon.Warning)
+                    .SetTitle("Unknown action")
+                    .SetMainInstruction($"Action {line.ActionType} unknown, skipping action")
+                    .Build());
             }
 
             return null;
@@ -296,9 +300,13 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.ConditionFactory(line);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                MessageBox.Show($"Condition {line.ConditionType} unknown, skipping action");
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetIcon(MessageBoxIcon.Warning)
+                    .SetTitle("Unknown condition")
+                    .SetMainInstruction($"Condition {line.ConditionType} unknown, skipping condition")
+                    .Build());
             }
 
             return null;
@@ -310,9 +318,13 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.ConditionFactory(id);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                MessageBox.Show($"Condition {id} unknown, skipping action");
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetIcon(MessageBoxIcon.Warning)
+                    .SetTitle("Unknown condition")
+                    .SetMainInstruction($"Condition {id} unknown, skipping condition")
+                    .Build());
             }
 
             return null;
@@ -324,9 +336,13 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.EventFactory(line);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                MessageBox.Show($"Event {line.EventType} unknown, skipping action");
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetIcon(MessageBoxIcon.Warning)
+                    .SetTitle("Unknown event")
+                    .SetMainInstruction($"Event {line.EventType} unknown, skipping event")
+                    .Build());
             }
 
             return null;

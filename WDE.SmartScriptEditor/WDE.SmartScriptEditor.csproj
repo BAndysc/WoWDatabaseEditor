@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net5.0-windows7.0</TargetFramework>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
@@ -20,6 +20,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\WDE.Common.WPF\WDE.Common.WPF.csproj" />
     <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
     <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
     <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
@@ -47,16 +48,32 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\SmartScriptIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\SmartScriptAuraIcon.png" />
-    <Resource Include="Resources\SmartScriptCreatureIcon.png" />
-    <Resource Include="Resources\SmartScriptGameobjectIcon.png" />
-    <Resource Include="Resources\SmartScriptGeneric.png" />
-    <Resource Include="Resources\SmartScriptQuestIcon.png" />
-    <Resource Include="Resources\SmartScriptSpellIcon.png" />
-    <Resource Include="Resources\SmartScriptTimedActionListIcon.png" />
+    <None Include="Resources\SmartScriptAuraIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\SmartScriptIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\SmartScriptCreatureIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\SmartScriptGameobjectIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\SmartScriptGeneric.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\SmartScriptQuestIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\SmartScriptSpellIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\SmartScriptTimedActionListIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AsyncAwaitBestPractices.MVVM">

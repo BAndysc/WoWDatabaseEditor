@@ -8,7 +8,7 @@ namespace WDE.Common.Windows
     {
         string Title { get; }
         string UniqueId { get; }
-        Visibility Visibility { get; set; }
+        bool Visibility { get; set; }
         ToolPreferedPosition PreferedPosition { get; }
         bool OpenOnStart { get; }
         bool IsSelected { get; set; }

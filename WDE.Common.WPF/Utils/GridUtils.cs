@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace WDE.Common.Utils
+namespace WDE.Common.WPF.Utils
 {
     public static class GridUtils
     {

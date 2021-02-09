@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mvvm="http://prismlibrary.com/"
-             xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
+             xmlns:utils="clr-namespace:WDE.Common.WPF.Utils;assembly=WDE.Common.WPF"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">

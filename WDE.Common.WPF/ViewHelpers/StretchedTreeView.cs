@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace WDE.Common.ViewHelpers
+namespace WDE.Common.WPF.ViewHelpers
 {
     // https://stackoverflow.com/a/35557401
     public class StretchedTreeView: TreeView
@@ -34,7 +29,7 @@ namespace WDE.Common.ViewHelpers
             // The purpose of this code is to stretch the Header Content all the way accross the TreeView. 
             if (this.VisualChildrenCount > 0)
             {
-                Grid grid = this.GetVisualChild(0) as Grid;
+                Grid? grid = this.GetVisualChild(0) as Grid;
                 if (grid != null && grid.ColumnDefinitions.Count == 3)
                 {
                     // Remove the middle column which is set to Auto and let it get replaced with the 

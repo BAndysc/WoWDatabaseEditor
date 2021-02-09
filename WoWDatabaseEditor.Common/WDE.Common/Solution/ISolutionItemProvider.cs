@@ -1,5 +1,5 @@
-﻿using System.Windows.Media;
-using WDE.Common.CoreVersion;
+﻿using WDE.Common.CoreVersion;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.Common
@@ -8,7 +8,7 @@ namespace WDE.Common
     public interface ISolutionItemProvider
     {
         string GetName();
-        ImageSource GetImage();
+        ImageUri GetImage();
         string GetDescription();
         
         bool IsCompatibleWithCore(ICoreVersion core);

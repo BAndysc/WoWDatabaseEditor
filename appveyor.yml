@@ -4,7 +4,7 @@ configuration: Release
 platform: x64
 build_script:
 - cmd: >-
-    dotnet publish -c Release -r win-x64 --self-contained false -f net5.0-windows -o bin/wowdatabaseeditor/
+    dotnet publish -c Release -r win-x64 --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/
 
     echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor/COMMIT_HASH
 

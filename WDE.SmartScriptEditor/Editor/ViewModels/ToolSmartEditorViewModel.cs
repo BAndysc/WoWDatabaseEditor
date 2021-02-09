@@ -17,13 +17,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     
     public class ToolSmartEditorViewModel : ObservableBase, ITool, IToolSmartEditorViewModel
     {
-        public bool IsOpened => Visibility == Visibility.Visible;
+        public bool IsOpened => Visibility;
         public string Title => "Smart edit";
         public string UniqueId => "tc_smart_script_edit";
         public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Left;
         public bool OpenOnStart => false;
         private bool isSelected;
-        private Visibility visibility;
+        private bool visibility;
 
         public bool IsSelected
         {
@@ -31,7 +31,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set => SetProperty(ref isSelected, value);
         }
         
-        public Visibility Visibility
+        public bool Visibility
         {
             get => visibility;
             set => SetProperty(ref visibility, value);

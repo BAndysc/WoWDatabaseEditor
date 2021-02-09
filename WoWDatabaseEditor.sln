@@ -61,6 +61,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.Trinity", "WDE.Trinity\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.AzerothCore", "WDE.AzerothCore\WDE.AzerothCore.csproj", "{4A5E9E2A-DBC9-4290-ACEB-B108FA458F0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common.WPF", "WDE.Common.WPF\WDE.Common.WPF.csproj", "{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -323,6 +325,18 @@ Global
 		{4A5E9E2A-DBC9-4290-ACEB-B108FA458F0E}.Release|x64.Build.0 = Release|Any CPU
 		{4A5E9E2A-DBC9-4290-ACEB-B108FA458F0E}.Release|x86.ActiveCfg = Release|Any CPU
 		{4A5E9E2A-DBC9-4290-ACEB-B108FA458F0E}.Release|x86.Build.0 = Release|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Debug|x64.Build.0 = Debug|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Debug|x86.Build.0 = Debug|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Release|x64.ActiveCfg = Release|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Release|x64.Build.0 = Release|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Release|x86.ActiveCfg = Release|Any CPU
+		{5C512B55-B4CA-4DE6-A3DC-A1500F94AE00}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

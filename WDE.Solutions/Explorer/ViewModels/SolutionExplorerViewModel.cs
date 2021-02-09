@@ -27,7 +27,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         private readonly IStatusBar statusBar;
 
         private SolutionItemViewModel selected;
-        private Visibility visibility;
+        private bool visibility;
 
         public string UniqueId => "solution_explorer";
         public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Right;
@@ -193,7 +193,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         
         public string Title { get; } = "Solution explorer";
 
-        public Visibility Visibility
+        public bool Visibility
         {
             get => visibility;
             set => SetProperty(ref visibility, value);

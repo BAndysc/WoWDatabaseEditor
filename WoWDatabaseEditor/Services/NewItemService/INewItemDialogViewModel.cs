@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using WDE.Common;
 using WDE.Common.Managers;
+using WDE.Common.Types;
 
 namespace WoWDatabaseEditor.Services.NewItemService
 {
@@ -25,7 +26,7 @@ namespace WoWDatabaseEditor.Services.NewItemService
 
         public string Name { get; }
         public string Description { get; }
-        public ImageSource Image { get; }
+        public ImageUri Image { get; }
 
         public ISolutionItem CreateSolutionItem()
         {

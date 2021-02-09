@@ -6,6 +6,7 @@
                    xmlns:utils="clr-namespace:WoWDatabaseEditor.Utils"
                    xmlns:system="clr-namespace:System;assembly=System.Runtime"
                    xmlns:utils1="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
+                   xmlns:utils2="clr-namespace:WDE.Common.WPF.Utils;assembly=WDE.Common.WPF"
                    prism:ViewModelLocator.AutoWireViewModel="False">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -34,7 +35,7 @@
                 <DataTemplate>
                     <DockPanel LastChildFill="True" Margin="7,5">
                         <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontSize="32" FontWeight="Light" />
-                        <ContentControl utils1:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                        <ContentControl utils2:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
                                         VerticalContentAlignment="Stretch" />
                     </DockPanel>
                 </DataTemplate>

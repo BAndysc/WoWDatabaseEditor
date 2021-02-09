@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace WDE.Common.Utils
+namespace WDE.Common.WPF.Utils
 {
     public partial class LoadingSpinner : UserControl
     {

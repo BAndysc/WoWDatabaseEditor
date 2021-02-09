@@ -18,7 +18,7 @@ namespace WDE.TrinityMySqlDatabase.Tools
         private readonly IDatabaseLogger databaseLogger;
         public string Title => "Database query debugger";
         public string UniqueId => "trinity_database_query_debugger";
-        private Visibility visibility = Visibility.Hidden;
+        private bool visibility = false;
  
         public ICommand ClearConsole {get;}
  
@@ -26,14 +26,14 @@ namespace WDE.TrinityMySqlDatabase.Tools
         public bool OpenOnStart => false;
 
         public TextDocument Text { get; } = new TextDocument();
-        public Visibility Visibility
+        public bool Visibility
         {
             get => visibility; 
             set
             {
                 if (value == visibility)
                     return;
-                if (value == Visibility.Visible)
+                if (value)
                 {
                     databaseLogger.OnLog += OnTrace;
                 }

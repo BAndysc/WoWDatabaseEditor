@@ -37,7 +37,7 @@ namespace WoWDatabaseEditor.Managers
             foreach (var tool in tools)
             {
                 allTools.Add(tool);
-                tool.Visibility = Visibility.Collapsed;
+                tool.Visibility = false;
                 typeToToolInstance[tool.GetType()] = tool;
             }
         }
@@ -116,7 +116,7 @@ namespace WoWDatabaseEditor.Managers
             if (!OpenedTools.Contains(tool))
                 OpenedTools.Add(tool);
 
-            tool.Visibility = Visibility.Visible;
+            tool.Visibility = true;
             tool.IsSelected = true;
         }
 

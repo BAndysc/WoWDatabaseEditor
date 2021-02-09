@@ -34,7 +34,7 @@ namespace WoWDatabaseEditor.Utils
                         if (tool != null)
                         {
                             e.Content = tool;
-                            tool.Visibility = anchorable.IsVisible ? Visibility.Visible : Visibility.Hidden;
+                            tool.Visibility = anchorable.IsVisible;
                             return;
                         }
                     }

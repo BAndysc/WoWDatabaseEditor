@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Controls;
 
-namespace WDE.Common.ViewHelpers
+namespace WDE.Common.WPF.ViewHelpers
 {
     public class IntInputValidationRule: ValidationRule
     {
