@@ -6,13 +6,14 @@
              xmlns:data="clr-namespace:WDE.DbcStore"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:dbcStore="clr-namespace:WDE.DbcStore;assembly=WDE.DbcStore"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              mc:Ignorable="d">
 
     <UserControl.Resources>
         <ObjectDataProvider x:Key="dbcVersionsEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="data:DBCVersions" />
+                <x:Type TypeName="dbcStore:DBCVersions" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+﻿using System.Threading.Tasks;
 using Microsoft.VisualBasic;
 using WDE.Common;
 using WDE.Common.CoreVersion;

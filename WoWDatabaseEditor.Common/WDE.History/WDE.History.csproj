@@ -20,6 +20,5 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj" />
-    <ProjectReference Include="..\WDE.Module\WDE.Module.csproj" />
   </ItemGroup>
 </Project>

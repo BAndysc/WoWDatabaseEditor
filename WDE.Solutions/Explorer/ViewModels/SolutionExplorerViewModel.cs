@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows;
-using GongSolutions.Wpf.DragDrop;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -10,6 +8,7 @@ using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
+using WDE.Common.Utils.DragDrop;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 

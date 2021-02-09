@@ -5,11 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WDE.TrinityMySqlDatabase.Tools"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:converters="clr-namespace:WDE.Common.WPF.Converters;assembly=WDE.Common.WPF"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
+    </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <Button Command="{Binding ClearConsole}" DockPanel.Dock="Top">Clear</Button>
-        <avalonedit:TextEditor IsReadOnly="True" Document="{Binding Text}" Padding="5" x:Name="MyAvalonEdit"
+        <avalonedit:TextEditor IsReadOnly="True" Document="{Binding Text, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
                                FontFamily="Consolas" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
         
     </DockPanel>

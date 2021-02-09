@@ -3,6 +3,7 @@ using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.SQLEditor.ViewModels;
 
@@ -13,15 +14,18 @@ namespace WDE.SQLEditor.Providers
     {
         private readonly IMySqlExecutor mySqlExecutor;
         private readonly IStatusBar statusBar;
+        private readonly Func<INativeTextDocument> document;
         private readonly ITaskRunner taskRunner;
         private readonly Lazy<ISolutionItemSqlGeneratorRegistry> sqlGeneratorsRegistry;
 
         public MetaSqlSolutionItemEditorProvider(Lazy<ISolutionItemSqlGeneratorRegistry> sqlGeneratorsRegistry,
+            Func<INativeTextDocument> document,
             IMySqlExecutor mySqlExecutor,
             IStatusBar statusBar,
             ITaskRunner taskRunner)
         {
             this.sqlGeneratorsRegistry = sqlGeneratorsRegistry;
+            this.document = document;
             this.mySqlExecutor = mySqlExecutor;
             this.statusBar = statusBar;
             this.taskRunner = taskRunner;
@@ -29,7 +33,9 @@ namespace WDE.SQLEditor.Providers
 
         public IDocument GetEditor(MetaSolutionSQL item)
         {
-            return new SqlEditorViewModel(mySqlExecutor, statusBar, taskRunner, sqlGeneratorsRegistry.Value.GenerateSql(item));
+            var doc = document();
+            doc.FromString(sqlGeneratorsRegistry.Value.GenerateSql(item));
+            return new SqlEditorViewModel(mySqlExecutor, statusBar, taskRunner, doc);
         }
     }
 }

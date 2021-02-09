@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Windows;
 using System.Windows.Input;
-using ICSharpCode.AvalonEdit.Document;
 using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.TrinityMySqlDatabase.Services;
@@ -16,6 +16,7 @@ namespace WDE.TrinityMySqlDatabase.Tools
     public class DebugQueryToolViewModel : BindableBase, ITool, ICodeEditorViewModel
     {
         private readonly IDatabaseLogger databaseLogger;
+        private readonly IMainThread mainThread;
         public string Title => "Database query debugger";
         public string UniqueId => "trinity_database_query_debugger";
         private bool visibility = false;
@@ -25,7 +26,7 @@ namespace WDE.TrinityMySqlDatabase.Tools
         public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Bottom;
         public bool OpenOnStart => false;
 
-        public TextDocument Text { get; } = new TextDocument();
+        public INativeTextDocument Text { get; }
         public bool Visibility
         {
             get => visibility; 
@@ -52,10 +53,12 @@ namespace WDE.TrinityMySqlDatabase.Tools
             set => SetProperty(ref isSelected, value);
         }
         
-        public DebugQueryToolViewModel(IDatabaseLogger databaseLogger)
+        public DebugQueryToolViewModel(IDatabaseLogger databaseLogger, IMainThread mainThread, INativeTextDocument document)
         {
             this.databaseLogger = databaseLogger;
-            
+            this.mainThread = mainThread;
+            this.Text = document;
+
             ClearConsole = new DelegateCommand(() =>
             {
                 Clear.Invoke();
@@ -65,11 +68,9 @@ namespace WDE.TrinityMySqlDatabase.Tools
 
         private void OnTrace(string? arg1, string? arg2, TraceLevel tl)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            mainThread.Dispatch(() =>
             {
-                Text.BeginUpdate();
-                Text.Insert(Text.TextLength, $"[{tl}]: {arg2}\n{arg1}");
-                Text.EndUpdate();
+                Text.Append($"[{tl}]: {arg2}\n{arg1}");
                 ScrollToEnd.Invoke();
             });
         }
@@ -78,7 +79,7 @@ namespace WDE.TrinityMySqlDatabase.Tools
         public event Action Clear = delegate {};
     }
 
-    internal interface ICodeEditorViewModel
+    public interface ICodeEditorViewModel
     {
         event Action ScrollToEnd;
         event Action Clear;

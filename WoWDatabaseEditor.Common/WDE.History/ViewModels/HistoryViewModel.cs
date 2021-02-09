@@ -11,7 +11,7 @@ using WDE.Module.Attributes;
 
 namespace WDE.HistoryWindow.ViewModels
 {
-    internal class HistoryEvent
+    public class HistoryEvent
     {
         public string Name { get; set; }
         public bool IsFromFuture { get; set; }
@@ -19,7 +19,7 @@ namespace WDE.HistoryWindow.ViewModels
 
     [AutoRegister]
     [SingleInstance]
-    internal class HistoryViewModel : BindableBase, ITool
+    public class HistoryViewModel : BindableBase, ITool
     {
         private bool visibility;
 

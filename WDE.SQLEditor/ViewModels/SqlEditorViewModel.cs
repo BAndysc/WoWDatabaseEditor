@@ -1,12 +1,11 @@
-﻿using System.ComponentModel;
-using System.Windows.Input;
-using ICSharpCode.AvalonEdit.Document;
+﻿using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using IDocument = WDE.Common.Managers.IDocument;
 
@@ -14,24 +13,27 @@ namespace WDE.SQLEditor.ViewModels
 {
     public class SqlEditorViewModel : BindableBase, IDocument
     {
-        private TextDocument code;
+        private INativeTextDocument code;
 
-        public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, IStatusBar statusBar, ITaskRunner taskRunner, string sql)
+        public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
+            IStatusBar statusBar, 
+            ITaskRunner taskRunner, 
+            INativeTextDocument sql)
         {
-            Code = new TextDocument(sql);
+            Code = sql;
             ExecuteSql = new DelegateCommand(() =>
             {
                 taskRunner.ScheduleTask("Executing query",
                     async () =>
                     {
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
-                        await mySqlExecutor.ExecuteSql(Code.Text);
+                        await mySqlExecutor.ExecuteSql(Code.ToString());
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
                     });
             });
         }
 
-        public TextDocument Code
+        public INativeTextDocument Code
         {
             get => code;
             set => SetProperty(ref code, value);

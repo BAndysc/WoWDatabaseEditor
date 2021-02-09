@@ -16,6 +16,7 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Windows;
+using WDE.Common.WPF;
 using WDE.Common.WPF.Utils;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.ModulesManagement;
@@ -112,6 +113,7 @@ namespace WoWDatabaseEditorCore.WPF
         {
             base.ConfigureModuleCatalog(moduleCatalog);
             moduleCatalog.AddModule(typeof(MainModule));
+            moduleCatalog.AddModule(typeof(CommonWpfModule));
             moduleCatalog.AddModule(typeof(MainModuleWPF));
 
             List<Assembly> allAssemblies = GetPluginDlls().Select(AssemblyLoadContext.Default.LoadFromAssemblyPath).ToList();
@@ -134,7 +136,7 @@ namespace WoWDatabaseEditorCore.WPF
             string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             if (path == null)
                 return ArraySegment<string>.Empty;
-            return Directory.GetFiles(path, "WDE*.dll").Where(path => !path.Contains("Test.dll"));
+            return Directory.GetFiles(path, "WDE*.dll").Where(path => !path.Contains("Test.dll") && !path.Contains("WDE.Common.WPF"));
         }
 
         private IList<Conflict> DetectConflicts(List<Assembly> allAssemblies)

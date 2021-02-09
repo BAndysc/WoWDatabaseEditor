@@ -7,6 +7,7 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:helpers="clr-namespace:WDE.Solutions.Explorer.Helpers"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:attached="clr-namespace:WDE.Common.WPF.Attached;assembly=WDE.Common.WPF"
              prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
     <UserControl.Resources>
 
@@ -163,7 +164,7 @@
 
     </UserControl.Resources>
     <TreeView x:Name="tv" ItemsSource="{Binding Root}" dd:DragDrop.IsDragSource="True"
-              dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}">
+              dd:DragDrop.IsDropTarget="True" attached:GongDragAndDrop.WdeDropHandler="{Binding}" >
 
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="SelectedItemChanged">
