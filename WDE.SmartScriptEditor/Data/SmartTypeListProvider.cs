@@ -3,7 +3,6 @@ using WDE.Common.Managers;
 using WDE.Conditions.Data;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Editor.ViewModels;
-using WDE.SmartScriptEditor.Editor.Views;
 
 namespace WDE.SmartScriptEditor.Data
 {

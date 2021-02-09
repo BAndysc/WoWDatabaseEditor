@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="WDE.SmartScriptEditor.WPF.Editor.Views.ToolSmartEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:utils="clr-namespace:WDE.Common.WPF.Utils;assembly=WDE.Common.WPF"
+             mvvm:ViewModelLocator.AutoWireViewModel="False"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <ContentControl DataContext="{Binding EditorViewModel}" Content="{Binding }" utils:ViewBind.Model="{Binding}" />
+</UserControl>

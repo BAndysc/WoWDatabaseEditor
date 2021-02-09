@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Data;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.MVVM.Observable;
@@ -14,8 +12,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 {
     public class ParametersEditViewModel : ObservableBase, IDialog
     {
-        private readonly CollectionViewSource items;
-
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             SmartBaseElement element,
             bool focusFirst,
@@ -63,9 +59,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                     }));
             }
 
-            items = new CollectionViewSource {Source = FilteredParameters};
-            items.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
-
             Accept = new DelegateCommand(() =>
             {
                 BeforeAccept?.Invoke();
@@ -78,7 +71,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public List<IEditableParameterViewModel> Parameters { get; } = new();
         public ObservableCollection<IEditableParameterViewModel> FilteredParameters { get; } = new();
         public string Readable { get; private set; }
-        public ICollectionView AllItems => items.View;
         public bool ShowCloseButtons { get; set; } = true;
 
         public DelegateCommand Accept { get; }

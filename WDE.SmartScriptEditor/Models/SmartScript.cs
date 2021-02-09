@@ -121,7 +121,10 @@ namespace WDE.SmartScriptEditor.Models
                         }
 
                         if (conds.TryGetValue(line.Id, out var conditionList))
-                            currentEvent.Conditions.AddRange(conditionList);
+                        {
+                            foreach (var c in conditionList)
+                                currentEvent.Conditions.Add(c);
+                        }
                         
                         Events.Add(currentEvent);
                     }

@@ -1,23 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
-using System.Windows.Data;
-using System.Windows.Input;
-using Microsoft.Xaml.Behaviors.Core;
+using System.Linq;
+using DynamicData;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 using WDE.Conditions.Data;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartSelectViewModel : BindableBase, IDialog
     {
-        private readonly ObservableCollection<SmartItem> allItems = new();
-
-        private readonly CollectionViewSource items;
+        private ReactiveProperty<Func<SmartItem, bool>> currentFilter;
+        private readonly SourceList<SmartItem> items = new();
         private readonly Func<SmartGenericJsonData, bool> predicate;
         private string searchBox;
         private SmartItem selectedItem;
@@ -30,13 +29,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.predicate = predicate;
             MakeItems(type, smartDataManager, conditionDataManager);
 
-            items = new CollectionViewSource();
-            items.Source = allItems;
-            items.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
-            items.Filter += ItemsOnFilter;
+            items = new SourceList<SmartItem>();
+            ReadOnlyObservableCollection<SmartItem> l;
+            currentFilter = new ReactiveProperty<Func<SmartItem, bool>>(_ => true, Compare.Create<Func<SmartItem, bool>>((_, _) => false, _ => 0));
+            items
+                .Connect()
+                .Filter(currentFilter)
+                .Sort(Comparer<SmartItem>.Create((x, y) => x.Name.CompareTo(y.Name)))
+                .Bind(out l)
+                .Subscribe();
+            FilteredItems = l;
 
-            if (items.View.MoveCurrentToFirst())
-                SelectedItem = items.View.CurrentItem as SmartItem;
+            if (items.Count > 0)
+                SelectedItem = items.Items.First();
 
             Accept = new DelegateCommand(() =>
             {
@@ -44,7 +49,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }, () => selectedItem != null);
         }
 
-        public ICollectionView AllItems => items.View;
+        public ReadOnlyObservableCollection<SmartItem> FilteredItems { get; }
 
         public string SearchBox
         {
@@ -52,7 +57,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set
             {
                 SetProperty(ref searchBox, value);
-                items.View.Refresh();
+                if (string.IsNullOrEmpty(value))
+                    currentFilter.Value = _ => true;
+                else
+                    currentFilter.Value = item => item.Name.ToLower().Contains(SearchBox.ToLower());
             }
         }
 
@@ -65,17 +73,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 Accept?.RaiseCanExecuteChanged();
             }
         }
-
-        private void ItemsOnFilter(object sender, FilterEventArgs filterEventArgs)
-        {
-            SmartItem item = filterEventArgs.Item as SmartItem;
-
-            if (predicate != null && !predicate(item.Data))
-                filterEventArgs.Accepted = false;
-            else
-                filterEventArgs.Accepted = string.IsNullOrEmpty(SearchBox) || item.Name.ToLower().Contains(SearchBox.ToLower());
-        }
-
+        
         private void MakeItems(SmartType type, ISmartDataManager smartDataManager, IConditionDataManager conditionDataManager)
         {
             foreach (var smartDataGroup in smartDataManager.GetGroupsData(type))
@@ -84,8 +82,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 {
                     if (smartDataManager.Contains(type, member))
                     {
-                        SmartItem i = new();
                         SmartGenericJsonData data = smartDataManager.GetDataByName(type, member);
+                        if (predicate != null && predicate(data))
+                            continue;
+                     
+                        SmartItem i = new();   
                         i.Group = smartDataGroup.Name;
                         i.Name = data.NameReadable;
                         i.Id = data.Id;
@@ -94,7 +95,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         i.Deprecated = data.Deprecated;
                         i.Data = data;
 
-                        allItems.Add(i);
+                        items.Add(i);
                     }
                 }
             }
@@ -107,9 +108,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     {
                         if (conditionDataManager.HasConditionData(member))
                         {
-                            SmartItem i = new();
                             ConditionJsonData data = conditionDataManager.GetConditionData(member);
 
+                            SmartItem i = new();
                             i.Group = conditionDataGroup.Name;
                             i.Name = data.NameReadable;
                             i.Id = data.Id;
@@ -117,7 +118,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             i.Deprecated = false;
                             i.ConditionData = data;
 
-                            allItems.Add(i);
+                            items.Add(i);
                         }
                     }
                 }   

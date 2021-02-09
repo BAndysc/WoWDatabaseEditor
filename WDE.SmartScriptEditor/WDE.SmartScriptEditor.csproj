@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0-windows7.0</TargetFramework>
+    <TargetFrameworks>net5.0-windows7.0;net5.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
@@ -11,16 +10,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\bin\Release\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WDE.Common.WPF\WDE.Common.WPF.csproj" />
     <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
     <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
     <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
@@ -75,31 +65,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AsyncAwaitBestPractices.MVVM">
-      <Version>5.0.2</Version>
-    </PackageReference>
-    <PackageReference Include="CommonServiceLocator">
-      <Version>2.0.5</Version>
-    </PackageReference>
-    <PackageReference Include="gong-wpf-dragdrop">
-      <Version>2.3.2</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Prism.Wpf">
-      <Version>8.0.0.1909</Version>
+    <PackageReference Include="DynamicData">
+      <Version>7.1.1</Version>
     </PackageReference>
     <PackageReference Include="SmartFormat.NET">
       <Version>2.5.3</Version>
-    </PackageReference>
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Unity.Abstractions">
-      <Version>5.11.6</Version>
-    </PackageReference>
-    <PackageReference Include="Unity.Container">
-      <Version>5.11.10</Version>
-    </PackageReference>
-    <PackageReference Include="Unity.RegistrationByConvention">
-      <Version>5.11.1</Version>
     </PackageReference>
   </ItemGroup>
 </Project>

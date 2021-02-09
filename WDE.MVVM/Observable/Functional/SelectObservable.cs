@@ -15,7 +15,7 @@ namespace WDE.MVVM.Observable.Functional
         
         public IDisposable Subscribe(IObserver<R> observer)
         {
-            return observable.Subscribe(val => observer.OnNext(converter(val)));
+            return observable.SubscribeAction(val => observer.OnNext(converter(val)));
         }
     }
 }

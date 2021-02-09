@@ -11,7 +11,6 @@ using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Utils;
-using WDE.SmartScriptEditor.Editor.Views;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {

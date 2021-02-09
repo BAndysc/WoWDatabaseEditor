@@ -16,7 +16,6 @@ using WDE.Common.Tasks;
 using WDE.Common.Services.MessageBox;
 using WDE.SmartScriptEditor.Providers;
 using WDE.SmartScriptEditor.Data;
-using WDE.SmartScriptEditor.Editor.Views;
 using WDE.SmartScriptEditor.History;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels

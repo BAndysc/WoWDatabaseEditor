@@ -15,7 +15,7 @@ namespace WDE.MVVM.Test.MVVM
 
             int receivedValue = 0;
 
-            using (property.Subscribe(v => receivedValue = v))
+            using (property.SubscribeAction(v => receivedValue = v))
             {
                 Assert.AreEqual(1, receivedValue);
                 property.Value = 2;

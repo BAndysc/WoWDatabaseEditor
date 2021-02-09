@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;

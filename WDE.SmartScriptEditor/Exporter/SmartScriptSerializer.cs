@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.Xaml.Behaviors.Core;
 using SmartFormat;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Data;

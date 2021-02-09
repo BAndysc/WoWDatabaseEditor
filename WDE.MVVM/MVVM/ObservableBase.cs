@@ -71,7 +71,7 @@ namespace WDE.MVVM
 
             var setter = property.GetSetMethod(true);
             
-            AutoDispose(observable.Subscribe(next =>
+            AutoDispose(observable.SubscribeAction(next =>
                 {
                     setter!.Invoke(this, new object?[] {next});
                     RaisePropertyChanged(propertyName);
