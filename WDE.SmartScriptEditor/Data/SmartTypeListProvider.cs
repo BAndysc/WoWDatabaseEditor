@@ -21,11 +21,11 @@ namespace WDE.SmartScriptEditor.Data
             this.conditionDataManager = conditionDataManager;
         }
 
-        public int? Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
+        public async System.Threading.Tasks.Task<int?> Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
         {
             SmartSelectViewModel model = new(type, predicate, smartDataManager, conditionDataManager);
             
-            if (windowManager.ShowDialog(model))
+            if (await windowManager.ShowDialog(model))
                 return model.SelectedItem.Id;
 
             return null;

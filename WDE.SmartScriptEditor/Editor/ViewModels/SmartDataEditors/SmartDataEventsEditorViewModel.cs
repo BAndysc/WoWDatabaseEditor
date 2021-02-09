@@ -11,6 +11,7 @@ using WDE.Common.Annotations;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
@@ -32,12 +33,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 Source.ValidTypes = SmartScriptTypes.Where(x => x.IsChecked).Select(x => x.Type).ToList();
                 CloseOk?.Invoke();
             });
-            EditParameter = new DelegateCommand<SmartParameterJsonData?>(EditParam);
-            AddParameter = new DelegateCommand(AddParam);
-            EditCondition = new DelegateCommand<SmartConditionalJsonData?>(EditCond);
-            AddCondition = new DelegateCommand(AddCond);
-            EditDescriptionDefinition = new DelegateCommand<SmartDescriptionRulesJsonData?>(EditDescDefinition);
-            AddDescriptionDefinition = new DelegateCommand(AddDescDef);
+            EditParameter = new AsyncAutoCommand<SmartParameterJsonData?>(EditParam);
+            AddParameter = new AsyncAutoCommand(AddParam);
+            EditCondition = new AsyncAutoCommand<SmartConditionalJsonData?>(EditCond);
+            AddCondition = new AsyncAutoCommand(AddCond);
+            EditDescriptionDefinition = new AsyncAutoCommand<SmartDescriptionRulesJsonData?>(EditDescDefinition);
+            AddDescriptionDefinition = new AsyncAutoCommand(AddDescDef);
             DeleteActiveItem = new DelegateCommand(DeleteItem);
             SelectedParamIndex = -1;
             SelectedCondIndex = -1;
@@ -56,48 +57,48 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public bool IsSourceEmpty() => Source.IsEmpty();
 
         public DelegateCommand SaveItem { get; }
-        public DelegateCommand<SmartParameterJsonData?> EditParameter { get; }
-        public DelegateCommand AddParameter { get; }
-        public DelegateCommand<SmartConditionalJsonData?> EditCondition { get; }
-        public DelegateCommand AddCondition { get; }
-        public DelegateCommand<SmartDescriptionRulesJsonData?> EditDescriptionDefinition { get; }
-        public DelegateCommand AddDescriptionDefinition { get; }
+        public AsyncAutoCommand<SmartParameterJsonData?> EditParameter { get; }
+        public AsyncAutoCommand AddParameter { get; }
+        public AsyncAutoCommand<SmartConditionalJsonData?> EditCondition { get; }
+        public AsyncAutoCommand AddCondition { get; }
+        public AsyncAutoCommand<SmartDescriptionRulesJsonData?> EditDescriptionDefinition { get; }
+        public AsyncAutoCommand AddDescriptionDefinition { get; }
         public DelegateCommand DeleteActiveItem { get; }
 
-        private void EditParam(SmartParameterJsonData? param)
+        private async Task EditParam(SmartParameterJsonData? param)
         {
             if (param.HasValue)
-                OpenParameterEditor(param.Value, false);
+                await OpenParameterEditor(param.Value, false);
         }
 
-        private void AddParam()
+        private async Task AddParam()
         {
             var temp = new SmartParameterJsonData();
-            OpenParameterEditor(in temp, true);
+            await OpenParameterEditor(temp, true);
         }
 
-        private void EditCond(SmartConditionalJsonData? cond)
+        private async Task EditCond(SmartConditionalJsonData? cond)
         {
             if (cond.HasValue)
-                OpenConditionEditor(cond.Value, false);
+                await OpenConditionEditor(cond.Value, false);
         }
 
-        private void AddCond()
+        private async Task AddCond()
         {
             var temp = new SmartConditionalJsonData();
-            OpenConditionEditor(in temp, true);
+            await OpenConditionEditor(temp, true);
         }
 
-        private void EditDescDefinition(SmartDescriptionRulesJsonData? descRule)
+        private async Task EditDescDefinition(SmartDescriptionRulesJsonData? descRule)
         {
             if (descRule.HasValue)
-                OpenDescriptionRuleEditor(descRule.Value, false);
+                await OpenDescriptionRuleEditor(descRule.Value, false);
         }
 
-        private void AddDescDef()
+        private async Task AddDescDef()
         {
             var temp = new SmartDescriptionRulesJsonData();
-            OpenDescriptionRuleEditor(in temp, true);
+            await OpenDescriptionRuleEditor(temp, true);
         }
 
         private void DeleteItem()
@@ -119,10 +120,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
         
-        private void OpenParameterEditor(in SmartParameterJsonData item, bool insertOnSave)
+        private async Task OpenParameterEditor(SmartParameterJsonData item, bool insertOnSave)
         {
             var vm = new SmartDataParameterEditorViewModel(parameterFactory, in item);
-            if (windowManager.ShowDialog(vm) && !vm.Source.IsEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.Source.IsEmpty())
             {
                 if (insertOnSave)
                     Source.Parameters.Add(vm.Source.ToSmartParameterJsonData());
@@ -136,10 +137,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        private void OpenConditionEditor(in SmartConditionalJsonData item, bool insertOnSave)
+        private async Task OpenConditionEditor(SmartConditionalJsonData item, bool insertOnSave)
         {
             var vm = new SmartDataConditionEditorViewModel(in item, insertOnSave, false);
-            if (windowManager.ShowDialog(vm) && !vm.IsSourceEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.IsSourceEmpty())
             {
                 if (vm.InsertOnSave)
                     Source.Conditions.Add(vm.GetSource());
@@ -153,10 +154,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        private void OpenDescriptionRuleEditor(in SmartDescriptionRulesJsonData item, bool insertOnSave)
+        private async Task OpenDescriptionRuleEditor(SmartDescriptionRulesJsonData item, bool insertOnSave)
         {
             var vm = new SmartDataDescRuleEditorViewModel(windowManager, in item, insertOnSave);
-            if (windowManager.ShowDialog(vm) && !vm.IsSourceEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.IsSourceEmpty())
             {
                 if (vm.InsertOnSave)
                     Source.DescriptionRules.Add(vm.GetSource());

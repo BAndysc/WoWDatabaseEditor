@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WDE.Common;
@@ -46,7 +47,7 @@ namespace WDE.SmartScriptEditor
         public bool IsCompatibleWithCore(ICoreVersion core) => 
             core.SmartScriptFeatures.SupportedTypes.Contains(type);
 
-        public abstract ISolutionItem CreateSolutionItem();
+        public abstract Task<ISolutionItem> CreateSolutionItem();
     }
 
     [AutoRegister]
@@ -62,9 +63,9 @@ namespace WDE.SmartScriptEditor
             this.creatureEntryProvider = creatureEntryProvider;
         }
 
-        public override ISolutionItem CreateSolutionItem()
+        public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = creatureEntryProvider.Value.GetEntryFromService();
+            uint? entry = await creatureEntryProvider.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Creature);
@@ -84,9 +85,9 @@ namespace WDE.SmartScriptEditor
             this.goProvider = goProvider;
         }
 
-        public override ISolutionItem CreateSolutionItem()
+        public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = goProvider.Value.GetEntryFromService();
+            uint? entry = await goProvider.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.GameObject);
@@ -106,9 +107,9 @@ namespace WDE.SmartScriptEditor
             this.service = service;
         }
 
-        public override ISolutionItem CreateSolutionItem()
+        public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = service.Value.GetEntryFromService();
+            uint? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Quest);
@@ -128,9 +129,9 @@ namespace WDE.SmartScriptEditor
             this.service = service;
         }
 
-        public override ISolutionItem CreateSolutionItem()
+        public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = service.Value.GetEntryFromService();
+            uint? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Spell);
@@ -150,9 +151,9 @@ namespace WDE.SmartScriptEditor
             this.service = service;
         }
 
-        public override ISolutionItem CreateSolutionItem()
+        public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = service.Value.GetEntryFromService();
+            uint? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Spell);
@@ -173,9 +174,9 @@ namespace WDE.SmartScriptEditor
             this.creatureEntryProvider = creatureEntryProvider;
         }
 
-        public override ISolutionItem CreateSolutionItem()
+        public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = creatureEntryProvider.Value.GetEntryFromService();
+            uint? entry = await creatureEntryProvider.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.TimedActionList);
@@ -200,11 +201,11 @@ namespace WDE.SmartScriptEditor
             this.dbcStore = dbcStore;
         }
 
-        public override ISolutionItem CreateSolutionItem()
+        public override async Task<ISolutionItem> CreateSolutionItem()
         {
             var areaTriggers =
                 dbcStore.Value.AreaTriggerStore.ToDictionary(at => at.Key, at => new SelectOption($"Client areatrigger {at.Key}"));
-            int? entry = itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
+            int? entry = await itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem(entry.Value, SmartScriptType.AreaTrigger);
@@ -234,13 +235,13 @@ namespace WDE.SmartScriptEditor
             this.serverSide = serverSide;
         }
 
-        public override ISolutionItem CreateSolutionItem()
+        public override async Task<ISolutionItem> CreateSolutionItem()
         {
             var areaTriggers = database.Value.GetAreaTriggerTemplates()
                 .Where(trigger => trigger.IsServerSide == serverSide)
                 .ToDictionary(at => (int)at.Id, at => new SelectOption($"Area trigger {at.Id}"));
 
-            int? entry = itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
+            int? entry = await itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem(entry.Value, type);

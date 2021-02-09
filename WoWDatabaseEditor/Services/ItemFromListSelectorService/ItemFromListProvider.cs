@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
@@ -16,10 +17,10 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             this.windowManager = windowManager;
         }
         
-        public int? GetItemFromList(Dictionary<int, SelectOption> items, bool flags, int? current = null)
+        public async Task<int?> GetItemFromList(Dictionary<int, SelectOption> items, bool flags, int? current = null)
         {
             using ItemFromListProviderViewModel vm = new(items, flags, current);
-            if (windowManager.ShowDialog(vm))
+            if (await windowManager.ShowDialog(vm))
                 return vm.GetEntry();
             return null;
         }

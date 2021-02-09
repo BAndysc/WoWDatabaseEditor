@@ -37,14 +37,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.windowManager = windowManager;
             this.dataSourceMode = dataSourceMode;
             MakeItems();
-            AddGroup = new DelegateCommand(AddGroupToSource);
+            AddGroup = new AsyncAutoCommand(AddGroupToSource);
             Save = new DelegateCommand(() =>
             {
                 taskRunner.ScheduleTask("Saving Group Definitions to file", SaveGroupsToFile);
             });
             DeleteItem = new DelegateCommand<object>(DeleteItemFromSource);
-            AddMember = new DelegateCommand<SmartDataGroupsEditorData>(AddItemToGroup);
-            EditItem = new DelegateCommand<SmartDataGroupsEditorData>(EditSourceItem);
+            AddMember = new AsyncAutoCommand<SmartDataGroupsEditorData>(AddItemToGroup);
+            EditItem = new AsyncAutoCommand<SmartDataGroupsEditorData>(EditSourceItem);
             // history setup
             History = historyCreator();
             historyHandler = new SmartDataGroupsHistory(SourceItems);
@@ -62,17 +62,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public ObservableCollection<SmartDataGroupsEditorData> SourceItems { get; private set; }
 
-        public DelegateCommand AddGroup { get; }
+        public AsyncAutoCommand AddGroup { get; }
         public DelegateCommand<object> DeleteItem { get; }
-        public DelegateCommand<SmartDataGroupsEditorData> AddMember { get; }
-        public DelegateCommand<SmartDataGroupsEditorData> EditItem { get; }
+        public AsyncAutoCommand<SmartDataGroupsEditorData> AddMember { get; }
+        public AsyncAutoCommand<SmartDataGroupsEditorData> EditItem { get; }
         private DelegateCommand UndoCommand;
         private DelegateCommand RedoCommand;
 
-        public void AddGroupToSource()
+        public async Task AddGroupToSource()
         {
-            var result = "";
-            OpenNameEditingWindow("", out result);
+            var result = await OpenNameEditingWindow("");
             if (!string.IsNullOrWhiteSpace(result))
                 SourceItems.Add(new SmartDataGroupsEditorData(result));
         }
@@ -87,30 +86,27 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        private void AddItemToGroup(SmartDataGroupsEditorData data)
+        private async Task AddItemToGroup(SmartDataGroupsEditorData data)
         {
-            var result = "";
-            OpenNameEditingWindow(GetNewItemNamePrefix(), out result);
+            var result = await OpenNameEditingWindow(GetNewItemNamePrefix());
             if (!string.IsNullOrWhiteSpace(result))
                 data.Members.Add(new SmartDataGroupsEditorDataNode(result, data));
         }
 
-        private void EditSourceItem(SmartDataGroupsEditorData data)
+        private async Task EditSourceItem(SmartDataGroupsEditorData data)
         {
-            var result = data.Name;
-            OpenNameEditingWindow(data.Name, out result);
+            var result = await OpenNameEditingWindow(data.Name);
             if (!string.IsNullOrEmpty(result))
                 data.Name = result;
         }
 
-        private void OpenNameEditingWindow(string source, out string name)
+        private async Task<string> OpenNameEditingWindow(string source)
         {
             var vm = new SmartDataGroupsInputViewModel(source);
-            name = "";
-            if (windowManager.ShowDialog(vm))
+            if (await windowManager.ShowDialog(vm))
             {
                 if (!string.IsNullOrWhiteSpace(vm.Name))
-                    name = vm.Name;
+                    return vm.Name;
                 else
                 {
                     messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
@@ -120,6 +116,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         .Build());
                 }
             }
+
+            return "";
         }
 
         private async Task SaveGroupsToFile()

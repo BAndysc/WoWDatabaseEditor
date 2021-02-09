@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.VisualBasic;
@@ -20,7 +21,7 @@ namespace WDE.Solutions
 
         public string GetDescription() => "Container for solutions";
 
-        public ISolutionItem CreateSolutionItem()
+        public async Task<ISolutionItem> CreateSolutionItem()
         {
             string input = Interaction.InputBox("Put folder name", "New Folder", "My new folder");
             if (!string.IsNullOrEmpty(input))

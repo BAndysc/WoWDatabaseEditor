@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Types;
@@ -27,7 +28,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
         public string Description { get; }
         public ImageUri Image { get; }
 
-        public ISolutionItem CreateSolutionItem()
+        public Task<ISolutionItem> CreateSolutionItem()
         {
             return provider.CreateSolutionItem();
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
@@ -17,12 +18,12 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
             this.windowManager = windowManager;
         }
 
-        public ISolutionItem? GetNewSolutionItem()
+        public async Task<ISolutionItem?> GetNewSolutionItem()
         {
             var vm = viewModel();
-            if (windowManager.ShowDialog(vm))
+            if (await windowManager.ShowDialog(vm))
             {
-                return vm.SelectedPrototype!.CreateSolutionItem();
+                return await vm.SelectedPrototype!.CreateSolutionItem();
             }
             return null;
         }

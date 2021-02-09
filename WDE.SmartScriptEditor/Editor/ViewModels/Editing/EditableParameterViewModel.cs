@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.MVVM;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
@@ -17,7 +20,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             this.itemFromListProvider = itemFromListProvider;
             Group = group;
             Parameter = parameter;
-            SelectItemAction = new DelegateCommand(SelectItem);
+            SelectItemAction = new AsyncAutoCommand(SelectItem);
 
             Watch(parameter, p => p.IsUsed, nameof(IsHidden));
             Watch(parameter, p => p.Parameter, nameof(HasItems));
@@ -28,7 +31,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public string Group { get; }
         
-        public DelegateCommand SelectItemAction { get; set; }
+        public ICommand SelectItemAction { get; set; }
 
         public string Name => Parameter.Name;
 
@@ -52,13 +55,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             }
         }
         
-        private void SelectItem()
+        private async Task SelectItem()
         {
             if (Parameter.Parameter.Items != null)
             {
                 if (Parameter is ParameterValueHolder<int> p)
                 {
-                    int? val = itemFromListProvider.GetItemFromList(p.Parameter.Items, Parameter.Parameter is FlagParameter, p.Value);
+                    int? val = await itemFromListProvider.GetItemFromList(p.Parameter.Items, Parameter.Parameter is FlagParameter, p.Value);
                     if (val.HasValue)
                         p.Value = val.Value;   
                 }

@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Editor.Views;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
@@ -25,8 +26,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.windowManager = windowManager;
             SaveItem = new DelegateCommand((() => CloseOk?.Invoke()));
             DeleteItem = new DelegateCommand(DeleteSelectedParam);
-            AddParameter = new DelegateCommand(OpenCreateParameterWindow);
-            EditParameter = new DelegateCommand<SmartParameterJsonData?>(OpenEditParameterWindow);
+            AddParameter = new AsyncAutoCommand(OpenCreateParameterWindow);
+            EditParameter = new AsyncAutoCommand<SmartParameterJsonData?>(OpenEditParameterWindow);
             InsertOnSave = isCreatingItem;
             selectedParamIndex = -1;
         }
@@ -43,8 +44,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand SaveItem { get; }
         public DelegateCommand DeleteItem { get; }
-        public DelegateCommand AddParameter { get; }
-        public DelegateCommand<SmartParameterJsonData?> EditParameter { get; }
+        public AsyncAutoCommand AddParameter { get; }
+        public AsyncAutoCommand<SmartParameterJsonData?> EditParameter { get; }
 
         private void DeleteSelectedParam()
         {
@@ -52,22 +53,22 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 Source.Parameters.RemoveAt(selectedParamIndex);
         }
 
-        private void OpenCreateParameterWindow()
+        private async System.Threading.Tasks.Task OpenCreateParameterWindow()
         {
             var tempParam = new SmartParameterJsonData();
-            OpenParameterEditor(tempParam, true);
+            await OpenParameterEditor(tempParam, true);
         }
 
-        private void OpenEditParameterWindow(SmartParameterJsonData? param)
+        private async System.Threading.Tasks.Task OpenEditParameterWindow(SmartParameterJsonData? param)
         {
             if (param.HasValue)
-                OpenParameterEditor(param.Value, false);
+                await OpenParameterEditor(param.Value, false);
         }
 
-        private void OpenParameterEditor(SmartParameterJsonData item, bool insertOnSave)
+        private async System.Threading.Tasks.Task OpenParameterEditor(SmartParameterJsonData item, bool insertOnSave)
         {
             var vm = new SmartDataParameterEditorViewModel(parameterFactory, in item);
-            if (windowManager.ShowDialog(vm) && !vm.Source.IsEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.Source.IsEmpty())
             {
                 if (insertOnSave)
                     Source.Parameters.Add(vm.Source.ToSmartParameterJsonData());

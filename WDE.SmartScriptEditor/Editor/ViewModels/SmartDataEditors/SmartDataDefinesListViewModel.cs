@@ -52,8 +52,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     break;
             }
 
-            OnItemSelected = new DelegateCommand<SmartGenericJsonData?>(ShowEditorWindow);
-            CreateNew = new DelegateCommand(CreateNewItem);
+            OnItemSelected = new AsyncAutoCommand<SmartGenericJsonData?>(ShowEditorWindow);
+            CreateNew = new AsyncAutoCommand(CreateNewItem);
             DeleteItem = new DelegateCommand(DeleteSelectedItem);
             Save = new DelegateCommand(() =>
             {
@@ -76,25 +76,25 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         }
 
         public int SelectedItemIndex { get; set; }
-        public DelegateCommand<SmartGenericJsonData?> OnItemSelected { get; }
-        public DelegateCommand CreateNew { get; }
+        public AsyncAutoCommand<SmartGenericJsonData?> OnItemSelected { get; }
+        public AsyncAutoCommand CreateNew { get; }
         public DelegateCommand DeleteItem { get; }
         private DelegateCommand UndoCommand;
         private DelegateCommand RedoCommand;
 
         public ObservableCollection<SmartGenericJsonData> DefinesItems { get; }
 
-        private void ShowEditorWindow(SmartGenericJsonData? action)
+        private async Task ShowEditorWindow(SmartGenericJsonData? action)
         {
             if (action.HasValue)
-                OpenEditor(action.Value, false);
+                await OpenEditor(action.Value, false);
         }
 
-        private void CreateNewItem()
+        private async Task CreateNewItem()
         {
             var newItem = new SmartGenericJsonData();
             newItem.Id = DefinesItems.Max(x => x.Id) + 1;
-            OpenEditor(newItem, true);
+            await OpenEditor(newItem, true);
         }
 
         private void DeleteSelectedItem()
@@ -103,10 +103,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 DefinesItems.RemoveAt(SelectedItemIndex);
         }
 
-        private void OpenEditor(SmartGenericJsonData item, bool isCreating)
+        private async Task OpenEditor(SmartGenericJsonData item, bool isCreating)
         {
             var vm = GetEditorViewModel(in item, isCreating);
-            if (windowManager.ShowDialog(vm as IDialog) && !vm.IsSourceEmpty())
+            if (await windowManager.ShowDialog(vm as IDialog) && !vm.IsSourceEmpty())
             {
                 if (vm.InsertOnSave)
                     DefinesItems.Add(vm.GetSource());

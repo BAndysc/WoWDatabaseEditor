@@ -1,10 +1,11 @@
-﻿using WDE.Module.Attributes;
+﻿using System.Threading.Tasks;
+using WDE.Module.Attributes;
 
 namespace WDE.Common.Managers
 {
     [UniqueProvider]
     public interface IWindowManager
     {
-        bool ShowDialog(IDialog viewModel);
+        Task<bool> ShowDialog(IDialog viewModel);
     }
 }

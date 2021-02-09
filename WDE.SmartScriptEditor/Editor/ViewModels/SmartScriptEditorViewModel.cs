@@ -17,6 +17,7 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Conditions.Data;
 using WDE.Conditions.Exporter;
 using WDE.MVVM;
@@ -220,17 +221,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
             });
             
-            EditAction = new DelegateCommand<SmartAction>(a => EditActionCommand(a));
-            EditCondition = new DelegateCommand<SmartCondition>(c => EditConditionCommand(c));
-            AddEvent = new DelegateCommand(AddEventCommand);
-            AddAction = new DelegateCommand<NewActionViewModel>(AddActionCommand);
-            AddCondition = new DelegateCommand<NewConditionViewModel>(AddConditionCommand);
+            EditAction = new AsyncAutoCommand<SmartAction>(EditActionCommand);
+            EditCondition = new AsyncAutoCommand<SmartCondition>(EditConditionCommand);
+            AddEvent = new AsyncAutoCommand(AddEventCommand);
+            AddAction = new AsyncAutoCommand<NewActionViewModel>(AddActionCommand);
+            AddCondition = new AsyncAutoCommand<NewConditionViewModel>(AddConditionCommand);
 
-            DirectEditParameter = new DelegateCommand<object>(obj =>
+            DirectEditParameter = new DelegateCommand<object>(async obj =>
             {
                 if (obj is ParameterValueHolder<int> param)
                 {
-                    int? val = itemFromListProvider.GetItemFromList(param.Parameter.Items ?? new Dictionary<int, SelectOption>(), param.Parameter is FlagParameter, param.Value);
+                    int? val = await itemFromListProvider.GetItemFromList(param.Parameter.Items ?? new Dictionary<int, SelectOption>(), param.Parameter is FlagParameter, param.Value);
                     if (val.HasValue)
                         param.Value = val.Value;   
                 } 
@@ -239,13 +240,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var actionData = smartDataManager.GetRawData(SmartType.SmartAction, sourceTargetEdit.RelatedAction.Id);
                     if (sourceTargetEdit.IsSource)
                     {
-                        int? newSource = ShowSourcePicker(actionData);
+                        int? newSource = await ShowSourcePicker(actionData);
                         if (newSource.HasValue)
                             smartFactory.UpdateSource(sourceTargetEdit.RelatedAction.Source, newSource.Value);                        
                     }
                     else
                     {
-                        int? newTarget = ShowTargetPicker(actionData);
+                        int? newTarget = await ShowTargetPicker(actionData);
                         if (newTarget.HasValue)
                             smartFactory.UpdateTarget(sourceTargetEdit.RelatedAction.Target, newTarget.Value);   
                     }
@@ -737,15 +738,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand<DropActionsConditionsArgs> OnDropActions { get; set; }
         public DelegateCommand<int?> OnDropItems { get; set; }
 
-        public DelegateCommand<NewActionViewModel> AddAction { get; set; }
-        public DelegateCommand<NewConditionViewModel> AddCondition { get; set; }
+        public AsyncAutoCommand<NewActionViewModel> AddAction { get; set; }
+        public AsyncAutoCommand<NewConditionViewModel> AddCondition { get; set; }
 
         public DelegateCommand<SmartAction> DeleteAction { get; set; }
 
-        public DelegateCommand<SmartAction> EditAction { get; set; }
-        public DelegateCommand<SmartCondition> EditCondition { get; 
+        public AsyncAutoCommand<SmartAction> EditAction { get; set; }
+        public AsyncAutoCommand<SmartCondition> EditCondition { get; 
         }
-        public DelegateCommand AddEvent { get; set; }
+        public AsyncAutoCommand AddEvent { get; set; }
 
         public DelegateCommand UndoCommand { get; set; }
         public DelegateCommand RedoCommand { get; set; }
@@ -911,17 +912,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             obj.Parent.Actions.Remove(obj);
         }
 
-        private void AddActionCommand(NewActionViewModel obj)
+        private async Task AddActionCommand(NewActionViewModel obj)
         {
             SmartEvent e = obj.Event;
             if (e == null)
                 return;
-            int? sourceId = ShowSourcePicker();
+            int? sourceId = await ShowSourcePicker();
 
             if (!sourceId.HasValue)
                 return;
 
-            int? actionId = ShowActionPicker(sourceId.Value);
+            int? actionId = await ShowActionPicker(sourceId.Value);
 
             if (!actionId.HasValue)
                 return;
@@ -932,7 +933,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             if (actionData.UsesTarget && !actionData.TargetIsSource)
             {
-                int? targetId = ShowTargetPicker(actionData);
+                int? targetId = await ShowTargetPicker(actionData);
 
                 if (!targetId.HasValue)
                     return;
@@ -946,17 +947,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
             ev.Parent = e;
-            if (EditActionCommand(ev))
+            if (await EditActionCommand(ev))
                 e.Actions.Add(ev);
         }
 
-        private void AddConditionCommand(NewConditionViewModel obj)
+        private async Task AddConditionCommand(NewConditionViewModel obj)
         {
             SmartEvent e = obj.Event;
             if (e == null)
                 return;
 
-            int? conditionId = ShowConditionPicker();
+            int? conditionId = await ShowConditionPicker();
             
             if (!conditionId.HasValue)
                 return;
@@ -966,29 +967,29 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SmartCondition ev = smartFactory.ConditionFactory(conditionId.Value);
             ev.Parent = e;
             
-            if ((conditionData.Parameters?.Count ?? 0) == 0 || EditConditionCommand(ev))
+            if ((conditionData.Parameters?.Count ?? 0) == 0 || await EditConditionCommand(ev))
                 e.Conditions.Add(ev);
         }
 
-        private int? ShowConditionPicker()
+        private Task<int?> ShowConditionPicker()
         {
             return smartTypeListProvider.Get(SmartType.SmartCondition, _ => true);
         }
         
-        private int? ShowEventPicker()
+        private Task<int?> ShowEventPicker()
         {
             return smartTypeListProvider.Get(SmartType.SmartEvent,
                 data => data.ValidTypes == null || data.ValidTypes.Contains(script.SourceType));
         }
 
-        private int? ShowTargetPicker(SmartGenericJsonData actionData)
+        private Task<int?> ShowTargetPicker(SmartGenericJsonData actionData)
         {
             return smartTypeListProvider.Get(SmartType.SmartTarget,
                 data => (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
                         (actionData.Targets == null || actionData.Targets.Intersect(data.Types).Any()));
         }
 
-        private int? ShowSourcePicker(SmartGenericJsonData? actionData = null)
+        private Task<int?> ShowSourcePicker(SmartGenericJsonData? actionData = null)
         {
             return smartTypeListProvider.Get(SmartType.SmartSource,
                 data =>
@@ -1018,7 +1019,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf;
         }
         
-        private int? ShowActionPicker(int sourceId, bool showCommentMetaAction = true)
+        private Task<int?> ShowActionPicker(int sourceId, bool showCommentMetaAction = true)
         {
             return smartTypeListProvider.Get(SmartType.SmartAction,
                 data => (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
@@ -1026,16 +1027,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         (showCommentMetaAction || data.Id != SmartConstants.ActionComment));
         }
 
-        private void AddEventCommand()
+        private async Task AddEventCommand()
         {
             DeselectAll.Execute();
-            int? id = ShowEventPicker();
+            int? id = await ShowEventPicker();
 
             if (id.HasValue)
             {
                 SmartEvent ev = smartFactory.EventFactory(id.Value);
                 ev.Parent = script;
-                if (EditEventCommand(ev))
+                if (await EditEventCommand(ev))
                     script.Events.Add(ev);
             }
         }
@@ -1069,9 +1070,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             if (actionData.Id != SmartConstants.ActionComment)
             {
-                actionList.Add(new EditableActionData("Type", "Source", () =>
+                actionList.Add(new EditableActionData("Type", "Source", async () =>
                 {
-                    int? newSourceIndex = ShowSourcePicker();
+                    int? newSourceIndex = await ShowSourcePicker();
                     if (!newSourceIndex.HasValue)
                         return;
 
@@ -1091,18 +1092,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     smartFactory.UpdateSource(obj.Source, newSourceIndex.Value);
                 }, obj.Source.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartSource, id).Name)));
 
-                actionList.Add(new EditableActionData("Type", "Action", () =>
+                actionList.Add(new EditableActionData("Type", "Action", async () =>
                 {
-                    int? newActionIndex = ShowActionPicker(obj.Source.Id, false);
+                    int? newActionIndex = await ShowActionPicker(obj.Source.Id, false);
                     if (!newActionIndex.HasValue)
                         return;
 
                     smartFactory.UpdateAction(obj, newActionIndex.Value);
                 }, obj.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id).Name)));
             
-                actionList.Add(new EditableActionData("Type", "Target", () =>
+                actionList.Add(new EditableActionData("Type", "Target", async () =>
                 {
-                    int? newTargetIndex = ShowTargetPicker(smartDataManager.GetRawData(SmartType.SmartAction, obj.Id));
+                    int? newTargetIndex = await ShowTargetPicker(smartDataManager.GetRawData(SmartType.SmartAction, obj.Id));
                     if (!newTargetIndex.HasValue)
                         return;
 
@@ -1154,10 +1155,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             return viewModel;
         }
 
-        private bool EditActionCommand(SmartAction smartAction)
+        private async Task<bool> EditActionCommand(SmartAction smartAction)
         {
             var viewModel = ActionEditViewModel(smartAction);
-            var result = windowManager.ShowDialog(viewModel);
+            var result = await windowManager.ShowDialog(viewModel);
             viewModel.Dispose();
             return result;
         }
@@ -1179,9 +1180,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 parametersList.Add((obj.GetParameter(i), "Condition"));
             }
 
-            actionList.Add(new EditableActionData("Condition", "General", () =>
+            actionList.Add(new EditableActionData("Condition", "General", async () =>
             {
-                int? newConditionId = ShowConditionPicker();
+                int? newConditionId = await ShowConditionPicker();
                 if (!newConditionId.HasValue)
                     return;
 
@@ -1212,10 +1213,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             return viewModel;
         }
 
-        private bool EditConditionCommand(SmartCondition originalCondition)
+        private async Task<bool> EditConditionCommand(SmartCondition originalCondition)
         {
             var viewModel = ConditionEditViewModel(originalCondition);
-            bool result = windowManager.ShowDialog(viewModel);
+            bool result = await windowManager.ShowDialog(viewModel);
             viewModel.Dispose();
             return result;
         }
@@ -1242,9 +1243,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 //(ev.CooldownMin, "General")
             };
 
-            actionList.Add(new EditableActionData("Event", "General", () =>
+            actionList.Add(new EditableActionData("Event", "General", async () =>
             {
-                int? newEventIndex = ShowEventPicker();
+                int? newEventIndex = await ShowEventPicker();
                 if (!newEventIndex.HasValue)
                     return;
 
@@ -1281,10 +1282,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             return viewModel;
         }
         
-        private bool EditEventCommand(SmartEvent originalEvent)
+        private async Task<bool> EditEventCommand(SmartEvent originalEvent)
         {
             var viewModel = EventEditViewModel(originalEvent);
-            bool result = windowManager.ShowDialog(viewModel);
+            bool result = await windowManager.ShowDialog(viewModel);
             viewModel.Dispose();
             return result;
         }

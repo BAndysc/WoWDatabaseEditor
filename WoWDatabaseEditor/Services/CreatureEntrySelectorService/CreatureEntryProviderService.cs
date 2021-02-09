@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.DBC;
@@ -26,7 +27,7 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 
         protected abstract IEnumerable<T> GetList();
 
-        public uint? GetEntryFromService()
+        public async Task<uint?> GetEntryFromService()
         {
             List<ColumnDescriptor> columns = new()
             {
@@ -37,7 +38,7 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 
             var context = new GenericSelectorDialogViewModel<T>(columns, GetList(), entryGetter, index);
 
-            if (windowManager.ShowDialog(context))
+            if (await windowManager.ShowDialog(context))
                 return context.GetEntry();
 
             return null;

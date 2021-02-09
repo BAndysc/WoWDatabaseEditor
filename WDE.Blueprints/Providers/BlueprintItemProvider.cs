@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WDE.Common;
@@ -13,7 +14,7 @@ namespace WDE.Blueprints.Providers
     {
         public bool IsCompatibleWithCore(ICoreVersion core) => false;
         
-        public ISolutionItem CreateSolutionItem()
+        public async Task<ISolutionItem> CreateSolutionItem()
         {
             return new BlueprintSolutionItem();
         }

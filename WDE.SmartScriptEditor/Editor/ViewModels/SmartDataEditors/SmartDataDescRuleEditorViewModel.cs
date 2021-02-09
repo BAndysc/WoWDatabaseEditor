@@ -6,6 +6,7 @@ using Prism.Mvvm;
 using Prism.Commands;
 using WDE.SmartScriptEditor.Data;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -19,8 +20,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Source = new SmartDataDescRuleEditor(in source);
             Save = new DelegateCommand(() => CloseOk?.Invoke());
             Delete = new DelegateCommand(DeleteCondition);
-            AddCondition = new DelegateCommand(AddCond);
-            EditCondition = new DelegateCommand<SmartConditionalJsonData?>(EditCond);
+            AddCondition = new AsyncAutoCommand(AddCond);
+            EditCondition = new AsyncAutoCommand<SmartConditionalJsonData?>(EditCond);
             SelectedCondIndex = -1;
         }
         
@@ -30,21 +31,21 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         public DelegateCommand Save { get; }
         public DelegateCommand Delete { get; }
-        public DelegateCommand AddCondition { get; }
-        public DelegateCommand<SmartConditionalJsonData?> EditCondition { get; }
+        public AsyncAutoCommand AddCondition { get; }
+        public AsyncAutoCommand<SmartConditionalJsonData?> EditCondition { get; }
 
         public SmartDescriptionRulesJsonData GetSource() => Source.ToSmartDescriptionRulesJsonData();
         public bool IsSourceEmpty() => Source.IsEmpty();
 
-        private void EditCond(SmartConditionalJsonData? cond)
+        private async System.Threading.Tasks.Task EditCond(SmartConditionalJsonData? cond)
         {
             if (cond.HasValue)
-                OpenConditionEditor(cond.Value, false);
+                await OpenConditionEditor(cond.Value, false);
         }
         
-        private void AddCond()
+        private async System.Threading.Tasks.Task AddCond()
         {
-            OpenConditionEditor( new SmartConditionalJsonData(), true);
+            await OpenConditionEditor( new SmartConditionalJsonData(), true);
         }
 
         private void DeleteCondition()
@@ -53,10 +54,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 Source.Conditions.RemoveAt(SelectedCondIndex);
         }
         
-        private void OpenConditionEditor(SmartConditionalJsonData item, bool insertOnSave)
+        private async System.Threading.Tasks.Task OpenConditionEditor(SmartConditionalJsonData item, bool insertOnSave)
         {
             var vm = new SmartDataConditionEditorViewModel(in item, insertOnSave, true);
-            if (windowManager.ShowDialog(vm) && !vm.IsSourceEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.IsSourceEmpty())
             {
                 if (vm.InsertOnSave)
                     Source.Conditions.Add(vm.GetSource());

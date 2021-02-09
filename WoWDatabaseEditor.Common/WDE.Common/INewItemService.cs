@@ -1,4 +1,4 @@
-﻿using WDE.Common.Annotations;
+﻿using System.Threading.Tasks;
 using WDE.Module.Attributes;
 
 namespace WDE.Common
@@ -6,7 +6,6 @@ namespace WDE.Common
     [UniqueProvider]
     public interface INewItemService
     {
-        [CanBeNull]
-        ISolutionItem GetNewSolutionItem();
+        Task<ISolutionItem> GetNewSolutionItem();
     }
 }

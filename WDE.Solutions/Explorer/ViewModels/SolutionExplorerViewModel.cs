@@ -74,9 +74,9 @@ namespace WDE.Solutions.Explorer.ViewModels
                 }
             };
 
-            AddItem = new DelegateCommand(() =>
+            AddItem = new DelegateCommand(async () =>
             {
-                ISolutionItem item = newItemService.GetNewSolutionItem();
+                ISolutionItem item = await newItemService.GetNewSolutionItem();
                 if (item != null)
                 {
                     if (selected == null || selected.Item.Items == null)

@@ -1,4 +1,5 @@
-﻿using WDE.Common.CoreVersion;
+﻿using System.Threading.Tasks;
+using WDE.Common.CoreVersion;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
 
@@ -13,6 +14,6 @@ namespace WDE.Common
         
         bool IsCompatibleWithCore(ICoreVersion core);
 
-        ISolutionItem CreateSolutionItem();
+        Task<ISolutionItem> CreateSolutionItem();
     }
 }

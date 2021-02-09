@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
@@ -44,7 +45,7 @@ namespace WoWDatabaseEditorCore.Providers
             DocumentManager = documentManager;
             this.settings = settings;
             SubItems = new List<IMenuItem>();
-            SubItems.Add(new ModuleMenuItem("_New", new DelegateCommand(OpenNewItemWindow)));
+            SubItems.Add(new ModuleMenuItem("_New", new AsyncAutoCommand(OpenNewItemWindow)));
             SubItems.Add(new ModuleMenuItem("_Save", new DelegateCommand(() => DocumentManager.ActiveDocument?.Save.Execute(null),
                 () => DocumentManager.ActiveDocument?.Save.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument).
                 ObservesProperty(() => DocumentManager.ActiveDocument.IsModified)));
@@ -97,9 +98,9 @@ namespace WoWDatabaseEditorCore.Providers
                     true);
         }
 
-        private void OpenNewItemWindow()
+        private async Task OpenNewItemWindow()
         {
-            ISolutionItem? item = newItemService.GetNewSolutionItem();
+            ISolutionItem? item = await newItemService.GetNewSolutionItem();
             if (item != null)
             {
                 solutionManager.Items.Add(item);
