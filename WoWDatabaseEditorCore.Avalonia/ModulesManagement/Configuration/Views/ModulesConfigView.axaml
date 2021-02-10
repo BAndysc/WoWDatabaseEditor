@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.ModulesManagement.Configuration.Views.ModulesConfigView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="False"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DataGrid Items="{Binding Items}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Enabled" 
+                                        Binding="{Binding IsEnabled}" 
+                                        Width="2*" />
+                    <DataGridTextColumn Header="Name" 
+                                        Binding="{Binding Name}" 
+                                        Width="2*" />
+                    <DataGridTextColumn Header="Is loaded" 
+                                        Binding="{Binding IsLoaded}" 
+                                        Width="*" />
+                    <DataGridTextColumn Header="Details" 
+                                        Binding="{Binding Details}" 
+                                        Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+</UserControl>

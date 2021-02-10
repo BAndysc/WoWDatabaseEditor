@@ -1,0 +1,83 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Icon.ico" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="**\*.xaml.cs">
+            <DependentUpon>%(Filename)</DependentUpon>
+        </Compile>
+        <AvaloniaResource Include="**\*.xaml">
+            <SubType>Designer</SubType>
+        </AvaloniaResource>
+        <Compile Update="ModulesManagement\Configuration\Views\ModulesConfigView.axaml.cs">
+            <DependentUpon>ModulesConfigView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="CoreVersion\Views\CoreVersionConfigView.axaml.cs">
+            <DependentUpon>CoreVersionConfigView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\DialogWindow.axaml.cs">
+            <DependentUpon>DialogWindow.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Services\ConfigurationService\Views\ConfigurationPanelView.axaml.cs">
+            <DependentUpon>ConfigurationPanelView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\StatusBarView.axaml.cs">
+            <DependentUpon>StatusBarView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\TasksPanel.axaml.cs">
+            <DependentUpon>TasksPanel.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Services\NewItemService\NewItemDialogView.axaml.cs">
+            <DependentUpon>NewItemDialogView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Services\CreatureEntrySelectorService\GenericSelectorDialogView.axaml.cs">
+            <DependentUpon>GenericSelectorDialogView.axaml</DependentUpon>
+        </Compile>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="0.10.0" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.0" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
+        <PackageReference Include="Dock.Avalonia" Version="0.10.0" />
+        <PackageReference Include="Dock.Avalonia.Themes.Default" Version="0.10.0" />
+        <PackageReference Include="Dock.Model.Avalonia" Version="0.10.0" />
+        <PackageReference Include="Prism.Avalonia" Version="7.2.0.1430" />
+        <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
+        <PackageReference Include="Prism.Unity.Avalonia" Version="7.2.0.1430" />
+        <PackageReference Include="SmartFormat.NET" Version="2.5.3" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
+        <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+        <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+        <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+        <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
+        <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
+        <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj" />
+        <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Resource Include="Icon.ico" />
+    </ItemGroup>
+</Project>

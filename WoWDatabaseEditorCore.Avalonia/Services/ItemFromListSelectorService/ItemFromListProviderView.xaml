@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService.ItemFromListProviderView"
+             xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.Avalonia.Extensions"
+        Background="{DynamicResource MenuDefaultBackground}">
+    <UserControl.Resources>
+    </UserControl.Resources>
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <TextBox x:Name="SearchBox" Margin="0,0,0,6" Padding="2,4" Text="{Binding SearchText}" />
+        <DataGrid 
+                extensions:DataGridColumns.ColumnsSource="{Binding  Columns}"
+                x:Name="ListView" 
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
+                Items="{Binding FilteredItems}" Grid.Row="1" Margin="0,0,0,6"
+                IsVisible="{Binding ShowItemsList}">
+        </DataGrid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding Accept}" Grid.Column="1" Content="Ok" />
+        </Grid>
+    </Grid>
+</UserControl>

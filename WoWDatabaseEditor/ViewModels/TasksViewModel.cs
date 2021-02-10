@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
@@ -116,6 +117,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 {
                     SetProperty(ref progress, value);
                     RaisePropertyChanged(nameof(InProgress));
+                    RaisePropertyChanged(nameof(Percent));
                 }
             }
             
@@ -136,6 +138,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 set
                 {
                     SetProperty(ref maxValue, value);
+                    RaisePropertyChanged(nameof(Percent));
                 }
             }
 
@@ -150,6 +153,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
             
             public bool InProgress => Progress < MaxValue;
+
+            public double Percent => Math.Clamp(100 * Progress / MaxValue, 0, 100);
 
             public void Dispose()
             {

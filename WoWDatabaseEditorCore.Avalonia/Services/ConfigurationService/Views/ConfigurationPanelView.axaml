@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Services.ConfigurationService.Views.ConfigurationPanelView"
+             xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:prism="http://prismlibrary.com/"
+                   xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+                   prism:ViewModelLocator.AutoWireViewModel="False">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TabControl Items="{Binding ContainerTabItems}" SelectedItem="{Binding SelectedTabItem}"
+                    TabStripPlacement="Left">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}">
+<!--                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsModified}">
+                                        <DataTrigger.Value><system:Boolean>True</system:Boolean></DataTrigger.Value>
+                                        <Setter Property="FontWeight" Value="Bold"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>-->
+                    </TextBlock>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True" Margin="7,5">
+                        <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontSize="32" FontWeight="Light" />
+                        <ContentControl utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch" />
+                    </DockPanel>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+        <Button Margin="0,10,0,0" Content="Save" Grid.Row="1" HorizontalAlignment="Left" Width="119"
+                Command="{Binding Save}" />
+    </Grid>
+</UserControl>

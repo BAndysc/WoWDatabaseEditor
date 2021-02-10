@@ -5,11 +5,13 @@
         <OutputType>Library</OutputType>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
+        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Prism.Core">
-        <Version>8.0.0.1909</Version>
+        <Version>7.2.0.1422</Version>
       </PackageReference>
     </ItemGroup>
 

@@ -4,12 +4,11 @@
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
+    <Configurations>Debug;Release;DebugAvalonia</Configurations>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\bin\Debug\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\bin\Release\</OutputPath>
+  <PropertyGroup>
+      <OutputPath>..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\GeminiGraphEditor\GeminiGraphEditor.csproj" />
@@ -34,7 +33,7 @@
       <Version>12.0.3</Version>
     </PackageReference>
     <PackageReference Include="Prism.Wpf">
-      <Version>8.0.0.1909</Version>
+      <Version>7.2.0.1422</Version>
     </PackageReference>
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Unity.Container">

@@ -1,0 +1,85 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="WoWDatabaseEditorCore.Avalonia.App">
+    <Application.Resources>
+            <DrawingImage x:Key="StatusBarIconNotice">
+        <DrawingImage.Drawing>
+            <DrawingGroup >
+                <DrawingGroup.Transform>
+                    <TranslateTransform X="0.00029201540746726096" Y="0" />
+                </DrawingGroup.Transform>
+                <GeometryDrawing Brush="#FFFFFFFF"
+                                 Geometry="F1 M20,20z M0,0z M10,0A10,10,0,1,0,20,10A10,10,0,0,0,10,0z M11,16L9,16 9,14 11,14z M11,12L9,12 9,4 11,4z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="StatusBarIconWarning">
+        <DrawingImage.Drawing>
+            <DrawingGroup >
+                <GeometryDrawing Brush="#FFFF5D00"
+                                 Geometry="F1 M20,20z M0,0z M19.64,16.36L11.53,2.3A1.85,1.85,0,0,0,10,1.21A1.85,1.85,0,0,0,8.48,2.3L0.36,16.36C-0.48,17.81,0.21,19,1.88,19L18.12,19C19.79,19,20.48,17.81,19.64,16.36z M11,16L9,16 9,14 11,14z M11,12L9,12 9,6 11,6z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="StatusBarIconError">
+        <DrawingImage.Drawing>
+            <DrawingGroup >
+                <DrawingGroup.Transform>
+                    <TranslateTransform X="0.00029201540746726096" Y="0" />
+                </DrawingGroup.Transform>
+                <GeometryDrawing Brush="#DD6663"
+                                 Geometry="F1 M20,20z M0,0z M10,0A10,10,0,1,0,20,10A10,10,0,0,0,10,0z M15.66,14.24L14.25,15.65 10,11.41 5.76,15.66 4.34,14.24 8.59,10 4.34,5.76 5.76,4.34 10,8.59 14.24,4.35 15.65,5.76 11.41,10z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="StatusBarIconSuccess">
+        <DrawingImage.Drawing>
+            <DrawingGroup >
+                <GeometryDrawing Brush="#7CE185"
+                                 Geometry="F1 M20,20z M0,0z M7,14.17L2.83,10 1.42,11.41 7,17 19,5 17.59,3.58 7,14.17z" />
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+        
+        
+        <!-- SmartScripts -->
+        <SolidColorBrush x:Key="SmartScripts.Background" Color="#F5F6FC" />
+    
+        <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="#F5F6FC" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Border" Color="#E9EFFB" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Background" Color="#E9EFFB" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Border" Color="#F5C61F" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Background" Color="#FFF2BF" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="#282828" />
+   
+        <SolidColorBrush x:Key="SmartScripts.Parameter.Foreground" Color="#3C76BE" />
+        <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#2E8A8A" /> <!-- #378B6F-->
+    
+        <SolidColorBrush x:Key="SmartScripts.Comment.Background" Color="#E1F3C9" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Border" Color="#D1E577" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Foreground" Color="#282828" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Border" Color="#F5C61F" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Background" Color="#FFF2BF" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected" Color="#282828" />
+    
+        <SolidColorBrush x:Key="SmartScripts.Event.Background" Color="#F5F8FF" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Foreground" Color="#FF282828" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Border" Color="#BFCCE0" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Background" Color="#FFF5F2BF" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Foreground" Color="#FF282828" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Border" Color="#FFF5C61F" />
+    
+        <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0" />
+        <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77000000" />
+        
+    </Application.Resources>
+    <Application.Styles>
+        <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
+        <StyleInclude Source="avares://AvaloniaEdit/AvaloniaEdit.xaml" />
+        <!--<StyleInclude Source="avares://WDE.SmartScriptEditor/Themes/Generic.axaml"/>-->
+        <StyleInclude Source="avares://Dock.Avalonia.Themes.Default/DefaultTheme.axaml"/>
+        <FluentTheme Mode="Light"/>
+    </Application.Styles>
+</Application>

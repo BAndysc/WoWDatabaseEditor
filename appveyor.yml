@@ -1,14 +1,22 @@
 version: 0.1.{build}
 image: Visual Studio 2019
 configuration: Release
-platform: x64
+platform: Any CPU
 build_script:
 - cmd: >-
-    dotnet publish -c Release -r win-x64 --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/
+    dotnet publish -c Release --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/ WoWDatabaseEditorCore.WPF/WoWDatabaseEditorCore.WPF.csproj
+    
+    dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia/ WoWDatabaseEditorCore.Avalonia/WoWDatabaseEditorCore.Avalonia.csproj
 
     echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor/COMMIT_HASH
+    
+    echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor-avalonia/COMMIT_HASH
 
     7z a WoWDatabaseEditor.zip bin/wowdatabaseeditor/*
+    
+    7z a WoWDatabaseEditorAvalonia.zip bin/wowdatabaseeditor-avalonia/*
 artifacts:
 - path: WoWDatabaseEditor.zip
   name: WoWDatabaseEditor.zip
+- path: WoWDatabaseEditorAvalonia.zip
+  name: WoWDatabaseEditorAvalonia.zip

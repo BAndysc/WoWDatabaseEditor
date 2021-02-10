@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using WDE.Common.Tasks;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
@@ -40,10 +41,10 @@ namespace WoWDatabaseEditorCore.Managers
             var viewString = viewModel.AssemblyQualifiedName!.Replace("ViewModel", "View");
             view = Type.GetType(viewString);
 
-            if (view == null) // try WPF version
+            if (view == null) // try backend version
             {
                 var assemblyName = viewModel.Assembly.GetName().Name;
-                view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + ".WPF"));
+                view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend));
             }
 
             if (view != null)

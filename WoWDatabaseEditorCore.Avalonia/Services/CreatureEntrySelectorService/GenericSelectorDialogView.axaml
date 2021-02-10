@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Services.CreatureEntrySelectorService.GenericSelectorDialogView"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.Avalonia.Extensions"
+        prism:ViewModelLocator.AutoWireViewModel="False"
+        Background="{DynamicResource MenuDefaultBackground}">
+
+    <Grid Margin="6" Background="{DynamicResource MenuDefaultBackground}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <TextBox Margin="0,0,0,6" Text="{Binding SearchText}" />
+        <DataGrid SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
+                  Items="{Binding FilteredItems}"
+                  Grid.Row="1" 
+                  Margin="0,0,0,6"
+                  extensions:DataGridColumns.ColumnsSource="{Binding Columns}"
+                  AutoGenerateColumns="False">
+        </DataGrid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding Accept}" Grid.Column="1" Content="Ok" />
+        </Grid>
+    </Grid>
+</UserControl>

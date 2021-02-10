@@ -5,13 +5,12 @@
         <OutputType>Library</OutputType>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
+        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <OutputPath>..\bin\Debug\</OutputPath>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <OutputPath>..\bin\Release\</OutputPath>
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>

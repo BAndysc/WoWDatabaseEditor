@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="WDE.Parameters.Views.ParametersView"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:parameters="clr-namespace:WDE.Parameters"
+             prism:ViewModelLocator.AutoWireViewModel="False">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+        <ListBox BorderBrush="Transparent" Items="{Binding Parameters}" SelectedItem="{Binding Selected}" />
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+        <Grid Grid.Column="2" IsEnabled="{Binding HasSelected}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Content="{Binding Selected.Key}" Grid.ColumnSpan="2" />
+            <Label Content="Name" Grid.Row="1" />
+            <Label Content="Is flag" Grid.Row="2" />
+            <TextBox Text="{Binding Selected.Name}" Grid.Row="1" Grid.Column="1" />
+            <CheckBox IsChecked="{Binding Selected.IsFlag}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left"
+                      VerticalAlignment="Top" IsHitTestVisible="False" />
+            <DataGrid CanUserResizeColumns="True" Items="{Binding Selected.Values}"  Grid.ColumnSpan="2" Grid.Row="3">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Key" 
+                                        Binding="{Binding Key}" 
+                                        Width="70" />
+                    <DataGridTextColumn Header="Name" 
+                                        Binding="{Binding Value.Name}" 
+                                        Width="120" />
+                    <DataGridTextColumn Header="Description" 
+                                        Binding="{Binding Value.Description}" 
+                                        Width="200" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</UserControl>

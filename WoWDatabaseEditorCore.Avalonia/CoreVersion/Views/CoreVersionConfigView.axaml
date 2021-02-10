@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.CoreVersion.Views.CoreVersionConfigView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
+             mvvm:ViewModelLocator.AutoWireViewModel="False"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+        <TextBlock Grid.ColumnSpan="2" TextWrapping="WrapWithOverflow" FontSize="18" FontWeight="Light" Margin="0,0,0,7">
+            Choose which core version will you be working with. Particular modules (like SmartScripts module) can respect that.
+        </TextBlock>
+
+        <TextBlock Grid.Row="1" VerticalAlignment="Center" Margin="5">Core version</TextBlock>
+        <ComboBox Grid.Row="1" Grid.Column="1" 
+                  Items="{Binding CoreVersions}" 
+                  SelectedItem="{Binding SelectedVersion, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding FriendlyName}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </Grid>
+</UserControl>

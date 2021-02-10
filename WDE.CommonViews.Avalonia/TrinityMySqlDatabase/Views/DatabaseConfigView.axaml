@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="WDE.TrinityMySqlDatabase.Views.DatabaseConfigView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="False">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Content="Host" />
+        <Label Content="Port" Grid.Row="1"/>
+        <Label Content="User" Grid.Row="2" />
+        <Label Content="Password" Grid.Row="3" />
+        <Label Content="Database" Grid.Row="4" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host, Mode=TwoWay}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding User, Mode=TwoWay}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Password, Mode=TwoWay}" />
+        <TextBox Margin="5" Grid.Column="1" Grid.Row="4" Text="{Binding Database, Mode=TwoWay}" />
+    </Grid>
+</UserControl>

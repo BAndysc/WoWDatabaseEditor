@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Views.AboutView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="20">
+        <StackPanel>
+            <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <Image Source="/Icon.ico" Width="56" Height="56" />
+                    <TextBlock VerticalAlignment="Bottom" FontSize="34" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
+                </StackPanel>
+            </Border>
+            <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
+                <TextBlock FontWeight="Bold" Text="WoW Database Editor" />
+                <TextBlock TextWrapping="WrapWithOverflow" Text=" is an application used to create scripts (behaviours) in TrinityCore based servers." />
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
+                <TextBlock  TextWrapping="WrapWithOverflow" Text="To start work, add new &quot;file&quot; to the solution - File -&gt; Load. To edit script, double click on selected item in Solution Explorer." />
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
+                <TextBlock  TextWrapping="WrapWithOverflow" Text="Items in Solution Explorer are saved automatically, but scripts themselves are not. Remember to save them (export to database)" />
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
+                <TextBlock  TextWrapping="WrapWithOverflow" Text="Database is not required, but in that case features are limited. It is database editor by design." />
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

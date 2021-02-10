@@ -3,13 +3,12 @@
     <PropertyGroup>
         <TargetFramework>net5.0-windows7.0</TargetFramework>
         <UseWPF>true</UseWPF>
+        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <OutputPath>..\bin\Debug\</OutputPath>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <OutputPath>..\bin\Release\</OutputPath>
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,7 +24,7 @@
 
     <ItemGroup>
         <PackageReference Include="Prism.Wpf">
-            <Version>8.0.0.1909</Version>
+            <Version>7.2.0.1422</Version>
         </PackageReference>
         <PackageReference Include="AvalonEdit">
             <Version>6.1.0-preview1</Version>
@@ -40,13 +39,5 @@
             <Version>1.1.31</Version>
         </PackageReference>
         <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="DbcStore" />
-      <Folder Include="History" />
-      <Folder Include="Parameters" />
-      <Folder Include="Solutions\Explorer" />
-      <Folder Include="SQLEditor" />
     </ItemGroup>
 </Project>

@@ -1,0 +1,9 @@
+<Window x:Class="WoWDatabaseEditorCore.Avalonia.Views.DialogWindow"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             prism:ViewModelLocator.AutoWireViewModel="False">
+    <ContentControl utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch" />
+</Window>

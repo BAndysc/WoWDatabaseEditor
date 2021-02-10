@@ -1,0 +1,78 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mvvm="http://prismlibrary.com/"
+        xmlns:controls="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+        xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mvvm:ViewModelLocator.AutoWireViewModel="True"
+        x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
+        Title="{Binding Title}">
+
+    <NativeMenu.Menu>
+        <NativeMenu utils:MenuBind.MenuItems="{Binding MenuItemProviders}">
+            
+        </NativeMenu>
+    </NativeMenu.Menu>
+    <Grid>
+    <DockPanel LastChildFill="True">
+        
+        <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{Binding StatusBar}" />
+        
+        <Panel DockPanel.Dock="Right" Width="400">
+            <Grid RowDefinitions="*,*,*">
+                <ItemsRepeater Items="{Binding DocumentManager.OpenedTools}">
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="True">
+                                <Border DockPanel.Dock="Top" Height="25" Background="#007ACC" BorderBrush="#00406b" BorderThickness="1">
+                                    <Label Content="{Binding Title}" Foreground="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"></Label>
+                                </Border>
+                                <ContentControl utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </Grid>
+        </Panel>
+        
+        <!--<controls:DockControl Layout="{Binding Layout}">
+            
+        </controls:DockControl>-->
+        
+        <TabControl Items="{Binding DocumentManager.OpenedDocuments}" TabStripPlacement="Top">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Title}" />
+                        <Button Command="{Binding CloseCommand}" Content="x" />
+                        <StackPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Margin" Value="5,0,0,0" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Style>
+                        </StackPanel.Styles>
+                    </StackPanel>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ContentControl utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch" />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </DockPanel>
+        <Border BoxShadow="0 0 10 10 #000000">
+        <views:TasksPanel DataContext="{Binding TasksViewModel}"
+                          Margin="6,6,6,26"
+                          HorizontalAlignment="Right" 
+                          VerticalAlignment="Bottom"
+                          IsVisible="{Binding IsPanelVisible, Mode=OneWay}"></views:TasksPanel>
+            </Border>
+        </Grid>
+</Window>

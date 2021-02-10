@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,7 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
+using Prism.Unity.Ioc;
 using Unity;
 using Unity.RegistrationByConvention;
 using WDE.Common.Events;
@@ -96,7 +98,7 @@ namespace WoWDatabaseEditorCore.WPF
             containerRegistry.RegisterInstance(Container);
             modulesManager = new ModulesManager();
             var mainThread = new MainThread();
-            GlobalApplication.InitializeApplication(mainThread);
+            GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.WPF);
             containerRegistry.RegisterInstance<IMainThread>(mainThread);
             containerRegistry.RegisterInstance(modulesManager);
         }

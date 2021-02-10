@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="WDE.HistoryWindow.Views.HistoryView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <ListBox Items="{Binding Items}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Name}">
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{Binding IsFromFuture}" ComparisonCondition="Equal" Value="True">
+                                    <ChangePropertyAction TargetObject="{Binding #TextBlock}" PropertyName="Foreground" Value="Gray"/>
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </TextBlock>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

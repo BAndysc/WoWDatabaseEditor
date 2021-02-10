@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Services.NewItemService.NewItemDialogView"
+             xmlns="https://github.com/avaloniaui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                   Margin="0,9,0,0">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectedItem="{Binding SelectedPrototype}"
+                  Items="{Binding ItemPrototypes}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  KeyDown="UIElement_OnKeyDown">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid DoubleTapped="InputElement_OnDoubleTapped">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding Image}" Width="32" Grid.RowSpan="2" />
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Grid.Column="1" />
+                        <TextBlock Text="{Binding Description}" TextWrapping="WrapWithOverflow" Grid.Column="1"
+                                   Grid.Row="1" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" IsCancel="True" />
+            <Button Grid.Column="2" Content="OK" Command="{Binding Accept}" />
+        </Grid>
+    </Grid>
+</UserControl>
