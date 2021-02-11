@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common.Database;
@@ -93,7 +94,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.smartEditorViewModel = smartEditorViewModel;
             this.conditionDataManager = conditionDataManager;
 
-            CloseCommand = new DelegateCommand(() =>
+            CloseCommand = new AsyncCommand(async () =>
             {
                 if (smartEditorViewModel.CurrentScript == Script)
                     smartEditorViewModel.ShowEditor(null, null);
@@ -804,7 +805,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Cut => CutCommand;
         public ICommand Paste => PasteCommand;
         public ICommand Save => SaveCommand;
-        public ICommand CloseCommand { get; set; }
+        public AsyncAwaitBestPractices.MVVM.IAsyncCommand CloseCommand { get; set; }
         
         internal void SetSolutionItem(SmartScriptSolutionItem item)
         {

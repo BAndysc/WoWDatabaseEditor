@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Events;
@@ -50,7 +51,7 @@ namespace WDE.SmartScriptEditor.Providers
 
         private class EmptyMessageboxService : IMessageBoxService
         {
-            public T ShowDialog<T>(IMessageBox<T> messageBox) => default;
+            public Task<T> ShowDialog<T>(IMessageBox<T> messageBox) => default;
         }
     }
 }

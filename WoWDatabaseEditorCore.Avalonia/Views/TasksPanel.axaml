@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
              xmlns:tasks="clr-namespace:WDE.Common.Tasks;assembly=WDE.Common"
+             xmlns:utils1="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <Border BorderThickness="1"
@@ -20,22 +21,30 @@
                         <DataTemplate>
                             <Button BorderThickness="0" Command="{Binding ForgetTaskCommand}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                                 <DockPanel LastChildFill="True">
-                                    <Image Width="24" Height="24" Margin="4,0,8,0" DockPanel.Dock="Left" Stretch="Fill" Source="{StaticResource StatusBarIconWarning}">
+                                    <ContentPresenter Margin="4,0,8,0">
+                                        <ContentPresenter.Content>
+                                            <utils1:LoadingSpinner></utils1:LoadingSpinner>
+                                        </ContentPresenter.Content>
                                         <Interaction.Behaviors>
                                             <DataTriggerBehavior Binding="{Binding State}" ComparisonCondition="Equal">
                                                 <DataTriggerBehavior.Value>
                                                     <tasks:TaskState>FinishedSuccess</tasks:TaskState>
                                                 </DataTriggerBehavior.Value>
-                                                <ChangePropertyAction TargetObject="{Binding #Image}" PropertyName="Source" Value="{StaticResource StatusBarIconSuccess}"/>
+                                                <ChangePropertyAction TargetObject="{Binding #ContentPresenter}" PropertyName="Content">
+                                                    <ChangePropertyAction.Value>
+                                                        <Image Width="24" Height="24" DockPanel.Dock="Left" Stretch="Fill" Source="{StaticResource StatusBarIconSuccess}">
+                                                        </Image>
+                                                    </ChangePropertyAction.Value>
+                                                </ChangePropertyAction>
                                             </DataTriggerBehavior>
-                                            <DataTriggerBehavior Binding="{Binding State}" ComparisonCondition="Equal">
+                                            <!--<DataTriggerBehavior Binding="{Binding State}" ComparisonCondition="Equal">
                                                 <DataTriggerBehavior.Value>
                                                     <tasks:TaskState>FinishedFailed</tasks:TaskState>
                                                 </DataTriggerBehavior.Value>
-                                                <ChangePropertyAction TargetObject="{Binding #Image}" PropertyName="Source" Value="{StaticResource StatusBarIconError}"/>
-                                            </DataTriggerBehavior>
+                                                <ChangePropertyAction TargetObject="{Binding #ContentPresenter}" PropertyName="ContentPresenter.Content" Value="{StaticResource StatusBarIconError}"/>
+                                            </DataTriggerBehavior>-->
                                         </Interaction.Behaviors>
-                                    </Image>
+                                    </ContentPresenter>
                                     
                                     <StackPanel HorizontalAlignment="Stretch" Margin="0,0,5,0">
                                         <Label Content="{Binding TaskName}" FontWeight="Bold"></Label>
@@ -47,6 +56,7 @@
                                 
                                 <Button.Styles>
                                     <Style Selector="Button">
+                                        <Setter Property="Opacity" Value="0.5" />
                                         <Setter Property="Background" Value="Transparent" />
                                     </Style>
                                     <Style Selector="Button:pointerover">
@@ -54,6 +64,13 @@
                                     </Style>
                                     <Style Selector="Button:pressed /template/ ContentPresenter">
                                         <Setter Property="Background" Value="#16000000" />
+                                    </Style>
+                                    <Style Selector="Button:disabled">
+                                        <Setter Property="Opacity" Value="1"/>
+                                    </Style>
+                                    <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="TextBlock.Foreground" Value="Black" />
                                     </Style>
                                 </Button.Styles>
                             </Button>

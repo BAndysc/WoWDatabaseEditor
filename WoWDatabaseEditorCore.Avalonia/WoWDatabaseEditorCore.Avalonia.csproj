@@ -10,6 +10,7 @@
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Icon.ico" />
+        <None Remove="Services\MessageBoxService\MessageBoxView.axaml.xml" />
     </ItemGroup>
     <ItemGroup>
         <Compile Update="**\*.xaml.cs">
@@ -43,6 +44,9 @@
         </Compile>
         <Compile Update="Services\CreatureEntrySelectorService\GenericSelectorDialogView.axaml.cs">
             <DependentUpon>GenericSelectorDialogView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Services\MessageBoxService\MessageBoxView.axaml.cs">
+          <DependentUpon>MessageBoxView.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
     <ItemGroup>

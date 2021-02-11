@@ -18,7 +18,6 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
     {
         private readonly Func<T, uint> entryGetter;
         private readonly Func<T, string> index;
-        private ReactiveProperty<Func<T, bool>> currentFilter;
         private SourceList<T> items;
         private string search = "";
 
@@ -31,10 +30,16 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
             this.index = index;
             items = new SourceList<T>();
             ReadOnlyObservableCollection<T> l;
-            currentFilter = new ReactiveProperty<Func<T, bool>>(_ => true, Compare.Create<Func<T, bool>>((_, _) => false, _ => 0));
+            var currentFilter = this.WhenValueChanged(t => t.SearchText).Select<string?, Func<T, bool>>(val =>
+            {
+                if (string.IsNullOrEmpty(val))
+                    return model => true;
+                var lowerCase = val.ToLower();
+                return model => index(model).ToLower().Contains(lowerCase);
+            });
             items
                 .Connect()
-                .Filter(currentFilter)
+                .Filter(currentFilter, ListFilterPolicy.ClearAndReplace)
                 .Sort(Comparer<T>.Create((x, y) => entryGetter(x).CompareTo(entryGetter(y))))
                 .Bind(out l)
                 .Subscribe();
@@ -58,18 +63,9 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
         public string SearchText
         {
             get => search;
-            set
-            {
-                SetProperty(ref search, value);
-                
-                if (string.IsNullOrEmpty(SearchText))
-                    currentFilter.Value = _ => true;
-                else
-                    currentFilter.Value = model => index(model).ToLower().Contains(SearchText.ToLower());
-            }
+            set => SetProperty(ref search, value);
         }
-
-
+        
         public uint GetEntry()
         {
             if (SelectedItem != null)

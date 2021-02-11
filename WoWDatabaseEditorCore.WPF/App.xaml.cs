@@ -230,7 +230,7 @@ namespace WoWDatabaseEditorCore.WPF
                         .WithButton("Copy log path to clipboard", 2)
                         .WithButton("Open log file", 1)
                         .WithButton("Close", 0)
-                        .Build());
+                        .Build()).Result; // in WPF in fact this is sync, so this is legal
                     if (choice == 2)
                         clipboardService.SetText(logPath);
                     else if (choice == 1)

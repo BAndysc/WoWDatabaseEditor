@@ -28,6 +28,10 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
             {
                 CloseOk?.Invoke();
             });
+            Cancel = new DelegateCommand(() =>
+            {
+                CloseCancel?.Invoke();
+            });
         }
 
         public ObservableCollection<NewItemPrototypeInfo> ItemPrototypes { get; }
@@ -38,6 +42,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
             set => SetProperty(ref selectedPrototype, value);
         }
     
+        public ICommand Cancel { get; }
         public ICommand Accept { get; }
         public int DesiredWidth => 600;
         public int DesiredHeight => 430;

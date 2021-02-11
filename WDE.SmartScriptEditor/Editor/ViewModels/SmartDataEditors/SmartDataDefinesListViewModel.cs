@@ -170,7 +170,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
         public ICommand Save { get; private set; }
-        public ICommand CloseCommand { get; set; } = null;
+        public AsyncAwaitBestPractices.MVVM.IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose => true;
         public IHistoryManager History { get; }
         private bool isModified = false;

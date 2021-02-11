@@ -15,6 +15,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.NewItemService
         {
             InitializeComponent();
         }
+        
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);

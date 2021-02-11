@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using DynamicData;
+using DynamicData.Binding;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.MVVM.Observable;
@@ -21,40 +24,43 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             IEnumerable<EditableActionData> actionParameters = null,
             System.Action saveAction = null)
         {
+            HashSet<IEditableParameterViewModel> visible = new();
+            SourceList<IEditableParameterViewModel> visibleParameters = new();
+            List<IEditableParameterViewModel> allParameters = new();
             Link(element, e => e.Readable, () => Readable);
 
             FocusFirst = focusFirst;
             
             if (actionParameters != null)
                 foreach (EditableActionData act in actionParameters)
-                    Parameters.Add(new EditableParameterActionViewModel(act));
+                    allParameters.Add(new EditableParameterActionViewModel(act));
 
             if (parameters != null)
                 foreach (var parameter in parameters)
-                    Parameters.Add(AutoDispose(new EditableParameterViewModel<int>(parameter.parameter, parameter.name, itemFromListProvider)));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<int>(parameter.parameter, parameter.name, itemFromListProvider)));
 
             if (floatParameters != null)
                 foreach (var parameter in floatParameters)
-                    Parameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider)));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider)));
 
             if (stringParameters != null)
                 foreach (var parameter in stringParameters)
-                    Parameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider)));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider)));
 
-            foreach (IEditableParameterViewModel parameter in Parameters)
+            foreach (IEditableParameterViewModel parameter in allParameters)
             {
                 AutoDispose(parameter.Subscribe(p => p.IsHidden,
                     isHidden =>
                     {
                         if (isHidden)
                         {
-                            if (FilteredParameters.Contains(parameter))
-                                FilteredParameters.Remove(parameter);
+                            if (visible.Remove(parameter))
+                                visibleParameters.Remove(parameter);
                         }
                         else
                         {
-                            if (!FilteredParameters.Contains(parameter))
-                                FilteredParameters.Add(parameter);
+                            if (visible.Add(parameter))
+                                visibleParameters.Add(parameter);
                         }
                     }));
             }
@@ -66,10 +72,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 CloseOk?.Invoke();
             });
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
+
+            ReadOnlyObservableCollection<Grouping<string, IEditableParameterViewModel>> l;
+            visibleParameters
+                .Connect()
+                .GroupOn(t => t.Group)
+                .Transform(group => new Grouping<string, IEditableParameterViewModel>(group))
+                .DisposeMany()
+                .Bind(out l)
+                .Subscribe();
+            FilteredParameters = l;
         }
 
-        public List<IEditableParameterViewModel> Parameters { get; } = new();
-        public ObservableCollection<IEditableParameterViewModel> FilteredParameters { get; } = new();
+        public ReadOnlyObservableCollection<Grouping<string, IEditableParameterViewModel>> FilteredParameters { get; }
         public string Readable { get; private set; }
         public bool ShowCloseButtons { get; set; } = true;
 
@@ -84,5 +99,25 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public event Action CloseCancel;
         public event Action CloseOk;
         public event Action BeforeAccept;
+    }
+    
+    public class Grouping<TKey, TVal> : ObservableCollectionExtended<TVal>, IGrouping<TKey, TVal>, IDisposable
+    {
+        private readonly IDisposable disposable;
+        
+        public Grouping(IGroup<TVal, TKey> group) 
+        {
+            if (group == null)
+                throw new ArgumentNullException(nameof(group));
+
+            Key = group.GroupKey;
+            disposable = group.List
+                .Connect()
+                .Bind(this)
+                .Subscribe();
+        }
+
+        public TKey Key { get; private set; }
+        public void Dispose() => disposable.Dispose();
     }
 }

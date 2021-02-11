@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -60,13 +61,13 @@ namespace WoWDatabaseEditorCore.Managers
         {
             if (!OpenedDocuments.Contains(editor))
             {
-                ICommand? origCommand = editor.CloseCommand;
-                editor.CloseCommand = new Command(() =>
+                IAsyncCommand? origCommand = editor.CloseCommand;
+                editor.CloseCommand = new AsyncCommand(async () =>
                 {
                     bool close = true;
                     if (editor.IsModified)
                     {
-                        MessageBoxButtonType result = messageBoxService.ShowDialog(
+                        MessageBoxButtonType result = await messageBoxService.ShowDialog(
                             new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Document is modified")
                             .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
                             .SetContent("Your changes will be lost if you don't save them.")
@@ -84,7 +85,8 @@ namespace WoWDatabaseEditorCore.Managers
 
                     if (close)
                     {
-                        origCommand?.Execute(null);
+                        if (origCommand != null)
+                            await origCommand.ExecuteAsync();
                         OpenedDocuments.Remove(editor);
                         if (ActiveDocument == editor)
                             ActiveDocument = OpenedDocuments.Count > 0 ? OpenedDocuments[0] : null;
@@ -92,7 +94,7 @@ namespace WoWDatabaseEditorCore.Managers
                         editor.CloseCommand = origCommand;
                     }
                 },
-                () => origCommand?.CanExecute(null) ?? true);
+                (context) => origCommand?.CanExecute(null) ?? true);
                 OpenedDocuments.Add(editor);
             }
 

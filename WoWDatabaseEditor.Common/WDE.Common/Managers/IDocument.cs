@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.History;
 
 namespace WDE.Common.Managers
@@ -14,7 +15,7 @@ namespace WDE.Common.Managers
         ICommand Cut { get; }
         ICommand Paste { get; }
         ICommand Save { get; }
-        ICommand CloseCommand { get; set; }
+        IAsyncCommand CloseCommand { get; set; }
         bool CanClose { get; }
         bool IsModified { get; }
         IHistoryManager History { get; }

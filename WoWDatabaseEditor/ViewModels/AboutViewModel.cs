@@ -19,7 +19,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public ICommand Cut { get; } = new DisabledCommand();
         public ICommand Paste { get; } = new DisabledCommand();
         public ICommand Save { get; } = new DisabledCommand();
-        public ICommand? CloseCommand { get; set; } = null;
+        public AsyncAwaitBestPractices.MVVM.IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         public bool IsModified { get; } = false;
         public IHistoryManager? History { get; } = null;

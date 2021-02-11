@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.Common.Services;
@@ -28,10 +29,11 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
             if (openedPanel == null)
             {
                 openedPanel = settings();
-                ICommand? origCommand = openedPanel.CloseCommand;
-                openedPanel.CloseCommand = new DelegateCommand(() =>
+                IAsyncCommand? origCommand = openedPanel.CloseCommand;
+                openedPanel.CloseCommand = new AsyncCommand(async () =>
                 {
-                    origCommand?.Execute(null);
+                    if (origCommand != null)
+                        await origCommand.ExecuteAsync();
                     openedPanel = null;
                 });
             }

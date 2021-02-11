@@ -1,7 +1,9 @@
-﻿namespace WDE.Common.Services.MessageBox
+﻿using System.Threading.Tasks;
+
+namespace WDE.Common.Services.MessageBox
 {
     public interface IMessageBoxService
     {
-        T ShowDialog<T>(IMessageBox<T> messageBox);
+        Task<T> ShowDialog<T>(IMessageBox<T> messageBox);
     }
 }

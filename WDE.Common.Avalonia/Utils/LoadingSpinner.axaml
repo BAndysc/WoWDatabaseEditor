@@ -1,0 +1,137 @@
+<UserControl x:Class="WDE.Common.Avalonia.Utils.LoadingSpinner"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+	<UserControl.Resources>
+		
+	</UserControl.Resources>
+	
+	<Canvas x:Name="spinner_1" HorizontalAlignment="Center" Width="24" Height="24" VerticalAlignment="Center">
+		<Grid x:Name="LayoutRoot" Height="24" Width="24"/>
+		<Canvas Height="24" Width="24">
+			<!-- top -->
+			<Ellipse Canvas.Left="10" Canvas.Top="2" Opacity="0.4" Name="el1" />
+			<Ellipse Canvas.Left="15" Canvas.Top="5" Opacity="0.4" Name="el2" />
+			<!-- right -->
+			<Ellipse Canvas.Left="18" Canvas.Top="10" Opacity="0.4" Name="el3" />
+			<Ellipse Canvas.Left="15" Canvas.Top="15" Opacity="0.4" Name="el4" />
+			<!-- bottom -->
+			<Ellipse Canvas.Left="10" Canvas.Top="18" Opacity="0.4" Name="el5" />
+			<Ellipse Canvas.Left="5" Canvas.Top="15" Opacity="0.4" Name="el6" />
+			<!-- left -->
+			<Ellipse Canvas.Left="2" Canvas.Top="10" Opacity="0.4" Name="el7" />
+			<Ellipse Canvas.Left="5" Canvas.Top="5" Opacity="0.4" Name="el8" />
+		</Canvas>
+		<Canvas.Styles>
+			<Style Selector="Ellipse">
+				<Setter Property="Fill" Value="Gray" />
+				<Setter Property="Width" Value="4" />
+				<Setter Property="Height" Value="4" />
+			</Style>
+			<Style Selector="Ellipse#el1">
+				<Style.Animations>
+					<Animation Duration="0:0:1.6" IterationCount="Infinite" PlaybackDirection="AlternateReverse">
+						<KeyFrame Cue="0%">
+							<Setter Property="Opacity" Value="0" />
+						</KeyFrame>
+						<KeyFrame Cue="100%">
+							<Setter Property="Opacity" Value="0.4" />
+						</KeyFrame>
+					</Animation>
+				</Style.Animations>
+			</Style>
+			<Style Selector="Ellipse#el2">
+				<Style.Animations>
+					<Animation Duration="0:0:1.6" Delay="0:0:0.2" IterationCount="Infinite" PlaybackDirection="AlternateReverse">
+						<KeyFrame Cue="0%">
+							<Setter Property="Opacity" Value="0" />
+						</KeyFrame>
+						<KeyFrame Cue="100%">
+							<Setter Property="Opacity" Value="0.4" />
+						</KeyFrame>
+					</Animation>
+				</Style.Animations>
+			</Style>
+			<Style Selector="Ellipse#el3">
+				<Style.Animations>
+					<Animation Duration="0:0:1.6" Delay="0:0:0.4" IterationCount="Infinite" PlaybackDirection="AlternateReverse">
+						<KeyFrame Cue="0%">
+							<Setter Property="Opacity" Value="0" />
+						</KeyFrame>
+						<KeyFrame Cue="100%">
+							<Setter Property="Opacity" Value="0.4" />
+						</KeyFrame>
+					</Animation>
+				</Style.Animations>
+			</Style>
+			
+			<Style Selector="Ellipse#el4">
+				<Style.Animations>
+					<Animation Duration="0:0:1.6" Delay="0:0:0.6" IterationCount="Infinite" PlaybackDirection="AlternateReverse">
+						<KeyFrame Cue="0%">
+							<Setter Property="Opacity" Value="0" />
+						</KeyFrame>
+						<KeyFrame Cue="100%">
+							<Setter Property="Opacity" Value="0.4" />
+						</KeyFrame>
+					</Animation>
+				</Style.Animations>
+			</Style>
+			
+			<Style Selector="Ellipse#el5">
+				<Style.Animations>
+					<Animation Duration="0:0:1.6" Delay="0:0:0.8" IterationCount="Infinite" PlaybackDirection="AlternateReverse">
+						<KeyFrame Cue="0%">
+							<Setter Property="Opacity" Value="0" />
+						</KeyFrame>
+						<KeyFrame Cue="100%">
+							<Setter Property="Opacity" Value="0.4" />
+						</KeyFrame>
+					</Animation>
+				</Style.Animations>
+			</Style>
+			
+			<Style Selector="Ellipse#el6">
+				<Style.Animations>
+					<Animation Duration="0:0:1.6" Delay="0:0:1" IterationCount="Infinite" PlaybackDirection="AlternateReverse">
+						<KeyFrame Cue="0%">
+							<Setter Property="Opacity" Value="0" />
+						</KeyFrame>
+						<KeyFrame Cue="100%">
+							<Setter Property="Opacity" Value="0.4" />
+						</KeyFrame>
+					</Animation>
+				</Style.Animations>
+			</Style>
+			
+			<Style Selector="Ellipse#el7">
+				<Style.Animations>
+					<Animation Duration="0:0:1.6" Delay="0:0:1.2" IterationCount="Infinite" PlaybackDirection="AlternateReverse">
+						<KeyFrame Cue="0%">
+							<Setter Property="Opacity" Value="0" />
+						</KeyFrame>
+						<KeyFrame Cue="100%">
+							<Setter Property="Opacity" Value="0.4" />
+						</KeyFrame>
+					</Animation>
+				</Style.Animations>
+			</Style>
+			
+			<Style Selector="Ellipse#el8">
+				<Style.Animations>
+					<Animation Duration="0:0:1.6" Delay="0:0:1.4" IterationCount="Infinite" PlaybackDirection="AlternateReverse">
+						<KeyFrame Cue="0%">
+							<Setter Property="Opacity" Value="0" />
+						</KeyFrame>
+						<KeyFrame Cue="100%">
+							<Setter Property="Opacity" Value="0.4" />
+						</KeyFrame>
+					</Animation>
+				</Style.Animations>
+			</Style>
+		</Canvas.Styles>
+	</Canvas>
+</UserControl>

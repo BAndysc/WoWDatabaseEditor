@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using ExtensionMethods;
 using Prism.Mvvm;
 using WDE.Blueprints.Data;
@@ -55,7 +56,7 @@ namespace WDE.Blueprints.Editor.ViewModels
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
         public ICommand Save { get; } = AlwaysDisabledCommand.Command;
-        public ICommand CloseCommand { get; set; } = null;
+        public IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         public bool IsModified { get; } = false;
         public IHistoryManager History { get; } = null;

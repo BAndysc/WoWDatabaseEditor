@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using AvalonDock;
@@ -23,16 +24,26 @@ namespace WoWDatabaseEditorCore.WPF.Views
             Closing += OnClosing;
         }
 
+        private bool realClosing = false;
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            if (DataContext is ICloseAwareViewModel closeAwareViewModel)
+            if (!realClosing && DataContext is ICloseAwareViewModel closeAwareViewModel)
             {
-                if (!closeAwareViewModel.CanClose())
-                    e.Cancel = true;
+                TryClose(closeAwareViewModel);
+                e.Cancel = !realClosing;
             }
             
             if (!e.Cancel)
                 LayoutUtility.SaveLayout(DockingManager);
+        }
+
+        private async Task TryClose(ICloseAwareViewModel closeAwareViewModel)
+        {
+            if (await closeAwareViewModel.CanClose())
+            {
+                realClosing = true;
+                Close();
+            }
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)

@@ -18,7 +18,7 @@
     </NativeMenu.Menu>
     <Grid>
     <DockPanel LastChildFill="True">
-        
+        <NativeMenuBar DockPanel.Dock="Top"/>
         <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{Binding StatusBar}" />
         
         <Panel DockPanel.Dock="Right" Width="400">
@@ -43,7 +43,7 @@
             
         </controls:DockControl>-->
         
-        <TabControl Items="{Binding DocumentManager.OpenedDocuments}" TabStripPlacement="Top">
+        <TabControl Classes="Main" Items="{Binding DocumentManager.OpenedDocuments}" TabStripPlacement="Top">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">

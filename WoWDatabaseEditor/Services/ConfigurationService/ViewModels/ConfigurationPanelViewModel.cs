@@ -78,7 +78,7 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
         public ICommand Copy => AlwaysDisabledCommand.Command;
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
-        public ICommand? CloseCommand { get; set; } = null;
+        public AsyncAwaitBestPractices.MVVM.IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose => true;
         public bool IsModified => ContainerTabItems.Any(t => t.IsModified);
         public IHistoryManager? History => null;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
@@ -83,7 +84,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
         }
 
-        public bool CanClose()
+        public async Task<bool> CanClose()
         {
             var modifiedDocuments = DocumentManager.OpenedDocuments.Where(d => d.IsModified).ToList();
 
@@ -109,7 +110,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                             .WithButton("No to all", MessageBoxButtonType.CustomB);
                     }
 
-                    MessageBoxButtonType result = messageBoxService.ShowDialog(message.Build());
+                    MessageBoxButtonType result = await messageBoxService.ShowDialog(message.Build());
 
                     if (result == MessageBoxButtonType.Cancel)
                         return false;

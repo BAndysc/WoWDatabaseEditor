@@ -41,8 +41,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             }
             base.OnClosed(e);
         }
-
-
+        
         private void DialogWindowOnCloseOk()
         {
             Close(true);

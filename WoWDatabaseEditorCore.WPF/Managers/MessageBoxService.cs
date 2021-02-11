@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Ookii.Dialogs.Wpf;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
@@ -10,7 +11,7 @@ namespace WoWDatabaseEditorCore.WPF.Managers
     [AutoRegister]
     public class MessageBoxService : IMessageBoxService
     {
-        public T ShowDialog<T>(IMessageBox<T> messageBox)
+        public Task<T> ShowDialog<T>(IMessageBox<T> messageBox)
         {
             using (TaskDialog dialog = new TaskDialog())
             {
@@ -32,7 +33,7 @@ namespace WoWDatabaseEditorCore.WPF.Managers
 
                 TaskDialogButton returned = dialog.ShowDialog();
 
-                return buttonToValue[returned];
+                return Task.FromResult(buttonToValue[returned]);
             }
         }
 

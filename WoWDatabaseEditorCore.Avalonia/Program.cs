@@ -18,6 +18,7 @@ namespace WoWDatabaseEditorCore.Avalonia
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+                .With(new AvaloniaNativePlatformOptions { UseGpu = false })
                 .UseReactiveUI()
                 .LogToDebug();
     }

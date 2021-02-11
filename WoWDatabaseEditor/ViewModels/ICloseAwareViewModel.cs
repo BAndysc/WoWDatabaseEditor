@@ -1,7 +1,9 @@
-﻿namespace WoWDatabaseEditorCore.ViewModels
+﻿using System.Threading.Tasks;
+
+namespace WoWDatabaseEditorCore.ViewModels
 {
     public interface ICloseAwareViewModel
     {
-        bool CanClose();
+        Task<bool> CanClose();
     }
 }

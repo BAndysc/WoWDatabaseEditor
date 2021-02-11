@@ -29,27 +29,18 @@
             Margin="0,0,0,10" />
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
             <ItemsControl Focusable="False" ItemsSource="{Binding FilteredParameters}" x:Name="Parameters">
-                <ItemsControl.GroupStyle>
-                    <GroupStyle HidesIfEmpty="True">
-                        <GroupStyle.ContainerStyle>
-                            <Style TargetType="GroupItem">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="GroupItem">
-                                            <GroupBox Header="{Binding Path=Name}" Focusable="False">
-                                                <ItemsPresenter />
-                                            </GroupBox>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </GroupStyle.ContainerStyle>
-                    </GroupStyle>
-                </ItemsControl.GroupStyle>
-
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <editing:ParameterEditorView Margin="0,0,0,5" />
+                        <StackPanel>
+                            <TextBlock Text="{Binding Key}" FontWeight="Thin" FontSize="17" />
+                            <ItemsControl ItemsSource="{Binding}" Margin="10,0,0,16">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <editing:ParameterEditorView Margin="0,0,0,5" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

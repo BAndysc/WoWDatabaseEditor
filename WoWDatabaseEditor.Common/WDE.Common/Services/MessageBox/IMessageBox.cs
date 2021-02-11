@@ -2,7 +2,8 @@
 
 namespace WDE.Common.Services.MessageBox
 {
-    public interface IMessageBox<T>
+    public interface IMessageBox {}
+    public interface IMessageBox<T> : IMessageBox
     {
         string Title { get; }
         MessageBoxIcon Icon { get; }
