@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace WDE.Conditions.Views
+namespace WDE.Conditions.WPF.Views
 {
     public partial class ConditionsParameterEditorView : UserControl
     {

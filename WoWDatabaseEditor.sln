@@ -20,6 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoWDatabaseEditorCore", "Wo
 		{4A5E9E2A-DBC9-4290-ACEB-B108FA458F0E} = {4A5E9E2A-DBC9-4290-ACEB-B108FA458F0E}
 		{F2CE4D59-594F-4DE5-8B2C-2FD605F808E8} = {F2CE4D59-594F-4DE5-8B2C-2FD605F808E8}
 		{A55A533C-AE21-44BB-867B-1AD5BFFCCCBA} = {A55A533C-AE21-44BB-867B-1AD5BFFCCCBA}
+		{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC} = {FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.SmartScriptEditor", "WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj", "{B060C7F1-97B0-4A26-B7A8-E47C9AF08D07}"
@@ -71,6 +72,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common.Avalonia", "WDE.Common.Avalonia\WDE.Common.Avalonia.csproj", "{7ACFACDD-9DE8-4DF3-B283-171639FD9E1E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.CommonViews.Avalonia", "WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj", "{5647D3F5-EDF9-4D44-AAB9-678B31D57E6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Conditions.WPF", "WDE.Conditions.WPF\WDE.Conditions.WPF.csproj", "{72A03A5C-F3AE-4DE6-97AF-A686C70BC78A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -220,6 +223,11 @@ Global
 		{5647D3F5-EDF9-4D44-AAB9-678B31D57E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5647D3F5-EDF9-4D44-AAB9-678B31D57E6C}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
 		{5647D3F5-EDF9-4D44-AAB9-678B31D57E6C}.DebugAvalonia|Any CPU.Build.0 = DebugAvalonia|Any CPU
+		{72A03A5C-F3AE-4DE6-97AF-A686C70BC78A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72A03A5C-F3AE-4DE6-97AF-A686C70BC78A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72A03A5C-F3AE-4DE6-97AF-A686C70BC78A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72A03A5C-F3AE-4DE6-97AF-A686C70BC78A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72A03A5C-F3AE-4DE6-97AF-A686C70BC78A}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

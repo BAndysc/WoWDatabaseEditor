@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Mvvm;
 using Prism.Commands;
 using WDE.Common.History;
@@ -37,8 +38,8 @@ namespace WDE.Conditions.ViewModels
                 taskRunner.ScheduleTask("Saving conditions definition list", SaveConditions);
             }, () => IsModified);
             Delete = new DelegateCommand(DeleteItem);
-            AddItem = new DelegateCommand(AddNewItem);
-            EditItem = new DelegateCommand<ConditionJsonData?>(EditCondition);
+            AddItem = new AsyncCommand(AddNewItem);
+            EditItem = new AsyncCommand<ConditionJsonData?>(EditCondition);
             // history setup
             historyHandler = new ConditionsEditorHistoryHandler(SourceItems);
             History = historyCreator();
@@ -57,8 +58,8 @@ namespace WDE.Conditions.ViewModels
         public int SelectedIndex { get; set; }
         
         public DelegateCommand Delete { get; }
-        public DelegateCommand AddItem { get; }
-        public DelegateCommand<ConditionJsonData?> EditItem { get; }
+        public AsyncCommand AddItem { get; }
+        public AsyncCommand<ConditionJsonData?> EditItem { get; }
         private readonly DelegateCommand undoCommand;
         private readonly DelegateCommand redoCommand;
 
@@ -68,24 +69,24 @@ namespace WDE.Conditions.ViewModels
                 SourceItems.RemoveAt(SelectedIndex);
         }
 
-        private void AddNewItem()
+        private async Task AddNewItem()
         {
             var obj = new ConditionJsonData();
             obj.Id = SourceItems.Max(x => x.Id) + 1;
             obj.Name = "CONDITION_";
-            OpenEditor(obj, true);
+            await OpenEditor(obj, true);
         }
 
-        private void EditCondition(ConditionJsonData? item)
+        private async Task EditCondition(ConditionJsonData? item)
         {
             if (item.HasValue)
-                OpenEditor(item.Value, false);
+                await OpenEditor(item.Value, false);
         }
 
-        private void OpenEditor(ConditionJsonData item, bool isCreating)
+        private async Task OpenEditor(ConditionJsonData item, bool isCreating)
         {
             var vm = new ConditionEditorViewModel(in item, windowManager, parameterFactory);
-            if (windowManager.ShowDialog(vm) && !vm.IsEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.IsEmpty())
             {
                 if (isCreating)
                     SourceItems.Add(vm.Source.ToConditionJsonData());
@@ -115,7 +116,7 @@ namespace WDE.Conditions.ViewModels
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
         public ICommand Save { get; }
-        public ICommand CloseCommand { get; set; } = null;
+        public IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
 

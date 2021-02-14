@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Mvvm;
 using Prism.Commands;
 using WDE.Common.History;
@@ -37,7 +38,7 @@ namespace WDE.Conditions.ViewModels
             });
             Delete = new DelegateCommand(DeleteSource);
             AddItem = new DelegateCommand(AddSource);
-            EditItem = new DelegateCommand<ConditionSourcesJsonData?>(EditSource);
+            EditItem = new AsyncCommand<ConditionSourcesJsonData?>(EditSource);
             // history setup
             historyHandler = new ConditionSourcesEditorHistoryHandler(SourceItems);
             History = historyCreator();
@@ -57,7 +58,7 @@ namespace WDE.Conditions.ViewModels
         
         public DelegateCommand Delete { get; }
         public DelegateCommand AddItem { get; }
-        public DelegateCommand<ConditionSourcesJsonData?> EditItem { get; }
+        public AsyncCommand<ConditionSourcesJsonData?> EditItem { get; }
         private readonly DelegateCommand undoCommand;
         private readonly DelegateCommand redoCommand;
 
@@ -75,16 +76,16 @@ namespace WDE.Conditions.ViewModels
             OpenEditor(obj, true);
         }
 
-        private void EditSource(ConditionSourcesJsonData? item)
+        private async Task EditSource(ConditionSourcesJsonData? item)
         {
             if (item.HasValue)
-                OpenEditor(item.Value, false);
+                await OpenEditor(item.Value, false);
         }
 
-        private void OpenEditor(ConditionSourcesJsonData item, bool isCreating)
+        private async Task OpenEditor(ConditionSourcesJsonData item, bool isCreating)
         {
             var vm = new ConditionSourceEditorViewModel(in item, parameterFactory, windowManager);
-            if (windowManager.ShowDialog(vm) && !vm.IsEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.IsEmpty())
             {
                 if (isCreating)
                     SourceItems.Add(vm.Source.ToConditionSourcesJsonData());
@@ -114,7 +115,7 @@ namespace WDE.Conditions.ViewModels
         public ICommand Cut { get; }= AlwaysDisabledCommand.Command;
         public ICommand Paste { get; }= AlwaysDisabledCommand.Command;
         public ICommand Save { get; }
-        public ICommand CloseCommand { get; set; } = null;
+        public IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
         public bool IsModified

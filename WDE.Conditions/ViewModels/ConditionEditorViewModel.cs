@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Mvvm;
 using Prism.Commands;
 using WDE.Common.Managers;
@@ -23,7 +25,7 @@ namespace WDE.Conditions.ViewModels
             SelectedParamIndex = -1;
             Save = new DelegateCommand(() => CloseOk?.Invoke());
             DeleteParam = new DelegateCommand(DeleteItem);
-            EditParam = new DelegateCommand<ConditionParameterJsonData?>(EditItem);
+            EditParam = new AsyncCommand<ConditionParameterJsonData?>(EditItem);
             AddParam = new DelegateCommand(AddItem);
         }
         
@@ -32,7 +34,7 @@ namespace WDE.Conditions.ViewModels
         
         public DelegateCommand Save { get; }
         public DelegateCommand DeleteParam { get; }
-        public DelegateCommand<ConditionParameterJsonData?> EditParam { get; }
+        public AsyncCommand<ConditionParameterJsonData?> EditParam { get; }
         public DelegateCommand AddParam { get; }
 
         private void DeleteItem()
@@ -46,16 +48,16 @@ namespace WDE.Conditions.ViewModels
             OpenEditor(new ConditionParameterJsonData(), true);
         }
 
-        private void EditItem(ConditionParameterJsonData? item)
+        private async Task EditItem(ConditionParameterJsonData? item)
         {
             if (item.HasValue)
-                OpenEditor(item.Value, false);
+                await OpenEditor(item.Value, false);
         }
         
-        private void OpenEditor(ConditionParameterJsonData item, bool isCreating)
+        private async Task OpenEditor(ConditionParameterJsonData item, bool isCreating)
         {
             var vm = new ConditionsParameterEditorViewModel(in item, parameterFactory);
-            if (windowManager.ShowDialog(vm) && !vm.IsEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.IsEmpty())
             {
                 if (isCreating)
                     Source.Parameters.Add(vm.Source.ToConditionParameterJsonData());

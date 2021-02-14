@@ -1,10 +1,10 @@
 ﻿using System.Windows.Controls;
 
-namespace WDE.Conditions.Views
+namespace WDE.Conditions.WPF.Views
 {
-    public partial class ConditionEditorView : UserControl
+    public partial class ConditionSourceEditorView : UserControl
     {
-        public ConditionEditorView()
+        public ConditionSourceEditorView()
         {
             InitializeComponent();
         }

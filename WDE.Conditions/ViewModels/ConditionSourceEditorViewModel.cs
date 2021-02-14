@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Mvvm;
 using Prism.Commands;
 using WDE.Common.Annotations;
@@ -26,28 +28,28 @@ namespace WDE.Conditions.ViewModels
             SelectedTargetIndex = -1;
             Save = new DelegateCommand(() => CloseOk?.Invoke());
             ClearEntryParam = new DelegateCommand(ClearSourceEntryParam);
-            EditEntryParam = new DelegateCommand(EditSourceEntryParam);
+            EditEntryParam = new AsyncCommand(EditSourceEntryParam);
             ClearGroupParam = new DelegateCommand(ClearSourceGroupParam);
-            EditGroupParam = new DelegateCommand(EditSourceGroupParam);
+            EditGroupParam = new AsyncCommand(EditSourceGroupParam);
             ClearSourceIdParam = new DelegateCommand(ClearSourceSourceIdParam);
-            EditSourceIdParam = new DelegateCommand(EditSourceSourceIdParam);
+            EditSourceIdParam = new AsyncCommand(EditSourceSourceIdParam);
             DeleteTarget = new DelegateCommand(DeleteSourceTarget);
-            AddTarget = new DelegateCommand(AddTargetToSource);
-            EditTarget = new DelegateCommand<ConditionSourceTargetJsonData?>(EditSourceTarget);
+            AddTarget = new AsyncCommand(AddTargetToSource);
+            EditTarget = new AsyncCommand<ConditionSourceTargetJsonData?>(EditSourceTarget);
         }
         
         public ConditionSourceEditorData Source { get; }
         public int SelectedTargetIndex { get; set; }
         public DelegateCommand Save { get; }
         public DelegateCommand ClearEntryParam { get; }
-        public DelegateCommand EditEntryParam { get; }
+        public AsyncCommand EditEntryParam { get; }
         public DelegateCommand ClearGroupParam { get; }
-        public DelegateCommand EditGroupParam { get; }
+        public AsyncCommand EditGroupParam { get; }
         public DelegateCommand ClearSourceIdParam { get; }
-        public DelegateCommand EditSourceIdParam { get; }
+        public AsyncCommand EditSourceIdParam { get; }
         public DelegateCommand DeleteTarget { get; }
-        public DelegateCommand AddTarget { get; }
-        public DelegateCommand<ConditionSourceTargetJsonData?> EditTarget { get; }
+        public AsyncCommand AddTarget { get; }
+        public AsyncCommand<ConditionSourceTargetJsonData?> EditTarget { get; }
 
         private void ClearSourceEntryParam() => Source.UpdateDataParam(null, ConditionSourceParamUpdate.UpdateEntryParam);
 
@@ -55,16 +57,16 @@ namespace WDE.Conditions.ViewModels
 
         private void ClearSourceSourceIdParam() => Source.UpdateDataParam(null, ConditionSourceParamUpdate.UpdateSourceIdParam);
 
-        private void EditSourceEntryParam() => OpenParamEditor(Source.EntryParam ?? new ConditionSourceParamsJsonData(), ConditionSourceParamUpdate.UpdateEntryParam);
+        private Task EditSourceEntryParam() => OpenParamEditor(Source.EntryParam ?? new ConditionSourceParamsJsonData(), ConditionSourceParamUpdate.UpdateEntryParam);
 
-        private void EditSourceGroupParam() => OpenParamEditor(Source.GroupParam ?? new ConditionSourceParamsJsonData(), ConditionSourceParamUpdate.UpdateGroupParam);
+        private Task EditSourceGroupParam() => OpenParamEditor(Source.GroupParam ?? new ConditionSourceParamsJsonData(), ConditionSourceParamUpdate.UpdateGroupParam);
 
-        private void EditSourceSourceIdParam() => OpenParamEditor(Source.SourceIdParam ?? new ConditionSourceParamsJsonData(), ConditionSourceParamUpdate.UpdateSourceIdParam);
+        private Task EditSourceSourceIdParam() => OpenParamEditor(Source.SourceIdParam ?? new ConditionSourceParamsJsonData(), ConditionSourceParamUpdate.UpdateSourceIdParam);
 
-        private void OpenParamEditor(in ConditionSourceParamsJsonData item, ConditionSourceParamUpdate paramUpdate)
+        private async Task OpenParamEditor(ConditionSourceParamsJsonData item, ConditionSourceParamUpdate paramUpdate)
         {
             var vm = new ConditionsParameterEditorViewModel(in item, parameterFactory);
-            if (windowManager.ShowDialog(vm) && !vm.IsEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.IsEmpty())
                 Source.UpdateDataParam(vm.Source.ToConditionSourceParamsJsonData(), paramUpdate);
         }
 
@@ -74,21 +76,21 @@ namespace WDE.Conditions.ViewModels
                 Source.Targets.RemoveAt(SelectedTargetIndex);
         }
 
-        private void AddTargetToSource()
+        private async Task AddTargetToSource()
         {
-            OpenTargetEditor(new ConditionSourceTargetJsonData(), true);
+            await OpenTargetEditor(new ConditionSourceTargetJsonData(), true);
         }
 
-        private void EditSourceTarget(ConditionSourceTargetJsonData? obj)
+        private async Task EditSourceTarget(ConditionSourceTargetJsonData? obj)
         {
             if (obj.HasValue)
-                OpenTargetEditor(obj.Value, false);
+                await OpenTargetEditor(obj.Value, false);
         }
 
-        private void OpenTargetEditor(ConditionSourceTargetJsonData item, bool isCreating)
+        private async Task OpenTargetEditor(ConditionSourceTargetJsonData item, bool isCreating)
         {
             var vm = new ConditionSourceTargetInputViewModel(in item);
-            if (windowManager.ShowDialog(vm) && !vm.IsEmpty())
+            if (await windowManager.ShowDialog(vm) && !vm.IsEmpty())
             {
                 if (isCreating)
                     Source.Targets.Add(vm.Source.ToConditionSourceTargetJsonData());

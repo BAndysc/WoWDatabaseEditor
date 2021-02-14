@@ -96,11 +96,4 @@
             <Version>4.50.1</Version>
         </PackageReference>
     </ItemGroup>
-
-
-    <ItemGroup>
-      <Folder Include="CoreVersion" />
-      <Folder Include="ModulesManagement\Configuration" />
-      <Folder Include="Services\ConfigurationService" />
-    </ItemGroup>
 </Project>

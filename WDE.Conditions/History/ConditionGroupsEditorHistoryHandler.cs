@@ -15,7 +15,7 @@ namespace WDE.Conditions.History
         public ConditionGroupsEditorHistoryHandler(ObservableCollection<ConditionGroupsEditorData> groupsData)
         {
             this.groupsData = groupsData;
-            groupsDataSubscription = groupsData.ToStream().Subscribe(e =>
+            groupsDataSubscription = groupsData.ToStream().SubscribeAction(e =>
             {
                 if (e.Type == CollectionEventType.Add)
                 {
