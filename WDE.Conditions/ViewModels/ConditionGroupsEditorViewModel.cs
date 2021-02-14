@@ -19,7 +19,7 @@ using WDE.Conditions.History;
 
 namespace WDE.Conditions.ViewModels
 {
-    public class ConditionGroupsEditorViewModel: BindableBase, IDocument
+    public class ConditionGroupsEditorViewModel : BindableBase, IDocument
     {
         private readonly ConditionGroupsEditorHistoryHandler historyHandler;
         private readonly IConditionDataProvider conditionDataProvider;
