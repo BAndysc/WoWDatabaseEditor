@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WDE.Conditions.Views.ConditionsDefinitionEditorView"
+﻿<UserControl x:Class="WDE.Conditions.Views.ConditionSourcesListEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -28,7 +28,6 @@
                     <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}">
                         <GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Id}" />
                         <GridViewColumn Header="Name" Width="Auto" DisplayMemberBinding="{Binding Name}" />
-                        <GridViewColumn Header="Readable Name" Width="Auto" DisplayMemberBinding="{Binding NameReadable}" />
                         <GridViewColumn Header="Desc" Width="Auto" DisplayMemberBinding="{Binding Description}"/>
                     </GridView>
                 </ListView.View>

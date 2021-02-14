@@ -42,8 +42,9 @@ namespace WDE.SmartScriptEditor.Providers
                 new SmartDataCategoryMenuItemProvider<SmartDataGroupsEditorViewModel>("Target Groups", new object[] { smartDataProvider, taskRunner, 
                     messageBoxService, windowManager, historyCreator, SmartDataSourceMode.SD_SOURCE_TARGETS }),
             };
-            
-            IMenuCategoryItem obj = new SmartDataCategoryItem("Smart Data", editors);
+
+            var saiCategory = new List<IMenuItem> {new SmartDataCategoryItem("Smart Scripts", editors)};
+            IMenuCategoryItem obj = new SmartDataCategoryItem("Smart Data", saiCategory);
             SubItems = new List<IMenuItem>() {obj};
         }
 

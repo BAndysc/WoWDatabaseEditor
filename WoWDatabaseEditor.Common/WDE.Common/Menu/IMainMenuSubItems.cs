@@ -17,7 +17,7 @@ namespace WDE.Common.Menu
 
     public interface IMenuDocumentItem : IMenuItem
     {
-        IDocument EditorDocument { get; }
+        IDocument EditorDocument();
     }
 
     public interface IMenuCommandItem : IMenuItem

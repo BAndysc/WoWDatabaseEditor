@@ -49,7 +49,7 @@
 		"parameters": [
 			{
 				"type": "ItemParameter",
-				"name": "Item",
+				"name": "Item"
 			},
 			{
 				"type": "Parameter",
@@ -75,7 +75,7 @@
 				"type": "ItemParameter",
 				"name": "Item",
 				"description": "Item id to check (this condition applies only to players!)"
-			},
+			}
 		],
 		"description": "{target} has equiped item {pram1}"
 	},
@@ -89,7 +89,7 @@
 			{
 				"type": "ZoneAreaParameter",
 				"name": "Zone"
-			},
+			}
 		],
 		"description": "{target} in zone {pram1}"
 	},
@@ -119,7 +119,7 @@
 					"6": {"name": "REP_REVERED"},
 					"7": {"name": "REP_EXALTED"}
 				}
-			},
+			}
 		],
 		"description": "{target} has at least reputation {pram2} to faction {pram1}"
 	},
@@ -138,7 +138,7 @@
 					"67": {"name": "Horde"},
 					"469": {"name": "Alliance"}
 				}
-			},
+			}
 		],
 		"description": "{target} belongs to {pram1}"
 	},
@@ -157,7 +157,7 @@
 			{
 				"type": "Parameter",
 				"name": "Minimum skill value"
-			},
+			}
 		],
 		"description": "{target} has at least value {pram2} for skill {pram1}"
 	},
@@ -172,7 +172,7 @@
 				"type": "QuestParameter",
 				"name": "Quest",
 				"description": "Quest ID to check"
-			},
+			}
 		],
 		"description": "{target} has quest {pram1} rewarded"
 	},
@@ -187,7 +187,7 @@
 				"type": "QuestParameter",
 				"name": "Quest",
 				"description": "Quest ID to check"
-			},
+			}
 		],
 		"description": "{target} has quest {pram1} active"
 	},
@@ -205,9 +205,9 @@
 					"0": {"name": "DRUNKEN_SOBER"},
 					"1": {"name": "DRUNKEN_TIPSY"},
 					"2": {"name": "DRUNKEN_DRUNK"},
-					"3": {"name": "DRUNKEN_SMASHED"},
+					"3": {"name": "DRUNKEN_SMASHED"}
 				}
-			},
+			}
 		],
 		"description": "{target} has drunk state {pram1}"
 	},
@@ -224,7 +224,7 @@
 			{
 				"type": "Parameter",
 				"name": "Variable Value"
-			},
+			}
 		],
 		"description": "world variable {pram1} is set to {pram2}"
 	},
@@ -238,7 +238,7 @@
 			{
 				"type": "GameEventParameter",
 				"name": "Event"
-			},
+			}
 		],
 		"description": "event {pram1} is active"
 	},
@@ -283,7 +283,7 @@
 				"type": "QuestParameter",
 				"name": "Quest",
 				"description": "Quest ID to check"
-			},
+			}
 		],
 		"description": "{target} has never finished nor has active quest {pram1}"
 	},
@@ -298,7 +298,7 @@
 				"type": "ClassParameter",
 				"name": "Class",
 				"description": "Only for players"
-			},
+			}
 		],
 		"description": "{target} is class {pram1}"
 	},
@@ -313,7 +313,7 @@
 				"type": "RaceParameter",
 				"name": "Race",
 				"description": "Only for players"
-			},
+			}
 		],
 		"description": "{target} is race {pram1}"
 	},
@@ -327,7 +327,7 @@
 			{
 				"type": "AchievementParameter",
 				"name": "Achievement"
-			},
+			}
 		],
 		"description": "{target} has achievement {pram1} completed"
 	},
@@ -341,7 +341,7 @@
 			{
 				"type": "Parameter",
 				"name": "Title ID"
-			},
+			}
 		],
 		"description": "{target} has title {pram1}"
 	},
@@ -355,7 +355,7 @@
 			{
 				"type": "Parameter",
 				"name": "Spawn mask"
-			},
+			}
 		],
 		"description": "{target} in spawn mask {pram1}"
 	},
@@ -374,7 +374,7 @@
 					"1": {"name": "GENDER_FEMALE"},
 					"2": {"name": "GENDER_NONE"}
 				}
-			},
+			}
 		],
 		"description": "{target} is {pram1}"
 	},
@@ -414,9 +414,9 @@
 					"33554432": {"name": "UNIT_STATE_FLEEING_MOVE"},
 					"67108864": {"name": "UNIT_STATE_CHASE_MOVE"},
 					"134217728": {"name": "UNIT_STATE_FOLLOW_MOVE"},
-					"268435456": {"name": "UNIT_STATE_IGNORE_PATHFINDING"},
+					"268435456": {"name": "UNIT_STATE_IGNORE_PATHFINDING"}
 				}
-			},
+			}
 		],
 		"description": "{target} has unit state {pram1}"
 	},
@@ -430,7 +430,7 @@
 			{
 				"type": "MapParameter",
 				"name": "Map"
-			},
+			}
 		],
 		"description": "{target} in map {pram1}"
 	},
@@ -444,7 +444,7 @@
 			{
 				"type": "ZoneAreaParameter",
 				"name": "Area"
-			},
+			}
 		],
 		"description": "{target} in area {pram1}"
 	},
@@ -459,7 +459,7 @@
 				"type": "CreatureTypeParameter",
 				"name": "Type",
 				"description": "From creature_template.type"
-			},
+			}
 		],
 		"description": "{target} is {pram1}"
 	},
@@ -474,7 +474,7 @@
 				"type": "SpellParameter",
 				"name": "Spell",
 				"description": "Only for players"
-			},
+			}
 		],
 		"description": "{target} has learned spell {pram1}"
 	},
@@ -488,7 +488,7 @@
 			{
 				"type": "PhaseParameter",
 				"name": "Phase"
-			},
+			}
 		],
 		"description": "{target} in phase {pram1}"
 	},
@@ -515,7 +515,7 @@
 					"4": {"name": "lower or equals (<=)"}
 				},
 				"description": "Comparison type"
-			},
+			}
 		],
 		"description": "{target}'s level {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
 	},
@@ -530,7 +530,7 @@
 				"type": "QuestParameter",
 				"name": "Quest",
 				"description": "Quest id which player has to have completed with all objectives, but not yet rewarded"
-			},
+			}
 		],
 		"description": "{target} has completed quest {pram1} (but not yet rewarded)"
 	},
@@ -548,7 +548,7 @@
 			{
 				"type": "Parameter",
 				"name": "Distance"
-			},
+			}
 		],
 		"description": "there is creature {pram1} within range {pram2} yards to {target}"
 	},
@@ -566,7 +566,7 @@
 			{
 				"type": "Parameter",
 				"name": "Distance"
-			},
+			}
 		],
 		"description": "there is gameobject {pram1} within range {pram2} yards to {target}"
 	},
@@ -625,7 +625,7 @@
 					"128": {"name": "TYPEMASK_CORPSE"},
 					"256": {"name": "TYPEMASK_AREATRIGGER"},
 					"88": {"name": "TYPEMASK_SEER", "description": "TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT"}
-				},
+				}
 			}
 		],
 		"description": "{target} is of type {pram1}"
@@ -655,8 +655,8 @@
 					"3": {"name": "RELATION_OWNED_BY"},
 					"4": {"name": "RELATION_PASSENGER_OF"},
 					"5": {"name": "RELATION_CREATED_BY"}
-				},
-			},
+				}
+			}
 		],
 		"description": "{target} {pram2value:choose(0|1|2|3|4|5):is {pram1}|is in party with {pram2}|is in raid or party with {pram2}|is owned by {pram1}|is passenger of {pram1}|is summoned by {pram1}}"
 	},
@@ -686,9 +686,9 @@
 					"16": {"name": "REP_FRIENDLY"},
 					"32": {"name": "REP_HONORED"},
 					"64": {"name": "REP_REVERED"},
-					"128": {"name": "REP_EXALTED"},
+					"128": {"name": "REP_EXALTED"}
 				}
-			},
+			}
 		],
 		"description": "{target} reaction to {pram1} is {pram2}"
 	},
@@ -719,7 +719,7 @@
 					"2": {"name": "lower than (<)"},
 					"3": {"name": "higher or equals (>=)"},
 					"4": {"name": "lower or equals (<=)"}
-				},
+				}
 			}
 		],
 		"description": "{target} distance to {pram1} {pram3value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram2} yards"
@@ -752,8 +752,8 @@
 					"2": {"name": "lower than (<)"},
 					"3": {"name": "higher or equals (>=)"},
 					"4": {"name": "lower or equals (<=)"}
-				},
-			},
+				}
+			}
 		],
 		"description": "{target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
 	},
@@ -777,8 +777,8 @@
 					"2": {"name": "lower than (<)"},
 					"3": {"name": "higher or equals (>=)"},
 					"4": {"name": "lower or equals (<=)"}
-				},
-			},
+				}
+			}
 		],
 		"description": "{target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}%"
 	},
@@ -793,7 +793,7 @@
 				"type": "Parameter",
 				"name": "Terrain Swap",
 				"description": "To explain"
-			},
+			}
 		],
 		"description": "{target} in terrain swap {pram1}"
 	}

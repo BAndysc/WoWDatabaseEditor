@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using WDE.Common.Menu;
 using WDE.Common.Annotations;
 using WDE.Common.History;
+using WDE.Common.Managers;
+using WDE.Common.Parameters;
+using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
+using WDE.Conditions.Data;
 using WDE.Conditions.ViewModels;
 using WDE.Module.Attributes;
 
@@ -15,14 +20,26 @@ namespace WDE.Conditions.MenuItems
         public List<IMenuItem> SubItems { get; }
         public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityNormal;
 
-        public ConditionModuleMenuItem(Func<IHistoryManager> historyCreator)
+        public ConditionModuleMenuItem(Func<IHistoryManager> historyCreator, IConditionDataProvider conditionDataProvider, IWindowManager windowManager, ITaskRunner taskRunner,
+            IParameterFactory parameterFactory, IMessageBoxService messageBoxService)
         {
             var editors = new List<IMenuItem>();
             
-            // TODO: Fill this out
-            editors.Add(new ConditionsEditorMenuItem<ConditionsDefinitionEditorViewModel>("Conditions", new [] { historyCreator }));
-            
-            SubItems = new List<IMenuItem>() { new ConditionsMenuCategory("Smart Data", editors) };
+            editors.Add(new ConditionsEditorMenuItem<ConditionsDefinitionEditorViewModel>("Conditions", new object[]
+            {
+                historyCreator, conditionDataProvider, windowManager, taskRunner, parameterFactory
+            }));
+            editors.Add(new ConditionsEditorMenuItem<ConditionSourcesListEditorViewModel>("Condition Sources", new object[]
+            {
+                historyCreator, conditionDataProvider, parameterFactory, windowManager, taskRunner
+            }));
+            editors.Add(new ConditionsEditorMenuItem<ConditionGroupsEditorViewModel>("Condition Groups", new object[]
+            {
+                historyCreator, conditionDataProvider, windowManager, messageBoxService, taskRunner
+            }));
+
+            var conditionsCategory = new List<IMenuItem> {new ConditionsMenuCategory("Conditions", editors)};
+            SubItems = new List<IMenuItem>() { new ConditionsMenuCategory("Smart Data", conditionsCategory) };
         }
     }
 

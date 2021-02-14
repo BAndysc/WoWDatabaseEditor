@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,31 +15,31 @@ using WDE.Conditions.History;
 
 namespace WDE.Conditions.ViewModels
 {
-    public class ConditionsDefinitionEditorViewModel: BindableBase, IDocument
+    public class ConditionSourcesListEditorViewModel: BindableBase, IDocument
     {
-        private readonly ConditionsEditorHistoryHandler historyHandler;
+        private readonly ConditionSourcesEditorHistoryHandler historyHandler;
         private readonly IConditionDataProvider conditionDataProvider;
-        private readonly IWindowManager windowManager;
         private readonly IParameterFactory parameterFactory;
-        
-        public ConditionsDefinitionEditorViewModel(Func<IHistoryManager> historyCreator, IConditionDataProvider conditionDataProvider, IWindowManager windowManager,
-            ITaskRunner taskRunner, IParameterFactory parameterFactory)
+        private readonly IWindowManager windowManager;
+
+        public ConditionSourcesListEditorViewModel(Func<IHistoryManager> historyCreator, IConditionDataProvider conditionDataProvider, IParameterFactory parameterFactory,
+            IWindowManager windowManager, ITaskRunner taskRunner)
         {
             this.conditionDataProvider = conditionDataProvider;
-            SourceItems = new ObservableCollection<ConditionJsonData>(conditionDataProvider.GetConditions().ToList());
-            this.windowManager = windowManager;
             this.parameterFactory = parameterFactory;
+            this.windowManager = windowManager;
+            
+            SourceItems = new ObservableCollection<ConditionSourcesJsonData>(conditionDataProvider.GetConditionSources());
             SelectedIndex = -1;
-
             Save = new DelegateCommand(() =>
             {
-                taskRunner.ScheduleTask("Saving conditions definition list", SaveConditions);
-            }, () => IsModified);
-            Delete = new DelegateCommand(DeleteItem);
-            AddItem = new DelegateCommand(AddNewItem);
-            EditItem = new DelegateCommand<ConditionJsonData?>(EditCondition);
+                taskRunner.ScheduleTask("Saving Condition Sources", SaveSources);
+            });
+            Delete = new DelegateCommand(DeleteSource);
+            AddItem = new DelegateCommand(AddSource);
+            EditItem = new DelegateCommand<ConditionSourcesJsonData?>(EditSource);
             // history setup
-            historyHandler = new ConditionsEditorHistoryHandler(SourceItems);
+            historyHandler = new ConditionSourcesEditorHistoryHandler(SourceItems);
             History = historyCreator();
             undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
@@ -53,53 +52,53 @@ namespace WDE.Conditions.ViewModels
             History.AddHandler(historyHandler);
         }
 
-        public ObservableCollection<ConditionJsonData> SourceItems { get; }
+        public ObservableCollection<ConditionSourcesJsonData> SourceItems { get; }
         public int SelectedIndex { get; set; }
         
         public DelegateCommand Delete { get; }
         public DelegateCommand AddItem { get; }
-        public DelegateCommand<ConditionJsonData?> EditItem { get; }
+        public DelegateCommand<ConditionSourcesJsonData?> EditItem { get; }
         private readonly DelegateCommand undoCommand;
         private readonly DelegateCommand redoCommand;
 
-        private void DeleteItem()
+        private void DeleteSource()
         {
             if (SelectedIndex >= 0)
                 SourceItems.RemoveAt(SelectedIndex);
         }
 
-        private void AddNewItem()
+        private void AddSource()
         {
-            var obj = new ConditionJsonData();
+            var obj = new ConditionSourcesJsonData();
             obj.Id = SourceItems.Max(x => x.Id) + 1;
-            obj.Name = "CONDITION_";
+            obj.Name = "CONDITION_SOURCE_TYPE_";
             OpenEditor(obj, true);
         }
 
-        private void EditCondition(ConditionJsonData? item)
+        private void EditSource(ConditionSourcesJsonData? item)
         {
             if (item.HasValue)
                 OpenEditor(item.Value, false);
         }
 
-        private void OpenEditor(ConditionJsonData item, bool isCreating)
+        private void OpenEditor(ConditionSourcesJsonData item, bool isCreating)
         {
-            var vm = new ConditionEditorViewModel(in item, windowManager, parameterFactory);
+            var vm = new ConditionSourceEditorViewModel(in item, parameterFactory, windowManager);
             if (windowManager.ShowDialog(vm) && !vm.IsEmpty())
             {
                 if (isCreating)
-                    SourceItems.Add(vm.Source.ToConditionJsonData());
+                    SourceItems.Add(vm.Source.ToConditionSourcesJsonData());
                 else
                 {
                     if (SelectedIndex >= 0)
-                        SourceItems[SelectedIndex] = vm.Source.ToConditionJsonData();
+                        SourceItems[SelectedIndex] = vm.Source.ToConditionSourcesJsonData();
                 }
             }
         }
-
-        private async Task SaveConditions()
+        
+        private async Task SaveSources()
         {
-            await conditionDataProvider.SaveConditions(SourceItems.ToList());
+            await conditionDataProvider.SaveConditionSources(SourceItems.ToList());
             History.MarkAsSaved();
         }
         
@@ -108,17 +107,16 @@ namespace WDE.Conditions.ViewModels
             historyHandler.Dispose();
         }
 
-        public string Title { get; } = "Conditions Editor";
+        public string Title { get; } = "Condition Sources Editor";
         public ICommand Undo => undoCommand;
         public ICommand Redo => redoCommand;
         public ICommand Copy { get; } = AlwaysDisabledCommand.Command;
-        public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
-        public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
+        public ICommand Cut { get; }= AlwaysDisabledCommand.Command;
+        public ICommand Paste { get; }= AlwaysDisabledCommand.Command;
         public ICommand Save { get; }
         public ICommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
-
         public bool IsModified
         {
             get => isModified;

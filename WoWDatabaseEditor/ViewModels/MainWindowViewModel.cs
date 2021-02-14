@@ -38,7 +38,7 @@ namespace WoWDatabaseEditor.ViewModels
             DocumentManager = documentManager;
             StatusBar = statusBar;
             this.messageBoxService = messageBoxService;
-            OpenDocument = new DelegateCommand<IDocument>(ShowDocument);
+            OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
 
             TasksViewModel = tasksViewModel;
 
@@ -63,16 +63,16 @@ namespace WoWDatabaseEditor.ViewModels
             set => SetProperty(ref title, value);
         }
 
-        public DelegateCommand<IDocument> OpenDocument { get; }
+        public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
 
         private void ShowAbout()
         {
             DocumentManager.OpenDocument(new AboutViewModel());
         }
 
-        private void ShowDocument(IDocument document)
+        private void ShowDocument(IMenuDocumentItem documentItem)
         {
-            DocumentManager.OpenDocument(document);
+            DocumentManager.OpenDocument(documentItem.EditorDocument());
         }
 
         public ITool? ResolveViewModel(string id)

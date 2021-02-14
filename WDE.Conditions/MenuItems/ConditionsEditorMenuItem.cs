@@ -1,4 +1,5 @@
-﻿using WDE.Common.Managers;
+﻿using System;
+using WDE.Common.Managers;
 using WDE.Common.Menu;
 
 namespace WDE.Conditions.MenuItems
@@ -7,7 +8,7 @@ namespace WDE.Conditions.MenuItems
     {
         public string ItemName { get; }
         #nullable enable
-        private object[]? constructorParams;
+        private readonly object[]? constructorParams;
 
         public ConditionsEditorMenuItem(string itemName, object[]? constructorParams)
         {
@@ -15,6 +16,6 @@ namespace WDE.Conditions.MenuItems
             this.constructorParams = constructorParams;
         }
 
-        public IDocument EditorDocument => (T)System.Activator.CreateInstance(typeof(T), constructorParams)!;
+        public IDocument EditorDocument() => (T)Activator.CreateInstance(typeof(T), constructorParams);
     }
 }
