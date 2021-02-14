@@ -1,13 +1,15 @@
 using System;
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
+using AvaloniaStyles.Controls;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
 {
-    public class MessageBoxView : Window
+    public class MessageBoxView : BaseMessageBoxWindow
     {
         public MessageBoxView()
         {
@@ -47,12 +49,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
             return new Size(width, height);
         }
 
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            return base.ArrangeOverride(finalSize);
-            
-        }
-
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
@@ -67,6 +63,13 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
             }
         }
 
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (!realClosing)
+                e.Cancel = true;
+            base.OnClosing(e);
+        }
+
         protected override void OnClosed(EventArgs e)
         {
             if (DataContext is IMessageBoxViewModel dialogWindow)
@@ -75,9 +78,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
             }
             base.OnClosed(e);
         }
-        
+
+        private bool realClosing;
         private void DialogWindowOnClose()
         {
+            realClosing = true;
             Close(true);
         }
     }

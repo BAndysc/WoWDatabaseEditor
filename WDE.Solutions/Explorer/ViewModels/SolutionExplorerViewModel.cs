@@ -198,7 +198,11 @@ namespace WDE.Solutions.Explorer.ViewModels
             set => SetProperty(ref visibility, value);
         }
 
-        public SolutionItemViewModel SelectedItem => selected;
+        public SolutionItemViewModel SelectedItem
+        {
+            get => selected;
+            set => SetProperty(ref selected, value);
+        }
 
         private void AddItemToRoot(ISolutionItem item, int index = -1)
         {

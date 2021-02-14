@@ -9,9 +9,9 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <Border BorderThickness="1"
-            Background="White"
+            Background="{DynamicResource ContentBackground}"
             BorderBrush="Gray" 
-            Width="300" Height="350" BoxShadow="0 0 10 10 #000000">
+            Width="300" Height="350" BoxShadow="0 0 15 4 #60000000">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label DockPanel.Dock="Top">Running tasks</Label>

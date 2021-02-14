@@ -1,0 +1,4 @@
+<Style xmlns="https://github.com/avaloniaui" Selector="TreeView">
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Padding" Value="0"/>
+</Style>

@@ -1,11 +1,12 @@
-﻿using WDE.Module.Attributes;
+﻿using System.Threading.Tasks;
+using WDE.Module.Attributes;
 
 namespace WDE.Common.Services
 {
     [UniqueProvider]
     public interface IClipboardService
     {
-        string GetText();
+        Task<string> GetText();
         void SetText(string text);
     }
 }

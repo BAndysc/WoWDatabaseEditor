@@ -23,11 +23,11 @@
         <Label Content="Path to DBC/DB2s" VerticalContentAlignment="Center" />
         <TextBox Margin="5" Grid.Column="1" Grid.Row="0"
                  Text="{Binding Path, Mode=TwoWay}" Padding="5" Name="Path" />
-        <Button Grid.Column="2" Grid.Row="0" Padding="5" VerticalAlignment="Center">...</Button>
+        <Button Grid.Column="2" Grid.Row="0" Padding="5" VerticalAlignment="Center" Command="{Binding PickFolder}">...</Button>
 
         <Label Content="DBC/DB2 Version" VerticalContentAlignment="Center" Grid.Row="1" />
         <ComboBox Name="dbcVersion" Grid.Row="1" Grid.Column="1" Margin="5" Padding="5" VerticalAlignment="Center"
-                  Items="{Binding DbcVersionsEnum}"
+                  Items="{Binding DBCVersions}"
                   SelectedItem="{Binding DBCVersion}" />
 
         <Label Content="Skip loading dbc" VerticalContentAlignment="Center" Grid.Row="2" />

@@ -1,0 +1,29 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
+    <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
+    
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/PopupRoot.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/TreeView.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/TreeViewItem.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/TabStrip.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/Button.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ToggleButton.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/TextBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/Window.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/GridSplitter.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/StatusBar.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/SideBar.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/CheckBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/RadioButton.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ComboBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ComboBoxItem.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ContextMenu.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/MenuItem.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ListBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ListBoxItem.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/DataGrid.xaml"/>
+    
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ToolsTabControl.xaml"/>
+</Styles>

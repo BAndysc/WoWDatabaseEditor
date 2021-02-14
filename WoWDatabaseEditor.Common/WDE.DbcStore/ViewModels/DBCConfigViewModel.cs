@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.Managers;
 using WDE.DbcStore.Data;
 using WDE.DbcStore.Providers;
 using WDE.Module.Attributes;
@@ -16,17 +18,25 @@ namespace WDE.DbcStore.ViewModels
         private string path;
         private bool skipLoading;
 
-        public DBCConfigViewModel(IDbcSettingsProvider dbcSettings)
+        public DBCConfigViewModel(IDbcSettingsProvider dbcSettings, IWindowManager windowManager)
         {
             path = dbcSettings.GetSettings().Path;
             skipLoading = dbcSettings.GetSettings().SkipLoading;
             dbcVersion = dbcSettings.GetSettings().DBCVersion;
             
+            PickFolder = new DelegateCommand(async () =>
+            {
+                var selectedPath = await windowManager.ShowFolderPickerDialog(Path);
+                if (selectedPath != null)
+                    Path = selectedPath;
+            });
             Save = new DelegateCommand(() =>
             {
                 dbcSettings.UpdateSettings(new DBCSettings {Path = Path, SkipLoading = SkipLoading, DBCVersion = DBCVersion});
                 IsModified = false;
             });
+
+            DBCVersions = new ObservableCollection<DBCVersions>(Enum.GetValues<DBCVersions>());
         }
 
         public string Path
@@ -66,9 +76,12 @@ namespace WDE.DbcStore.ViewModels
             private set => SetProperty(ref isModified, value);
         }
         
+        public ObservableCollection<DBCVersions> DBCVersions { get; }
+        
         public string Name => "DBC";
 
         public ICommand Save { get; }
+        public ICommand PickFolder { get; }
 
         public bool IsRestartRequired => true;
     }

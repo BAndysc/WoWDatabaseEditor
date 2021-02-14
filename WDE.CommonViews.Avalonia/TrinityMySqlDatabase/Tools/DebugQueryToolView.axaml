@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WDE.TrinityMySqlDatabase.Tools.DebugQueryToolView"
+﻿<components:ToolView x:Class="WDE.TrinityMySqlDatabase.Tools.DebugQueryToolView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,15 +6,51 @@
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <UserControl.Resources>
+    <components:ToolView.Icon>
+        <controls:MonochromaticIcon Name="Icon">
+            <controls:MonochromaticIcon.Source>
+                <DrawingImage>
+                    <DrawingImage.Drawing>
+                        <DrawingGroup>
+                            <DrawingGroup Opacity="1">
+                                <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,9L2,13C2,13 2.996,14 8,14 13.004,14 14,13 14,13L14,9C14,9 12.985,10 8,10 3.015,10 2,9 2,9z">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                            <DrawingGroup Opacity="1">
+                                <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,4L2,8C2,8 2.996,9 8,9 13.004,9 14,8 14,8L14,4C14,4 12.985,5 8,5 3.015,5 2,4 2,4z">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                            <DrawingGroup Opacity="1">
+                                <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,3C2,3 2.126,1 8,1 13.874,1 14,3 14,3 14,3 13.976,4 8,4 2.024,4 2,3 2,3z">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingGroup>
+                    </DrawingImage.Drawing>
+                </DrawingImage>
+            </controls:MonochromaticIcon.Source>
+        </controls:MonochromaticIcon>
+    </components:ToolView.Icon>
+    
+    <components:ToolView.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
-    </UserControl.Resources>
+    </components:ToolView.Resources>
     <DockPanel LastChildFill="True">
         <Button Command="{Binding ClearConsole}" DockPanel.Dock="Top">Clear</Button>
         <avaloniaEdit:TextEditor IsReadOnly="True" Document="{Binding Text, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
                                FontFamily="Consolas"/>
         
     </DockPanel>
-</UserControl>
+</components:ToolView>

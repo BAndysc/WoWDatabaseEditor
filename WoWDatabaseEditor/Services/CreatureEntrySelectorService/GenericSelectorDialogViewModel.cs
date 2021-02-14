@@ -7,6 +7,7 @@ using DynamicData.Binding;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Extensions;
@@ -52,13 +53,27 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 
             items.AddRange(collection);
 
-            Accept = new DelegateCommand(() => CloseOk?.Invoke());
+            Accept = new DelegateCommand(() =>
+            {
+                if (SelectedItem == null && FilteredItems.Count > 0)
+                    SelectedItem = FilteredItems[0];
+                CloseOk?.Invoke();
+            }, () => SelectedItem != null || FilteredItems.Count == 1);
+            Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
+
+            FilteredItems.ObserveCollectionChanges().Subscribe(_ => Accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => Accept.RaiseCanExecuteChanged());
         }
 
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
         public ReadOnlyObservableCollection<T> FilteredItems { get; }
 
-        public T? SelectedItem { get; set; }
+        private T? selectedItem;
+        public T? SelectedItem
+        {
+            get => selectedItem;
+            set => SetProperty(ref selectedItem, value);
+        }
 
         public string SearchText
         {
@@ -76,8 +91,8 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
             return res;
         }
 
-        public ICommand Accept { get; }
-        
+        public DelegateCommand Accept { get; }
+        public ICommand Cancel { get; }
         public int DesiredWidth => 380;
         public int DesiredHeight => 500;
         public string Title => "Picker";

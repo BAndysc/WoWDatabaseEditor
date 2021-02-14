@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Threading.Tasks;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 
@@ -8,9 +9,9 @@ namespace WoWDatabaseEditorCore.WPF.Services
     [SingleInstance]
     public class ClipboardService : IClipboardService
     {
-        public string GetText()
+        public Task<string> GetText()
         {
-            return Clipboard.GetText();
+            return Task.FromResult(Clipboard.GetText());
         }
 
         public void SetText(string text)

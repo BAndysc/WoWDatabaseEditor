@@ -1,0 +1,32 @@
+<Styles xmlns="https://github.com/avaloniaui">
+    <Style Selector="ComboBoxItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="6"/>
+    </Style>
+    
+    <Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource MenuItem.Background.PointerOver}"/>
+    </Style>
+    <Style Selector="ComboBoxItem:pointerover TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MenuItem.Foreground.PointerOver}"/>
+    </Style>
+    
+    <Style Selector="ComboBoxItem:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource MenuItem.Background.PointerOver}"/>
+    </Style>
+    <Style Selector="ComboBoxItem:selected TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MenuItem.Foreground.PointerOver}"/>
+    </Style>
+    
+    <Style Selector="ComboBoxItem:selected:focus /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource MenuItem.Background.PointerOver}"/>
+    </Style>
+    
+    <Style Selector="ComboBoxItem:selected:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource MenuItem.Background.PointerOver}"/>
+    </Style>
+
+    <Style Selector="ComboBoxItem:selected:focus:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource MenuItem.Background.PointerOver}"/>
+    </Style>
+</Styles>

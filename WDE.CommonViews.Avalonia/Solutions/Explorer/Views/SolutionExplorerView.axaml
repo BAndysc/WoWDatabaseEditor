@@ -1,14 +1,41 @@
-﻿<UserControl x:Class="WDE.Solutions.Explorer.Views.SolutionExplorerView"
+﻿<components:ToolView x:Class="WDE.Solutions.Explorer.Views.SolutionExplorerView"
              
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:prism="http://prismlibrary.com/"
-             xmlns:views="clr-namespace:WDE.Solutions.Explorer.Views"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             xmlns="https://github.com/avaloniaui"
-             prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:prism="http://prismlibrary.com/"
+          xmlns:views="clr-namespace:WDE.Solutions.Explorer.Views"
+          xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+          xmlns:system="clr-namespace:System;assembly=System.Runtime"
+          xmlns="https://github.com/avaloniaui"
+          xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+          prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
     
-    <UserControl.Resources>
+    <components:ToolView.Icon>
+        <controls:MonochromaticIcon Stretch="Fill" Name="That">
+            <Image.Source>
+                <DrawingImage>
+                    <DrawingImage.Drawing>
+                        <DrawingGroup>
+                            <DrawingGroup Opacity="1">
+                                <GeometryDrawing Brush="{Binding #That.Fill}" Geometry="F0 M32,32z M0,0z M29.512,12.539L2.472,12.499 2.409,25.54 4.504,27.578 27.807,27.525 29.554,25.668 29.512,12.539z">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #That.BorderBrush}" Thickness="1" LineJoin="Bevel" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                                <GeometryDrawing Brush="{Binding #That.Fill}" Geometry="F0 M32,32z M0,0z M2.491,11.465L2.491,7.168C2.491,7.168,3.402,5.258,5.258,5.258L8.48,5.258C10.497,5.258,10.666,7.406,13.852,7.406L28.372,7.452 29.447,8.526 29.447,11.749">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #That.BorderBrush}" Thickness="1" LineJoin="Bevel" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingGroup>
+                    </DrawingImage.Drawing>
+                </DrawingImage>
+            </Image.Source>
+        </controls:MonochromaticIcon>
+    </components:ToolView.Icon>
+    
+    <components:ToolView.Resources>
         <DrawingImage x:Key="Folder">
             <DrawingImage.Drawing>
                 <DrawingGroup>
@@ -21,60 +48,58 @@
             <DrawingImage.Drawing>
                 <DrawingGroup >
                     <GeometryDrawing Brush="#FF575757"
-                                     Geometry="F0 M16,16z M0,0z M14,4L14,13.913 13,15 3,15 2,14 2,2 3,1 12,1 14,4z M3.394,1.95L2.95,2.394 2.95,13.606 3.394,14.05 12.583,14.05 13.05,13.542 13.05,4.288 11.492,1.95 3.394,1.95z" />
-                    <GeometryDrawing Brush="#FF575757" Geometry="F0 M16,16z M0,0z M11,1L11,4 14,4 11,1z" />
+                                     Geometry="F1 M16,16z M0,0z M14,4L14,13.913 13,15 3,15 2,14 2,2 3,1 12,1 14,4z M3.394,1.95L2.95,2.394 2.95,13.606 3.394,14.05 12.583,14.05 13.05,13.542 13.05,4.288 11.492,1.95 3.394,1.95z" />
+                    <GeometryDrawing Brush="#FF575757" Geometry="F1 M16,16z M0,0z M11,1L11,4 14,4 11,1z" />
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
-    </UserControl.Resources>
+    </components:ToolView.Resources>
     
     <TreeView x:Name="tv" Margin="0" Items="{Binding Root}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" DoubleTapped="Tv_OnDoubleTapped">
-            <TreeView.Styles>
-                <Style Selector="ItemsPresenter">
-                    <Setter Property="Margin" Value="0"></Setter>
-                </Style>
-                <Style Selector="TreeViewItem">
-                    <Setter Property="Padding" Value="8"></Setter>
-                    <Setter Property="ContextMenu">
-                        <Setter.Value>
-                            <ContextMenu>
-                                <MenuItem Header="Add"
-                                          Command="{Binding #tv.DataContext.AddItem}"
-                                          IsEnabled="{Binding IsContainer}" />
-                                <MenuItem Header="Remove"
-                                          Command="{Binding #tv.DataContext.RemoveItem}" />
-                                <Separator />
-                                <MenuItem Header="Generate SQL"
-                                          Command="{Binding #tv.DataContext.GenerateSQL}"
-                                          IsEnabled="{Binding IsExportable}" />
-                            </ContextMenu>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </TreeView.Styles>
-            <TreeView.DataTemplates>
-                <TreeDataTemplate ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Source="{StaticResource File}">
-                            <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding IsContainer}" ComparisonCondition="Equal" Value="True">
-                                    <ChangePropertyAction TargetObject="{Binding #Image}" PropertyName="Source" Value="{StaticResource Folder}"/>
-                                </DataTriggerBehavior>
-                            </Interaction.Behaviors>
-                        </Image>
-                        <TextBlock Padding="2" VerticalAlignment="Center" Text="{Binding ExtraId}"
-                                   FontFamily="Consolas" Background="{DynamicResource ContentSpecialBackground}"
-                                   Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
-                            <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding ExtraId}" ComparisonCondition="Equal" Value="{x:Null}">
-                                    <ChangePropertyAction TargetObject="TextBlock" PropertyName="IsVisible" Value="False"/>
-                                </DataTriggerBehavior>
-                            </Interaction.Behaviors>
-                        </TextBlock>
-                        <TextBlock Margin="0,0,0,0" Padding="0,0,0,0" VerticalAlignment="Center"
-                                   Text="{Binding Name}" />
-                    </StackPanel>
-                </TreeDataTemplate>
-            </TreeView.DataTemplates>
-        </TreeView>
-</UserControl>
+        <TreeView.Styles>
+            <Style Selector="TreeViewItem">
+                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                <Setter Property="ContextMenu">
+                    <Setter.Value>
+                        <ContextMenu>
+                            <MenuItem Header="Add"
+                                      Command="{Binding #tv.DataContext.AddItem}"
+                                      IsEnabled="{Binding IsContainer}" />
+                            <MenuItem Header="Remove"
+                                      Command="{Binding #tv.DataContext.RemoveItem}" />
+                            <Separator />
+                            <MenuItem Header="Generate SQL"
+                                      Command="{Binding #tv.DataContext.GenerateSQL}"
+                                      IsEnabled="{Binding IsExportable}" />
+                        </ContextMenu>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </TreeView.Styles>
+        <TreeView.DataTemplates>
+            <TreeDataTemplate ItemsSource="{Binding Children}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Source="{StaticResource File}">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{Binding IsContainer}" ComparisonCondition="Equal" Value="True">
+                                <ChangePropertyAction TargetObject="{Binding #Image}" PropertyName="Source" Value="{StaticResource Folder}"/>
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Image>
+                    <TextBlock Padding="2" VerticalAlignment="Center" Text="{Binding ExtraId}"
+                               FontFamily="Consolas" Background="{DynamicResource ContentSpecialBackground}"
+                               Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{Binding ExtraId}" ComparisonCondition="Equal" Value="{x:Null}">
+                                <ChangePropertyAction TargetObject="TextBlock" PropertyName="IsVisible" Value="False"/>
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </TextBlock>
+                    <TextBlock Margin="0,0,0,0" Padding="0,0,0,0" VerticalAlignment="Center"
+                               Text="{Binding Name}" />
+                </StackPanel>
+            </TreeDataTemplate>
+        </TreeView.DataTemplates>
+    </TreeView>
+</components:ToolView>

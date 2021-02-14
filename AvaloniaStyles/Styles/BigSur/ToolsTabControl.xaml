@@ -1,0 +1,101 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+        
+    <Style Selector="controls|ToolsTabControl">
+        <Setter Property="ItemTemplate">
+            <DataTemplate>
+                <ContentPresenter 
+                    Content="{Binding Path=(controls:ToolsTabControl.AttachedView).Icon, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}}"
+                    Width="16" Height="16" />
+            </DataTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel>
+                    <Border 
+                        DockPanel.Dock="Top"
+                        BorderThickness="0,0,0,1" 
+                        BorderBrush="{DynamicResource TitleBarSeparatorBrush}">
+                        <ItemsPresenter
+                            Name="PART_ItemsPresenter"
+                            Items="{TemplateBinding Items}"
+                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                            ItemTemplate="{TemplateBinding ItemTemplate}">
+                        </ItemsPresenter>
+                    </Border>
+                    <ContentPresenter
+                        Name="PART_SelectedContentHost"
+                        Margin="{TemplateBinding Padding}"
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                        Content="{Binding ActiveView, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                    </ContentPresenter>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|ToolsTabControl StackPanel#ToolsList">
+        <Setter Property="Margin" Value="6" />
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="Spacing" Value="14" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="controls|ToolsTabControl TabItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MainColorForeground}"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ContentPresenter
+                    Name="PART_ContentPresenter"
+                    ContentTemplate="{TemplateBinding HeaderTemplate}"
+                    Content="{TemplateBinding Header}"/>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|ToolsTabControl TabItem controls|MonochromaticIcon">
+        <Setter Property="Fill" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource MainColorForeground}"/>
+        <Setter Property="AlternativeBorderBrush" Value="{DynamicResource MainColorForeground}"/>
+        <Setter Property="AlternativeBorderBrush2" Value="{DynamicResource MainColorForeground}"/>
+    </Style>
+    
+    <Style Selector="controls|ToolsTabControl TabItem:pointerover controls|MonochromaticIcon">
+        <Setter Property="Fill" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+        <Setter Property="AlternativeBorderBrush" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+        <Setter Property="AlternativeBorderBrush2" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    </Style>
+    <Style Selector="controls|ToolsTabControl TabItem:pointerover controls|MonochromaticIcon">
+        <Setter Property="Fill" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+        <Setter Property="AlternativeBorderBrush" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+        <Setter Property="AlternativeBorderBrush2" Value="{DynamicResource ThemeControlHighlightMidBrush}"/>
+    </Style>
+    <Style Selector="controls|ToolsTabControl TabItem:selected controls|MonochromaticIcon">
+        <Setter Property="Fill" Value="{DynamicResource ThemeAccentBrush4}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="AlternativeBorderBrush" Value="White"/>
+        <Setter Property="AlternativeBorderBrush2" Value="{DynamicResource ThemeAccentBrush4}"/>
+    </Style>
+    <Style Selector="controls|ToolsTabControl TabItem:selected:focus controls|MonochromaticIcon">
+        <Setter Property="Fill" Value="{DynamicResource ThemeAccentBrush3}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="AlternativeBorderBrush" Value="White"/>
+        <Setter Property="AlternativeBorderBrush2" Value="{DynamicResource ThemeAccentBrush3}"/>
+    </Style>
+    <Style Selector="controls|ToolsTabControl TabItem:selected:pointerover controls|MonochromaticIcon">
+        <Setter Property="Fill" Value="{DynamicResource ThemeAccentBrush3}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="AlternativeBorderBrush" Value="White"/>
+        <Setter Property="AlternativeBorderBrush2" Value="{DynamicResource ThemeAccentBrush3}"/>
+    </Style>
+    <Style Selector="controls|ToolsTabControl TabItem:selected:focus:pointerover controls|MonochromaticIcon">
+        <Setter Property="Fill" Value="{DynamicResource ThemeAccentBrush2}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="AlternativeBorderBrush" Value="White"/>
+        <Setter Property="AlternativeBorderBrush2" Value="{DynamicResource ThemeAccentBrush2}"/>
+    </Style>
+</Styles>

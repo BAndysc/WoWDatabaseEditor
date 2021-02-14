@@ -417,12 +417,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 CopyCommand.Execute();
                 DeleteSelected.Execute();
             });
-            PasteCommand = new DelegateCommand(() =>
+            PasteCommand = new DelegateCommand(async () =>
             {
-                if (string.IsNullOrEmpty(clipboard.GetText()))
+                if (string.IsNullOrEmpty(await clipboard.GetText()))
                     return;
                 
-                var content = clipboard.GetText() ?? "";
+                var content = await clipboard.GetText() ?? "";
                 List<IConditionLine> conditions = null;
                 
                 if (content.StartsWith("conditions:"))

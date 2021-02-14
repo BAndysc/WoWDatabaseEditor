@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing.ParametersEditView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
+             xmlns:extendedTextBlock="clr-namespace:WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock"
+             mvvm:ViewModelLocator.AutoWireViewModel="False">
+    
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <extendedTextBlock:FormattedTextBlock
+            IsHitTestVisible="False"
+            Text="{Binding Readable}"
+            Margin="0,0,0,10" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Grid.Row="1">
+            <ItemsPresenter Focusable="False" Items="{Binding FilteredParameters}" x:Name="Parameters">
+                <ItemsPresenter.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Key}" FontWeight="Thin" FontSize="17" />
+                            <ItemsPresenter Items="{Binding}" Margin="10,0,0,16">
+                                <ItemsPresenter.ItemTemplate>
+                                    <DataTemplate>
+                                        <editing:ParameterEditorView Margin="0,0,0,5" />
+                                    </DataTemplate>
+                                </ItemsPresenter.ItemTemplate>
+                            </ItemsPresenter>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsPresenter.ItemTemplate>
+            </ItemsPresenter>
+        </ScrollViewer>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding Cancel}"  Content="Cancel" />
+            <Button Command="{Binding Accept}" Grid.Column="2" Content="Ok" />
+            <!-- <Grid.Style> -->
+            <!--     <Style TargetType="Grid"> -->
+            <!--         <Style.Triggers> -->
+            <!--             <DataTrigger Binding="{Binding ShowCloseButtons}" Value="False"> -->
+            <!--                 <Setter Property="Visibility" Value="Collapsed"></Setter> -->
+            <!--             </DataTrigger> -->
+            <!--         </Style.Triggers> -->
+            <!--     </Style> -->
+            <!-- </Grid.Style> -->
+        </Grid>
+    </Grid>
+</UserControl>

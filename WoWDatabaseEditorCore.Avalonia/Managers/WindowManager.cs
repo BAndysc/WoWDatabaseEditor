@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Views;
@@ -24,6 +25,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             view.Width = viewModel.DesiredWidth;
             view.DataContext = viewModel;
             return await view.ShowDialog<bool>(mainWindow.Value);
+        }
+
+        public Task<string> ShowFolderPickerDialog(string defaultDirectory)
+        {
+            return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(mainWindow.Value);
         }
     }
 }

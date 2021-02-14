@@ -1,0 +1,14 @@
+<Styles xmlns="https://github.com/avaloniaui">
+    <Style Selector="Button.Toggle /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="0" />
+        <!-- no double border -->
+        <Setter Property="BorderThickness" Value="0.5,0.5,0,0.5" />
+    </Style>
+    <Style Selector="Button.Toggle.Left /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="4,0,0,4" />
+    </Style>
+    <Style Selector="Button.Toggle.Right /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="0,4,4,0" />
+        <Setter Property="BorderThickness" Value="0.5" />
+    </Style>
+</Styles>

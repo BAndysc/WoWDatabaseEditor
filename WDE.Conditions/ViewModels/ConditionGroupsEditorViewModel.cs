@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Mvvm;
 using Prism.Commands;
 using WDE.Common.Annotations;
@@ -39,10 +40,10 @@ namespace WDE.Conditions.ViewModels
             {
                 taskRunner.ScheduleTask("Saving condition groups", SaveGroupsToFile);
             }, () => IsModified);
-            AddGroup = new DelegateCommand(AddGroupToSource);
+            AddGroup = new AsyncCommand(AddGroupToSource);
             DeleteItem = new DelegateCommand<object>(DeleteItemFromSource);
-            AddMember = new DelegateCommand<ConditionGroupsEditorData>(AddItemToGroup);
-            EditItem = new DelegateCommand<ConditionGroupsEditorData>(EditSourceItem);
+            AddMember = new AsyncCommand<ConditionGroupsEditorData>(AddItemToGroup);
+            EditItem = new AsyncCommand<ConditionGroupsEditorData>(EditSourceItem);
             // history setup
             historyHandler = new ConditionGroupsEditorHistoryHandler(SourceItems);
             History = historyCreator();
@@ -59,17 +60,16 @@ namespace WDE.Conditions.ViewModels
         
         public ObservableCollection<ConditionGroupsEditorData> SourceItems { get; private set; }
 
-        public DelegateCommand AddGroup { get; }
+        public AsyncCommand AddGroup { get; }
         public DelegateCommand<object> DeleteItem { get; }
-        public DelegateCommand<ConditionGroupsEditorData> AddMember { get; }
-        public DelegateCommand<ConditionGroupsEditorData> EditItem { get; }
+        public AsyncCommand<ConditionGroupsEditorData> AddMember { get; }
+        public AsyncCommand<ConditionGroupsEditorData> EditItem { get; }
         private readonly DelegateCommand undoCommand;
         private readonly DelegateCommand redoCommand;
         
-        public void AddGroupToSource()
+        public async Task AddGroupToSource()
         {
-            var result = "";
-            OpenNameEditingWindow("", out result);
+            var result = await OpenNameEditingWindow("");
             if (!string.IsNullOrWhiteSpace(result))
                 SourceItems.Add(new ConditionGroupsEditorData(result));
         }
@@ -84,39 +84,37 @@ namespace WDE.Conditions.ViewModels
             }
         }
 
-        private void AddItemToGroup(ConditionGroupsEditorData data)
+        private async Task AddItemToGroup(ConditionGroupsEditorData data)
         {
-            var result = "";
-            OpenNameEditingWindow("CONDITION_", out result);
+            var result = await OpenNameEditingWindow("CONDITION_");
             if (!string.IsNullOrWhiteSpace(result))
                 data.Members.Add(new ConditionGroupsEditorDataNode(result, data));
         }
 
-        private void EditSourceItem(ConditionGroupsEditorData data)
+        private async Task EditSourceItem(ConditionGroupsEditorData data)
         {
-            var result = data.Name;
-            OpenNameEditingWindow(data.Name, out result);
+            var result = await OpenNameEditingWindow(data.Name);
             if (!string.IsNullOrEmpty(result))
                 data.Name = result;
         }
 
-        private void OpenNameEditingWindow(string source, out string name)
+        private async Task<string?> OpenNameEditingWindow(string source)
         {
             var vm = new ConditionGroupsInputViewModel(source);
-            name = "";
-            if (windowManager.ShowDialog(vm))
+            if (await windowManager.ShowDialog(vm))
             {
                 if (!string.IsNullOrWhiteSpace(vm.Name))
-                    name = vm.Name;
+                    return vm.Name;
                 else
                 {
-                    messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
+                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
                         .SetMainInstruction($"Group name cannot be empty!")
                         .SetIcon(MessageBoxIcon.Error)
                         .WithOkButton(true)
                         .Build());
                 }
             }
+            return null;
         }
 
         private async Task SaveGroupsToFile()
@@ -146,7 +144,7 @@ namespace WDE.Conditions.ViewModels
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
         public ICommand Save { get; }
-        public ICommand CloseCommand { get; set; } = null;
+        public IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
 

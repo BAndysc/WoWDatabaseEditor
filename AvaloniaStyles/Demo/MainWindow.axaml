@@ -1,0 +1,95 @@
+<controls:ExtendedWindow xmlns="https://github.com/avaloniaui"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+          mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+          SizeToContent="Manual"
+          x:Class="AvaloniaStyles.Demo.MainWindow"
+          Title="Demo">
+    <controls:ExtendedWindow.SideBar>
+        <controls:ToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
+            <controls:ToolsTabControl.ItemTemplate>
+                <DataTemplate>
+                    <ContentPresenter 
+                        Content="{Binding Path=(controls:ToolsTabControl.AttachedView).Icon, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}}"
+                        Width="16" Height="16" />
+                </DataTemplate>
+            </controls:ToolsTabControl.ItemTemplate>
+        </controls:ToolsTabControl>
+    </controls:ExtendedWindow.SideBar>
+    
+    <controls:ExtendedWindow.ToolBar>
+        <controls:ToolBar>
+            <controls:ToolBar.LeftContent>
+                <StackPanel Orientation="Horizontal">
+                    <Button>Play</Button>
+                    <Button>Pause</Button>
+                </StackPanel>
+            </controls:ToolBar.LeftContent>
+            <controls:ToolBar.RightContent>
+                <StackPanel Orientation="Horizontal">
+                    <Button>
+                        <Border Background="Transparent"
+                                Width="12"
+                                Height="12"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Path Fill="{Binding $parent[Button].Foreground}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Data="M 0 0 L 6 3.5 L 0 7 Z"/>
+                        </Border>
+                    </Button>
+                    <Button>SQL</Button>
+                </StackPanel>
+            </controls:ToolBar.RightContent>
+            <controls:ToolBar.Content>
+                <Button>Search</Button>
+            </controls:ToolBar.Content>
+        </controls:ToolBar>
+    </controls:ExtendedWindow.ToolBar>
+    
+    <controls:ExtendedWindow.StatusBar>
+        <TextBlock>Window loaded</TextBlock>
+    </controls:ExtendedWindow.StatusBar>
+    
+    <controls:ExtendedWindow.TabStrip>
+        <TabStrip DockPanel.Dock="Top" 
+                  SelectedItem="{Binding ActiveTab}"
+                  Items="{Binding Tabs}">
+            <TabStrip.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True">
+                        <Button DockPanel.Dock="Left" Classes="closeButton">Close</Button>
+                        <TextBlock Text="{Binding }" />
+                    </DockPanel>
+                </DataTemplate>
+            </TabStrip.ItemTemplate>
+        </TabStrip>
+    </controls:ExtendedWindow.TabStrip>
+    
+    <StackPanel Margin="10" Spacing="10" Orientation="Vertical" Background="{DynamicResource MainColorBackground}">
+        <Button>Button</Button>
+        <Button IsEnabled="False">Disabled button</Button>
+        <CheckBox>Checkbox</CheckBox>
+        <CheckBox IsChecked="True">Checked</CheckBox>
+        <CheckBox IsChecked="{x:Null}">Indetermine</CheckBox>
+        <RadioButton>Radio</RadioButton>
+        <RadioButton IsChecked="True">Checked radio</RadioButton>
+        <TextBox Watermark="Textbox" />
+        <ComboBox Items="{Binding Themes}" SelectedItem="{Binding CurrentTheme, Mode=TwoWay}" />
+        <ListBox>
+            <ListBoxItem>A</ListBoxItem>
+            <ListBoxItem>B</ListBoxItem>
+            <ListBoxItem>C</ListBoxItem>
+            <ListBoxItem>D</ListBoxItem>
+        </ListBox>
+        <DataGrid AutoGenerateColumns="True" 
+                  CanUserResizeColumns="True"
+                  SelectionMode="Extended"
+                  Items="{Binding Items}">
+        </DataGrid>
+        <Button Click="ShowDemoDialog">Show Modal Dialog</Button>
+    </StackPanel>
+</controls:ExtendedWindow>

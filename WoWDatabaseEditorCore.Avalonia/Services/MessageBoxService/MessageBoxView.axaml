@@ -1,29 +1,29 @@
-<Window x:Class="WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService.MessageBoxView"
+<controls:BaseMessageBoxWindow x:Class="WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService.MessageBoxView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.Avalonia.Extensions"
-             Title="{Binding Title}"
+             Title="{Binding Model.MainInstruction}"
+             Message="{Binding Model.Content}"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:messageBoxService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              CanResize="False"
              WindowStartupLocation="CenterOwner"
              d:DataContext="{d:DesignInstance messageBoxService:MessageBoxViewModelDesignModel}"
              Background="{DynamicResource MenuDefaultBackground}">
-    <Grid Margin="12" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*">
-        <TextBlock TextWrapping="WrapWithOverflow" FontSize="24" Margin="0,0,0,6" Text="{Binding Model.MainInstruction}"></TextBlock>
-        <TextBlock TextWrapping="WrapWithOverflow" Margin="0,0,0,6" Grid.Row="1" Text="{Binding Model.Content}"></TextBlock>
-        <ItemsPresenter Grid.Row="2" Items="{Binding Buttons}">
-            <ItemsPresenter.ItemTemplate>
-                <DataTemplate>
-                    <Button MinWidth="80" Content="{Binding Name}" Command="{Binding Command}"></Button>
-                </DataTemplate>
-            </ItemsPresenter.ItemTemplate>
-            <ItemsPresenter.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right"/>
-                </ItemsPanelTemplate>
-            </ItemsPresenter.ItemsPanel>
-        </ItemsPresenter>
-    </Grid>
-</Window>
+    <controls:BaseMessageBoxWindow.Image>
+        <Image Source="../../Icon.png"></Image>
+    </controls:BaseMessageBoxWindow.Image>
+    <ItemsPresenter Items="{Binding Buttons}">
+        <ItemsPresenter.ItemTemplate>
+            <DataTemplate>
+                <Button Content="{Binding Name}" Command="{Binding Command}"></Button>
+            </DataTemplate>
+        </ItemsPresenter.ItemTemplate>
+        <ItemsPresenter.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel />
+            </ItemsPanelTemplate>
+        </ItemsPresenter.ItemsPanel>
+    </ItemsPresenter>
+</controls:BaseMessageBoxWindow>

@@ -16,7 +16,9 @@
                   Items="{Binding ItemPrototypes}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   DoubleTapped="InputElement_OnDoubleTapped"
-                  KeyDown="UIElement_OnKeyDown">
+                  KeyDown="UIElement_OnKeyDown"
+                  Name="ItemsList"
+                  >
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

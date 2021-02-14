@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using WDE.Common.Avalonia.Components;
 using WDE.Solutions.Explorer.ViewModels;
 
 namespace WDE.Solutions.Explorer.Views
@@ -9,7 +10,7 @@ namespace WDE.Solutions.Explorer.Views
     /// <summary>
     ///     Interaction logic for SolutionExplorerView
     /// </summary>
-    public class SolutionExplorerView : UserControl
+    public class SolutionExplorerView : ToolView 
     {
         public SolutionExplorerView()
         {

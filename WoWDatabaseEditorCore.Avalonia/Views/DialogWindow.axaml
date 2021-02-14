@@ -1,12 +1,21 @@
-<Window x:Class="WoWDatabaseEditorCore.Avalonia.Views.DialogWindow"
+<controls:ExtendedWindow x:Class="WoWDatabaseEditorCore.Avalonia.Views.DialogWindow"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              WindowStartupLocation="CenterOwner"
              ShowInTaskbar="False"
              CanResize="{Binding Resizeable}"
+             utils:ViewBind.Model="{Binding}"
+             Name="ThisWindow"
              prism:ViewModelLocator.AutoWireViewModel="False">
-    <ContentControl utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
-                            VerticalContentAlignment="Stretch" />
-</Window>
+    <controls:ExtendedWindow.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding Cancel}" />
+        <KeyBinding Gesture="Enter" Command="{Binding Accept}" />
+    </controls:ExtendedWindow.KeyBindings>
+    <controls:ExtendedWindow.ToolBar>
+        <controls:ToolBar Content="{Binding #ThisWindow.Content.ToolBar}">
+        </controls:ToolBar>
+    </controls:ExtendedWindow.ToolBar>
+</controls:ExtendedWindow>

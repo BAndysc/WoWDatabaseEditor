@@ -1,0 +1,45 @@
+﻿<components:ToolView x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.ToolSmartEditorView"
+          xmlns="https://github.com/avaloniaui"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mvvm="http://prismlibrary.com/"
+          xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+          xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+          mvvm:ViewModelLocator.AutoWireViewModel="False"
+          mc:Ignorable="d"
+          d:DesignHeight="300" d:DesignWidth="300">
+    
+    <components:ToolView.Icon>
+        <controls:MonochromaticIcon Name="Icon">
+            <controls:MonochromaticIcon.Source>
+                <DrawingImage>
+                    <DrawingImage.Drawing>
+                        <DrawingGroup>
+                            <DrawingGroup Opacity="1">
+                                <GeometryDrawing Geometry="F0 M32,32z M0,0z M17.76,4.524L5.544,4.442 5.541,27.528 25.499,27.516 25.54,14.483">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #Icon.AlternativeBorderBrush2}" Thickness="1.1" LineJoin="Round" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                                <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M32,32z M0,0z M23.746,4.927L15.997,12.676 14.364,16.849 18.166,15.585 26.362,7.389 23.746,4.927z">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="1.1" LineJoin="Round" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                                <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M32,32z M0,0z M26.863,6.865L28.572,5.156 26,2.583 24.29,4.292">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="1.1" LineJoin="Round" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingGroup>
+                    </DrawingImage.Drawing>
+                </DrawingImage>
+            </controls:MonochromaticIcon.Source>
+        </controls:MonochromaticIcon>
+    </components:ToolView.Icon>
+    
+    <ContentPresenter DataContext="{Binding EditorViewModel}" utils:ViewBind.Model="{Binding}" />
+</components:ToolView>

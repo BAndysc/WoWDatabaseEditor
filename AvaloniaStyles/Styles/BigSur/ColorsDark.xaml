@@ -1,0 +1,118 @@
+<Style xmlns="https://github.com/avaloniaui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:sys="clr-namespace:System;assembly=netstandard">
+    <Style.Resources>
+        <SolidColorBrush x:Key="ThemeControlHighlightMidForeground" Color="White" />
+        <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="#2566D8" />
+        <SolidColorBrush x:Key="ThemeAccentBrush4" Color="#215CC3" />
+        <SolidColorBrush x:Key="ThemeAccentBrush3" Color="#276BE2" />
+        <SolidColorBrush x:Key="ThemeAccentBrush2" Color="#276BE2" />
+        
+        <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#1E1E20" />
+        <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#565656" />
+        <Thickness x:Key="BorderThickness">0.5</Thickness>
+        
+        <SolidColorBrush x:Key="ThemeForegroundBrush" Color="White" />
+        <SolidColorBrush x:Key="MainColorBackground" Color="#303032" />
+        <SolidColorBrush x:Key="ContentBackground" Color="#1E1E1E" />
+        <SolidColorBrush x:Key="ContentAlternateRowBackground" Color="#292929" />
+        <SolidColorBrush x:Key="MainColorForeground" Color="#EBEBEB" />
+        <!-- generic content like button or textarea -->
+        <SolidColorBrush x:Key="RaisedContentBorderBrush" Color="#181818" />
+        
+        <SolidColorBrush x:Key="RaisedContentBorderBrush.Accent" Color="#232325" />
+        
+        <LinearGradientBrush x:Key="RaisedContentBackground" StartPoint="0 0" EndPoint="0 1">
+            <GradientStops>
+                <GradientStop Color="#787878" Offset="0" />
+                <GradientStop Color="#565656" Offset="1"/>  
+            </GradientStops>
+        </LinearGradientBrush>
+        
+        <LinearGradientBrush x:Key="RaisedContentBackground.Accent" StartPoint="0% 0%" EndPoint="0% 100%">
+            <GradientStops>
+                <GradientStop Color="#7BBBF2" Offset="0" />
+                <GradientStop Color="#4E9EEB" Offset="0.05" /> 
+                <GradientStop Color="#4792DF" Offset="1" />
+            </GradientStops>
+        </LinearGradientBrush>
+        
+        <SolidColorBrush x:Key="RaisedContentForeground.Accent" Color="#E4F0FB" />
+        
+        <!-- button -->
+        <SolidColorBrush x:Key="ButtonForeground" Color="#E6E6E6" />
+        
+        <!-- title bar -->
+        <SolidColorBrush x:Key="TitleBarSeparatorBrush" Color="Black" />
+        <SolidColorBrush x:Key="TitleBarHighlight" Color="#4B4B4B" /> <!-- glow simulation on the top of titlebar -->
+        <SolidColorBrush x:Key="TitleBarBackground" Color="#363636" />
+        
+        <!-- textbox -->
+        <SolidColorBrush x:Key="TextBoxForeground" Color="White" />
+        <SolidColorBrush x:Key="TextBoxWatermarkForeground" Color="#909090" />
+        
+        <!-- tabstrip -->
+        <SolidColorBrush x:Key="TabStripBackground" Color="#262626" />
+        <SolidColorBrush x:Key="TabStripForeground" Color="White" />
+        <SolidColorBrush x:Key="TabStripBorderBrush" Color="#5C5C5C" />
+        <SolidColorBrush x:Key="TabStripBackgroundPointerOver" Color="#4A4A4A" />
+        <SolidColorBrush x:Key="TabStripBackgroundActive" Color="#363636" />
+        
+        <!-- sidebar-->
+        <SolidColorBrush x:Key="SideBarBackground" Color="#BE363636"/>
+        
+        <!-- treeview -->
+        <SolidColorBrush x:Key="TreeViewItem.Background.PointerOver" Color="#10FFFFFF" />
+        <SolidColorBrush x:Key="TreeViewItem.BorderBrush.PointerOver" Color="#20FFFFFF" />
+
+        <SolidColorBrush x:Key="TreeViewItem.Background.Active" Color="#A055A2D5" />
+        <SolidColorBrush x:Key="TreeViewItem.BorderBrush.Active" Color="#C055A2D5" />
+
+        <SolidColorBrush x:Key="TreeViewItem.Background.Active.PointerOver" Color="#C055A2D5" />
+        <SolidColorBrush x:Key="TreeViewItem.BorderBrush.Active.PointerOver" Color="#FF55A2D5" />
+        
+        <!-- checkbox -->
+        <SolidColorBrush x:Key="CheckBox.Indeterminate.Background" Color="White" />
+        <LinearGradientBrush x:Key="CheckBox.Background" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStops>
+                <GradientStop Offset="0" Color="#666666" />
+                <GradientStop Offset="0.15" Color="#404040" />
+                <GradientStop Offset="1" Color="#5E5F5F" />
+            </GradientStops>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="CheckBox.BorderBrush" Color="#1A1A1A" />
+        <SolidColorBrush x:Key="CheckBox.BorderBrush.Checked" Color="#1A1A1A" />
+        <LinearGradientBrush x:Key="CheckBox.Background.Checked" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStops>
+                <GradientStop Offset="0" Color="#6998E8" />
+                <GradientStop Offset="0.15" Color="#2B63CC" />
+                <GradientStop Offset="1" Color="#2B63CC" />
+            </GradientStops>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="CheckBox.Background.Pressed" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStops>
+                <GradientStop Offset="0" Color="#666666" />
+                <GradientStop Offset="0.15" Color="#5F5F5F" />
+                <GradientStop Offset="1" Color="#5F5F5F" />
+            </GradientStops>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="CheckBox.Background.Checked.Pressed" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStops>
+                <GradientStop Offset="0" Color="#6998E8" />
+                <GradientStop Offset="0.15" Color="#2E72FF" />
+                <GradientStop Offset="1" Color="#2E72FF" />
+            </GradientStops>
+        </LinearGradientBrush>
+        
+        <!-- menu -->
+        <SolidColorBrush x:Key="Popup.Background" Color="#5D5D5D" />
+        <SolidColorBrush x:Key="MenuItem.Background" Color="Transparent" />
+        <SolidColorBrush x:Key="MenuItem.Foreground" Color="White" />
+        <SolidColorBrush x:Key="MenuItem.Background.PointerOver" Color="#357AFF" />
+        <SolidColorBrush x:Key="MenuItem.Foreground.PointerOver" Color="White" />
+        
+        <!-- datagrid -->
+        <SolidColorBrush x:Key="DataGrid.Header.Background" Color="#404040" />
+        <SolidColorBrush x:Key="DataGrid.Header.Background.Pressed" Color="#202020" />
+    </Style.Resources>
+</Style>

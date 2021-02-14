@@ -1,5 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles;assembly=AvaloniaStyles"
              x:Class="WoWDatabaseEditorCore.Avalonia.App">
     <Application.Resources>
             <DrawingImage x:Key="StatusBarIconNotice">
@@ -40,46 +41,11 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-        
-        
-        <!-- SmartScripts -->
-        <SolidColorBrush x:Key="SmartScripts.Background" Color="#F5F6FC" />
-    
-        <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="#F5F6FC" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Border" Color="#E9EFFB" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Background" Color="#E9EFFB" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Border" Color="#F5C61F" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Background" Color="#FFF2BF" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="#282828" />
-   
-        <SolidColorBrush x:Key="SmartScripts.Parameter.Foreground" Color="#3C76BE" />
-        <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#2E8A8A" /> <!-- #378B6F-->
-    
-        <SolidColorBrush x:Key="SmartScripts.Comment.Background" Color="#E1F3C9" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Border" Color="#D1E577" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Foreground" Color="#282828" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Border" Color="#F5C61F" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Background" Color="#FFF2BF" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Selected" Color="#282828" />
-    
-        <SolidColorBrush x:Key="SmartScripts.Event.Background" Color="#F5F8FF" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Foreground" Color="#FF282828" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Border" Color="#BFCCE0" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Background" Color="#FFF5F2BF" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Foreground" Color="#FF282828" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Border" Color="#FFF5C61F" />
-    
-        <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0" />
-        <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77000000" />
-        
     </Application.Resources>
     <Application.Styles>
-        <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
-        <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
+        <avaloniaStyles:SystemTheme Mode="Auto" />
         <StyleInclude Source="avares://AvaloniaEdit/AvaloniaEdit.xaml" />
-        <!--<StyleInclude Source="avares://WDE.SmartScriptEditor/Themes/Generic.axaml"/>-->
+        <StyleInclude Source="avares://WDE.SmartScriptEditor.Avalonia/Themes/Generic.axaml"/>
         <StyleInclude Source="avares://Dock.Avalonia.Themes.Default/DefaultTheme.axaml"/>
-        <FluentTheme Mode="Light"/>
     </Application.Styles>
 </Application>

@@ -1,7 +1,12 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
+using AvaloniaStyles.Controls;
 using WDE.Common.Managers;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
@@ -9,7 +14,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     /// <summary>
     ///     Interaction logic for ModulesConfigView.xaml
     /// </summary>
-    public class DialogWindow : Window
+    public class DialogWindow : ExtendedWindow
     {
         public DialogWindow()
         {
@@ -20,6 +25,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+            //(Content as IInputElement)?.Focus();
         }
 
         protected override void OnDataContextChanged(EventArgs e)

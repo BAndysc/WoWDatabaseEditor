@@ -9,7 +9,6 @@
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Icon.ico" />
         <None Remove="Services\MessageBoxService\MessageBoxView.axaml.xml" />
     </ItemGroup>
     <ItemGroup>
@@ -48,6 +47,10 @@
         <Compile Update="Services\MessageBoxService\MessageBoxView.axaml.cs">
           <DependentUpon>MessageBoxView.axaml</DependentUpon>
         </Compile>
+        <None Remove="Icon.png" />
+        <AvaloniaResource Include="Icon.png" />
+        <None Remove="IconSmall.png" />
+        <AvaloniaResource Include="IconSmall.png" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="0.10.0" />
@@ -65,6 +68,7 @@
         <PackageReference Include="SmartFormat.NET" Version="2.5.3" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
         <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
@@ -72,6 +76,7 @@
         <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
         <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
+        <ProjectReference Include="..\WDE.SmartScriptEditor.Avalonia\WDE.SmartScriptEditor.Avalonia.csproj" />
         <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
         <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj" />
         <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
@@ -82,6 +87,31 @@
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <Resource Include="Icon.ico" />
+      <Folder Include="Extensions" />
+    </ItemGroup>
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Styles\Button.xaml" />
+      <UpToDateCheckInput Remove="Styles\CheckBox.xaml" />
+      <UpToDateCheckInput Remove="Styles\ColorsDark.xaml" />
+      <UpToDateCheckInput Remove="Styles\ColorsLight.xaml" />
+      <UpToDateCheckInput Remove="Styles\ComboBox.xaml" />
+      <UpToDateCheckInput Remove="Styles\ComboBoxItem.xaml" />
+      <UpToDateCheckInput Remove="Styles\ContextMenu.xaml" />
+      <UpToDateCheckInput Remove="Styles\GridSplitter.xaml" />
+      <UpToDateCheckInput Remove="Styles\ListBox.xaml" />
+      <UpToDateCheckInput Remove="Styles\ListBoxItem.xaml" />
+      <UpToDateCheckInput Remove="Styles\MacOS.xaml" />
+      <UpToDateCheckInput Remove="Styles\MenuItem.xaml" />
+      <UpToDateCheckInput Remove="Styles\PopupRoot.xaml" />
+      <UpToDateCheckInput Remove="Styles\RadioButton.xaml" />
+      <UpToDateCheckInput Remove="Styles\SideBar.xaml" />
+      <UpToDateCheckInput Remove="Styles\StatusBar.xaml" />
+      <UpToDateCheckInput Remove="Styles\TabStrip.xaml" />
+      <UpToDateCheckInput Remove="Styles\TextBox.xaml" />
+      <UpToDateCheckInput Remove="Styles\ToggleButton.xaml" />
+      <UpToDateCheckInput Remove="Styles\ToolsTabControl.xaml" />
+      <UpToDateCheckInput Remove="Styles\TreeView.xaml" />
+      <UpToDateCheckInput Remove="Styles\TreeViewItem.xaml" />
+      <UpToDateCheckInput Remove="Styles\Window.xaml" />
     </ItemGroup>
 </Project>

@@ -9,34 +9,24 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TabControl Items="{Binding ContainerTabItems}" SelectedItem="{Binding SelectedTabItem}"
-                    TabStripPlacement="Left">
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}">
-<!--                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsModified}">
-                                        <DataTrigger.Value><system:Boolean>True</system:Boolean></DataTrigger.Value>
-                                        <Setter Property="FontWeight" Value="Bold"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>-->
-                    </TextBlock>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <DockPanel LastChildFill="True" Margin="7,5">
-                        <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontSize="32" FontWeight="Light" />
-                        <ContentControl utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
-                                        VerticalContentAlignment="Stretch" />
-                    </DockPanel>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </TabControl>
+        <Grid ColumnDefinitions="Auto,*">
+            <ListBox Items="{Binding ContainerTabItems}" 
+                SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text="*" IsVisible="{Binding IsModified}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <DockPanel Grid.Column="1" LastChildFill="True" Margin="7,0">
+                <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedTabItem.Name}" FontSize="32" FontWeight="Light" />
+                <ContentControl DataContext="{Binding SelectedTabItem}" utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch" />
+            </DockPanel>
+        </Grid>
         <Button Margin="0,10,0,0" Content="Save" Grid.Row="1" HorizontalAlignment="Left" Width="119"
                 Command="{Binding Save}" />
     </Grid>

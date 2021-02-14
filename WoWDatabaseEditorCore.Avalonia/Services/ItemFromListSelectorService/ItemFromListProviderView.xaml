@@ -1,26 +1,36 @@
-﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService.ItemFromListProviderView"
-             xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.Avalonia.Extensions"
-        Background="{DynamicResource MenuDefaultBackground}">
-    <UserControl.Resources>
-    </UserControl.Resources>
+﻿<controls:DialogViewBase x:Class="WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService.ItemFromListProviderView"
+                         xmlns="https://github.com/avaloniaui"
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                         xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+                         xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia">
+    <controls:DialogViewBase.ToolBar>
+        <TextBox x:Name="SearchBox" 
+                 Padding="2,4" 
+                 Text="{Binding SearchText}" 
+                 Width="300" 
+                 utils:FocusUtils.FocusFirst="True"
+                 HorizontalAlignment="Right" />
+    </controls:DialogViewBase.ToolBar>
+    
     <Grid Margin="6">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        <TextBox x:Name="SearchBox" Margin="0,0,0,6" Padding="2,4" Text="{Binding SearchText}" />
         <DataGrid 
-                extensions:DataGridColumns.ColumnsSource="{Binding  Columns}"
+                utils:DataGridColumns.ColumnsSource="{Binding  Columns}"
                 x:Name="ListView" 
                 SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
-                Items="{Binding FilteredItems}" Grid.Row="1" Margin="0,0,0,6"
+                Items="{Binding FilteredItems}" Margin="0,0,0,6"
                 IsVisible="{Binding ShowItemsList}">
+            
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
         </DataGrid>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="80" />
@@ -28,4 +38,4 @@
             <Button Command="{Binding Accept}" Grid.Column="1" Content="Ok" />
         </Grid>
     </Grid>
-</UserControl>
+</controls:DialogViewBase>

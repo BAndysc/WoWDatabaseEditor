@@ -111,6 +111,7 @@
         <Border Grid.Row="1" Grid.ColumnSpan="2"  
                 Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
                 BorderBrush="#828790" 
+                Margin="0,6,0,6"
                 BorderThickness="1">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding FilteredItems}">
@@ -171,68 +172,6 @@
                 </ItemsControl>
             </ScrollViewer>
         </Border>
-        
-        <!--<ListView x:Name="Items"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-                      Margin="0,6,0,6" Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{Binding FilteredItems}">
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel IsItemsHost="True" />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.HeaderTemplate>
-                        <DataTemplate>
-                            <Grid VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="15" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Rectangle Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
-                                <TextBlock Grid.Column="1" Text="{Binding Name}" Padding="3" FontWeight="Bold" 
-                                           Foreground="#FF226E8B" Margin="0,5,0,0" />
-                                <Rectangle Grid.Column="2" Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
-                            </Grid>
-                        </DataTemplate>
-                    </GroupStyle.HeaderTemplate>
-                </GroupStyle>
-            </ListView.GroupStyle>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal" MouseDown="UIElement_OnMouseDown">
-                        <Image Margin="0,0,4,0">
-                            <Image.Style>
-                                <Style TargetType="Image">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsTimed}">
-                                            <DataTrigger.Value>
-                                                <system:Boolean>True</system:Boolean>
-                                            </DataTrigger.Value>
-                                            <Setter Property="Source" Value="{StaticResource timedIcon}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                    <Setter Property="Source" Value="{StaticResource cogIcon}" />
-                                </Style>
-                            </Image.Style>
-                        </Image>
-                        <TextBlock Text="{Binding Name}" Width="140"
-                                   Foreground="{DynamicResource SmartScripts.Event.Foreground}">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Deprecated}" Value="true">
-                                            <Setter Property="Foreground" Value="Gray" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>-->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80" />

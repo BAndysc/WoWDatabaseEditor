@@ -2,6 +2,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Logging;
 using Avalonia.ReactiveUI;
 
 namespace WoWDatabaseEditorCore.Avalonia
@@ -18,8 +19,8 @@ namespace WoWDatabaseEditorCore.Avalonia
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .With(new AvaloniaNativePlatformOptions { UseGpu = false })
+                .With(new AvaloniaNativePlatformOptions { UseGpu = true })
                 .UseReactiveUI()
-                .LogToDebug();
+                .LogToTrace();
     }
 }

@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="WDE.SmartScriptEditor.Avalonia.Editor.UserControls.SmartScriptView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
+             xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor"
+             xmlns:viewModels1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             mc:Ignorable="d" x:Name="Rooot"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <system:Boolean x:Key="FalseValue">False</system:Boolean>
+        <system:Boolean x:Key="TrueValue">True</system:Boolean>
+    </UserControl.Resources>
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Back" Command="{Binding DeleteSelected}" />
+        <KeyBinding Gesture="Delete" Command="{Binding DeleteSelected}" />
+        <KeyBinding Gesture="Enter" Command="{Binding EditSelected}" />
+        <KeyBinding Gesture="Ctrl+A" Command="{Binding SelectAll}" />
+        <KeyBinding Gesture="Up" Command="{Binding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Down" Command="{Binding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Ctrl+Up" Command="{Binding SelectionUp}"
+                    CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Gesture="Ctrl+Down" Command="{Binding SelectionDown}"
+                    CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Gesture="Right" Command="{Binding SelectionRight}" />
+        <KeyBinding Gesture="Left" Command="{Binding SelectionLeft}" />
+    </UserControl.KeyBindings>
+    
+    <UserControl.Styles>
+        <Style Selector="Button.FlatButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Top" />
+        </Style>
+        <Style Selector="Button.FlatButton:pointerover /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.FlatButton:pressed /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </UserControl.Styles>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <Grid Background="{DynamicResource SmartScripts.Background}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MinHeight="30" />
+            </Grid.RowDefinitions>
+            <ItemsControl Focusable="False" Items="{Binding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
+                          Margin="7,0,7,0">
+                <ItemsControl.DataTemplates>
+                    <DataTemplate DataType="{x:Type models:SmartEvent}">
+                        <userControls:SmartEventView
+                            Selected="{Binding IsSelected, Mode=TwoWay}"
+                            userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
+                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                            DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectActions, ElementName=Rooot}"
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                            EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}"
+                            IsHitTestVisible="True"/>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type models:SmartAction}">
+                        <userControls:SmartActionView
+                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
+                            EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                            userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
+                        />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type models:SmartCondition}">
+                        <userControls:SmartConditionView
+                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
+                            EditConditionCommand="{Binding DataContext.EditCondition, ElementName=Rooot}"
+                            userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                            />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
+                        <Button Classes="FlatButton"
+                                Content="Add action"
+                                Command="{Binding DataContext.AddAction, ElementName=Rooot}"
+                                CommandParameter="{Binding}">
+                        </Button>
+                    </DataTemplate>
+                
+                    <DataTemplate DataType="{x:Type viewModels1:NewConditionViewModel}">
+                        <Button Classes="FlatButton"
+                            Content="Add condition"
+                            Command="{Binding DataContext.AddCondition, ElementName=Rooot}"
+                            CommandParameter="{Binding}">
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.DataTemplates>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <userControls:SmartScriptPanelLayout Background="Transparent"
+                                                      Script="{Binding Script}" 
+                                                      DropItems="{Binding OnDropItems}"
+                                                      DropActions="{Binding OnDropActions}"
+                                                      DropConditions="{Binding OnDropConditions}"
+                                                      />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <Button
+                Grid.Row="1" 
+                Classes="FlatButton"
+                Content="Add event"
+                Command="{Binding AddEvent}">
+            </Button>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
