@@ -68,17 +68,10 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="50" />
                             </Grid.ColumnDefinitions>
-                            <Label Grid.Column="0" Content="{Binding Name}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                            <Button Grid.Column="1" Command="{Binding ElementName=rootWindow, Path=DataContext.DeleteItem}" CommandParameter="{Binding}">
-                                <Path Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}">
-                                    <Path.Data>
-                                        <GeometryGroup>
-                                            <LineGeometry StartPoint="4,4" EndPoint="10,10"/>
-                                            <LineGeometry StartPoint="10,4" EndPoint="4,10"/>
-                                        </GeometryGroup>
-                                    </Path.Data>
-                                </Path>
-                            </Button>
+                            <TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Style="{DynamicResource GenericCrossButton}" Height="30"
+                                    Command="{Binding ElementName=rootWindow, Path=DataContext.DeleteItem}" 
+                                    CommandParameter="{Binding}" />
                         </Grid>
                     </DataTemplate>
                 </TreeView.Resources>

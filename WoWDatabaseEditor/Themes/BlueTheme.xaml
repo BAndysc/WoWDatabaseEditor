@@ -171,7 +171,17 @@
     <SolidColorBrush x:Key="StatusBarForeground" Color="White" />
     
     <SolidColorBrush x:Key="ScrollBarColor" Color="#8C8C8C" />
-
+    
+    <!-- Buttons -->
+    <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070" />
+    <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD" />
+    <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF2C628B" />
+    <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD" />
+    <SolidColorBrush x:Key="Button.Static.Foreground" Color="#6d6d78" />
+    <SolidColorBrush x:Key="Button.OnPress.Background" Color="#FFC4E5F6"/>
+    <SolidColorBrush x:Key="Button.Inactive.Border" Color="#FFADB2B5"/>
+    <SolidColorBrush x:Key="Button.Inactive.Background" Color="#FFF4F4F4"/>
+    
     <!-- Icons -->
     <DrawingImage x:Key="StatusBarIconNotice">
         <DrawingImage.Drawing>

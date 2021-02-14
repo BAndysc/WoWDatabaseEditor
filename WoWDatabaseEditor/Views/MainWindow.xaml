@@ -76,7 +76,7 @@
                                 <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
                                     <Setter Property="Header" Value="{Binding ItemName}"/>
                                     <Setter Property="Command" Value="{Binding ElementName=rootWindow, Path=DataContext.OpenDocument}" />
-                                    <Setter Property="CommandParameter" Value="{Binding EditorDocument}" />
+                                    <Setter Property="CommandParameter" Value="{Binding}" />
                                 </Style>
                             </helpers:DynamicMenuItemStyleSelector.DocumentItemStyle>
                             <helpers:DynamicMenuItemStyleSelector.CommandItemStyle>

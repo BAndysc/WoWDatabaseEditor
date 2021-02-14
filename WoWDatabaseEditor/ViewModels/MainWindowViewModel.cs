@@ -18,6 +18,7 @@ using WoWDatabaseEditor.Managers;
 using WoWDatabaseEditor.Utils;
 using System.Diagnostics;
 using WDE.Common.Menu;
+using WoWDatabaseEditor.Providers;
 
 namespace WoWDatabaseEditor.ViewModels
 {
@@ -32,16 +33,16 @@ namespace WoWDatabaseEditor.ViewModels
             IStatusBar statusBar,
             IMessageBoxService messageBoxService,
             TasksViewModel tasksViewModel,
-            IEnumerable<IMainMenuItem> menuItemProviders)
+            EditorMainMenuItemsProvider menuItemProvider)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
             this.messageBoxService = messageBoxService;
-            OpenDocument = new DelegateCommand<IDocument>(ShowDocument);
+            OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
 
             TasksViewModel = tasksViewModel;
 
-            MenuItemProviders = PrepareMenuItems(menuItemProviders);
+            MenuItemProviders = menuItemProvider.GetItems();
 
             foreach (var window in documentManager.AllTools)
                 toolById[window.UniqueId] = window;
@@ -53,7 +54,7 @@ namespace WoWDatabaseEditor.ViewModels
         public IDocumentManager DocumentManager { get; }
 
         public TasksViewModel TasksViewModel { get; }
-        
+
         public List<IMainMenuItem> MenuItemProviders { get; }
 
         public string Title
@@ -61,17 +62,17 @@ namespace WoWDatabaseEditor.ViewModels
             get => title;
             set => SetProperty(ref title, value);
         }
-        
-        public DelegateCommand<IDocument> OpenDocument { get; }
+
+        public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
 
         private void ShowAbout()
         {
             DocumentManager.OpenDocument(new AboutViewModel());
         }
 
-        private void ShowDocument(IDocument document)
+        private void ShowDocument(IMenuDocumentItem documentItem)
         {
-            DocumentManager.OpenDocument(document);
+            DocumentManager.OpenDocument(documentItem.EditorDocument());
         }
 
         public ITool? ResolveViewModel(string id)
@@ -153,41 +154,5 @@ namespace WoWDatabaseEditor.ViewModels
 
             return true;
         }
-
-        private List<IMainMenuItem> PrepareMenuItems(IEnumerable<IMainMenuItem> menuItemProviders)
-        {
-            var itemsDict = new Dictionary<string, IMainMenuItem>();
-            foreach (var menuItem in menuItemProviders)
-            {
-                if (itemsDict.ContainsKey(menuItem.ItemName) &&
-                    itemsDict[menuItem.ItemName] is MainMenuSubItemsAggregator aggregator)
-                    aggregator.AddSubItems(menuItem.SubItems);
-                else
-                    itemsDict.Add(menuItem.ItemName,
-                        new MainMenuSubItemsAggregator(menuItem.ItemName, menuItem.SortPriority, menuItem.SubItems.ToList()));
-            }
-
-            var list = itemsDict.Values.ToList();
-            list.Sort(new MainMenuItemComparer());
-            return list;
-        }
-    }
-    
-    internal class MainMenuSubItemsAggregator: IMainMenuItem
-    {
-        public string ItemName { get; }
-        private List<IMenuItem> subItems;
-        public MainMenuItemSortPriority SortPriority { get; }
-
-        internal MainMenuSubItemsAggregator(string itemName, MainMenuItemSortPriority sortPriority, List<IMenuItem> subItems)
-        {
-            this.subItems = subItems;
-            SortPriority = sortPriority;
-            ItemName = itemName; 
-        }
-
-        public void AddSubItems(List<IMenuItem> subItems) => this.subItems.AddRange(subItems);
-
-        public List<IMenuItem> SubItems => subItems;
     }
 }

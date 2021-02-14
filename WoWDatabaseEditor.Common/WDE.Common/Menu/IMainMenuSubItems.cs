@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Input;
 using WDE.Common.Managers;
 
@@ -16,7 +17,7 @@ namespace WDE.Common.Menu
 
     public interface IMenuDocumentItem : IMenuItem
     {
-        IDocument EditorDocument { get; }
+        IDocument EditorDocument();
     }
 
     public interface IMenuCommandItem : IMenuItem
@@ -26,6 +27,6 @@ namespace WDE.Common.Menu
 
     public interface IMenuCategoryItem: IMenuItem
     {
-        IMenuItem[] CategoryItems { get; }
+        List<IMenuItem> CategoryItems { get; }
     }
 }

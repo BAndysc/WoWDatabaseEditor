@@ -23,7 +23,7 @@
     <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#FF252526"/>
     <SolidColorBrush x:Key="{x:Static SystemColors.ControlLightColor}" Color="#3F3F46"/>
     <SolidColorBrush x:Key="BorderColor" Color="#515159" />
-
+    
     <!-- highlight -->
     <SolidColorBrush x:Key="Highlight.Background" Color="#2467AF" />
     <SolidColorBrush x:Key="Highlight.Over.Background" Color="#184575" />
@@ -614,11 +614,14 @@
     <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#007ACC" />
 
     <!-- Button -->
-    <SolidColorBrush x:Key="Button.Static.Border" Color="#3F3F46" />
-    <SolidColorBrush x:Key="Button.Static.Background" Color="#252526" />
+    <SolidColorBrush x:Key="Button.Static.Border" Color="#515159" />
+    <SolidColorBrush x:Key="Button.Static.Background" Color="#3F3F46" />
     <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#007ACC" />
     <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#3E3E40" />
-    <SolidColorBrush x:Key="Button.Static.Foreground" Color="#e6e6e6" />
+    <SolidColorBrush x:Key="Button.Static.Foreground" Color="#6d6d78" />
+    <SolidColorBrush x:Key="Button.OnPress.Background" Color="#6d6d78"/>
+    <SolidColorBrush x:Key="Button.Inactive.Border" Color="#afafb6"/>
+    <SolidColorBrush x:Key="Button.Inactive.Background" Color="#afafb6"/>
 
     <!-- Check box -->
     <SolidColorBrush x:Key="OptionMark.Static.Background" Color="#2D2D30" />
