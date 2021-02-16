@@ -25,27 +25,17 @@ namespace WDE.Common.Avalonia.Utils
                 SetContentProperty(targetLocation, view);
             }
             else
-                SetContentProperty(targetLocation, null);
+                SetContentProperty(targetLocation, new Panel());
 
             return viewModel;
         }
 
-        private static bool SetContentProperty(IAvaloniaObject targetLocation, object? view)
+        private static void SetContentProperty(IAvaloniaObject targetLocation, object? view)
         {
-            try
+            if (view != null && targetLocation != null)
             {
-                if (view != null)
-                {
-                    Type? type = targetLocation.GetType();
-                    type.GetProperty("Content")
-                        ?.SetValue(targetLocation, view);
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                throw e;
+                Type? type = targetLocation.GetType();
+                type.GetProperty("Content")?.SetValue(targetLocation, view);
             }
         }
     }

@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
@@ -12,22 +13,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     {
         public MainWindow()
         {
-            ExtendClientAreaToDecorationsHint = false;
-            ExtendClientAreaTitleBarHeightHint = -1;            
-
-            TransparencyLevelHint = WindowTransparencyLevel.AcrylicBlur;     
+            ExtendClientAreaChromeHints =
+                ExtendClientAreaChromeHints.OSXThickTitleBar | ExtendClientAreaChromeHints.SystemChrome; 
             
             InitializeComponent();
             this.AttachDevTools();
-        }
-
-        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-        {
-            base.OnApplyTemplate(e);
-                        
-            ExtendClientAreaChromeHints = 
-                global::Avalonia.Platform.ExtendClientAreaChromeHints.PreferSystemChrome |                 
-                global::Avalonia.Platform.ExtendClientAreaChromeHints.OSXThickTitleBar;
         }
 
         private void InitializeComponent()

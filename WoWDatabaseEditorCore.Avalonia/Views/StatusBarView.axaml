@@ -2,8 +2,7 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Foreground="White">
-    <Grid Background="#007ACC"  
-          VerticalAlignment="Stretch">
+    <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -27,8 +26,7 @@
 
                 <Button.Styles>
                     <Style Selector="Button">
-                        <Setter Property="BorderThickness" Value="0"></Setter>
-                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="BorderThickness" Value="0" />
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="Margin" Value="5,0,5,0" />
                     </Style>

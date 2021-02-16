@@ -1,0 +1,15 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls">     
+    <Style Selector="controls|SideBar">
+        <Setter Property="Background" Value="{DynamicResource SideBarBackground}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <ContentPresenter 
+                        Background="{TemplateBinding Background}"
+                        Content="{TemplateBinding Content}" />
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

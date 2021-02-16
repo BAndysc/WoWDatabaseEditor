@@ -1,0 +1,35 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls">
+    <Style Selector="TabStrip">
+        <Setter Property="Background" Value="{DynamicResource TabStripBackground}"/>
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <controls:StretchWrapPanel />
+            </ItemsPanelTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="TabStrip > TabStripItem">
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+    
+    <Style Selector="TabStripItem">
+        <Setter Property="Height" Value="26"></Setter>
+        <Setter Property="Background" Value="{DynamicResource TabStripBackground}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{DynamicResource TabStripForeground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TabStripBorderBrush}"/>
+        <Setter Property="Padding" Value="10,1,10,0"/>
+        <Setter Property="BorderThickness" Value="0,0,0.5,0.5"/>
+    </Style>
+    <Style Selector="TabStripItem:pointerover">
+        <Setter Property="Background" Value="{DynamicResource TabStripBackgroundPointerOver}"/>
+    </Style>
+    <Style Selector="TabStripItem:selected">
+        <Setter Property="Background" Value="{DynamicResource TabStripBackgroundActive}" />
+    </Style>
+    <Style Selector="TabStripItem:selected TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource TabStripForeground}" />
+    </Style>
+</Styles>

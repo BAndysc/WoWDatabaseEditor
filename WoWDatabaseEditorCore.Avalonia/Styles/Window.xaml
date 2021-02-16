@@ -1,0 +1,33 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:asyncAvaloniaTest="clr-namespace:WoWDatabaseEditorCore.Avalonia"
+        xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls">
+    <Style Selector="Window">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
+    </Style>
+    <Style Selector="controls|ExtendedTitleBar">
+        <Setter Property="Height" Value="38" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <Border Classes="Bg"/>
+                    <Border Classes="Separator" />
+                    <ContentPresenter Content="{TemplateBinding Content}" Margin="78,7.5,7.5,7.5"/>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|ExtendedTitleBar /template/ Border.Bg">
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TitleBarHighlight}"></Setter>
+        <Setter Property="BorderThickness" Value="0,0.5,0,0" />
+        <Setter Property="CornerRadius" Value="2,2,0,0" />
+        <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+    </Style>
+    <Style Selector="controls|ExtendedTitleBar /template/ Border.Separator">
+        <Setter Property="BorderBrush" Value="{DynamicResource TitleBarSeparatorBrush}"></Setter>
+        <Setter Property="BorderThickness" Value="0,0,0,0.5" />
+    </Style>
+    
+    
+</Styles>

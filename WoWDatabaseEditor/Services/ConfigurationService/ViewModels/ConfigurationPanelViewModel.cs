@@ -41,7 +41,12 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
         }
 
         public ObservableCollection<IConfigurable> ContainerTabItems { get; set; }
-        public IConfigurable? SelectedTabItem { get; set; }
+        private IConfigurable? selectedTabItem;
+        public IConfigurable? SelectedTabItem
+        {
+            get => selectedTabItem;
+            set => SetProperty(ref selectedTabItem, value);
+        }
 
         private void SaveAll()
         {

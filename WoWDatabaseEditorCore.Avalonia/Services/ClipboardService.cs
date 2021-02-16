@@ -1,22 +1,21 @@
-﻿using System.Windows;
 using System.Threading.Tasks;
+using Avalonia;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditorCore.WPF.Services
+namespace WoWDatabaseEditorCore.Avalonia.Services
 {
     [AutoRegister]
-    [SingleInstance]
     public class ClipboardService : IClipboardService
     {
         public Task<string> GetText()
         {
-            return Task.FromResult(Clipboard.GetText());
+            return Application.Current.Clipboard.GetTextAsync();
         }
 
         public void SetText(string text)
         {
-            Clipboard.SetText(text);
+            Application.Current.Clipboard.SetTextAsync(text);
         }
     }
 }
