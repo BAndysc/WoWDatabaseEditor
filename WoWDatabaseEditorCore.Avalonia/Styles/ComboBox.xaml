@@ -39,7 +39,7 @@
                                   Focusable="False"
                                   IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
                                   Grid.Column="1">
-                        <Path Fill="{DynamicResource ThemeForegroundBrush}"
+                        <Path Fill="{DynamicResource RaisedContentForeground.Accent}"
                               Width="8"
                               Height="10"
                               Stretch="Uniform"

@@ -7,6 +7,7 @@ using DynamicData.Binding;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Extensions;
@@ -53,6 +54,7 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
             items.AddRange(collection);
 
             Accept = new DelegateCommand(() => CloseOk?.Invoke());
+            Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
         }
 
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
@@ -77,7 +79,7 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
         }
 
         public ICommand Accept { get; }
-        
+        public ICommand Cancel { get; }
         public int DesiredWidth => 380;
         public int DesiredHeight => 500;
         public string Title => "Picker";

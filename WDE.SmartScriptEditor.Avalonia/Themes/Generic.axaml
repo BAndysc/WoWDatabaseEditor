@@ -1,0 +1,224 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
+        xmlns:editingViewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing"
+        xmlns:extendedTextBlock="clr-namespace:WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock"
+        xmlns:views1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views"
+        xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
+        xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing">
+    
+    
+    <Style Selector="userControls1|SmartActionView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate >
+                <Border BorderThickness="1">
+                    <extendedTextBlock:FormattedTextBlock 
+                        Padding="2" 
+                        Text="{Binding Readable}">
+                    </extendedTextBlock:FormattedTextBlock >
+                    
+                    <Border.Styles>
+                        <Style Selector="Border">
+                            <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Border}" />
+                        </Style>
+                        <Style Selector="extendedTextBlock|FormattedTextBlock">
+                            <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
+                        </Style>
+                    </Border.Styles>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="userControls1|SmartActionView:selected extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Selected.Background}" />
+    </Style>
+    <Style Selector="userControls1|SmartActionView extendedTextBlock|FormattedTextBlock:overlink">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="userControls1|SmartActionView:selected Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
+    </Style>
+    
+    <Style Selector="userControls1|SmartConditionView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="1">
+                    
+                    <extendedTextBlock:FormattedTextBlock Padding="2" 
+                                                     Text="{Binding Readable}" />
+                    
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    
+    <Style Selector="userControls1|SmartEventView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="1" DockPanel.Dock="Top">
+                        <extendedTextBlock:FormattedTextBlock 
+                                                         Text="{Binding Readable}"
+                                                         Padding="3">
+                        </extendedTextBlock:FormattedTextBlock>
+                    </Border>
+                    <Canvas Margin="20,0,0,0" />
+                    <DockPanel.Styles>
+                        <Style Selector="extendedTextBlock|FormattedTextBlock">
+                            <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
+                            <!--<Setter Property="Foreground" Value="{DynamicResource SmartScripts.Event.Selected.Foreground}" />-->
+                        </Style>
+                        <Style Selector="Border">
+                            <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Border}" />
+                        </Style>
+                        <Style Selector="Canvas">
+                            <Setter Property="Background" Value="{DynamicResource SmartScripts.Condition.Background}" />
+                        </Style>
+                    </DockPanel.Styles>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="userControls1|SmartEventView:selected extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
+    </Style>
+    <Style Selector="userControls1|SmartEventView:selected Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
+    </Style>
+    <Style Selector="userControls1|SmartEventView:selected Canvas">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
+    </Style>
+    
+    
+    
+    
+    
+      
+  <Style Selector="userControls1|ParameterTextBox">
+    <Setter Property="CaretBrush" Value="{DynamicResource ThemeForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource ThemeBorderThickness}"/>
+    <Setter Property="SelectionBrush" Value="{DynamicResource HighlightBrush}"/>
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource HighlightForegroundBrush}"/>
+    <Setter Property="Padding" Value="4"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+          <DockPanel Margin="{TemplateBinding Padding}"
+                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+
+            <DataValidationErrors>
+
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <ContentPresenter Grid.Column="0" Grid.ColumnSpan="1" Content="{TemplateBinding InnerLeftContent}"/>
+                <ScrollViewer Grid.Column="1" Grid.ColumnSpan="1"
+                              HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                              VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+                  <Panel>
+                    <TextBlock Name="watermark"
+                              Opacity="0.5"
+                              Text="{TemplateBinding Watermark}"
+                              TextAlignment="{TemplateBinding TextAlignment}"
+                              TextWrapping="{TemplateBinding TextWrapping}"
+                              IsVisible="False"/>
+                    <TextPresenter Name="PART_TextPresenter"
+                                    Text="{TemplateBinding Text, Mode=TwoWay}"
+                                    CaretIndex="{TemplateBinding CaretIndex}"
+                                    SelectionStart="{TemplateBinding SelectionStart}"
+                                    SelectionEnd="{TemplateBinding SelectionEnd}"
+                                    TextAlignment="{TemplateBinding TextAlignment}"
+                                    TextWrapping="{TemplateBinding TextWrapping}"
+                                    PasswordChar="{TemplateBinding PasswordChar}"
+                                    RevealPassword="{TemplateBinding RevealPassword}"
+                                    SelectionBrush="{TemplateBinding SelectionBrush}"
+                                    SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                    CaretBrush="{TemplateBinding CaretBrush}" />
+                  </Panel>
+                </ScrollViewer>
+                <ContentPresenter Grid.Column="2" Grid.ColumnSpan="1" Content="{TemplateBinding InnerRightContent}"/>             
+              </Grid>
+            </DataValidationErrors>
+          </DockPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="userControls1|ParameterTextBox:pointerover /template/ Border#border">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+  <Style Selector="userControls1|ParameterTextBox:focus /template/ Border#border">
+    <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+  </Style>
+  <Style Selector="userControls1|ParameterTextBox:error /template/ Border#border">
+    <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}"/>
+  </Style>
+  <Style Selector="userControls1|ParameterTextBox /template/ DockPanel">
+    <Setter Property="Cursor" Value="IBeam" />
+  </Style>
+  <Style Selector="userControls1|ParameterTextBox:disabled /template/ Border#border">
+      <Setter Property="Opacity" Value="{DynamicResource ThemeDisabledOpacity}" />
+  </Style>
+    
+    
+    
+    <Style Selector="editing|ParameterEditorView">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <DockPanel>
+                        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
+                    <ContentPresenter Content="{Binding}">
+                                <ContentPresenter.DataTemplates>
+                                    <views1:ParameterDataTemplateSelector>
+                                        <views1:ParameterDataTemplateSelector.Generic>
+                                            <DataTemplate>
+                                                <DockPanel LastChildFill="True">
+                                                    <Button DockPanel.Dock="Right" Content="  ...  "
+                                                            Command="{Binding SelectItemAction}" 
+                                                            Margin="3,0,0,0" 
+                                                            IsVisible="{Binding HasItems}"/>
+                                                    <userControls1:ParameterTextBox VerticalContentAlignment="Center"
+                                                             Text="{Binding Parameter.Value, Mode=TwoWay}"
+                                                             FontFamily="Consolas">
+                                                        <userControls1:ParameterTextBox.Styles>
+                                                            <Style Selector="TextBox:not(:focus-within) /template/ TextPresenter#PART_TextPresenter">
+                                                                <Setter Property="IsVisible" Value="False" />
+                                                            </Style>
+                                                            <Style Selector="TextBox:focus-within ContentPresenter TextBlock">
+                                                                <Setter Property="IsVisible" Value="False" />
+                                                            </Style>
+                                                        </userControls1:ParameterTextBox.Styles>
+                                                        <userControls1:ParameterTextBox.InnerLeftContent>
+                                                            <TextBlock Text="{Binding Parameter.String, Mode=OneWay}" Margin="0,1,0,0" />
+                                                        </userControls1:ParameterTextBox.InnerLeftContent>
+                                                    </userControls1:ParameterTextBox>
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </views1:ParameterDataTemplateSelector.Generic>
+                                        <views1:ParameterDataTemplateSelector.BoolParameter>
+                                            <DataTemplate>
+                                                <CheckBox Focusable="True" VerticalContentAlignment="Center" IsChecked="{Binding BoolIsChecked}" />
+                                            </DataTemplate>
+                                        </views1:ParameterDataTemplateSelector.BoolParameter>
+                                        <views1:ParameterDataTemplateSelector.ButtonParameter>
+                                            <DataTemplate>
+                                                <Button Command="{Binding Command}" Content="{Binding ActionName}"></Button>
+                                            </DataTemplate>                                        
+                                        </views1:ParameterDataTemplateSelector.ButtonParameter>
+                                    </views1:ParameterDataTemplateSelector>
+                                </ContentPresenter.DataTemplates>
+                            </ContentPresenter>
+                        
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</Styles>

@@ -12,8 +12,9 @@
         <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#C4C4C4" />
         <Thickness x:Key="BorderThickness">0.5</Thickness>
         
-        <SolidColorBrush x:Key="ThemeForegroundBrush" Color="White" />
-        <SolidColorBrush x:Key="MainColorBackground" Color="White" />
+        <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#282828" />
+        <SolidColorBrush x:Key="MainColorBackground" Color="#ECECEC" />
+        <SolidColorBrush x:Key="ContentBackground" Color="White" />
         <SolidColorBrush x:Key="MainColorForeground" Color="#282828" />	
         <!-- generic content like button or textarea -->
         <LinearGradientBrush x:Key="RaisedContentBorderBrush" StartPoint="0%, 0%" EndPoint="0%,100%">
@@ -43,6 +44,8 @@
                 <GradientStop Color="#296EF6" Offset="1"/>  
             </GradientStops>
         </LinearGradientBrush>
+        
+        <SolidColorBrush x:Key="RaisedContentForeground.Accent" Color="White" />
         	
         <!-- button -->
         <SolidColorBrush x:Key="RaisedContentBackgroundPressed" Color="#DDDDDD" />
@@ -75,7 +78,7 @@
         </LinearGradientBrush>
         
         <!-- sidebar-->
-        <SolidColorBrush x:Key="SideBarBackground" Color="#80C0C0C0"/>
+        <SolidColorBrush x:Key="SideBarBackground" Color="#BEDCDCDC"/>
         
         <!-- treeview -->
         <SolidColorBrush x:Key="TreeViewItem.Background.PointerOver" Color="#10000000" />
@@ -89,7 +92,7 @@
         
         <!-- checkbox -->
         <SolidColorBrush x:Key="CheckBox.Indeterminate.Background" Color="#606060" />
-        <SolidColorBrush x:Key="CheckBox.Background" Color="Transparent" />
+        <SolidColorBrush x:Key="CheckBox.Background" Color="White" />
         <SolidColorBrush x:Key="CheckBox.BorderBrush" Color="#B6B6B6" />
         <SolidColorBrush x:Key="CheckBox.BorderBrush.Checked" Color="#4081F5" />
         <SolidColorBrush x:Key="CheckBox.Background.Checked" Color="#4D8AF5" />

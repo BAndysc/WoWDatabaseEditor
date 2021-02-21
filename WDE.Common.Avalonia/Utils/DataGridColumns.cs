@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
-using WoWDatabaseEditorCore.Extensions;
+using WDE.Common.Types;
 
-namespace WoWDatabaseEditorCore.Avalonia.Extensions
+namespace WDE.Common.Avalonia.Utils
 {
     public class DataGridColumns
     {

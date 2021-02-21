@@ -2,7 +2,6 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.Avalonia.Extensions"
              Title="{Binding Title}"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:messageBoxService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService"

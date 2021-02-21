@@ -1,9 +1,14 @@
-<Styles xmlns="https://github.com/avaloniaui">
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls">
     <Style Selector="TextBox">
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBoxForeground}" />
         <Setter Property="BorderThickness" Value="0.5" />
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+    </Style>
+    
+    <Style Selector="controls|ExtendedTitleBar TextBox">
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
     </Style>
         

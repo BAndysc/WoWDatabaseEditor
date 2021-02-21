@@ -6,6 +6,7 @@ using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Managers;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Extensions;
 

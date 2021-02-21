@@ -12,6 +12,7 @@ using Prism.Mvvm;
 using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;

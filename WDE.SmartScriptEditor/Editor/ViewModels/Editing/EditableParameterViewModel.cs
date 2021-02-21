@@ -11,7 +11,8 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 {
-    public class EditableParameterViewModel<T> : ObservableBase, IEditableParameterViewModel, IDialog
+    public abstract class EditableParameterViewModel : ObservableBase {}
+    public class EditableParameterViewModel<T> : EditableParameterViewModel, IEditableParameterViewModel, IDialog
     {
         private readonly IItemFromListProvider itemFromListProvider;
 

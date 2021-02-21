@@ -37,6 +37,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 toolById[window.UniqueId] = window;
 
             ShowAbout();
+            //LoadDefault();
         }
 
         public IStatusBar StatusBar { get; }

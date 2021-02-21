@@ -84,4 +84,7 @@
     <ItemGroup>
         <Resource Include="Icon.ico" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Extensions" />
+    </ItemGroup>
 </Project>

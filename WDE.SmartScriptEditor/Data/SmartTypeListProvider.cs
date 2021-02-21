@@ -22,12 +22,34 @@ namespace WDE.SmartScriptEditor.Data
 
         public async System.Threading.Tasks.Task<int?> Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
         {
-            SmartSelectViewModel model = new(type, predicate, smartDataManager, conditionDataManager);
+            var title = GetTitleForType(type);
+            SmartSelectViewModel model = new(title, type, predicate, smartDataManager, conditionDataManager);
             
             if (await windowManager.ShowDialog(model))
                 return model.SelectedItem.Id;
 
             return null;
+        }
+
+        private string GetTitleForType(SmartType type)
+        {
+            switch (type)
+            {
+                case SmartType.SmartEvent:
+                    return "Pick event";
+                case SmartType.SmartAction:
+                    return "Pick action";
+                case SmartType.SmartTarget:
+                    return "Pick action target";
+                case SmartType.SmartCondition:
+                    return "Pick condition";
+                case SmartType.SmartConditionSource:
+                    return "Pick condition source";
+                case SmartType.SmartSource:
+                    return "Pick action source";
+                default:
+                    return "Pick";
+            }
         }
     }
 }

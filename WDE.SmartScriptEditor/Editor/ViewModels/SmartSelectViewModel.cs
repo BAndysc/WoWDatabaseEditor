@@ -18,11 +18,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     {
         private readonly SourceList<SmartItem> items = new();
 
-        public SmartSelectViewModel(SmartType type,
+        public SmartSelectViewModel(
+            string title,
+            SmartType type,
             Func<SmartGenericJsonData, bool> predicate,
             ISmartDataManager smartDataManager,
             IConditionDataManager conditionDataManager)
         {
+            Title = title;
             MakeItems(type, predicate, smartDataManager, conditionDataManager);
             
             ReadOnlyObservableCollection<SmartItemsGroup> l;
@@ -48,6 +51,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (items.Count > 0)
                 SelectedItem = items.Items.First();
 
+            Cancel = new DelegateCommand(() =>
+            {
+                CloseCancel?.Invoke();
+            });
             Accept = new DelegateCommand(() =>
             {
                 if (selectedItem == null)
@@ -139,10 +146,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
+        public DelegateCommand Cancel { get; }
         public DelegateCommand Accept { get; }
         public int DesiredWidth => 750;
         public int DesiredHeight => 650;
-        public string Title => "Pick";
+        public string Title { get; }
         public bool Resizeable => true;
         public event Action CloseCancel;
         public event Action CloseOk;

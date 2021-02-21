@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using WDE.Common.Menu;
 using WDE.Common.Windows;
 
@@ -11,11 +12,11 @@ namespace WDE.Common.Avalonia.Utils
     {
         public static IViewLocator? AppViewLocator { get; set; }
         
-        public static readonly AvaloniaProperty ModelProperty = AvaloniaProperty.RegisterAttached<ContentControl, object>("Model",
+        public static readonly AvaloniaProperty ModelProperty = AvaloniaProperty.RegisterAttached<Control, object>("Model",
             typeof(ViewBind),coerce: OnModelChanged);
         
-        public static object GetModel(ContentControl control) => control.GetValue(ModelProperty);
-        public static void SetModel(ContentControl control, object value) => control.SetValue(ModelProperty, value);
+        public static object GetModel(Control control) => control.GetValue(ModelProperty);
+        public static void SetModel(Control control, object value) => control.SetValue(ModelProperty, value);
         
         private static object OnModelChanged(IAvaloniaObject targetLocation, object viewModel)
         {

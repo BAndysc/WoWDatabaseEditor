@@ -1,4 +1,4 @@
-﻿namespace WoWDatabaseEditorCore.Extensions
+﻿namespace WDE.Common.Types
 {
     public class ColumnDescriptor
     {

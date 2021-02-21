@@ -1,18 +1,18 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:mvvm="http://prismlibrary.com/"
-        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
-        xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
-        xmlns:controls1="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        mvvm:ViewModelLocator.AutoWireViewModel="True"
-        x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
-        TransparencyLevelHint="AcrylicBlur"
-        ExtendClientAreaTitleBarHeightHint="38"
-        ExtendClientAreaToDecorationsHint="True"
-        Title="{Binding Title}">
+<controls:ExtendedWindow xmlns="https://github.com/avaloniaui"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:mvvm="http://prismlibrary.com/"
+          xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+          xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
+          xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls"
+          mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+          mvvm:ViewModelLocator.AutoWireViewModel="True"
+          x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
+          TransparencyLevelHint="AcrylicBlur"
+          ExtendClientAreaTitleBarHeightHint="38"
+          ExtendClientAreaToDecorationsHint="True"
+          Title="{Binding Title}">
 
     <NativeMenu.Menu>
         <NativeMenu utils:MenuBind.MenuItems="{Binding MenuItemProviders}">
@@ -20,11 +20,22 @@
         </NativeMenu>
     </NativeMenu.Menu>
     
+    <controls:ExtendedWindow.SideBar>
+        <ItemsRepeater Items="{Binding DocumentManager.OpenedTools}">
+            <ItemsRepeater.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl utils:ViewBind.Model="{Binding}" 
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch" />
+                </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+    </controls:ExtendedWindow.SideBar>
     
-    <DockPanel LastChildFill="True">
-        <controls1:ExtendedTitleBar DockPanel.Dock="Top">
+    <controls:ExtendedWindow.ToolBar>
+        <controls:ExtendedTitleBar DockPanel.Dock="Top">
             <Panel>
-                <StackPanel Orientation="Horizontal" Spacing="9" HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal" Spacing="9" HorizontalAlignment="Left">
                     <Button>
                         <Border Background="Transparent"
                                 Width="12"
@@ -39,9 +50,17 @@
                     </Button>
                     <Button>SQL</Button>
                 </StackPanel>
+                
+                <TextBox HorizontalAlignment="Right" MinWidth="250" Watermark="Search"></TextBox>
             </Panel>
-        </controls1:ExtendedTitleBar>
-        
+        </controls:ExtendedTitleBar>
+    </controls:ExtendedWindow.ToolBar>
+    
+    <controls:ExtendedWindow.StatusBar>
+        <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{Binding StatusBar}" />
+    </controls:ExtendedWindow.StatusBar>
+    
+    <controls:ExtendedWindow.TabStrip>
         <TabStrip DockPanel.Dock="Top" 
                   SelectedItem="{Binding DocumentManager.ActiveDocument}"
                   Items="{Binding DocumentManager.OpenedDocuments}">
@@ -54,39 +73,20 @@
                 </DataTemplate>
             </TabStrip.ItemTemplate>
         </TabStrip>
-        <controls1:StatusBar DockPanel.Dock="Bottom">
-            <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{Binding StatusBar}" />
-        </controls1:StatusBar>
-        
-        <Grid ColumnDefinitions="250,Auto,*">
-            <controls1:SideBar DockPanel.Dock="Left">
-                <ItemsRepeater Items="{Binding DocumentManager.OpenedTools}">
-                    <ItemsRepeater.ItemTemplate>
-                        <DataTemplate>
-                            <ContentControl utils:ViewBind.Model="{Binding}" 
-                                            HorizontalContentAlignment="Stretch"
-                                            VerticalContentAlignment="Stretch" />
-                        </DataTemplate>
-                    </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
-            </controls1:SideBar>
-            <GridSplitter Grid.Column="1" />
-            <Panel Grid.Column="2" Background="{DynamicResource MainColorBackground}">
-                <ContentControl utils:ViewBind.Model="{Binding}"
-                                DataContext="{Binding DocumentManager.ActiveDocument}"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch" />
+    </controls:ExtendedWindow.TabStrip>
+    
+    <Panel Background="{DynamicResource MainColorBackground}">
+        <ContentControl utils:ViewBind.Model="{Binding}"
+                        DataContext="{Binding DocumentManager.ActiveDocument}"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch" />
                 
-                <views:TasksPanel DataContext="{Binding TasksViewModel}"
-                                  Margin="0,0,5,0"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Bottom"
-                                  IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
-            </Panel>
-        </Grid>
-    </DockPanel>
-    
-    
+        <views:TasksPanel DataContext="{Binding TasksViewModel}"
+                          Margin="0,0,5,0"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Bottom"
+                          IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
+    </Panel>
     
     <!-- <DockPanel LastChildFill="True"> -->
     <!--     <NativeMenuBar DockPanel.Dock="Top"/> -->
@@ -109,4 +109,4 @@
     <!--         </Grid> -->
     <!--     </Panel> -->
     <!-- </DockPanel> -->
-</Window>
+</controls:ExtendedWindow>

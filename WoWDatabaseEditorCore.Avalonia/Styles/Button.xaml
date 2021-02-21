@@ -1,4 +1,5 @@
-<Styles xmlns="https://github.com/avaloniaui">
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls">
     <Style Selector="Button">
         <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
         <Setter Property="BorderThickness" Value="0.5" />
@@ -20,7 +21,17 @@
         <Setter Property="Padding" Value="6,0"></Setter>
     </Style>
     
+    <Style Selector="Button:pressed">
+        <Setter Property="Foreground" Value="{DynamicResource RaisedContentForeground.Accent}" />
+    </Style>
+
     <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource RaisedContentBackground.Accent}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush.Accent}" />
+    </Style>
+    
+    <!-- titlebar button style -->
+    <Style Selector="controls|ExtendedTitleBar Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackgroundPressed}" />
     </Style>
 </Styles>

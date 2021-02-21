@@ -5,11 +5,12 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
+using WoWDatabaseEditorCore.Avalonia.Controls;
 using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
-    public class MainWindow : Window
+    public class MainWindow : ExtendedWindow
     {
         public MainWindow()
         {

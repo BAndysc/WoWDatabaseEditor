@@ -13,7 +13,8 @@
         <Thickness x:Key="BorderThickness">0.5</Thickness>
         
         <SolidColorBrush x:Key="ThemeForegroundBrush" Color="White" />
-        <SolidColorBrush x:Key="MainColorBackground" Color="#1D1F20" />
+        <SolidColorBrush x:Key="MainColorBackground" Color="#303032" />
+        <SolidColorBrush x:Key="ContentBackground" Color="#1D1F20" />
         <SolidColorBrush x:Key="MainColorForeground" Color="#EBEBEB" />
         <!-- generic content like button or textarea -->
         <LinearGradientBrush x:Key="RaisedContentBorderBrush" StartPoint="0%, 0%" EndPoint="0%,100%">
@@ -38,6 +39,8 @@
                 <GradientStop Color="#2B64D0" Offset="1"/>  
             </GradientStops>
         </LinearGradientBrush>
+        
+        <SolidColorBrush x:Key="RaisedContentForeground.Accent" Color="White" />
         
         <!-- button -->
         <SolidColorBrush x:Key="RaisedContentBackgroundPressed" Color="#999999" />
@@ -65,7 +68,7 @@
         <SolidColorBrush x:Key="TabStripBackgroundActive" Color="#363636" />
         
         <!-- sidebar-->
-        <SolidColorBrush x:Key="SideBarBackground" Color="#80000000"/>
+        <SolidColorBrush x:Key="SideBarBackground" Color="#BE363636"/>
         
         <!-- treeview -->
         <SolidColorBrush x:Key="TreeViewItem.Background.PointerOver" Color="#10FFFFFF" />

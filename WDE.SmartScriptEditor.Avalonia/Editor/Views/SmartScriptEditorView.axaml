@@ -1,0 +1,9 @@
+﻿<UserControl x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartScriptEditorView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
+             xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls">
+    <userControls1:SmartScriptView />
+</UserControl>

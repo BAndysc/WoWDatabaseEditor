@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -20,7 +21,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.NewItemService
         {
             AvaloniaXamlLoader.Load(this);
         }
-        
+
         private void UIElement_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter && DataContext is NewItemDialogViewModel vm)
