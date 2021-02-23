@@ -11,10 +11,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
     /// <summary>
     ///     Interaction logic for SmartActionView.xaml
     /// </summary>
-    public class SmartActionView : TemplatedControl
+    public class SmartActionView : SelectableTemplatedControl
     {
-        public static AvaloniaProperty IsSelectedProperty = AvaloniaProperty.Register<SmartActionView, bool>(nameof(IsSelected));
-
         public static AvaloniaProperty DeselectAllRequestProperty =
             AvaloniaProperty.Register<SmartActionView, ICommand>(nameof(DeselectAllRequest));
 
@@ -27,13 +25,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public static AvaloniaProperty DirectEditParameterProperty =
             AvaloniaProperty.Register<SmartActionView, ICommand>(nameof(DirectEditParameter));
         
-        
-        public bool IsSelected
-        {
-            get => (bool) GetValue(IsSelectedProperty);
-            set => SetValue(IsSelectedProperty, value);
-        }
-
         public ICommand DeselectAllRequest
         {
             get => (ICommand) GetValue(DeselectAllRequestProperty);
@@ -56,24 +47,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             get => (ICommand) GetValue(DirectEditParameterProperty);
             set => SetValue(DirectEditParameterProperty, value);
-        }
-        
-        private System.IDisposable sub;
-        protected override void OnDataContextChanged(EventArgs e)
-        {
-            sub?.Dispose();
-            base.OnDataContextChanged(e);
-
-            if (DataContext == null)
-                sub = null;
-            else
-                sub = (DataContext as SmartAction).ToObservable(e => e.IsSelected).Subscribe(@is =>
-                {
-                    if (@is)
-                        PseudoClasses.Add(":selected");
-                    else
-                        PseudoClasses.Remove(":selected");
-                });
         }
         
         protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -103,6 +76,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             }
             else if (e.ClickCount == 2)
                 EditActionCommand?.Execute(DataContext);
+
+            e.Handled = true;
         }
     }
 }

@@ -1,60 +1,99 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
-        xmlns:editingViewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:extendedTextBlock="clr-namespace:WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock"
-        xmlns:views1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views"
-        xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
+        xmlns:views="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views"
+        xmlns:controls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
         xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing">
     
+    <Styles.Resources>
+        <!-- SmartScripts -->
+        <SolidColorBrush x:Key="SmartScripts.Background" Color="#F5F6FC" />
     
-    <Style Selector="userControls1|SmartActionView">
+        <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="#F5F6FC" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Border" Color="#E9EFFB" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Background" Color="#E9EFFB" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Border" Color="#F5C61F" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Background" Color="#FFF2BF" />
+        <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="#282828" />
+   
+        <SolidColorBrush x:Key="SmartScripts.Parameter.Foreground" Color="#3C76BE" />
+        <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#2E8A8A" /> <!-- #378B6F-->
+    
+        <SolidColorBrush x:Key="SmartScripts.Comment.Background" Color="#E1F3C9" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Border" Color="#D1E577" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Foreground" Color="#282828" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Border" Color="#F5C61F" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Background" Color="#FFF2BF" />
+        <SolidColorBrush x:Key="SmartScripts.Comment.Selected" Color="#282828" />
+    
+        <SolidColorBrush x:Key="SmartScripts.Event.Background" Color="#F5F8FF" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Foreground" Color="#FF282828" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Border" Color="#BFCCE0" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Background" Color="#FFF5F2BF" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Foreground" Color="#FF282828" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Border" Color="#FFF5C61F" />
+    
+        <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0" />
+        <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77000000" />
+    </Styles.Resources>
+    
+    <Style Selector="controls|SmartActionView">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
-            <ControlTemplate >
+            <ControlTemplate>
                 <Border BorderThickness="1">
                     <extendedTextBlock:FormattedTextBlock 
                         Padding="2" 
                         Text="{Binding Readable}">
                     </extendedTextBlock:FormattedTextBlock >
-                    
-                    <Border.Styles>
-                        <Style Selector="Border">
-                            <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Border}" />
-                        </Style>
-                        <Style Selector="extendedTextBlock|FormattedTextBlock">
-                            <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
-                        </Style>
-                    </Border.Styles>
                 </Border>
             </ControlTemplate>
         </Setter>
     </Style>
-    <Style Selector="userControls1|SmartActionView:selected extendedTextBlock|FormattedTextBlock">
-        <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Selected.Background}" />
+    <Style Selector="controls|SmartActionView /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Border}" />
     </Style>
-    <Style Selector="userControls1|SmartActionView extendedTextBlock|FormattedTextBlock:overlink">
-        <Setter Property="Cursor" Value="Hand" />
+    <Style Selector="controls|SmartActionView /template/ extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
     </Style>
-    <Style Selector="userControls1|SmartActionView:selected Border">
+    <Style Selector="controls|SmartActionView:selected /template/ Border">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
     </Style>
+    <Style Selector="controls|SmartActionView:selected /template/ extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Selected.Background}" />
+    </Style>
+    <Style Selector="controls|SmartActionView /template/ extendedTextBlock|FormattedTextBlock:overlink">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
     
-    <Style Selector="userControls1|SmartConditionView">
+    <Style Selector="controls|SmartConditionView">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Border BorderThickness="1">
-                    
                     <extendedTextBlock:FormattedTextBlock Padding="2" 
-                                                     Text="{Binding Readable}" />
-                    
+                                                          Text="{Binding Readable}" />
                 </Border>
             </ControlTemplate>
         </Setter>
     </Style>
+    <Style Selector="controls|SmartConditionView /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Border}" />
+    </Style>
+    <Style Selector="controls|SmartConditionView /template/ extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
+    </Style>
+    <Style Selector="controls|SmartConditionView:selected /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
+    </Style>
+    <Style Selector="controls|SmartConditionView:selected /template/ extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Selected.Background}" />
+    </Style>
+    <Style Selector="controls|SmartConditionView /template/ extendedTextBlock|FormattedTextBlock:overlink">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
     
-    
-    <Style Selector="userControls1|SmartEventView">
+    <Style Selector="controls|SmartEventView">
         <Setter Property="Template">
             <ControlTemplate>
                 <DockPanel LastChildFill="True">
@@ -65,38 +104,35 @@
                         </extendedTextBlock:FormattedTextBlock>
                     </Border>
                     <Canvas Margin="20,0,0,0" />
-                    <DockPanel.Styles>
-                        <Style Selector="extendedTextBlock|FormattedTextBlock">
-                            <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
-                            <!--<Setter Property="Foreground" Value="{DynamicResource SmartScripts.Event.Selected.Foreground}" />-->
-                        </Style>
-                        <Style Selector="Border">
-                            <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Border}" />
-                        </Style>
-                        <Style Selector="Canvas">
-                            <Setter Property="Background" Value="{DynamicResource SmartScripts.Condition.Background}" />
-                        </Style>
-                    </DockPanel.Styles>
                 </DockPanel>
             </ControlTemplate>
         </Setter>
     </Style>
-    <Style Selector="userControls1|SmartEventView:selected extendedTextBlock|FormattedTextBlock">
+    <Style Selector="controls|SmartEventView /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Border}" />
+    </Style>
+    <Style Selector="controls|SmartEventView /template/ extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
+    </Style>
+    <Style Selector="controls|SmartEventView /template/ Canvas">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Condition.Background}" />
+    </Style>
+    
+    <Style Selector="controls|SmartEventView:selected /template/ extendedTextBlock|FormattedTextBlock">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
     </Style>
-    <Style Selector="userControls1|SmartEventView:selected Border">
+    <Style Selector="controls|SmartEventView:selected /template/ Border">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
     </Style>
-    <Style Selector="userControls1|SmartEventView:selected Canvas">
+    <Style Selector="controls|SmartEventView:selected /template/ Canvas">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
     </Style>
     
+    <Style Selector="controls|SmartEventView /template/ extendedTextBlock|FormattedTextBlock:overlink">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
     
-    
-    
-    
-      
-  <Style Selector="userControls1|ParameterTextBox">
+  <Style Selector="controls|ParameterTextBox">
     <Setter Property="CaretBrush" Value="{DynamicResource ThemeForegroundBrush}" />
     <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}"/>
     <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
@@ -150,19 +186,19 @@
       </ControlTemplate>
     </Setter>
   </Style>
-  <Style Selector="userControls1|ParameterTextBox:pointerover /template/ Border#border">
+  <Style Selector="controls|ParameterTextBox:pointerover /template/ Border#border">
     <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
   </Style>
-  <Style Selector="userControls1|ParameterTextBox:focus /template/ Border#border">
+  <Style Selector="controls|ParameterTextBox:focus /template/ Border#border">
     <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
   </Style>
-  <Style Selector="userControls1|ParameterTextBox:error /template/ Border#border">
+  <Style Selector="controls|ParameterTextBox:error /template/ Border#border">
     <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}"/>
   </Style>
-  <Style Selector="userControls1|ParameterTextBox /template/ DockPanel">
+  <Style Selector="controls|ParameterTextBox /template/ DockPanel">
     <Setter Property="Cursor" Value="IBeam" />
   </Style>
-  <Style Selector="userControls1|ParameterTextBox:disabled /template/ Border#border">
+  <Style Selector="controls|ParameterTextBox:disabled /template/ Border#border">
       <Setter Property="Opacity" Value="{DynamicResource ThemeDisabledOpacity}" />
   </Style>
     
@@ -176,43 +212,43 @@
                         <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
                     <ContentPresenter Content="{Binding}">
                                 <ContentPresenter.DataTemplates>
-                                    <views1:ParameterDataTemplateSelector>
-                                        <views1:ParameterDataTemplateSelector.Generic>
+                                    <views:ParameterDataTemplateSelector>
+                                        <views:ParameterDataTemplateSelector.Generic>
                                             <DataTemplate>
                                                 <DockPanel LastChildFill="True">
                                                     <Button DockPanel.Dock="Right" Content="  ...  "
                                                             Command="{Binding SelectItemAction}" 
                                                             Margin="3,0,0,0" 
                                                             IsVisible="{Binding HasItems}"/>
-                                                    <userControls1:ParameterTextBox VerticalContentAlignment="Center"
+                                                    <controls:ParameterTextBox VerticalContentAlignment="Center"
                                                              Text="{Binding Parameter.Value, Mode=TwoWay}"
                                                              FontFamily="Consolas">
-                                                        <userControls1:ParameterTextBox.Styles>
+                                                        <controls:ParameterTextBox.Styles>
                                                             <Style Selector="TextBox:not(:focus-within) /template/ TextPresenter#PART_TextPresenter">
                                                                 <Setter Property="IsVisible" Value="False" />
                                                             </Style>
                                                             <Style Selector="TextBox:focus-within ContentPresenter TextBlock">
                                                                 <Setter Property="IsVisible" Value="False" />
                                                             </Style>
-                                                        </userControls1:ParameterTextBox.Styles>
-                                                        <userControls1:ParameterTextBox.InnerLeftContent>
+                                                        </controls:ParameterTextBox.Styles>
+                                                        <controls:ParameterTextBox.InnerLeftContent>
                                                             <TextBlock Text="{Binding Parameter.String, Mode=OneWay}" Margin="0,1,0,0" />
-                                                        </userControls1:ParameterTextBox.InnerLeftContent>
-                                                    </userControls1:ParameterTextBox>
+                                                        </controls:ParameterTextBox.InnerLeftContent>
+                                                    </controls:ParameterTextBox>
                                                 </DockPanel>
                                             </DataTemplate>
-                                        </views1:ParameterDataTemplateSelector.Generic>
-                                        <views1:ParameterDataTemplateSelector.BoolParameter>
+                                        </views:ParameterDataTemplateSelector.Generic>
+                                        <views:ParameterDataTemplateSelector.BoolParameter>
                                             <DataTemplate>
                                                 <CheckBox Focusable="True" VerticalContentAlignment="Center" IsChecked="{Binding BoolIsChecked}" />
                                             </DataTemplate>
-                                        </views1:ParameterDataTemplateSelector.BoolParameter>
-                                        <views1:ParameterDataTemplateSelector.ButtonParameter>
+                                        </views:ParameterDataTemplateSelector.BoolParameter>
+                                        <views:ParameterDataTemplateSelector.ButtonParameter>
                                             <DataTemplate>
                                                 <Button Command="{Binding Command}" Content="{Binding ActionName}"></Button>
                                             </DataTemplate>                                        
-                                        </views1:ParameterDataTemplateSelector.ButtonParameter>
-                                    </views1:ParameterDataTemplateSelector>
+                                        </views:ParameterDataTemplateSelector.ButtonParameter>
+                                    </views:ParameterDataTemplateSelector>
                                 </ContentPresenter.DataTemplates>
                             </ContentPresenter>
                         

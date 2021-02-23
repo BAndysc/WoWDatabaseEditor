@@ -43,6 +43,7 @@
                             DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                             DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectActions, ElementName=Rooot}"
                             DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}"
                             EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}"
                             IsHitTestVisible="True"/>
                     </DataTemplate>
@@ -54,11 +55,17 @@
                             EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
                             IsSelected="{Binding IsSelected, Mode=TwoWay}"
                             userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
-
-                            />
+                        />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type models:SmartCondition}">
-                        <userControls:SmartConditionView/>
+                        <userControls:SmartConditionView
+                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
+                            EditConditionCommand="{Binding DataContext.EditCondition, ElementName=Rooot}"
+                            userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                            />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
                         <Button Classes="FlatButton"

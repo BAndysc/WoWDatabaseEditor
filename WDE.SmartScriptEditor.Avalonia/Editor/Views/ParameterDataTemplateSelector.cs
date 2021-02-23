@@ -8,17 +8,17 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
 {
     public class ParameterDataTemplateSelector : IDataTemplate
     {
-        public DataTemplate Generic { get; set; }
-        public DataTemplate BoolParameter { get; set; }
-        public DataTemplate ButtonParameter { get; set; }
+        public DataTemplate? Generic { get; set; }
+        public DataTemplate? BoolParameter { get; set; }
+        public DataTemplate? ButtonParameter { get; set; }
         
         public IControl Build(object item)
         {
-            if (item is EditableParameterViewModel<int> intParam && intParam.Parameter.Parameter is BoolParameter boolParameter)
+            if (item is EditableParameterViewModel<int> intParam && intParam.Parameter.Parameter is BoolParameter boolParameter && BoolParameter != null)
                 return BoolParameter.Build(item);
-            if (item is EditableParameterActionViewModel aevm)
+            if (item is EditableParameterActionViewModel aevm && ButtonParameter != null)
                 return ButtonParameter.Build(item);
-            return Generic.Build(item);
+            return Generic?.Build(item) ?? new Panel();
         }
 
         public bool Match(object data)

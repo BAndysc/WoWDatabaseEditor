@@ -54,6 +54,9 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
 
         private void ParseTest(string text, Action<string, int, bool, bool> action)
         {
+            if (text == null)
+                return;
+            
             int partIndex = 0;
             bool one = false;
             bool parameter = false;
@@ -207,7 +210,7 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
                 o => o.Text,
                 (o, v) => o.Text = v);
 
-        private string _text;
+        private string _text = "";
         
         /// <summary>
         /// Gets or sets the text.

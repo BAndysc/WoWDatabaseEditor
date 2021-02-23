@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using WDE.SmartScriptEditor.Editor.UserControls;
@@ -28,11 +29,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         private readonly Dictionary<ContentPresenter, SmartAction> presenterToAction = new();
         private readonly Dictionary<ContentPresenter, SmartEvent> presenterToEvent = new();
 
-        private ContentPresenter addActionPresenter;
-        private NewActionViewModel addActionViewModel;
+        private ContentPresenter? addActionPresenter;
+        private NewActionViewModel? addActionViewModel;
         
-        private ContentPresenter addConditionPresenter;
-        private NewConditionViewModel addConditionViewModel;
+        private ContentPresenter? addConditionPresenter;
+        private NewConditionViewModel? addConditionViewModel;
         private bool draggingActions;
         private bool draggingEvents;
         private bool draggingConditions;
@@ -47,20 +48,29 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         
         private double ConditionWidth(double totalWidth) => Math.Max(EventWidth(totalWidth) - 22, 0);
 
+        static SmartScriptPanelLayout()
+        {
+            PointerPressedEvent.AddClassHandler<SmartScriptPanelLayout>(PointerPressedHandled, RoutingStrategies.Tunnel, true);
+        }
+
+        private static void PointerPressedHandled(SmartScriptPanelLayout panel, PointerPressedEventArgs e)
+        {
+            panel.mouseStartPosition = e.GetPosition(panel);
+        }
+        
         protected override void LogicalChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             base.LogicalChildrenCollectionChanged(sender, e);
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (var o in e.NewItems)
+                foreach (var o in e.NewItems!)
                 {
                     OnVisualChildrenChanged(o as ContentPresenter, null);
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                
-                foreach (var o in e.OldItems)
+                foreach (var o in e.OldItems!)
                 {
                     OnVisualChildrenChanged(null, o as ContentPresenter);
                 }
@@ -71,12 +81,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             InvalidateMeasure();
         }
 
-        protected void OnVisualChildrenChanged(ContentPresenter visualAdded, ContentPresenter visualRemoved)
+        protected void OnVisualChildrenChanged(ContentPresenter? visualAdded, ContentPresenter? visualRemoved)
         {
             if (visualAdded is ContentPresenter visualAddedPresenter)
             {
                 visualAddedPresenter.DataContextChanged += OnLoadVisualChild;
-                OnLoadVisualChild(visualAddedPresenter, null);
+                OnLoadVisualChild(visualAddedPresenter, EventArgs.Empty);
             }
 
             if (visualRemoved is ContentPresenter visualRemovedPresenter)
@@ -114,9 +124,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             InvalidateMeasure();
         }
 
-        private void OnLoadVisualChild(object sender, EventArgs e)
+        private void OnLoadVisualChild(object? sender, EventArgs e)
         {
-            ContentPresenter visualAddedPresenter = sender as ContentPresenter;
+            if (sender is not ContentPresenter visualAddedPresenter)
+                return;
+            
             if (visualAddedPresenter.Content is SmartEvent @event)
             {
                 presenterToEvent[visualAddedPresenter] = @event;
@@ -158,8 +170,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            Console.WriteLine("measuring");
-            //Size s = base.MeasureOverride(availableSize);
             float totalDesiredHeight = EventSpacing;
             double eventWidth = EventWidth((float) availableSize.Width);
             double actionWidth = availableSize.Width - eventWidth;
@@ -207,16 +217,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                var logic = ((ILogical) e.Source);
-                if (!(e.Source.InteractiveParent.InteractiveParent.InteractiveParent is SmartEventView) && !(e.Source.InteractiveParent.InteractiveParent.InteractiveParent is SmartActionView))
-                {
-                    foreach (ContentPresenter @event in Events())
-                        SetSelected(@event.Child, false);
-                }
-                else if (e.Source.InteractiveParent.InteractiveParent.InteractiveParent is SmartEventView ve)
-                    SetSelected(ve, true);
-        
-                mouseStartPosition = e.GetPosition(this);
+                foreach (ContentPresenter @event in Events())
+                    SetSelected(@event.Child, false);
             }            
         }
 
@@ -377,12 +379,17 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            Console.WriteLine("arranging");
             eventHeights.Clear();
             actionHeights.Clear();
             conditionHeights.Clear();
             float y = EventSpacing;
 
+            if (draggingActions || draggingConditions || draggingEvents)
+            {
+                addActionPresenter?.Arrange(new Rect(-5, -5, 1, 1));
+                addConditionPresenter?.Arrange(new Rect(-5, -5, 1, 1));
+            }
+            
             float selectedHeight = 0;
             foreach (SmartEvent ev in Script.Events)
             {
@@ -430,7 +437,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
                     if (mouseY > y && mouseY < y + height && !draggingActions && !draggingEvents)
                     {
-                        if (presenterToEvent.TryGetValue(eventPresenter, out SmartEvent smartEvent))
+                        if (presenterToEvent.TryGetValue(eventPresenter, out SmartEvent? smartEvent) && smartEvent != null)
                         {
                             if (addActionViewModel != null)
                                 addActionViewModel.Event = smartEvent;
@@ -439,12 +446,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                                 addConditionViewModel.Event = smartEvent;                            
                         }
                             
-                        addActionPresenter.Arrange(new Rect(EventWidth(finalSize.Width),
+                        addActionPresenter?.Arrange(new Rect(EventWidth(finalSize.Width),
                             y + actionHeight - 26,
                             Math.Max(finalSize.Width - EventWidth(finalSize.Width), 0),
                             24));
                             
-                        addConditionPresenter.Arrange(new Rect(25,
+                        addConditionPresenter?.Arrange(new Rect(25,
                             y + eventsConditionsHeight - 26,
                             ConditionWidth(finalSize.Width),
                             24));
@@ -489,13 +496,13 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             float eventHeight)
         {
             float totalHeight = 26;
-            if (!presenterToEvent.TryGetValue(eveentPresenter, out SmartEvent @event))
+            if (!presenterToEvent.TryGetValue(eveentPresenter, out SmartEvent? @event))
                 return totalHeight;
 
             var actionIndex = 0;
             foreach (SmartAction action in @event.Actions)
             {
-                if (!actionToPresenter.TryGetValue(action, out ContentPresenter actionPresenter))
+                if (!actionToPresenter.TryGetValue(action, out ContentPresenter? actionPresenter))
                     continue;
 
                 var height = (float) actionPresenter.DesiredSize.Height;
@@ -517,12 +524,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         private float MeasureActions(ContentPresenter eventPresenter)
         {
             float totalHeight = 26;
-            if (!presenterToEvent.TryGetValue(eventPresenter, out SmartEvent @event))
+            if (!presenterToEvent.TryGetValue(eventPresenter, out SmartEvent? @event))
                 return totalHeight;
 
             foreach (SmartAction action in @event.Actions)
             {
-                if (!actionToPresenter.TryGetValue(action, out ContentPresenter actionPresenter))
+                if (!actionToPresenter.TryGetValue(action, out ContentPresenter? actionPresenter))
                     continue;
 
                 var height = (float) actionPresenter.DesiredSize.Height;
@@ -535,12 +542,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         private float MeasureConditions(ContentPresenter eventPresenter)
         {
             float totalHeight = 26;
-            if (!presenterToEvent.TryGetValue(eventPresenter, out SmartEvent @event))
+            if (!presenterToEvent.TryGetValue(eventPresenter, out SmartEvent? @event))
                 return totalHeight;
 
             foreach (SmartCondition condition in @event.Conditions)
             {
-                if (!conditionToPresenter.TryGetValue(condition, out ContentPresenter actionPresenter))
+                if (!conditionToPresenter.TryGetValue(condition, out ContentPresenter? actionPresenter))
                     continue;
 
                 var height = (float) actionPresenter.DesiredSize.Height;
@@ -558,14 +565,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             float eventHeight)
         {
             float totalHeight = 26;
-            if (!presenterToEvent.TryGetValue(eveentPresenter, out SmartEvent @event))
+            if (!presenterToEvent.TryGetValue(eveentPresenter, out SmartEvent? @event))
                 return totalHeight;
 
             var conditionIndex = 0;
             y += eventHeight;
             foreach (SmartCondition condition in @event.Conditions)
             {
-                if (!conditionToPresenter.TryGetValue(condition, out ContentPresenter conditionPresenter))
+                if (!conditionToPresenter.TryGetValue(condition, out ContentPresenter? conditionPresenter))
                     continue;
 
                 var height = (float) conditionPresenter.DesiredSize.Height;
@@ -601,8 +608,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         }
 
         public static readonly AvaloniaProperty ScriptProperty =
-            AvaloniaProperty.Register<SmartScriptPanelLayout, SmartScript>(nameof(Script),
-                null);
+            AvaloniaProperty.Register<SmartScriptPanelLayout, SmartScript?>(nameof(Script), null);
         
         public float EventSpacing => 10;
 

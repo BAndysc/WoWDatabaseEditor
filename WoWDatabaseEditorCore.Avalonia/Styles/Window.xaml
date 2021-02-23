@@ -39,7 +39,6 @@
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                
                 <DockPanel LastChildFill="True">
                     <ContentPresenter DockPanel.Dock="Top" Content="{TemplateBinding ToolBar}" />
                     
@@ -49,7 +48,7 @@
                         <ContentPresenter Content="{TemplateBinding StatusBar}" />
                     </controls:StatusBar>
                     
-                    <Grid ColumnDefinitions="Auto,Auto,*">
+                    <Grid ColumnDefinitions="300,Auto,*" Name="SidebarGrid">
                         <controls:SideBar>
                             <ContentPresenter Content="{TemplateBinding SideBar}" />
                         </controls:SideBar>

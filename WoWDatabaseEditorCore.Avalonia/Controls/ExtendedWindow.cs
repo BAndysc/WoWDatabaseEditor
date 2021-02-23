@@ -62,6 +62,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Controls
             
             ExtendClientAreaChromeHints =
                 ExtendClientAreaChromeHints.OSXThickTitleBar | ExtendClientAreaChromeHints.SystemChrome;
+
+            if (SideBar == null && e.NameScope.Find("SidebarGrid") is Grid grid)
+            {
+                grid.ColumnDefinitions[0].MaxWidth = 0;
+            }
         }
 
         private void ContentChanged(AvaloniaPropertyChangedEventArgs e, string pseudoclass)
