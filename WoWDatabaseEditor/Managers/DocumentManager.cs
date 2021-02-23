@@ -37,6 +37,7 @@ namespace WoWDatabaseEditorCore.Managers
                 tool.Visibility = false;
                 typeToToolInstance[tool.GetType()] = tool;
             }
+            allTools.Sort((a, b) => -a.OpenOnStart.CompareTo(b.OpenOnStart));
         }
 
         public IReadOnlyList<ITool> AllTools => allTools;

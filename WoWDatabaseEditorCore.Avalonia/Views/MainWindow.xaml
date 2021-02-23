@@ -6,6 +6,7 @@
           xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
           xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
           xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls"
+          xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
@@ -21,38 +22,34 @@
     </NativeMenu.Menu>
     
     <controls:ExtendedWindow.SideBar>
-        <ItemsRepeater Items="{Binding DocumentManager.OpenedTools}">
-            <ItemsRepeater.ItemTemplate>
+        <controls:ToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
+            <controls:ToolsTabControl.ItemTemplate>
                 <DataTemplate>
-                    <ContentControl utils:ViewBind.Model="{Binding}" 
-                                    HorizontalContentAlignment="Stretch"
-                                    VerticalContentAlignment="Stretch" />
+                    <ContentPresenter 
+                        Content="{Binding Path=(controls:ToolsTabControl.AttachedView).Icon, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}}"
+                        Width="16" Height="16" />
                 </DataTemplate>
-            </ItemsRepeater.ItemTemplate>
-        </ItemsRepeater>
+            </controls:ToolsTabControl.ItemTemplate>
+        </controls:ToolsTabControl>
     </controls:ExtendedWindow.SideBar>
     
     <controls:ExtendedWindow.ToolBar>
         <controls:ExtendedTitleBar DockPanel.Dock="Top">
-            <Panel>
-                <StackPanel Orientation="Horizontal" Spacing="9" HorizontalAlignment="Left">
-                    <Button>
-                        <Border Background="Transparent"
-                                Width="12"
-                                Height="12"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                            <Path Fill="{Binding $parent[Button].Foreground}"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"
-                                  Data="M 0 0 L 6 3.5 L 0 7 Z"/>
-                        </Border>
-                    </Button>
-                    <Button>SQL</Button>
-                </StackPanel>
-                
-                <TextBox HorizontalAlignment="Right" MinWidth="250" Watermark="Search"></TextBox>
-            </Panel>
+            <StackPanel Orientation="Horizontal" Spacing="9" HorizontalAlignment="Right">
+                <Button>
+                    <Border Background="Transparent"
+                            Width="12"
+                            Height="12"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Path Fill="{Binding $parent[Button].Foreground}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Data="M 0 0 L 6 3.5 L 0 7 Z"/>
+                    </Border>
+                </Button>
+                <Button>SQL</Button>
+            </StackPanel>
         </controls:ExtendedTitleBar>
     </controls:ExtendedWindow.ToolBar>
     
@@ -66,47 +63,41 @@
                   Items="{Binding DocumentManager.OpenedDocuments}">
             <TabStrip.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Title}" />
-                        <TextBlock Text="*" IsVisible="{Binding IsModified}" />
-                    </StackPanel>
+                    <DockPanel LastChildFill="True">
+                        <Button DockPanel.Dock="Left" Command="{Binding CloseCommand}" Classes="closeButton">Close</Button>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Title}" />
+                            <TextBlock Text="*" IsVisible="{Binding IsModified}" />
+                        </StackPanel>
+                    </DockPanel>
                 </DataTemplate>
             </TabStrip.ItemTemplate>
         </TabStrip>
     </controls:ExtendedWindow.TabStrip>
     
     <Panel Background="{DynamicResource MainColorBackground}">
-        <ContentControl utils:ViewBind.Model="{Binding}"
-                        DataContext="{Binding DocumentManager.ActiveDocument}"
-                        HorizontalContentAlignment="Stretch"
-                        VerticalContentAlignment="Stretch" />
-                
+        <components:MultiViewModelContentPresenter
+            ViewModels="{Binding DocumentManager.OpenedDocuments}"
+            SelectedViewModel="{Binding DocumentManager.ActiveDocument}">
+            <components:MultiViewModelContentPresenter.Styles>
+                <Style Selector="components|MultiViewModelContentPresenter">
+                    <Setter Property="Template">
+                        <ControlTemplate>
+                            <ContentPresenter DataContext="{TemplateBinding SelectedViewModel}" 
+                                              Content="{TemplateBinding SelectedView}"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"
+                                              />
+                        </ControlTemplate>
+                    </Setter>
+                </Style>
+            </components:MultiViewModelContentPresenter.Styles>
+        </components:MultiViewModelContentPresenter>
+        
         <views:TasksPanel DataContext="{Binding TasksViewModel}"
                           Margin="0,0,5,0"
                           HorizontalAlignment="Right"
                           VerticalAlignment="Bottom"
                           IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
     </Panel>
-    
-    <!-- <DockPanel LastChildFill="True"> -->
-    <!--     <NativeMenuBar DockPanel.Dock="Top"/> -->
-    <!--      -->
-    <!--     <Panel DockPanel.Dock="Right" Width="400"> -->
-    <!--         <Grid RowDefinitions="*,*,*"> -->
-    <!--             <ItemsRepeater Items="{Binding DocumentManager.OpenedTools}"> -->
-    <!--                 <ItemsRepeater.ItemTemplate> -->
-    <!--                     <DataTemplate> -->
-    <!--                         <DockPanel LastChildFill="True"> -->
-    <!--                             <Border DockPanel.Dock="Top" Height="25" Background="#007ACC" BorderBrush="#00406b" BorderThickness="1"> -->
-    <!--                                 <Label Content="{Binding Title}" Foreground="White" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"></Label> -->
-    <!--                             </Border> -->
-    <!--                             <ContentControl utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch" -->
-    <!--                                             VerticalContentAlignment="Stretch" /> -->
-    <!--                         </DockPanel> -->
-    <!--                     </DataTemplate> -->
-    <!--                 </ItemsRepeater.ItemTemplate> -->
-    <!--             </ItemsRepeater> -->
-    <!--         </Grid> -->
-    <!--     </Panel> -->
-    <!-- </DockPanel> -->
 </controls:ExtendedWindow>

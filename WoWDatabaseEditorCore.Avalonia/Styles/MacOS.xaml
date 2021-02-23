@@ -24,4 +24,6 @@
     <StyleInclude Source="avares://WoWDatabaseEditorCore.Avalonia/Styles/MenuItem.xaml"/>
     <StyleInclude Source="avares://WoWDatabaseEditorCore.Avalonia/Styles/ListBox.xaml"/>
     <StyleInclude Source="avares://WoWDatabaseEditorCore.Avalonia/Styles/ListBoxItem.xaml"/>
+    
+    <StyleInclude Source="avares://WoWDatabaseEditorCore.Avalonia/Styles/ToolsTabControl.xaml"/>
 </Styles>

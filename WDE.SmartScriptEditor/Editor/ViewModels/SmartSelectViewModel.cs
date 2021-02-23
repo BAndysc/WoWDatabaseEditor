@@ -35,7 +35,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (string.IsNullOrEmpty(text))
                         return _ => true;
                     var lower = text.ToLower();
-                    return item => item.Name.ToLower().Contains(SearchBox.ToLower());
+                    return item => item.Name.ToLower().Contains(lower);
                 });
 
             AutoDispose(items.Connect()

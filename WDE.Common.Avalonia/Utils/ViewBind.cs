@@ -17,14 +17,20 @@ namespace WDE.Common.Avalonia.Utils
         
         public static object GetModel(Control control) => control.GetValue(ModelProperty);
         public static void SetModel(Control control, object value) => control.SetValue(ModelProperty, value);
+
+        public static bool TryResolve(object viewModel, out object view)
+        {
+            view = null;
+            if (AppViewLocator != null && AppViewLocator.TryResolve(viewModel.GetType(), out var viewType))
+                view = Activator.CreateInstance(viewType);
+            
+            return view != null;
+        }
         
         private static object OnModelChanged(IAvaloniaObject targetLocation, object viewModel)
         {
-            if (AppViewLocator != null && AppViewLocator.TryResolve(viewModel.GetType(), out var viewType))
-            {
-                object? view = Activator.CreateInstance(viewType);
+            if (TryResolve(viewModel, out var view))
                 SetContentProperty(targetLocation, view);
-            }
             else
                 SetContentProperty(targetLocation, new Panel());
 

@@ -1,25 +1,53 @@
-﻿<UserControl x:Class="WDE.HistoryWindow.Views.HistoryView"
+﻿<components:ToolView x:Class="WDE.HistoryWindow.Views.HistoryView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <ListBox Items="{Binding Items}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <WrapPanel>
-                        <TextBlock Text="{Binding Name}">
-                            <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding IsFromFuture}" ComparisonCondition="Equal" Value="True">
-                                    <ChangePropertyAction TargetObject="{Binding #TextBlock}" PropertyName="Foreground" Value="Gray"/>
-                                </DataTriggerBehavior>
-                            </Interaction.Behaviors>
-                        </TextBlock>
-                    </WrapPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </Grid>
-</UserControl>
+    
+    <components:ToolView.Icon>
+        <components:MonochromaticIcon Name="Icon">
+            <components:MonochromaticIcon.Source>
+                <DrawingImage>
+                    <DrawingImage.Drawing>
+                        <DrawingGroup>
+                            <DrawingGroup Opacity="1">
+                                <GeometryDrawing Brush="{Binding #Icon.Fill}">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="1.1" LineJoin="Miter" />
+                                    </GeometryDrawing.Pen>
+                                    <GeometryDrawing.Geometry>
+                                        <EllipseGeometry RadiusX="12.494" RadiusY="12.494" Center="15.879,16.433" />
+                                    </GeometryDrawing.Geometry>
+                                </GeometryDrawing>
+                                <GeometryDrawing Geometry="F0 M32,32z M0,0z M14.094,9.294L15.879,16.433 19.449,20.003">
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="{Binding #Icon.AlternativeBorderBrush}" Thickness="1.78" LineJoin="Miter" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                            </DrawingGroup>
+                        </DrawingGroup>
+                    </DrawingImage.Drawing>
+                </DrawingImage>
+            </components:MonochromaticIcon.Source>
+        </components:MonochromaticIcon>
+    </components:ToolView.Icon>
+    
+    <ListBox Items="{Binding Items}">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <WrapPanel>
+                    <TextBlock Text="{Binding Name}">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{Binding IsFromFuture}" ComparisonCondition="Equal" Value="True">
+                                <ChangePropertyAction TargetObject="{Binding #TextBlock}" PropertyName="Foreground" Value="Gray"/>
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </TextBlock>
+                </WrapPanel>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</components:ToolView>
