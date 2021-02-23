@@ -72,6 +72,7 @@
         <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
         <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
+        <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.Avalonia.csproj" />
         <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
         <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj" />
         <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
