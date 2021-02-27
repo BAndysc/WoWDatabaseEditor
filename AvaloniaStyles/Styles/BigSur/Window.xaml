@@ -23,7 +23,7 @@
                     <Border Classes="Separator" />
                     <DockPanel LastChildFill="True" Margin="78,7.5,7.5,7.5">
                         <ContentPresenter Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"/>
-                        <ContentPresenter Content="{TemplateBinding Content}" Margin="0,0,10,0" HorizontalContentAlignment="Stretch"/>
+                        <ContentPresenter Content="{TemplateBinding Content}" Margin="10,0,10,0" HorizontalContentAlignment="Stretch"/>
                     </DockPanel>
                 </Panel>
             </ControlTemplate>
@@ -144,6 +144,7 @@
                 <Panel>
                     <Border BorderThickness="0.5"
                             BorderBrush="#80FFFFFF" 
+                            CornerRadius="10"
                             IsHitTestVisible="False"
                             Background="{TemplateBinding Background}" />
                     <StackPanel Name="Main" Orientation="Vertical" Spacing="13" Margin="15" VerticalAlignment="Center" HorizontalAlignment="Stretch">

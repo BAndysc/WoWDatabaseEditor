@@ -18,7 +18,7 @@
                     <DockPanel LastChildFill="True" Margin="78,7.5,7.5,7.5">
                         <ContentPresenter Content="{TemplateBinding LeftContent}" DockPanel.Dock="Left"/>
                         <ContentPresenter Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"/>
-                        <ContentPresenter Content="{TemplateBinding Content}" HorizontalContentAlignment="Stretch"/>
+                        <ContentPresenter Content="{TemplateBinding Content}" HorizontalContentAlignment="Stretch" Margin="10,0"/>
                     </DockPanel>
                 </Panel>
             </ControlTemplate>

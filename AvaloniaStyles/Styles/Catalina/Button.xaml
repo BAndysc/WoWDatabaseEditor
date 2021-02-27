@@ -31,7 +31,11 @@
     </Style>
     
     <!-- titlebar button style -->
+    <Style Selector="controls1|ToolBar Button:pressed">
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+    </Style>
     <Style Selector="controls1|ToolBar Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBackgroundPressed}" />
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackgroundPressed}" />
     </Style>
 </Styles>

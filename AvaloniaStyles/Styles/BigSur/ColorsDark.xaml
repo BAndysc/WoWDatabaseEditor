@@ -18,44 +18,34 @@
         <SolidColorBrush x:Key="ContentAlternateRowBackground" Color="#292929" />
         <SolidColorBrush x:Key="MainColorForeground" Color="#EBEBEB" />
         <!-- generic content like button or textarea -->
-        <LinearGradientBrush x:Key="RaisedContentBorderBrush" StartPoint="0%, 0%" EndPoint="0%,100%">
-            <GradientStops>
-                <GradientStop Color="#838383" Offset="0" />
-                <GradientStop Color="#686868" Offset="0.05"/>  
-            </GradientStops>
-        </LinearGradientBrush>
+        <SolidColorBrush x:Key="RaisedContentBorderBrush" Color="#181818" />
         
         <SolidColorBrush x:Key="RaisedContentBorderBrush.Accent" Color="#232325" />
         
-        <LinearGradientBrush x:Key="RaisedContentBackground" StartPoint="0%, 0%" EndPoint="0%,100%">
+        <LinearGradientBrush x:Key="RaisedContentBackground" StartPoint="0 0" EndPoint="0 1">
             <GradientStops>
-                <GradientStop Color="#686868" Offset="0" />
-                <GradientStop Color="#686868" Offset="1"/>  
+                <GradientStop Color="#787878" Offset="0" />
+                <GradientStop Color="#565656" Offset="1"/>  
             </GradientStops>
         </LinearGradientBrush>
         
-        <LinearGradientBrush x:Key="RaisedContentBackground.Accent" StartPoint="0,0" EndPoint="0,1.5">
+        <LinearGradientBrush x:Key="RaisedContentBackground.Accent" StartPoint="0% 0%" EndPoint="0% 100%">
             <GradientStops>
-                <GradientStop Color="#6CA2F6" Offset="0" />
-                <GradientStop Color="#2B64D0" Offset="1"/>  
+                <GradientStop Color="#7BBBF2" Offset="0" />
+                <GradientStop Color="#4E9EEB" Offset="0.05" /> 
+                <GradientStop Color="#4792DF" Offset="1" />
             </GradientStops>
         </LinearGradientBrush>
         
-        <SolidColorBrush x:Key="RaisedContentForeground.Accent" Color="White" />
+        <SolidColorBrush x:Key="RaisedContentForeground.Accent" Color="#E4F0FB" />
         
         <!-- button -->
-        <SolidColorBrush x:Key="RaisedContentBackgroundPressed" Color="#999999" />
-        <SolidColorBrush x:Key="ButtonForeground" Color="#FAFAFA" />
+        <SolidColorBrush x:Key="ButtonForeground" Color="#E6E6E6" />
         
         <!-- title bar -->
-        <SolidColorBrush x:Key="TitleBarSeparatorBrush" Color="#494C4D" />
-        <SolidColorBrush x:Key="TitleBarHighlight" Color="#828688" /> <!-- glow simulation on the top of titlebar -->
-        <LinearGradientBrush x:Key="TitleBarBackground" StartPoint="0%, 0%" EndPoint="0%,100%" >
-            <GradientStops>
-                <GradientStop Color="#3E4042" Offset="0" />
-                <GradientStop Color="#363839" Offset="1"/>  
-            </GradientStops>
-        </LinearGradientBrush>
+        <SolidColorBrush x:Key="TitleBarSeparatorBrush" Color="Black" />
+        <SolidColorBrush x:Key="TitleBarHighlight" Color="#4B4B4B" /> <!-- glow simulation on the top of titlebar -->
+        <SolidColorBrush x:Key="TitleBarBackground" Color="#363636" />
         
         <!-- textbox -->
         <SolidColorBrush x:Key="TextBoxForeground" Color="White" />
@@ -86,8 +76,8 @@
         <LinearGradientBrush x:Key="CheckBox.Background" StartPoint="0%,0%" EndPoint="0%,100%">
             <GradientStops>
                 <GradientStop Offset="0" Color="#666666" />
-                <GradientStop Offset="0.15" Color="#414141" />
-                <GradientStop Offset="1" Color="#5F5F5F" />
+                <GradientStop Offset="0.15" Color="#404040" />
+                <GradientStop Offset="1" Color="#5E5F5F" />
             </GradientStops>
         </LinearGradientBrush>
         <SolidColorBrush x:Key="CheckBox.BorderBrush" Color="#1A1A1A" />

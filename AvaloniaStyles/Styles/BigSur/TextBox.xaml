@@ -8,17 +8,26 @@
         <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
     </Style>
     
-    <Style Selector="controls1|ExtendedTitleBar TextBox">
+    <Style Selector="controls1|ToolBar TextBox">
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
     </Style>
         
+    <Style Selector="TextBox:focus">
+        <Setter Property="ClipToBounds" Value="False" />
+    </Style>
+    
     <Style Selector="TextBox:focus /template/ Border#border">
-        <Setter Property="BorderBrush" Value="#83A5E5"/>
-        <Setter Property="BoxShadow" Value="inset 0 0 3 1 #83A5E5"></Setter>
+        <Setter Property="BorderBrush" Value="#3B89CD"/>
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="BoxShadow" Value="0 0 0 3 #993B89CD"></Setter>
     </Style>
         
     <Style Selector="TextBox /template/ Border#border">
-        <Setter Property="CornerRadius" Value="4"></Setter>
+        <Setter Property="CornerRadius" Value="0"></Setter>
+    </Style>
+    
+    <Style Selector="controls1|ToolBar TextBox /template/ Border">
+        <Setter Property="CornerRadius" Value="5"></Setter>
     </Style>
     
     <Style Selector="TextBox /template/ TextBlock#watermark">
