@@ -6,13 +6,14 @@
           xmlns:mvvm="http://prismlibrary.com/"
           xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
           mvvm:ViewModelLocator.AutoWireViewModel="False"
           mc:Ignorable="d"
           d:DesignHeight="300" d:DesignWidth="300">
     
     <components:ToolView.Icon>
-        <components:MonochromaticIcon Name="Icon">
-            <components:MonochromaticIcon.Source>
+        <controls:MonochromaticIcon Name="Icon">
+            <controls:MonochromaticIcon.Source>
                 <DrawingImage>
                     <DrawingImage.Drawing>
                         <DrawingGroup>
@@ -36,8 +37,8 @@
                         </DrawingGroup>
                     </DrawingImage.Drawing>
                 </DrawingImage>
-            </components:MonochromaticIcon.Source>
-        </components:MonochromaticIcon>
+            </controls:MonochromaticIcon.Source>
+        </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
     <ContentPresenter DataContext="{Binding EditorViewModel}" utils:ViewBind.Model="{Binding}" />

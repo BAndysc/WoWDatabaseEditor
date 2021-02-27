@@ -5,10 +5,11 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
+using AvaloniaStyles.Controls;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
 {
-    public class MessageBoxView : Window
+    public class MessageBoxView : BaseMessageBoxWindow
     {
         public MessageBoxView()
         {

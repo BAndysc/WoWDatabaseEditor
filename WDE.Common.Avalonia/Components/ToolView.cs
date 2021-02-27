@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using AvaloniaStyles.Controls;
 
 namespace WDE.Common.Avalonia.Components
 {

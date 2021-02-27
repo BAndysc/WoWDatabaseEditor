@@ -7,11 +7,12 @@
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <components:ToolView.Icon>
-        <components:MonochromaticIcon Name="Icon">
-            <components:MonochromaticIcon.Source>
+        <controls:MonochromaticIcon Name="Icon">
+            <controls:MonochromaticIcon.Source>
                 <DrawingImage>
                     <DrawingImage.Drawing>
                         <DrawingGroup>
@@ -39,8 +40,8 @@
                         </DrawingGroup>
                     </DrawingImage.Drawing>
                 </DrawingImage>
-            </components:MonochromaticIcon.Source>
-        </components:MonochromaticIcon>
+            </controls:MonochromaticIcon.Source>
+        </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
     <components:ToolView.Resources>

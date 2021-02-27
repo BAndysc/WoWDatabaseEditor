@@ -5,12 +5,14 @@
           xmlns:mvvm="http://prismlibrary.com/"
           xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
           xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
-          xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls"
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
           TransparencyLevelHint="AcrylicBlur"
+          Icon="../Icon.ico"
+          ManagedIcon="../Icon.ico"
           ExtendClientAreaTitleBarHeightHint="38"
           ExtendClientAreaToDecorationsHint="True"
           Title="{Binding Title}">
@@ -22,7 +24,7 @@
     </NativeMenu.Menu>
     
     <controls:ExtendedWindow.SideBar>
-        <controls:ToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
+        <views:WdeToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
             <controls:ToolsTabControl.ItemTemplate>
                 <DataTemplate>
                     <ContentPresenter 
@@ -30,27 +32,29 @@
                         Width="16" Height="16" />
                 </DataTemplate>
             </controls:ToolsTabControl.ItemTemplate>
-        </controls:ToolsTabControl>
+        </views:WdeToolsTabControl>
     </controls:ExtendedWindow.SideBar>
     
     <controls:ExtendedWindow.ToolBar>
-        <controls:ExtendedTitleBar DockPanel.Dock="Top">
-            <StackPanel Orientation="Horizontal" Spacing="9" HorizontalAlignment="Right">
-                <Button>
-                    <Border Background="Transparent"
-                            Width="12"
-                            Height="12"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center">
-                        <Path Fill="{Binding $parent[Button].Foreground}"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Data="M 0 0 L 6 3.5 L 0 7 Z"/>
-                    </Border>
-                </Button>
-                <Button>SQL</Button>
-            </StackPanel>
-        </controls:ExtendedTitleBar>
+        <controls:ToolBar>
+            <controls:ToolBar.RightContent>
+                <StackPanel Orientation="Horizontal">
+                    <Button>
+                        <Border Background="Transparent"
+                                Width="12"
+                                Height="12"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Path Fill="{Binding $parent[Button].Foreground}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Data="M 0 0 L 6 3.5 L 0 7 Z"/>
+                        </Border>
+                    </Button>
+                    <Button>SQL</Button>
+                </StackPanel>
+            </controls:ToolBar.RightContent>
+        </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>
     
     <controls:ExtendedWindow.StatusBar>

@@ -6,8 +6,8 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
+using AvaloniaStyles.Controls;
 using WDE.Common.Managers;
-using WoWDatabaseEditorCore.Avalonia.Controls;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {

@@ -1,0 +1,34 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="TextBox">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextBoxForeground}" />
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+    </Style>
+    
+    <Style Selector="controls1|ExtendedTitleBar TextBox">
+        <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
+    </Style>
+        
+    <Style Selector="TextBox:focus /template/ Border#border">
+        <Setter Property="BorderBrush" Value="#83A5E5"/>
+        <Setter Property="BoxShadow" Value="inset 0 0 3 1 #83A5E5"></Setter>
+    </Style>
+        
+    <Style Selector="TextBox /template/ Border#border">
+        <Setter Property="CornerRadius" Value="4"></Setter>
+    </Style>
+    
+    <Style Selector="TextBox /template/ TextBlock#watermark">
+        <Setter Property="Foreground" Value="{DynamicResource TextBoxWatermarkForeground}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,1,0,0" />
+    </Style>
+    
+    <Style Selector="TextBox /template/ TextPresenter">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,1,0,0" />
+    </Style>
+</Styles>

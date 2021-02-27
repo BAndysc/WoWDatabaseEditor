@@ -1,0 +1,25 @@
+<controls:BaseMessageBoxWindow xmlns="https://github.com/avaloniaui"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+          mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+          Title="Document has been modified."
+          SizeToContent="WidthAndHeight"
+          Message="Would you like to save the document?"
+          x:Class="AvaloniaStyles.Demo.MessageBox">
+    <controls:BaseMessageBoxWindow.Image>
+        <Border Background="#7244CC"
+                CornerRadius="10" 
+                BoxShadow="0 1 3 0 #40000000"
+                BorderThickness="0.5"
+                BorderBrush="#70FFFFFF"
+                ClipToBounds="False" />
+    </controls:BaseMessageBoxWindow.Image>
+    <StackPanel>
+        <Button Click="Button_OnClick">Save</Button>
+        <Button Click="Button_OnClick">Don't save</Button>
+        <Separator />
+        <Button Click="Button_OnClick">Cancel</Button>
+    </StackPanel>
+</controls:BaseMessageBoxWindow>

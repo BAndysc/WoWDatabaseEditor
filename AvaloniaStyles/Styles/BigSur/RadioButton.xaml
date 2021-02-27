@@ -1,0 +1,77 @@
+<Styles xmlns="https://github.com/avaloniaui">
+  <Style Selector="RadioButton">
+    <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0.5"/>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="Auto,*" Background="{TemplateBinding Background}">
+          <Ellipse Name="border"
+                   StrokeThickness="0.5"
+                   Width="15"
+                   Height="15"
+                   VerticalAlignment="Center"/>
+          <Ellipse Name="checkMark"
+                   Width="5"
+                   Height="5"
+                   Stretch="Uniform"
+                   Fill="White"
+                   UseLayoutRounding="False"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+          <Ellipse Name="indeterminateMark"
+                   Fill="{DynamicResource ThemeAccentBrush}"
+                   Width="5"
+                   Height="5"
+                   Stretch="Uniform"
+                   UseLayoutRounding="False"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+          <ContentPresenter Name="PART_ContentPresenter"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Content="{TemplateBinding Content}"
+                            Margin="4,0,0,0"
+                            VerticalAlignment="Center"
+                            Grid.Column="1"/>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  
+  <Style Selector="RadioButton /template/ Ellipse#border">
+    <Setter Property="Stroke" Value="{DynamicResource CheckBox.BorderBrush}" />
+    <Setter Property="Fill" Value="{DynamicResource CheckBox.Background}" />
+  </Style>
+  <Style Selector="RadioButton:pressed /template/ Ellipse#border">
+    <Setter Property="Stroke" Value="{DynamicResource CheckBox.BorderBrush.Pressed}" />
+    <Setter Property="Fill" Value="{DynamicResource CheckBox.Background.Pressed}" />
+  </Style>
+  <Style Selector="RadioButton:pointerover /template/ Ellipse#border">
+    <Setter Property="Stroke" Value="{DynamicResource CheckBox.BorderBrush}"/>
+  </Style>
+  <Style Selector="RadioButton /template/ Ellipse#checkMark">
+    <Setter Property="Fill" Value="White"/>
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+  <Style Selector="RadioButton /template/ Ellipse#indeterminateMark">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+  <Style Selector="RadioButton:checked /template/ Ellipse#border">
+    <Setter Property="Stroke" Value="{DynamicResource CheckBox.BorderBrush.Checked}" />
+    <Setter Property="Fill" Value="{DynamicResource CheckBox.Background.Checked}" />
+  </Style>
+  <Style Selector="RadioButton:checked:pressed /template/ Ellipse#border">
+    <Setter Property="Stroke" Value="{DynamicResource CheckBox.BorderBrush.Checked.Pressed}" />
+    <Setter Property="Fill" Value="{DynamicResource CheckBox.Background.Checked.Pressed}" />
+  </Style>
+  <Style Selector="RadioButton:checked /template/ Ellipse#checkMark">
+    <Setter Property="IsVisible" Value="True"/>
+  </Style>
+  <Style Selector="RadioButton:indeterminate /template/ Ellipse#indeterminateMark">
+    <Setter Property="IsVisible" Value="True"/>
+  </Style>
+  <Style Selector="RadioButton:disabled /template/ Ellipse#border">
+    <Setter Property="Opacity" Value="{DynamicResource ThemeDisabledOpacity}"/>
+  </Style>
+</Styles>

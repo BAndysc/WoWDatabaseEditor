@@ -1,0 +1,129 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="controls1|ExtendedTitleBar">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <ContentPresenter Content="{TemplateBinding LeftContent}"/>
+                    <ContentPresenter Content="{TemplateBinding Content} "/>                        
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls1|ToolBar StackPanel">
+        <Setter Property="Spacing" Value="10" />
+    </Style>
+
+    <Style Selector="controls1|ExtendedWindow">
+        <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
+        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+        <Setter Property="UseSystemChrome" Value="False" />
+        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="2" BorderBrush="#007ACC">
+                    <DockPanel LastChildFill="True">
+                        <Panel Height="24" DockPanel.Dock="Top">
+                            <Border Background="{TemplateBinding Background}" IsHitTestVisible="False"/>
+                            <DockPanel>
+                                <Image Source="{TemplateBinding ManagedIcon}" DockPanel.Dock="Left" Width="24"/>
+                                <NativeMenuBar DockPanel.Dock="Left" />
+                                <Button DockPanel.Dock="Right" Content="Close">
+                                    <Interaction.Behaviors>
+                                        <EventTriggerBehavior EventName="Click">
+                                            <CallMethodAction MethodName="Close" TargetObject="{Binding $parent[TopLevel]}" />
+                                        </EventTriggerBehavior>
+                                    </Interaction.Behaviors>
+                                </Button>
+                                <Button DockPanel.Dock="Right" Content="Maximize">
+                                    <Interaction.Behaviors>
+                                        <EventTriggerBehavior EventName="Click">
+                                            <CallMethodAction MethodName="MaximizeNormalize" TargetObject="{Binding $parent[TopLevel]}" />
+                                        </EventTriggerBehavior>
+                                    </Interaction.Behaviors>
+                                </Button>
+                                <Button DockPanel.Dock="Right" Content="Minimize">
+                                    <Interaction.Behaviors>
+                                        <EventTriggerBehavior EventName="Click">
+                                            <ChangePropertyAction PropertyName="WindowState" Value="Minimized" TargetObject="{Binding $parent[TopLevel]}" />
+                                        </EventTriggerBehavior>
+                                    </Interaction.Behaviors>
+                                </Button>
+                                <TextBlock IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{TemplateBinding Title}" />
+                            </DockPanel>
+                        </Panel>
+                        <DockPanel LastChildFill="True" Background="{TemplateBinding Background}">
+                            <StackPanel HorizontalAlignment="Left" DockPanel.Dock="Top" Orientation="Horizontal" Spacing="20">
+                                <ContentPresenter Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                <ContentPresenter Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                            </StackPanel>
+                        
+                            <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
+
+                            <controls1:StatusBar DockPanel.Dock="Bottom" Name="StatusBar">
+                                <ContentPresenter Content="{TemplateBinding StatusBar}" />
+                            </controls1:StatusBar>
+                        
+                            <Grid ColumnDefinitions="*,Auto,300" Name="ReversedSidebarGrid">
+                                <Panel ClipToBounds="True">
+                                    <ContentPresenter Content="{TemplateBinding Content}" />
+                                </Panel>
+                                <GridSplitter Grid.Column="1"></GridSplitter>
+                                <controls1:SideBar Grid.Column="2">
+                                    <ContentPresenter Content="{TemplateBinding SideBar}" />
+                                </controls1:SideBar>
+                            </Grid>
+                        </DockPanel>
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls1|ExtendedWindow:has-sidebar /template/ controls1|SideBar">
+        <Setter Property="MinWidth" Value="250" />
+    </Style>
+    
+    <Style Selector="controls1|ExtendedWindow:not(:has-statusbar) /template/ controls1|StatusBar#StatusBar">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    
+    <Style Selector="controls1|ExtendedWindow:not(:has-tabstrip) /template/ Panel#Tabs">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    
+    
+    <!-- dialog -->
+    <Style Selector="controls1|BaseMessageBoxWindow">
+        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+        <Setter Property="Title" Value="{DynamicResource Title}"/>
+        <Setter Property="WindowStartupLocation" Value="CenterOwner" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}" Padding="15">
+                    <DockPanel LastChildFill="True">
+                        <ContentPresenter Content="{TemplateBinding Image}"
+                                          VerticalContentAlignment="Center"
+                                          Width="54" Height="54"
+                                          Margin="0,0,15,0" />
+                        <ContentPresenter DockPanel.Dock="Bottom" Content="{TemplateBinding Content}" Name="Buttons" HorizontalContentAlignment="Right"/>
+                        <TextBlock Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" FontSize="14" />
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls1|BaseMessageBoxWindow Separator">
+        <Setter Property="Width" Value="10" />
+    </Style>
+    <Style Selector="controls1|BaseMessageBoxWindow StackPanel">
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Spacing" Value="6" />
+    </Style>
+</Styles>

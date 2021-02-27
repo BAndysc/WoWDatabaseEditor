@@ -20,6 +20,7 @@
         <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
 </Project>

@@ -7,10 +7,11 @@
           xmlns:system="clr-namespace:System;assembly=System.Runtime"
           xmlns="https://github.com/avaloniaui"
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
           prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
     
     <components:ToolView.Icon>
-        <components:MonochromaticIcon Stretch="Fill" Name="That">
+        <controls:MonochromaticIcon Stretch="Fill" Name="That">
             <Image.Source>
                 <DrawingImage>
                     <DrawingImage.Drawing>
@@ -31,7 +32,7 @@
                     </DrawingImage.Drawing>
                 </DrawingImage>
             </Image.Source>
-        </components:MonochromaticIcon>
+        </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
     <components:ToolView.Resources>

@@ -1,0 +1,11 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Design.PreviewWith>
+        <Button>Click me</Button>
+    </Design.PreviewWith>
+    
+    <Style Selector="controls|ToolBar Button">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+</Styles>

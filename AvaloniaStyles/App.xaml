@@ -1,0 +1,8 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles"
+             x:Class="AvaloniaStyles.App">
+    <Application.Styles>
+        <avaloniaStyles:SystemTheme Mode="Windows10" />
+    </Application.Styles>
+</Application>

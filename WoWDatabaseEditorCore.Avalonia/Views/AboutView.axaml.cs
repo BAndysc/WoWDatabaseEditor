@@ -1,5 +1,7 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using AvaloniaStyles;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
@@ -15,6 +17,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        private void Button_OnClick(object? sender, RoutedEventArgs e)
+        {
         }
     }
 }

@@ -1,0 +1,29 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
+    <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
+    
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/PopupRoot.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/TreeView.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/TreeViewItem.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/TabStrip.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/Button.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ToggleButton.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/TextBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/Window.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/GridSplitter.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/StatusBar.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/SideBar.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/CheckBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/RadioButton.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ComboBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ComboBoxItem.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ContextMenu.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/MenuItem.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ListBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ListBoxItem.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/DataGrid.xaml"/>
+    
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ToolsTabControl.xaml"/>
+</Styles>

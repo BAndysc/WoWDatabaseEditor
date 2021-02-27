@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
-             xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              WindowStartupLocation="CenterOwner"
              ShowInTaskbar="False"
              CanResize="{Binding Resizeable}"
@@ -15,8 +15,7 @@
         <KeyBinding Gesture="Enter" Command="{Binding Accept}" />
     </controls:ExtendedWindow.KeyBindings>
     <controls:ExtendedWindow.ToolBar>
-        <controls:ExtendedTitleBar>
-            <ContentPresenter Content="{Binding #ThisWindow.Content.ToolBar}"/>
-        </controls:ExtendedTitleBar>
+        <controls:ToolBar Content="{Binding #ThisWindow.Content.ToolBar}">
+        </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>
 </controls:ExtendedWindow>
