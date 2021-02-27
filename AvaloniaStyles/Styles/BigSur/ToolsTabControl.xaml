@@ -3,6 +3,13 @@
         xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
         
     <Style Selector="controls|ToolsTabControl">
+        <Setter Property="ItemTemplate">
+            <DataTemplate>
+                <ContentPresenter 
+                    Content="{Binding Path=(controls:ToolsTabControl.AttachedView).Icon, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}}"
+                    Width="16" Height="16" />
+            </DataTemplate>
+        </Setter>
         <Setter Property="Template">
             <ControlTemplate>
                 <DockPanel>

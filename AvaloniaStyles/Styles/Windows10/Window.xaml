@@ -24,60 +24,50 @@
         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <Border BorderThickness="2" BorderBrush="#007ACC">
+                <Border BorderThickness="1" BorderBrush="{DynamicResource AccentColorBackground}">
                     <DockPanel LastChildFill="True">
-                        <Panel Height="24" DockPanel.Dock="Top">
+                        <Panel Height="30" DockPanel.Dock="Top">
                             <Border Background="{TemplateBinding Background}" IsHitTestVisible="False"/>
-                            <DockPanel>
+                            <DockPanel Margin="6,0,0,0">
                                 <Image Source="{TemplateBinding ManagedIcon}" DockPanel.Dock="Left" Width="24"/>
                                 <NativeMenuBar DockPanel.Dock="Left" />
-                                <Button DockPanel.Dock="Right" Content="Close">
-                                    <Interaction.Behaviors>
-                                        <EventTriggerBehavior EventName="Click">
-                                            <CallMethodAction MethodName="Close" TargetObject="{Binding $parent[TopLevel]}" />
-                                        </EventTriggerBehavior>
-                                    </Interaction.Behaviors>
-                                </Button>
-                                <Button DockPanel.Dock="Right" Content="Maximize">
-                                    <Interaction.Behaviors>
-                                        <EventTriggerBehavior EventName="Click">
-                                            <CallMethodAction MethodName="MaximizeNormalize" TargetObject="{Binding $parent[TopLevel]}" />
-                                        </EventTriggerBehavior>
-                                    </Interaction.Behaviors>
-                                </Button>
-                                <Button DockPanel.Dock="Right" Content="Minimize">
-                                    <Interaction.Behaviors>
-                                        <EventTriggerBehavior EventName="Click">
-                                            <ChangePropertyAction PropertyName="WindowState" Value="Minimized" TargetObject="{Binding $parent[TopLevel]}" />
-                                        </EventTriggerBehavior>
-                                    </Interaction.Behaviors>
-                                </Button>
-                                <TextBlock IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{TemplateBinding Title}" />
+                                <controls1:WindowControlButtons DockPanel.Dock="Right"/>
+                                <TextBlock 
+                                    IsHitTestVisible="False" 
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" 
+                                    Foreground="{DynamicResource TitleBarForeground}"
+                                    Text="{TemplateBinding Title}" />
                             </DockPanel>
                         </Panel>
-                        <DockPanel LastChildFill="True" Background="{TemplateBinding Background}">
-                            <StackPanel HorizontalAlignment="Left" DockPanel.Dock="Top" Orientation="Horizontal" Spacing="20">
-                                <ContentPresenter Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                <ContentPresenter Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                            </StackPanel>
                         
-                            <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
-
-                            <controls1:StatusBar DockPanel.Dock="Bottom" Name="StatusBar">
-                                <ContentPresenter Content="{TemplateBinding StatusBar}" />
-                            </controls1:StatusBar>
+                        <controls1:StatusBar DockPanel.Dock="Bottom" Name="StatusBar">
+                            <ContentPresenter Content="{TemplateBinding StatusBar}" />
+                        </controls1:StatusBar>
                         
-                            <Grid ColumnDefinitions="*,Auto,300" Name="ReversedSidebarGrid">
-                                <Panel ClipToBounds="True">
-                                    <ContentPresenter Content="{TemplateBinding Content}" />
-                                </Panel>
-                                <GridSplitter Grid.Column="1"></GridSplitter>
-                                <controls1:SideBar Grid.Column="2">
-                                    <ContentPresenter Content="{TemplateBinding SideBar}" />
-                                </controls1:SideBar>
-                            </Grid>
-                        </DockPanel>
+                        <Border Background="{TemplateBinding Background}" Padding="4">
+                            <DockPanel LastChildFill="True" Background="{TemplateBinding Background}">
+                                <StackPanel HorizontalAlignment="Left" DockPanel.Dock="Top" Orientation="Horizontal" Spacing="20">
+                                    <ContentPresenter Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <ContentPresenter Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                </StackPanel>
+                        
+                                <Grid ColumnDefinitions="*,Auto,300" Name="ReversedSidebarGrid">
+                                    <DockPanel ClipToBounds="True" LastChildFill="True">
+                                        <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
+                                        <ContentPresenter Content="{TemplateBinding Content}" 
+                                                          BorderThickness="1,0,1,1"
+                                                          BorderBrush="{DynamicResource ContentBorderBrush}"
+                                                          Background="{DynamicResource ContentBackground}"/>
+                                    </DockPanel>
+                                    <GridSplitter Grid.Column="1"></GridSplitter>
+                                    <controls1:SideBar Grid.Column="2">
+                                        <ContentPresenter Content="{TemplateBinding SideBar}" />
+                                    </controls1:SideBar>
+                                </Grid>
+                            </DockPanel>
+                        </Border>
                     </DockPanel>
                 </Border>
             </ControlTemplate>

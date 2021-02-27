@@ -20,6 +20,14 @@ namespace AvaloniaStyles.Controls
         public static void SetAttachedView(TabItem control, IControl value) =>
             control.SetValue(AttachedViewProperty, value);
 
+        
+        public static readonly AvaloniaProperty<string> ToolTitleProperty =
+            AvaloniaProperty.RegisterAttached<ToolsTabControl, TabItem, string>("ToolTitle");
+        public static string GetToolTitle(TabItem control) => (string) control.GetValue(ToolTitleProperty);
+        public static void SetToolTitle(TabItem control, string value) =>
+            control.SetValue(ToolTitleProperty, value);
+        
+        
         public static readonly StyledProperty<IControl> ActiveViewProperty =
             AvaloniaProperty.Register<ToolsTabControl, IControl>(nameof(ActiveView));
 

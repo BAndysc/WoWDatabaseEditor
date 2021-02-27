@@ -22,8 +22,6 @@
             <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
                 <TextBlock  TextWrapping="WrapWithOverflow" Text="Database is not required, but in that case features are limited. It is database editor by design." />
             </WrapPanel>
-            <Button>Big Sur</Button>
-            <Button Click="Button_OnClick">Catalina Light</Button>
         </StackPanel>
     </Grid>
 </UserControl>

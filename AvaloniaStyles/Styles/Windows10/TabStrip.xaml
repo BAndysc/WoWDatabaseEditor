@@ -4,7 +4,6 @@
         <Setter Property="Background" Value="{DynamicResource TabStripBackground}"/>
         <Setter Property="BorderBrush" Value="#007ACC"/>
         <Setter Property="BorderThickness" Value="0,0,0,2" />
-        <Setter Property="Height" Value="21"/>
         <Setter Property="Template">
             <ControlTemplate>
                 <Border BorderBrush="{TemplateBinding BorderBrush}"
@@ -22,11 +21,11 @@
     </Style>
     
     <Style Selector="TabStripItem">
-        <Setter Property="Height" Value="19"></Setter>
+        <Setter Property="MinHeight" Value="17" />
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-        <Setter Property="Padding" Value="10,1,10,0"/>
+        <Setter Property="Padding" Value="2, 1, 6,0"/>
         <Setter Property="BorderThickness" Value="0,0,0,0"/>
         <Setter Property="Foreground" Value="White" />
     </Style>
@@ -68,17 +67,6 @@
                 </Border>
             </ControlTemplate>
         </Setter>
-        <Setter Property="Transitions">
-            <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
-            </Transitions>
-        </Setter>
-    </Style>
-    <Style Selector="TabStripItem Button.closeButton">
-        <Setter Property="Opacity" Value="0" />
-    </Style>
-    <Style Selector="TabStripItem:pointerover Button.closeButton">
-        <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="TabStripItem Button.closeButton /template/ Border">
         <Setter Property="Background" Value="Transparent" />

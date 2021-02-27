@@ -18,9 +18,5 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         {
             AvaloniaXamlLoader.Load(this);
         }
-
-        private void Button_OnClick(object? sender, RoutedEventArgs e)
-        {
-        }
     }
 }

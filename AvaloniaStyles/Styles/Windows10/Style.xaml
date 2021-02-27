@@ -4,7 +4,11 @@
         
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabStrip.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/NativeMenuBar.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/WindowControlButtons.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/SideBar.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Window.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/StatusBar.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ToolsTabControl.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Button.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ColorsDark.xaml" />
 </Styles>

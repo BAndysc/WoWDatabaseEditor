@@ -64,8 +64,11 @@
       <AvaloniaResource Include="Styles\Catalina\TreeViewItem.xaml" />
       <AvaloniaResource Include="Styles\Catalina\Window.xaml" />
       <AvaloniaResource Include="Styles\Windows10\NativeMenuBar.xaml" />
+      <AvaloniaResource Include="Styles\Windows10\SideBar.xaml" />
+      <AvaloniaResource Include="Styles\Windows10\StatusBar.xaml" />
       <AvaloniaResource Include="Styles\Windows10\Style.xaml" />
       <AvaloniaResource Include="Styles\Windows10\TabStrip.xaml" />
+      <AvaloniaResource Include="Styles\Windows10\ToolsTabControl.xaml" />
       <AvaloniaResource Include="Styles\Windows10\Window.xaml" />
       <None Remove="App.xaml" />
       <AvaloniaResource Include="App.xaml" />

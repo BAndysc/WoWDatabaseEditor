@@ -23,7 +23,7 @@
                     <Border Classes="Separator" />
                     <DockPanel LastChildFill="True" Margin="78,7.5,7.5,7.5">
                         <ContentPresenter Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"/>
-                        <ContentPresenter Content="{TemplateBinding Content}" Margin="0,0,10,0" HorizontalContentAlignment="Center"/>
+                        <ContentPresenter Content="{TemplateBinding Content}" Margin="0,0,10,0" HorizontalContentAlignment="Stretch"/>
                     </DockPanel>
                 </Panel>
             </ControlTemplate>
@@ -79,7 +79,7 @@
                                     BorderThickness="0,0,0,0.5">
                             </Border>
                             <ContentPresenter Name="LeftPartToolBar"
-                                              HorizontalContentAlignment="Right"
+                                              HorizontalAlignment="Right"
                                               Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                         </Panel>
                         

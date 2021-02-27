@@ -25,32 +25,32 @@
     
     <controls:ExtendedWindow.SideBar>
         <views:WdeToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
-            <controls:ToolsTabControl.ItemTemplate>
-                <DataTemplate>
-                    <ContentPresenter 
-                        Content="{Binding Path=(controls:ToolsTabControl.AttachedView).Icon, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}}"
-                        Width="16" Height="16" />
-                </DataTemplate>
-            </controls:ToolsTabControl.ItemTemplate>
+            <views:WdeToolsTabControl.Styles>
+                <Style Selector="TabItem">
+                    <Setter Property="(controls:ToolsTabControl.ToolTitle)" Value="{Binding Title}" />
+                </Style>
+            </views:WdeToolsTabControl.Styles>
         </views:WdeToolsTabControl>
     </controls:ExtendedWindow.SideBar>
     
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
+            <controls:ToolBar.LeftContent>
+                <Button>
+                    <Border Background="Transparent"
+                            Width="12"
+                            Height="12"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Path Fill="{Binding $parent[Button].Foreground}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Data="M 0 0 L 6 3.5 L 0 7 Z"/>
+                    </Border>
+                </Button>
+            </controls:ToolBar.LeftContent>
             <controls:ToolBar.RightContent>
                 <StackPanel Orientation="Horizontal">
-                    <Button>
-                        <Border Background="Transparent"
-                                Width="12"
-                                Height="12"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                            <Path Fill="{Binding $parent[Button].Foreground}"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"
-                                  Data="M 0 0 L 6 3.5 L 0 7 Z"/>
-                        </Border>
-                    </Button>
                     <Button>SQL</Button>
                 </StackPanel>
             </controls:ToolBar.RightContent>

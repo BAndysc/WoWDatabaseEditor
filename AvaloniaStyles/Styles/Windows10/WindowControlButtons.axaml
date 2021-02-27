@@ -1,0 +1,71 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Design.PreviewWith>
+        <controls:WindowControlButtons />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|WindowControlButtons">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <Button>
+                        <Path Data="F1M0,6L0,9 9,9 9,6 0,6z"
+                              Fill="White" />
+                        <Interaction.Behaviors>
+                            <EventTriggerBehavior EventName="Click">
+                                <ChangePropertyAction PropertyName="WindowState" Value="Minimized" TargetObject="{Binding $parent[TopLevel]}" />
+                            </EventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Button>
+                    <Button>
+                        <Path Width="10"
+                              Height="10"
+                              Fill="White"
+                              Name="PART_MaxRestore"/>
+                        <Interaction.Behaviors>
+                            <EventTriggerBehavior EventName="Click">
+                                <CallMethodAction MethodName="MaximizeNormalize" TargetObject="{Binding $parent[TopLevel]}" />
+                            </EventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Button>
+                    <Button>
+                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Line Stroke="White" StrokeThickness="2.5" StartPoint="1,1" EndPoint="9, 9" />
+                            <Line Stroke="White" StrokeThickness="2.5" StartPoint="1,9" EndPoint="9, 1" />
+                        </Grid>
+                        <Interaction.Behaviors>
+                            <EventTriggerBehavior EventName="Click">
+                                <CallMethodAction MethodName="Close" TargetObject="{Binding $parent[TopLevel]}" />
+                            </EventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Button>
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button">
+        <Setter Property="Width" Value="46" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#3F3F41" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentColorBackground}" />
+    </Style>
+    
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons /template/ Path#PART_MaxRestore">
+        <Setter Property="Data" Value="F1M0,0L0,9 9,9 9,0 0,0 0,3 8,3 8,8 1,8 1,3z"/>
+    </Style>
+    <Style Selector="controls|ExtendedWindow:maximized controls|WindowControlButtons /template/ Path#PART_MaxRestore">
+        <Setter Property="Data" Value="F1M0,10L0,3 3,3 3,0 10,0 10,2 4,2 4,3 7,3 7,6 6,6 6,5 1,5 1,10z M1,10L7,10 7,7 10,7 10,2 9,2 9,6 6,6 6,9 1,9z"/>
+    </Style>
+</Styles>

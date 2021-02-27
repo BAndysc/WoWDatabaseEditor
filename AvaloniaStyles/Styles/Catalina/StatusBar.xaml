@@ -12,7 +12,7 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Background="{TemplateBinding Background}"
                             CornerRadius="0,0,2,2">
-                        <ContentPresenter Content="{TemplateBinding Content}" Margin="78,7.5,7.5,7.5"/>
+                        <ContentPresenter Content="{TemplateBinding Content}" Padding="7.5,2"/>
                     </Border>
                 </Panel>
             </ControlTemplate>
