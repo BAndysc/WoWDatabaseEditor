@@ -28,6 +28,7 @@ namespace WDE.Common.Avalonia.Utils
                 {
                     Content = col.HeaderText
                 };
+                column.IsReadOnly = !col.CheckboxMember;
                 column.Binding = new Binding(col.DisplayMember);
                 dataGrid.Columns.Add(column);
             }

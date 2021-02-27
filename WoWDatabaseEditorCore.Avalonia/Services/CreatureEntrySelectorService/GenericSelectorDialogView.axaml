@@ -6,7 +6,12 @@
                          xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
                          prism:ViewModelLocator.AutoWireViewModel="False">
     <controls:DialogViewBase.ToolBar>
-        <TextBox x:Name="SearchBox" Padding="2,4" Text="{Binding SearchText}" Width="300" HorizontalAlignment="Right" />
+        <TextBox x:Name="SearchBox" 
+                 Padding="2,4" 
+                 Text="{Binding SearchText}" 
+                 Width="300" 
+                 utils:FocusUtils.FocusFirst="True"
+                 HorizontalAlignment="Right" />
     </controls:DialogViewBase.ToolBar>
 
     <Grid Margin="6">
@@ -17,8 +22,14 @@
         <DataGrid SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
                   Items="{Binding FilteredItems}"
                   Margin="0,0,0,6"
+                  IsReadOnly="True"
                   utils:DataGridColumns.ColumnsSource="{Binding Columns}"
                   AutoGenerateColumns="False">
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
         </DataGrid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

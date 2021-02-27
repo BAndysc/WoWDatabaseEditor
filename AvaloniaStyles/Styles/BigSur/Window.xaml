@@ -21,7 +21,7 @@
                 <Panel>
                     <Border Classes="Bg"/>
                     <Border Classes="Separator" />
-                    <DockPanel LastChildFill="True" Margin="78,7.5,7.5,7.5">
+                    <DockPanel LastChildFill="True" Margin="90,7.5,7.5,7.5">
                         <ContentPresenter Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"/>
                         <ContentPresenter Content="{TemplateBinding Content}" Margin="10,0,10,0" HorizontalContentAlignment="Stretch"/>
                     </DockPanel>

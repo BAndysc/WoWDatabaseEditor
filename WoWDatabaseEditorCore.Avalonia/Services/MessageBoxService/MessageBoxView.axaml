@@ -12,7 +12,7 @@
              d:DataContext="{d:DesignInstance messageBoxService:MessageBoxViewModelDesignModel}"
              Background="{DynamicResource MenuDefaultBackground}">
     <controls:BaseMessageBoxWindow.Image>
-        <Image Source="../../Icon.ico"></Image>
+        <Image Source="../../Icon.png"></Image>
     </controls:BaseMessageBoxWindow.Image>
     <ItemsPresenter Items="{Binding Buttons}">
         <ItemsPresenter.ItemTemplate>

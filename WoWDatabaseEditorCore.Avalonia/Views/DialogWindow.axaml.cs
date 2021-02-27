@@ -30,7 +30,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
-            (Content as IInputElement)?.Focus();
+            //(Content as IInputElement)?.Focus();
         }
 
         protected override void OnDataContextChanged(EventArgs e)

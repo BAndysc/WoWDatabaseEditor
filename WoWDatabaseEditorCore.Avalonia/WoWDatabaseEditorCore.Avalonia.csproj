@@ -9,7 +9,6 @@
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Icon.ico" />
         <None Remove="Services\MessageBoxService\MessageBoxView.axaml.xml" />
     </ItemGroup>
     <ItemGroup>
@@ -48,6 +47,10 @@
         <Compile Update="Services\MessageBoxService\MessageBoxView.axaml.cs">
           <DependentUpon>MessageBoxView.axaml</DependentUpon>
         </Compile>
+        <None Remove="Icon.png" />
+        <AvaloniaResource Include="Icon.png" />
+        <None Remove="IconSmall.png" />
+        <AvaloniaResource Include="IconSmall.png" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="0.10.0" />
@@ -82,9 +85,6 @@
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <Resource Include="Icon.ico" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Extensions" />

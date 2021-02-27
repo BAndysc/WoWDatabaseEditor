@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.LogicalTree;
 using WDE.Common.Avalonia.Utils;
 
 namespace WDE.Common.Avalonia.Components
@@ -64,6 +65,7 @@ namespace WDE.Common.Avalonia.Components
                 incc.CollectionChanged -= NewInccOnCollectionChanged;
             }
             viewModelsToViews.Clear();
+            LogicalChildren.Clear();
 
             if (newValue is INotifyCollectionChanged newIncc)
             {
@@ -83,6 +85,8 @@ namespace WDE.Common.Avalonia.Components
                     viewModelsToViews[newViewModel] = view as IControl;
                     if (selectedViewModel == newViewModel)
                         SelectedView = view as IControl;
+                    if (view is ILogical logical)
+                        LogicalChildren.Add(logical);
                 }
             }
         }
@@ -96,7 +100,11 @@ namespace WDE.Common.Avalonia.Components
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 foreach (var oldViewModel in e.OldItems)
+                {
+                    if (viewModelsToViews.TryGetValue(oldViewModel, out var view) && view is ILogical logical)
+                        LogicalChildren.Remove(logical);
                     viewModelsToViews.Remove(oldViewModel);
+                }
             }
         }
     }

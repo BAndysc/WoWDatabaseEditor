@@ -4,6 +4,8 @@
                 xmlns:system="clr-namespace:System;assembly=System.Runtime"
                 xmlns:mvvm="http://prismlibrary.com/"
                 xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+                xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+                Name="Root"
                 mvvm:ViewModelLocator.AutoWireViewModel="False">
     <UserControl.Styles>
         <Style Selector="ListBox">
@@ -46,13 +48,6 @@
                             <Pen Brush="#FF707070" Thickness="0.8" LineJoin="Miter" />
                         </GeometryDrawing.Pen>
                     </GeometryDrawing>
-                    <DrawingGroup Opacity="1" Transform="1,0,0,1,0,10">
-                        <GeometryDrawing Geometry="F0 M16,16z M0,0z M3,3L13,3">
-                            <GeometryDrawing.Pen>
-                                <Pen Brush="#FF707070" Thickness="0.8" LineJoin="Miter" />
-                            </GeometryDrawing.Pen>
-                        </GeometryDrawing>
-                    </DrawingGroup>
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
@@ -66,7 +61,8 @@
                      Watermark="Search"
                      Text="{Binding SearchBox}"
                      HorizontalAlignment="Right"
-                     VerticalContentAlignment="Center" />
+                     VerticalContentAlignment="Center"
+                     utils:FocusUtils.FocusFirst="True" />
         </Grid>
     </controls:DialogViewBase.ToolBar>
     
@@ -95,7 +91,7 @@
                                                Foreground="#FF226E8B" Margin="0,5,0,0" />
                                     <Rectangle Grid.Column="2" Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
                                 </Grid>
-                                <ListBox Items="{Binding }" 
+                                <ListBox Items="{Binding}" 
                                          SelectedItem="{Binding SelectedItem}">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -104,36 +100,29 @@
                                     </ListBox.ItemsPanel>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image Margin="0,0,4,0">
-                                                    <!-- <Image.Style> -->
-                                                    <!--     <Style TargetType="Image"> -->
-                                                    <!--         <Style.Triggers> -->
-                                                    <!--             <DataTrigger Binding="{Binding IsTimed}"> -->
-                                                    <!--                 <DataTrigger.Value> -->
-                                                    <!--                     <system:Boolean>True</system:Boolean> -->
-                                                    <!--                 </DataTrigger.Value> -->
-                                                    <!--                 <Setter Property="Source" Value="{StaticResource timedIcon}" /> -->
-                                                    <!--             </DataTrigger> -->
-                                                    <!--         </Style.Triggers> -->
-                                                    <!--         <Setter Property="Source" Value="{StaticResource cogIcon}" /> -->
-                                                    <!--     </Style> -->
-                                                    <!-- </Image.Style> -->
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Image Margin="0,0,4,0" Width="16" Height="16" Stretch="Fill" Source="{StaticResource cogIcon}">
+                                                    <Interaction.Behaviors>
+                                                        <DataTriggerBehavior Binding="{Binding IsTimed}" Value="True">
+                                                            <ChangePropertyAction PropertyName="Source" Value="{StaticResource timedIcon}"></ChangePropertyAction>
+                                                        </DataTriggerBehavior>
+                                                    </Interaction.Behaviors>
                                                 </Image>
-                                                <TextBlock Text="{Binding Name}" Width="140">
-                                                    <!-- <TextBlock.Style> -->
-                                                    <!--     <Style TargetType="TextBlock"> -->
-                                                    <!--         <Style.Triggers> -->
-                                                    <!--             <DataTrigger Binding="{Binding Deprecated}" Value="true"> -->
-                                                    <!--                 <Setter Property="Foreground" Value="Gray" /> -->
-                                                    <!--             </DataTrigger> -->
-                                                    <!--         </Style.Triggers> -->
-                                                    <!--     </Style> -->
-                                                    <!-- </TextBlock.Style> -->
+                                                <TextBlock Text="{Binding Name}" Width="140" VerticalAlignment="Center">
+                                                    <Interaction.Behaviors>
+                                                        <DataTriggerBehavior Binding="{Binding Deprecated}" Value="True">
+                                                            <ChangePropertyAction PropertyName="Foreground" Value="Gray" />
+                                                        </DataTriggerBehavior>
+                                                    </Interaction.Behaviors>
                                                 </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
+                                    <Interaction.Behaviors>
+                                        <EventTriggerBehavior EventName="DoubleTapped">
+                                            <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
+                                        </EventTriggerBehavior>
+                                    </Interaction.Behaviors>
                                 </ListBox>
                             </StackPanel>
                         </DataTemplate>

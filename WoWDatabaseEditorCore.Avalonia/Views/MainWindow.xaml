@@ -11,8 +11,8 @@
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
           TransparencyLevelHint="AcrylicBlur"
-          Icon="../Icon.ico"
-          ManagedIcon="../Icon.ico"
+          Icon="../Icon.png"
+          ManagedIcon="../IconSmall.png"
           ExtendClientAreaTitleBarHeightHint="38"
           ExtendClientAreaToDecorationsHint="True"
           Title="{Binding Title}">

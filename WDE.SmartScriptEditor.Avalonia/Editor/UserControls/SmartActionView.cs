@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using WDE.MVVM;
@@ -78,6 +79,13 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 EditActionCommand?.Execute(DataContext);
 
             e.Handled = true;
+        }
+
+        protected override void OnDataContextEndUpdate()
+        {
+            var isComment = DataContext is SmartAction action && action.Id == SmartConstants.ActionComment;
+            PseudoClasses.Set(":comment", isComment);
+            PseudoClasses.Set(":action", !isComment);
         }
     }
 }

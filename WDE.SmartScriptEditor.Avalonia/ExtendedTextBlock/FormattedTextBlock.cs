@@ -19,8 +19,8 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
         {
             drawer = new FormattedTextDrawer();
             drawer.AddStyle(STYLE_DEFAULT, new Typeface("Open Sans"), 12, Brushes.Black);
-            drawer.AddStyle(STYLE_PARAMETER, new Typeface("Fira Code", FontStyle.Normal, FontWeight.Bold), 12, Brushes.Navy);
-            drawer.AddStyle(STYLE_SOURCE, new Typeface("Fira Code", FontStyle.Normal, FontWeight.Bold), 12, Brushes.ForestGreen);
+            drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Monaco", FontStyle.Normal, FontWeight.Bold), 12, Brushes.Navy);
+            drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Monaco", FontStyle.Normal, FontWeight.Bold), 12, Brushes.ForestGreen);
             
             AffectsRender<FormattedTextBlock>(BackgroundProperty);
             AffectsRender<FormattedTextBlock>(TextProperty);

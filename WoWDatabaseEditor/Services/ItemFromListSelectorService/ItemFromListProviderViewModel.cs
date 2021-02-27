@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Input;
 using DynamicData;
+using DynamicData.Binding;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Annotations;
@@ -69,15 +70,28 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 
             ShowItemsList = items.Count > 0;
             DesiredHeight = ShowItemsList ? 470 : 130;
-            Accept = new DelegateCommand(() => CloseOk?.Invoke());
+            Accept = new DelegateCommand(() =>
+            {
+                if (SelectedItem == null && FilteredItems.Count > 0)
+                    SelectedItem = FilteredItems[0];
+                CloseOk?.Invoke();
+            }, () => SelectedItem != null || FilteredItems.Count == 1);
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
+            
+            FilteredItems.ObserveCollectionChanges().Subscribe(_ => Accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => Accept.RaiseCanExecuteChanged());
         }
 
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
         public ReadOnlyObservableCollection<CheckableSelectOption> FilteredItems { get; }
 
-        public CheckableSelectOption? SelectedItem { get; set; }
-
+        private CheckableSelectOption? selectedItem;
+        public CheckableSelectOption? SelectedItem
+        {
+            get => selectedItem;
+            set => SetProperty(ref selectedItem, value);
+        }
+        
         public string SearchText
         {
             get => search;
@@ -121,7 +135,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         }
 
         public bool ShowItemsList { get; }
-        public ICommand Accept { get; }
+        public DelegateCommand Accept { get; }
         public ICommand Cancel { get; }
         public int DesiredWidth => 400;
         public int DesiredHeight { get; }
