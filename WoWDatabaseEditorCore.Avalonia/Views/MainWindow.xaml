@@ -23,6 +23,17 @@
         </NativeMenu>
     </NativeMenu.Menu>
     
+    <Window.KeyBindings>
+        <KeyBinding Gesture="{x:Static views:MainWindow.UndoGesture}" Command="{Binding DocumentManager.ActiveDocument.Undo}" />
+        <KeyBinding Gesture="{x:Static views:MainWindow.RedoGesture}" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
+
+        <KeyBinding Gesture="{x:Static views:MainWindow.SaveGesture}" Command="{Binding DocumentManager.ActiveDocument.Save}" />
+
+        <KeyBinding Gesture="{x:Static TextBox.CopyGesture}" Command="{Binding DocumentManager.ActiveDocument.Copy}" />
+        <KeyBinding  Gesture="{x:Static TextBox.PasteGesture}" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
+        <KeyBinding  Gesture="{x:Static TextBox.CutGesture}" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
+    </Window.KeyBindings>
+    
     <controls:ExtendedWindow.SideBar>
         <views:WdeToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
             <views:WdeToolsTabControl.Styles>

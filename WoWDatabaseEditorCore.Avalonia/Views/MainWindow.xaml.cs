@@ -1,8 +1,11 @@
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using AvaloniaStyles.Controls;
@@ -13,6 +16,15 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
 {
     public class MainWindow : ExtendedWindow
     {
+        public static KeyGesture UndoGesture { get; } = AvaloniaLocator.Current
+            .GetService<PlatformHotkeyConfiguration>()?.Undo.FirstOrDefault();
+
+        public static KeyGesture RedoGesture { get; } = AvaloniaLocator.Current
+            .GetService<PlatformHotkeyConfiguration>()?.Redo.FirstOrDefault();
+
+        public static KeyGesture SaveGesture { get; } = new KeyGesture(Key.S, AvaloniaLocator.Current
+            .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control);
+        
         private ToolsTabControl tools;
         public MainWindow()
         {

@@ -91,7 +91,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
                 if (!GetSelected(this))
                 {
-                    if (!e.KeyModifiers.HasFlag(KeyModifiers.Meta))
+                    if (!e.KeyModifiers.HasFlag(MultiselectGesture))
                         DeselectAllRequest?.Execute(null);
                     SetSelected(this, true);
                 }

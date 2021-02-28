@@ -10,6 +10,25 @@
              xmlns:viewModels1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
              mc:Ignorable="d" x:Name="Rooot"
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <system:Boolean x:Key="FalseValue">False</system:Boolean>
+        <system:Boolean x:Key="TrueValue">True</system:Boolean>
+    </UserControl.Resources>
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Back" Command="{Binding DeleteSelected}" />
+        <KeyBinding Gesture="Delete" Command="{Binding DeleteSelected}" />
+        <KeyBinding Gesture="Enter" Command="{Binding EditSelected}" />
+        <KeyBinding Gesture="Ctrl+A" Command="{Binding SelectAll}" />
+        <KeyBinding Gesture="Up" Command="{Binding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Down" Command="{Binding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Ctrl+Up" Command="{Binding SelectionUp}"
+                    CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Gesture="Ctrl+Down" Command="{Binding SelectionDown}"
+                    CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Gesture="Right" Command="{Binding SelectionRight}" />
+        <KeyBinding Gesture="Left" Command="{Binding SelectionLeft}" />
+    </UserControl.KeyBindings>
+    
     <UserControl.Styles>
         <Style Selector="Button.FlatButton">
             <Setter Property="Cursor" Value="Hand" />

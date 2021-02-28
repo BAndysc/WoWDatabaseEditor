@@ -5,7 +5,7 @@
         <StackPanel>
             <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                    <Image Source="/Icon.ico" Width="56" Height="56" />
+                    <Image Source="../Icon.png" Width="56" Height="56" />
                     <TextBlock VerticalAlignment="Bottom" FontSize="34" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
                 </StackPanel>
             </Border>
