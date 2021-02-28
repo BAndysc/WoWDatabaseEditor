@@ -39,7 +39,7 @@ namespace AvaloniaStyles
                             actualTheme = SystemThemeOptions.MacOsCatalinaLight;
                     }
                     else
-                        actualTheme = SystemThemeOptions.MacOsBigSurLight;
+                        actualTheme = SystemThemeOptions.Windows10;
                 }
 
                 switch (actualTheme)
