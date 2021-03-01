@@ -17,6 +17,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlQuestTemplateAddon>();
         public ITable<MySqlAreaTriggerTemplate> AreaTriggerTemplate => GetTable<MySqlAreaTriggerTemplate>();
         public ITable<MySqlGameEvent> GameEvents => GetTable<MySqlGameEvent>();
+        public ITable<MySqlConversationTemplate> ConversationTemplate => GetTable<MySqlConversationTemplate>();
         public ITable<MySqlConditionLine> Conditions => GetTable<MySqlConditionLine>();
     }
 }

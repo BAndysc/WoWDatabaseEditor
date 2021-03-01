@@ -22,6 +22,8 @@ namespace WDE.TrinityMySqlDatabase.Database
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => Enumerable.Empty<IAreaTriggerTemplate>();
 
         public IEnumerable<IGameEvent> GetGameEvents() => Enumerable.Empty<IGameEvent>();
+        
+        public IEnumerable<IConversationTemplate> GetConversationTemplates() => Enumerable.Empty<IConversationTemplate>();
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
 

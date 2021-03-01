@@ -34,6 +34,7 @@ namespace WDE.Parameters
             factory.Register("CreatureParameter", new CreatureParameter(database));
             factory.Register("QuestParameter", new QuestParameter(database));
             factory.Register("GameobjectParameter", new GameobjectParameter(database));
+            factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
         }
@@ -130,4 +131,32 @@ namespace WDE.Parameters
             return base.ToString(key);
         }
     }
+    
+    
+    public class ConversationTemplateParameter : Parameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public ConversationTemplateParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+
+        public override string ToString(int key)
+        {
+            if (Items == null)
+            {
+                Items = new Dictionary<int, SelectOption>();
+                foreach (IConversationTemplate item in database.GetConversationTemplates())
+                {
+                    var name = $"conversation with first line id: {item.FirstLineId}";
+                    if (!string.IsNullOrEmpty(item.ScriptName))
+                        name += $", script name: {item.ScriptName}";
+                    Items.Add((int) item.Id, new SelectOption(name));
+                }
+            }
+            return base.ToString(key);
+        }
+    }
+    
 }

@@ -19,6 +19,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         private List<MySqlAreaTriggerTemplate>? areaTriggerTemplates;
         private List<MySqlGameEvent>? gameEventsCache;
+        private List<MySqlConversationTemplate>? conversationTemplates;
         
         private TrinityMySqlDatabaseProvider trinityDatabase;
         private readonly ITaskRunner taskRunner;
@@ -84,6 +85,8 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         public IEnumerable<IGameEvent> GetGameEvents() => gameEventsCache ?? trinityDatabase.GetGameEvents();
+        
+        public IEnumerable<IConversationTemplate> GetConversationTemplates() => conversationTemplates ?? trinityDatabase.GetConversationTemplates();
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
             areaTriggerTemplates ?? trinityDatabase.GetAreaTriggerTemplates();
@@ -123,7 +126,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
             public async Task Run(ITaskProgress progress)
             {
-                int steps = 5;
+                int steps = 6;
                 
                 progress.Report(0, steps, "Loading creatures");
                 cache.creatureTemplateCache = await cache.trinityDatabase.GetCreatureTemplatesAsync();
@@ -137,7 +140,10 @@ namespace WDE.TrinityMySqlDatabase.Database
                 progress.Report(3, steps, "Loading areatrigger templates");
                 cache.areaTriggerTemplates = await cache.trinityDatabase.GetAreaTriggerTemplatesAsync();
                 
-                progress.Report(4, steps, "Loading quests");
+                progress.Report(4, steps, "Loading conversation templates");
+                cache.conversationTemplates = await cache.trinityDatabase.GetConversationTemplatesAsync();
+                
+                progress.Report(5, steps, "Loading quests");
 
                 cache.questTemplateCache = await cache.trinityDatabase.GetQuestTemplatesAsync();
 

@@ -98,6 +98,7 @@ namespace WDE.SmartScriptEditor.Models
                             target_position = Target.GetPosition(),
                             targetid = Target.Id,
                             sourceid = Source.Id,
+                            pram2_m1 = "[p=1]" + (GetParameter(1).Value - 1) + "[/p]",
                             pram1 = "[p=0]" + GetParameter(0) + "[/p]",
                             pram2 = "[p=1]" + GetParameter(1) + "[/p]",
                             pram3 = "[p=2]" + GetParameter(2) + "[/p]",

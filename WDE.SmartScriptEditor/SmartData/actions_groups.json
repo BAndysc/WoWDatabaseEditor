@@ -19,7 +19,8 @@
             "SMART_ACTION_RANDOM_SOUND",
             "SMART_ACTION_MUSIC_AC",
             "SMART_ACTION_RANDOM_MUSIC_AC",
-            "SMART_ACTION_PLAYER_TALK_AC"
+            "SMART_ACTION_PLAYER_TALK_AC",
+            "SMART_ACTION_TALK_CONVERSATION"
         ]
     },
     {
@@ -145,6 +146,7 @@
         "name": "Summon",
         "group_members": [
             "SMART_ACTION_SUMMON_CREATURE",
+            "SMART_ACTION_SUMMON_CREATURE_TC_MASTER",
             "SMART_ACTION_SUMMON_GO",
             "SMART_ACTION_SUMMON_CREATURE_GROUP",
             "SMART_ACTION_CONE_SUMMON_AC",

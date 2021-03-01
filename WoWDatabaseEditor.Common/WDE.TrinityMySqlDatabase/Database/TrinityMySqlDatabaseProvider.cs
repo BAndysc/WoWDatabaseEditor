@@ -69,6 +69,21 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await (from t in model.GameEvents orderby t.Entry select t).ToListAsync();
         }
         
+        public IEnumerable<IConversationTemplate> GetConversationTemplates()
+        {
+            var task = GetConversationTemplatesAsync();
+            task.Wait();
+            return task.Result;
+        }
+        
+        public async Task<List<MySqlConversationTemplate>> GetConversationTemplatesAsync()
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
+                return new List<MySqlConversationTemplate>();
+            
+            using var model = new TrinityDatabase();
+            return await (from t in model.ConversationTemplate orderby t.Id select t).ToListAsync();
+        }
         
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
         {

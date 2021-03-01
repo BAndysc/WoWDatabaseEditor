@@ -245,6 +245,7 @@
     {
         "id": 12,
         "name": "SMART_ACTION_SUMMON_CREATURE",
+        "tags": ["TrinityWrath", "Azeroth", "TrinityCata"],
         "parameters": [
             {
                 "type": "CreatureParameter",
@@ -266,6 +267,45 @@
             }
         ],
         "description": "{source}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}}{pram5value:choose(0):| and attack {target}}",
+        "name_readable": "Summon creature",
+        "uses_target": true,
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 12,
+        "name": "SMART_ACTION_SUMMON_CREATURE_TC_MASTER",
+        "tags": ["TrinityMaster"],
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature",
+                "description": "Creature Entry to summon"
+            },
+            {
+                "type": "SummonTypeParameter",
+                "name": "Summon Type"
+            },
+            {
+                "type": "Parameter",
+                "name": "Duration",
+                "description": "In ms"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Attack Invoker"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "1": {"name": "personal spawn"},
+                    "2": {"name": "use invoker as summoner"}
+                }
+            }
+        ],
+        "description": "{pram5value:choose(0|1|2|3):{source}|{source}|[s]Action invoker[/s]|[s]Action invoker[/s]|{source}}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}}{pram5value:choose(0|1|2|3):|, as personal spawn||, as personal spawn|}{pram5value:choose(0):| and attack {target}}",
         "name_readable": "Summon creature",
         "uses_target": true,
         "target_is_source": false,
@@ -3116,6 +3156,25 @@
         "name_readable": "Set health",
         "uses_target": true,
         "target_is_source": true
+    },
+    {
+        "id": 143,
+        "name": "SMART_ACTION_TALK_CONVERSATION",
+        "tags": ["TrinityMaster"],
+        "parameters": [
+            {
+                "type": "ConversationTemplateParameter",
+                "name": "Conversation template id"
+            },
+            {
+                "type": "Parameter",
+                "name": "Base object dynamic actor index"
+            }
+        ],
+        "description": "Start conversation {pram1}{pram2value:choose(0):| with base object dynamic actor index: {pram2_m1}}",
+        "name_readable": "Start conversation",
+        "uses_target": false,
+        "implicit_source": "SMART_TARGET_NONE"
     },
     {
         "id": 201,

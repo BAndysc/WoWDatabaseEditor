@@ -20,6 +20,7 @@ namespace WDE.Common.Database
         IEnumerable<IQuestTemplate> GetQuestTemplates();
 
         IEnumerable<IGameEvent> GetGameEvents();
+        IEnumerable<IConversationTemplate> GetConversationTemplates();
 
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
 
