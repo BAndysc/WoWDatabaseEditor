@@ -7,5 +7,7 @@ namespace WDE.Common.Managers
     public interface IWindowManager
     {
         Task<bool> ShowDialog(IDialog viewModel);
+
+        Task<string> ShowFolderPickerDialog(string defaultDirectory);
     }
 }

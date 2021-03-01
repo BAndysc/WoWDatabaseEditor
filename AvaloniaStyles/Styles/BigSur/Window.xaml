@@ -89,21 +89,22 @@
                     </DockPanel>
                     
                     <GridSplitter Grid.Column="1"></GridSplitter>
-                    
-                    <DockPanel LastChildFill="True" Grid.Column="2">
+                
+                    <DockPanel LastChildFill="True"  Grid.Column="2">
                         <controls1:ExtendedTitleBar DockPanel.Dock="Top"
                                                     RightContent="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
                             <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                         </controls1:ExtendedTitleBar>
-                    
+                
                         <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
 
                         <controls1:StatusBar DockPanel.Dock="Bottom" Name="StatusBar">
                             <ContentPresenter Content="{TemplateBinding StatusBar}" />
                         </controls1:StatusBar>
-                    
-                        <Panel  Background="{DynamicResource MainColorBackground}" ClipToBounds="True">
+                
+                        <Panel Background="{DynamicResource MainColorBackground}" ClipToBounds="True">
                             <ContentPresenter Content="{TemplateBinding Content}" />
+                            <ContentPresenter Content="{TemplateBinding Overlay}" />    
                         </Panel>
                     </DockPanel>
                 </Grid>

@@ -3,39 +3,11 @@
         xmlns:extendedTextBlock="clr-namespace:WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock"
         xmlns:views="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views"
         xmlns:controls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
-        xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing">
+        xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
+        xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles">
 
-    <Styles.Resources>
-        <!-- SmartScripts -->
-        <SolidColorBrush x:Key="SmartScripts.Background" Color="#F5F6FC" />
-
-        <SolidColorBrush x:Key="SmartScripts.Actions.Background" Color="#F5F6FC" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Border" Color="#E9EFFB" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Background" Color="#E9EFFB" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Border" Color="#F5C61F" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Selected.Background" Color="#FFF2BF" />
-        <SolidColorBrush x:Key="SmartScripts.Action.Foreground" Color="#282828" />
-
-        <SolidColorBrush x:Key="SmartScripts.Parameter.Foreground" Color="#3C76BE" />
-        <SolidColorBrush x:Key="SmartScripts.Source.Foreground" Color="#2E8A8A" /> <!-- #378B6F-->
-
-        <SolidColorBrush x:Key="SmartScripts.Comment.Background" Color="#E1F3C9" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Border" Color="#D1E577" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Foreground" Color="#282828" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Border" Color="#F5C61F" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Selected.Background" Color="#FFF2BF" />
-        <SolidColorBrush x:Key="SmartScripts.Comment.Selected" Color="#282828" />
-
-        <SolidColorBrush x:Key="SmartScripts.Event.Background" Color="#F5F8FF" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Foreground" Color="#FF282828" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Border" Color="#BFCCE0" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Background" Color="#FFF5F2BF" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Foreground" Color="#FF282828" />
-        <SolidColorBrush x:Key="SmartScripts.Event.Selected.Border" Color="#FFF5C61F" />
-
-        <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0" />
-        <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77000000" />
-    </Styles.Resources>
+    <styles:StyleIncludeColorAware DarkSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsDark.axaml"
+                                   LightSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsLight.axaml"/>
 
     <Style Selector="controls|SmartActionView:action">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -43,6 +15,7 @@
             <ControlTemplate>
                 <Border BorderThickness="1" Classes="action">
                     <extendedTextBlock:FormattedTextBlock
+                        IsSelected="{Binding IsSelected}"
                         Padding="2"
                         Text="{Binding Readable}" />
                 </Border>
@@ -92,6 +65,7 @@
             <ControlTemplate>
                 <Border BorderThickness="1">
                     <extendedTextBlock:FormattedTextBlock Padding="2"
+                                                          IsSelected="{Binding IsSelected}"
                                                           Text="{Binding Readable}" />
                 </Border>
             </ControlTemplate>
@@ -119,6 +93,7 @@
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="1" DockPanel.Dock="Top" Padding="5">
                         <extendedTextBlock:FormattedTextBlock
+                            IsSelected="{Binding IsSelected}"
                             Text="{Binding Readable}" />
                     </Border>
                     <Canvas Margin="20,0,0,0" />
@@ -250,6 +225,7 @@
                                                     </controls:ParameterTextBox.Styles>
                                                     <controls:ParameterTextBox.InnerLeftContent>
                                                         <TextBlock Text="{Binding Parameter.String, Mode=OneWay}"
+                                                                   VerticalAlignment="Center"
                                                                    Margin="0,1,0,0" />
                                                     </controls:ParameterTextBox.InnerLeftContent>
                                                 </controls:ParameterTextBox>

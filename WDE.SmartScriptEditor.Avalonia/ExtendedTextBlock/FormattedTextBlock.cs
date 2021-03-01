@@ -10,21 +10,52 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
 {
     public class FormattedTextBlock : Control
     {
-        private static FormattedTextDrawer drawer;
+        private static FormattedTextDrawer? drawer = null;
         private static int STYLE_DEFAULT = 0;
         private static int STYLE_PARAMETER = 1;
         private static int STYLE_SOURCE = 2;
+        private static int STYLE_DEFAULT_SELECTED = 3;
 
         static FormattedTextBlock()
         {
-            drawer = new FormattedTextDrawer();
-            drawer.AddStyle(STYLE_DEFAULT, new Typeface("Open Sans"), 12, Brushes.Black);
-            drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Monaco", FontStyle.Normal, FontWeight.Bold), 12, Brushes.Navy);
-            drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Monaco", FontStyle.Normal, FontWeight.Bold), 12, Brushes.ForestGreen);
-            
+            AffectsRender<FormattedTextBlock>(IsSelectedProperty);
             AffectsRender<FormattedTextBlock>(BackgroundProperty);
             AffectsRender<FormattedTextBlock>(TextProperty);
             AffectsMeasure<FormattedTextBlock>(TextProperty);
+        }
+
+        public FormattedTextBlock()
+        {
+            // this is a hack optimization
+            // this probably will be removed
+            // when avalonia has support for "RUN"
+            if (drawer == null)
+            {
+                drawer = new FormattedTextDrawer();
+                if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Foreground", out var eventColor)
+                    && eventColor is IBrush eventBrush)
+                {
+                    drawer.AddStyle(STYLE_DEFAULT, new Typeface("Open Sans"), 12, eventBrush);
+                }
+                
+                if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Selected.Foreground", out var eventSelectedColor)
+                    && eventSelectedColor is IBrush eventSelectedBrush)
+                {
+                    drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface("Open Sans"), 12, eventSelectedBrush);
+                }
+                
+                if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", out var parameterColor)
+                    && parameterColor is IBrush parameterBrush)
+                {
+                    drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Monaco", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush);
+                }
+                
+                if (Application.Current.Styles.TryGetResource("SmartScripts.Source.Foreground", out var sourceColor)
+                    && sourceColor is IBrush sourceBrush)
+                {
+                    drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Monaco", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush);
+                }
+            }
         }
         
         private int overPartIndex = -1;
@@ -156,11 +187,11 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
 
             ParseTest(Text, (text, partIndex, source, parameter) =>
             {
-                var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : STYLE_DEFAULT);
+                var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : (IsSelected ? STYLE_DEFAULT_SELECTED : STYLE_DEFAULT));
    
                 Rect bounds;
                 sw2.Start();
-                (wasWrapped, bounds) = drawer.Draw(context, text, styleId, !wasWrapped, ref x, ref y, Padding.Left, Bounds.Width);
+                (wasWrapped, bounds) = drawer!.Draw(context, text, styleId, !wasWrapped, ref x, ref y, Padding.Left, Bounds.Width);
                 sw2.Stop();
 
                 if (overPartIndex == partIndex && (source || parameter) && IsPointerOver)
@@ -192,12 +223,12 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             ParseTest(Text, (text, partIndex, source, parameter) =>
             {
                 var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : STYLE_DEFAULT);
-                (wasWrapped, bounds) = drawer.Measure(text, styleId, !wasWrapped, ref x, ref y, availableSize.Width);
+                (wasWrapped, bounds) = drawer!.Measure(text, styleId, !wasWrapped, ref x, ref y, availableSize.Width);
                 if (bounds.Contains(currentPos))
                     overPartIndex = partIndex;
                 everWrapped |= wasWrapped;
             });
-            var size = new Size(everWrapped ? availableSize.Width : x, y + drawer.LineHeight);
+            var size = new Size(everWrapped ? availableSize.Width : x, y + drawer!.LineHeight);
             return size.Inflate(Padding);
         }
 
@@ -222,6 +253,19 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             set { SetAndRaise(TextProperty, ref _text, value); }
         }
         
+        public static readonly DirectProperty<FormattedTextBlock, bool> IsSelectedProperty =
+            AvaloniaProperty.RegisterDirect<FormattedTextBlock, bool>(
+                nameof(IsSelected),
+                o => o.IsSelected,
+                (o, v) => o.IsSelected = v);
+
+        private bool isSelected; 
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => SetAndRaise(IsSelectedProperty, ref isSelected, value);
+        }
+        
         public static readonly StyledProperty<IBrush> BackgroundProperty =
             Border.BackgroundProperty.AddOwner<TextBlock>();
 
@@ -230,8 +274,8 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
         /// </summary>
         public IBrush Background
         {
-            get { return GetValue(BackgroundProperty); }
-            set { SetValue(BackgroundProperty, value); }
+            get => GetValue(BackgroundProperty);
+            set => SetValue(BackgroundProperty, value);
         }
         
         /// <summary>

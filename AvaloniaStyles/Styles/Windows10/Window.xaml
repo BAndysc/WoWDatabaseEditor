@@ -46,27 +46,30 @@
                         </controls1:StatusBar>
                         
                         <Border Background="{TemplateBinding Background}" Padding="4">
-                            <DockPanel LastChildFill="True" Background="{TemplateBinding Background}">
-                                <StackPanel HorizontalAlignment="Left" DockPanel.Dock="Top" Orientation="Horizontal" Spacing="20">
-                                    <ContentPresenter Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                    <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                    <ContentPresenter Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                </StackPanel>
+                            <Panel>
+                                <DockPanel LastChildFill="True" Background="{TemplateBinding Background}">
+                                    <StackPanel HorizontalAlignment="Left" DockPanel.Dock="Top" Orientation="Horizontal" Spacing="20">
+                                        <ContentPresenter Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                        <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                        <ContentPresenter Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    </StackPanel>
                         
-                                <Grid ColumnDefinitions="*,Auto,300" Name="ReversedSidebarGrid">
-                                    <DockPanel ClipToBounds="True" LastChildFill="True">
-                                        <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
-                                        <ContentPresenter Content="{TemplateBinding Content}" 
-                                                          BorderThickness="1,0,1,1"
-                                                          BorderBrush="{DynamicResource ContentBorderBrush}"
-                                                          Background="{DynamicResource ContentBackground}"/>
-                                    </DockPanel>
-                                    <GridSplitter Grid.Column="1"></GridSplitter>
-                                    <controls1:SideBar Grid.Column="2">
-                                        <ContentPresenter Content="{TemplateBinding SideBar}" />
-                                    </controls1:SideBar>
-                                </Grid>
-                            </DockPanel>
+                                    <Grid ColumnDefinitions="*,Auto,300" Name="ReversedSidebarGrid">
+                                        <DockPanel ClipToBounds="True" LastChildFill="True">
+                                            <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
+                                            <ContentPresenter Content="{TemplateBinding Content}" 
+                                                              BorderThickness="1,0,1,1"
+                                                              BorderBrush="{DynamicResource ContentBorderBrush}"
+                                                              Background="{DynamicResource ContentBackground}"/>
+                                        </DockPanel>
+                                        <GridSplitter Grid.Column="1"></GridSplitter>
+                                        <controls1:SideBar Grid.Column="2">
+                                            <ContentPresenter Content="{TemplateBinding SideBar}" />
+                                        </controls1:SideBar>
+                                    </Grid>
+                                </DockPanel>
+                                <ContentPresenter Content="{TemplateBinding Overlay}" />
+                            </Panel>
                         </Border>
                     </DockPanel>
                 </Border>

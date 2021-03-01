@@ -32,6 +32,9 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<TabStrip> TabStripProperty =
             AvaloniaProperty.Register<ExtendedWindow, TabStrip>(nameof(TabStrip));
         
+        public static readonly StyledProperty<IControl> OverlayProperty =
+            AvaloniaProperty.Register<ExtendedWindow, IControl>(nameof(Overlay));
+        
         public IImage ManagedIcon
         {
             get => GetValue(ManagedIconProperty);
@@ -62,6 +65,12 @@ namespace AvaloniaStyles.Controls
             set => SetValue(StatusBarProperty, value);
         }
         
+        public IControl Overlay
+        {
+            get => GetValue(OverlayProperty);
+            set => SetValue(OverlayProperty, value);
+        }
+        
         public TabStrip TabStrip
         {
             get => GetValue(TabStripProperty);
@@ -76,6 +85,7 @@ namespace AvaloniaStyles.Controls
             SideBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-sidebar"));
             StatusBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-statusbar"));
             TabStripProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-tabstrip"));
+            OverlayProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-overlay"));
 
             WindowStateProperty.Changed.AddClassHandler<ExtendedWindow>((window, state) =>
             {

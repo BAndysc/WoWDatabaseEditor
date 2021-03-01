@@ -16,6 +16,9 @@ namespace AvaloniaStyles
     
     public class SystemTheme : StyleInclude
     {
+        internal static SystemThemeOptions EffectiveTheme { get; private set; }
+        internal static bool EffectiveThemeIsDark { get; private set; }
+        
         public SystemTheme(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
@@ -41,6 +44,11 @@ namespace AvaloniaStyles
                     else
                         actualTheme = SystemThemeOptions.Windows10;
                 }
+
+                EffectiveTheme = actualTheme;
+                EffectiveThemeIsDark = EffectiveTheme == SystemThemeOptions.Windows10 ||
+                                       EffectiveTheme == SystemThemeOptions.MacOsCatalinaDark ||
+                                       EffectiveTheme == SystemThemeOptions.MacOsBigSurDark;
 
                 switch (actualTheme)
                 {

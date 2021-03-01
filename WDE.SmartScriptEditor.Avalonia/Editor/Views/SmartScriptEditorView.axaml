@@ -5,5 +5,5 @@
              xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls">
-    <userControls1:SmartScriptView />
+    <userControls1:SmartScriptView Focusable="True"/>
 </UserControl>

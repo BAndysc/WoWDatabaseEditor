@@ -90,29 +90,30 @@
         </TabStrip>
     </controls:ExtendedWindow.TabStrip>
     
-    <Panel Background="{DynamicResource MainColorBackground}">
-        <components:MultiViewModelContentPresenter
-            ViewModels="{Binding DocumentManager.OpenedDocuments}"
-            SelectedViewModel="{Binding DocumentManager.ActiveDocument}">
-            <components:MultiViewModelContentPresenter.Styles>
-                <Style Selector="components|MultiViewModelContentPresenter">
-                    <Setter Property="Template">
-                        <ControlTemplate>
-                            <ContentPresenter DataContext="{TemplateBinding SelectedViewModel}" 
-                                              Content="{TemplateBinding SelectedView}"
-                                              HorizontalAlignment="Stretch"
-                                              VerticalAlignment="Stretch"
-                                              />
-                        </ControlTemplate>
-                    </Setter>
-                </Style>
-            </components:MultiViewModelContentPresenter.Styles>
-        </components:MultiViewModelContentPresenter>
-        
+    <controls:ExtendedWindow.Overlay>
         <views:TasksPanel DataContext="{Binding TasksViewModel}"
                           Margin="0,0,5,0"
                           HorizontalAlignment="Right"
                           VerticalAlignment="Bottom"
+                          ClipToBounds="False"
                           IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
-    </Panel>
+    </controls:ExtendedWindow.Overlay>
+    
+    <components:MultiViewModelContentPresenter
+        ViewModels="{Binding DocumentManager.OpenedDocuments}"
+        SelectedViewModel="{Binding DocumentManager.ActiveDocument}">
+        <components:MultiViewModelContentPresenter.Styles>
+            <Style Selector="components|MultiViewModelContentPresenter">
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <ContentPresenter DataContext="{TemplateBinding SelectedViewModel}" 
+                                          Content="{TemplateBinding SelectedView}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Stretch"
+                        />
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+        </components:MultiViewModelContentPresenter.Styles>
+    </components:MultiViewModelContentPresenter>
 </controls:ExtendedWindow>

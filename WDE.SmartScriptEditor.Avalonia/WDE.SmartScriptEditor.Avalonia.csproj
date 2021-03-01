@@ -28,4 +28,17 @@
     <ItemGroup>
         <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <AvaloniaResource Include="Themes\ColorsDark.axaml">
+        <SubType>Designer</SubType>
+      </AvaloniaResource>
+      <AvaloniaXaml Remove="Themes\ColorsLight.axaml" />
+      <AvaloniaResource Include="Themes\ColorsLight.axaml">
+        <SubType>Designer</SubType>
+      </AvaloniaResource>
+      <AvaloniaXaml Remove="Themes\ColorsDark.axaml" />
+      <AvaloniaResource Include="Themes\ColorsDark.axaml">
+        <SubType>Designer</SubType>
+      </AvaloniaResource>
+    </ItemGroup>
 </Project>

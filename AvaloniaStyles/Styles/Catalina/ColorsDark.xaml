@@ -120,6 +120,7 @@
         <SolidColorBrush x:Key="MenuItem.Foreground" Color="White" />
         <SolidColorBrush x:Key="MenuItem.Background.PointerOver" Color="#357AFF" />
         <SolidColorBrush x:Key="MenuItem.Foreground.PointerOver" Color="White" />
+        <SolidColorBrush x:Key="MenuItem.Separator" Color="#969A9F" />
         
         <!-- datagrid -->
         <SolidColorBrush x:Key="DataGrid.Header.Background" Color="#404040" />
