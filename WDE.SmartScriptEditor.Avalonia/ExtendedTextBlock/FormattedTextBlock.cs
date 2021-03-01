@@ -154,7 +154,8 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
                 else if (s == ' ' && state == State.Text && toFulsh == null)
                 {
                     toFulsh = text.AsSpan(startIndex, index - startIndex + 1);
-                    startIndex = index + 1;
+                    if (index < text.Length - 1)
+                        startIndex = index + 1;
                 }
 
                 if (state == State.Text && index == text.Length - 1)
