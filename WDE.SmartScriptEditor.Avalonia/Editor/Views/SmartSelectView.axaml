@@ -5,6 +5,7 @@
                 xmlns:mvvm="http://prismlibrary.com/"
                 xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
                 xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+                xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
                 Name="Root"
                 mvvm:ViewModelLocator.AutoWireViewModel="False">
     <UserControl.Styles>
@@ -56,13 +57,14 @@
     <controls:DialogViewBase.ToolBar>
         <Grid ColumnDefinitions="*,250">
             <TextBlock Text="{Binding Title}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" />
-            <TextBox Grid.Column="1"
-                     Width="220"
-                     Watermark="Search"
-                     Text="{Binding SearchBox}"
-                     HorizontalAlignment="Right"
-                     VerticalContentAlignment="Center"
-                     utils:FocusUtils.FocusFirst="True" />
+            <userControls:FixedTextBox Grid.Column="1"
+                          Width="220"
+                          AcceptsReturn="False"
+                          Watermark="Search"
+                          Text="{Binding SearchBox}"
+                          HorizontalAlignment="Right"
+                          VerticalContentAlignment="Center"
+                          utils:FocusUtils.FocusFirst="True" />
         </Grid>
     </controls:DialogViewBase.ToolBar>
     
