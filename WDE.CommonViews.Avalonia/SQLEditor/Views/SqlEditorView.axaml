@@ -10,6 +10,6 @@
     <DockPanel LastChildFill="True">
         <Button DockPanel.Dock="Top" Content="Execute SQL" Command="{Binding ExecuteSql}" />
         <avaloniaEdit:TextEditor SyntaxHighlighting="TSQL" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
-                          FontFamily="Consolas" />
+                          FontFamily="Consolas,Menlo,Courier,Courier New" />
     </DockPanel>
 </UserControl>

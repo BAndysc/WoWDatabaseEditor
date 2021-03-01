@@ -88,7 +88,7 @@
                         </Interaction.Behaviors>
                     </Image>
                     <TextBlock Padding="2" VerticalAlignment="Center" Text="{Binding ExtraId}"
-                               FontFamily="Consolas" Background="{DynamicResource ContentSpecialBackground}"
+                               FontFamily="Consolas,Menlo,Courier,Courier New" Background="{DynamicResource ContentSpecialBackground}"
                                Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
                         <Interaction.Behaviors>
                             <DataTriggerBehavior Binding="{Binding ExtraId}" ComparisonCondition="Equal" Value="{x:Null}">

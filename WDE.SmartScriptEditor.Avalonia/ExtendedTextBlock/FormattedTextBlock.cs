@@ -47,13 +47,13 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", out var parameterColor)
                     && parameterColor is IBrush parameterBrush)
                 {
-                    drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Monaco", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush);
+                    drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush);
                 }
                 
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Source.Foreground", out var sourceColor)
                     && sourceColor is IBrush sourceBrush)
                 {
-                    drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Monaco", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush);
+                    drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush);
                 }
             }
         }
