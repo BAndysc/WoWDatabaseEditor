@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using Ookii.Dialogs.Wpf;
+﻿using System.Windows.Controls;
 
 namespace WDE.DbcStore.Views
 {
@@ -12,16 +10,6 @@ namespace WDE.DbcStore.Views
         public DBCConfigView()
         {
             InitializeComponent();
-        }
-
-        private void ShowFolderBrowse(object sender, RoutedEventArgs e)
-        {
-            VistaFolderBrowserDialog dialog = new();
-            dialog.SelectedPath = Path.Text;
-            bool? result = dialog.ShowDialog();
-
-            if (result.HasValue && result.Value)
-                Path.Text = dialog.SelectedPath;
         }
     }
 }
