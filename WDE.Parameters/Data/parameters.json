@@ -1275,5 +1275,556 @@
 			"377": {"name": "Eyebrow"},
 			"378": {"name": "Toast"}
 		}
+	},
+	"NpcRankParameter": {
+		"name": "Npc rank",
+		"values": {
+			"0": {
+				"name": "Normal"
+			},
+			"1": {
+				"name": "Elite"
+			},
+			"2": {
+				"name": "Rare Elite"
+			},
+			"3": {
+				"name": "Boss"
+			},
+			"4": {
+				"name": "Rare"
+			}
+		}
+	},
+	"SpellSchoolParameter": {
+		"name": "Spell school type",
+		"prefix": "SPELL_SCHOOL_",
+		"values": {
+			"0": {
+				"name": "NORMAL"
+			},
+			"1": {
+				"name": "HOLY"
+			},
+			"2": {
+				"name": "FIRE"
+			},
+			"3": {
+				"name": "NATURE"
+			},
+			"4": {
+				"name": "FROST"
+			},
+			"5": {
+				"name": "SHADOW"
+			},
+			"6": {
+				"name": "ARCANE"
+			}
+		}
+	},
+	"UnitClassParameter": {
+		"name": "Unit class",
+		"inmenu": true,
+		"prefix": "CLASS_",
+		"values": {
+			"1": {
+				"name": "WARRIOR"
+			},
+			"2": {
+				"name": "PALADIN"
+			},
+			"4": {
+				"name": "ROGUE"
+			},
+			"8": {
+				"name": "MAGE"
+			}
+		}
+	},
+	"DynamicFlagsParameter": {
+		"name": "Dynamic flags",
+		"isflag": true,
+		"prefix": "UNIT_DYNFLAG_",
+		"values": {
+			"0": {
+				"name": "NONE"
+			},
+			"1": {
+				"name": "LOOTABLE"
+			},
+			"2": {
+				"name": "TRACK_UNIT",
+				"description": "Creature's location will be seen as a small dot in the minimap"
+			},
+			"4": {
+				"name": "TAPPED",
+				"description": "Makes creatures name appear grey (Lua_UnitIsTapped)"
+			},
+			"8": {
+				"name": "TAPPED_BY_PLAYER",
+				"description": "Lua_UnitIsTappedByPlayer usually used by PCVs (Player Controlled Vehicles)"
+			},
+			"16": {
+				"name": "SPECIALINFO"
+			},
+			"32": {
+				"name": "DEAD",
+				"description": "Makes the creature appear dead (this DOES NOT make the creature's name grey or not attack players)."
+			},
+			"64": {
+				"name": "REFER_A_FRIEND"
+			},
+			"128": {
+				"name": "TAPPED_BY_ALL_THREAT_LIST",
+				"description": "Lua_UnitIsTappedByAllThreatList"
+			}
+		}
+	},
+	"CreatureFamilyParameter": {
+		"name": "Creature family",
+		"values": {
+			"1": {
+				"name": "Wolf"
+			},
+			"2": {
+				"name": "Cat"
+			},
+			"3": {
+				"name": "Spider"
+			},
+			"4": {
+				"name": "Bear"
+			},
+			"5": {
+				"name": "Boar"
+			},
+			"6": {
+				"name": "Crocolisk"
+			},
+			"7": {
+				"name": "Carrion Bird"
+			},
+			"8": {
+				"name": "Crab"
+			},
+			"9": {
+				"name": "Gorilla"
+			},
+			"11": {
+				"name": "Raptor"
+			},
+			"12": {
+				"name": "Tallstrider"
+			},
+			"15": {
+				"name": "Felhunter"
+			},
+			"16": {
+				"name": "Voidwalker"
+			},
+			"17": {
+				"name": "Succubus"
+			},
+			"19": {
+				"name": "Doomguard"
+			},
+			"20": {
+				"name": "Scorpid"
+			},
+			"21": {
+				"name": "Turtle"
+			},
+			"23": {
+				"name": "Imp"
+			},
+			"24": {
+				"name": "Bat"
+			},
+			"25": {
+				"name": "Hyena"
+			},
+			"26": {
+				"name": "Owl"
+			},
+			"27": {
+				"name": "Wind Serpent"
+			},
+			"28": {
+				"name": "Remote Control"
+			},
+			"29": {
+				"name": "Felguard"
+			},
+			"30": {
+				"name": "Dragonhawk"
+			},
+			"31": {
+				"name": "Ravager"
+			},
+			"32": {
+				"name": "Warp Stalker"
+			},
+			"33": {
+				"name": "Sporebat"
+			},
+			"34": {
+				"name": "Nether Ray"
+			},
+			"35": {
+				"name": "Serpent"
+			},
+			"37": {
+				"name": "Moth"
+			},
+			"38": {
+				"name": "Chimaera"
+			},
+			"39": {
+				"name": "Devilsaur"
+			},
+			"40": {
+				"name": "Ghoul"
+			},
+			"41": {
+				"name": "Silithid"
+			},
+			"42": {
+				"name": "Worm"
+			},
+			"43": {
+				"name": "Rhino"
+			},
+			"44": {
+				"name": "Wasp"
+			},
+			"45": {
+				"name": "Core Hound"
+			},
+			"46": {
+				"name": "Spirit Beast"
+			}
+		}
+	},
+	"CreatureTypeParameter": {
+		"name": "Creature type",
+		"values": {
+			"0": {
+				"name": "None"
+			},
+			"1": {
+				"name": "Beast"
+			},
+			"2": {
+				"name": "Dragonkin"
+			},
+			"3": {
+				"name": "Demon"
+			},
+			"4": {
+				"name": "Elemental"
+			},
+			"5": {
+				"name": "Giant"
+			},
+			"6": {
+				"name": "Undead"
+			},
+			"7": {
+				"name": "Humanoid"
+			},
+			"8": {
+				"name": "Critter"
+			},
+			"9": {
+				"name": "Mechanical"
+			},
+			"10": {
+				"name": "Not specified"
+			},
+			"11": {
+				"name": "Totem"
+			},
+			"12": {
+				"name": "Non-Combat Pet"
+			},
+			"13": {
+				"name": "Gas Cloud"
+			},
+			"14": {
+				"name": "Wild Pet"
+			},
+			"15": {
+				"name": "Aberration"
+			}
+		}
+	},
+	"TypeFlagsParameter": {
+		"name": "Type flags",
+		"isflag": true,
+		"prefix": "CREATURE_TYPEFLAGS_",
+		"values": {
+			"1": {
+				"name": "TAMEABLE",
+				"description": "Makes the mob tameable (must also be a beast and have family set)"
+			},
+			"2": {
+				"name": "GHOST_VISIBLE",
+				"description": "Creature are also visible for not alive player."
+			},
+			"4": {
+				"name": "BOSS",
+				"description": "Changes creature's visible level to \"??\" in the creature's portrait - Immune to Knockback."
+			},
+			"8": {
+				"name": "DO_NOT_PLAY_WOUND_PARRY_ANIMATION",
+				"description": "Does not play wound animation on parry."
+			},
+			"16": {
+				"name": "HIDE_FACTION_TOOLTIP",
+				"description": "Hides tooltip faction."
+			},
+			"32": {
+				"name": "UNK",
+				"description": "Sound related"
+			},
+			"64": {
+				"name": "SPELL_ATTACKABLE",
+				"description": "Spell attackable."
+			},
+			"128": {
+				"name": "CAN_INTERACT_WHILE_DEAD",
+				"description": "Player can interact with the creature if its dead (not player dead)."
+			},
+			"256": {
+				"name": "HERB_SKINNING_SKILL",
+				"description": "Can be looted by herbalist."
+			},
+			"512": {
+				"name": "MINING_SKINNING_SKILL",
+				"description": "Can be looted by miner."
+			},
+			"1024": {
+				"name": "DO_NOT_LOG_DEATH",
+				"description": "Death event will not show up in combat log."
+			},
+			"2048": {
+				"name": "MOUNTED_COMBAT_ALLOWED",
+				"description": "Creature can remain mounted when entering combat."
+			},
+			"4096": {
+				"name": "FLAG_CAN_ASSIST",
+				"description": "Can aid any player in combat if in range."
+			},
+			"8192": {
+				"name": "IS_PET_BAR_USED",
+				"description": "Is using pet bar."
+			},
+			"16384": {
+				"name": "MASK_UID",
+				"description": ""
+			},
+			"32768": {
+				"name": "ENGINEERING_SKINNING_SKILL",
+				"description": "Can be looted by engineer."
+			},
+			"65536": {
+				"name": "EXOTIC_PET",
+				"description": "Can be tamed by hunter as exotic pet."
+			},
+			"131072": {
+				"name": "USE_DEFAULT_COLLISION_BOX",
+				"description": "Collision related. (always using default collision box?)"
+			},
+			"262144": {
+				"name": "IS_SIEGE_WEAPON",
+				"description": "Is siege weapon."
+			},
+			"524288": {
+				"name": "CAN_COLLIDE_WITH_MISSILES",
+				"description": "Projectiles can collide with this creature - interacts with TARGET_DEST_TRAJ."
+			},
+			"1048576": {
+				"name": "HIDE_NAME_PLATE",
+				"description": "Hides nameplate."
+			},
+			"2097152": {
+				"name": "DO_NOT_PLAY_MOUNTED_ANIMATIONS",
+				"description": "Does not play mounted animations."
+			},
+			"4194304": {
+				"name": "IS_LINK_ALL"
+			},
+			"8388608": {
+				"name": "INTERACT_ONLY_WITH_CREATOR",
+				"description": "Can only interact with its creator."
+			},
+			"16777216": {
+				"name": "DO_NOT_PLAY_UNIT_EVENT_SOUNDS"
+			},
+			"33554432": {
+				"name": "HAS_NO_SHADOW_BLOB"
+			},
+			"67108864": {
+				"name": "TREAT_AS_RAID_UNIT",
+				"description": "Creature can be targeted by spells that require target to be in caster's party/raid."
+			},
+			"134217728": {
+				"name": "FORCE_GOSSIP",
+				"description": "Allows the creature to display a single gossip option."
+			},
+			"268435456": {
+				"name": "DO_NOT_SHEATHE"
+			},
+			"536870912": {
+				"name": "DO_NOT_TARGET_ON_INTERACTION",
+				"description": ""
+			},
+			"1073741824": {
+				"name": "DO_NOT_RENDER_OBJECT_NAME"
+			},
+			"2147483648": {
+				"name": "UNIT_IS_QUEST_BOSS"
+			}
+		}
+	},
+	"SpellMechanicParameter": {
+		"name": "Spell mechanics",
+		"isflag": true,
+		"prefix": "MECHANIC_",
+		"values": {
+			"1": {
+				"name": "CHARM"
+			},
+			"2": {
+				"name": "DISORIENTED"
+			},
+			"4": {
+				"name": "DISARM"
+			},
+			"8": {
+				"name": "DISTRACT"
+			},
+			"16": {
+				"name": "FEAR"
+			},
+			"32": {
+				"name": "GRIP",
+				"description": "Death Grip and similar effects"
+			},
+			"64": {
+				"name": "ROOT"
+			},
+			"128": {
+				"name": "SLOW_ATTACK"
+			},
+			"256": {
+				"name": "SILENCE"
+			},
+			"512": {
+				"name": "SLEEP"
+			},
+			"1024": {
+				"name": "SNARE"
+			},
+			"2048": {
+				"name": "STUN"
+			},
+			"4096": {
+				"name": "FREEZE"
+			},
+			"8192": {
+				"name": "KNOCKOUT",
+				"description": "Incapacitate effects such as Repetance (Paladin)"
+			},
+			"16384": {
+				"name": "BLEED"
+			},
+			"32768": {
+				"name": "BANDAGE",
+				"description": "Healing etc."
+			},
+			"65536": {
+				"name": "POLYMORPH"
+			},
+			"131072": {
+				"name": "BANISH"
+			},
+			"262144": {
+				"name": "SHIELD"
+			},
+			"524288": {
+				"name": "SHACKLE",
+				"description": "Shackle Undead only"
+			},
+			"1048576": {
+				"name": "MOUNT",
+				"description": "Any effect that summons a mount"
+			},
+			"2097152": {
+				"name": "INFECTED",
+				"description": "Frost Fever, Blood Plague etc."
+			},
+			"4194304": {
+				"name": "TURN",
+				"description": "e.g. Turn Evil"
+			},
+			"8388608": {
+				"name": "HORROR",
+				"description": "e.g. Death Coil (Warlock)"
+			},
+			"16777216": {
+				"name": "INVULNERABILITY",
+				"description": "Forbearance, Nether Protection, Diplomatic Immunity only"
+			},
+			"33554432": {
+				"name": "INTERRUPT"
+			},
+			"67108864": {
+				"name": "DAZE"
+			},
+			"134217728": {
+				"name": "DISCOVERY",
+				"description": "Any Create Item effect"
+			},
+			"268435456": {
+				"name": "IMMUNE_SHIELD",
+				"description": "Divine Shield, Ice Block, Hand of Protection..."
+			},
+			"536870912": {
+				"name": "SAPPED"
+			},
+			"1073741824": {
+				"name": "ENRAGED"
+			}
+		}
+	},
+	"SpellSchoolMaskParameter": {
+		"name": "Spell school masks",
+		"isflag": true,
+		"prefix": "SPELL_SCHOOL_MASK_",
+		"values": {
+			"1": {
+				"name": "NORMAL"
+			},
+			"2": {
+				"name": "HOLY"
+			},
+			"4": {
+				"name": "FIRE"
+			},
+			"8": {
+				"name": "NATURE"
+			},
+			"16": {
+				"name": "FROST"
+			},
+			"32": {
+				"name": "SHADOW"
+			},
+			"64": {
+				"name": "ARCANE"
+			}
+		}
 	}
 }

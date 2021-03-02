@@ -80,6 +80,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SmartScriptEditor.Avalo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaStyles", "AvaloniaStyles\AvaloniaStyles.csproj", "{F6EB59E0-BAC4-49B9-81D3-D16D4E8A0FB6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseEditors.WPF", "WDE.DatabaseEditors.WPF\WDE.DatabaseEditors.WPF.csproj", "{1AD26D63-0725-4A7D-AB08-151CEDCE5C37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseEditors", "WDE.DatabaseEditors\WDE.DatabaseEditors.csproj", "{8F2C1E4B-5B87-4F59-B633-7277E49C98B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -243,6 +247,18 @@ Global
 		{F6EB59E0-BAC4-49B9-81D3-D16D4E8A0FB6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F6EB59E0-BAC4-49B9-81D3-D16D4E8A0FB6}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
 		{F6EB59E0-BAC4-49B9-81D3-D16D4E8A0FB6}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
+		{1AD26D63-0725-4A7D-AB08-151CEDCE5C37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AD26D63-0725-4A7D-AB08-151CEDCE5C37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AD26D63-0725-4A7D-AB08-151CEDCE5C37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AD26D63-0725-4A7D-AB08-151CEDCE5C37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AD26D63-0725-4A7D-AB08-151CEDCE5C37}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AD26D63-0725-4A7D-AB08-151CEDCE5C37}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
+		{8F2C1E4B-5B87-4F59-B633-7277E49C98B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F2C1E4B-5B87-4F59-B633-7277E49C98B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F2C1E4B-5B87-4F59-B633-7277E49C98B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F2C1E4B-5B87-4F59-B633-7277E49C98B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F2C1E4B-5B87-4F59-B633-7277E49C98B3}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F2C1E4B-5B87-4F59-B633-7277E49C98B3}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
