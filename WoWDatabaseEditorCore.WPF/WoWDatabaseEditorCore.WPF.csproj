@@ -23,6 +23,8 @@
         <ProjectReference Include="..\WDE.Common.WPF\WDE.Common.WPF.csproj" />
         <ProjectReference Include="..\WDE.CommonViews.WPF\WDE.CommonViews.WPF.csproj" />
         <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+        <ProjectReference Include="..\WDE.DatabaseEditors.WPF\WDE.DatabaseEditors.WPF.csproj" />
+        <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
         <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
         <ProjectReference Include="..\WDE.SmartScriptEditor.WPF\WDE.SmartScriptEditor.WPF.csproj" />

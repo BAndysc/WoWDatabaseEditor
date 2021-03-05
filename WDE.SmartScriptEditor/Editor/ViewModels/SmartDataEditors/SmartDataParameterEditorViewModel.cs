@@ -62,7 +62,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
         public List<SmartDataParamterData> ParameterKeys { get; }
-        public BindableTuple<int, SelectOption>? SeletectedParamValue { get; set; }
+        public BindableTuple<long, SelectOption>? SeletectedParamValue { get; set; }
 
         public DelegateCommand AddValue { get; }
         public DelegateCommand DeleteValue { get; }
@@ -78,7 +78,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        private void AddValueToParam() => Source.Values.Add(new BindableTuple<int, SelectOption>(0, new SelectOption()));
+        private void AddValueToParam() => Source.Values.Add(new BindableTuple<long, SelectOption>(0, new SelectOption()));
         private void DeleteValueFromParam()
         {
             if (SeletectedParamValue != null)
@@ -119,8 +119,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public string Description { get; set; }
         public string Type { get; set; }
         public bool Required { get; set; }
-        public int DefaultVal { get; set; }
-        public ObservableCollection<BindableTuple<int, SelectOption>> Values { get; set; }
+        public long DefaultVal { get; set; }
+        public ObservableCollection<BindableTuple<long, SelectOption>> Values { get; set; }
 
         public SmartDataParameterEditorData(in SmartParameterJsonData source)
         {
@@ -129,10 +129,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Type = source.Type;
             Required = source.Required;
             DefaultVal = source.DefaultVal;
-            Values = new ObservableCollection<BindableTuple<int, SelectOption>>();
+            Values = new ObservableCollection<BindableTuple<long, SelectOption>>();
             if (source.Values != null)
                 foreach (var pair in source.Values)
-                    Values.Add(new BindableTuple<int, SelectOption>(pair.Key, pair.Value));
+                    Values.Add(new BindableTuple<long, SelectOption>(pair.Key, pair.Value));
         }
 
         public SmartParameterJsonData ToSmartParameterJsonData()
@@ -145,7 +145,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             obj.DefaultVal = DefaultVal;
             if (Values.Count > 0)
             {
-                obj.Values = new Dictionary<int, SelectOption>();
+                obj.Values = new Dictionary<long, SelectOption>();
                 foreach (var pair in Values)
                     obj.Values.TryAdd(pair.Item1, pair.Item2);
             }

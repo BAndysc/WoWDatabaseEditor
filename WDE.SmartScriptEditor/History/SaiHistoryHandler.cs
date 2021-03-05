@@ -265,7 +265,7 @@ namespace WDE.SmartScriptEditor.History
             }
         }
 
-        private void Parameter_OnValueChanged(ParameterValueHolder<int> sender, int old, int @new)
+        private void Parameter_OnValueChanged(ParameterValueHolder<long> sender, long old, long @new)
         {
             PushAction(new ParameterChangedAction(sender, old, @new));
         }
@@ -369,9 +369,9 @@ namespace WDE.SmartScriptEditor.History
             }
         }
 
-        private class ParameterChangedAction : GenericParameterChangedAction<int>
+        private class ParameterChangedAction : GenericParameterChangedAction<long>
         {
-            public ParameterChangedAction(ParameterValueHolder<int> param, int old, int @new) : base(param, old, @new)
+            public ParameterChangedAction(ParameterValueHolder<long> param, long old, long @new) : base(param, old, @new)
             {
             }
         }

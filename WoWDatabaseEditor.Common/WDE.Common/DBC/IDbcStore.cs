@@ -6,18 +6,18 @@ namespace WDE.Common.DBC
     [UniqueProvider]
     public interface IDbcStore
     {
-        Dictionary<int, string> AreaTriggerStore { get; }
-        Dictionary<int, string> SkillStore { get; }
-        Dictionary<int, string> LanguageStore { get; }
-        Dictionary<int, string> PhaseStore { get; }
-        Dictionary<int, string> AreaStore { get; }
-        Dictionary<int, string> MapStore { get; }
-        Dictionary<int, string> SoundStore { get; }
-        Dictionary<int, string> MovieStore { get; }
-        Dictionary<int, string> ClassStore { get; }
-        Dictionary<int, string> RaceStore { get; }
-        Dictionary<int, string> EmoteStore { get; }
-        Dictionary<int, string> AchievementStore { get; }
-        Dictionary<int, string> ItemStore { get; }
+        Dictionary<long, string> AreaTriggerStore { get; }
+        Dictionary<long, string> SkillStore { get; }
+        Dictionary<long, string> LanguageStore { get; }
+        Dictionary<long, string> PhaseStore { get; }
+        Dictionary<long, string> AreaStore { get; }
+        Dictionary<long, string> MapStore { get; }
+        Dictionary<long, string> SoundStore { get; }
+        Dictionary<long, string> MovieStore { get; }
+        Dictionary<long, string> ClassStore { get; }
+        Dictionary<long, string> RaceStore { get; }
+        Dictionary<long, string> EmoteStore { get; }
+        Dictionary<long, string> AchievementStore { get; }
+        Dictionary<long, string> ItemStore { get; }
     }
 }

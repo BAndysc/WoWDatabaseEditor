@@ -10,14 +10,14 @@ namespace WDE.SmartScriptEditor.Models
     {
         public static readonly int SmartSourceParametersCount = 3;
 
-        private ParameterValueHolder<int> condition;
+        private ParameterValueHolder<long> condition;
 
         public SmartSource(int id) : base(SmartSourceParametersCount, id)
         {
-            condition = new ParameterValueHolder<int>("Condition ID", Parameter.Instance);
+            condition = new ParameterValueHolder<long>("Condition ID", Parameter.Instance);
         }
 
-        public ParameterValueHolder<int> Condition => condition;
+        public ParameterValueHolder<long> Condition => condition;
 
         public override string Readable
         {

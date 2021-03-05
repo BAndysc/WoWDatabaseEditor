@@ -3,9 +3,9 @@ using System.Globalization;
 
 namespace WDE.Common.Parameters
 {
-    public class Parameter : GenericBaseParameter<int>
+    public class Parameter : GenericBaseParameter<long>
     {
-        public override string ToString(int key)
+        public override string ToString(long key)
         {
             SelectOption option = null;
             if (Items?.TryGetValue(key, out option) ?? false)
@@ -25,7 +25,7 @@ namespace WDE.Common.Parameters
             this.divider = divider;
         }
         
-        public override string ToString(int value)
+        public override string ToString(long value)
         {
             return (value / divider).ToString(CultureInfo.InvariantCulture);
         }
@@ -48,7 +48,7 @@ namespace WDE.Common.Parameters
 
     public class FlagParameter : Parameter
     {
-        public override string ToString(int value)
+        public override string ToString(long value)
         {
             var flags = new List<string>();
             if (value == 0 && Items.TryGetValue(0, out var zero))

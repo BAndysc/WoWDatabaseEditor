@@ -40,12 +40,12 @@ namespace WDE.SmartScriptEditor.Models
 
     public class DescriptionParams
     {
-        public int pram1;
-        public int pram2;
-        public int pram3;
-        public int pram4;
-        public int pram5;
-        public int pram6;
-        public int source_type;
+        public long pram1;
+        public long pram2;
+        public long pram3;
+        public long pram4;
+        public long pram5;
+        public long pram6;
+        public long source_type;
     }
 }

@@ -65,7 +65,7 @@ namespace WDE.Conditions.ViewModels
         }
         
         public List<ConditionParameterData> ParameterKeys { get; private set; }
-        public BindableTuple<int, SelectOption>? SeletectedParamValue { get; set; }
+        public BindableTuple<long, SelectOption>? SeletectedParamValue { get; set; }
 
         public DelegateCommand AddValue { get; }
         public DelegateCommand DeleteValue { get; }
@@ -81,7 +81,7 @@ namespace WDE.Conditions.ViewModels
             }
         }
 
-        private void AddValueToParam() => Source.Values.Add(new BindableTuple<int, SelectOption>(0, new SelectOption()));
+        private void AddValueToParam() => Source.Values.Add(new BindableTuple<long, SelectOption>(0, new SelectOption()));
         private void DeleteValueFromParam()
         {
             if (SeletectedParamValue != null)
@@ -137,17 +137,17 @@ namespace WDE.Conditions.ViewModels
         public string Name { get; set; }
         public string Description { get; set; }
         public string Type { get; set; }
-        public ObservableCollection<BindableTuple<int, SelectOption>> Values { get; set; }
+        public ObservableCollection<BindableTuple<long, SelectOption>> Values { get; set; }
 
         public ConditionParameterEditorData(in ConditionParameterJsonData source)
         {
             Name = source.Name;
             Description = source.Description;
             Type = source.Type;
-            Values = new ObservableCollection<BindableTuple<int, SelectOption>>();
+            Values = new ObservableCollection<BindableTuple<long, SelectOption>>();
             if (source.Values != null)
                 foreach (var pair in source.Values)
-                    Values.Add(new BindableTuple<int, SelectOption>(pair.Key, pair.Value));
+                    Values.Add(new BindableTuple<long, SelectOption>(pair.Key, pair.Value));
         }
 
         public ConditionParameterEditorData(in ConditionSourceParamsJsonData source)
@@ -155,7 +155,7 @@ namespace WDE.Conditions.ViewModels
             Name = source.Name;
             Description = source.Description;
             Type = source.Type;
-            Values = new ObservableCollection<BindableTuple<int, SelectOption>>();
+            Values = new ObservableCollection<BindableTuple<long, SelectOption>>();
         }
 
         public ConditionParameterJsonData ToConditionParameterJsonData()
@@ -166,7 +166,7 @@ namespace WDE.Conditions.ViewModels
             obj.Type = Type;
             if (Values.Count > 0)
             {
-                obj.Values = new Dictionary<int, SelectOption>();
+                obj.Values = new Dictionary<long, SelectOption>();
                 foreach (var pair in Values)
                     obj.Values.TryAdd(pair.Item1, pair.Item2);
             }

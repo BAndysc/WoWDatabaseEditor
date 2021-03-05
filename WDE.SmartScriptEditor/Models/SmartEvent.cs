@@ -14,11 +14,11 @@ namespace WDE.SmartScriptEditor.Models
         public static readonly int SmartEventParamsCount = 4;
 
         private bool isSelected;
-        private ParameterValueHolder<int> chance;
-        private ParameterValueHolder<int> cooldownMax;
-        private ParameterValueHolder<int> cooldownMin;
-        private ParameterValueHolder<int> flags;
-        private ParameterValueHolder<int> phases;
+        private ParameterValueHolder<long> chance;
+        private ParameterValueHolder<long> cooldownMax;
+        private ParameterValueHolder<long> cooldownMin;
+        private ParameterValueHolder<long> flags;
+        private ParameterValueHolder<long> phases;
         
         public SmartScript Parent { get; set; }
 
@@ -44,11 +44,11 @@ namespace WDE.SmartScriptEditor.Models
                 }
             };
             
-            flags = new ParameterValueHolder<int>("Flags", SmartEventFlagParameter.Instance);
-            chance = new ParameterValueHolder<int>("Chance", Parameter.Instance);
-            phases = new ParameterValueHolder<int>("Phases", SmartEventPhaseParameter.Instance);
-            cooldownMin = new ParameterValueHolder<int>("CooldownMin", Parameter.Instance);
-            cooldownMax = new ParameterValueHolder<int>("CooldownMax", Parameter.Instance);
+            flags = new ParameterValueHolder<long>("Flags", SmartEventFlagParameter.Instance);
+            chance = new ParameterValueHolder<long>("Chance", Parameter.Instance);
+            phases = new ParameterValueHolder<long>("Phases", SmartEventPhaseParameter.Instance);
+            cooldownMin = new ParameterValueHolder<long>("CooldownMin", Parameter.Instance);
+            cooldownMax = new ParameterValueHolder<long>("CooldownMax", Parameter.Instance);
 
             flags.PropertyChanged += (_, _) => CallOnChanged();
             chance.PropertyChanged += (_, _) => CallOnChanged();
@@ -71,11 +71,11 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        public ParameterValueHolder<int> CooldownMax => cooldownMax;
-        public ParameterValueHolder<int> CooldownMin => cooldownMin;
-        public ParameterValueHolder<int> Phases => phases;
-        public ParameterValueHolder<int> Chance => chance;
-        public ParameterValueHolder<int> Flags => flags;
+        public ParameterValueHolder<long> CooldownMax => cooldownMax;
+        public ParameterValueHolder<long> CooldownMin => cooldownMin;
+        public ParameterValueHolder<long> Phases => phases;
+        public ParameterValueHolder<long> Chance => chance;
+        public ParameterValueHolder<long> Flags => flags;
 
         public ObservableCollection<SmartAction> Actions { get; }
         public ObservableCollection<SmartCondition> Conditions { get; }
@@ -166,7 +166,7 @@ namespace WDE.SmartScriptEditor.Models
         public static SmartEventFlagParameter Instance { get; } = new SmartEventFlagParameter();
         public SmartEventFlagParameter()
         {
-            Items = new Dictionary<int, SelectOption>()
+            Items = new Dictionary<long, SelectOption>()
             {
                 [1] = new("NOT_REPEATABLE"),
                 [2] = new("DIFFICULTY_0"),
@@ -185,7 +185,7 @@ namespace WDE.SmartScriptEditor.Models
         public static SmartEventPhaseParameter Instance { get; } = new SmartEventPhaseParameter();
         public SmartEventPhaseParameter()
         {
-            Items = new Dictionary<int, SelectOption>()
+            Items = new Dictionary<long, SelectOption>()
             {
                 [0] = new("Always"),
                 [1] = new("Phase 1"),

@@ -1,6 +1,7 @@
 ﻿{
   "name": "Creature Template",
   "table_name": "creature_template",
+  "table_index_name": "entry",
   "groups": [
     {
       "group_name": "Entries",
@@ -222,8 +223,8 @@
           "read_only": false
         },
         {
-          "name": "speed_run",
-          "db_column_name": "Run speed",
+          "name": "Run speed",
+          "db_column_name": "speed_run",
           "value_type": "float",
           "read_only": false
         },
@@ -400,17 +401,6 @@
           "name": "Script name",
           "db_column_name": "ScriptName",
           "value_type": "string",
-          "read_only": false
-        }
-      ]
-    },
-    {
-      "group_name": "",
-      "fields": [
-        {
-          "name": "",
-          "db_column_name": "",
-          "value_type": "",
           "read_only": false
         }
       ]

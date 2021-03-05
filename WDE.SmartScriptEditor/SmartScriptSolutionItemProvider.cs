@@ -202,7 +202,7 @@ namespace WDE.SmartScriptEditor
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
             var areaTriggers =
-                dbcStore.Value.AreaTriggerStore.ToDictionary(at => at.Key, at => new SelectOption($"Client areatrigger {at.Key}"));
+                dbcStore.Value.AreaTriggerStore.ToDictionary(at => (int)at.Key, at => new SelectOption($"Client areatrigger {at.Key}"));
             int? entry = await itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
             if (!entry.HasValue)
                 return null;

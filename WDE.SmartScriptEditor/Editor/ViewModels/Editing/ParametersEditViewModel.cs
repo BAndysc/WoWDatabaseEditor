@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             SmartBaseElement element,
             bool focusFirst,
-            IEnumerable<(ParameterValueHolder<int> parameter, string name)> parameters,
+            IEnumerable<(ParameterValueHolder<long> parameter, string name)> parameters,
             IEnumerable<(ParameterValueHolder<float> parameter, string name)> floatParameters = null,
             IEnumerable<(ParameterValueHolder<string> parameter, string name)> stringParameters = null,
             IEnumerable<EditableActionData> actionParameters = null,
@@ -37,7 +37,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
             if (parameters != null)
                 foreach (var parameter in parameters)
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<int>(parameter.parameter, parameter.name, itemFromListProvider)));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider)));
 
             if (floatParameters != null)
                 foreach (var parameter in floatParameters)

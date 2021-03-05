@@ -23,7 +23,7 @@ namespace WDE.Parameters.Models
         public string Prefix { get; set; }
 
         [JsonProperty(PropertyName = "values")]
-        public Dictionary<int, SelectOption> Values { get; set; }
+        public Dictionary<long, SelectOption> Values { get; set; }
 
         public override string ToString()
         {

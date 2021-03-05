@@ -124,7 +124,7 @@ namespace WDE.SmartScriptEditor.Exporter
             var lines = new List<ISmartScriptLine>();
             var conditions = new List<IConditionLine>();
             var previousWasWait = false;
-            int nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EventTriggerTimed)
+            long nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EventTriggerTimed)
                 .Select(e => e.GetParameter(0).Value)
                 .DefaultIfEmpty(0)
                 .Max() + 1;

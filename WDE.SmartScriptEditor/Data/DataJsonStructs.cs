@@ -24,13 +24,13 @@ namespace WDE.SmartScriptEditor.Data
         public bool Required { get; set; }
 
         [JsonProperty(PropertyName = "defaultVal")]
-        public int DefaultVal { get; set; }
+        public long DefaultVal { get; set; }
 
         [JsonProperty(PropertyName = "enter_to_accept")]
         public bool EnterToAccept { get; set; }
 
         [JsonProperty(PropertyName = "values")]
-        public Dictionary<int, SelectOption> Values { get; set; }
+        public Dictionary<long, SelectOption> Values { get; set; }
     }
 
     public enum WarningType

@@ -68,8 +68,8 @@ namespace WDE.SmartScriptEditor.Models
             SmartScriptType? source = null;
 
             var conds = ParseConditions(conditions);
-            SortedDictionary<int, SmartEvent> triggerIdToActionParent = new();
-            SortedDictionary<int, SmartEvent> triggerIdToEvent = new();
+            SortedDictionary<long, SmartEvent> triggerIdToActionParent = new();
+            SortedDictionary<long, SmartEvent> triggerIdToEvent = new();
             Dictionary<int, SmartEvent> linkToSmartEventParent = new();
 
             // find double links (multiple events linking to same event, this is not supported by design)
@@ -84,7 +84,7 @@ namespace WDE.SmartScriptEditor.Models
             if (doubleLinks.Count > 0)
             {
                 int nextFreeTriggerTimedEvent = lines.Where(e => e.Id == SmartConstants.EventTriggerTimed)
-                    .Select(e => e.EventParam1)
+                    .Select(e => (int)e.EventParam1)
                     .DefaultIfEmpty(0)
                     .Max() + 1;
 
@@ -189,7 +189,7 @@ namespace WDE.SmartScriptEditor.Models
                     lastAction.GetParameter(1).Value != lastAction.GetParameter(2).Value)
                     continue;
 
-                int waitTime = lastAction.GetParameter(1).Value;
+                long waitTime = lastAction.GetParameter(1).Value;
                 SmartAction waitAction = smartFactory.ActionFactory(SmartConstants.ActionWait,
                     smartFactory.SourceFactory(SmartConstants.SourceNone),
                     smartFactory.TargetFactory(SmartConstants.TargetNone));

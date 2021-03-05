@@ -34,23 +34,23 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ConditionTarget")]
         [PrimaryKey]
-        public int ConditionTarget { get; set; }
+        public long ConditionTarget { get; set; }
 
         [Column(Name = "ConditionValue1")]
         [PrimaryKey]
-        public int ConditionValue1 { get; set; }
+        public long ConditionValue1 { get; set; }
 
         [Column(Name = "ConditionValue2")]
         [PrimaryKey]
-        public int ConditionValue2 { get; set; }
+        public long ConditionValue2 { get; set; }
 
         [Column(Name = "ConditionValue3")]
         [PrimaryKey]
-        public int ConditionValue3 { get; set; }
+        public long ConditionValue3 { get; set; }
 
         [Column(Name = "NegativeCondition")]
         [PrimaryKey]
-        public int NegativeCondition { get; set; }
+        public long NegativeCondition { get; set; }
 
         [Column(Name = "Comment")]
         public string Comment { get; set; } = "";

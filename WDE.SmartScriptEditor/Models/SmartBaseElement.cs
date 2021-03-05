@@ -15,7 +15,7 @@ namespace WDE.SmartScriptEditor.Models
         public event EventHandler OnChanged = delegate { };
         public event Action<SmartBaseElement, int, int> OnIdChanged = delegate { };
 
-        private readonly ParameterValueHolder<int>[] @params;
+        private readonly ParameterValueHolder<long>[] @params;
 
         private string readableHint;
         public string ReadableHint
@@ -50,10 +50,10 @@ namespace WDE.SmartScriptEditor.Models
         {
             Id = id;
             ParametersCount = parametersCount;
-            @params = new ParameterValueHolder<int>[parametersCount];
+            @params = new ParameterValueHolder<long>[parametersCount];
             for (int i = 0; i < parametersCount; ++i)
             {
-                @params[i] = new ParameterValueHolder<int>(Parameter.Instance);
+                @params[i] = new ParameterValueHolder<long>(Parameter.Instance);
                 @params[i].PropertyChanged += (_, _) => CallOnChanged();
             }
 
@@ -61,7 +61,7 @@ namespace WDE.SmartScriptEditor.Models
             OnChanged += (sender, args) => OnPropertyChanged(nameof(Readable));
         }
 
-        public ParameterValueHolder<int> GetParameter(int index)
+        public ParameterValueHolder<long> GetParameter(int index)
         {
             return @params[index];
         }

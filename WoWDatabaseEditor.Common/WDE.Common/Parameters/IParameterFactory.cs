@@ -7,9 +7,9 @@ namespace WDE.Common.Parameters
     [UniqueProvider]
     public interface IParameterFactory
     {
-        IParameter<int> Factory(string type);
+        IParameter<long> Factory(string type);
         bool IsRegistered(string type);
-        void Register(string key, IParameter<int> parameter);
+        void Register(string key, IParameter<long> parameter);
         
         IEnumerable<string> GetKeys();
     }

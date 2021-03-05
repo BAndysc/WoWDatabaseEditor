@@ -3,10 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net5.0-windows7.0</TargetFramework>
         <UseWPF>true</UseWPF>
-        <Configurations>Debug;Release;</Configurations>
+        <Configurations>Debug;Release;DebugAvalonia</Configurations>
         <Platforms>AnyCPU</Platforms>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-        <FileVersion>0.0.0.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -24,9 +22,5 @@
         <PackageReference Include="Prism.Wpf">
             <Version>7.2.0.1422</Version>
         </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Views" />
     </ItemGroup>
 </Project>

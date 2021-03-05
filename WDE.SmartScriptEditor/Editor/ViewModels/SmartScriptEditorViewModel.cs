@@ -1049,7 +1049,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 obj.Parent = originalAction.Parent; // fake parent
             SmartGenericJsonData actionData = smartDataManager.GetRawData(SmartType.SmartAction, originalAction.Id);
             
-            var parametersList = new List<(ParameterValueHolder<int>, string)>();
+            var parametersList = new List<(ParameterValueHolder<long>, string)>();
             var floatParametersList = new List<(ParameterValueHolder<float>, string)>();
             var actionList = new List<EditableActionData>();
             var stringParametersList = new List<(ParameterValueHolder<string>, string)>() {(obj.CommentParameter, "Comment")};
@@ -1171,7 +1171,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 obj.Parent = originalCondition.Parent; // fake parent
             
             var actionList = new List<EditableActionData>();
-            var parametersList = new List<(ParameterValueHolder<int>, string)>();
+            var parametersList = new List<(ParameterValueHolder<long>, string)>();
 
             parametersList.Add((obj.Inverted, "General"));
             parametersList.Add((obj.ConditionTarget, "General"));
@@ -1235,7 +1235,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 ev.Parent = originalEvent.Parent; // fake parent
             
             var actionList = new List<EditableActionData>();
-            var parametersList = new List<(ParameterValueHolder<int>, string)>
+            var parametersList = new List<(ParameterValueHolder<long>, string)>
             {
                 (ev.Chance, "General"),
                 (ev.Flags, "General"),

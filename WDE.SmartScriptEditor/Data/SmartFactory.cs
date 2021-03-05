@@ -248,7 +248,7 @@ namespace WDE.SmartScriptEditor.Data
                         parameterFactory.Register(key, data.Parameters[i].Type == "FlagParameter" ? new FlagParameter(){Items = data.Parameters[i].Values} : new Parameter(){Items = data.Parameters[i].Values});
                 }
                 
-                IParameter<int> parameter = parameterFactory.Factory(key);
+                IParameter<long> parameter = parameterFactory.Factory(key);
                 element.GetParameter(i).Name = data.Parameters[i].Name;
                 if (!update)
                     element.GetParameter(i).Value = data.Parameters[i].DefaultVal;
@@ -278,7 +278,7 @@ namespace WDE.SmartScriptEditor.Data
                         parameterFactory.Register(key, new Parameter(){Items = data.Parameters[i].Values});
                 }
                 
-                IParameter<int> parameter = parameterFactory.Factory(key);
+                IParameter<long> parameter = parameterFactory.Factory(key);
 
                 element.GetParameter(i).Name = data.Parameters[i].Name;
                 element.GetParameter(i).IsUsed = true;

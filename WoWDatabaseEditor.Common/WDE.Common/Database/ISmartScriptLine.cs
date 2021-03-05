@@ -14,55 +14,55 @@ namespace WDE.Common.Database
 
         int EventType { get; set; }
 
-        int EventPhaseMask { get; set; }
+        long EventPhaseMask { get; set; }
 
-        int EventChance { get; set; }
+        long EventChance { get; set; }
 
-        int EventFlags { get; set; }
+        long EventFlags { get; set; }
 
-        int EventParam1 { get; set; }
+        long EventParam1 { get; set; }
 
-        int EventParam2 { get; set; }
+        long EventParam2 { get; set; }
 
-        int EventParam3 { get; set; }
+        long EventParam3 { get; set; }
 
-        int EventParam4 { get; set; }
+        long EventParam4 { get; set; }
 
-        int EventCooldownMin { get; set; }
+        long EventCooldownMin { get; set; }
 
-        int EventCooldownMax { get; set; }
+        long EventCooldownMax { get; set; }
 
         int ActionType { get; set; }
 
-        int ActionParam1 { get; set; }
+        long ActionParam1 { get; set; }
 
-        int ActionParam2 { get; set; }
+        long ActionParam2 { get; set; }
 
-        int ActionParam3 { get; set; }
+        long ActionParam3 { get; set; }
 
-        int ActionParam4 { get; set; }
+        long ActionParam4 { get; set; }
 
-        int ActionParam5 { get; set; }
+        long ActionParam5 { get; set; }
 
-        int ActionParam6 { get; set; }
+        long ActionParam6 { get; set; }
 
         int SourceType { get; set; }
 
-        int SourceParam1 { get; set; }
+        long SourceParam1 { get; set; }
 
-        int SourceParam2 { get; set; }
+        long SourceParam2 { get; set; }
 
-        int SourceParam3 { get; set; }
+        long SourceParam3 { get; set; }
 
         int SourceConditionId { get; set; }
 
         int TargetType { get; set; }
 
-        int TargetParam1 { get; set; }
+        long TargetParam1 { get; set; }
 
-        int TargetParam2 { get; set; }
+        long TargetParam2 { get; set; }
 
-        int TargetParam3 { get; set; }
+        long TargetParam3 { get; set; }
 
         int TargetConditionId { get; set; }
 
@@ -84,31 +84,31 @@ namespace WDE.Common.Database
         public int Id { get; set; }
         public int Link { get; set; }
         public int EventType { get; set; }
-        public int EventPhaseMask { get; set; }
-        public int EventChance { get; set; }
-        public int EventFlags { get; set; }
-        public int EventParam1 { get; set; }
-        public int EventParam2 { get; set; }
-        public int EventParam3 { get; set; }
-        public int EventParam4 { get; set; }
-        public int EventCooldownMin { get; set; }
-        public int EventCooldownMax { get; set; }
+        public long EventPhaseMask { get; set; }
+        public long EventChance { get; set; }
+        public long EventFlags { get; set; }
+        public long EventParam1 { get; set; }
+        public long EventParam2 { get; set; }
+        public long EventParam3 { get; set; }
+        public long EventParam4 { get; set; }
+        public long EventCooldownMin { get; set; }
+        public long EventCooldownMax { get; set; }
         public int ActionType { get; set; }
-        public int ActionParam1 { get; set; }
-        public int ActionParam2 { get; set; }
-        public int ActionParam3 { get; set; }
-        public int ActionParam4 { get; set; }
-        public int ActionParam5 { get; set; }
-        public int ActionParam6 { get; set; }
+        public long ActionParam1 { get; set; }
+        public long ActionParam2 { get; set; }
+        public long ActionParam3 { get; set; }
+        public long ActionParam4 { get; set; }
+        public long ActionParam5 { get; set; }
+        public long ActionParam6 { get; set; }
         public int SourceType { get; set; }
-        public int SourceParam1 { get; set; }
-        public int SourceParam2 { get; set; }
-        public int SourceParam3 { get; set; }
+        public long SourceParam1 { get; set; }
+        public long SourceParam2 { get; set; }
+        public long SourceParam3 { get; set; }
         public int SourceConditionId { get; set; }
         public int TargetType { get; set; }
-        public int TargetParam1 { get; set; }
-        public int TargetParam2 { get; set; }
-        public int TargetParam3 { get; set; }
+        public long TargetParam1 { get; set; }
+        public long TargetParam2 { get; set; }
+        public long TargetParam3 { get; set; }
         public int TargetConditionId { get; set; }
         public float TargetX { get; set; }
         public float TargetY { get; set; }
@@ -119,7 +119,7 @@ namespace WDE.Common.Database
 
     public static class SmartScriptLineExtensions
     {
-        public static int GetEventParam(this ISmartScriptLine line, int i)
+        public static long GetEventParam(this ISmartScriptLine line, int i)
         {
             switch (i)
             {
@@ -136,7 +136,7 @@ namespace WDE.Common.Database
             throw new IndexOutOfRangeException();
         }
         
-        public static int GetActionParam(this ISmartScriptLine line, int i)
+        public static long GetActionParam(this ISmartScriptLine line, int i)
         {
             switch (i)
             {
@@ -157,7 +157,7 @@ namespace WDE.Common.Database
             throw new IndexOutOfRangeException();
         }
         
-        public static int GetSourceParam(this ISmartScriptLine line, int i)
+        public static long GetSourceParam(this ISmartScriptLine line, int i)
         {
             switch (i)
             {
@@ -172,7 +172,7 @@ namespace WDE.Common.Database
             throw new IndexOutOfRangeException();
         }
         
-        public static int GetTargetParam(this ISmartScriptLine line, int i)
+        public static long GetTargetParam(this ISmartScriptLine line, int i)
         {
             switch (i)
             {
