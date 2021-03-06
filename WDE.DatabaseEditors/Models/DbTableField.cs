@@ -1,8 +1,11 @@
-﻿using WDE.DatabaseEditors.Data;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using WDE.Common.Annotations;
+using WDE.DatabaseEditors.Data;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DbTableField<T> : IDbTableField// where T : new()
+    public class DbTableField<T> : IDbTableField, INotifyPropertyChanged
     {
         public DbTableField(string fieldName, bool isReadOnly, bool isModified, string valueType, bool isParameter,
             T value)
@@ -41,6 +44,25 @@ namespace WDE.DatabaseEditors.Models
         public bool IsModified { get; set; }
         public string ValueType { get; }
         public bool IsParameter { get; }
-        public T Value { get; set; }
+        private T fieldValue;
+
+        public T Value
+        {
+            get => fieldValue;
+            set
+            {
+                fieldValue = value;
+                OnPropertyChanged(nameof(Value));
+            }
+        }
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName]
+            string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

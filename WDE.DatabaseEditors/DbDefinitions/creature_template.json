@@ -9,37 +9,37 @@
         {
           "name": "Entry",
           "db_column_name": "entry",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": true
         },
         {
           "name": "Difficulty 1",
           "db_column_name": "difficulty_entry_1",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": true
         },
         {
           "name": "Difficulty 2",
           "db_column_name": "difficulty_entry_2",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": true
         },
         {
           "name": "Difficulty 3",
           "db_column_name": "difficulty_entry_3",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": true
         },
         {
           "name": "Kill credit",
           "db_column_name": "KillCredit1",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": true
         },
         {
           "name": "Kill credit 2",
           "db_column_name": "KillCredit2",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": true
         }
       ]
@@ -67,25 +67,25 @@
         {
           "name": "Model Id 1",
           "db_column_name": "modelid1",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Model Id 2",
           "db_column_name": "modelid2",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Model Id 3",
           "db_column_name": "modelid3",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Model Id 4",
           "db_column_name": "modelid4",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
@@ -108,7 +108,7 @@
         {
           "name": "Gossip menu ID",
           "db_column_name": "gossip_menu_id",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": true
         }
       ]
@@ -119,19 +119,19 @@
         {
           "name": "Faction",
           "db_column_name": "faction",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Min level",
           "db_column_name": "minlevel",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Max level",
           "db_column_name": "maxlevel",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
@@ -231,7 +231,7 @@
         {
           "name": "Movement type",
           "db_column_name": "MovementType",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
@@ -243,7 +243,7 @@
         {
           "name": "Movement ID",
           "db_column_name": "movementId",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": true
         }
       ]
@@ -260,13 +260,13 @@
         {
           "name": "Melee attack time",
           "db_column_name": "BaseAttackTime",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Ranged attack time",
           "db_column_name": "RangeAttackTime",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
@@ -284,7 +284,7 @@
         {
           "name": "Pet spell ID",
           "db_column_name": "PetSpellDataId",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
@@ -331,31 +331,31 @@
         {
           "name": "Loot ID",
           "db_column_name": "lootid",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Skinning loot ID",
           "db_column_name": "skinloot",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Pickpocket loot ID",
           "db_column_name": "pickpocketloot",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Min gold",
           "db_column_name": "mingold",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         },
         {
           "name": "Max gold",
           "db_column_name": "maxgold",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         }
       ]
@@ -366,7 +366,7 @@
         {
           "name": "Vehicle ID",
           "db_column_name": "VehicleId",
-          "value_type": "int",
+          "value_type": "uint",
           "read_only": false
         }
       ]

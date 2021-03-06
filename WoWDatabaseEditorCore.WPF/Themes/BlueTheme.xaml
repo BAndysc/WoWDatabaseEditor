@@ -172,6 +172,10 @@
     
     <SolidColorBrush x:Key="ScrollBarColor" Color="#8C8C8C" />
     
+    <!-- TreeViewItem -->
+    <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#bfbfbf"/>
+    <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#0000b3" />
+    
     <!-- Buttons -->
     <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070" />
     <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD" />

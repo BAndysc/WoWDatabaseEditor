@@ -17,7 +17,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             this.windowManager = windowManager;
         }
         
-        public async Task<int?> GetItemFromList(Dictionary<int, SelectOption> items, bool flags, int? current = null)
+        public async Task<long?> GetItemFromList(Dictionary<long, SelectOption> items, bool flags, long? current = null)
         {
             using ItemFromListProviderViewModel vm = new(items, flags, current);
             if (await windowManager.ShowDialog(vm))

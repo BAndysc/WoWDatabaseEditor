@@ -44,13 +44,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         {
             get
             {
-                if (Parameter is ParameterValueHolder<int> p)
+                if (Parameter is ParameterValueHolder<long> p)
                     return p.Value == 1;
                 return false;
             }
             set
             {
-                if (Parameter is ParameterValueHolder<int> p)
+                if (Parameter is ParameterValueHolder<long> p)
                     p.Value = value ? 1 : 0;
                 RaisePropertyChanged();
             }
@@ -60,9 +60,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         {
             if (Parameter.Parameter.Items != null)
             {
-                if (Parameter is ParameterValueHolder<int> p)
+                if (Parameter is ParameterValueHolder<long> p)
                 {
-                    int? val = await itemFromListProvider.GetItemFromList(p.Parameter.Items, Parameter.Parameter is FlagParameter, p.Value);
+                    long? val = await itemFromListProvider.GetItemFromList(p.Parameter.Items, Parameter.Parameter is FlagParameter, p.Value);
                     if (val.HasValue)
                         p.Value = val.Value;   
                 }

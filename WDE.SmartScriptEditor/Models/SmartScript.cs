@@ -42,7 +42,7 @@ namespace WDE.SmartScriptEditor.Models
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
             this.messageBoxService = messageBoxService;
-            EntryOrGuid = item.Entry;
+            EntryOrGuid = (int)item.Entry;
             SourceType = item.SmartType;
             Events = new ObservableCollection<SmartEvent>();
             selectionHelper = new SmartSelectionHelper(this);

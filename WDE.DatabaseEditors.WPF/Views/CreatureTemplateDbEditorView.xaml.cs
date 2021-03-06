@@ -8,5 +8,10 @@ namespace WDE.DatabaseEditors.WPF.Views
         {
             InitializeComponent();
         }
+        
+        private void fieldInput_Error(object sender, System.Windows.Controls.ValidationErrorEventArgs e)
+        {
+            // saveButton.IsEnabled = e.Action != System.Windows.Controls.ValidationErrorEventAction.Added;
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         private readonly bool asFlags;
         private string search = "";
         
-        public ItemFromListProviderViewModel(Dictionary<int, SelectOption> items, bool asFlags, int? current = null)
+        public ItemFromListProviderViewModel(Dictionary<long, SelectOption> items, bool asFlags, long? current = null)
         {
             this.asFlags = asFlags;
             

@@ -25,7 +25,7 @@ namespace WDE.DatabaseEditors.Data
             this.tableDataProvider = tableDataProvider;
         }
 
-        public async Task<IDbTableData> LoadCreatureTamplateDataEntry(int creatureEntry)
+        public async Task<IDbTableData> LoadCreatureTamplateDataEntry(uint creatureEntry)
         {
             var tableDefinition = tableDefinitionProvider.GetCreatureTemplateDefinition();
             var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, creatureEntry);
@@ -37,21 +37,11 @@ namespace WDE.DatabaseEditors.Data
             return tableDataProvider.GetDatabaseTable(in tableDefinition, tableFieldFactory, result[0]);
         }
 
-        private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, int creatureEntry)
+        private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, uint creatureEntry)
         {
-            // StringBuilder stringBuilder = new StringBuilder("SELECT ");
-
             var columns = tableDefinitionJson.Groups.SelectMany(x => x.Fields).Select(x => $"`{x.DbColumnName}`");
             var names = string.Join(",", columns);
-                
-            // foreach (var group in tableDefinitionJson.Groups)
-                // group.Fields
-            // foreach (var field in group.Fields)
-                // stringBuilder.Append($"{field.DbColumnName}, ");
 
-            // stringBuilder.Remove(stringBuilder.Length - 3, 2);
-            // stringBuilder.Append($" FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TableIndexFieldName} = {creatureEntry}");
-            // return stringBuilder.ToString();
             return
                 $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TableIndexFieldName} = {creatureEntry};";
         }

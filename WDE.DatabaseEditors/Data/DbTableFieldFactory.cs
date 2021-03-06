@@ -22,11 +22,16 @@ namespace WDE.DatabaseEditors.Data
                     var intValue = (dbValue is int bi) ? bi : default;
                     field = new DbTableField<bool>(in definition, intValue > 0);
                     break;
+                case "uint":
+                    field = new DbTableField<uint>(in definition, (dbValue is uint ui) ? ui : default);
+                    break;
                 default:
-                    field = new DbTableField<int>(in definition, (dbValue is int i) ? i : default);
+                    if (dbValue is uint defui)
+                        field = new DbTableField<long>(in definition, defui);
+                    else
+                        field = new DbTableField<long>(in definition, (dbValue is int i) ? i : default);
                     break;
             }
-
             return field;
         }
     }

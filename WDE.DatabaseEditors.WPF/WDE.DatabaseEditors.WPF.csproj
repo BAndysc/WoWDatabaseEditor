@@ -5,6 +5,7 @@
         <UseWPF>true</UseWPF>
         <Configurations>Debug;Release;DebugAvalonia</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup>

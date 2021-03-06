@@ -612,7 +612,8 @@
     <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Stroke" Color="#007ACC" />
     <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Fill" Color="#007ACC" />
     <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#007ACC" />
-
+    <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#737373"/>
+    <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#f2f2f2" />
     <!-- Button -->
     <SolidColorBrush x:Key="Button.Static.Border" Color="#515159" />
     <SolidColorBrush x:Key="Button.Static.Background" Color="#3F3F46" />

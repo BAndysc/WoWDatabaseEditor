@@ -230,9 +230,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             DirectEditParameter = new DelegateCommand<object>(async obj =>
             {
-                if (obj is ParameterValueHolder<int> param)
+                if (obj is ParameterValueHolder<long> param)
                 {
-                    int? val = await itemFromListProvider.GetItemFromList(param.Parameter.Items ?? new Dictionary<int, SelectOption>(), param.Parameter is FlagParameter, param.Value);
+                    long? val = await itemFromListProvider.GetItemFromList(param.Parameter.Items ?? new Dictionary<long, SelectOption>(), param.Parameter is FlagParameter, param.Value);
                     if (val.HasValue)
                         param.Value = val.Value;   
                 } 
@@ -884,8 +884,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task AsyncLoad()
         {
-            var lines = database.GetScriptFor(this.item.Entry, this.item.SmartType).ToList();
-            var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, this.item.Entry, (int)this.item.SmartType).ToList();
+            var lines = database.GetScriptFor((int)this.item.Entry, this.item.SmartType).ToList();
+            var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, (int)this.item.Entry, (int)this.item.SmartType).ToList();
             script.Load(lines, conditions);
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
@@ -897,11 +897,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             var (lines, conditions) = script.ToSmartScriptLinesNoMetaActions(smartFactory, smartDataManager);
             
-            await database.InstallScriptFor(item.Entry, item.SmartType, lines);
+            await database.InstallScriptFor((int)item.Entry, item.SmartType, lines);
             
             await database.InstallConditions(conditions, 
                 IDatabaseProvider.ConditionKeyMask.SourceEntry | IDatabaseProvider.ConditionKeyMask.SourceId,
-                new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript, null, item.Entry, (int)item.SmartType));
+                new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript, null, (int)item.Entry, (int)item.SmartType));
 
             statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
             
