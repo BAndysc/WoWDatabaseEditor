@@ -14,6 +14,10 @@
       <ProjectReference Include="..\WDE.CommonViews.WPF\WDE.CommonViews.WPF.csproj" />
       <ProjectReference Include="..\WDE.Conditions.WPF\WDE.Conditions.WPF.csproj" />
       <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+      <ProjectReference Include="..\WDE.DatabaseEditors.WPF\WDE.DatabaseEditors.WPF.csproj" />
+      <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
+      <ProjectReference Include="..\WDE.DatabseEditors.WPF\WDE.DatabseEditors.WPF.csproj" />
+      <ProjectReference Include="..\WDE.DatabseEditors\WDE.DatabseEditors.csproj" />
       <ProjectReference Include="..\WDE.MVVM.Test\WDE.MVVM.Test.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />

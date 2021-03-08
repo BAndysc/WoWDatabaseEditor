@@ -18,8 +18,9 @@
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <None Update="DbDefinitions\creature_template.json">
+      <None Remove="DbDefinitions\creature_template.json" />
+      <Content Include="DbDefinitions\creature_template.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+      </Content>
     </ItemGroup>
 </Project>
