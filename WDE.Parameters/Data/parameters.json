@@ -1832,5 +1832,119 @@
 				"name": "ARCANE"
 			}
 		}
+	},
+	"GameobjectTypeParameter": {
+		"name": "Types of gameobject",
+		"prefix": "GAMEOBJECT_TYPE",
+		"values": {
+			"0" : {
+				"name": "DOOR"
+			},
+			"1" : {
+				"name": "BUTTON"
+			},
+			"2" : {
+				"name": "QUEST_GIVER"
+			},
+			"3" : {
+				"name": "CHEST"
+			},
+			"4" : {
+				"name": "BINDER"
+			},
+			"5" : {
+				"name": "GENERIC"
+			},
+			"6" : {
+				"name": "TRAP"
+			},
+			"7" : {
+				"name": "CHAIR"
+			},
+			"8" : {
+				"name": "SPELL_FOCUS"
+			},
+			"9" : {
+				"name": "TEXT"
+			},
+			"10" : {
+				"name": "GOOBER"
+			},
+			"11" : {
+				"name": "TRANSPORT"
+			},
+			"12" : {
+				"name": "AREA_DAMAGE"
+			},
+			"13" : {
+				"name": "CAMERA"
+			},
+			"14" : {
+				"name": "MAP_OBJECT"
+			},
+			"15" : {
+				"name": "MO_TRANSPORT"
+			},
+			"16" : {
+				"name": "DUEL_ARBITER"
+			},
+			"17" : {
+				"name": "FISHING_NODE"
+			},
+			"18" : {
+				"name": "RITUAL"
+			},
+			"19" : {
+				"name": "MAILBOX"
+			},
+			"20" : {
+				"name": "AUCTIONHOUSE"
+			},
+			"21" : {
+				"name": "GUARDPOST"
+			},
+			"22" : {
+				"name": "SPELL_CASTER"
+			},
+			"23" : {
+				"name": "MEETING_STONE"
+			},
+			"24" : {
+				"name": "FLAG_STAND"
+			},
+			"25" : {
+				"name": "FISHING_HOLE"
+			},
+			"26" : {
+				"name": "FLAG_DROP"
+			},
+			"27" : {
+				"name": "MINI_GAME"
+			},
+			"28" : {
+				"name": "LOTTERY_KIOSK"
+			},
+			"29" : {
+				"name": "CAPTURE_POINT"
+			},
+			"30" : {
+				"name": "AURA_GENERATOR"
+			},
+			"31" : {
+				"name": "DUNGEON_DIFFICULTY"
+			},
+			"32" : {
+				"name": "BARBER_CHAIR"
+			},
+			"33" : {
+				"name": "DESTRUCTIBLE_BUILDING"
+			},
+			"34" : {
+				"name": "GUILD_BANK"
+			},
+			"35" : {
+				"name": "TRAPDOOR"
+			}
+		}
 	}
 }

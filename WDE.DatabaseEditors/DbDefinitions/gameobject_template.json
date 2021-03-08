@@ -1,0 +1,226 @@
+﻿{
+  "name": "Gameobject Template",
+  "table_name": "gameobject_template",
+  "table_index_name": "entry",
+  "table_name_source_field": "name",
+  "groups": [
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Type",
+          "db_column_name": "type",
+          "value_type": "GameobjectTypeParameter",
+          "read_only": true
+        }
+      ]
+    },
+    {
+      "group_name": "Visual",
+      "fields": [
+        {
+          "name": "Display",
+          "db_column_name": "displayId",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Size",
+          "db_column_name": "size",
+          "value_type": "float",
+          "read_only": false
+        },
+        {
+          "name": "IconName",
+          "db_column_name": "IconName",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Cast bar caption",
+          "db_column_name": "castBarCaption",
+          "value_type": "string",
+          "read_only": true
+        }
+      ]
+    },
+    {
+      "group_name": "Data",
+      "fields": [
+        {
+          "name": "Data 0",
+          "db_column_name": "Data0",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 1",
+          "db_column_name": "Data1",
+          "value_type": "int",
+          "read_only": false
+        },
+        {
+          "name": "Data 2",
+          "db_column_name": "Data2",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 3",
+          "db_column_name": "Data3",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 4",
+          "db_column_name": "Data4",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 5",
+          "db_column_name": "Data5",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 6",
+          "db_column_name": "Data6",
+          "value_type": "int",
+          "read_only": false
+        },
+        {
+          "name": "Data 7",
+          "db_column_name": "Data7",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 8",
+          "db_column_name": "Data8",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 9",
+          "db_column_name": "Data9",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 10",
+          "db_column_name": "Data10",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 11",
+          "db_column_name": "Data11",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 12",
+          "db_column_name": "Data12",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 13",
+          "db_column_name": "Data13",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 14",
+          "db_column_name": "Data14",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 15",
+          "db_column_name": "Data15",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 16",
+          "db_column_name": "Data16",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 17",
+          "db_column_name": "Data17",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 18",
+          "db_column_name": "Data18",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 19",
+          "db_column_name": "Data19",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 20",
+          "db_column_name": "Data20",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 21",
+          "db_column_name": "Data21",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 22",
+          "db_column_name": "Data22",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Data 23",
+          "db_column_name": "Data23",
+          "value_type": "uint",
+          "read_only": false
+        }
+      ]
+    },
+    {
+      "group_name": "Scripts",
+      "fields": [
+        {
+          "name": "AI name",
+          "db_column_name": "AIName",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Script name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "read_only": false
+        }
+      ]
+    }
+  ]
+}

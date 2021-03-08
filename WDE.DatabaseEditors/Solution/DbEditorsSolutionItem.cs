@@ -14,7 +14,7 @@ namespace WDE.DatabaseEditors.Solution
         }
 
         public DbTableData TableData { get; }
-        
+
         public bool IsContainer => false;
         public ObservableCollection<ISolutionItem> Items { get; }
         public string ExtraId { get; }

@@ -6,5 +6,6 @@ namespace WDE.DatabaseEditors.Data
     public interface IDbTableDataJsonProvider
     {
         string GetCreatureTemplateDefinitionJson();
+        string GetGameobjectTemplateDefinitionJson();
     }
 }

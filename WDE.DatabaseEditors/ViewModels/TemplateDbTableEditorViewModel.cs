@@ -30,6 +30,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.itemFromListProvider = itemFromListProvider;
             this.parameterFactory = parameterFactory;
             tableData = solutionItem.TableData;
+            Title = $"{tableData.TableName} Editor";
 
             OpenParameterWindow = new AsyncAutoCommand<IDbTableField?>(EditParameter);
             
@@ -83,7 +84,7 @@ namespace WDE.DatabaseEditors.ViewModels
             historyHandler.Dispose();
         }
 
-        public string Title { get; } = "Creature Template Editor";
+        public string Title { get; }
         public ICommand Undo => undoCommand;
         public ICommand Redo => redoCommand;
         public ICommand Copy => AlwaysDisabledCommand.Command;

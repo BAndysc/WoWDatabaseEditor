@@ -7,5 +7,6 @@ namespace WDE.DatabaseEditors.Data
     public class DbTableDataJsonProvider : IDbTableDataJsonProvider
     {
         public string GetCreatureTemplateDefinitionJson() => File.ReadAllText("DbDefinitions/creature_template.json");
+        public string GetGameobjectTemplateDefinitionJson() => File.ReadAllText("DbDefinitions/gameobject_template.json");
     }
 }

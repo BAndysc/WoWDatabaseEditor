@@ -10,6 +10,7 @@ namespace WDE.DatabaseEditors.Data
         private readonly IDbTableDataJsonProvider jsonProvider;
 
         private readonly DatabaseEditorTableDefinitionJson creatureTemplateDefinition;
+        private readonly DatabaseEditorTableDefinitionJson gameobjectTemplateDefinition;
         
         public DbTableDefinitionProvider(IDbTableDataSerializationProvider serializationProvider, IDbTableDataJsonProvider jsonProvider)
         {
@@ -18,8 +19,12 @@ namespace WDE.DatabaseEditors.Data
 
             creatureTemplateDefinition =
                 serializationProvider.DeserializeTableDefinition<DatabaseEditorTableDefinitionJson>(jsonProvider.GetCreatureTemplateDefinitionJson());
+            gameobjectTemplateDefinition =
+                serializationProvider.DeserializeTableDefinition<DatabaseEditorTableDefinitionJson>(jsonProvider.GetGameobjectTemplateDefinitionJson());
         }
 
         public DatabaseEditorTableDefinitionJson GetCreatureTemplateDefinition() => creatureTemplateDefinition;
+
+        public DatabaseEditorTableDefinitionJson GetGameobjectTemplateDefinition() => gameobjectTemplateDefinition;
     }
 }

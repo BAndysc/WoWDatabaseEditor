@@ -22,5 +22,9 @@
       <Content Include="DbDefinitions\creature_template.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <None Remove="DbDefinitions\gameobject_template.json" />
+      <Content Include="DbDefinitions\gameobject_template.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 </Project>

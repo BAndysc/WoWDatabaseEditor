@@ -37,6 +37,18 @@ namespace WDE.DatabaseEditors.Data
             return tableDataProvider.GetDatabaseTable(in tableDefinition, tableFieldFactory, result[0]);
         }
 
+        public async Task<IDbTableData> LoadGameobjectTamplateDataEntry(uint goEntry)
+        {
+            var tableDefinition = tableDefinitionProvider.GetGameobjectTemplateDefinition();
+            var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, goEntry);
+            var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+
+            if (result == null || result.Count == 0)
+                return null;
+
+            return tableDataProvider.GetDatabaseTable(in tableDefinition, tableFieldFactory, result[0]);
+        }
+
         private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, uint creatureEntry)
         {
             var columns = tableDefinitionJson.Groups.SelectMany(x => x.Fields).Select(x => $"`{x.DbColumnName}`");

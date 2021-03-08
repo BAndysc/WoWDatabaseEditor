@@ -8,5 +8,6 @@ namespace WDE.DatabaseEditors.Data
     public interface IDbEditorTableDataProvider
     {
         Task<IDbTableData> LoadCreatureTamplateDataEntry(uint creatureEntry);
+        Task<IDbTableData> LoadGameobjectTamplateDataEntry(uint goEntry);
     }
 }
