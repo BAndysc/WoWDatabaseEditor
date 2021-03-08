@@ -23,6 +23,11 @@ build_script:
     7z a WoWDatabaseEditor.zip bin/wowdatabaseeditor/*
     
     7z a WoWDatabaseEditorAvalonia.zip bin/wowdatabaseeditor-avalonia/*
+test_script:
+- cmd: >-
+    dotnet test WDE.MVVM.Test/WDE.MVVM.Test.csproj
+
+    dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
 artifacts:
 - path: WoWDatabaseEditor.zip
   name: WoWDatabaseEditor.zip

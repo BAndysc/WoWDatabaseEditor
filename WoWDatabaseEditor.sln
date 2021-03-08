@@ -100,6 +100,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoaderAvalonia", "LoaderAva
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoaderWPF", "LoaderWPF\LoaderWPF.csproj", "{6553F34E-9271-4EA7-BABE-35294CE0A8BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWDatabaseEditorCore.Test", "WoWDatabaseEditorCore.Test\WoWDatabaseEditorCore.Test.csproj", "{4A78EB3A-3B3E-41D3-809A-60FD1EF4F801}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -273,6 +275,12 @@ Global
 		{6553F34E-9271-4EA7-BABE-35294CE0A8BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6553F34E-9271-4EA7-BABE-35294CE0A8BA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6553F34E-9271-4EA7-BABE-35294CE0A8BA}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A78EB3A-3B3E-41D3-809A-60FD1EF4F801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A78EB3A-3B3E-41D3-809A-60FD1EF4F801}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A78EB3A-3B3E-41D3-809A-60FD1EF4F801}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A78EB3A-3B3E-41D3-809A-60FD1EF4F801}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A78EB3A-3B3E-41D3-809A-60FD1EF4F801}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A78EB3A-3B3E-41D3-809A-60FD1EF4F801}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
