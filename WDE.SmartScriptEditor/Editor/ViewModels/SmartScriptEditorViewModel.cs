@@ -64,7 +64,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set => SetProperty(ref script, value);
         }
         
-        public SmartScriptEditorViewModel(IHistoryManager history,
+        public SmartScriptEditorViewModel(SmartScriptSolutionItem item,
+            IHistoryManager history,
             IDatabaseProvider database,
             IEventAggregator eventAggregator,
             ISmartDataManager smartDataManager,
@@ -717,6 +718,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             args.Sql = new SmartScriptExporter(script, smartFactory, smartDataManager).GetSql();
                     }
                 }));
+
+            SetSolutionItem(item);
         }
 
         public string Name => itemNameRegistry.GetName(item);
@@ -807,7 +810,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Save => SaveCommand;
         public AsyncAwaitBestPractices.MVVM.IAsyncCommand CloseCommand { get; set; }
         
-        internal void SetSolutionItem(SmartScriptSolutionItem item)
+        private void SetSolutionItem(SmartScriptSolutionItem item)
         {
             Debug.Assert(this.item == null);
             this.item = item;

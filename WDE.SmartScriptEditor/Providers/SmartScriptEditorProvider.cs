@@ -20,8 +20,7 @@ namespace WDE.SmartScriptEditor.Providers
 
         public IDocument GetEditor(SmartScriptSolutionItem item)
         {
-            SmartScriptEditorViewModel vm = containerProvider.Resolve<SmartScriptEditorViewModel>();
-            vm.SetSolutionItem(item);
+            SmartScriptEditorViewModel vm = containerProvider.Resolve<SmartScriptEditorViewModel>((typeof(SmartScriptSolutionItem), item));
 
             return vm;
         }

@@ -18,4 +18,11 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "ExclusiveGroup")]
         public int ExclusiveGroup { get; set; }
     }
+    
+    [Table(Name = "quest_template_addon")]
+    public class MySqlQuestTemplateAddonWithScriptName : MySqlQuestTemplateAddon
+    {
+        [Column(Name = "ScriptName")] 
+        public string ScriptName { get; set; } = "";
+    }
 }

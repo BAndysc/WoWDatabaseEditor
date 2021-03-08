@@ -1861,7 +1861,7 @@
             "Quest"
         ],
         "name": "SMART_EVENT_QUEST_ACCEPTED",
-        "description": "When player accepted quest",
+        "description": "On quest accepted",
         "name_readable": "On quest accept"
     },
     {
@@ -1869,8 +1869,14 @@
         "valid_types": [
             "Quest"
         ],
+        "parameters": [
+          {
+            "type": "Parameter",
+            "name": "Objective id"
+          }
+        ],
         "name": "SMART_EVENT_QUEST_OBJ_COPLETETION",
-        "description": "When player completed objective",
+        "description": "On quest objective {pram1} completed",
         "name_readable": "On quest objective completion"
     },
     {
@@ -1879,7 +1885,7 @@
             "Quest"
         ],
         "name": "SMART_EVENT_QUEST_COMPLETION",
-        "description": "When player completed quest",
+        "description": "On quest completed",
         "name_readable": "On quest complete"
     },
     {
@@ -1888,7 +1894,7 @@
             "Quest"
         ],
         "name": "SMART_EVENT_QUEST_REWARDED",
-        "description": "When player rewarded quest",
+        "description": "On quest rewarded",
         "name_readable": "On quest reward"
     },
     {
@@ -1897,7 +1903,7 @@
             "Quest"
         ],
         "name": "SMART_EVENT_QUEST_FAIL",
-        "description": "When player failed quest",
+        "description": "On quest failed",
         "name_readable": "On quest fail"
     },
     {

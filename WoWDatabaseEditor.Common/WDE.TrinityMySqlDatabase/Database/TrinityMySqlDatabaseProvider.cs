@@ -167,6 +167,16 @@ namespace WDE.TrinityMySqlDatabase.Database
                         .Set(p => p.ScriptName, "")
                         .UpdateAsync();
                     break;
+                case SmartScriptType.Quest:
+                    var addonExists = await model.QuestTemplateAddon.Where(p => p.Entry == (uint)entryOrGuid).AnyAsync();
+                    if (!addonExists)
+                        await model.QuestTemplateAddon.InsertAsync(() => new MySqlQuestTemplateAddon()
+                            {Entry = (uint)entryOrGuid});
+                    await model.QuestTemplateAddonWithScriptName
+                        .Where(p => p.Entry == (uint) entryOrGuid)
+                        .Set(p => p.ScriptName, "SmartQuest")
+                        .UpdateAsync();
+                    break;
                 case SmartScriptType.AreaTrigger:
                     await model.AreaTriggerScript.Where(p => p.Id == entryOrGuid).DeleteAsync();
                     await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Id = entryOrGuid, ScriptName = "SmartTrigger"});
