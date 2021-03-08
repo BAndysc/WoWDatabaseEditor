@@ -5,6 +5,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configurations>Debug;Release;DebugAvalonia</Configurations>
     <Platforms>AnyCPU</Platforms>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
       <OutputPath>..\..\bin\$(Configuration)\</OutputPath>

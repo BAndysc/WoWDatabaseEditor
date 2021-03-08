@@ -76,6 +76,7 @@ namespace WDE.Solutions.Manager
         private void Save()
         {
             JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
+            ser.Formatting = Formatting.Indented;
             using (StreamWriter file = File.CreateText(@"solutions.json"))
             {
                 ser.Serialize(file, Items);

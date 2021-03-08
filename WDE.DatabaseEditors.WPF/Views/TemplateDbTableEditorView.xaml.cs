@@ -2,9 +2,9 @@
 
 namespace WDE.DatabaseEditors.WPF.Views
 {
-    public partial class CreatureTemplateDbEditorView : UserControl
+    public partial class TemplateDbTableEditorView : UserControl
     {
-        public CreatureTemplateDbEditorView()
+        public TemplateDbTableEditorView()
         {
             InitializeComponent();
         }

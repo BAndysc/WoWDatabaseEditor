@@ -1,68 +1,98 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Newtonsoft.Json;
 using WDE.Common.Annotations;
 using WDE.DatabaseEditors.Data;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DbTableField<T> : IDbTableField, INotifyPropertyChanged
+    public class DbTableField<T> : IDbTableField, INotifyPropertyChanged, IObservableTableField
     {
+        // Constructor for serialization purpose
+        public DbTableField() { }
+        
         public DbTableField(string fieldName, bool isReadOnly, bool isModified, string valueType, bool isParameter,
             T value)
         {
             FieldName = fieldName;
             IsReadOnly = isReadOnly;
-            IsModified = isModified;
+            this.isModified = isModified;
             ValueType = valueType;
             IsParameter = isParameter;
-            Value = value;
+            fieldValue = value;
         }
 
         public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition)
         {
             FieldName = fieldDefinition.Name;
             IsReadOnly = fieldDefinition.IsReadOnly;
-            IsModified = false;
+            isModified = false;
             ValueType = fieldDefinition.ValueType;
             IsParameter = fieldDefinition.ValueType.EndsWith("Parameter");
-            Value = default;
+            fieldValue = default;
         }
         
         public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition, T value)
         {
             FieldName = fieldDefinition.Name;
             IsReadOnly = fieldDefinition.IsReadOnly;
-            IsModified = false;
+            isModified = false;
             ValueType = fieldDefinition.ValueType;
             IsParameter = fieldDefinition.ValueType.EndsWith("Parameter");
-            Value = value;
+            fieldValue = value;
         }
 
-        public string FieldName { get; }
+        public string FieldName { get; set; }
 
-        public bool IsReadOnly { get; }
-        public bool IsModified { get; set; }
-        public string ValueType { get; }
-        public bool IsParameter { get; }
+        public bool IsReadOnly { get; set; }
+        [JsonProperty]
+        private bool isModified;
+
+        [JsonIgnore]
+        public bool IsModified
+        {
+            get => isModified;
+            set
+            {
+                isModified = value;
+                OnPropertyChanged(nameof(IsModified));
+            }
+        }
+        public string ValueType { get; set; }
+        public bool IsParameter { get; set; }
+        [JsonProperty]
         private T fieldValue;
 
+        [JsonIgnore]
         public T Value
         {
             get => fieldValue;
             set
             {
+                TableFieldValueChanged.Invoke(this, new TableFieldValueChangedEventArgs(nameof(Value), fieldValue, isModified, value, true));
                 fieldValue = value;
+                IsModified = true;
                 OnPropertyChanged(nameof(Value));
             }
         }
         
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]
             string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event TableFieldValueChangedEventHandler TableFieldValueChanged = delegate { };
+
+        public void RevertPropertyValueChange(object previousValue, bool previousModified)
+        {
+            fieldValue = (T)previousValue;
+            isModified = previousModified;
+            OnPropertyChanged(nameof(Value));
+            OnPropertyChanged(nameof(IsModified));
         }
     }
 }

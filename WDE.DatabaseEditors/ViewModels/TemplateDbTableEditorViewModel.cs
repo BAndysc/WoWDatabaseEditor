@@ -13,35 +13,29 @@ using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.Solution;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public class CreatureTemplateDbEditorViewModel: BindableBase, IDocument
+    public class TemplateDbTableEditorViewModel: BindableBase, IDocument
     {
-        private readonly IDbEditorTableDataProvider tableDataProvider;
-        private readonly IWindowManager windowManager;
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IParameterFactory parameterFactory;
-        private readonly Func<Task<uint?>> tableObjectSelector;
-        private readonly Func<uint, Task<IDbTableData>> tableContentLoader;
 
         private readonly TemplateTableEditorHistoryHandler historyHandler;
         
-        public CreatureTemplateDbEditorViewModel(IDbEditorTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider, IParameterFactory parameterFactory, 
-            Func<Task<uint?>> tableObjectSelector, Func<uint, Task<IDbTableData>> tableContentLoader, Func<IHistoryManager> historyCreator, ITaskRunner taskRunner, IWindowManager windowManager)
+        public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, IItemFromListProvider itemFromListProvider,
+            IParameterFactory parameterFactory, Func<IHistoryManager> historyCreator)
         {
-            this.tableDataProvider = tableDataProvider;
             this.itemFromListProvider = itemFromListProvider;
             this.parameterFactory = parameterFactory;
-            this.tableObjectSelector = tableObjectSelector;
-            this.tableContentLoader = tableContentLoader;
-            this.windowManager = windowManager;
+            tableData = solutionItem.TableData;
 
             OpenParameterWindow = new AsyncAutoCommand<IDbTableField?>(EditParameter);
             
             // setup history
             History = historyCreator();
-            historyHandler = new TemplateTableEditorHistoryHandler();
+            historyHandler = new TemplateTableEditorHistoryHandler(tableData);
             undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
             History.PropertyChanged += (sender, args) =>
@@ -52,8 +46,6 @@ namespace WDE.DatabaseEditors.ViewModels
                 RaisePropertyChanged(nameof(IsModified));
             };
             History.AddHandler(historyHandler);
-            // load content
-            taskRunner.ScheduleTask("Loading data for table...", LoadTable);
         }
 
         private DbTableData? tableData;
@@ -70,16 +62,6 @@ namespace WDE.DatabaseEditors.ViewModels
         public AsyncAutoCommand<IDbTableField?> OpenParameterWindow { get; }
         private readonly DelegateCommand undoCommand;
         private readonly DelegateCommand redoCommand;
-        
-        private async Task LoadTable()
-        {
-            var key = await tableObjectSelector.Invoke();
-            if (key.HasValue)
-            {
-                var data = await tableContentLoader.Invoke(key.Value);
-                TableData = data as DbTableData;
-            }
-        }
 
         private async Task EditParameter(IDbTableField? tableField)
         {
@@ -103,8 +85,8 @@ namespace WDE.DatabaseEditors.ViewModels
 
         public string Title { get; } = "Creature Template Editor";
         public ICommand Undo => undoCommand;
-        public ICommand Redo => AlwaysDisabledCommand.Command;
-        public ICommand Copy => redoCommand;
+        public ICommand Redo => redoCommand;
+        public ICommand Copy => AlwaysDisabledCommand.Command;
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
         public ICommand Save => AlwaysDisabledCommand.Command;

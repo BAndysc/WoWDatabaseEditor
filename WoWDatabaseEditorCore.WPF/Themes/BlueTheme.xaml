@@ -175,6 +175,8 @@
     <!-- TreeViewItem -->
     <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#bfbfbf"/>
     <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#0000b3" />
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.Modified" Color="#FFE8A6" Opacity=".5"/>
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.Normal" Color="#FFFFFFFF"/>
     
     <!-- Buttons -->
     <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070" />
