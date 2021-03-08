@@ -3,10 +3,11 @@ using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using WDE.Common.Annotations;
 using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DbTableField<T> : IDbTableField, INotifyPropertyChanged, IObservableTableField
+    public class DbTableField<T> : IDbTableField, INotifyPropertyChanged, IDbTableHistoryActionSource
     {
         // Constructor for serialization purpose
         public DbTableField() { }
@@ -73,12 +74,14 @@ namespace WDE.DatabaseEditors.Models
             get => fieldValue;
             set
             {
-                TableFieldValueChanged.Invoke(this, new TableFieldValueChangedEventArgs(nameof(Value), fieldValue, isModified, value, true));
+                PublishFieldValueChangedHistoryAction(nameof(Value), fieldValue, isModified, value);
                 fieldValue = value;
                 IsModified = true;
                 OnPropertyChanged(nameof(Value));
             }
         }
+        
+        public string ToSqlFieldDescription() => $"`{inDbFieldName}`={Value}";
         
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
@@ -89,16 +92,23 @@ namespace WDE.DatabaseEditors.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event TableFieldValueChangedEventHandler TableFieldValueChanged = delegate { };
-
-        public void RevertPropertyValueChange(object previousValue, bool previousModified)
+        private void PublishFieldValueChangedHistoryAction(string fieldName, T val, bool wasModified, T newVal)
         {
-            fieldValue = (T)previousValue;
+            historyActionReceiver?.RegisterAction(new DbFieldHistoryAction<T>(this, val, newVal, wasModified, isModified));
+        }
+
+        public void RevertPropertyValueChange(T previousValue, bool previousModified)
+        {
+            fieldValue = previousValue;
             isModified = previousModified;
             OnPropertyChanged(nameof(Value));
             OnPropertyChanged(nameof(IsModified));
         }
 
-        public string ToSqlFieldDescription() => $"`{inDbFieldName}`={Value}";
+        private IDbFieldHistoryActionReceiver? historyActionReceiver;
+        
+        public void RegisterActionReceiver(IDbFieldHistoryActionReceiver receiver) => historyActionReceiver = receiver;
+
+        public void UnregisterActionReceiver() => historyActionReceiver = null;
     }
 }

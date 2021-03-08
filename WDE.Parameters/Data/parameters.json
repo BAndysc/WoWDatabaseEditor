@@ -1328,6 +1328,9 @@
 		"inmenu": true,
 		"prefix": "CLASS_",
 		"values": {
+			"0": {
+				"name": "NONE"
+			},
 			"1": {
 				"name": "WARRIOR"
 			},
@@ -1384,6 +1387,9 @@
 	"CreatureFamilyParameter": {
 		"name": "Creature family",
 		"values": {
+			"0": {
+				"name": "None"
+			},
 			"1": {
 				"name": "Wolf"
 			},
