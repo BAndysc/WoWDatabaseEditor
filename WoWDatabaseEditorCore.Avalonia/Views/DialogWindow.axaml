@@ -8,6 +8,7 @@
              ShowInTaskbar="False"
              CanResize="{Binding Resizeable}"
              utils:ViewBind.Model="{Binding}"
+             Title="{Binding Title}"
              Name="ThisWindow"
              prism:ViewModelLocator.AutoWireViewModel="False">
     <controls:ExtendedWindow.KeyBindings>

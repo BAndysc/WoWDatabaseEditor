@@ -130,8 +130,8 @@ namespace WDE.SmartScriptEditor.Exporter
                     sql.AppendLine("UPDATE gameobject_template SET AIName=\"SmartGameObjectAI\" WHERE entry=@ENTRY;");
                     break;
                 case SmartScriptType.Quest:
-                    sql.AppendLine("DELETE FROM quest_scripts WHERE questId = @ENTRY;");
-                    sql.AppendLine("INSERT INTO quest_scripts(questId, ScriptName) VALUES(@ENTRY, \"SmartQuest\");");
+                    sql.AppendLine("INSERT IGNORE INTO quest_template_addon (ID) VALUES (@ENTRY);");
+                    sql.AppendLine("UPDATE quest_template_addon SET ScriptName=\"SmartQuest\" WHERE ID=@ENTRY;");
                     break;
                 case SmartScriptType.Spell:
                     sql.AppendLine("DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartSpell\";");

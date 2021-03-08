@@ -21,6 +21,7 @@ namespace WDE.Trinity
         {
             SmartScriptType.Creature,
             SmartScriptType.GameObject,
+            SmartScriptType.Quest,
             SmartScriptType.AreaTrigger,
             SmartScriptType.TimedActionList,
             SmartScriptType.AreaTriggerEntity,
