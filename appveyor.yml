@@ -10,16 +10,12 @@ build_script:
     
     rename bin\wowdatabaseeditor\LoaderWPF.runtimeconfig.json WoWDatabaseEditor.WPF.runtimeconfig.json
     
-    del bin\wowdatabaseeditor\LoaderAvalonia.*
-
     dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia/ LoaderAvalonia/LoaderAvalonia.csproj
     
     rename bin\wowdatabaseeditor-avalonia\LoaderAvalonia.deps.json WoWDatabaseEditor.Avalonia.deps.json
     
     rename bin\wowdatabaseeditor-avalonia\LoaderAvalonia.runtimeconfig.json WoWDatabaseEditor.Avalonia.runtimeconfig.json
     
-    del bin\wowdatabaseeditor-avalonia\LoaderAvalonia.*
-
     echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor/COMMIT_HASH
     
     echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor-avalonia/COMMIT_HASH
