@@ -6,11 +6,20 @@ namespace WDE.DatabaseEditors.Models
     public class DbTableData : IDbTableData
     {
         public string TableName { get; }
+        public string DbTableName { get; }
+        public string TableIndexFieldName { get; }
+        public string TableIndexValue { get; }
+        public string TableDescription { get; }
         public List<IDbTableColumnCategory> Categories { get; }
 
-        public DbTableData(string tableName, List<IDbTableColumnCategory> categories)
+        public DbTableData(string tableName, string dbTableName, string tableIndexFieldName, string tableIndexValue, string tableDescription,
+            List<IDbTableColumnCategory> categories)
         {
             TableName = tableName;
+            DbTableName = dbTableName;
+            TableIndexFieldName = tableIndexFieldName;
+            TableIndexValue = tableIndexValue;
+            TableDescription = tableDescription;
             Categories = categories;
         }
     }

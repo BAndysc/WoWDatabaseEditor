@@ -33,6 +33,18 @@ namespace WDE.DatabaseEditors.History
             }
         }
 
+        // private void BindField<T>(IDbTableField field, T type)
+        // {
+        //     if (field is IObservableTableField fieldNotifier)
+        //         fieldNotifier.TableFieldValueChanged += FieldNotifierOnPropertyChanged;
+        // }
+        //
+        // private void UnbindField<T>(IDbTableField field, T type)
+        // {
+        //     if (field is IObservableTableField<T> fieldNotifier)
+        //         fieldNotifier.TableFieldValueChanged -= FieldNotifierOnPropertyChanged;
+        // }
+
         private void UnbindTableData()
         {
             foreach (var category in tableData.Categories)

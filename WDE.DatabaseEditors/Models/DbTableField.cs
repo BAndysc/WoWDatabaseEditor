@@ -11,10 +11,11 @@ namespace WDE.DatabaseEditors.Models
         // Constructor for serialization purpose
         public DbTableField() { }
         
-        public DbTableField(string fieldName, bool isReadOnly, bool isModified, string valueType, bool isParameter,
+        public DbTableField(string fieldName, string inDbFieldName, bool isReadOnly, bool isModified, string valueType, bool isParameter,
             T value)
         {
             FieldName = fieldName;
+            this.inDbFieldName = inDbFieldName;
             IsReadOnly = isReadOnly;
             this.isModified = isModified;
             ValueType = valueType;
@@ -25,6 +26,7 @@ namespace WDE.DatabaseEditors.Models
         public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition)
         {
             FieldName = fieldDefinition.Name;
+            inDbFieldName = fieldDefinition.DbColumnName;
             IsReadOnly = fieldDefinition.IsReadOnly;
             isModified = false;
             ValueType = fieldDefinition.ValueType;
@@ -35,6 +37,7 @@ namespace WDE.DatabaseEditors.Models
         public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition, T value)
         {
             FieldName = fieldDefinition.Name;
+            inDbFieldName = fieldDefinition.DbColumnName;
             IsReadOnly = fieldDefinition.IsReadOnly;
             isModified = false;
             ValueType = fieldDefinition.ValueType;
@@ -43,7 +46,8 @@ namespace WDE.DatabaseEditors.Models
         }
 
         public string FieldName { get; set; }
-
+        [JsonProperty]
+        private string inDbFieldName;
         public bool IsReadOnly { get; set; }
         [JsonProperty]
         private bool isModified;
@@ -94,5 +98,7 @@ namespace WDE.DatabaseEditors.Models
             OnPropertyChanged(nameof(Value));
             OnPropertyChanged(nameof(IsModified));
         }
+
+        public string ToSqlFieldDescription() => $"`{inDbFieldName}`={Value}";
     }
 }

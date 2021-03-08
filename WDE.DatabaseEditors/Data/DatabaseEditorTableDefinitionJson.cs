@@ -17,6 +17,9 @@ namespace WDE.DatabaseEditors.Data
         [JsonProperty(PropertyName = "table_index_name")]
         public string TableIndexFieldName { get; set; }
         
+        [JsonProperty(PropertyName = "table_name_source_field")]
+        public string TableNameSource { get; set; }
+        
         [JsonProperty(PropertyName = "groups")]
         public IList<DbEditorTableGroupJson> Groups { get; set; }
     }

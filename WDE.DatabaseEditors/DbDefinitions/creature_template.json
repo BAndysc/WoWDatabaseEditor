@@ -2,6 +2,7 @@
   "name": "Creature Template",
   "table_name": "creature_template",
   "table_index_name": "entry",
+  "table_name_source_field": "name",
   "groups": [
     {
       "group_name": "Entries",

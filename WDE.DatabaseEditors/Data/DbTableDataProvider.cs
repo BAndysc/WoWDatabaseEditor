@@ -9,18 +9,24 @@ namespace WDE.DatabaseEditors.Data
     [AutoRegister]
     public class DbTableDataProvider : IDbTableDataProvider
     {
-        public DbTableDataProvider()
-        {
-            
-        }
+        public DbTableDataProvider() { }
         
         public IDbTableData GetDatabaseTable(in DatabaseEditorTableDefinitionJson tableDefinition, IDbTableFieldFactory fieldFactory, Dictionary<string, object> fieldsFromDb)
         {
             var tableCategories = new List<IDbTableColumnCategory>(tableDefinition.Groups.Count);
+            var tableIndex = fieldsFromDb.ContainsKey(tableDefinition.TableIndexFieldName)
+                ? fieldsFromDb[tableDefinition.TableIndexFieldName].ToString()
+                : "";
+            var descNameField = fieldsFromDb.ContainsKey(tableDefinition.TableNameSource)
+                ? fieldsFromDb[tableDefinition.TableNameSource].ToString()
+                : "";
+            var tableDesc = $"Template of {descNameField ?? "Unk"}";
+
             foreach (var category in tableDefinition.Groups)
                 tableCategories.Add(CreateCategory(in category, fieldFactory, fieldsFromDb));
-            
-            return new DbTableData(tableDefinition.Name, tableCategories);
+
+            return new DbTableData(tableDefinition.Name, tableDefinition.TableName, tableDefinition.TableIndexFieldName, 
+                tableIndex ?? "Unk", tableDesc, tableCategories);
         }
 
         private DbTableColumnCategory CreateCategory(in DbEditorTableGroupJson groupDefinition, IDbTableFieldFactory fieldFactory, Dictionary<string, object> fieldsFromDb)

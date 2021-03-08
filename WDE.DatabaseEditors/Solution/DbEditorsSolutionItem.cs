@@ -10,7 +10,7 @@ namespace WDE.DatabaseEditors.Solution
         {
             TableData = tableData;
             Items = null;
-            ExtraId = TableData.TableName;
+            ExtraId = TableData.TableIndexValue;
         }
 
         public DbTableData TableData { get; }
