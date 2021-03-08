@@ -6,19 +6,19 @@ build_script:
 - cmd: >-
     dotnet publish -c Release --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/ LoaderWPF/LoaderWPF.csproj
     
-    rename bin/wowdatabaseeditor/LoaderWPF.deps.json WoWDatabaseEditor.WPF.deps.json
+    rename bin\wowdatabaseeditor\LoaderWPF.deps.json WoWDatabaseEditor.WPF.deps.json
     
-    rename bin/wowdatabaseeditor/LoaderWPF.runtimeconfig.json WoWDatabaseEditor.WPF.runtimeconfig.json
+    rename bin\wowdatabaseeditor\LoaderWPF.runtimeconfig.json WoWDatabaseEditor.WPF.runtimeconfig.json
     
-    del bin/wowdatabaseeditor/LoaderAvalonia.*
+    del bin\wowdatabaseeditor\LoaderAvalonia.*
 
     dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia/ LoaderAvalonia/LoaderAvalonia.csproj
     
-    rename bin/wowdatabaseeditor-avalonia/LoaderAvalonia.deps.json WoWDatabaseEditor.Avalonia.deps.json
+    rename bin\wowdatabaseeditor-avalonia\LoaderAvalonia.deps.json WoWDatabaseEditor.Avalonia.deps.json
     
-    rename bin/wowdatabaseeditor-avalonia/LoaderAvalonia.runtimeconfig.json WoWDatabaseEditor.Avalonia.runtimeconfig.json
+    rename bin\wowdatabaseeditor-avalonia\LoaderAvalonia.runtimeconfig.json WoWDatabaseEditor.Avalonia.runtimeconfig.json
     
-    del bin/wowdatabaseeditor-avalonia/LoaderAvalonia.*
+    del bin\wowdatabaseeditor-avalonia\LoaderAvalonia.*
 
     echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor/COMMIT_HASH
     
