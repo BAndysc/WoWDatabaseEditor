@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0-windows7.0</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
+      <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+      <ProjectReference Include="..\WDE.MVVM.Test\WDE.MVVM.Test.csproj" />
+      <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+      <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+      <ProjectReference Include="..\WDE.SmartScriptEditor.Avalonia\WDE.SmartScriptEditor.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
+      <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
+      <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj" />
+      <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
+    </ItemGroup>
+
+</Project>

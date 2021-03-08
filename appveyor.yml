@@ -4,9 +4,9 @@ configuration: Release
 platform: Any CPU
 build_script:
 - cmd: >-
-    dotnet publish -c Release --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/ WoWDatabaseEditorCore.WPF/WoWDatabaseEditorCore.WPF.csproj
+    dotnet publish -c Release --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/ LoaderWPF/LoaderWPF.csproj
     
-    dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia/ WoWDatabaseEditorCore.Avalonia/WoWDatabaseEditorCore.Avalonia.csproj
+    dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia/ LoaderAvalonia/LoaderAvalonia.csproj
 
     echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor/COMMIT_HASH
     
