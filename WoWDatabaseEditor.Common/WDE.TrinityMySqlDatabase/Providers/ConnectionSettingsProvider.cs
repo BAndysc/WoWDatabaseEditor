@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using Newtonsoft.Json;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.TrinityMySqlDatabase.Data;
 
@@ -10,23 +11,13 @@ namespace WDE.TrinityMySqlDatabase.Providers
     [SingleInstance]
     public class ConnectionSettingsProvider : IConnectionSettingsProvider
     {
-        public ConnectionSettingsProvider()
+        private readonly IUserSettings userSettings;
+
+        public ConnectionSettingsProvider(IUserSettings userSettings)
         {
-            DbAccess? access = null;
-            if (File.Exists("database.json"))
-            {
-                JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
-                using (StreamReader re = new("database.json"))
-                {
-                    JsonTextReader reader = new(re);
-                    access = ser.Deserialize<DbAccess>(reader);
-                }
-            }
-
-            if (access == null)
-                access = new DbAccess();
-
-            DbAccess = access;
+            this.userSettings = userSettings;
+            DbAccess? access = userSettings.Get<DbAccess?>();
+            DbAccess = access ?? new DbAccess();
         }
 
         private DbAccess DbAccess { get; }
@@ -43,11 +34,7 @@ namespace WDE.TrinityMySqlDatabase.Providers
             DbAccess.Password = password;
             DbAccess.Host = host;
             DbAccess.Port = port;
-            JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
-            using (StreamWriter file = File.CreateText(@"database.json"))
-            {
-                ser.Serialize(file, DbAccess);
-            }
+            userSettings.Update(DbAccess);
         }
     }
 }

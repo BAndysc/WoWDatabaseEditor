@@ -1,6 +1,8 @@
-﻿namespace WDE.DbcStore.Data
+﻿using WDE.Common.Services;
+
+namespace WDE.DbcStore.Data
 {
-    public class DBCSettings
+    public struct DBCSettings : ISettings
     {
         public DBCVersions DBCVersion;
         public string Path;

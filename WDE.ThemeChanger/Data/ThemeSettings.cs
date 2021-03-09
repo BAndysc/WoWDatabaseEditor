@@ -1,6 +1,8 @@
-﻿namespace WDE.ThemeChanger.Data
+﻿using WDE.Common.Services;
+
+namespace WDE.ThemeChanger.Data
 {
-    public struct ThemeSettings
+    public struct ThemeSettings : ISettings
     {
         public string Name { get; }
 

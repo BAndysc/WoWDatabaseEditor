@@ -6,6 +6,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Prism.Events;
 using WDE.Common;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.Solutions.Manager
@@ -14,8 +15,11 @@ namespace WDE.Solutions.Manager
     [SingleInstance]
     public class SolutionManager : ISolutionManager
     {
-        public SolutionManager(IEventAggregator eventAggregator)
+        private readonly IUserSettings userSettings;
+
+        public SolutionManager(IUserSettings userSettings)
         {
+            this.userSettings = userSettings;
             Items = new ObservableCollection<ISolutionItem>();
 
             Initialize();
@@ -27,19 +31,15 @@ namespace WDE.Solutions.Manager
 
         public void Initialize()
         {
-            if (File.Exists("solutions.json"))
+            var data = userSettings.Get<Data>();
+            
+            if (data.Items == null)
+                return;
+
+            foreach (var item in data.Items)
             {
-                JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
-                using (StreamReader re = new("solutions.json"))
-                {
-                    JsonTextReader reader = new(re);
-                    ser.Deserialize<List<ISolutionItem>>(reader)
-                        .ForEach(e =>
-                        {
-                            InitItem(e);
-                            Items.Add(e);
-                        });
-                }
+                InitItem(item);
+                Items.Add(item);
             }
         }
 
@@ -75,25 +75,29 @@ namespace WDE.Solutions.Manager
 
         private void Save()
         {
-            JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
-            ser.Formatting = Formatting.Indented;
-            using (StreamWriter file = File.CreateText(@"solutions.json"))
-            {
-                ser.Serialize(file, Items);
-            }
+            userSettings.Update<Data>(new Data(Items));
         }
 
         private void InitItem(ISolutionItem item)
         {
             if (item.Items != null)
                 item.Items.CollectionChanged += ItemsOnCollectionChanged;
-            //@todo fixme
-//            item.SetUnity(_container);
+
             if (item.Items != null)
             {
                 foreach (ISolutionItem iitem in item.Items)
                     InitItem(iitem);
             }
+        }
+
+        private struct Data : ISettings
+        {
+            public Data(IList<ISolutionItem> items)
+            {
+                Items = items;
+            }
+
+            public IList<ISolutionItem> Items { get; set; }
         }
     }
 }
