@@ -27,11 +27,11 @@ namespace WDE.DbcStore
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
 
-        public DbcStore(IParameterFactory parameterFactory, ITaskRunner taskRunner)
+        public DbcStore(IParameterFactory parameterFactory, ITaskRunner taskRunner, IDbcSettingsProvider settingsProvider)
         {
             this.parameterFactory = parameterFactory;
             this.taskRunner = taskRunner;
-            dbcSettingsProvider = new DbcSettingsProvider();
+            dbcSettingsProvider = settingsProvider;
 
             Load();
         }
@@ -82,7 +82,7 @@ namespace WDE.DbcStore
             if (!Directory.Exists(dbcSettingsProvider.GetSettings().Path))
                 return;
 
-            taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, this));
+            taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, dbcSettingsProvider, this));
         }
 
         private class DbcLoadTask : IThreadedTask
@@ -110,11 +110,11 @@ namespace WDE.DbcStore
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
             
-            public DbcLoadTask(IParameterFactory parameterFactory, DbcStore store)
+            public DbcLoadTask(IParameterFactory parameterFactory, IDbcSettingsProvider settingsProvider, DbcStore store)
             {
                 this.parameterFactory = parameterFactory;
                 this.store = store;
-                dbcSettingsProvider = new DbcSettingsProvider();
+                dbcSettingsProvider = settingsProvider;
             }
             
             private void Load(string filename, int id, int nameIndex, Dictionary<int, string> dictionary)

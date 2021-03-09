@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Newtonsoft.Json;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.ThemeChanger.Data;
 
@@ -10,18 +11,12 @@ namespace WDE.ThemeChanger.Providers
     [SingleInstance]
     public class ThemeSettingsProvider : IThemeSettingsProvider
     {
-        public ThemeSettingsProvider()
+        private readonly IUserSettings userSettings;
+
+        public ThemeSettingsProvider(IUserSettings userSettings)
         {
-            Settings = new ThemeSettings(null);
-            if (File.Exists("theme.json"))
-            {
-                JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
-                using (StreamReader re = new("theme.json"))
-                {
-                    JsonTextReader reader = new(re);
-                    Settings = ser.Deserialize<ThemeSettings>(reader);
-                }
-            }
+            this.userSettings = userSettings;
+            Settings = userSettings.Get<ThemeSettings>();
         }
 
         private ThemeSettings Settings { get; set; }
@@ -33,12 +28,7 @@ namespace WDE.ThemeChanger.Providers
 
         public void UpdateSettings(Theme theme)
         {
-            Settings = new ThemeSettings(theme.Name);
-            JsonSerializer ser = new() {TypeNameHandling = TypeNameHandling.Auto};
-            using (StreamWriter file = File.CreateText(@"theme.json"))
-            {
-                ser.Serialize(file, Settings);
-            }
+            userSettings.Update(new ThemeSettings(theme.Name));
         }
     }
 }
