@@ -10,12 +10,9 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              x:Name="rootWindow">
-    <UserControl.InputBindings>
-        <KeyBinding Modifiers="Control" Key="Z" Command="{Binding Undo}"/>
-        <KeyBinding Modifiers="Control" Key="Y" Command="{Binding Redo}"/>
-    </UserControl.InputBindings>
     <UserControl.Resources>
         <viewHelpers:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <viewHelpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
         <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
@@ -26,39 +23,20 @@
             <StackPanel Grid.Row="0">
                 <!-- <Button Content="Add new" Width="30"/> -->
             </StackPanel>
-            <viewHelpers:StretchedTreeView Grid.Row="1" ItemsSource="{Binding TableData.Categories}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                <viewHelpers:StretchedTreeView.ItemContainerStyleSelector>
-                    <helpers:DbTableEditorViewStyleSelector>
-                        <helpers:DbTableEditorViewStyleSelector.groupHeaderStyle>
-                            <Style TargetType="{x:Type viewHelpers:StretchedTreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                                <Setter Property="Header" Value="{Binding CategoryName}"/>
-                                <Setter Property="ItemsSource" Value="{Binding Fields}" />
-                                <Setter Property="IsExpanded" Value="True" />
-                                <Setter Property="AllowExpander" Value="False" />
-                                <Setter Property="HeaderTemplate">
-                                    <Setter.Value>
+            <ScrollViewer Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding TableData.Categories}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
+                                <Border Height="30" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
+                                    <Label Content="{Binding CategoryName}" Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}"/>
+                                </Border>
+                                <ItemsControl ItemsSource="{Binding Fields}">
+                                    <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Label Content="{Binding }" Height="30" VerticalContentAlignment="Bottom"
-                                                   HorizontalAlignment="Stretch"
-                                                   Background="{DynamicResource TreeViewItem.Header.Background.Special}"
-                                                   Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}"/>
-                                        </DataTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </helpers:DbTableEditorViewStyleSelector.groupHeaderStyle>
-                        <helpers:DbTableEditorViewStyleSelector.fieldStyle>
-                            <Style TargetType="{x:Type TreeViewItem}">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type TreeViewItem}">
-                                            <Grid Height="30" Margin="20, 10, 0, 10" HorizontalAlignment="Stretch">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="150"/>
-                                                    <ColumnDefinition />
-                                                </Grid.ColumnDefinitions>
-                                                <Grid.Style>
-                                                    <Style TargetType="{x:Type Grid}">
+                                            <StackPanel Orientation="Horizontal" Margin="20, 5, 0, 0" HorizontalAlignment="Stretch">
+                                                <StackPanel.Style>
+                                                    <Style TargetType="{x:Type StackPanel}">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsModified}" Value="True">
                                                                 <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Modified}"/>
@@ -68,58 +46,123 @@
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </Grid.Style>
-                                                <TextBlock Grid.Column="0" Text="{Binding FieldName}" TextWrapping="Wrap" TextAlignment="Left" 
-                                                           HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                                <ContentControl Grid.Column="1" Content="{Binding }" HorizontalAlignment="Stretch">
-                                                    <ContentControl.ContentTemplateSelector>
-                                                        <helpers:DbTableFieldValueContentTemplateSelector>
-                                                            <helpers:DbTableFieldValueContentTemplateSelector.GenericTemplate>
-                                                                <DataTemplate>
-                                                                    <TextBox Text="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" IsEnabled="True" IsReadOnly="False" />
-                                                                </DataTemplate>
-                                                            </helpers:DbTableFieldValueContentTemplateSelector.GenericTemplate>
-                                                            <helpers:DbTableFieldValueContentTemplateSelector.ReadOnlyGenericTemplate>
-                                                                <DataTemplate>
-                                                                    <TextBlock Text="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" />
-                                                                </DataTemplate>
-                                                            </helpers:DbTableFieldValueContentTemplateSelector.ReadOnlyGenericTemplate>
-                                                            <helpers:DbTableFieldValueContentTemplateSelector.BoolTemplate>
-                                                                <DataTemplate>
-                                                                    <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"
-                                                                              IsEnabled="{Binding IsReadOnly, Converter={StaticResource InvertedBoolConverter}}"
-                                                                              VerticalAlignment="Center" />
-                                                                </DataTemplate>
-                                                            </helpers:DbTableFieldValueContentTemplateSelector.BoolTemplate>
-                                                            <helpers:DbTableFieldValueContentTemplateSelector.ParameterTemplate>
-                                                                <DataTemplate>
-                                                                    <Grid HorizontalAlignment="Stretch">
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition MinWidth="40"/>
-                                                                            <ColumnDefinition Width="40" />
-                                                                            <ColumnDefinition Width="*" />
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <Label Grid.Column="0"
-                                                                               Content="{Binding Value, Mode=TwoWay}"
-                                                                               VerticalAlignment="Center"/>
-                                                                        <Button Grid.Column="1" Content="..."  Width="25" Margin="0, 0, 10, 0"
-                                                                            Command="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}"
-                                                                            CommandParameter="{Binding}"/>
-                                                                    </Grid>
-                                                                </DataTemplate>
-                                                            </helpers:DbTableFieldValueContentTemplateSelector.ParameterTemplate>
-                                                        </helpers:DbTableFieldValueContentTemplateSelector>
-                                                    </ContentControl.ContentTemplateSelector>
-                                                </ContentControl>
-                                            </Grid>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </helpers:DbTableEditorViewStyleSelector.fieldStyle>
-                    </helpers:DbTableEditorViewStyleSelector>
-                </viewHelpers:StretchedTreeView.ItemContainerStyleSelector>
-            </viewHelpers:StretchedTreeView>
+                                                </StackPanel.Style>
+                                                <TextBlock Text="{Binding FieldName}" TextWrapping="Wrap"
+                                                           MinHeight="15" MaxHeight="50" Width="100"
+                                                           Margin="0, 10, 10, 0"/>
+                                                <TextBox IsReadOnly="{Binding IsReadOnly}"
+                                                         Text="{Binding Value, Mode=TwoWay}"
+                                                         Width="150" MaxWidth="150"
+                                                         MaxLines="3" MaxHeight="50"
+                                                         TextAlignment="Left" VerticalContentAlignment="Center"/>
+                                                <Button Content="..."  Margin="0, 0, 10, 0"
+                                                        Width="25" Height="25" VerticalAlignment="Center"
+                                                        Command="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}"
+                                                        CommandParameter="{Binding}" 
+                                                        Visibility="{Binding IsParameter, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <!-- <viewHelpers:StretchedTreeView Grid.Row="1" ItemsSource="{Binding TableData.Categories}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"> -->
+            <!--     <viewHelpers:StretchedTreeView.ItemContainerStyleSelector> -->
+            <!--         <helpers:DbTableEditorViewStyleSelector> -->
+            <!--             <helpers:DbTableEditorViewStyleSelector.groupHeaderStyle> -->
+            <!--                 <Style TargetType="{x:Type viewHelpers:StretchedTreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}"> -->
+            <!--                     <Setter Property="Header" Value="{Binding CategoryName}"/> -->
+            <!--                     <Setter Property="ItemsSource" Value="{Binding Fields}" /> -->
+            <!--                     <Setter Property="IsExpanded" Value="True" /> -->
+            <!--                     <Setter Property="AllowExpander" Value="False" /> -->
+            <!--                     <Setter Property="HeaderTemplate"> -->
+            <!--                         <Setter.Value> -->
+            <!--                             <DataTemplate> -->
+            <!--                                 <Label Content="{Binding }" Height="30" VerticalContentAlignment="Bottom" -->
+            <!--                                        HorizontalAlignment="Stretch" -->
+            <!--                                        Background="{DynamicResource TreeViewItem.Header.Background.Special}" -->
+            <!--                                        Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}"/> -->
+            <!--                             </DataTemplate> -->
+            <!--                         </Setter.Value> -->
+            <!--                     </Setter> -->
+            <!--                 </Style> -->
+            <!--             </helpers:DbTableEditorViewStyleSelector.groupHeaderStyle> -->
+            <!--             <helpers:DbTableEditorViewStyleSelector.fieldStyle> -->
+            <!--                 <Style TargetType="{x:Type TreeViewItem}"> -->
+            <!--                     <Setter Property="Template"> -->
+            <!--                         <Setter.Value> -->
+            <!--                             <ControlTemplate TargetType="{x:Type TreeViewItem}"> -->
+            <!--                                 <Grid Height="30" Margin="20, 10, 0, 10" HorizontalAlignment="Stretch"> -->
+            <!--                                     <Grid.ColumnDefinitions> -->
+            <!--                                         <ColumnDefinition Width="150"/> -->
+            <!--                                         <ColumnDefinition /> -->
+            <!--                                     </Grid.ColumnDefinitions> -->
+            <!--                                     <Grid.Style> -->
+            <!--                                         <Style TargetType="{x:Type Grid}"> -->
+            <!--                                             <Style.Triggers> -->
+            <!--                                                 <DataTrigger Binding="{Binding IsModified}" Value="True"> -->
+            <!--                                                     <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Modified}"/> -->
+            <!--                                                 </DataTrigger> -->
+            <!--                                                 <DataTrigger Binding="{Binding IsModified}" Value="False"> -->
+            <!--                                                     <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}"/> -->
+            <!--                                                 </DataTrigger> -->
+            <!--                                             </Style.Triggers> -->
+            <!--                                         </Style> -->
+            <!--                                     </Grid.Style> -->
+            <!--                                     <TextBlock Grid.Column="0" Text="{Binding FieldName}" TextWrapping="Wrap" TextAlignment="Left"  -->
+            <!--                                                HorizontalAlignment="Left" VerticalAlignment="Center"/> -->
+            <!--                                     <ContentControl Grid.Column="1" Content="{Binding }" HorizontalAlignment="Stretch"> -->
+            <!--                                         <ContentControl.ContentTemplateSelector> -->
+            <!--                                             <helpers:DbTableFieldValueContentTemplateSelector> -->
+            <!--                                                 <helpers:DbTableFieldValueContentTemplateSelector.GenericTemplate> -->
+            <!--                                                     <DataTemplate> -->
+            <!--                                                         <TextBox Text="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" IsEnabled="True" IsReadOnly="False" /> -->
+            <!--                                                     </DataTemplate> -->
+            <!--                                                 </helpers:DbTableFieldValueContentTemplateSelector.GenericTemplate> -->
+            <!--                                                 <helpers:DbTableFieldValueContentTemplateSelector.ReadOnlyGenericTemplate> -->
+            <!--                                                     <DataTemplate> -->
+            <!--                                                         <TextBlock Text="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" /> -->
+            <!--                                                     </DataTemplate> -->
+            <!--                                                 </helpers:DbTableFieldValueContentTemplateSelector.ReadOnlyGenericTemplate> -->
+            <!--                                                 <helpers:DbTableFieldValueContentTemplateSelector.BoolTemplate> -->
+            <!--                                                     <DataTemplate> -->
+            <!--                                                         <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" -->
+            <!--                                                                   IsEnabled="{Binding IsReadOnly, Converter={StaticResource InvertedBoolConverter}}" -->
+            <!--                                                                   VerticalAlignment="Center" /> -->
+            <!--                                                     </DataTemplate> -->
+            <!--                                                 </helpers:DbTableFieldValueContentTemplateSelector.BoolTemplate> -->
+            <!--                                                 <helpers:DbTableFieldValueContentTemplateSelector.ParameterTemplate> -->
+            <!--                                                     <DataTemplate> -->
+            <!--                                                         <Grid HorizontalAlignment="Stretch"> -->
+            <!--                                                             <Grid.ColumnDefinitions> -->
+            <!--                                                                 <ColumnDefinition MinWidth="40"/> -->
+            <!--                                                                 <ColumnDefinition Width="40" /> -->
+            <!--                                                                 <ColumnDefinition Width="*" /> -->
+            <!--                                                             </Grid.ColumnDefinitions> -->
+            <!--                                                             <Label Grid.Column="0" -->
+            <!--                                                                    Content="{Binding Value, Mode=TwoWay}" -->
+            <!--                                                                    VerticalAlignment="Center"/> -->
+            <!--                                                             <Button Grid.Column="1" Content="..."  Width="25" Margin="0, 0, 10, 0" -->
+            <!--                                                                 Command="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}" -->
+            <!--                                                                 CommandParameter="{Binding}"/> -->
+            <!--                                                         </Grid> -->
+            <!--                                                     </DataTemplate> -->
+            <!--                                                 </helpers:DbTableFieldValueContentTemplateSelector.ParameterTemplate> -->
+            <!--                                             </helpers:DbTableFieldValueContentTemplateSelector> -->
+            <!--                                         </ContentControl.ContentTemplateSelector> -->
+            <!--                                     </ContentControl> -->
+            <!--                                 </Grid> -->
+            <!--                             </ControlTemplate> -->
+            <!--                         </Setter.Value> -->
+            <!--                     </Setter> -->
+            <!--                 </Style> -->
+            <!--             </helpers:DbTableEditorViewStyleSelector.fieldStyle> -->
+            <!--         </helpers:DbTableEditorViewStyleSelector> -->
+            <!--     </viewHelpers:StretchedTreeView.ItemContainerStyleSelector> -->
+            <!-- </viewHelpers:StretchedTreeView> -->
         </Grid>
     </DockPanel>
 </UserControl>

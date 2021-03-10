@@ -15,7 +15,7 @@ namespace WDE.DatabaseEditors.Data
         public string TableName { get; set; }
         
         [JsonProperty(PropertyName = "table_index_name")]
-        public string TableIndexFieldName { get; set; }
+        public string TablePrimaryKeyColumnName { get; set; }
         
         [JsonProperty(PropertyName = "table_name_source_field")]
         public string TableNameSource { get; set; }

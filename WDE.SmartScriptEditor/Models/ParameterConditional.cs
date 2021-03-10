@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SmartFormat;
 using WDE.Common.Parameters;
+using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Models

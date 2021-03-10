@@ -3,6 +3,7 @@ using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using WDE.Common.Parameters;
+using WDE.Parameters.Models;
 
 namespace WDE.SmartScriptEditor.Models
 {

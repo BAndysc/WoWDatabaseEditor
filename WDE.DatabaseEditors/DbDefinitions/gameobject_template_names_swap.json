@@ -1,0 +1,1015 @@
+﻿{
+  "condition_value_source": "type",
+  "options": {
+    "0": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Start open (flag)"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Lock Id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Time in ms to auto close"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Immune to damage (flag)"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "On close broadcast text id"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Ignored by pathfinding (flag)"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Condition Id"
+      }
+    ],
+    "1": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Start open"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Auto close"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Linked trap entry"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Immune to damage (flag)"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Is large (flag)"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "On close broadcast text id"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Los ok (flag)"
+      },
+      {
+        "db_column_name": "Data 9",
+        "new_name": "Condition Id"
+      }
+    ],
+    "2": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Quest list id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Page material id"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Gossip Id"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Custom anim"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Immune to damage"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Los ok (flag)"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Allow mounted (flag)"
+      },
+      {
+        "db_column_name": "Data 9",
+        "new_name": "Is large (flag)"
+      },
+      {
+        "db_column_name": "Data 10",
+        "new_name": "Condition Id"
+      }
+    ],
+    "3": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Loot id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Restock time in sec"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Is consumable (flag)"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Min success opens"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Max success opens"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "On loot event id"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Linked trap entry"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Required quest id to open"
+      },
+      {
+        "db_column_name": "Data 9",
+        "new_name": "Min level to open"
+      },
+      {
+        "db_column_name": "Data 10",
+        "new_name": "Los ok (flag)"
+      },
+      {
+        "db_column_name": "Data 11",
+        "new_name": "Leave loot (flag)"
+      },
+      {
+        "db_column_name": "Data 12",
+        "new_name": "Not in combat (flag)"
+      },
+      {
+        "db_column_name": "Data 13",
+        "new_name": "Log loot (flag)"
+      },
+      {
+        "db_column_name": "Data 14",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 15",
+        "new_name": "Use group loot rules"
+      },
+      {
+        "db_column_name": "Data 16",
+        "new_name": "Floating tooltip (flag)"
+      },
+      {
+        "db_column_name": "Data 17",
+        "new_name": "Condition Id"
+      }
+    ],
+    "5": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Floating tooltip (flag)"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Highlight (flag)"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Server only"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Is large (flag)"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Float on water (flag)"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Required quest id to open"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Condition Id"
+      }
+    ],
+    "6": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Object level"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Diameter (radius x 2)"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Spell id"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Trap type"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Cooldown time in sec"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Auto close time"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Start delay time in sec"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Server only"
+      },
+      {
+        "db_column_name": "Data 9",
+        "new_name": "Is stealthed (flag)"
+      },
+      {
+        "db_column_name": "Data 10",
+        "new_name": "Is large (flag)"
+      },
+      {
+        "db_column_name": "Data 11",
+        "new_name": "Is stealth affected (flag)"
+      },
+      {
+        "db_column_name": "Data 12",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 13",
+        "new_name": "On close broadcast text id"
+      },
+      {
+        "db_column_name": "Data 14",
+        "new_name": "Ignore totems (flag)"
+      },
+      {
+        "db_column_name": "Data 15",
+        "new_name": "Condition Id"
+      }
+    ],
+    "7": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Amount of slots"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Height"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Usable only by creator"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Triggered event id"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Condition Id"
+      }
+    ],
+    "8": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Spell focus type id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Radius"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Linked trap entry"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Server only"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Required quest id to open"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Is large (flag)"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Floating tooltip (flag)"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Float on water (flag)"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Condition Id"
+      }
+    ],
+    "9": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Page id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Language"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Page material"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Allow mounted (flag)"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Condition id"
+      }
+    ],
+    "10": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Required quest id to open"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Triggered event id"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Auto close time in ms"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Custom anim"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Is consumable (flag)"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Cooldown time in sec"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Page id"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Language"
+      },
+      {
+        "db_column_name": "Data 9",
+        "new_name": "Page material"
+      },
+      {
+        "db_column_name": "Data 10",
+        "new_name": "Spell id"
+      },
+      {
+        "db_column_name": "Data 11",
+        "new_name": "Immune to damage (flag)"
+      },
+      {
+        "db_column_name": "Data 12",
+        "new_name": "Linked trap entry"
+      },
+      {
+        "db_column_name": "Data 13",
+        "new_name": "Is large (flag)"
+      },
+      {
+        "db_column_name": "Data 14",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 15",
+        "new_name": "On close broadcast text id"
+      },
+      {
+        "db_column_name": "Data 16",
+        "new_name": "Los ok"
+      },
+      {
+        "db_column_name": "Data 17",
+        "new_name": "Usable while mounted (flag)"
+      },
+      {
+        "db_column_name": "Data 18",
+        "new_name": "Floating tooltip (flag)"
+      },
+      {
+        "db_column_name": "Data 19",
+        "new_name": "Gossip id"
+      },
+      {
+        "db_column_name": "Data 20",
+        "new_name": "Allow multi interaction"
+      },
+      {
+        "db_column_name": "Data 21",
+        "new_name": "Float on water (flag)"
+      },
+      {
+        "db_column_name": "Data 22",
+        "new_name": "Condition Id"
+      }
+    ],
+    "11": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Time to pause"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Start open"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Time to auto close in sec"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Pause 1 event id"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Pause 2 event id"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Map id"
+      }
+    ],
+    "12": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Radius"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Min damage"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Max damage"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Damage school"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Time to auto close in sec"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "On close broadcast text id"
+      }
+    ],
+    "13": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Cinematic id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Triggered event id"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Condition Id"
+      }
+    ],
+    "15": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Taxi path id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Move speed"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Acceleration rate"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "On start event id"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "On end event id"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Transport physics"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Map id"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "World state"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Allow stops (flag)"
+      }
+    ],
+    "18": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Required amount of casters"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Spell id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Anim spell id"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Is ritual persistent (flag)"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Caster target spell id"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Caster target spell targets (flag)"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Casters grouped"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Ritual dont check target (flag)"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Condition Id"
+      }
+    ],
+    "21": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Creature entry"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Charges"
+      }
+    ],
+    "22": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Spell id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Charges"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Party only (flag)"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Allow while mounted (flag)"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Is large (flag)"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Condition Id"
+      }
+    ],
+    "23": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Min level"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Max level"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Area id"
+      }
+    ],
+    "24": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "On pickup spell id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Radius"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "On return aura spell id"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "On return spell id"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Immune to damage (flag)"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "On open broadcast text id"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Los ok"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Condition Id"
+      }
+    ],
+    "25": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Radius"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Loot id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Min success opens"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Max success opens"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Lock Id"
+      }
+    ],
+    "26": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Lock id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Triggered event id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "On pickup spell id"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Immune to damage (flag)"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "On open broadcast text id"
+      }
+    ],
+    "29": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Radius"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Spell id"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "World state 1"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "World state 2"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "On win event id 1"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "On win event id 2"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "On contested event id 1"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "On contested event id 2"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "On progress event id 1"
+      },
+      {
+        "db_column_name": "Data 9",
+        "new_name": "On progress event id 2"
+      },
+      {
+        "db_column_name": "Data 10",
+        "new_name": "On neutral event id 1"
+      },
+      {
+        "db_column_name": "Data 11",
+        "new_name": "On neutral event id 2"
+      },
+      {
+        "db_column_name": "Data 12",
+        "new_name": "Neutral pct"
+      },
+      {
+        "db_column_name": "Data 13",
+        "new_name": "World state 3"
+      },
+      {
+        "db_column_name": "Data 14",
+        "new_name": "Min superiority"
+      },
+      {
+        "db_column_name": "Data 15",
+        "new_name": "Max superiority"
+      },
+      {
+        "db_column_name": "Data 16",
+        "new_name": "Min time"
+      },
+      {
+        "db_column_name": "Data 17",
+        "new_name": "Max time"
+      },
+      {
+        "db_column_name": "Data 18",
+        "new_name": "Is large (flag)"
+      },
+      {
+        "db_column_name": "Data 19",
+        "new_name": "Highlight (flag)"
+      },
+      {
+        "db_column_name": "Data 20",
+        "new_name": "Starting value"
+      },
+      {
+        "db_column_name": "Data 21",
+        "new_name": "Unidirectional"
+      }
+    ],
+    "30": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Start open (flag)"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Radius"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Aura 1 spell id"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Condition Id 1"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Aura 2 spell id"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Condition Id 2"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Server only"
+      }
+    ],
+    "31": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Map id"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Difficulty"
+      }
+    ],
+    "32": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Chair height"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Height offset"
+      }
+    ],
+    "33": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": "Intact num hits"
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Credit proxy creature"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 3",
+        "new_name": "Intact event"
+      },
+      {
+        "db_column_name": "Data 4",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 5",
+        "new_name": "Damaged num hits"
+      },
+      {
+        "db_column_name": "Data 6",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 7",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 8",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 9",
+        "new_name": "Damaged event"
+      },
+      {
+        "db_column_name": "Data 10",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 11",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 12",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 13",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 14",
+        "new_name": "Destroyed event"
+      },
+      {
+        "db_column_name": "Data 15",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 16",
+        "new_name": "Time to rebuild in sec"
+      },
+      {
+        "db_column_name": "Data 17",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 18",
+        "new_name": "Destructible data"
+      },
+      {
+        "db_column_name": "Data 19",
+        "new_name": "Rebuilding event"
+      },
+      {
+        "db_column_name": "Data 20",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 21",
+        "new_name": "Unused"
+      },
+      {
+        "db_column_name": "Data 22",
+        "new_name": "Damage event"
+      },
+      {
+        "db_column_name": "Data 23",
+        "new_name": "Unused"
+      }
+    ],
+    "35": [
+      {
+        "db_column_name": "Data 0",
+        "new_name": ""
+      },
+      {
+        "db_column_name": "Data 1",
+        "new_name": "Start open (flag)"
+      },
+      {
+        "db_column_name": "Data 2",
+        "new_name": "Auto close (flag)"
+      }
+    ]
+  }
+}

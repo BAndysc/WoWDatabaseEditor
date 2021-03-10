@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using WDE.Common.Parameters;
+using WDE.Parameters.Models;
 
 namespace WDE.SmartScriptEditor.Models
 {

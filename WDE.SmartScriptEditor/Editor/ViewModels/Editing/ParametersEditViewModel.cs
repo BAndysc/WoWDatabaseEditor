@@ -9,6 +9,7 @@ using WDE.Common.Managers;
 using WDE.MVVM.Observable;
 using WDE.MVVM;
 using WDE.Common.Providers;
+using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing

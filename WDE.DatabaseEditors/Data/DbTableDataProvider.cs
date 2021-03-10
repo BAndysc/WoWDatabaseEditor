@@ -14,9 +14,7 @@ namespace WDE.DatabaseEditors.Data
         public IDbTableData GetDatabaseTable(in DatabaseEditorTableDefinitionJson tableDefinition, IDbTableFieldFactory fieldFactory, Dictionary<string, object> fieldsFromDb)
         {
             var tableCategories = new List<IDbTableColumnCategory>(tableDefinition.Groups.Count);
-            var tableIndex = fieldsFromDb.ContainsKey(tableDefinition.TableIndexFieldName)
-                ? fieldsFromDb[tableDefinition.TableIndexFieldName].ToString()
-                : "";
+            var tableIndex = fieldsFromDb[tableDefinition.TablePrimaryKeyColumnName].ToString();
             var descNameField = fieldsFromDb.ContainsKey(tableDefinition.TableNameSource)
                 ? fieldsFromDb[tableDefinition.TableNameSource].ToString()
                 : "";
@@ -25,7 +23,7 @@ namespace WDE.DatabaseEditors.Data
             foreach (var category in tableDefinition.Groups)
                 tableCategories.Add(CreateCategory(in category, fieldFactory, fieldsFromDb));
 
-            return new DbTableData(tableDefinition.Name, tableDefinition.TableName, tableDefinition.TableIndexFieldName, 
+            return new DbTableData(tableDefinition.Name, tableDefinition.TableName, tableDefinition.TablePrimaryKeyColumnName, 
                 tableIndex ?? "Unk", tableDesc, tableCategories);
         }
 

@@ -55,7 +55,7 @@ namespace WDE.DatabaseEditors.Data
             var names = string.Join(",", columns);
 
             return
-                $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TableIndexFieldName} = {creatureEntry};";
+                $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} = {creatureEntry};";
         }
     }
 }

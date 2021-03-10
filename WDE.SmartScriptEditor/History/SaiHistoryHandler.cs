@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using WDE.Common.History;
 using WDE.MVVM;
+using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.Utils;

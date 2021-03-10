@@ -23,6 +23,7 @@ using WDE.Conditions.Data;
 using WDE.Conditions.Exporter;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Editor.ViewModels.Editing;

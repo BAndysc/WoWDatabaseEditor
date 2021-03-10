@@ -7,6 +7,7 @@ using WDE.MVVM;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Utils;
+using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
