@@ -2,34 +2,74 @@ version: 0.1.{build}
 image: Visual Studio 2019
 configuration: Release
 platform: Any CPU
+environment:
+  DEPLOY_URL:
+    secure: tI50+kR1mSDCXK8B4BPyT9ArtYD3D1NAvb5/06G8mFA=  
+  DEPLOY_USER:
+    secure: IZcgg6msojQGCM0rLsUNTA==
+  DEPLOY_KEY:
+    secure: DoukQF6JSbhuFNX7qvxkkHVLccEINEcnBpvPGPDTVlQyaOO69y0729rh7VC2KNDdkSlPtuZKeZ+PXQ6ELaEn3A==    
 build_script:
 - cmd: >-
-    dotnet publish -c Release --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/ LoaderWPF/LoaderWPF.csproj
+    Rem Building WDE
     
-    rename bin\wowdatabaseeditor\LoaderWPF.deps.json WoWDatabaseEditorCore.WPF.deps.json
-    
-    rename bin\wowdatabaseeditor\LoaderWPF.runtimeconfig.json WoWDatabaseEditorCore.WPF.runtimeconfig.json
-    
-    dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia/ LoaderAvalonia/LoaderAvalonia.csproj
-    
-    rename bin\wowdatabaseeditor-avalonia\LoaderAvalonia.deps.json WoWDatabaseEditorCore.Avalonia.deps.json
-    
-    rename bin\wowdatabaseeditor-avalonia\LoaderAvalonia.runtimeconfig.json WoWDatabaseEditorCore.Avalonia.runtimeconfig.json
-    
-    echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor/COMMIT_HASH
-    
-    echo %APPVEYOR_REPO_COMMIT% > bin/wowdatabaseeditor-avalonia/COMMIT_HASH
+    dotnet publish -c Release --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/ LoaderWPF/LoaderWPF.csproj -r win7-x64
+ 
+    dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
 
-    7z a WoWDatabaseEditor.zip bin/wowdatabaseeditor/*
+    dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
+
+    dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
     
-    7z a WoWDatabaseEditorAvalonia.zip bin/wowdatabaseeditor-avalonia/*
+    rename bin\wowdatabaseeditor\Updater.exe _Updater.exe
+    
+    rename bin\wowdatabaseeditor-avalonia-mac\Updater _Updater
+    
+    rename bin\wowdatabaseeditor-avalonia-linux\Updater _Updater
+
+    rename bin\wowdatabaseeditor-avalonia-win\Updater.exe _Updater.exe
+
+    FOR %%A IN (bin\wowdatabaseeditor\app.ini,bin\wowdatabaseeditor-avalonia-win\app.ini,bin\wowdatabaseeditor-avalonia-mac\app.ini,bin\wowdatabaseeditor-avalonia-linux\app.ini) DO (echo COMMIT=%APPVEYOR_REPO_COMMIT% >> %%A & echo BRANCH=%APPVEYOR_REPO_BRANCH% >> %%A & echo VERSION=%APPVEYOR_BUILD_VERSION% >> %%A & echo BUILD_VERSION=%APPVEYOR_BUILD_NUMBER% >> %%A & echo UPDATE_SERVER=%DEPLOY_URL% >> %%A & echo MARKETPLACE=default >> %%A)
+
+    echo PLATFORM=WindowsWPF >> bin/wowdatabaseeditor/app.ini
+
+    echo PLATFORM=Windows >> bin/wowdatabaseeditor-avalonia-win/app.ini
+
+    echo PLATFORM=MacOs >> bin/wowdatabaseeditor-avalonia-mac/app.ini
+
+    echo PLATFORM=Linux >> bin/wowdatabaseeditor-avalonia-linux/app.ini
+
+    7z a WoWDatabaseEditorWindowsWPF.zip .\bin\wowdatabaseeditor\*
+    
+    7z a WoWDatabaseEditorWindows.zip .\bin\wowdatabaseeditor-avalonia-win\*
+    
+    7z a WoWDatabaseEditorMacOs.zip .\bin\wowdatabaseeditor-avalonia-mac\*
+    
+    7z a WoWDatabaseEditorLinux.zip .\bin\wowdatabaseeditor-avalonia-linux\*
 test_script:
 - cmd: >-
     dotnet test WDE.MVVM.Test/WDE.MVVM.Test.csproj
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
+skip_commits:
+  message: /%[a-zA-Z_]+%/    
 artifacts:
-- path: WoWDatabaseEditor.zip
-  name: WoWDatabaseEditor.zip
-- path: WoWDatabaseEditorAvalonia.zip
-  name: WoWDatabaseEditorAvalonia.zip
+- path: WoWDatabaseEditorWindowsWPF.zip
+  name: WoWDatabaseEditorWindowsWPF.zip
+- path: WoWDatabaseEditorMacOs.zip
+  name: WoWDatabaseEditorMacOs.zip
+- path: WoWDatabaseEditorWindows.zip
+  name: WoWDatabaseEditorWindows.zip
+- path: WoWDatabaseEditorLinux.zip
+  name: WoWDatabaseEditorLinux.zip
+deploy_script:
+- cmd: >-
+    curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windowswpf" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindowsWPF.zip;type=application/zip"
+    
+    curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windows" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindows.zip;type=application/zip"
+    
+    curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=macos" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorMacOs.zip;type=application/zip"
+    
+    curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=linux" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorLinux.zip;type=application/zip"
+    
+    curl -X POST "%DEPLOY_URL%/Changelog/Add" -H  "accept: */*" -H  "Content-Type: application/json" -d "{\"version\":{\"branch\":\"%APPVEYOR_REPO_BRANCH%\",\"marketplace\":\"default\",\"version\":%APPVEYOR_BUILD_NUMBER%},\"user\":{\"user\":\"%DEPLOY_USER%\",\"key\":\"%DEPLOY_KEY%\"},\"entry\":\"%APPVEYOR_REPO_COMMIT_MESSAGE%%APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED%\"}"
