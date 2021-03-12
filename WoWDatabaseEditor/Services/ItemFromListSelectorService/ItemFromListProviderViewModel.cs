@@ -72,13 +72,14 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             DesiredHeight = ShowItemsList ? 470 : 130;
             Accept = new DelegateCommand(() =>
             {
-                if (SelectedItem == null && FilteredItems.Count > 0)
+                if (SelectedItem == null && FilteredItems.Count == 1)
                     SelectedItem = FilteredItems[0];
                 CloseOk?.Invoke();
-            }, () => SelectedItem != null || FilteredItems.Count == 1);
+            }, () => SelectedItem != null || FilteredItems.Count == 1 || int.TryParse(SearchText, out _));
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
             
             FilteredItems.ObserveCollectionChanges().Subscribe(_ => Accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SearchText).Subscribe(_ => Accept.RaiseCanExecuteChanged());
             this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => Accept.RaiseCanExecuteChanged());
         }
 
