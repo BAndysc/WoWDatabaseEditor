@@ -42,9 +42,7 @@
                                 </DockPanel>
                             </Panel>
                             
-                            <controls1:StatusBar DockPanel.Dock="Bottom" Name="StatusBar">
-                                <ContentPresenter Content="{TemplateBinding StatusBar}" />
-                            </controls1:StatusBar>
+                            <ContentPresenter Content="{TemplateBinding StatusBar}" DockPanel.Dock="Bottom" Name="StatusBar"/>
                             
                             <Border Background="{TemplateBinding Background}" Padding="4">
                                 <Panel>
@@ -83,7 +81,7 @@
         <Setter Property="MinWidth" Value="250" />
     </Style>
     
-    <Style Selector="controls1|ExtendedWindow:not(:has-statusbar) /template/ controls1|StatusBar#StatusBar">
+    <Style Selector="controls1|ExtendedWindow:not(:has-statusbar) /template/ ContentControl#StatusBar">
         <Setter Property="IsVisible" Value="False" />
     </Style>
     

@@ -26,8 +26,8 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<IControl> SideBarProperty =
             AvaloniaProperty.Register<ExtendedWindow, IControl>(nameof(SideBar));
         
-        public static readonly StyledProperty<IControl> StatusBarProperty =
-            AvaloniaProperty.Register<ExtendedWindow, IControl>(nameof(StatusBar));
+        public static readonly StyledProperty<StatusBar> StatusBarProperty =
+            AvaloniaProperty.Register<ExtendedWindow, StatusBar>(nameof(StatusBar));
         
         public static readonly StyledProperty<TabStrip> TabStripProperty =
             AvaloniaProperty.Register<ExtendedWindow, TabStrip>(nameof(TabStrip));
@@ -59,7 +59,7 @@ namespace AvaloniaStyles.Controls
             set => SetValue(SideBarProperty, value);
         }
         
-        public IControl StatusBar
+        public StatusBar StatusBar
         {
             get => GetValue(StatusBarProperty);
             set => SetValue(StatusBarProperty, value);

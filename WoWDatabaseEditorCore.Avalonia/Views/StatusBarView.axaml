@@ -1,7 +1,10 @@
 ﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Views.StatusBarView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Foreground="White">
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
+    <UserControl.Resources>
+        <converters:NullConverter Inverted="True" x:Key="NullConverter" />
+    </UserControl.Resources>
     <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -13,8 +16,11 @@
         
         <Panel>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="{DynamicResource StatusBarForeground}" HorizontalAlignment="Left"
-                           VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}" />
+                <Button Opacity="1" Command="{Binding CurrentNotification.ClickCommand}" IsEnabled="{Binding CurrentNotification.ClickCommand, Converter={StaticResource NullConverter}}">
+                    <TextBlock HorizontalAlignment="Left"
+                               VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}" />                    
+                </Button>
+
             </StackPanel>
         </Panel>
         <Panel Grid.Column="1" VerticalAlignment="Stretch" Margin="0">
@@ -23,20 +29,6 @@
                     <TextBlock Text="{Binding TasksViewModel.PendingTasksCount, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
                     <TextBlock Text=" tasks running in background"></TextBlock>
                 </WrapPanel>
-
-                <Button.Styles>
-                    <Style Selector="Button">
-                        <Setter Property="BorderThickness" Value="0" />
-                        <Setter Property="Background" Value="Transparent" />
-                        <Setter Property="Margin" Value="5,0,5,0" />
-                    </Style>
-                    <Style Selector="Button:pressed /template/ ContentPresenter">
-                        <Setter Property="Background" Value="#60000000" />
-                    </Style>
-                    <Style Selector="Button:pointerover">
-                        <Setter Property="Background" Value="#40000000" />
-                    </Style>
-                </Button.Styles>
             </Button>
         </Panel>
     </Grid>

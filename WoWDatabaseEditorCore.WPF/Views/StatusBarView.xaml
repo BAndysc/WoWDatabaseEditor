@@ -5,8 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:managers="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:converters="clr-namespace:WDE.Common.WPF.Converters;assembly=WDE.Common.WPF"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:NullConverter Inverted="True" x:Key="NullConverter" />
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Grid Background="{TemplateBinding Background}">
+                                <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,5,0" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#40000000" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#60000000" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <StatusBar Background="{DynamicResource StatusBarBackground}" 
                VerticalAlignment="Center">
         <StatusBar.ItemsPanel>
@@ -22,9 +48,9 @@
                 </Grid>
             </ItemsPanelTemplate>
         </StatusBar.ItemsPanel>
-        <StatusBarItem>
+        <StatusBarItem VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" Padding="0" Margin="0"> 
             <StackPanel Orientation="Horizontal">
-                <Image Margin="10,0,10,0">
+                <Image Margin="10,3,10,3">
                     <Image.Style>
                         <Style TargetType="{x:Type Image}">
                             <Style.Triggers>
@@ -49,8 +75,10 @@
                         </Style>
                     </Image.Style>
                 </Image>
-                <TextBlock Foreground="{DynamicResource StatusBarForeground}" HorizontalAlignment="Left"
-                           VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}" />
+                <Button Command="{Binding CurrentNotification.ClickCommand}" IsEnabled="{Binding CurrentNotification.ClickCommand, Converter={StaticResource NullConverter}}">
+                    <TextBlock Foreground="{DynamicResource StatusBarForeground}" HorizontalAlignment="Left"
+                               VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}" />
+                </Button>
             </StackPanel>
         </StatusBarItem>
         <StatusBarItem Grid.Column="1" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" Padding="0" Margin="0">
@@ -59,28 +87,6 @@
                     <Run Text="{Binding TasksViewModel.PendingTasksCount, Mode=OneWay}"/>
                     <Run Text=" tasks running in background" />
                 </TextBlock>
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Background" Value="Transparent" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type Button}">
-                                    <Grid Background="{TemplateBinding Background}">
-                                        <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,5,0" />
-                                    </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#40000000" />
-                                        </Trigger>
-                                        <Trigger Property="IsPressed" Value="True">
-                                            <Setter Property="Background" Value="#60000000" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Button.Style>
             </Button>
         </StatusBarItem>
     </StatusBar>

@@ -69,7 +69,9 @@
     </controls:ExtendedWindow.ToolBar>
     
     <controls:ExtendedWindow.StatusBar>
-        <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{Binding StatusBar}" />
+        <controls:StatusBar>
+            <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{Binding StatusBar}" />
+        </controls:StatusBar>
     </controls:ExtendedWindow.StatusBar>
     
     <controls:ExtendedWindow.TabStrip>
