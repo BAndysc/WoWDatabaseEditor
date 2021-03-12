@@ -14,6 +14,7 @@ using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
+using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
@@ -32,7 +33,7 @@ namespace WDE.DatabaseEditors.ViewModels
             tableData = solutionItem.TableData;
             Title = $"{tableData.TableName} Editor";
 
-            OpenParameterWindow = new AsyncAutoCommand<IDbTableField?>(EditParameter);
+            OpenParameterWindow = new AsyncAutoCommand<object?>(EditParameter);
             
             // setup history
             History = historyCreator();
@@ -60,21 +61,20 @@ namespace WDE.DatabaseEditors.ViewModels
             }
         }
         
-        public AsyncAutoCommand<IDbTableField?> OpenParameterWindow { get; }
+        public AsyncAutoCommand<object?> OpenParameterWindow { get; }
         private readonly DelegateCommand undoCommand;
         private readonly DelegateCommand redoCommand;
 
-        private async Task EditParameter(IDbTableField? tableField)
+        private async Task EditParameter(object? tableField)
         {
-            if (tableField is DbTableField<long> longField)
+            if (tableField is ParameterValueHolder<long> valueHolder)
             {
-                var parameter = parameterFactory.Factory(tableField.ValueType);
-                if (parameter != null)
+                if (valueHolder.Parameter.HasItems)
                 {
-                    var result = await itemFromListProvider.GetItemFromList(parameter.Items, parameter is FlagParameter,
-                        longField.Value);
+                    var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
+                        valueHolder.Parameter is FlagParameter, valueHolder.Value);
                     if (result.HasValue)
-                        longField.Value = result.Value;
+                        valueHolder.Value = result.Value;
                 }
             }
         }

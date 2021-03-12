@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using WDE.Common.Annotations;
 using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.History;
+using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.Models
 {
@@ -13,7 +14,7 @@ namespace WDE.DatabaseEditors.Models
         public DbTableField() { }
         
         public DbTableField(string fieldName, string inDbFieldName, bool isReadOnly, bool isModified, string valueType, bool isParameter,
-            T value)
+            ParameterValueHolder<T> value)
         {
             FieldName = fieldName;
             this.inDbFieldName = inDbFieldName;
@@ -21,10 +22,11 @@ namespace WDE.DatabaseEditors.Models
             this.isModified = isModified;
             ValueType = valueType;
             IsParameter = isParameter;
-            fieldValue = value;
+            Parameter = value;
+            Parameter.OnValueChanged += ParameterOnOnValueChanged;
         }
 
-        public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition)
+        public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition, ParameterValueHolder<T> value)
         {
             FieldName = fieldDefinition.Name;
             inDbFieldName = fieldDefinition.DbColumnName;
@@ -32,18 +34,8 @@ namespace WDE.DatabaseEditors.Models
             isModified = false;
             ValueType = fieldDefinition.ValueType;
             IsParameter = fieldDefinition.ValueType.EndsWith("Parameter");
-            fieldValue = default;
-        }
-        
-        public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition, T value)
-        {
-            FieldName = fieldDefinition.Name;
-            inDbFieldName = fieldDefinition.DbColumnName;
-            IsReadOnly = fieldDefinition.IsReadOnly;
-            isModified = false;
-            ValueType = fieldDefinition.ValueType;
-            IsParameter = fieldDefinition.ValueType.EndsWith("Parameter");
-            fieldValue = value;
+            Parameter = value;
+            Parameter.OnValueChanged += ParameterOnOnValueChanged;
         }
 
         public string FieldName { get; set; }
@@ -65,23 +57,10 @@ namespace WDE.DatabaseEditors.Models
         }
         public string ValueType { get; set; }
         public bool IsParameter { get; set; }
-        [JsonProperty]
-        private T fieldValue;
 
-        [JsonIgnore]
-        public T Value
-        {
-            get => fieldValue;
-            set
-            {
-                PublishFieldValueChangedHistoryAction(nameof(Value), fieldValue, isModified, value);
-                fieldValue = value;
-                IsModified = true;
-                OnPropertyChanged(nameof(Value));
-            }
-        }
-        
-        public string ToSqlFieldDescription() => $"`{inDbFieldName}`={Value}";
+        public ParameterValueHolder<T> Parameter { get; }
+
+        public string ToSqlFieldDescription() => $"`{inDbFieldName}`={Parameter.Value}";
         
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
@@ -91,18 +70,17 @@ namespace WDE.DatabaseEditors.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private void PublishFieldValueChangedHistoryAction(string fieldName, T val, bool wasModified, T newVal)
+        
+        private void ParameterOnOnValueChanged(ParameterValueHolder<T> param, T oldValue, T newValue)
         {
-            historyActionReceiver?.RegisterAction(new DbFieldHistoryAction<T>(this, val, newVal, wasModified, isModified));
+            historyActionReceiver?.RegisterAction(new DbFieldHistoryAction<T>(this, oldValue, newValue, isModified, true));
+            IsModified = true;
         }
 
         public void RevertPropertyValueChange(T previousValue, bool previousModified)
         {
-            fieldValue = previousValue;
-            isModified = previousModified;
-            OnPropertyChanged(nameof(Value));
-            OnPropertyChanged(nameof(IsModified));
+            Parameter.Value = previousValue;
+            IsModified = previousModified; ;
         }
 
         private IDbFieldHistoryActionReceiver? historyActionReceiver;
