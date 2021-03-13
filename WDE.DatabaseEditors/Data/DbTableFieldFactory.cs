@@ -52,7 +52,7 @@ namespace WDE.DatabaseEditors.Data
             string fieldName)
         {
             var parameter = parameterFactory.Factory(definition.ValueType);
-            if (parameter != null)
+            if (parameter != null && parameter.HasItems)
             {
                 try
                 {

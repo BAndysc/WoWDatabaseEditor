@@ -41,6 +41,7 @@ namespace WDE.DatabaseEditors.Data
             }
             catch (Exception e)
             {
+                // in case of throw from DbTableFieldFactory
                 messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
                     .SetMainInstruction(e.Message)
                     .SetIcon(MessageBoxIcon.Error)
