@@ -7,7 +7,7 @@ namespace WDE.DatabaseEditors.Data
     [UniqueProvider]
     public interface IDbEditorTableDataProvider
     {
-        Task<IDbTableData> LoadCreatureTamplateDataEntry(uint creatureEntry);
-        Task<IDbTableData> LoadGameobjectTamplateDataEntry(uint goEntry);
+        Task<IDbTableData> LoadCreatureTemplateDataEntry(uint creatureEntry);
+        Task<IDbTableData> LoadGameobjectTemplateDataEntry(uint goEntry);
     }
 }

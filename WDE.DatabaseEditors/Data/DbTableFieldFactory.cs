@@ -48,21 +48,6 @@ namespace WDE.DatabaseEditors.Data
             return field;
         }
 
-        private static T ConvertValue<T>(object dbValue, string fieldName)
-        {
-            // allow null return when value is null and type is string
-            if (dbValue is DBNull && typeof(T) == typeof(string))
-                return default;
-            if (dbValue is T fieldValue)
-                return fieldValue;
-
-            //
-            // if (typeof(T) == typeof(int) && dbValue != null)
-                // return dbValue as T;
-            return default;
-                // throw new Exception($"Field {fieldName} db value doesn't match declared type! Expecting {typeof(T).Name} got {dbValue.GetType().Name}");
-        }
-
         private ParameterValueHolder<long> CreateParameterValue(in DbEditorTableGroupFieldJson definition, object dbValue,
             string fieldName)
         {

@@ -26,8 +26,8 @@ namespace WDE.DatabaseEditors.Solution
             var key = await creatureEntryProviderService.Value.GetEntryFromService();
             if (key.HasValue)
             {
-                var data = await tableDataProvider.Value.LoadCreatureTamplateDataEntry(key.Value);
-                return new DbEditorsSolutionItem(data as DbTableData);
+                var data = await tableDataProvider.Value.LoadCreatureTemplateDataEntry(key.Value);
+                return new DbEditorsSolutionItem(key.Value, nameof(tableDataProvider.Value.LoadCreatureTemplateDataEntry), data as DbTableData);
             }
 
             return null;

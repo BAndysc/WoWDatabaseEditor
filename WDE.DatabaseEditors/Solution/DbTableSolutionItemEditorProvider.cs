@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Solution;
+using WDE.Common.Tasks;
+using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels;
 using WDE.Module.Attributes;
 
@@ -13,20 +18,38 @@ namespace WDE.DatabaseEditors.Solution
     public class DbTableSolutionItemEditorProvider : ISolutionItemEditorProvider<DbEditorsSolutionItem>
     {
         private readonly Lazy<IItemFromListProvider> itemFromListProvider;
-        private readonly Lazy<IParameterFactory> parameterFactory;
         private readonly Func<IHistoryManager> historyCreator;
+        private readonly Lazy<IDbEditorTableDataProvider> tableDataProvider;
+        private readonly Lazy<ITaskRunner> taskRunner;
         
-        public DbTableSolutionItemEditorProvider(Lazy<IItemFromListProvider> itemFromListProvider, Lazy<IParameterFactory> parameterFactory, Func<IHistoryManager> historyCreator)
+        public DbTableSolutionItemEditorProvider(Lazy<IItemFromListProvider> itemFromListProvider,
+            Func<IHistoryManager> historyCreator, Lazy<IDbEditorTableDataProvider> tableDataProvider,
+            Lazy<ITaskRunner> taskRunner)
         {
             this.itemFromListProvider = itemFromListProvider;
-            this.parameterFactory = parameterFactory;
             this.historyCreator = historyCreator;
+            this.tableDataProvider = tableDataProvider;
+            this.taskRunner = taskRunner;
         }
         
         public IDocument GetEditor(DbEditorsSolutionItem item)
         {
-            return new TemplateDbTableEditorViewModel(item, itemFromListProvider.Value, parameterFactory.Value,
-                historyCreator);
+            Func<uint, Task<IDbTableData>>? tableDataLoader = null;
+            if (item.TableData == null)
+                tableDataLoader = FindTableDataLoader(item.TableDataLoaderMethodName);
+            
+            return new TemplateDbTableEditorViewModel(item, itemFromListProvider.Value, historyCreator,
+                tableDataLoader, taskRunner.Value);
+        }
+
+        private Func<uint, Task<IDbTableData>>? FindTableDataLoader(string methodName)
+        {
+            // use reflection to get tableDataProvider method from solution item
+            var method = tableDataProvider.Value.GetType().GetMethod(methodName);
+            if (method == null)
+                return null;
+
+            return method.CreateDelegate<Func<uint, Task<IDbTableData>>>(tableDataProvider.Value);
         }
     }
 }

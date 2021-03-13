@@ -1,18 +1,15 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Newtonsoft.Json;
 using WDE.Common.Annotations;
 using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.History;
+using WDE.DatabaseEditors.Solution;
 using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DbTableField<T> : IDbTableField, INotifyPropertyChanged, IDbTableHistoryActionSource
+    public class DbTableField<T> : IDbTableField, INotifyPropertyChanged, IDbTableHistoryActionSource, IStateRestorableField
     {
-        // Constructor for serialization purpose
-        public DbTableField() { }
-        
         public DbTableField(string fieldName, string inDbFieldName, bool isReadOnly, bool isModified, string valueType, bool isParameter,
             ParameterValueHolder<T> value)
         {
@@ -38,14 +35,11 @@ namespace WDE.DatabaseEditors.Models
             Parameter.OnValueChanged += ParameterOnOnValueChanged;
         }
 
-        public string FieldName { get; set; }
-        [JsonProperty]
-        private string inDbFieldName;
-        public bool IsReadOnly { get; set; }
-        [JsonProperty]
+        public string FieldName { get; }
+        private readonly string inDbFieldName;
+        public bool IsReadOnly { get; }
         private bool isModified;
-
-        [JsonIgnore]
+        
         public bool IsModified
         {
             get => isModified;
@@ -55,12 +49,21 @@ namespace WDE.DatabaseEditors.Models
                 OnPropertyChanged(nameof(IsModified));
             }
         }
-        public string ValueType { get; set; }
-        public bool IsParameter { get; set; }
-
+        public string ValueType { get; }
+        public bool IsParameter { get; }
+        
         public ParameterValueHolder<T> Parameter { get; }
 
         public string ToSqlFieldDescription() => $"`{inDbFieldName}`={Parameter.Value}";
+
+        public void RestoreLoadedFieldState(DbTableSolutionItemModifiedField fieldData)
+        {
+            isModified = true;
+            if (fieldData.NewValue != null)
+                Parameter.Value = (T) fieldData.NewValue;
+        }
+
+        public object? GetValueForPersistence() => Parameter.Value;
         
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 

@@ -6,6 +6,6 @@ namespace WDE.DatabaseEditors.Solution
     [AutoRegister]
     public class DbEditorsSolutionItemNameProvider : ISolutionNameProvider<DbEditorsSolutionItem>
     {
-        public string GetName(DbEditorsSolutionItem item) => item.TableData.TableDescription;
+        public string GetName(DbEditorsSolutionItem item) => item.ItemDescription;
     }
 }

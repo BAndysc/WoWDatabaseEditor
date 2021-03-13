@@ -25,7 +25,7 @@ namespace WDE.DatabaseEditors.Data
             this.tableDataProvider = tableDataProvider;
         }
 
-        public async Task<IDbTableData> LoadCreatureTamplateDataEntry(uint creatureEntry)
+        public async Task<IDbTableData> LoadCreatureTemplateDataEntry(uint creatureEntry)
         {
             var tableDefinition = tableDefinitionProvider.GetCreatureTemplateDefinition();
             var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, creatureEntry);
@@ -37,7 +37,7 @@ namespace WDE.DatabaseEditors.Data
             return tableDataProvider.GetDatabaseTable(in tableDefinition, tableFieldFactory, result[0]);
         }
 
-        public async Task<IDbTableData> LoadGameobjectTamplateDataEntry(uint goEntry)
+        public async Task<IDbTableData> LoadGameobjectTemplateDataEntry(uint goEntry)
         {
             var tableDefinition = tableDefinitionProvider.GetGameobjectTemplateDefinition();
             var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, goEntry);

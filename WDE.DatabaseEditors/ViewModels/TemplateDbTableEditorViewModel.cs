@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -21,33 +23,30 @@ namespace WDE.DatabaseEditors.ViewModels
     public class TemplateDbTableEditorViewModel: BindableBase, IDocument
     {
         private readonly IItemFromListProvider itemFromListProvider;
-        private readonly IParameterFactory parameterFactory;
+        private readonly Func<uint, Task<IDbTableData>>? tableDataLoader;
 
-        private readonly TemplateTableEditorHistoryHandler historyHandler;
+        private TemplateTableEditorHistoryHandler historyHandler;
+        private readonly DbEditorsSolutionItem solutionItem;
         
         public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, IItemFromListProvider itemFromListProvider,
-            IParameterFactory parameterFactory, Func<IHistoryManager> historyCreator)
+            Func<IHistoryManager> historyCreator, Func<uint, Task<IDbTableData>>? tableDataLoader, ITaskRunner taskRunner)
         {
             this.itemFromListProvider = itemFromListProvider;
-            this.parameterFactory = parameterFactory;
-            tableData = solutionItem.TableData;
-            Title = $"{tableData.TableName} Editor";
+            this.solutionItem = solutionItem;
+            this.tableDataLoader = tableDataLoader;
+            if (solutionItem.TableData != null)
+                tableData = solutionItem.TableData;
+            else
+                taskRunner.ScheduleTask($"Loading {solutionItem.TableName}..", LoadTableDefinition);
 
+            Title = $"{solutionItem.TableName} Editor";
+            
             OpenParameterWindow = new AsyncAutoCommand<object?>(EditParameter);
+            saveModifiedFields = new DelegateCommand(SaveSolutionItem);
             
             // setup history
             History = historyCreator();
-            historyHandler = new TemplateTableEditorHistoryHandler(tableData);
-            undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
-            redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
-            History.PropertyChanged += (sender, args) =>
-            {
-                undoCommand.RaiseCanExecuteChanged();
-                redoCommand.RaiseCanExecuteChanged();
-                IsModified = !History.IsSaved;
-                RaisePropertyChanged(nameof(IsModified));
-            };
-            History.AddHandler(historyHandler);
+            SetupHistory();
         }
 
         private DbTableData? tableData;
@@ -62,8 +61,9 @@ namespace WDE.DatabaseEditors.ViewModels
         }
         
         public AsyncAutoCommand<object?> OpenParameterWindow { get; }
-        private readonly DelegateCommand undoCommand;
-        private readonly DelegateCommand redoCommand;
+        private DelegateCommand undoCommand;
+        private DelegateCommand redoCommand;
+        private readonly DelegateCommand saveModifiedFields;
 
         private async Task EditParameter(object? tableField)
         {
@@ -78,10 +78,72 @@ namespace WDE.DatabaseEditors.ViewModels
                 }
             }
         }
+
+        private async Task LoadTableDefinition()
+        {
+            if (tableDataLoader == null)
+                return;
+
+            var data = await tableDataLoader.Invoke(solutionItem.Entry) as DbTableData;
+
+            if (solutionItem.ModifiedFields == null)
+            {
+                TableData = data;
+                SetupHistory();
+                return;
+            }
+
+            foreach (var field in data.Categories.SelectMany(c => c.Fields))
+            {
+                if (!solutionItem.ModifiedFields.ContainsKey(field.FieldName))
+                    continue;
+                    
+                if (field is IStateRestorableField restorableField)
+                    restorableField.RestoreLoadedFieldState(solutionItem.ModifiedFields[field.FieldName]);
+            }
+
+            TableData = data;
+            SetupHistory();
+        }
+
+        private void SaveSolutionItem()
+        {
+            if (tableData == null)
+                return;
+
+            var dict = new Dictionary<string, DbTableSolutionItemModifiedField>();
+            
+            foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
+            {
+                if (field is IStateRestorableField restorableField)
+                    dict[field.FieldName] = new(field.FieldName, restorableField.GetValueForPersistence());
+            }
+
+            solutionItem.ModifiedFields = dict;
+            History.MarkAsSaved();
+        }
         
         public void Dispose()
         {
             historyHandler.Dispose();
+        }
+
+        private void SetupHistory()
+        {
+            if (tableData == null)
+                return;
+            
+            historyHandler = new TemplateTableEditorHistoryHandler(tableData);
+            undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
+            redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
+            History.PropertyChanged += (sender, args) =>
+            {
+                undoCommand.RaiseCanExecuteChanged();
+                redoCommand.RaiseCanExecuteChanged();
+                IsModified = !History.IsSaved;
+                RaisePropertyChanged(nameof(IsModified));
+            };
+            History.AddHandler(historyHandler);
         }
 
         public string Title { get; }
@@ -90,7 +152,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public ICommand Copy => AlwaysDisabledCommand.Command;
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
-        public ICommand Save => AlwaysDisabledCommand.Command;
+        public ICommand Save => saveModifiedFields;
         public IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
