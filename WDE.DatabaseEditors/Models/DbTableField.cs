@@ -57,7 +57,11 @@ namespace WDE.DatabaseEditors.Models
         
         public ParameterValueHolder<T> Parameter { get; }
 
-        public string ToSqlFieldDescription() => $"`{DbFieldName}`={Parameter.Value}";
+        public string ToSqlFieldDescription()
+        {
+            var paramValue = Parameter.Value is string ? $"\"{Parameter.Value}\"" : $"{Parameter.Value}";
+            return $"`{DbFieldName}`={paramValue}";
+        }
 
         // IStateRestorableField
         

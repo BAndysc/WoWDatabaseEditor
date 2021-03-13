@@ -107,22 +107,27 @@ namespace WDE.DatabaseEditors.ViewModels
 
             if (solutionItem.ModifiedFields == null)
             {
-                TableData = data;
-                SetupHistory();
-                SetupSwapDataHandler();
+                SaveLoadedTableData(data);
                 return;
             }
 
             foreach (var field in data.Categories.SelectMany(c => c.Fields))
             {
-                if (!solutionItem.ModifiedFields.ContainsKey(field.FieldName))
+                if (!solutionItem.ModifiedFields.ContainsKey(field.DbFieldName))
                     continue;
                     
                 if (field is IStateRestorableField restorableField)
                     restorableField.RestoreLoadedFieldState(solutionItem.ModifiedFields[field.FieldName]);
             }
 
+            SaveLoadedTableData(data);
+        }
+
+        private void SaveLoadedTableData(DbTableData data)
+        {
             TableData = data;
+            // for cache purpose
+            solutionItem.TableData = data;
             SetupHistory();
             SetupSwapDataHandler();
         }
@@ -137,7 +142,7 @@ namespace WDE.DatabaseEditors.ViewModels
             foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
             {
                 if (field is IStateRestorableField restorableField)
-                    dict[field.FieldName] = new(field.FieldName, restorableField.GetValueForPersistence());
+                    dict[field.DbFieldName] = new(field.DbFieldName, restorableField.GetValueForPersistence());
             }
 
             solutionItem.ModifiedFields = dict;

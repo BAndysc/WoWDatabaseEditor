@@ -8,7 +8,7 @@ namespace WDE.DatabaseEditors.Solution
 {
     public class DbEditorsSolutionItem : ISolutionItem
     {
-        public DbEditorsSolutionItem() {}
+        public DbEditorsSolutionItem() {} // for serialization to avoid crash
         
         public DbEditorsSolutionItem(uint entry, string tableDataLoaderMethodName, DbTableData tableData)
         {
@@ -18,14 +18,19 @@ namespace WDE.DatabaseEditors.Solution
             Entry = entry;
             TableDataLoaderMethodName = tableDataLoaderMethodName;
             TableName = tableData.TableName;
+            DbTableName = tableData.DbTableName;
+            KeyColumnName = tableData.TableIndexFieldName;
         }
         
         public uint Entry { get; set; }
         public string ItemDescription { get; set; }
         public string TableName { get; set; }
+        public string DbTableName { get; set; }
+        public string KeyColumnName { get; set; }
         public string TableDataLoaderMethodName { get; set; }
 
-        [JsonIgnore] public DbTableData? TableData { get; } = null;
+        // just cache to avoid loading data from db each time
+        [JsonIgnore] public DbTableData? TableData { get; set; } = null;
         
         public Dictionary<string, DbTableSolutionItemModifiedField> ModifiedFields { get; set; }
 

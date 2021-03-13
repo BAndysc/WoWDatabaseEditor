@@ -2,12 +2,12 @@
 {
     public class DbTableSolutionItemModifiedField
     {
-        public string FieldName { get; }
+        public string DbFieldName { get; }
         public object? NewValue { get; }
         
-        public DbTableSolutionItemModifiedField(string fieldName, object? newValue)
+        public DbTableSolutionItemModifiedField(string dbFieldName, object? newValue)
         {
-            FieldName = fieldName;
+            DbFieldName = dbFieldName;
             NewValue = newValue;
         }
     }

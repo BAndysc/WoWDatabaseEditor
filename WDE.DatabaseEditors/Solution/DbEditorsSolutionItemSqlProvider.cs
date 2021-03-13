@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using WDE.Common.Solution;
+using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -7,12 +9,23 @@ namespace WDE.DatabaseEditors.Solution
     [AutoRegister]
     public class DbEditorsSolutionItemSqlProvider : ISolutionItemSqlProvider<DbEditorsSolutionItem>
     {
-        public string GenerateSql(DbEditorsSolutionItem item)
+        public string GenerateSql(DbEditorsSolutionItem item) => GenerateQuery(item.ModifiedFields, item.DbTableName, item.KeyColumnName, item.Entry);
+
+        private string GenerateQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, string keyColumnName, uint itemKey)
         {
-            var fields = item.TableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified)
-                .Select(f => f.ToSqlFieldDescription());
-            string fieldsString = string.Join(", ", fields);
-            return $"UPDATE `{item.TableData.DbTableName}` SET {fieldsString} WHERE `{item.TableData.TableIndexFieldName}`= {item.TableData.TableIndexValue};";
+            if (fields == null || fields.Count == 0)
+                return "";
+
+            var updateParts = fields.Select(p => BuildFieldUpdateExpression(p.Value));
+            string fieldsString = string.Join(", ", updateParts);
+            return $"UPDATE `{tableName}` SET {fieldsString} WHERE `{keyColumnName}`= {itemKey};";
+        }
+
+        private string BuildFieldUpdateExpression(DbTableSolutionItemModifiedField modifiedField)
+        {
+            var paramValue = modifiedField.NewValue is string ? $"\"{modifiedField.NewValue}\"" : 
+                (modifiedField.NewValue is null ? "NULL" : $"{modifiedField.NewValue}");
+            return $"`{modifiedField.DbFieldName}`={paramValue}";
         }
     }
 }
