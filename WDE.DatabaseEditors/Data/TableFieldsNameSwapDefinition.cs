@@ -7,9 +7,9 @@ namespace WDE.DatabaseEditors.Data
     {
         [JsonProperty(PropertyName = "condition_value_source")]
         public string ConditionValueSource { get; set; }
-        
+
         [JsonProperty(PropertyName = "options")]
-        public Dictionary<int, IList<TableFieldSwapDataDefinition>> Options { get; set; }
+        public Dictionary<long, IList<TableFieldSwapDataDefinition>> Options { get; set; }
     }
 
     public struct TableFieldSwapDataDefinition

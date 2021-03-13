@@ -1,9 +1,7 @@
-﻿using WDE.DatabaseEditors.Models;
-
-namespace WDE.DatabaseEditors.Data
+﻿namespace WDE.DatabaseEditors.Data
 {
     public interface IDbTableFieldNameSwapHandler
     {
-        void SwapFieldName(IDbTableField field);
+        void OnFieldValueChanged(long newValue, string fieldName);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Prism.Ioc;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -21,15 +22,17 @@ namespace WDE.DatabaseEditors.Solution
         private readonly Func<IHistoryManager> historyCreator;
         private readonly Lazy<IDbEditorTableDataProvider> tableDataProvider;
         private readonly Lazy<ITaskRunner> taskRunner;
+        private readonly Lazy<IContainerProvider> containerRegistry;
         
         public DbTableSolutionItemEditorProvider(Lazy<IItemFromListProvider> itemFromListProvider,
             Func<IHistoryManager> historyCreator, Lazy<IDbEditorTableDataProvider> tableDataProvider,
-            Lazy<ITaskRunner> taskRunner)
+            Lazy<ITaskRunner> taskRunner, Lazy<IContainerProvider> containerRegistry)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.historyCreator = historyCreator;
             this.tableDataProvider = tableDataProvider;
             this.taskRunner = taskRunner;
+            this.containerRegistry = containerRegistry;
         }
         
         public IDocument GetEditor(DbEditorsSolutionItem item)
@@ -37,9 +40,9 @@ namespace WDE.DatabaseEditors.Solution
             Func<uint, Task<IDbTableData>>? tableDataLoader = null;
             if (item.TableData == null)
                 tableDataLoader = FindTableDataLoader(item.TableDataLoaderMethodName);
-            
-            return new TemplateDbTableEditorViewModel(item, itemFromListProvider.Value, historyCreator,
-                tableDataLoader, taskRunner.Value);
+
+            return containerRegistry.Value.Resolve<TemplateDbTableEditorViewModel>((typeof(DbEditorsSolutionItem), item),
+                (typeof(Func<uint, Task<IDbTableData>>), tableDataLoader));
         }
 
         private Func<uint, Task<IDbTableData>>? FindTableDataLoader(string methodName)

@@ -3,6 +3,7 @@
   "table_name": "gameobject_template",
   "table_index_name": "entry",
   "table_name_source_field": "name",
+  "name_swap_file_path": "DbDefinitions/gameobject_template_names_swap.json",
   "groups": [
     {
       "group_name": "General",
@@ -222,5 +223,5 @@
         }
       ]
     }
-  ],
+  ]
 }

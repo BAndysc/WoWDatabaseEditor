@@ -1,19 +1,83 @@
-﻿using WDE.DatabaseEditors.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using WDE.DatabaseEditors.Models;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.Data
 {
-    public class DbTableFieldNameSwapHandler : IDbTableFieldNameSwapHandler
+    public class DbTableFieldNameSwapHandler : IDbTableFieldNameSwapHandler, IDisposable
     {
-        private readonly TableFieldsNameSwapDefinition definition;
+        private readonly DbTableData tableData;
+        private readonly TableFieldsNameSwapDefinition nameSwapDefinition;
 
-        public DbTableFieldNameSwapHandler(string definitionPath)
+        public DbTableFieldNameSwapHandler(DbTableData tableData, TableFieldsNameSwapDefinition nameSwapDefinition)
         {
-            definition = new();
+            this.tableData = tableData;
+            this.nameSwapDefinition = nameSwapDefinition;
+            BindFields();
         }
 
-        public void SwapFieldName(IDbTableField field)
+        public void Dispose()
         {
-            
+            UnbindFields();
+        }
+        
+        private void BindFields()
+        {
+            var keyField = tableData.Categories.SelectMany(c => c.Fields)
+                .First(f => f.DbFieldName == nameSwapDefinition.ConditionValueSource);
+            if (keyField is ISwappableNameField swappableNameField)
+                swappableNameField.RegisterNameSwapHandler(this);
+        }
+
+        private void UnbindFields()
+        {
+            var keyField = tableData.Categories.SelectMany(c => c.Fields)
+                .First(f => f.DbFieldName == nameSwapDefinition.ConditionValueSource);
+            if (keyField is ISwappableNameField swappableNameField)
+                swappableNameField.UnregisterNameSwapHandler();
+        }
+
+        public void OnFieldValueChanged(long newValue, string fieldName)
+        {
+            // just for sure
+            if (fieldName != nameSwapDefinition.ConditionValueSource)
+                return;
+
+            if (nameSwapDefinition.Options.ContainsKey(newValue))
+                UpdateFields(nameSwapDefinition.Options[newValue]);
+            else
+                RestoreNames();
+        }
+
+        private void UpdateFields(IList<TableFieldSwapDataDefinition> definitions)
+        {
+            foreach (var field in tableData.Categories.SelectMany(c => c.Fields))
+            {
+                if (!(field is ISwappableNameField swappableNameField))
+                    continue;
+
+                try
+                {
+                    var data = definitions.First(d => d.DbColumnName == field.DbFieldName);
+                    swappableNameField.UpdateFieldName(data.NewName);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private void RestoreNames()
+        {
+            foreach (var field in tableData.Categories.SelectMany(c => c.Fields))
+            {
+                if (field is ISwappableNameField swappableNameField)
+                    swappableNameField.UpdateFieldName(swappableNameField.OriginalName);
+            }
         }
     }
 }

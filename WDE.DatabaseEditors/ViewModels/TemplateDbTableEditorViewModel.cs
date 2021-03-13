@@ -10,6 +10,7 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data;
@@ -22,18 +23,25 @@ namespace WDE.DatabaseEditors.ViewModels
 {
     public class TemplateDbTableEditorViewModel: BindableBase, IDocument
     {
-        private readonly IItemFromListProvider itemFromListProvider;
+        private readonly Lazy<IItemFromListProvider> itemFromListProvider;
         private readonly Func<uint, Task<IDbTableData>>? tableDataLoader;
+        private readonly Lazy<IMessageBoxService> messageBoxService;
+        private readonly IDbFieldNameSwapDataManager nameSwapDataManager;
 
-        private TemplateTableEditorHistoryHandler historyHandler;
+        private TemplateTableEditorHistoryHandler? historyHandler;
         private readonly DbEditorsSolutionItem solutionItem;
+        private DbTableFieldNameSwapHandler? tableFieldNameSwapHandler;
         
-        public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, IItemFromListProvider itemFromListProvider,
-            Func<IHistoryManager> historyCreator, Func<uint, Task<IDbTableData>>? tableDataLoader, ITaskRunner taskRunner)
+        public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, Func<uint, Task<IDbTableData>>? tableDataLoader, 
+            Lazy<IItemFromListProvider> itemFromListProvider, Func<IHistoryManager> historyCreator, ITaskRunner taskRunner,
+            Lazy<IMessageBoxService> messageBoxService, IDbFieldNameSwapDataManager nameSwapDataManager)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
             this.tableDataLoader = tableDataLoader;
+            this.messageBoxService = messageBoxService;
+            this.nameSwapDataManager = nameSwapDataManager;
+
             if (solutionItem.TableData != null)
                 tableData = solutionItem.TableData;
             else
@@ -41,12 +49,13 @@ namespace WDE.DatabaseEditors.ViewModels
 
             Title = $"{solutionItem.TableName} Editor";
             
-            OpenParameterWindow = new AsyncAutoCommand<object?>(EditParameter);
+            OpenParameterWindow = new AsyncAutoCommand<ParameterValueHolder<long>?>(EditParameter);
             saveModifiedFields = new DelegateCommand(SaveSolutionItem);
             
             // setup history
             History = historyCreator();
             SetupHistory();
+            SetupSwapDataHandler();
         }
 
         private DbTableData? tableData;
@@ -60,22 +69,22 @@ namespace WDE.DatabaseEditors.ViewModels
             }
         }
         
-        public AsyncAutoCommand<object?> OpenParameterWindow { get; }
+        public AsyncAutoCommand<ParameterValueHolder<long>?> OpenParameterWindow { get; }
         private DelegateCommand undoCommand;
         private DelegateCommand redoCommand;
         private readonly DelegateCommand saveModifiedFields;
 
-        private async Task EditParameter(object? tableField)
+        private async Task EditParameter(ParameterValueHolder<long>? valueHolder)
         {
-            if (tableField is ParameterValueHolder<long> valueHolder)
+            if (valueHolder == null)
+                return;
+            
+            if (valueHolder.Parameter.HasItems)
             {
-                if (valueHolder.Parameter.HasItems)
-                {
-                    var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
-                        valueHolder.Parameter is FlagParameter, valueHolder.Value);
-                    if (result.HasValue)
-                        valueHolder.Value = result.Value;
-                }
+                var result = await itemFromListProvider.Value.GetItemFromList(valueHolder.Parameter.Items,
+                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
+                if (result.HasValue)
+                    valueHolder.Value = result.Value;
             }
         }
 
@@ -86,10 +95,21 @@ namespace WDE.DatabaseEditors.ViewModels
 
             var data = await tableDataLoader.Invoke(solutionItem.Entry) as DbTableData;
 
+            if (data == null)
+            {
+                var result = await messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
+                    .SetMainInstruction($"Editor failed to load data from database!")
+                    .SetIcon(MessageBoxIcon.Error)
+                    .WithOkButton(true)
+                    .Build());
+                return;
+            }
+
             if (solutionItem.ModifiedFields == null)
             {
                 TableData = data;
                 SetupHistory();
+                SetupSwapDataHandler();
                 return;
             }
 
@@ -104,6 +124,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
             TableData = data;
             SetupHistory();
+            SetupSwapDataHandler();
         }
 
         private void SaveSolutionItem()
@@ -125,7 +146,8 @@ namespace WDE.DatabaseEditors.ViewModels
         
         public void Dispose()
         {
-            historyHandler.Dispose();
+            historyHandler?.Dispose();
+            tableFieldNameSwapHandler?.Dispose();
         }
 
         private void SetupHistory()
@@ -141,9 +163,18 @@ namespace WDE.DatabaseEditors.ViewModels
                 undoCommand.RaiseCanExecuteChanged();
                 redoCommand.RaiseCanExecuteChanged();
                 IsModified = !History.IsSaved;
-                RaisePropertyChanged(nameof(IsModified));
             };
             History.AddHandler(historyHandler);
+        }
+
+        private void SetupSwapDataHandler()
+        {
+            if (tableData == null)
+                return;
+            
+            var swapData = nameSwapDataManager.GetSwapData(tableData.TableName);
+            if (swapData.HasValue)
+                tableFieldNameSwapHandler = new DbTableFieldNameSwapHandler(tableData, swapData.Value);
         }
 
         public string Title { get; }

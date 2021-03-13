@@ -9,10 +9,18 @@ namespace WDE.DatabaseEditors.Data
     [AutoRegister]
     public class DbTableDataProvider : IDbTableDataProvider
     {
-        public DbTableDataProvider() { }
+        private readonly Lazy<IDbFieldNameSwapDataManager> nameSwapDataManager;
+
+        public DbTableDataProvider(Lazy<IDbFieldNameSwapDataManager> nameSwapDataManager)
+        {
+            this.nameSwapDataManager = nameSwapDataManager;
+        }
         
         public IDbTableData GetDatabaseTable(in DatabaseEditorTableDefinitionJson tableDefinition, IDbTableFieldFactory fieldFactory, Dictionary<string, object> fieldsFromDb)
         {
+            if (!string.IsNullOrWhiteSpace(tableDefinition.NameSwapFilePath))
+                nameSwapDataManager.Value.RegisterSwapDefinition(tableDefinition.Name, tableDefinition.NameSwapFilePath);
+            
             var tableCategories = new List<IDbTableColumnCategory>(tableDefinition.Groups.Count);
             var tableIndex = fieldsFromDb[tableDefinition.TablePrimaryKeyColumnName].ToString();
             var descNameField = fieldsFromDb.ContainsKey(tableDefinition.TableNameSource)

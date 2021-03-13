@@ -27,5 +27,9 @@
       <Content Include="DbDefinitions\gameobject_template.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <None Remove="DbDefinitions\gameobject_template_names_swap.json" />
+      <Content Include="DbDefinitions\gameobject_template_names_swap.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 </Project>

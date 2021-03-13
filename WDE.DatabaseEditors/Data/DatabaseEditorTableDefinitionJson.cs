@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 
 namespace WDE.DatabaseEditors.Data
 {
-    // Notes:
     [ExcludeFromCodeCoverage]
     public struct DatabaseEditorTableDefinitionJson
     {
@@ -19,6 +18,9 @@ namespace WDE.DatabaseEditors.Data
         
         [JsonProperty(PropertyName = "table_name_source_field")]
         public string TableNameSource { get; set; }
+        
+        [JsonProperty(PropertyName = "name_swap_file_path")]
+        public string NameSwapFilePath { get; set; }
         
         [JsonProperty(PropertyName = "groups")]
         public IList<DbEditorTableGroupJson> Groups { get; set; }
