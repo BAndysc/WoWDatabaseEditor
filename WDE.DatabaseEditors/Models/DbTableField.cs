@@ -23,6 +23,7 @@ namespace WDE.DatabaseEditors.Models
             IsParameter = isParameter;
             Parameter = value;
             Parameter.OnValueChanged += ParameterOnOnValueChanged;
+            OriginalValue = value.Value;
         }
 
         public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition, ParameterValueHolder<T> value)
@@ -36,6 +37,7 @@ namespace WDE.DatabaseEditors.Models
             IsParameter = fieldDefinition.ValueType.EndsWith("Parameter");
             Parameter = value;
             Parameter.OnValueChanged += ParameterOnOnValueChanged;
+            OriginalValue = value.Value;
         }
 
         public string FieldName { get; private set; }
@@ -56,6 +58,8 @@ namespace WDE.DatabaseEditors.Models
         public bool IsParameter { get; }
         
         public ParameterValueHolder<T> Parameter { get; }
+        public T OriginalValue { get; }
+        public string OriginalValueTooltip => $"Original value: {OriginalValue}";
 
         public string ToSqlFieldDescription()
         {
