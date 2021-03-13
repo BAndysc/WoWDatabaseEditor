@@ -16,7 +16,11 @@ namespace WDE.Updater
         {
             containerProvider.Resolve<IEventAggregator>()
                 .GetEvent<AllModulesLoaded>()
-                .Subscribe(() => { containerProvider.Resolve<UpdateViewModel>(); }, ThreadOption.PublisherThread, true);
+                .Subscribe(() =>
+                {
+                    containerProvider.Resolve<UpdateViewModel>();
+                    containerProvider.Resolve<ChangelogProvider>();
+                }, ThreadOption.PublisherThread, true);
         }
     }
 }

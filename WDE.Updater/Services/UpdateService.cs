@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
@@ -82,9 +83,16 @@ namespace WDE.Updater.Services
             var response = await InternalCheckForUpdates();
 
             var progress = new Progress<float>((v) => taskProgress.Report((int) (v * 1000), 1000, "downloading"));
-            
+
             if (response != null)
+            {
                 await UpdateClient.DownloadUpdate(response, "update.zip", progress);
+
+                if (response.ChangeLog?.Length > 0)
+                {
+                    await File.WriteAllTextAsync("~/changelog.json", JsonConvert.SerializeObject(response.ChangeLog));
+                }
+            }
             
             taskProgress.ReportFinished();
         }

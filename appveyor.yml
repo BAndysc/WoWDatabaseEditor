@@ -51,8 +51,6 @@ test_script:
     dotnet test WDE.MVVM.Test/WDE.MVVM.Test.csproj
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
-skip_commits:
-  message: /%[a-zA-Z_]+%/    
 artifacts:
 - path: WoWDatabaseEditorWindowsWPF.zip
   name: WoWDatabaseEditorWindowsWPF.zip
