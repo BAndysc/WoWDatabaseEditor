@@ -14,15 +14,15 @@
 
         int ConditionType { get; set; }
 
-        long ConditionTarget { get; set; }
+        byte ConditionTarget { get; set; }
 
-        long ConditionValue1 { get; set; }
+        uint ConditionValue1 { get; set; }
 
-        long ConditionValue2 { get; set; }
+        uint ConditionValue2 { get; set; }
 
-        long ConditionValue3 { get; set; }
+        uint ConditionValue3 { get; set; }
 
-        long NegativeCondition { get; set; }
+        uint NegativeCondition { get; set; }
 
         string Comment { get; set; }
     }
@@ -41,15 +41,15 @@
 
         public int ConditionType { get; set; }
 
-        public long ConditionTarget { get; set; }
+        public byte ConditionTarget { get; set; }
 
-        public long ConditionValue1 { get; set; }
+        public uint ConditionValue1 { get; set; }
 
-        public long ConditionValue2 { get; set; }
+        public uint ConditionValue2 { get; set; }
 
-        public long ConditionValue3 { get; set; }
+        public uint ConditionValue3 { get; set; }
 
-        public long NegativeCondition { get; set; }
+        public uint NegativeCondition { get; set; }
 
         public string Comment { get; set; }
     }
