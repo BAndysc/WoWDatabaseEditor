@@ -58,7 +58,7 @@ namespace WDE.DatabaseEditors.Models
         public bool IsParameter { get; }
         
         public ParameterValueHolder<T> Parameter { get; }
-        public T OriginalValue { get; }
+        public T OriginalValue { get; private set; }
         public string OriginalValueTooltip => $"Original value: {OriginalValue}";
 
         public string ToSqlFieldDescription()
@@ -74,9 +74,12 @@ namespace WDE.DatabaseEditors.Models
             isModified = true;
             if (fieldData.NewValue != null)
                 Parameter.Value = (T) fieldData.NewValue;
+            OriginalValue = (T) fieldData.OriginalValue;
         }
 
         public object? GetValueForPersistence() => Parameter.Value;
+
+        public object GetOriginalValueForPersistence() => OriginalValue;
         
         // ISwappableNameField
         

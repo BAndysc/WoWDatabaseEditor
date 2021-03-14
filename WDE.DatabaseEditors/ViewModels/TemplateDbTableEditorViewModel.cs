@@ -142,7 +142,9 @@ namespace WDE.DatabaseEditors.ViewModels
             foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
             {
                 if (field is IStateRestorableField restorableField)
-                    dict[field.DbFieldName] = new(field.DbFieldName, restorableField.GetValueForPersistence());
+                    dict[field.DbFieldName] = new(field.DbFieldName, 
+                        restorableField.GetOriginalValueForPersistence(), 
+                        restorableField.GetValueForPersistence());
             }
 
             solutionItem.ModifiedFields = dict;

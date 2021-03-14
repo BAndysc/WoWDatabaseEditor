@@ -6,5 +6,6 @@ namespace WDE.DatabaseEditors.Models
     {
         void RestoreLoadedFieldState(DbTableSolutionItemModifiedField fieldData);
         object? GetValueForPersistence();
+        object GetOriginalValueForPersistence();
     }
 }
