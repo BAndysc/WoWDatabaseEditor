@@ -11,7 +11,6 @@ namespace WDE.DatabaseEditors.Data
             Dictionary<string, object> fieldsFromDb, string descSuffix);
 
         IDbTableData? GetDatabaseMultiRecordTable(in DatabaseEditorTableDefinitionJson tableDefinition, 
-            IList<Dictionary<string, object>> records, bool ignoreCategories,
-            string descSuffix);
+            IList<Dictionary<string, object>> records, string descSuffix);
     }
 }

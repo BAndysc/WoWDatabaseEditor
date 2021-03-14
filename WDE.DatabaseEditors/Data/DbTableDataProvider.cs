@@ -55,7 +55,7 @@ namespace WDE.DatabaseEditors.Data
         }
 
         public IDbTableData? GetDatabaseMultiRecordTable(in DatabaseEditorTableDefinitionJson tableDefinition,
-            IList<Dictionary<string, object>> records, bool ignoreCategories, string descSuffix)
+            IList<Dictionary<string, object>> records, string descSuffix)
         {
             // no support for swap data (at least for now) cuz simply no need for that
             // if (!string.IsNullOrWhiteSpace(tableDefinition.NameSwapFilePath))
@@ -71,7 +71,13 @@ namespace WDE.DatabaseEditors.Data
                 var group = tableDefinition.Groups[0];
                 // prepare columns
                 for (int i = 0; i < group.Fields.Count; ++i)
-                    columns.Insert(i, tableColumnFactory.Value.CreateColumn(group.Fields[i]));
+                {
+                    // ensure that each added field of table index column has value of key
+                    object? defaultValue = group.Fields[i].DbColumnName == tableDefinition.TablePrimaryKeyColumnName
+                        ? records[0][tableDefinition.TablePrimaryKeyColumnName]
+                        : null;
+                    columns.Insert(i, tableColumnFactory.Value.CreateColumn(group.Fields[i], defaultValue));
+                }
 
                 foreach (var record in records)
                 {

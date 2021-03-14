@@ -57,7 +57,7 @@ namespace WDE.DatabaseEditors.Data
                 return null;
 
             return tableDataProvider.GetDatabaseMultiRecordTable(in tableDefinition, result, 
-                true, "Creature loot for entry");
+                 "Creature loot for entry");
         }
 
         private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, uint entry)

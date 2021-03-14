@@ -4,6 +4,6 @@ namespace WDE.DatabaseEditors.Data
 {
     public interface IDbTableColumnFactory
     {
-        IDbTableColumn CreateColumn(in DbEditorTableGroupFieldJson definition);
+        IDbTableColumn CreateColumn(in DbEditorTableGroupFieldJson definition, object? defaultValue);
     }
 }
