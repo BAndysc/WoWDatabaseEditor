@@ -18,12 +18,15 @@ namespace WDE.DatabaseEditors.Data
             this.parameterFactory = parameterFactory;
         }
         
-        public IDbTableField CreateField(in DbEditorTableGroupFieldJson definition, object dbValue)
+        public IDbTableField CreateField(in DbEditorTableGroupFieldJson definition, object dbValue, IDbTableColumn? targetedColumn = null)
         {
             IDbTableField field;
+            Type fieldType;
             if (definition.ValueType.Contains("Parameter"))
             {
                 field = new DbTableField<long>(in definition, CreateParameterValue(in definition, dbValue, definition.DbColumnName));
+                fieldType = typeof(long);
+                CheckFieldColumnTypeMatch(targetedColumn, fieldType);
                 return field;
             }
 
@@ -31,28 +34,42 @@ namespace WDE.DatabaseEditors.Data
             {
                 case "string":
                     field = new DbTableField<string>(in definition, CreateStringValue(dbValue, definition.DbColumnName));
+                    fieldType = typeof(string);
                     break;
                 case "float":
                     field = new DbTableField<float>(in definition, CreateFloatValue(dbValue, definition.DbColumnName));
+                    fieldType = typeof(float);
                     break;
                 case "bool":
                     field = new DbTableField<long>(in definition, CreateLongValue(dbValue, definition.DbColumnName, true));
+                    fieldType = typeof(long);
                     break;
                 case "uint":
                 case "int":
                     field = new DbTableField<long>(in definition, CreateLongValue(dbValue, definition.DbColumnName, false));
+                    fieldType = typeof(long);
                     break;
                 default:
-                    throw new Exception($"[DbTableFieldFactory::CreateField] Invalid type name for field {definition.DbColumnName}");
+                    throw new Exception($"Invalid type name for field {definition.DbColumnName}");
             }
+
+            CheckFieldColumnTypeMatch(targetedColumn, fieldType);
+            
             return field;
         }
 
+        private void CheckFieldColumnTypeMatch(IDbTableColumn? targetedColumn, Type fieldType)
+        {
+            if (targetedColumn != null && !targetedColumn.CanAddFieldOfType(fieldType))
+                throw new Exception(
+                    $"Type mismatch! Tried to add field of type {fieldType} to column of type {targetedColumn.GetType()}");
+        }
+        
         private ParameterValueHolder<long> CreateParameterValue(in DbEditorTableGroupFieldJson definition, object dbValue,
             string fieldName)
         {
             var parameter = parameterFactory.Factory(definition.ValueType);
-            if (parameter != null && parameter.HasItems)
+            if (parameter != null)
             {
                 try
                 {

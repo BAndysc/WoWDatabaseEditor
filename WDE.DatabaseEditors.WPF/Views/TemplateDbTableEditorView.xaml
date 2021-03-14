@@ -10,6 +10,11 @@
     <UserControl.Resources>
         <ResourceDictionary Source="../Controls/DbTableFieldViewControls.xaml" > </ResourceDictionary>
     </UserControl.Resources>
+    <!-- Must be, sadly due to possible loading of data after opening view binding for those doesn't work -->
+    <UserControl.InputBindings>
+        <KeyBinding Modifiers="Control" Key="Z" Command="{Binding Undo}"/>
+        <KeyBinding Modifiers="Control" Key="Y" Command="{Binding Redo}"/>
+    </UserControl.InputBindings>
     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
         <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>

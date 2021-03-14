@@ -12,7 +12,7 @@ namespace WDE.DatabaseEditors.WPF.Helpers
         
         public override Style SelectStyle(object item, DependencyObject container)
         {
-            if (item is IDbTableColumnCategory)
+            if (item is IDbTableFieldsCategory)
                 return groupHeaderStyle;
             else if (item is IDbTableField)
                 return fieldStyle;

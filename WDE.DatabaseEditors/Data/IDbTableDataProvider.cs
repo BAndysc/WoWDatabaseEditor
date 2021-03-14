@@ -7,6 +7,11 @@ namespace WDE.DatabaseEditors.Data
     [UniqueProvider]
     public interface IDbTableDataProvider
     {
-        IDbTableData GetDatabaseTable(in DatabaseEditorTableDefinitionJson tableDefinition, IDbTableFieldFactory fieldFactory, Dictionary<string, object> fieldsFromDb);
+        IDbTableData? GetDatabaseTable(in DatabaseEditorTableDefinitionJson tableDefinition, 
+            Dictionary<string, object> fieldsFromDb, string descSuffix);
+
+        IDbTableData? GetDatabaseMultiRecordTable(in DatabaseEditorTableDefinitionJson tableDefinition, 
+            IList<Dictionary<string, object>> records, bool ignoreCategories,
+            string descSuffix);
     }
 }

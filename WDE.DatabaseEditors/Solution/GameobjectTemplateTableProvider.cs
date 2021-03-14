@@ -26,7 +26,9 @@ namespace WDE.DatabaseEditors.Solution
             if (key.HasValue)
             {
                 var data = await tableDataProvider.Value.LoadGameobjectTemplateDataEntry(key.Value);
-                return new DbEditorsSolutionItem(key.Value, nameof(tableDataProvider.Value.LoadGameobjectTemplateDataEntry), data as DbTableData);
+                if (data != null)
+                    return new DbEditorsSolutionItem(key.Value,
+                        nameof(tableDataProvider.Value.LoadGameobjectTemplateDataEntry), data);
             }
 
             return null;

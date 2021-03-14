@@ -13,7 +13,6 @@ namespace WDE.DatabaseEditors.Data
     {
         private readonly IDbTableDefinitionProvider tableDefinitionProvider;
         private readonly IMySqlExecutor sqlExecutor;
-        private readonly IDbTableFieldFactory tableFieldFactory;
         private readonly IDbTableDataProvider tableDataProvider;
         
         public DbEditorTableDataProvider(IDbTableDefinitionProvider tableDefinitionProvider, IMySqlExecutor sqlExecutor, IDbTableFieldFactory tableFieldFactory, 
@@ -21,11 +20,10 @@ namespace WDE.DatabaseEditors.Data
         {
             this.tableDefinitionProvider = tableDefinitionProvider;
             this.sqlExecutor = sqlExecutor;
-            this.tableFieldFactory = tableFieldFactory;
             this.tableDataProvider = tableDataProvider;
         }
 
-        public async Task<IDbTableData> LoadCreatureTemplateDataEntry(uint creatureEntry)
+        public async Task<IDbTableData?> LoadCreatureTemplateDataEntry(uint creatureEntry)
         {
             var tableDefinition = tableDefinitionProvider.GetCreatureTemplateDefinition();
             var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, creatureEntry);
@@ -34,10 +32,10 @@ namespace WDE.DatabaseEditors.Data
             if (result == null || result.Count == 0)
                 return null;
 
-            return tableDataProvider.GetDatabaseTable(in tableDefinition, tableFieldFactory, result[0]);
+            return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0], "Template of");
         }
 
-        public async Task<IDbTableData> LoadGameobjectTemplateDataEntry(uint goEntry)
+        public async Task<IDbTableData?> LoadGameobjectTemplateDataEntry(uint goEntry)
         {
             var tableDefinition = tableDefinitionProvider.GetGameobjectTemplateDefinition();
             var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, goEntry);
@@ -46,16 +44,29 @@ namespace WDE.DatabaseEditors.Data
             if (result == null || result.Count == 0)
                 return null;
 
-            return tableDataProvider.GetDatabaseTable(in tableDefinition, tableFieldFactory, result[0]);
+            return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0], "Go Template of");
         }
 
-        private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, uint creatureEntry)
+        public async Task<IDbTableData?> LoadCreatureLootTemplateData(uint entry)
+        {
+            var tableDefinition = tableDefinitionProvider.GetCreatureLootTemplateDefinition();
+            var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, entry);
+            var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+
+            if (result == null || result.Count == 0)
+                return null;
+
+            return tableDataProvider.GetDatabaseMultiRecordTable(in tableDefinition, result, 
+                true, "Creature loot for entry");
+        }
+
+        private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, uint entry)
         {
             var columns = tableDefinitionJson.Groups.SelectMany(x => x.Fields).Select(x => $"`{x.DbColumnName}`");
             var names = string.Join(",", columns);
 
             return
-                $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} = {creatureEntry};";
+                $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} = {entry};";
         }
     }
 }

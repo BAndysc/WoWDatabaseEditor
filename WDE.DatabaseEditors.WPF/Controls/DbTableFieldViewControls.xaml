@@ -16,13 +16,13 @@
                     <Style.Triggers>
                         <DataTrigger
                             Binding="{Binding DataContext.IsReadOnly, RelativeSource={RelativeSource 
-                                AncestorType={x:Type controls:DbTableFieldView}, Mode=FindAncestor}}"
+                                AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"
                             Value="True">
                             <Setter Property="IsEnabled" Value="False" />
                         </DataTrigger>
                         <DataTrigger
                             Binding="{Binding DataContext.IsReadOnly, RelativeSource={RelativeSource 
-                                AncestorType={x:Type controls:DbTableFieldView}, Mode=FindAncestor}}"
+                                AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"
                             Value="False">
                             <Setter Property="IsEnabled" Value="True" />
                         </DataTrigger>
@@ -37,7 +37,7 @@
                     Background="#00000000">
             <TextBox
                 IsReadOnly="{Binding DataContext.IsReadOnly, RelativeSource={RelativeSource 
-                AncestorType={x:Type controls:DbTableFieldView}, Mode=FindAncestor}}"
+                AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"
                 Width="150" MaxWidth="150"
                 MaxLines="3" MaxHeight="50"
                 TextAlignment="Left" VerticalContentAlignment="Center">
@@ -57,21 +57,22 @@
                     </Style>
                 </TextBox.Style>
             </TextBox>
-            <Button Content="..." Margin="0, 0, 10, 0"
+            <Button Content="..." Margin="0, 0, 5, 0"
                     Width="25" Height="25" VerticalAlignment="Center"
                     Command="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}"
                     CommandParameter="{Binding}">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="Width" Value="25"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Parameter.HasItems}" Value="False">
-                                <Setter Property="Visibility" Value="Hidden" />
+                                <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                             <DataTrigger
                                 Binding="{Binding DataContext.IsReadOnly, RelativeSource={RelativeSource 
-                                    AncestorType={x:Type controls:DbTableFieldView}, Mode=FindAncestor}}"
+                                    AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"
                                 Value="True">
-                                <Setter Property="Visibility" Value="Hidden" />
+                                <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -80,6 +81,39 @@
         </StackPanel>
     </DataTemplate>
 
+    <Style TargetType="controls:DbTableFieldValueView">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image ToolTip="{Binding OriginalValueTooltip}" Source="{DynamicResource StatusBarIconNotice}"
+                               Width="15" Height="15" Margin="2, 0, 2, 0">
+                            <Image.Style>
+                                <Style TargetType="{x:Type Image}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsModified}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsModified}" Value="False">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                        <ContentPresenter Content="{Binding Parameter}">
+                            <ContentPresenter.ContentTemplateSelector>
+                                <helpers:FieldValueTemplateSelector
+                                    GenericTemplate="{StaticResource GenericParameterView}"
+                                    BoolTemplate="{StaticResource BoolParameterView}" />
+                            </ContentPresenter.ContentTemplateSelector>
+                        </ContentPresenter>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style TargetType="controls:DbTableFieldView">
         <Setter Property="Template">
             <Setter.Value>
@@ -99,34 +133,11 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding FieldName}" TextWrapping="Wrap"
-                                       MinHeight="15" MaxHeight="50" Width="100"
-                                       Margin="0, 0, 10, 0"
-                                       VerticalAlignment="Center" />
-                            <Image ToolTip="{Binding OriginalValueTooltip}" Source="{DynamicResource StatusBarIconNotice}"
-                                   Width="15" Height="15" Margin="0, 0, 5, 0">
-                                <Image.Style>
-                                    <Style TargetType="{x:Type Image}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsModified}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsModified}" Value="False">
-                                                <Setter Property="Visibility" Value="Hidden" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-                        </StackPanel>
-                        <ContentPresenter Content="{Binding Parameter}">
-                            <ContentPresenter.ContentTemplateSelector>
-                                <helpers:FieldValueTemplateSelector
-                                    GenericTemplate="{StaticResource GenericParameterView}"
-                                    BoolTemplate="{StaticResource BoolParameterView}" />
-                            </ContentPresenter.ContentTemplateSelector>
-                        </ContentPresenter>
+                        <TextBlock Text="{Binding FieldName}" TextWrapping="Wrap"
+                                   MinHeight="15" MaxHeight="50" Width="100"
+                                   Margin="0, 0, 10, 0"
+                                   VerticalAlignment="Center" />
+                        <controls:DbTableFieldValueView />
                     </StackPanel>
                 </ControlTemplate>
             </Setter.Value>

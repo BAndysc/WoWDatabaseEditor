@@ -11,9 +11,6 @@
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
     <ItemGroup>
-      <Folder Include="Providers" />
-    </ItemGroup>
-    <ItemGroup>
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
@@ -21,15 +18,18 @@
     <ItemGroup>
       <None Remove="DbDefinitions\creature_template.json" />
       <Content Include="DbDefinitions\creature_template.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <None Remove="DbDefinitions\gameobject_template.json" />
       <Content Include="DbDefinitions\gameobject_template.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <None Remove="DbDefinitions\gameobject_template_names_swap.json" />
       <Content Include="DbDefinitions\gameobject_template_names_swap.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Update="DbDefinitions\creature_loot_template.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 </Project>

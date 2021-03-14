@@ -10,7 +10,7 @@ namespace WDE.DatabaseEditors.Solution
     {
         public DbEditorsSolutionItem() {} // for serialization to avoid crash
         
-        public DbEditorsSolutionItem(uint entry, string tableDataLoaderMethodName, DbTableData tableData)
+        public DbEditorsSolutionItem(uint entry, string tableDataLoaderMethodName, IDbTableData tableData)
         {
             TableData = tableData;
             Items = null;
@@ -20,6 +20,7 @@ namespace WDE.DatabaseEditors.Solution
             TableName = tableData.TableName;
             DbTableName = tableData.DbTableName;
             KeyColumnName = tableData.TableIndexFieldName;
+            IsMultiRecord = tableData is DbMultiRecordTableData;
         }
         
         public uint Entry { get; set; }
@@ -28,9 +29,10 @@ namespace WDE.DatabaseEditors.Solution
         public string DbTableName { get; set; }
         public string KeyColumnName { get; set; }
         public string TableDataLoaderMethodName { get; set; }
+        public bool IsMultiRecord { get; set; }
 
         // just cache to avoid loading data from db each time
-        [JsonIgnore] public DbTableData? TableData { get; set; } = null;
+        [JsonIgnore] public IDbTableData? TableData { get; set; } = null;
         
         public Dictionary<string, DbTableSolutionItemModifiedField> ModifiedFields { get; set; }
 

@@ -99,6 +99,7 @@
 		"name": "Unit flags",
 		"prefix": "UNIT_FLAG_",
 		"values": {
+			"0": { "name": "NONE" },
 			"1": {"name": "SERVER_CONTROLLED", "description": "set only when unit movement is controlled by server - by SPLINE/MONSTER_MOVE packets, together with STUNNED; only set to units controlled by client; client function CGUnit_C::IsClientControlled returns false when set for owner"},
 			"2": {"name": "NON_ATTACKABLE", "description": "not attackable"},
 			"4": {"name": "REMOVE_CLIENT_CONTROL"},
@@ -138,6 +139,7 @@
 		"name": "Unit flags2",
 		"prefix": "UNIT_FLAG2_",
 		"values": {
+			"0": { "name": "NONE" },
 			"1": {"name": "FEIGN_DEATH"},
 			"2": {"name": "UNK1", "description": "Hide unit model (show only player equip)"},
 			"4": {"name": "IGNORE_REPUTATION"},
@@ -167,6 +169,7 @@
 		"name": "NPC flags",
 		"prefix": "UNIT_NPC_FLAG_",
 		"values": {
+			"0": { "name": "NONE" },
 			"1": {"name": "GOSSIP"},
 			"2": {"name": "QUESTGIVER"},
 			"4": {"name": "UNK1"},
@@ -310,6 +313,7 @@
 		"name": "Creature extra flags",
 		"prefix": "CREATURE_FLAG_EXTRA_",
 		"values": {
+			"0": { "name": "NONE" },
 			"1": {"name": "INSTANCE_BIND", "description": "creature kill bind instance with killer and killer's group"},
 			"2": {"name": "CIVILIAN", "description": "not aggro (ignore faction/reputation hostility)"},
 			"4": {"name": "NO_PARRY", "description": "creature can't parry"},

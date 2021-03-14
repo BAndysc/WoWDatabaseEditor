@@ -7,5 +7,6 @@ namespace WDE.DatabaseEditors.Data
     {
         string GetCreatureTemplateDefinitionJson();
         string GetGameobjectTemplateDefinitionJson();
+        string GetCreatureLootTemplateDefinitionJson();
     }
 }

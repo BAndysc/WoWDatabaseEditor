@@ -8,7 +8,5 @@
         bool IsModified { get; set; }
         string ValueType { get; }
         bool IsParameter { get; }
-
-        string ToSqlFieldDescription();
     }
 }

@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="WDE.DatabaseEditors.WPF.Views.MultiRecordDbTableEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WDE.DatabaseEditors.WPF.Views"
+             xmlns:controls="clr-namespace:WDE.DatabaseEditors.WPF.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             x:Name="rootWindow">
+    <UserControl.Resources>
+        <ResourceDictionary Source="../Controls/DbTableFieldViewControls.xaml" > </ResourceDictionary>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="42" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Vertical">
+                <Button Style="{DynamicResource GenericPlusButton}" Command="{Binding AddRow}"
+                        Margin="10, 5, 0, 5" Width="30"/>
+                <Separator HorizontalAlignment="Stretch"/>
+            </StackPanel>
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding TableData.Columns}" Margin="0, 0, 0, 20">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Template>
+                    <ControlTemplate TargetType="ItemsControl">
+                        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="0, 0, 0, 20">
+                            <Border>
+                                <Label Content="{Binding ColumnName}" HorizontalContentAlignment="Center" />
+                            </Border>
+                            <ItemsControl ItemsSource="{Binding Fields}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <controls:DbTableFieldValueView />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </DockPanel>
+</UserControl>

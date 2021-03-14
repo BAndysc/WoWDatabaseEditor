@@ -61,12 +61,6 @@ namespace WDE.DatabaseEditors.Models
         public T OriginalValue { get; private set; }
         public string OriginalValueTooltip => $"Original value: {OriginalValue}";
 
-        public string ToSqlFieldDescription()
-        {
-            var paramValue = Parameter.Value is string ? $"\"{Parameter.Value}\"" : $"{Parameter.Value}";
-            return $"`{DbFieldName}`={paramValue}";
-        }
-
         // IStateRestorableField
         
         public void RestoreLoadedFieldState(DbTableSolutionItemModifiedField fieldData)

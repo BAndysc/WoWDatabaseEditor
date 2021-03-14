@@ -2,7 +2,7 @@
 
 namespace WDE.DatabaseEditors.Models
 {
-    public interface IDbTableColumnCategory
+    public interface IDbTableFieldsCategory
     {
         string CategoryName { get; }
         List<IDbTableField> Fields { get; }

@@ -43,9 +43,12 @@ namespace WDE.DatabaseEditors.ViewModels
             this.nameSwapDataManager = nameSwapDataManager;
 
             if (solutionItem.TableData != null)
-                tableData = solutionItem.TableData;
+                tableData = solutionItem.TableData as DbTableData;
             else
+            {
+                IsLoading = true;
                 taskRunner.ScheduleTask($"Loading {solutionItem.TableName}..", LoadTableDefinition);
+            }
 
             Title = $"{solutionItem.TableName} Editor";
             
@@ -67,6 +70,13 @@ namespace WDE.DatabaseEditors.ViewModels
                 tableData = value;
                 RaisePropertyChanged(nameof(TableData));
             }
+        }
+        
+        private bool isLoading;
+        public bool IsLoading
+        {
+            get => isLoading;
+            internal set => SetProperty(ref isLoading, value);
         }
         
         public AsyncAutoCommand<ParameterValueHolder<long>?> OpenParameterWindow { get; }
@@ -91,8 +101,11 @@ namespace WDE.DatabaseEditors.ViewModels
         private async Task LoadTableDefinition()
         {
             if (tableDataLoader == null)
+            {
+                IsLoading = false;
                 return;
-
+            }
+            
             var data = await tableDataLoader.Invoke(solutionItem.Entry) as DbTableData;
 
             if (data == null)
@@ -125,6 +138,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private void SaveLoadedTableData(DbTableData data)
         {
+            IsLoading = false;
             TableData = data;
             // for cache purpose
             solutionItem.TableData = data;

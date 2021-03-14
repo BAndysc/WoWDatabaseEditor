@@ -16,31 +16,31 @@
         {
           "name": "Difficulty 1",
           "db_column_name": "difficulty_entry_1",
-          "value_type": "uint",
+          "value_type": "CreatureParameter",
           "read_only": true
         },
         {
           "name": "Difficulty 2",
           "db_column_name": "difficulty_entry_2",
-          "value_type": "uint",
+          "value_type": "CreatureParameter",
           "read_only": true
         },
         {
           "name": "Difficulty 3",
           "db_column_name": "difficulty_entry_3",
-          "value_type": "uint",
+          "value_type": "CreatureParameter",
           "read_only": true
         },
         {
           "name": "Kill credit",
           "db_column_name": "KillCredit1",
-          "value_type": "uint",
+          "value_type": "CreatureParameter",
           "read_only": true
         },
         {
           "name": "Kill credit 2",
           "db_column_name": "KillCredit2",
-          "value_type": "uint",
+          "value_type": "CreatureParameter",
           "read_only": true
         }
       ]

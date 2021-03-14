@@ -41,7 +41,9 @@ namespace WDE.DatabaseEditors.Solution
             if (item.TableData == null)
                 tableDataLoader = FindTableDataLoader(item.TableDataLoaderMethodName);
 
-            return containerRegistry.Value.Resolve<TemplateDbTableEditorViewModel>((typeof(DbEditorsSolutionItem), item),
+            return item.IsMultiRecord ? containerRegistry.Value.Resolve<MultiRecordDbTableEditorViewModel>(
+                    (typeof(DbEditorsSolutionItem), item), (typeof(Func<uint, Task<IDbTableData>>), tableDataLoader))
+                : containerRegistry.Value.Resolve<TemplateDbTableEditorViewModel>((typeof(DbEditorsSolutionItem), item),
                 (typeof(Func<uint, Task<IDbTableData>>), tableDataLoader));
         }
 

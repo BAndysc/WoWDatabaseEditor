@@ -10,6 +10,5 @@ namespace WDE.DatabaseEditors.Models
         string TableIndexFieldName { get; }
         string TableIndexValue { get; }
         string TableDescription { get; }
-        List<IDbTableColumnCategory> Categories { get; }
     }
 }

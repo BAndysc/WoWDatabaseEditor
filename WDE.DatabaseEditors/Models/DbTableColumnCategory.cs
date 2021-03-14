@@ -2,12 +2,12 @@
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DbTableColumnCategory : IDbTableColumnCategory
+    public class DbTableFieldsCategory : IDbTableFieldsCategory
     {
         public string CategoryName { get; }
         public List<IDbTableField> Fields { get; }
 
-        public DbTableColumnCategory(string categoryName, List<IDbTableField> fields)
+        public DbTableFieldsCategory(string categoryName, List<IDbTableField> fields)
         {
             CategoryName = categoryName;
             Fields = fields;

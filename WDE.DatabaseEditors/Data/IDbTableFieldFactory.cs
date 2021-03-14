@@ -5,6 +5,7 @@ namespace WDE.DatabaseEditors.Data
 {
     public interface IDbTableFieldFactory
     {
-        IDbTableField CreateField(in DbEditorTableGroupFieldJson definition, object dbValue);
+        IDbTableField CreateField(in DbEditorTableGroupFieldJson definition, object dbValue,
+            IDbTableColumn? targetedColumn = null);
     }
 }
