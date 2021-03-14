@@ -81,6 +81,8 @@ namespace AvaloniaStyles.Controls
         
         static ExtendedWindow()
         {
+            IsActiveProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) =>
+                x.PseudoClasses.Set(":focused", x.IsActive));
             ToolBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-toolbar"));
             SideBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-sidebar"));
             StatusBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-statusbar"));
@@ -160,18 +162,6 @@ namespace AvaloniaStyles.Controls
                 LogicalChildren.Add(newChild);
                 PseudoClasses.Add(pseudoclass);
             }
-        }
-
-        protected override void OnGotFocus(GotFocusEventArgs e)
-        {
-            base.OnGotFocus(e);
-            PseudoClasses.Add(":focused");
-        }
-
-        protected override void OnLostFocus(RoutedEventArgs e)
-        {
-            base.OnLostFocus(e);
-            PseudoClasses.Remove(":focused");
         }
 
         public void MaximizeNormalize()

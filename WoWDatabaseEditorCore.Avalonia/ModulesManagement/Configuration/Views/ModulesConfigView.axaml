@@ -8,16 +8,20 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <DataGrid Items="{Binding Items}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Enabled" 
-                                        Binding="{Binding IsEnabled}" 
-                                        Width="2*" />
+                    <DataGridCheckBoxColumn Header="Enabled" 
+                                            IsReadOnly="True"
+                                            Binding="{Binding IsEnabled}" 
+                                            Width="2*" />
                     <DataGridTextColumn Header="Name" 
+                                        IsReadOnly="True"
                                         Binding="{Binding Name}" 
                                         Width="2*" />
-                    <DataGridTextColumn Header="Is loaded" 
+                    <DataGridCheckBoxColumn Header="Is loaded" 
+                                        IsReadOnly="True"
                                         Binding="{Binding IsLoaded}" 
                                         Width="*" />
                     <DataGridTextColumn Header="Details" 
+                                        IsReadOnly="True"
                                         Binding="{Binding Details}" 
                                         Width="*" />
                 </DataGrid.Columns>

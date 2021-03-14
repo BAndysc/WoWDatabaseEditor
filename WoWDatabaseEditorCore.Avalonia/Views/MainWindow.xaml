@@ -12,7 +12,7 @@
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
           TransparencyLevelHint="AcrylicBlur"
           Icon="../Icon.png"
-          ManagedIcon="../IconSmall.png"
+          ManagedIcon="../Icon.png"
           ExtendClientAreaTitleBarHeightHint="38"
           ExtendClientAreaToDecorationsHint="True"
           Title="{Binding Title}">
