@@ -27,58 +27,58 @@ namespace WDE.TrinityMySqlDatabase.Models
         public int EventType { get; set; }
 
         [Column(Name = "event_phase_mask")]
-        public long EventPhaseMask { get; set; }
+        public int EventPhaseMask { get; set; }
 
         [Column(Name = "event_chance")]
-        public long EventChance { get; set; }
+        public int EventChance { get; set; }
 
         [Column(Name = "event_flags")]
-        public long EventFlags { get; set; }
+        public int EventFlags { get; set; }
 
         [Column(Name = "event_param1")]
-        public long EventParam1 { get; set; }
+        public int EventParam1 { get; set; }
 
         [Column(Name = "event_param2")]
-        public long EventParam2 { get; set; }
+        public int EventParam2 { get; set; }
 
         [Column(Name = "event_param3")]
-        public long EventParam3 { get; set; }
+        public int EventParam3 { get; set; }
 
         [Column(Name = "event_param4")]
-        public long EventParam4 { get; set; }
+        public int EventParam4 { get; set; }
 
         [Column(Name = "action_type")]
         public int ActionType { get; set; }
 
         [Column(Name = "action_param1")]
-        public long ActionParam1 { get; set; }
+        public int ActionParam1 { get; set; }
 
         [Column(Name = "action_param2")]
-        public long ActionParam2 { get; set; }
+        public int ActionParam2 { get; set; }
 
         [Column(Name = "action_param3")]
-        public long ActionParam3 { get; set; }
+        public int ActionParam3 { get; set; }
 
         [Column(Name = "action_param4")]
-        public long ActionParam4 { get; set; }
+        public int ActionParam4 { get; set; }
 
         [Column(Name = "action_param5")]
-        public long ActionParam5 { get; set; }
+        public int ActionParam5 { get; set; }
 
         [Column(Name = "action_param6")]
-        public long ActionParam6 { get; set; }
+        public int ActionParam6 { get; set; }
 
         [Column(Name = "target_type")]
         public int TargetType { get; set; }
 
         [Column(Name = "target_param1")]
-        public long TargetParam1 { get; set; }
+        public int TargetParam1 { get; set; }
 
         [Column(Name = "target_param2")]
-        public long TargetParam2 { get; set; }
+        public int TargetParam2 { get; set; }
 
         [Column(Name = "target_param3")]
-        public long TargetParam3 { get; set; }
+        public int TargetParam3 { get; set; }
 
         [Column(Name = "target_x")]
         public float TargetX { get; set; }
@@ -138,19 +138,19 @@ namespace WDE.TrinityMySqlDatabase.Models
             set { }
         }
 
-        public long SourceParam1
+        public int SourceParam1
         {
             get => 0;
             set { }
         }
 
-        public long SourceParam2
+        public int SourceParam2
         {
             get => 0;
             set { }
         }
 
-        public long SourceParam3
+        public int SourceParam3
         {
             get => 0;
             set { }
@@ -168,13 +168,13 @@ namespace WDE.TrinityMySqlDatabase.Models
             set { }
         }
 
-        public long EventCooldownMin
+        public int EventCooldownMin
         {
             get => 0;
             set { }
         }
 
-        public long EventCooldownMax
+        public int EventCooldownMax
         {
             get => 0;
             set { }

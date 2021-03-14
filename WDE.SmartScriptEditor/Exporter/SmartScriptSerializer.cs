@@ -304,10 +304,10 @@ namespace WDE.SmartScriptEditor.Exporter
                     ElseGroup = elseGroup,
                     ConditionType = c.Id,
                     ConditionTarget = (byte)c.ConditionTarget.Value,
-                    ConditionValue1 = (uint)c.GetParameter(0).Value,
-                    ConditionValue2 = (uint)c.GetParameter(1).Value,
-                    ConditionValue3 = (uint)c.GetParameter(2).Value,
-                    NegativeCondition = (uint)c.Inverted.Value,
+                    ConditionValue1 = (int)c.GetParameter(0).Value,
+                    ConditionValue2 = (int)c.GetParameter(1).Value,
+                    ConditionValue3 = (int)c.GetParameter(2).Value,
+                    NegativeCondition = (int)c.Inverted.Value,
                     Comment = c.Readable
                 });
             }

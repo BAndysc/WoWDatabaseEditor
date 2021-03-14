@@ -16,13 +16,13 @@
 
         byte ConditionTarget { get; set; }
 
-        uint ConditionValue1 { get; set; }
+        int ConditionValue1 { get; set; }
 
-        uint ConditionValue2 { get; set; }
+        int ConditionValue2 { get; set; }
 
-        uint ConditionValue3 { get; set; }
+        int ConditionValue3 { get; set; }
 
-        uint NegativeCondition { get; set; }
+        int NegativeCondition { get; set; }
 
         string Comment { get; set; }
     }
@@ -43,13 +43,13 @@
 
         public byte ConditionTarget { get; set; }
 
-        public uint ConditionValue1 { get; set; }
+        public int ConditionValue1 { get; set; }
 
-        public uint ConditionValue2 { get; set; }
+        public int ConditionValue2 { get; set; }
 
-        public uint ConditionValue3 { get; set; }
+        public int ConditionValue3 { get; set; }
 
-        public uint NegativeCondition { get; set; }
+        public int NegativeCondition { get; set; }
 
         public string Comment { get; set; }
     }
