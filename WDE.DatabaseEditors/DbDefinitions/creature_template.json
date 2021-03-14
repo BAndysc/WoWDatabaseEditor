@@ -110,7 +110,7 @@
           "name": "Gossip menu ID",
           "db_column_name": "gossip_menu_id",
           "value_type": "uint",
-          "read_only": true
+          "read_only": false
         }
       ]
     },
@@ -120,7 +120,7 @@
         {
           "name": "Faction",
           "db_column_name": "faction",
-          "value_type": "uint",
+          "value_type": "FactionParameter",
           "read_only": false
         },
         {
@@ -138,7 +138,7 @@
         {
           "name": "Expansion",
           "db_column_name": "exp",
-          "value_type": "int",
+          "value_type": "ExpansionParameter",
           "read_only": false
         },
         {

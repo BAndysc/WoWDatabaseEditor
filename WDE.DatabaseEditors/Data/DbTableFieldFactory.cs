@@ -85,7 +85,7 @@ namespace WDE.DatabaseEditors.Data
                 }
             }
 
-            throw new Exception($"Field {fieldName} has not known parameter type, type is {definition.ValueType} but it doesn't exist!");
+            throw new Exception($"Field {fieldName} has not known parameter type, type is {definition.ValueType} but it doesn't exist! (Missing DBC definition?)");
         }
         
         private ParameterValueHolder<string> CreateStringValue(object dbValue, string fieldName)

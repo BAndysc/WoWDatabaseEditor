@@ -31,6 +31,9 @@ namespace WDE.DatabaseEditors.Data
     {
         [JsonProperty(PropertyName = "group_name")]
         public string Name { get; set; }
+        
+        [JsonProperty(PropertyName = "group_sort_field")]
+        public string? GroupSortField { get; set; }
 
         [JsonProperty(PropertyName = "fields")]
         public IList<DbEditorTableGroupFieldJson> Fields { get; set; }

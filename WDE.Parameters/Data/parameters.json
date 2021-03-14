@@ -1574,6 +1574,9 @@
 		"isflag": true,
 		"prefix": "CREATURE_TYPEFLAGS_",
 		"values": {
+			"0": {
+				"name": "NONE"
+			},
 			"1": {
 				"name": "TAMEABLE",
 				"description": "Makes the mob tameable (must also be a beast and have family set)"
@@ -1703,6 +1706,9 @@
 		"isflag": true,
 		"prefix": "MECHANIC_",
 		"values": {
+			"0": {
+				"name": "NONE"
+			},
 			"1": {
 				"name": "CHARM"
 			},
@@ -1814,6 +1820,9 @@
 		"isflag": true,
 		"prefix": "SPELL_SCHOOL_MASK_",
 		"values": {
+			"0": {
+				"name": "NONE"
+			},
 			"1": {
 				"name": "NORMAL"
 			},
@@ -1948,6 +1957,47 @@
 			},
 			"35" : {
 				"name": "TRAPDOOR"
+			}
+		}
+	},
+	"ExpansionParameter": {
+		"name": "Game expansions",
+		"values": {
+			"0": {
+				"name": "CLASSIC"
+			},
+			"1": {
+				"name": "TBC"
+			},
+			"2": {
+				"name": "WOTLK"
+			}
+		}
+	},
+	"LootModeParameter": {
+		"name": "Modes of loot",
+		"prefix": "LOOT_MODE",
+		"values": {
+			"0": {
+				"name": "DISABLED"
+			},
+			"1": {
+				"name": "DEFAULT"
+			},
+			"2": {
+				"name": "HARD_MODE_1"
+			},
+			"4": {
+				"name": "HARD_MODE_2"
+			},
+			"8": {
+				"name": "HARD_MODE_3"
+			},
+			"16": {
+				"name": "HARD_MODE_4"
+			},
+			"32768": {
+				"name": "JUNK_FISH"
 			}
 		}
 	}
