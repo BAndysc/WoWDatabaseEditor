@@ -8,10 +8,13 @@ using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
+using WDE.Module.Attributes;
 using WoWDatabaseEditor.Providers;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
+    [SingleInstance]
+    [AutoRegister]
     public class MainWindowViewModel : BindableBase, ILayoutViewModelResolver, ICloseAwareViewModel
     {
         private readonly IMessageBoxService messageBoxService;
@@ -148,5 +151,22 @@ namespace WoWDatabaseEditorCore.ViewModels
 
             return true;
         }
+
+        public async Task<bool> TryClose()
+        {
+            if (!await CanClose())
+                return false;
+            
+            CloseRequest?.Invoke();
+            return true;
+        }
+
+        public void ForceClose()
+        {
+            ForceCloseRequest?.Invoke();
+        }
+
+        public event Action CloseRequest = delegate{};
+        public event Action ForceCloseRequest = delegate{};
     }
 }
