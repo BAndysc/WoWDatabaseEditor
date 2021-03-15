@@ -73,7 +73,11 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
 
         public void Dispose()
         {
-            
+            foreach (var tab in ContainerTabItems)
+            {
+                if (tab is IDisposable disposable)
+                    disposable.Dispose();
+            }
         }
 
         public string Title => "Settings";
