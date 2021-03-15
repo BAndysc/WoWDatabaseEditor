@@ -3,19 +3,22 @@ using System.IO;
 using AvalonDock;
 using AvalonDock.Layout;
 using AvalonDock.Layout.Serialization;
+using WDE.Common.Services;
 using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.WPF.Utils
 {
     internal static class LayoutUtility
     {
-        public static void SaveLayout(DockingManager manager)
+        private static string DockSettingsFile = "~/dock.layout";
+        
+        public static void SaveLayout(DockingManager manager, IFileSystem fileSystem)
         {
             var layoutSerializer = new XmlLayoutSerializer(manager);
-            layoutSerializer.Serialize("dock.layout");
+            layoutSerializer.Serialize(fileSystem.OpenWrite(DockSettingsFile));
         }
 
-        public static void LoadLayout(DockingManager manager, ILayoutViewModelResolver layoutResolver)
+        public static void LoadLayout(DockingManager manager, ILayoutViewModelResolver layoutResolver, IFileSystem fileSystem)
         {
             var layoutSerializer = new XmlLayoutSerializer(manager);
             HashSet<string> resolved = new HashSet<string>();
@@ -39,8 +42,8 @@ namespace WoWDatabaseEditorCore.WPF.Utils
                     e.Cancel = true;
                 };
 
-            if (File.Exists("dock.layout"))
-                layoutSerializer.Deserialize("dock.layout");
+            if (fileSystem.Exists(DockSettingsFile))
+                layoutSerializer.Deserialize(fileSystem.OpenRead(DockSettingsFile));
             else
                 layoutResolver.LoadDefault();
         }

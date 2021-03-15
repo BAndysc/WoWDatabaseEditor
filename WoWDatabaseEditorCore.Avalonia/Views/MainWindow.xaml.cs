@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using AvaloniaStyles.Controls;
+using WDE.Common.Managers;
 using WDE.Common.Windows;
 using WoWDatabaseEditorCore.ViewModels;
 
@@ -43,6 +45,20 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             tools.SelectionChanged += OnSelectionChanged;
         }
 
+        protected override void OnDataContextChanged(EventArgs e)
+        {
+            base.OnDataContextChanged(e);
+            if (DataContext is ICloseAwareViewModel closeAwareViewModel)
+            {
+                closeAwareViewModel.CloseRequest += Close;
+                closeAwareViewModel.ForceCloseRequest += () =>
+                {
+                    realClosing = true;
+                    Close();
+                };
+            }
+        }
+
         private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             if (e.RemovedItems != null)
@@ -68,14 +84,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            if (!realClosing && DataContext is ICloseAwareViewModel closeAwareViewModel)
+            if (!realClosing && DataContext is IApplication closeAwareViewModel)
             {
                 TryClose(closeAwareViewModel);
                 e.Cancel = true;
             }
         }
 
-        private async Task TryClose(ICloseAwareViewModel closeAwareViewModel)
+        private async Task TryClose(IApplication closeAwareViewModel)
         {
             if (await closeAwareViewModel.CanClose())
             {

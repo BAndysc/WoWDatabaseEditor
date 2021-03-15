@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+using System;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
     public interface ICloseAwareViewModel
     {
-        Task<bool> CanClose();
+        public event Action CloseRequest;
+        public event Action ForceCloseRequest;
     }
 }
