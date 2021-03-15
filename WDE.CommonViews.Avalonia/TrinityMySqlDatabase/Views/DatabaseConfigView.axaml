@@ -15,11 +15,11 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Content="Host" />
-        <Label Content="Port" Grid.Row="1"/>
-        <Label Content="User" Grid.Row="2" />
-        <Label Content="Password" Grid.Row="3" />
-        <Label Content="Database" Grid.Row="4" />
+        <TextBlock Text="Host" VerticalAlignment="Center" />
+        <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
+        <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
+        <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
+        <TextBlock Text="Database" Grid.Row="4" VerticalAlignment="Center" />
         <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host, Mode=TwoWay}" />
         <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" />
         <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding User, Mode=TwoWay}" />

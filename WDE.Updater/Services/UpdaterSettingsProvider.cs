@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
@@ -7,7 +8,6 @@ namespace WDE.Updater.Services
 {
     [SingleInstance]
     [AutoRegister]
-    [ExcludeFromCodeCoverage]
     public class UpdaterSettingsProvider : IUpdaterSettingsProvider
     {
         private readonly IUserSettings userSettings;
@@ -20,7 +20,13 @@ namespace WDE.Updater.Services
         public UpdaterSettings Settings
         {
             get => userSettings.Get<UpdaterSettings>();
-            set => userSettings.Update(value);
+            set
+            {
+                userSettings.Update(value); 
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings)));
+            }
         }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

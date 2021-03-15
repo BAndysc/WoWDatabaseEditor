@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
@@ -17,17 +18,30 @@ namespace WDE.Updater.ViewModels
         private readonly IUpdateService updateService;
         private readonly ITaskRunner taskRunner;
         private readonly IStatusBar statusBar;
-
-        public UpdateViewModel(IUpdateService updateService, ITaskRunner taskRunner, IStatusBar statusBar)
+        private readonly IUpdaterSettingsProvider settingsProvider;
+        
+        public ICommand CheckForUpdatesCommand { get; }
+        
+        public UpdateViewModel(IUpdateService updateService, 
+            ITaskRunner taskRunner, 
+            IStatusBar statusBar,
+            IUpdaterSettingsProvider settingsProvider)
         {
             this.updateService = updateService;
             this.taskRunner = taskRunner;
             this.statusBar = statusBar;
-            
-            if (updateService.CanCheckForUpdates())
-                taskRunner.ScheduleTask("Check for updates", UpdatesCheck);
-        }
+            this.settingsProvider = settingsProvider;
 
+            CheckForUpdatesCommand = new DelegateCommand(() =>
+            {
+                if (updateService.CanCheckForUpdates())
+                    taskRunner.ScheduleTask("Check for updates", UpdatesCheck);
+            }, updateService.CanCheckForUpdates);
+            
+            if (!settingsProvider.Settings.DisableAutoUpdates)
+                CheckForUpdatesCommand.Execute(null);
+        }
+        
         private async Task UpdatesCheck()
         {
             try

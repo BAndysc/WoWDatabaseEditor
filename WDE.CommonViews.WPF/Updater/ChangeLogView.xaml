@@ -9,6 +9,7 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance viewModels:ChangeLogViewModel}"
              Padding="15"
+             Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <converters:DataTimeToStringConverter Format="m" x:Key="TimeConverter"/>

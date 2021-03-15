@@ -20,6 +20,7 @@ namespace WDE.Updater.Test.Services
         private IFileSystem fileSystem = null!;
         private IStandaloneUpdater standaloneUpdate = null!;
         private IUpdateClient updateClient = null!;
+        private IUpdaterSettingsProvider settings = null!;
         
         [SetUp]
         public void Init()
@@ -31,6 +32,7 @@ namespace WDE.Updater.Test.Services
             fileSystem = Substitute.For<IFileSystem>();
             standaloneUpdate = Substitute.For<IStandaloneUpdater>();
             updateClient = Substitute.For<IUpdateClient>();
+            settings = Substitute.For<IUpdaterSettingsProvider>();
             clientFactory
                 .Create(Arg.Any<Uri>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<Platforms>())
                 .Returns(updateClient);
@@ -42,7 +44,7 @@ namespace WDE.Updater.Test.Services
             applicationVersion.VersionKnown.Returns(false);
             
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
-                standaloneUpdate);
+                standaloneUpdate, settings);
 
             Assert.IsFalse(updateService.CanCheckForUpdates());
         }
@@ -53,7 +55,7 @@ namespace WDE.Updater.Test.Services
             data.HasUpdateServerData.Returns(false);
             
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
-                standaloneUpdate);
+                standaloneUpdate, settings);
 
             Assert.IsFalse(updateService.CanCheckForUpdates());
         }
@@ -65,7 +67,7 @@ namespace WDE.Updater.Test.Services
             data.HasUpdateServerData.Returns(true);
             
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
-                standaloneUpdate);
+                standaloneUpdate, settings);
 
             Assert.IsTrue(updateService.CanCheckForUpdates());
         }
@@ -80,7 +82,7 @@ namespace WDE.Updater.Test.Services
                 .Returns(new CheckVersionResponse() {DownloadUrl = null, LatestVersion = 2});
             
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
-                standaloneUpdate);
+                standaloneUpdate, settings);
 
             Assert.IsNull(await updateService.CheckForUpdates());
         }
@@ -96,7 +98,7 @@ namespace WDE.Updater.Test.Services
                 .Returns(new CheckVersionResponse() {DownloadUrl = null, LatestVersion = 1});
             
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
-                standaloneUpdate);
+                standaloneUpdate, settings);
 
             Assert.IsNull(await updateService.CheckForUpdates());
         }
@@ -111,7 +113,7 @@ namespace WDE.Updater.Test.Services
                 .Returns(new CheckVersionResponse() {DownloadUrl = "localhost", LatestVersion = 2});
             
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
-                standaloneUpdate);
+                standaloneUpdate, settings);
 
             Assert.AreEqual("localhost", await updateService.CheckForUpdates());
         }
@@ -121,7 +123,7 @@ namespace WDE.Updater.Test.Services
         {
             application.CanClose().Returns(Task.FromResult(false));
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
-                standaloneUpdate);
+                standaloneUpdate, settings);
 
             await updateService.CloseForUpdate();
 
@@ -136,7 +138,7 @@ namespace WDE.Updater.Test.Services
         {
             application.CanClose().Returns(Task.FromResult(true));
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
-                standaloneUpdate);
+                standaloneUpdate, settings);
 
             await updateService.CloseForUpdate();
 

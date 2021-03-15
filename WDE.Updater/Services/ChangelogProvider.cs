@@ -43,13 +43,18 @@ namespace WDE.Updater.Services
                 documentManager.OpenDocument(new ChangeLogViewModel(changes));
         }
 
+        public bool HasChangelog()
+        {
+            return fileSystem.Exists("~/changelog.json");
+        }
+
         private List<ChangeLogEntry>? LoadChanges()
         {
-            if (!fileSystem.Exists("~/changelog.json"))
+            if (!HasChangelog())
                 return null;
             try
             {
-                return JsonConvert.DeserializeObject<List<ChangeLogEntry>>(fileSystem.ReadAllText("~/changelog.json"));
+                return JsonConvert.DeserializeObject<List<ChangeLogEntry>>(fileSystem.ReadAllText("changelog.json"));
             }
             catch (Exception)
             {

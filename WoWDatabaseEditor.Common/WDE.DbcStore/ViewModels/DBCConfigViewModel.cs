@@ -70,6 +70,8 @@ namespace WDE.DbcStore.ViewModels
         }
 
         private bool isModified;
+        public string ShortDescription => "To get all editor features, you need to use DBC (client database) files. This should be the path to extracted DBC files, the same the server uses.";
+        
         public bool IsModified
         {
             get => isModified;

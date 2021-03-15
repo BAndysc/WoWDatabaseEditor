@@ -31,6 +31,7 @@ namespace WDE.Updater.Services
         private readonly IApplication application;
         private readonly IFileSystem fileSystem;
         private readonly IStandaloneUpdater standaloneUpdater;
+        private readonly IUpdaterSettingsProvider settings;
         private IUpdateClient? updateClient;
 
         private IUpdateClient UpdateClient
@@ -52,7 +53,8 @@ namespace WDE.Updater.Services
             IApplicationVersion applicationVersion,
             IApplication application,
             IFileSystem fileSystem,
-            IStandaloneUpdater standaloneUpdater)
+            IStandaloneUpdater standaloneUpdater,
+            IUpdaterSettingsProvider settings)
         {
             this.data = data;
             this.clientFactory = clientFactory;
@@ -60,6 +62,7 @@ namespace WDE.Updater.Services
             this.application = application;
             this.fileSystem = fileSystem;
             this.standaloneUpdater = standaloneUpdater;
+            this.settings = settings;
             standaloneUpdater.RenameIfNeeded();
         }
 
@@ -78,6 +81,9 @@ namespace WDE.Updater.Services
         public async Task<string?> CheckForUpdates()
         {
             var response = await InternalCheckForUpdates();
+            var s = settings.Settings;
+            s.LastCheckedForUpdates = DateTime.Now;
+            settings.Settings = s;
             return response?.DownloadUrl;
         }
 

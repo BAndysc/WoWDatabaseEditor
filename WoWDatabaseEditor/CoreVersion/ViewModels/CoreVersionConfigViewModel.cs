@@ -50,6 +50,8 @@ namespace WoWDatabaseEditorCore.CoreVersion.ViewModels
         }
         
         public ICommand Save { get; }
+        public string ShortDescription =>
+            "Choose which core version will you be working with. Particular modules (like SmartScripts module) can respect that.";
         public string Name => "Core version";
         public bool IsRestartRequired => true;
     }

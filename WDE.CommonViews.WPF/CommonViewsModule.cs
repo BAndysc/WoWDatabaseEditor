@@ -37,6 +37,7 @@ namespace WDE.CommonViews.WPF
             viewLocator.Bind<SqlEditorViewModel, SqlEditorView>();
             // updater
             viewLocator.Bind<ChangeLogViewModel, ChangeLogView>();
+            viewLocator.Bind<UpdaterConfigurationViewModel, UpdaterConfigurationView>();
         }
     }
 }
