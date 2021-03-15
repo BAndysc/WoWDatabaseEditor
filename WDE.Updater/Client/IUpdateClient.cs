@@ -7,6 +7,6 @@ namespace WDE.Updater.Client
     public interface IUpdateClient
     {
         Task<CheckVersionResponse> CheckForUpdates(string branch, long version);
-        Task DownloadUpdate(CheckVersionResponse response, string destination, IProgress<float>? progress = null);
+        Task DownloadUpdate(CheckVersionResponse response, string destination, IProgress<(long downloadedBytes, long? totalLength)>? progress = null);
     }
 }

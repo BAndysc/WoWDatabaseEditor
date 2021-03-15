@@ -29,6 +29,7 @@ namespace WDE.Updater.Services
         private readonly IUpdateClientFactory clientFactory;
         private readonly IApplicationVersion applicationVersion;
         private readonly IApplication application;
+        private readonly IFileSystem fileSystem;
         private readonly IStandaloneUpdater standaloneUpdater;
         private IUpdateClient? updateClient;
 
@@ -50,12 +51,14 @@ namespace WDE.Updater.Services
             IUpdateClientFactory clientFactory,
             IApplicationVersion applicationVersion,
             IApplication application,
+            IFileSystem fileSystem,
             IStandaloneUpdater standaloneUpdater)
         {
             this.data = data;
             this.clientFactory = clientFactory;
             this.applicationVersion = applicationVersion;
             this.application = application;
+            this.fileSystem = fileSystem;
             this.standaloneUpdater = standaloneUpdater;
             standaloneUpdater.RenameIfNeeded();
         }
@@ -81,17 +84,28 @@ namespace WDE.Updater.Services
         public async Task DownloadLatestVersion(ITaskProgress taskProgress)
         {
             var response = await InternalCheckForUpdates();
-
-            var progress = new Progress<float>((v) => taskProgress.Report((int) (v * 1000), 1000, "downloading"));
-
+            
             if (response != null)
             {
+                var progress = new Progress<(long downloaded, long? totalBytes)>((v) =>
+                {
+                    var isDownloaded = (v.totalBytes.HasValue && v.totalBytes.Value == v.downloaded) ||
+                                       v.downloaded == -1;
+                    var isStatusKnown = v.totalBytes.HasValue;
+                    var currentProgress = v.totalBytes.HasValue ? (int) v.downloaded : (v.downloaded < 0 ? 1 : 0);
+                    var maxProgress = v.totalBytes ?? 1;
+                    
+                    if (taskProgress.State == TaskState.InProgress)
+                    {
+                        taskProgress.Report(currentProgress, (int)maxProgress, isDownloaded ? 
+                            "finished" : 
+                            (isStatusKnown ? $"{v.downloaded / 1_000_000f:0.00}/{maxProgress / 1_000_000f:0.00}MB" : $"{v.downloaded / 1_000_000f:0.00}MB"));                        
+                    }
+                });
                 await UpdateClient.DownloadUpdate(response, "update.zip", progress);
 
                 if (response.ChangeLog?.Length > 0)
-                {
-                    await File.WriteAllTextAsync("~/changelog.json", JsonConvert.SerializeObject(response.ChangeLog));
-                }
+                    fileSystem.WriteAllText("~/changelog.json", JsonConvert.SerializeObject(response.ChangeLog));
             }
             
             taskProgress.ReportFinished();

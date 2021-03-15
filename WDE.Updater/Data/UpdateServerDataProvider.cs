@@ -21,10 +21,25 @@ namespace WDE.Updater.Data
                 platform = p;
 
             HasUpdateServerData = updateServer != null && marketplace != null && platform != null;
-            UpdateServerUrl = new Uri(updateServer ?? "http://localhost");
+            UpdateServerUrl = SafeCreateUrl(updateServer, new Uri("http://localhost"));
             Marketplace = marketplace ?? "";
             UpdateKey = updateKey;
             Platform = platform ?? Platforms.Windows;
+        }
+
+        private Uri SafeCreateUrl(string? uri, Uri fallback)
+        {
+            if (uri == null)
+                return fallback;
+            
+            try
+            {
+                return new Uri(uri);
+            }
+            catch (Exception e)
+            {
+                return fallback;
+            }
         }
         
         public Uri UpdateServerUrl { get; }

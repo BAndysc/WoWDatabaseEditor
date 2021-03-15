@@ -41,7 +41,7 @@ namespace WDE.Updater.Client
             throw new Exception("Update server returned " + response.StatusCode);
         }
 
-        public async Task DownloadUpdate(CheckVersionResponse versionResponse, string destination, IProgress<float>? progress = null)
+        public async Task DownloadUpdate(CheckVersionResponse versionResponse, string destination, IProgress<(long, long?)>? progress = null)
         {
             var client = new HttpClient();
             using var response = await client.GetAsync(Path.Join(updateServerUrl.AbsoluteUri, versionResponse.DownloadUrl!.TrimStart('/')), HttpCompletionOption.ResponseHeadersRead);
@@ -50,9 +50,9 @@ namespace WDE.Updater.Client
             await using var stream = await response.Content.ReadAsStreamAsync();
             await using var file = File.OpenWrite(destination);
             
-            var relativeProgress = new Progress<long>(totalBytes => progress?.Report((float)totalBytes / contentLength ?? 1));
+            var relativeProgress = new Progress<long>(totalBytes => progress?.Report((totalBytes, contentLength)));
             await stream.CopyToAsync(file, 81920, relativeProgress);
-            progress?.Report(1);
+            progress?.Report((contentLength ?? -1, contentLength));
             await stream.CopyToAsync(file);
         }
     }

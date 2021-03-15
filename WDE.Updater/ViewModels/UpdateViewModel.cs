@@ -23,10 +23,9 @@ namespace WDE.Updater.ViewModels
             this.updateService = updateService;
             this.taskRunner = taskRunner;
             this.statusBar = statusBar;
+            
             if (updateService.CanCheckForUpdates())
-            { 
                 taskRunner.ScheduleTask("Check for updates", UpdatesCheck);
-            }
         }
 
         private async Task UpdatesCheck()
