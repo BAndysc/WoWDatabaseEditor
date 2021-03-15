@@ -5,6 +5,13 @@
         <Button>Click me</Button>
     </Design.PreviewWith>
     
+    <Style Selector="Button">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    
     <Style Selector="controls|ToolBar Button">
         <Setter Property="Background" Value="Transparent" />
     </Style>

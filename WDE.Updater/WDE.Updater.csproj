@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net5.0-windows7.0;net5.0</TargetFrameworks>
+        <OutputType>Library</OutputType>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+        <PackageReference Include="Newtonsoft.Json">
+            <Version>12.0.3</Version>
+        </PackageReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Models" />
+    </ItemGroup>
+</Project>

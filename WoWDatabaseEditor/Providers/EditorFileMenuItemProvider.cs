@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace WoWDatabaseEditorCore.Providers
         private readonly IEventAggregator eventAggregator;
         private readonly INewItemService newItemService;
         private readonly IConfigureService settings;
+        private readonly Func<AboutViewModel> aboutViewModelCrator;
         public IDocumentManager DocumentManager { get; }
         
         private readonly Dictionary<ISolutionItem, IDocument> documents = new();
@@ -37,13 +39,15 @@ namespace WoWDatabaseEditorCore.Providers
         public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityVeryHigh;
 
         public EditorFileMenuItemProvider(ISolutionManager solutionManager, IEventAggregator eventAggregator, INewItemService newItemService, 
-            ISolutionItemEditorRegistry solutionEditorManager, IMessageBoxService messageBoxService, IDocumentManager documentManager, IConfigureService settings)
+            ISolutionItemEditorRegistry solutionEditorManager, IMessageBoxService messageBoxService, IDocumentManager documentManager, IConfigureService settings,
+            Func<AboutViewModel> aboutViewModelCrator)
         {
             this.solutionManager = solutionManager;
             this.eventAggregator = eventAggregator;
             this.newItemService = newItemService;
             DocumentManager = documentManager;
             this.settings = settings;
+            this.aboutViewModelCrator = aboutViewModelCrator;
             SubItems = new List<IMenuItem>();
             SubItems.Add(new ModuleMenuItem("_New", new AsyncAutoCommand(OpenNewItemWindow)));
             SubItems.Add(new ModuleMenuItem("_Save", new DelegateCommand(() => DocumentManager.ActiveDocument?.Save.Execute(null),
@@ -109,7 +113,7 @@ namespace WoWDatabaseEditorCore.Providers
         }
         private void OpenSettings() => settings.ShowSettings();
 
-        private void OpenAbout() => DocumentManager.OpenDocument(new AboutViewModel());
+        private void OpenAbout() => DocumentManager.OpenDocument(aboutViewModelCrator());
 
         public event PropertyChangedEventHandler? PropertyChanged;
         

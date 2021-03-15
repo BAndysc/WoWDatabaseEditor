@@ -65,49 +65,49 @@
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <Grid Name="SidebarGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300" MinWidth="200"/>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition MinWidth="200" />
-                    </Grid.ColumnDefinitions>
-                    <DockPanel LastChildFill="True">
-                        <Panel DockPanel.Dock="Top" Height="39">
-                            <Border Background="{DynamicResource SideBarBackground}"
-                                    IsHitTestVisible="False" 
-                                    BorderBrush="{DynamicResource TitleBarSeparatorBrush}"
-                                    BorderThickness="0,0,0,0.5">
-                            </Border>
-                            <ContentPresenter Name="LeftPartToolBar"
-                                              HorizontalAlignment="Right"
-                                              Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                        </Panel>
+                <VisualLayerManager>
+                    <Grid Name="SidebarGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="300" MinWidth="200"/>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition MinWidth="200" />
+                        </Grid.ColumnDefinitions>
+                        <DockPanel LastChildFill="True">
+                            <Panel DockPanel.Dock="Top" Height="39">
+                                <Border Background="{DynamicResource SideBarBackground}"
+                                        IsHitTestVisible="False" 
+                                        BorderBrush="{DynamicResource TitleBarSeparatorBrush}"
+                                        BorderThickness="0,0,0,0.5">
+                                </Border>
+                                <ContentPresenter Name="LeftPartToolBar"
+                                                  HorizontalAlignment="Right"
+                                                  Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                            </Panel>
+                            
+                            <controls1:SideBar>
+                                <ContentPresenter Content="{TemplateBinding SideBar}" />
+                            </controls1:SideBar>
+                        </DockPanel>
                         
-                        <controls1:SideBar>
-                            <ContentPresenter Content="{TemplateBinding SideBar}" />
-                        </controls1:SideBar>
-                    </DockPanel>
+                        <GridSplitter Grid.Column="1"></GridSplitter>
                     
-                    <GridSplitter Grid.Column="1"></GridSplitter>
-                
-                    <DockPanel LastChildFill="True"  Grid.Column="2">
-                        <controls1:ExtendedTitleBar DockPanel.Dock="Top"
-                                                    RightContent="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                            <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                        </controls1:ExtendedTitleBar>
-                
-                        <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
+                        <DockPanel LastChildFill="True"  Grid.Column="2">
+                            <controls1:ExtendedTitleBar DockPanel.Dock="Top"
+                                                        RightContent="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                                <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                            </controls1:ExtendedTitleBar>
+                    
+                            <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
 
-                        <controls1:StatusBar DockPanel.Dock="Bottom" Name="StatusBar">
-                            <ContentPresenter Content="{TemplateBinding StatusBar}" />
-                        </controls1:StatusBar>
-                
-                        <Panel Background="{DynamicResource MainColorBackground}" ClipToBounds="True">
-                            <ContentPresenter Content="{TemplateBinding Content}" />
-                            <ContentPresenter Content="{TemplateBinding Overlay}" />    
-                        </Panel>
-                    </DockPanel>
-                </Grid>
+                            <ContentPresenter Content="{TemplateBinding StatusBar}" DockPanel.Dock="Bottom" Name="StatusBar"/>
+                    
+                            <Panel Background="{DynamicResource MainColorBackground}" ClipToBounds="True">
+                                <ContentPresenter Content="{TemplateBinding Content}" />
+                                <ContentPresenter Content="{TemplateBinding Overlay}" />    
+                            </Panel>
+                        </DockPanel>
+                    </Grid>
+                </VisualLayerManager>
             </ControlTemplate>
         </Setter>
     </Style>
@@ -124,7 +124,7 @@
         <Setter Property="MinWidth" Value="250" />
     </Style>
     
-    <Style Selector="controls1|ExtendedWindow:not(:has-statusbar) /template/ controls1|StatusBar#StatusBar">
+    <Style Selector="controls1|ExtendedWindow:not(:has-statusbar) /template/ ContentControl#StatusBar">
         <Setter Property="IsVisible" Value="False" />
     </Style>
     

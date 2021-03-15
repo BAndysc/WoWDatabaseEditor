@@ -3,6 +3,7 @@
     <Style Selector="TabStrip">
         <Setter Property="Background" Value="{DynamicResource TabStripBackground}"/>
         <Setter Property="BorderBrush" Value="#007ACC"/>
+        <Setter Property="Height" Value="21" />
         <Setter Property="BorderThickness" Value="0,0,0,2" />
         <Setter Property="Template">
             <ControlTemplate>

@@ -3,15 +3,27 @@ using System.ComponentModel;
 using System.Windows.Input;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Services;
+using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
+    [AutoRegister]
     public class AboutViewModel : IDocument
     {
-        public void Dispose()
+        private readonly IApplicationVersion applicationVersion;
+
+        public AboutViewModel(IApplicationVersion applicationVersion)
         {
+            this.applicationVersion = applicationVersion;
         }
 
+        public int BuildVersion => applicationVersion.BuildVersion;
+        public string Branch => applicationVersion.Branch;
+        public string CommitHash => applicationVersion.CommitHash;
+        public bool VersionKnown => applicationVersion.VersionKnown;
+        public string ReleaseData => $"WoWDatabaseEditor, branch: {Branch}, build: {BuildVersion}, commit: {CommitHash}";
+        
         public string Title { get; } = "About";
         public ICommand Undo { get; } = new DisabledCommand();
         public ICommand Redo { get; } = new DisabledCommand();
@@ -24,6 +36,10 @@ namespace WoWDatabaseEditorCore.ViewModels
         public bool IsModified { get; } = false;
         public IHistoryManager? History { get; } = null;
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        public void Dispose()
+        {
+        }
     }
 
     public class DisabledCommand : ICommand

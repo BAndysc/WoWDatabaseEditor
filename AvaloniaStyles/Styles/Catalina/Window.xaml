@@ -51,32 +51,32 @@
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <DockPanel LastChildFill="True">
-                    <controls1:ExtendedTitleBar DockPanel.Dock="Top"
-                                                LeftContent="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}"
-                                                RightContent="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                        <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                    </controls1:ExtendedTitleBar>
-                    
-                    <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
+                <VisualLayerManager>
+                    <DockPanel LastChildFill="True">
+                        <controls1:ExtendedTitleBar DockPanel.Dock="Top"
+                                                    LeftContent="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                                                    RightContent="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                            <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                        </controls1:ExtendedTitleBar>
+                        
+                        <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
 
-                    <controls1:StatusBar DockPanel.Dock="Bottom" Name="StatusBar">
-                        <ContentPresenter Content="{TemplateBinding StatusBar}" />
-                    </controls1:StatusBar>
-                    
-                    <Panel>
-                        <Grid ColumnDefinitions="300,Auto,*" Name="SidebarGrid">
-                            <controls1:SideBar>
-                                <ContentPresenter Content="{TemplateBinding SideBar}" />
-                            </controls1:SideBar>
-                            <GridSplitter Grid.Column="1"></GridSplitter>
-                            <Panel Grid.Column="2" Background="{DynamicResource MainColorBackground}" ClipToBounds="True">
-                                <ContentPresenter Content="{TemplateBinding Content}" />
-                            </Panel>
-                        </Grid>
-                        <ContentPresenter Content="{TemplateBinding Overlay}" />
-                    </Panel>
-                </DockPanel>
+                        <ContentPresenter Content="{TemplateBinding StatusBar}" DockPanel.Dock="Bottom" Name="StatusBar"/>
+                        
+                        <Panel>
+                            <Grid ColumnDefinitions="300,Auto,*" Name="SidebarGrid">
+                                <controls1:SideBar>
+                                    <ContentPresenter Content="{TemplateBinding SideBar}" />
+                                </controls1:SideBar>
+                                <GridSplitter Grid.Column="1"></GridSplitter>
+                                <Panel Grid.Column="2" Background="{DynamicResource MainColorBackground}" ClipToBounds="True">
+                                    <ContentPresenter Content="{TemplateBinding Content}" />
+                                </Panel>
+                            </Grid>
+                            <ContentPresenter Content="{TemplateBinding Overlay}" />
+                        </Panel>
+                    </DockPanel>
+                </VisualLayerManager>
             </ControlTemplate>
         </Setter>
     </Style>
@@ -85,7 +85,7 @@
         <Setter Property="MinWidth" Value="250" />
     </Style>
     
-    <Style Selector="controls1|ExtendedWindow:not(:has-statusbar) /template/ controls1|StatusBar#StatusBar">
+    <Style Selector="controls1|ExtendedWindow:not(:has-statusbar) /template/ ContentControl#StatusBar">
         <Setter Property="IsVisible" Value="False" />
     </Style>
     

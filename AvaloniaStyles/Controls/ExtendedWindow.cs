@@ -26,8 +26,8 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<IControl> SideBarProperty =
             AvaloniaProperty.Register<ExtendedWindow, IControl>(nameof(SideBar));
         
-        public static readonly StyledProperty<IControl> StatusBarProperty =
-            AvaloniaProperty.Register<ExtendedWindow, IControl>(nameof(StatusBar));
+        public static readonly StyledProperty<StatusBar> StatusBarProperty =
+            AvaloniaProperty.Register<ExtendedWindow, StatusBar>(nameof(StatusBar));
         
         public static readonly StyledProperty<TabStrip> TabStripProperty =
             AvaloniaProperty.Register<ExtendedWindow, TabStrip>(nameof(TabStrip));
@@ -59,7 +59,7 @@ namespace AvaloniaStyles.Controls
             set => SetValue(SideBarProperty, value);
         }
         
-        public IControl StatusBar
+        public StatusBar StatusBar
         {
             get => GetValue(StatusBarProperty);
             set => SetValue(StatusBarProperty, value);
@@ -81,6 +81,8 @@ namespace AvaloniaStyles.Controls
         
         static ExtendedWindow()
         {
+            IsActiveProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) =>
+                x.PseudoClasses.Set(":focused", x.IsActive));
             ToolBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-toolbar"));
             SideBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-sidebar"));
             StatusBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-statusbar"));
@@ -160,18 +162,6 @@ namespace AvaloniaStyles.Controls
                 LogicalChildren.Add(newChild);
                 PseudoClasses.Add(pseudoclass);
             }
-        }
-
-        protected override void OnGotFocus(GotFocusEventArgs e)
-        {
-            base.OnGotFocus(e);
-            PseudoClasses.Add(":focused");
-        }
-
-        protected override void OnLostFocus(RoutedEventArgs e)
-        {
-            base.OnLostFocus(e);
-            PseudoClasses.Remove(":focused");
         }
 
         public void MaximizeNormalize()

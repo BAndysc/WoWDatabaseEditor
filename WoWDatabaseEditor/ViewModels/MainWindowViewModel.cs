@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Prism.Commands;
@@ -14,6 +15,7 @@ namespace WoWDatabaseEditorCore.ViewModels
     public class MainWindowViewModel : BindableBase, ILayoutViewModelResolver, ICloseAwareViewModel
     {
         private readonly IMessageBoxService messageBoxService;
+        private readonly Func<AboutViewModel> aboutViewModelCreator;
 
         private string title = "Visual Database Editor 2018";
         private readonly Dictionary<string, ITool> toolById = new();
@@ -22,11 +24,13 @@ namespace WoWDatabaseEditorCore.ViewModels
             IStatusBar statusBar,
             IMessageBoxService messageBoxService,
             TasksViewModel tasksViewModel,
-            EditorMainMenuItemsProvider menuItemProvider)
+            EditorMainMenuItemsProvider menuItemProvider,
+            Func<AboutViewModel> aboutViewModelCreator)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
             this.messageBoxService = messageBoxService;
+            this.aboutViewModelCreator = aboutViewModelCreator;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
 
             TasksViewModel = tasksViewModel;
@@ -57,7 +61,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         private void ShowAbout()
         {
-            DocumentManager.OpenDocument(new AboutViewModel());
+            DocumentManager.OpenDocument(aboutViewModelCreator());
         }
 
         private void ShowDocument(IMenuDocumentItem documentItem)

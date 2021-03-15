@@ -18,4 +18,20 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    
+    <Style Selector="controls|StatusBar Button /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BoxShadow" Value="" />
+    </Style>
+    <Style Selector="controls|StatusBar Button">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Margin" Value="5,0,5,0" />
+    </Style>
+    <Style Selector="controls|StatusBar Button:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="#30000000" />
+    </Style>
+    <Style Selector="controls|StatusBar Button:pointerover">
+        <Setter Property="Background" Value="#20000000" />
+    </Style>
 </Styles>

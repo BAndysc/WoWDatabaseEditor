@@ -1,8 +1,9 @@
 ﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Views.AboutView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="20">
-        <StackPanel>
+    <DockPanel Margin="20" LastChildFill="True">
+        <TextBlock DockPanel.Dock="Bottom" IsVisible="{Binding VersionKnown}" Text="{Binding ReleaseData}" TextWrapping="WrapWithOverflow" />
+            <StackPanel>
             <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                     <Image Source="../Icon.png" Width="56" Height="56" />
@@ -23,5 +24,5 @@
                 <TextBlock  TextWrapping="WrapWithOverflow" Text="Database is not required, but in that case features are limited. It is database editor by design." />
             </WrapPanel>
         </StackPanel>
-    </Grid>
+    </DockPanel>
 </UserControl>

@@ -51,7 +51,9 @@
     </controls:ExtendedWindow.ToolBar>
     
     <controls:ExtendedWindow.StatusBar>
-        <TextBlock>Window loaded</TextBlock>
+        <controls:StatusBar>
+            <TextBlock>Window loaded</TextBlock>
+        </controls:StatusBar>
     </controls:ExtendedWindow.StatusBar>
     
     <controls:ExtendedWindow.TabStrip>

@@ -217,10 +217,10 @@ namespace WoWDatabaseEditorCore.WPF
                 }
                 catch (Exception e)
                 {
-                    var commitHash = File.Exists("COMMIT_HASH") ? File.ReadAllText("COMMIT_HASH") : "unknown";
+                    var deploymentVersion = File.Exists("app.ini") ? File.ReadAllText("app.ini") : "unknown app data";
                     Console.WriteLine(e.ToString());
                     var logPath = Path.GetTempFileName() + ".WDE.log.txt";
-                    File.WriteAllText(logPath, "Commit: " + commitHash + "\n\n" + e.ToString());
+                    File.WriteAllText(logPath, deploymentVersion + "\n\n" + e.ToString());
 
                     var choice = messageBoxService.ShowDialog(new MessageBoxFactory<int>().SetIcon(MessageBoxIcon.Error)
                         .SetTitle("Fatal error")
