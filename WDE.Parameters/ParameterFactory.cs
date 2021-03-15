@@ -11,9 +11,9 @@ namespace WDE.Parameters
     public class ParameterFactory : IParameterFactory
     {
         private readonly Dictionary<string, ParameterSpecModel> data = new();
-        private readonly Dictionary<string, IParameter<int>> parameters = new();
+        private readonly Dictionary<string, IParameter<long>> parameters = new();
 
-        public IParameter<int> Factory(string type)
+        public IParameter<long> Factory(string type)
         {
             if (parameters.TryGetValue(type, out var parameter))
                 return parameter;
@@ -25,7 +25,7 @@ namespace WDE.Parameters
             return parameters.ContainsKey(type);
         }
 
-        public void Register(string key, IParameter<int> parameter)
+        public void Register(string key, IParameter<long> parameter)
         {
             parameters.Add(key, parameter);
         }

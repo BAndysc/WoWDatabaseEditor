@@ -28,7 +28,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         private readonly bool asFlags;
         private string search = "";
         
-        public ItemFromListProviderViewModel(Dictionary<int, SelectOption> items, bool asFlags, int? current = null)
+        public ItemFromListProviderViewModel(Dictionary<long, SelectOption> items, bool asFlags, long? current = null)
         {
             this.asFlags = asFlags;
             
@@ -45,7 +45,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             
             this.items.Edit(list =>
             {
-                foreach (int key in items.Keys)
+                foreach (long key in items.Keys)
                 {
                     bool isSelected = current.HasValue && ((current == 0 && key == 0) || (key > 0) && (current & key) == key);
                     var item = new CheckableSelectOption(key, items[key], isSelected);
@@ -106,11 +106,11 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             }
         }
         
-        public int GetEntry()
+        public long GetEntry()
         {
             if (asFlags)
             {
-                var val = 0;
+                long val = 0;
                 foreach (var item in items.Items)
                 {
                     if (item.IsChecked)
@@ -123,8 +123,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             if (SelectedItem != null)
                 return SelectedItem.Entry;
 
-            int res;
-            if (int.TryParse(SearchText, out res))
+            long res;
+            if (long.TryParse(SearchText, out res))
                 return res;
             
             if (items.Count > 0)
@@ -148,7 +148,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 
     public class CheckableSelectOption : INotifyPropertyChanged
     {
-        public CheckableSelectOption(int entry, SelectOption selectOption, bool isChecked)
+        public CheckableSelectOption(long entry, SelectOption selectOption, bool isChecked)
         {
             Entry = entry;
             Name = selectOption.Name;
@@ -157,7 +157,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         }
 
         public bool IsChecked { get; set; }
-        public int Entry { get; set; }
+        public long Entry { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public event PropertyChangedEventHandler? PropertyChanged;

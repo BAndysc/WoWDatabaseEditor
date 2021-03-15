@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using SmartFormat;
 using WDE.Common.Parameters;
+using WDE.Parameters.Models;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -19,19 +20,19 @@ namespace WDE.SmartScriptEditor.Models
         private string comment;
         private bool isSelected;
         private SmartEvent parent;
-        private ParameterValueHolder<int> inverted;
-        private ParameterValueHolder<int> conditionTarget;
+        private ParameterValueHolder<long> inverted;
+        private ParameterValueHolder<long> conditionTarget;
 
         public SmartCondition(int id) : base(SmartConditionParametersCount, id)
         {
             var invertedParam = new Parameter();
-            invertedParam.Items = new Dictionary<int, SelectOption>() {[0] = new("False"), [1] = new("True")};
+            invertedParam.Items = new Dictionary<long, SelectOption>() {[0] = new("False"), [1] = new("True")};
             
             var conditionTargetParam = new Parameter();
-            conditionTargetParam.Items = new Dictionary<int, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
+            conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
 
-            inverted = new ParameterValueHolder<int>("Inverted", invertedParam);
-            conditionTarget = new ParameterValueHolder<int>("Condition target", conditionTargetParam);
+            inverted = new ParameterValueHolder<long>("Inverted", invertedParam);
+            conditionTarget = new ParameterValueHolder<long>("Condition target", conditionTargetParam);
             inverted.PropertyChanged += ((sender, value) =>
             {
                 CallOnChanged();
@@ -67,9 +68,9 @@ namespace WDE.SmartScriptEditor.Models
 
         public bool IsInverted => inverted.Value == 1;
 
-        public ParameterValueHolder<int> Inverted => inverted;
+        public ParameterValueHolder<long> Inverted => inverted;
         
-        public ParameterValueHolder<int> ConditionTarget => conditionTarget;
+        public ParameterValueHolder<long> ConditionTarget => conditionTarget;
         
         public string Comment
         {

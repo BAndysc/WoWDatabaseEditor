@@ -18,7 +18,7 @@ namespace WDE.Conditions.Data
         public string Description { get; set; }
 
         [JsonProperty(PropertyName = "values")]
-        public Dictionary<int, SelectOption> Values { get; set; }
+        public Dictionary<long, SelectOption> Values { get; set; }
     }
 
     [ExcludeFromCodeCoverage]

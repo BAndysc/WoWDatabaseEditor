@@ -119,7 +119,7 @@ namespace WDE.Common.Database
 
     public static class SmartScriptLineExtensions
     {
-        public static int GetEventParam(this ISmartScriptLine line, int i)
+        public static long GetEventParam(this ISmartScriptLine line, int i)
         {
             switch (i)
             {
@@ -136,7 +136,7 @@ namespace WDE.Common.Database
             throw new IndexOutOfRangeException();
         }
         
-        public static int GetActionParam(this ISmartScriptLine line, int i)
+        public static long GetActionParam(this ISmartScriptLine line, int i)
         {
             switch (i)
             {
@@ -157,7 +157,7 @@ namespace WDE.Common.Database
             throw new IndexOutOfRangeException();
         }
         
-        public static int GetSourceParam(this ISmartScriptLine line, int i)
+        public static long GetSourceParam(this ISmartScriptLine line, int i)
         {
             switch (i)
             {
@@ -172,7 +172,7 @@ namespace WDE.Common.Database
             throw new IndexOutOfRangeException();
         }
         
-        public static int GetTargetParam(this ISmartScriptLine line, int i)
+        public static long GetTargetParam(this ISmartScriptLine line, int i)
         {
             switch (i)
             {

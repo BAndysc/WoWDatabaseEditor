@@ -14,7 +14,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
         
         public IControl Build(object item)
         {
-            if (item is EditableParameterViewModel<int> intParam && intParam.Parameter.Parameter is BoolParameter boolParameter && BoolParameter != null)
+            if (item is EditableParameterViewModel<long> intParam && intParam.Parameter.Parameter is BoolParameter boolParameter && BoolParameter != null)
                 return BoolParameter.Build(item);
             if (item is EditableParameterActionViewModel aevm && ButtonParameter != null)
                 return ButtonParameter.Build(item);

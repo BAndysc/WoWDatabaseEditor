@@ -19,7 +19,7 @@ namespace WDE.SmartScriptEditor.Providers
 
         public string GetName(SmartScriptSolutionItem item)
         {
-            int entry = item.Entry;
+            int entry = (int)item.Entry;
 
             if (entry > 0)
             {

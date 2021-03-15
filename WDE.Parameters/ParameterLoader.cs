@@ -44,7 +44,7 @@ namespace WDE.Parameters
     {
         public BoolParameter()
         {
-            Items = new Dictionary<int, SelectOption> {{0, new SelectOption("No")}, {1, new SelectOption("Yes")}};
+            Items = new Dictionary<long, SelectOption> {{0, new SelectOption("No")}, {1, new SelectOption("Yes")}};
         }
     }
 
@@ -57,13 +57,13 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(int key)
+        public override string ToString(long key)
         {
             if (Items == null)
             {
-                Items = new Dictionary<int, SelectOption>();
+                Items = new Dictionary<long, SelectOption>();
                 foreach (ICreatureTemplate item in database.GetCreatureTemplates())
-                    Items.Add((int) item.Entry, new SelectOption(item.Name));
+                    Items.Add(item.Entry, new SelectOption(item.Name));
             }
             return base.ToString(key);
         }
@@ -78,13 +78,13 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(int key)
+        public override string ToString(long key)
         {
             if (Items == null)
             {
-                Items = new Dictionary<int, SelectOption>();
+                Items = new Dictionary<long, SelectOption>();
                 foreach (IQuestTemplate item in database.GetQuestTemplates())
-                    Items.Add((int) item.Entry, new SelectOption(item.Name));
+                    Items.Add(item.Entry, new SelectOption(item.Name));
             }
             return base.ToString(key);
         }
@@ -99,11 +99,11 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(int key)
+        public override string ToString(long key)
         {
             if (Items == null)
             {
-                Items = new Dictionary<int, SelectOption>();
+                Items = new Dictionary<long, SelectOption>();
                 foreach (IGameEvent item in database.GetGameEvents())
                     Items.Add(item.Entry, new SelectOption(item.Description));
             }
@@ -120,13 +120,13 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(int key)
+        public override string ToString(long key)
         {
             if (Items == null)
             {
-                Items = new Dictionary<int, SelectOption>();
+                Items = new Dictionary<long, SelectOption>();
                 foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
-                    Items.Add((int) item.Entry, new SelectOption(item.Name));
+                    Items.Add(item.Entry, new SelectOption(item.Name));
             }
             return base.ToString(key);
         }
@@ -142,17 +142,17 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(int key)
+        public override string ToString(long key)
         {
             if (Items == null)
             {
-                Items = new Dictionary<int, SelectOption>();
+                Items = new Dictionary<long, SelectOption>();
                 foreach (IConversationTemplate item in database.GetConversationTemplates())
                 {
                     var name = $"conversation with first line id: {item.FirstLineId}";
                     if (!string.IsNullOrEmpty(item.ScriptName))
                         name += $", script name: {item.ScriptName}";
-                    Items.Add((int) item.Id, new SelectOption(name));
+                    Items.Add(item.Id, new SelectOption(name));
                 }
             }
             return base.ToString(key);

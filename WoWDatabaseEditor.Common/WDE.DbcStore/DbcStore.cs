@@ -36,21 +36,21 @@ namespace WDE.DbcStore
             Load();
         }
         
-        public Dictionary<int, string> AreaTriggerStore { get; internal set; } = new();
-        public Dictionary<int, string> FactionStore { get; internal set; } = new();
-        public Dictionary<int, string> SpellStore { get; internal set; } = new();
-        public Dictionary<int, string> SkillStore { get; internal set;} = new();
-        public Dictionary<int, string> LanguageStore { get; internal set;} = new();
-        public Dictionary<int, string> PhaseStore { get; internal set;} = new();
-        public Dictionary<int, string> AreaStore { get; internal set;} = new();
-        public Dictionary<int, string> MapStore { get; internal set;} = new();
-        public Dictionary<int, string> SoundStore { get;internal set; } = new();
-        public Dictionary<int, string> MovieStore { get; internal set;} = new();
-        public Dictionary<int, string> ClassStore { get; internal set;} = new();
-        public Dictionary<int, string> RaceStore { get; internal set;} = new();
-        public Dictionary<int, string> EmoteStore { get;internal set; } = new();
-        public Dictionary<int, string> AchievementStore { get; internal set;} = new();
-        public Dictionary<int, string> ItemStore { get; internal set;} = new();
+        public Dictionary<long, string> AreaTriggerStore { get; internal set; } = new();
+        public Dictionary<long, string> FactionStore { get; internal set; } = new();
+        public Dictionary<long, string> SpellStore { get; internal set; } = new();
+        public Dictionary<long, string> SkillStore { get; internal set;} = new();
+        public Dictionary<long, string> LanguageStore { get; internal set;} = new();
+        public Dictionary<long, string> PhaseStore { get; internal set;} = new();
+        public Dictionary<long, string> AreaStore { get; internal set;} = new();
+        public Dictionary<long, string> MapStore { get; internal set;} = new();
+        public Dictionary<long, string> SoundStore { get;internal set; } = new();
+        public Dictionary<long, string> MovieStore { get; internal set;} = new();
+        public Dictionary<long, string> ClassStore { get; internal set;} = new();
+        public Dictionary<long, string> RaceStore { get; internal set;} = new();
+        public Dictionary<long, string> EmoteStore { get;internal set; } = new();
+        public Dictionary<long, string> AchievementStore { get; internal set;} = new();
+        public Dictionary<long, string> ItemStore { get; internal set;} = new();
 
         public IEnumerable<uint> Spells
         {
@@ -91,21 +91,21 @@ namespace WDE.DbcStore
             private readonly IParameterFactory parameterFactory;
             private readonly DbcStore store;
 
-            private Dictionary<int, string> AreaTriggerStore { get; } = new();
-            private Dictionary<int, string> FactionStore { get; } = new();
-            private Dictionary<int, string> SpellStore { get; } = new();
-            public Dictionary<int, string> SkillStore { get; } = new();
-            public Dictionary<int, string> LanguageStore { get; } = new();
-            public Dictionary<int, string> PhaseStore { get; } = new();
-            public Dictionary<int, string> AreaStore { get; } = new();
-            public Dictionary<int, string> MapStore { get; } = new();
-            public Dictionary<int, string> SoundStore { get; } = new();
-            public Dictionary<int, string> MovieStore { get; } = new();
-            public Dictionary<int, string> ClassStore { get; } = new();
-            public Dictionary<int, string> RaceStore { get; } = new();
-            public Dictionary<int, string> EmoteStore { get; } = new();
-            public Dictionary<int, string> AchievementStore { get; } = new();
-            public Dictionary<int, string> ItemStore { get; } = new();
+            private Dictionary<long, string> AreaTriggerStore { get; } = new();
+            private Dictionary<long, string> FactionStore { get; } = new();
+            private Dictionary<long, string> SpellStore { get; } = new();
+            public Dictionary<long, string> SkillStore { get; } = new();
+            public Dictionary<long, string> LanguageStore { get; } = new();
+            public Dictionary<long, string> PhaseStore { get; } = new();
+            public Dictionary<long, string> AreaStore { get; } = new();
+            public Dictionary<long, string> MapStore { get; } = new();
+            public Dictionary<long, string> SoundStore { get; } = new();
+            public Dictionary<long, string> MovieStore { get; } = new();
+            public Dictionary<long, string> ClassStore { get; } = new();
+            public Dictionary<long, string> RaceStore { get; } = new();
+            public Dictionary<long, string> EmoteStore { get; } = new();
+            public Dictionary<long, string> AchievementStore { get; } = new();
+            public Dictionary<long, string> ItemStore { get; } = new();
 
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -117,7 +117,7 @@ namespace WDE.DbcStore
                 dbcSettingsProvider = settingsProvider;
             }
             
-            private void Load(string filename, int id, int nameIndex, Dictionary<int, string> dictionary)
+            private void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary)
             {
                 progress.Report(now++, max, $"Loading {filename}");
                 DBReader r = new();
@@ -236,9 +236,9 @@ namespace WDE.DbcStore
 
     public class DbcParameter : Parameter
     {
-        public DbcParameter(Dictionary<int, string> storage)
+        public DbcParameter(Dictionary<long, string> storage)
         {
-            Items = new Dictionary<int, SelectOption>();
+            Items = new Dictionary<long, SelectOption>();
             foreach (int key in storage.Keys)
                 Items.Add(key, new SelectOption(storage[key]));
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using SmartFormat;
 using WDE.Common.Database;
+using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.Utils;
@@ -124,7 +125,7 @@ namespace WDE.SmartScriptEditor.Exporter
             var lines = new List<ISmartScriptLine>();
             var conditions = new List<IConditionLine>();
             var previousWasWait = false;
-            int nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EventTriggerTimed)
+            long nextTriggerId = script.Events.Where(e => e.Id == SmartConstants.EventTriggerTimed)
                 .Select(e => e.GetParameter(0).Value)
                 .DefaultIfEmpty(0)
                 .Max() + 1;
@@ -240,31 +241,31 @@ namespace WDE.SmartScriptEditor.Exporter
                     Id = id,
                     Link = linkTo ?? 0,
                     EventType = e.Id,
-                    EventPhaseMask = e.Phases.Value,
-                    EventChance = e.Chance.Value,
-                    EventFlags = e.Flags.Value,
-                    EventParam1 = e.GetParameter(0).Value,
-                    EventParam2 = e.GetParameter(1).Value,
-                    EventParam3 = e.GetParameter(2).Value,
-                    EventParam4 = e.GetParameter(3).Value,
-                    EventCooldownMin = e.CooldownMin.Value,
-                    EventCooldownMax = e.CooldownMax.Value,
+                    EventPhaseMask = (int)e.Phases.Value,
+                    EventChance = (int)e.Chance.Value,
+                    EventFlags = (int)e.Flags.Value,
+                    EventParam1 = (int)e.GetParameter(0).Value,
+                    EventParam2 = (int)e.GetParameter(1).Value,
+                    EventParam3 = (int)e.GetParameter(2).Value,
+                    EventParam4 = (int)e.GetParameter(3).Value,
+                    EventCooldownMin = (int)e.CooldownMin.Value,
+                    EventCooldownMax = (int)e.CooldownMax.Value,
                     ActionType = a.Id,
-                    ActionParam1 = a.GetParameter(0).Value,
-                    ActionParam2 = a.GetParameter(1).Value,
-                    ActionParam3 = a.GetParameter(2).Value,
-                    ActionParam4 = a.GetParameter(3).Value,
-                    ActionParam5 = a.GetParameter(4).Value,
-                    ActionParam6 = a.GetParameter(5).Value,
+                    ActionParam1 = (int)a.GetParameter(0).Value,
+                    ActionParam2 = (int)a.GetParameter(1).Value,
+                    ActionParam3 = (int)a.GetParameter(2).Value,
+                    ActionParam4 = (int)a.GetParameter(3).Value,
+                    ActionParam5 = (int)a.GetParameter(4).Value,
+                    ActionParam6 = (int)a.GetParameter(5).Value,
                     SourceType = a.Source.Id,
-                    SourceParam1 = a.Source.GetParameter(0).Value,
-                    SourceParam2 = a.Source.GetParameter(1).Value,
-                    SourceParam3 = a.Source.GetParameter(2).Value,
+                    SourceParam1 = (int)a.Source.GetParameter(0).Value,
+                    SourceParam2 = (int)a.Source.GetParameter(1).Value,
+                    SourceParam3 = (int)a.Source.GetParameter(2).Value,
                     SourceConditionId = 0,
                     TargetType = a.Target.Id,
-                    TargetParam1 = a.Target.GetParameter(0).Value,
-                    TargetParam2 = a.Target.GetParameter(1).Value,
-                    TargetParam3 = a.Target.GetParameter(2).Value,
+                    TargetParam1 = (int)a.Target.GetParameter(0).Value,
+                    TargetParam2 = (int)a.Target.GetParameter(1).Value,
+                    TargetParam3 = (int)a.Target.GetParameter(2).Value,
                     TargetConditionId = 0,
                     TargetX = a.Target.X,
                     TargetY = a.Target.Y,
@@ -302,11 +303,11 @@ namespace WDE.SmartScriptEditor.Exporter
                     SourceId = (int)scriptSourceType,
                     ElseGroup = elseGroup,
                     ConditionType = c.Id,
-                    ConditionTarget = c.ConditionTarget.Value,
-                    ConditionValue1 = c.GetParameter(0).Value,
-                    ConditionValue2 = c.GetParameter(1).Value,
-                    ConditionValue3 = c.GetParameter(2).Value,
-                    NegativeCondition = c.Inverted.Value,
+                    ConditionTarget = (byte)c.ConditionTarget.Value,
+                    ConditionValue1 = (int)c.GetParameter(0).Value,
+                    ConditionValue2 = (int)c.GetParameter(1).Value,
+                    ConditionValue3 = (int)c.GetParameter(2).Value,
+                    NegativeCondition = (int)c.Inverted.Value,
                     Comment = c.Readable
                 });
             }

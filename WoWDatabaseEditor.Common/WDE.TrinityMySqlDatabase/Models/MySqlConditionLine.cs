@@ -34,7 +34,7 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ConditionTarget")]
         [PrimaryKey]
-        public int ConditionTarget { get; set; }
+        public byte ConditionTarget { get; set; }
 
         [Column(Name = "ConditionValue1")]
         [PrimaryKey]

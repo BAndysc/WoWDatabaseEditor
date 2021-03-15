@@ -14,7 +14,7 @@
 
         int ConditionType { get; set; }
 
-        int ConditionTarget { get; set; }
+        byte ConditionTarget { get; set; }
 
         int ConditionValue1 { get; set; }
 
@@ -41,7 +41,7 @@
 
         public int ConditionType { get; set; }
 
-        public int ConditionTarget { get; set; }
+        public byte ConditionTarget { get; set; }
 
         public int ConditionValue1 { get; set; }
 

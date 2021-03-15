@@ -203,10 +203,10 @@ namespace WDE.SmartScriptEditor
         {
             var areaTriggers =
                 dbcStore.Value.AreaTriggerStore.ToDictionary(at => at.Key, at => new SelectOption($"Client areatrigger {at.Key}"));
-            int? entry = await itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
+            long? entry = await itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.AreaTrigger);
+            return new SmartScriptSolutionItem((int)entry.Value, SmartScriptType.AreaTrigger);
         }
     }
     
@@ -237,12 +237,12 @@ namespace WDE.SmartScriptEditor
         {
             var areaTriggers = database.Value.GetAreaTriggerTemplates()
                 .Where(trigger => trigger.IsServerSide == serverSide)
-                .ToDictionary(at => (int)at.Id, at => new SelectOption($"Area trigger {at.Id}"));
+                .ToDictionary(at => (long)at.Id, at => new SelectOption($"Area trigger {at.Id}"));
 
-            int? entry = await itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
+            long? entry = await itemFromListProvider.Value.GetItemFromList(areaTriggers, false);
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem(entry.Value, type);
+            return new SmartScriptSolutionItem((int)entry.Value, type);
         }
     }
     

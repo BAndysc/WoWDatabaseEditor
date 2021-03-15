@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SmartFormat;
 using WDE.Common.Parameters;
+using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Models
@@ -40,7 +41,7 @@ namespace WDE.SmartScriptEditor.Models
         private readonly string compare;
         private readonly string compareTo;
         private readonly CompareType compareType;
-        private int value;
+        private long value;
 
         public ParameterConditionalCompareAny(SmartConditionalJsonData data) : base(null, WarningType.NOT_SET)
         {
@@ -50,7 +51,7 @@ namespace WDE.SmartScriptEditor.Models
             compare = data.ComparedAnyParam;
         }
 
-        public bool Validate(int compare, int compareTo)
+        public bool Validate(long compare, long compareTo)
         {
             switch (compareType)
             {
@@ -73,15 +74,15 @@ namespace WDE.SmartScriptEditor.Models
 
         internal bool Validate(DescriptionParams paramz)
         {
-            int compareSource = ValueForSource(compare, paramz);
+            long compareSource = ValueForSource(compare, paramz);
             if (compareTo != null)
                 value = ValueForSource(compareTo, paramz);
             return Validate(compareSource, value);
         }
 
-        private int ValueForSource(string compare, DescriptionParams paramz)
+        private long ValueForSource(string compare, DescriptionParams paramz)
         {
-            var compareSource = 0;
+            long compareSource = 0;
             switch (compare)
             {
                 case "sourcetype":

@@ -46,7 +46,7 @@ namespace WDE.Conditions.Exporter
             line.SourceId = int.Parse(m.Groups[4].ToString());
             line.ElseGroup = int.Parse(m.Groups[5].ToString());
             line.ConditionType = int.Parse(m.Groups[6].ToString());
-            line.ConditionTarget = int.Parse(m.Groups[7].ToString());
+            line.ConditionTarget = byte.Parse(m.Groups[7].ToString());
             line.ConditionValue1 = int.Parse(m.Groups[8].ToString());
             line.ConditionValue2 = int.Parse(m.Groups[9].ToString());
             line.ConditionValue3 = int.Parse(m.Groups[10].ToString());
