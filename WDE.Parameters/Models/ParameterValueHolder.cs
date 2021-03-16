@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.Parameters;
 
-namespace WDE.SmartScriptEditor.Models
+namespace WDE.Parameters.Models
 {
     public class ParameterValueHolder<T> : INotifyPropertyChanged
     {
