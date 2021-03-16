@@ -1,8 +1,5 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 
 namespace WDE.Common.WPF.ViewHelpers
 {
@@ -22,10 +19,6 @@ namespace WDE.Common.WPF.ViewHelpers
 
     public class StretchedTreeViewItem: TreeViewItem
     {
-        public static readonly DependencyProperty AllowExpanderProperty =
-            DependencyProperty.RegisterAttached("AllowExpander", typeof(bool), typeof(StretchedTreeViewItem),
-                new UIPropertyMetadata(true, OnAllowExpanderChanged));
-        
         public StretchedTreeViewItem()
         {
             this.Loaded += new RoutedEventHandler(StretchingTreeViewItem_Loaded);
@@ -33,7 +26,7 @@ namespace WDE.Common.WPF.ViewHelpers
 
         private void StretchingTreeViewItem_Loaded(object sender, RoutedEventArgs e)
         {
-            // The purpose of this code is to stretch the Header Content all the way accross the TreeView.
+            // The purpose of this code is to stretch the Header Content all the way accross the TreeView. 
             if (this.VisualChildrenCount > 0)
             {
                 Grid? grid = this.GetVisualChild(0) as Grid;
@@ -42,7 +35,6 @@ namespace WDE.Common.WPF.ViewHelpers
                     // Remove the middle column which is set to Auto and let it get replaced with the 
                     // last column that is set to Star.
                     grid.ColumnDefinitions.RemoveAt(1);
-                    ChangeExpanderVisibility(grid, GetAllowExpander(this));
                 }
             }
         }
@@ -55,45 +47,6 @@ namespace WDE.Common.WPF.ViewHelpers
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
             return item is StretchedTreeViewItem;
-        }
-
-        protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
-        {
-            if (GetAllowExpander(this))
-                base.OnMouseDoubleClick(e);
-        }
-
-        [AttachedPropertyBrowsableForType(typeof(StretchedTreeViewItem))]
-        public static bool GetAllowExpander(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(AllowExpanderProperty);
-        }
-
-        [AttachedPropertyBrowsableForType(typeof(StretchedTreeViewItem))]
-        public static void SetAllowExpander(DependencyObject obj, object value)
-        {
-            obj.SetValue(AllowExpanderProperty, value);
-        }
-
-        private static void ChangeExpanderVisibility(Grid grid, bool visible)
-        {
-            var expander = grid?.Children[0] as ToggleButton;
-            if (expander != null)
-                expander.Visibility = visible ? Visibility.Visible : Visibility.Hidden;
-        }
-        
-        private static void OnAllowExpanderChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var item = d as StretchedTreeViewItem;
-            if (item == null)
-                throw new InvalidOperationException($"can only be attached to {nameof(StretchedTreeViewItem)}");
-            
-            if (item.VisualChildrenCount > 0)
-            {
-                Grid? grid = item.GetVisualChild(0) as Grid;
-                if (grid != null)
-                    ChangeExpanderVisibility(grid, GetAllowExpander(item));
-            }
         }
     }
 }

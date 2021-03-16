@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
-using Newtonsoft.Json;
-using Prism.Events;
 using WDE.Common;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
