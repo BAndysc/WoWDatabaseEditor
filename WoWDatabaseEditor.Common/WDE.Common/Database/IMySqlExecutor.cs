@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Module.Attributes;
 
@@ -8,6 +9,7 @@ namespace WDE.Common.Database
     public interface IMySqlExecutor
     {
         Task ExecuteSql(string query);
+        Task<IList<Dictionary<string, object>>> ExecuteSelectSql(string query);
 
         public class DatabaseExecutorException : Exception
         {
