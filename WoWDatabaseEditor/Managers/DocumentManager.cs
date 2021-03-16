@@ -93,6 +93,8 @@ namespace WoWDatabaseEditorCore.Managers
                             ActiveDocument = OpenedDocuments.Count > 0 ? OpenedDocuments[0] : null;
                         eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
                         editor.CloseCommand = origCommand;
+                        if (editor is IDisposable disposable)
+                            disposable.Dispose();
                     }
                 },
                 (context) => origCommand?.CanExecute(null) ?? true);

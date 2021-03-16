@@ -1,4 +1,5 @@
 ﻿using WDE.Common.Windows;
+using WDE.CommonViews.WPF.Updater;
 using WDE.DbcStore.ViewModels;
 using WDE.DbcStore.Views;
 using WDE.HistoryWindow.ViewModels;
@@ -13,6 +14,7 @@ using WDE.SQLEditor.Views;
 using WDE.TrinityMySqlDatabase.Tools;
 using WDE.TrinityMySqlDatabase.ViewModels;
 using WDE.TrinityMySqlDatabase.Views;
+using WDE.Updater.ViewModels;
 
 namespace WDE.CommonViews.WPF
 {
@@ -32,7 +34,10 @@ namespace WDE.CommonViews.WPF
             // dbc store
             viewLocator.Bind<DBCConfigViewModel, DBCConfigView>();
             // sql editor
-            viewLocator.Bind<SqlEditorViewModel, SqlEditorView>();            
+            viewLocator.Bind<SqlEditorViewModel, SqlEditorView>();
+            // updater
+            viewLocator.Bind<ChangeLogViewModel, ChangeLogView>();
+            viewLocator.Bind<UpdaterConfigurationViewModel, UpdaterConfigurationView>();
         }
     }
 }

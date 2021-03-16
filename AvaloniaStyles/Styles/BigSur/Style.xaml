@@ -4,6 +4,10 @@
     <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
     
+    <Style Selector="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+    </Style>
+    
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/PopupRoot.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/TreeView.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/TreeViewItem.xaml"/>

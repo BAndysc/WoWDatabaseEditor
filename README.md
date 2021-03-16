@@ -12,18 +12,24 @@ This project is continuation of [Visual SAI Studio](https://github.com/BandyscLe
 
 # Download latest version
 
+Application has built in auto updater, so you do not have to redownload here to upgrade the app.
+
 ## Windows only version
 **On Windows the application requires [.NET 5 Desktop Runtime x64](https://dotnet.microsoft.com/download/dotnet/5.0)**. Ensure you have `.NET Desktop Runtime 5.x` installed (`.NET 5` is NOT enough)
 
-Every commit is built by AppVeyor, here are the latest **Windows only binaries**: [WoWDatabaseEditorWindows.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditor.zip?branch=master)
+Every commit is built by AppVeyor, here are the latest **Windows only binaries**: [WoWDatabaseEditorWindows.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditorWindowsWPF.zip?branch=master)
 
 ## Mac OS / Linux / Windows version
 **To run the cross platform version, you need [.NET 5 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0) for your OS**.
 
 WoW Database Editor is also shipped with experimental cross platform version. That version is compatibile with both MacOS, Linux and Windows (this Windows version IS different to version above).
 
-Every commit is built by AppVeyor, here are the latest **cross-platform binaries**: [WoWDatabaseEditorCrossPlatform.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditorAvalonia.zip?branch=master)
+Every commit is built by AppVeyor, here are the latest **cross-platform binaries**: 
+ * [WoWDatabaseEditor for Windows.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditorWindows.zip?branch=master)
+ * [WoWDatabaseEditor for Linux.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditorLinux.zip?branch=master)
+ * [WoWDatabaseEditor for MacOS.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditorMacOs.zip?branch=master)
 
+This version probably will become the only option in the future, so I will appreciate any bug reports in it.
 
 # I want to contribute!
 That's a fantastic news! There is still a lot to do in the IDE, if you do not know what you can do, check out [opened issues, especially those marked as "help wanted"](https://github.com/BAndysc/WoWDatabaseEditor/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)

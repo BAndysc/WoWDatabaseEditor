@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Input;
 using AvalonDock;
 using MahApps.Metro.Controls;
+using WDE.Common.Managers;
+using WDE.Common.Services;
 using WoWDatabaseEditorCore.ViewModels;
 using WoWDatabaseEditorCore.WPF.Utils;
 
@@ -17,9 +19,12 @@ namespace WoWDatabaseEditorCore.WPF.Views
         public static DependencyProperty DocumentClosedCommandProperty =
             DependencyProperty.Register("DocumentClosedCommand", typeof(ICommand), typeof(MainWindow));
 
-        public MainWindow()
+        public IFileSystem fileSystem;
+        
+        public MainWindow(IFileSystem fileSystem)
         {
             InitializeComponent();
+            this.fileSystem = fileSystem;
             Loaded += OnLoaded;
             Closing += OnClosing;
         }
@@ -27,17 +32,17 @@ namespace WoWDatabaseEditorCore.WPF.Views
         private bool realClosing = false;
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            if (!realClosing && DataContext is ICloseAwareViewModel closeAwareViewModel)
+            if (!realClosing && DataContext is IApplication closeAwareViewModel)
             {
                 TryClose(closeAwareViewModel);
                 e.Cancel = !realClosing;
             }
             
             if (!e.Cancel)
-                LayoutUtility.SaveLayout(DockingManager);
+                LayoutUtility.SaveLayout(DockingManager, fileSystem);
         }
 
-        private async Task TryClose(ICloseAwareViewModel closeAwareViewModel)
+        private async Task TryClose(IApplication closeAwareViewModel)
         {
             if (await closeAwareViewModel.CanClose())
             {
@@ -50,7 +55,16 @@ namespace WoWDatabaseEditorCore.WPF.Views
         {
             if (DataContext is ILayoutViewModelResolver layoutResolver)
             {
-                LayoutUtility.LoadLayout(DockingManager, layoutResolver);   
+                LayoutUtility.LoadLayout(DockingManager, layoutResolver, fileSystem);   
+            }
+            if (DataContext is ICloseAwareViewModel closeAwareViewModel)
+            {
+                closeAwareViewModel.CloseRequest += Close;
+                closeAwareViewModel.ForceCloseRequest += () =>
+                {
+                    realClosing = true;
+                    Close();
+                };
             }
         }
 
@@ -64,12 +78,5 @@ namespace WoWDatabaseEditorCore.WPF.Views
         {
             DocumentClosedCommand?.Execute(e.Document.Content);
         }
-        
-        /*public void LoadLayout(Stream stream, Action<ITool> addToolCallback, Action<IDocument> addDocumentCallback,
-            Dictionary<string, ILayoutItem> itemsState)
-        {
-            LayoutUtility.LoadLayout(DockingManager, stream, addDocumentCallback, addToolCallback, itemsState);
-        }*/
-
     }
 }

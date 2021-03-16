@@ -90,7 +90,8 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
         public ICommand Save { get; }
 
         public string Name => "TrinityCore Database";
-        
+        public string ShortDescription => "To get all editor features, you have to connect to any Trinity compatible database.";
+
         private bool isModified;
         public bool IsModified
         {

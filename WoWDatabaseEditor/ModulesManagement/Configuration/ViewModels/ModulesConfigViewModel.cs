@@ -36,6 +36,7 @@ namespace WoWDatabaseEditorCore.ModulesManagement.Configuration.ViewModels
         }
 
         public string Name => "Modules";
+        public string ShortDescription => "List of all loaded modules";
         public ICommand Save { get; }
         public bool IsModified => false;
         public bool IsRestartRequired => false;

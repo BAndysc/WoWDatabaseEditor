@@ -116,6 +116,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Updater", "WDE.Updater\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Updater", "Updater\Updater.csproj", "{A094F0F9-C067-4B66-8FCA-ECA3747C6A4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Updater.Test", "WDE.Updater.Test\WDE.Updater.Test.csproj", "{DE7953F1-6155-44F0-86D3-1DCD0A9FE5DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -319,6 +321,12 @@ Global
 		{A094F0F9-C067-4B66-8FCA-ECA3747C6A4C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A094F0F9-C067-4B66-8FCA-ECA3747C6A4C}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
 		{A094F0F9-C067-4B66-8FCA-ECA3747C6A4C}.DebugAvalonia|Any CPU.Build.0 = DebugAvalonia|Any CPU
+		{DE7953F1-6155-44F0-86D3-1DCD0A9FE5DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE7953F1-6155-44F0-86D3-1DCD0A9FE5DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE7953F1-6155-44F0-86D3-1DCD0A9FE5DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE7953F1-6155-44F0-86D3-1DCD0A9FE5DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE7953F1-6155-44F0-86D3-1DCD0A9FE5DC}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE7953F1-6155-44F0-86D3-1DCD0A9FE5DC}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

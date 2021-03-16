@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="WDE.CommonViews.WPF.Updater.ChangeLogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WDE.CommonViews.WPF.Updater"
+             xmlns:viewModels="clr-namespace:WDE.Updater.ViewModels;assembly=WDE.Updater"
+             xmlns:converters="clr-namespace:WDE.Common.WPF.Converters;assembly=WDE.Common.WPF"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:ChangeLogViewModel}"
+             Padding="15"
+             Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <converters:DataTimeToStringConverter Format="m" x:Key="TimeConverter"/>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True">
+        <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA" DockPanel.Dock="Top">
+            <TextBlock VerticalAlignment="Bottom" 
+                       FontSize="34"
+                       FontFamily="Segoe UI Light" 
+                       TextWrapping="WrapWithOverflow"
+                       Text="{Binding Title}"/>
+        </Border>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Changes}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,10,0,0">
+                            <DockPanel>
+                                <TextBlock Text="{Binding VersionName}" FontSize="20"/>
+                                <TextBlock TextAlignment="Right" Text="{Binding Date, Converter={StaticResource TimeConverter}}" FontSize="14" DockPanel.Dock="Right"/>
+                            </DockPanel>
+                            <ItemsControl ItemsSource="{Binding Changes}" Margin="10,0,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel LastChildFill="True">
+                                            <Ellipse Width="4" Height="4" VerticalAlignment="Top" Margin="0,4,8,0" Fill="#FF5FA2DA" DockPanel.Dock="Left" />
+                                            <TextBlock Margin="0,0,0,5" FontSize="14" Text="{Binding .}" TextWrapping="WrapWithOverflow"></TextBlock>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

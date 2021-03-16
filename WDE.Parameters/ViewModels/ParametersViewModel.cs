@@ -42,7 +42,8 @@ namespace WDE.Parameters.ViewModels
         public ICommand Save { get; }
 
         public string Name => "Parameters browser";
-        
+        public string ShortDescription => null;
+
         public bool IsModified => false;
 
         public bool IsRestartRequired => false;

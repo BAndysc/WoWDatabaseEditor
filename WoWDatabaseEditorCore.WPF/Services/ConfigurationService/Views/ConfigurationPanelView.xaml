@@ -1,12 +1,14 @@
 ﻿<UserControl x:Class="WoWDatabaseEditorCore.WPF.Services.ConfigurationService.Views.ConfigurationPanelView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:Metro="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             xmlns:utils1="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
              xmlns:utils2="clr-namespace:WDE.Common.WPF.Utils;assembly=WDE.Common.WPF"
+             xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
              prism:ViewModelLocator.AutoWireViewModel="False">
+    <UserControl.Resources>
+        <viewHelpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" WhenNull="Collapsed" />
+    </UserControl.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -36,8 +38,15 @@
                 <DataTemplate>
                     <DockPanel LastChildFill="True" Margin="7,5">
                         <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontSize="32" FontWeight="Light" />
+                        <TextBlock DockPanel.Dock="Top" 
+                                   TextWrapping="WrapWithOverflow" 
+                                   FontSize="18" 
+                                   FontWeight="Light"
+                                   Visibility="{Binding ShortDescription, Converter={StaticResource NullToVisibilityConverter}}"
+                                   Text="{Binding ShortDescription}"
+                                   Margin="0,0,0,17" />
                         <ContentControl utils2:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
-                                        VerticalContentAlignment="Stretch" />
+                                            VerticalContentAlignment="Stretch" />
                     </DockPanel>
                 </DataTemplate>
             </TabControl.ContentTemplate>
