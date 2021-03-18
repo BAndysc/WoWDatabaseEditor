@@ -46,6 +46,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
             OpenParameterWindow = new AsyncAutoCommand<ParameterValueHolder<long>?>(EditParameter);
             AddRow = new DelegateCommand(AddNewRow);
+            DeleteRow = new DelegateCommand(DeleteExistingRow);
             Save = new DelegateCommand(SaveTable);
             
             History = historyCreator();
@@ -74,6 +75,8 @@ namespace WDE.DatabaseEditors.ViewModels
         private DelegateCommand redoCommand;
         public AsyncAutoCommand<ParameterValueHolder<long>?> OpenParameterWindow { get; }
         public DelegateCommand AddRow { get; }
+        public DelegateCommand DeleteRow { get; }
+        public int? SelectedRow { get; set; }
 
         private async Task LoadTableData()
         {
@@ -121,12 +124,13 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private void AddNewRow()
         {
-            if (tableData == null)
-                return;
+            tableData?.AddRow(fieldFactory.Value);
+        }
 
-            foreach (var column in tableData.Columns)
-                column.Fields.Add(fieldFactory.Value.CreateField(column.FieldDataSource, column.GetDefaultValue(),
-                    column));
+        private void DeleteExistingRow()
+        {
+            if (SelectedRow.HasValue && SelectedRow.Value >= 0)
+                tableData?.DeleteRow(SelectedRow.Value);
         }
         
         private void SetupHistory()

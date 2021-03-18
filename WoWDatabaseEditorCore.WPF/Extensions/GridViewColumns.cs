@@ -9,7 +9,6 @@ using System.Windows.Data;
 using System.Windows.Markup;
 using System.Xml;
 using WDE.Common.Types;
-using WoWDatabaseEditorCore.Extensions;
 
 #nullable disable
 namespace WoWDatabaseEditorCore.WPF.Extensions

@@ -447,6 +447,23 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
     
+    <Style TargetType="DataGrid">
+        <Setter Property="Background" Value="#303030" />
+        <Setter Property="Foreground" Value="#FFEEEEEE" />
+    </Style>
+    
+    <Style TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="#303030" />
+        <Setter Property="Foreground" Value="#FFEEEEEE" />
+        <Setter Property="MinHeight" Value="25"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    
+    <Style TargetType="DataGridRowHeader">
+        <Setter Property="Background" Value="#303030" />
+        <Setter Property="Foreground" Value="#FFEEEEEE" />
+    </Style>
+    
     <!-- SmartScripts -->
     <SolidColorBrush x:Key="SmartScripts.Background" Color="#303030" />
     

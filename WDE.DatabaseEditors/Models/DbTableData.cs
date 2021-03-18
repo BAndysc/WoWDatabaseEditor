@@ -12,8 +12,8 @@ namespace WDE.DatabaseEditors.Models
         public string TableDescription { get; }
         public List<IDbTableFieldsCategory> Categories { get; }
 
-        public DbTableData(string tableName, string dbTableName, string tableIndexFieldName, string tableIndexValue, string tableDescription,
-            List<IDbTableFieldsCategory> categories)
+        public DbTableData(string tableName, string dbTableName, string tableIndexFieldName, string tableIndexValue,
+            string tableDescription, List<IDbTableFieldsCategory> categories)
         {
             TableName = tableName;
             DbTableName = dbTableName;

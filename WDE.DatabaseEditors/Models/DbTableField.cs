@@ -23,7 +23,8 @@ namespace WDE.DatabaseEditors.Models
             IsParameter = isParameter;
             Parameter = value;
             Parameter.OnValueChanged += ParameterOnOnValueChanged;
-            OriginalValue = value.Value;
+            OriginalValue = new ParameterValueHolder<T>(Parameter.Parameter);
+            OriginalValue.Copy(Parameter);
         }
 
         public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition, ParameterValueHolder<T> value)
@@ -37,7 +38,8 @@ namespace WDE.DatabaseEditors.Models
             IsParameter = fieldDefinition.ValueType.EndsWith("Parameter");
             Parameter = value;
             Parameter.OnValueChanged += ParameterOnOnValueChanged;
-            OriginalValue = value.Value;
+            OriginalValue = new ParameterValueHolder<T>(Parameter.Parameter);
+            OriginalValue.Copy(Parameter);
         }
 
         public string FieldName { get; private set; }
@@ -58,8 +60,8 @@ namespace WDE.DatabaseEditors.Models
         public bool IsParameter { get; }
         
         public ParameterValueHolder<T> Parameter { get; }
-        public T OriginalValue { get; private set; }
-        public string OriginalValueTooltip => $"Original value: {OriginalValue}";
+        public ParameterValueHolder<T> OriginalValue { get; private set; }
+        public string OriginalValueTooltip => $"Original value: {OriginalValue.String}";
 
         // IStateRestorableField
         
@@ -68,7 +70,7 @@ namespace WDE.DatabaseEditors.Models
             isModified = true;
             if (fieldData.NewValue != null)
                 Parameter.Value = (T) fieldData.NewValue;
-            OriginalValue = (T) fieldData.OriginalValue;
+            OriginalValue.Value = (T) fieldData.OriginalValue;
         }
 
         public object? GetValueForPersistence() => Parameter.Value;

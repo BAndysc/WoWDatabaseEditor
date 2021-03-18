@@ -88,6 +88,14 @@ namespace WDE.DatabaseEditors.Data
                     }
                 }
                 
+                // make sure all columns have same amount of records
+                var firstColumnRecordsAmount = columns[0].Fields.Count;
+                foreach (var column in columns)
+                {
+                    if (column.Fields.Count != firstColumnRecordsAmount)
+                        throw new Exception("Detected row amount mismatch between table's columns!");
+                }
+                
                 return new DbMultiRecordTableData(tableDefinition.Name, tableDefinition.TableName,
                     tableDefinition.TablePrimaryKeyColumnName,
                     tableIndex ?? "Unk", tableDesc, columns);

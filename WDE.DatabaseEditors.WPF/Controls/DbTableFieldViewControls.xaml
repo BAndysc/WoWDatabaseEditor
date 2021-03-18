@@ -85,7 +85,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" >
                         <Image ToolTip="{Binding OriginalValueTooltip}" Source="{DynamicResource StatusBarIconNotice}"
                                Width="15" Height="15" Margin="2, 0, 2, 0">
                             <Image.Style>
