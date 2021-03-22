@@ -53,7 +53,7 @@ namespace WoWDatabaseEditorCore.Services.FileSystemService
         {
             var path = vfs.ResolvePath(virtualPath);
             path.Directory?.Create();
-            return path.OpenWrite();
+            return path.Open(FileMode.Create, FileAccess.Write);
         }
     }
 }
