@@ -32,7 +32,7 @@ namespace WDE.DatabaseEditors.Data
             if (result == null || result.Count == 0)
                 return null;
 
-            return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0], "Template of");
+            return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0]);
         }
 
         public async Task<IDbTableData?> LoadGameobjectTemplateDataEntry(uint goEntry)
@@ -44,7 +44,7 @@ namespace WDE.DatabaseEditors.Data
             if (result == null || result.Count == 0)
                 return null;
 
-            return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0], "Go Template of");
+            return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0]);
         }
 
         public async Task<IDbTableData?> LoadCreatureLootTemplateData(uint entry)
@@ -56,8 +56,7 @@ namespace WDE.DatabaseEditors.Data
             if (result == null || result.Count == 0)
                 return null;
 
-            return tableDataProvider.GetDatabaseMultiRecordTable(in tableDefinition, result, 
-                 "Creature loot for entry");
+            return tableDataProvider.GetDatabaseMultiRecordTable(in tableDefinition, result);
         }
 
         private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, uint entry)

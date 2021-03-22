@@ -25,17 +25,13 @@ namespace WDE.DatabaseEditors.Data
         }
         
         public IDbTableData? GetDatabaseTable(in DatabaseEditorTableDefinitionJson tableDefinition,
-            Dictionary<string, object> fieldsFromDb, string descSuffix)
+            Dictionary<string, object> fieldsFromDb)
         {
             if (!string.IsNullOrWhiteSpace(tableDefinition.NameSwapFilePath))
                 nameSwapDataManager.Value.RegisterSwapDefinition(tableDefinition.Name, tableDefinition.NameSwapFilePath);
             
             var tableCategories = new List<IDbTableFieldsCategory>(tableDefinition.Groups.Count);
             var tableIndex = fieldsFromDb[tableDefinition.TablePrimaryKeyColumnName].ToString();
-            var descNameField = fieldsFromDb.ContainsKey(tableDefinition.TableNameSource)
-                ? fieldsFromDb[tableDefinition.TableNameSource].ToString()
-                : tableIndex;
-            var tableDesc = $"{descSuffix} {descNameField ?? tableIndex}";
 
             try
             {
@@ -43,7 +39,7 @@ namespace WDE.DatabaseEditors.Data
                     tableCategories.Add(CreateCategory(in category, fieldsFromDb));
 
                 return new DbTableData(tableDefinition.Name, tableDefinition.TableName, tableDefinition.TablePrimaryKeyColumnName, 
-                    tableIndex ?? "Unk", tableDesc, tableCategories);
+                    tableIndex ?? "Unk", tableCategories);
             }
             catch (Exception e)
             {
@@ -55,14 +51,13 @@ namespace WDE.DatabaseEditors.Data
         }
 
         public IDbTableData? GetDatabaseMultiRecordTable(in DatabaseEditorTableDefinitionJson tableDefinition,
-            IList<Dictionary<string, object>> records, string descSuffix)
+            IList<Dictionary<string, object>> records)
         {
             // no support for swap data (at least for now) cuz simply no need for that
             // if (!string.IsNullOrWhiteSpace(tableDefinition.NameSwapFilePath))
             //     nameSwapDataManager.Value.RegisterSwapDefinition(tableDefinition.Name, tableDefinition.NameSwapFilePath);
 
             var tableIndex = records[0][tableDefinition.TablePrimaryKeyColumnName].ToString();
-            var tableDesc = $"{descSuffix} {tableIndex}";
 
             var columns = new List<IDbTableColumn>(records[0].Count);
 
@@ -98,7 +93,7 @@ namespace WDE.DatabaseEditors.Data
                 
                 return new DbMultiRecordTableData(tableDefinition.Name, tableDefinition.TableName,
                     tableDefinition.TablePrimaryKeyColumnName,
-                    tableIndex ?? "Unk", tableDesc, columns);
+                    tableIndex ?? "Unk", columns);
             }
             catch (Exception e)
             {

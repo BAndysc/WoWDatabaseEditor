@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.Solution;
-using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.Data;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -9,7 +10,19 @@ namespace WDE.DatabaseEditors.Solution
     [AutoRegister]
     public class DbEditorsSolutionItemSqlProvider : ISolutionItemSqlProvider<DbEditorsSolutionItem>
     {
-        public string GenerateSql(DbEditorsSolutionItem item) => GenerateQuery(item.ModifiedFields, item.DbTableName, item.KeyColumnName, item.Entry);
+        private readonly Lazy<IDbTableDefinitionProvider> tableDefinitionProvider;
+
+        public DbEditorsSolutionItemSqlProvider(Lazy<IDbTableDefinitionProvider> tableDefinitionProvider)
+        {
+            this.tableDefinitionProvider = tableDefinitionProvider;
+        }
+
+        public string GenerateSql(DbEditorsSolutionItem item)
+        {
+            var tableDefinition = GetTableDefinition(item.TableContentType);
+            return GenerateQuery(item.ModifiedFields, tableDefinition.TableName,
+                tableDefinition.TablePrimaryKeyColumnName, item.Entry);
+        }
 
         private string GenerateQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, string keyColumnName, uint itemKey)
         {
@@ -26,6 +39,21 @@ namespace WDE.DatabaseEditors.Solution
             var paramValue = modifiedField.NewValue is string ? $"\"{modifiedField.NewValue}\"" : 
                 (modifiedField.NewValue is null ? "NULL" : $"{modifiedField.NewValue}");
             return $"`{modifiedField.DbFieldName}`={paramValue}";
+        }
+
+        private DatabaseEditorTableDefinitionJson GetTableDefinition(DbTableContentType tableContentType)
+        {
+            switch (tableContentType)
+            {
+                case DbTableContentType.CreatureTemplate:
+                    return tableDefinitionProvider.Value.GetCreatureTemplateDefinition();
+                case DbTableContentType.CreatureLootTemplate:
+                    return tableDefinitionProvider.Value.GetCreatureLootTemplateDefinition();
+                case DbTableContentType.GameObjectTemplate:
+                    return tableDefinitionProvider.Value.GetGameobjectTemplateDefinition();
+                default:
+                    throw new Exception("[DbEditorsSolutionItemSqlProvider] not defined table content type!");
+            }
         }
     }
 }

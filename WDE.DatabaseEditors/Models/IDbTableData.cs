@@ -9,6 +9,5 @@ namespace WDE.DatabaseEditors.Models
         string DbTableName { get; }
         string TableIndexFieldName { get; }
         string TableIndexValue { get; }
-        string TableDescription { get; }
     }
 }

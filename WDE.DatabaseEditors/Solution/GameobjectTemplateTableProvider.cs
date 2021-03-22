@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.DatabaseEditors.Data;
@@ -27,8 +28,8 @@ namespace WDE.DatabaseEditors.Solution
             {
                 var data = await tableDataProvider.Value.LoadGameobjectTemplateDataEntry(key.Value);
                 if (data != null)
-                    return new DbEditorsSolutionItem(key.Value,
-                        nameof(tableDataProvider.Value.LoadGameobjectTemplateDataEntry), data);
+                    return new DbEditorsSolutionItem(key.Value, DbTableContentType.GameObjectTemplate, false,
+                        new Dictionary<string, DbTableSolutionItemModifiedField>());
             }
 
             return null;

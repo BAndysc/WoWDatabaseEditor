@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Providers;
 using WDE.DatabaseEditors.Data;
-using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -28,8 +28,8 @@ namespace WDE.DatabaseEditors.Solution
             {
                 var data = await tableDataProvider.Value.LoadCreatureLootTemplateData(key.Value);
                 if (data != null)
-                    return new DbEditorsSolutionItem(key.Value,
-                        nameof(tableDataProvider.Value.LoadCreatureLootTemplateData), data);
+                    return new DbEditorsSolutionItem(key.Value, DbTableContentType.CreatureLootTemplate, true, 
+                        new Dictionary<string, DbTableSolutionItemModifiedField>());
             }
 
             return null;

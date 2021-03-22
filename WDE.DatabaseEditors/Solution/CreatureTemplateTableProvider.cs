@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.DatabaseEditors.Data;
@@ -28,8 +29,8 @@ namespace WDE.DatabaseEditors.Solution
             {
                 var data = await tableDataProvider.Value.LoadCreatureTemplateDataEntry(key.Value);
                 if (data != null)
-                    return new DbEditorsSolutionItem(key.Value,
-                        nameof(tableDataProvider.Value.LoadCreatureTemplateDataEntry), data);
+                    return new DbEditorsSolutionItem(key.Value, DbTableContentType.CreatureTemplate,
+                        false, new Dictionary<string, DbTableSolutionItemModifiedField>());
             }
 
             return null;

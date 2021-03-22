@@ -75,7 +75,7 @@ namespace WDE.DatabaseEditors.Models
 
         public object? GetValueForPersistence() => Parameter.Value;
 
-        public object GetOriginalValueForPersistence() => OriginalValue;
+        public object GetOriginalValueForPersistence() => OriginalValue.Value;
         
         // ISwappableNameField
         

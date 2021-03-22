@@ -24,7 +24,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly Lazy<IItemFromListProvider> itemFromListProvider;
         private readonly Lazy<IDbTableFieldFactory> fieldFactory;
         
-        public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, 
+        public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName, 
             Func<uint, Task<IDbTableData?>>? tableDataLoader, Func<IHistoryManager> historyCreator,
             ITaskRunner taskRunner, Lazy<IItemFromListProvider> itemFromListProvider,
             Lazy<IDbTableFieldFactory> fieldFactory)
@@ -39,10 +39,10 @@ namespace WDE.DatabaseEditors.ViewModels
             else
             {
                 IsLoading = true;
-                taskRunner.ScheduleTask("Loading table data...", LoadTableData);
+                taskRunner.ScheduleTask($"Loading {tableName}..", LoadTableData);
             }
 
-            Title = $"{solutionItem.TableName} Editor";
+            Title = $"{tableName} Editor";
 
             OpenParameterWindow = new AsyncAutoCommand<ParameterValueHolder<long>?>(EditParameter);
             AddRow = new DelegateCommand(AddNewRow);
@@ -113,7 +113,7 @@ namespace WDE.DatabaseEditors.ViewModels
             IsLoading = false;
             TableData = data;
             // for cache purpose
-            solutionItem.TableData = data;
+            solutionItem.CacheTableData(data);
             SetupHistory();
         }
 

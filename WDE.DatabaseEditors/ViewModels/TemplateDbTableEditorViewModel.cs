@@ -24,7 +24,7 @@ namespace WDE.DatabaseEditors.ViewModels
     public class TemplateDbTableEditorViewModel: BindableBase, IDocument
     {
         private readonly Lazy<IItemFromListProvider> itemFromListProvider;
-        private readonly Func<uint, Task<IDbTableData>>? tableDataLoader;
+        private readonly Func<uint, Task<IDbTableData?>>? tableDataLoader;
         private readonly Lazy<IMessageBoxService> messageBoxService;
         private readonly IDbFieldNameSwapDataManager nameSwapDataManager;
 
@@ -32,9 +32,10 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly DbEditorsSolutionItem solutionItem;
         private DbTableFieldNameSwapHandler? tableFieldNameSwapHandler;
         
-        public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, Func<uint, Task<IDbTableData>>? tableDataLoader, 
-            Lazy<IItemFromListProvider> itemFromListProvider, Func<IHistoryManager> historyCreator, ITaskRunner taskRunner,
-            Lazy<IMessageBoxService> messageBoxService, IDbFieldNameSwapDataManager nameSwapDataManager)
+        public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName,
+            Func<uint, Task<IDbTableData?>>? tableDataLoader, Lazy<IItemFromListProvider> itemFromListProvider, 
+            Func<IHistoryManager> historyCreator, ITaskRunner taskRunner, Lazy<IMessageBoxService> messageBoxService,
+            IDbFieldNameSwapDataManager nameSwapDataManager)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
@@ -47,10 +48,10 @@ namespace WDE.DatabaseEditors.ViewModels
             else
             {
                 IsLoading = true;
-                taskRunner.ScheduleTask($"Loading {solutionItem.TableName}..", LoadTableDefinition);
+                taskRunner.ScheduleTask($"Loading {tableName}..", LoadTableDefinition);
             }
 
-            Title = $"{solutionItem.TableName} Editor";
+            Title = $"{tableName} Editor";
             
             OpenParameterWindow = new AsyncAutoCommand<ParameterValueHolder<long>?>(EditParameter);
             saveModifiedFields = new DelegateCommand(SaveSolutionItem);
@@ -130,7 +131,7 @@ namespace WDE.DatabaseEditors.ViewModels
                     continue;
                     
                 if (field is IStateRestorableField restorableField)
-                    restorableField.RestoreLoadedFieldState(solutionItem.ModifiedFields[field.FieldName]);
+                    restorableField.RestoreLoadedFieldState(solutionItem.ModifiedFields[field.DbFieldName]);
             }
 
             SaveLoadedTableData(data);
@@ -141,7 +142,7 @@ namespace WDE.DatabaseEditors.ViewModels
             IsLoading = false;
             TableData = data;
             // for cache purpose
-            solutionItem.TableData = data;
+            solutionItem.CacheTableData(data);
             SetupHistory();
             SetupSwapDataHandler();
         }

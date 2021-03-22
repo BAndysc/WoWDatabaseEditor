@@ -9,7 +9,6 @@
              d:DesignHeight="300" d:DesignWidth="300"
              x:Name="rootWindow">
     <UserControl.Resources>
-        <!-- <extensions:DataGridBindingConverter x:Key="GridBindingConverter" /> -->
         <ResourceDictionary Source="../Controls/DbTableFieldViewControls.xaml"> </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.InputBindings>
@@ -26,38 +25,10 @@
                         Margin="10, 5, 0, 5" Width="30"/>
                 <Separator HorizontalAlignment="Stretch"/>
             </StackPanel>
-            <!-- <extensions:TestDataGrid Grid.Row="1" ItemsSource="{Binding}" AutoGenerateColumns="True" -->
-            <!--                          CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeRows="False"  -->
-            <!--                          CanUserDeleteRows="False" -->
-            <!--                          extensions:MultiRecordTableGrid.ColumnsSource="{Binding TableData.Columns}"> -->
-            <!--     <DataGrid.CellStyle> -->
-            <!--         <Style TargetType="DataGridCell"> -->
-            <!--             <Setter Property="Template"> -->
-            <!--                 <Setter.Value> -->
-            <!--                     <ControlTemplate> -->
-            <!--                         <controls:DbTableFieldValueView DataContext="{Binding}" /> -->
-            <!--                     </ControlTemplate> -->
-            <!--                 </Setter.Value> -->
-            <!--             </Setter> -->
-            <!--         </Style> -->
-            <!--     </DataGrid.CellStyle> -->
-            <!-- </extensions:TestDataGrid> -->
-            <!--     <ListView Grid.Row="1" ItemContainerStyle="{DynamicResource ListViewItemStyle}" -->
-            <!--           ItemsSource="{Binding TableData.Columns}"> -->
-            <!--     <ListView.View> -->
-            <!--         <extensions:MultiRecordGridView extensions:GridViewColumns.HeaderTextMember="ColumnName" -->
-            <!--                              extensions:GridViewColumns.DisplayMemberMember="Fields" -->
-            <!--                              extensions:GridViewColumns.ColumnsSource="{Binding TableData.ColumnDescriptors}" -->
-            <!--                              extensions:GridViewColumns.ColumnHeadStyleName="GridColumnHeaderStyle" -->
-            <!--                              ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}" /> -->
-            <!--     </ListView.View> -->
-            <!--     ~1~ https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-create-a-custom-view-mode-for-a-listview?view=netframeworkdesktop-4.8 @1@ -->
-            <!-- </ListView> -->
             <ItemsControl Grid.Row="1" ItemsSource="{Binding TableData.Columns}" Margin="0, 0, 0, 20">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <extensions:MultiRecortTableViewPanel Orientation="Horizontal" Grid.IsSharedSizeScope="True" />
-                        <!-- <UniformGrid IsItemsHost="True" Rows="1" /> -->
+                        <VirtualizingStackPanel Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Template>
@@ -73,7 +44,7 @@
                             <Border>
                                 <Label Content="{Binding ColumnName}" HorizontalContentAlignment="Center" />
                             </Border>
-                            <ItemsControl ItemsSource="{Binding Fields}" x:Name="FieldsItemControl">
+                            <ItemsControl ItemsSource="{Binding Fields}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <controls:DbTableFieldValueView />

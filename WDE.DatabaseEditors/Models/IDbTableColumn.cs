@@ -8,7 +8,7 @@ namespace WDE.DatabaseEditors.Models
     {
         string ColumnName { get; }
         string DbColumnName { get; }
-        List<IDbTableField> Fields { get; }
+        ObservableCollection<IDbTableField> Fields { get; }
         DbEditorTableGroupFieldJson FieldDataSource { get; }
 
         bool CanAddFieldOfType(System.Type fieldType);

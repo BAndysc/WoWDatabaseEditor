@@ -18,43 +18,60 @@ namespace WDE.DatabaseEditors.Solution
     [AutoRegister]
     public class DbTableSolutionItemEditorProvider : ISolutionItemEditorProvider<DbEditorsSolutionItem>
     {
-        private readonly Lazy<IItemFromListProvider> itemFromListProvider;
-        private readonly Func<IHistoryManager> historyCreator;
         private readonly Lazy<IDbEditorTableDataProvider> tableDataProvider;
-        private readonly Lazy<ITaskRunner> taskRunner;
         private readonly Lazy<IContainerProvider> containerRegistry;
+        private readonly Lazy<IDbTableDefinitionProvider> tableDefinitionProvider;
         
-        public DbTableSolutionItemEditorProvider(Lazy<IItemFromListProvider> itemFromListProvider,
-            Func<IHistoryManager> historyCreator, Lazy<IDbEditorTableDataProvider> tableDataProvider,
-            Lazy<ITaskRunner> taskRunner, Lazy<IContainerProvider> containerRegistry)
+        public DbTableSolutionItemEditorProvider(Lazy<IDbEditorTableDataProvider> tableDataProvider, 
+            Lazy<IContainerProvider> containerRegistry, Lazy<IDbTableDefinitionProvider> tableDefinitionProvider)
         {
-            this.itemFromListProvider = itemFromListProvider;
-            this.historyCreator = historyCreator;
             this.tableDataProvider = tableDataProvider;
-            this.taskRunner = taskRunner;
             this.containerRegistry = containerRegistry;
+            this.tableDefinitionProvider = tableDefinitionProvider;
         }
         
         public IDocument GetEditor(DbEditorsSolutionItem item)
         {
-            Func<uint, Task<IDbTableData>>? tableDataLoader = null;
+            Func<uint, Task<IDbTableData?>>? tableDataLoader = null;
             if (item.TableData == null)
-                tableDataLoader = FindTableDataLoader(item.TableDataLoaderMethodName);
+                tableDataLoader = GetLoaderMethod(item.TableContentType);
+            var tableName = GetTableName(item.TableContentType);
 
             return item.IsMultiRecord ? containerRegistry.Value.Resolve<MultiRecordDbTableEditorViewModel>(
-                    (typeof(DbEditorsSolutionItem), item), (typeof(Func<uint, Task<IDbTableData>>), tableDataLoader))
+                    (typeof(DbEditorsSolutionItem), item), (typeof(string), tableName),
+                    (typeof(Func<uint, Task<IDbTableData>>), tableDataLoader))
                 : containerRegistry.Value.Resolve<TemplateDbTableEditorViewModel>((typeof(DbEditorsSolutionItem), item),
-                (typeof(Func<uint, Task<IDbTableData>>), tableDataLoader));
+                    (typeof(string), tableName), (typeof(Func<uint, Task<IDbTableData?>>), tableDataLoader));
         }
 
-        private Func<uint, Task<IDbTableData>>? FindTableDataLoader(string methodName)
+        private Func<uint, Task<IDbTableData?>> GetLoaderMethod(DbTableContentType contentType)
         {
-            // use reflection to get tableDataProvider method from solution item
-            var method = tableDataProvider.Value.GetType().GetMethod(methodName);
-            if (method == null)
-                return null;
-
-            return method.CreateDelegate<Func<uint, Task<IDbTableData>>>(tableDataProvider.Value);
+            switch (contentType)
+            {
+                case DbTableContentType.CreatureTemplate:
+                    return tableDataProvider.Value.LoadCreatureTemplateDataEntry;
+                case DbTableContentType.CreatureLootTemplate:
+                    return tableDataProvider.Value.LoadCreatureLootTemplateData;
+                case DbTableContentType.GameObjectTemplate:
+                    return tableDataProvider.Value.LoadGameobjectTemplateDataEntry;
+                default:
+                    throw new Exception("[DbTableSolutionItemEditorProvider] not defined table type!");
+            }
+        }
+        
+        private string GetTableName(DbTableContentType tableContentType)
+        {
+            switch (tableContentType)
+            {
+                case DbTableContentType.CreatureTemplate:
+                    return tableDefinitionProvider.Value.GetCreatureTemplateDefinition().Name;
+                case DbTableContentType.CreatureLootTemplate:
+                    return tableDefinitionProvider.Value.GetCreatureLootTemplateDefinition().Name;
+                case DbTableContentType.GameObjectTemplate:
+                    return tableDefinitionProvider.Value.GetGameobjectTemplateDefinition().Name;
+                default:
+                    throw new Exception("[DbTableSolutionItemEditorProvider] not defined table content type!");
+            }
         }
     }
 }

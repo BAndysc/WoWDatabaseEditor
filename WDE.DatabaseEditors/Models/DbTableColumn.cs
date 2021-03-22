@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
+using System.Collections.ObjectModel;
 using WDE.DatabaseEditors.Data;
 
 namespace WDE.DatabaseEditors.Models
@@ -8,14 +9,14 @@ namespace WDE.DatabaseEditors.Models
     {
         public string ColumnName => FieldDataSource.Name;
         public string DbColumnName => FieldDataSource.DbColumnName;
-        public List<IDbTableField> Fields { get; }
+        public ObservableCollection<IDbTableField> Fields { get; }
         public DbEditorTableGroupFieldJson FieldDataSource { get; }
         private object? defaultValue;
 
         public DbTableColumn(in DbEditorTableGroupFieldJson fieldDataSource, List<IDbTableField> fields, object? defaultValue)
         {
             FieldDataSource = fieldDataSource;
-            Fields = new List<IDbTableField>(fields);
+            Fields = new ObservableCollection<IDbTableField>(fields);
             this.defaultValue = defaultValue;
         }
 
