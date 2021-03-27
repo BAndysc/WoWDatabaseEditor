@@ -4,7 +4,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
@@ -19,14 +21,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 nameof(EditEventCommand),
                 o => o.EditEventCommand,
                 (o, v) => o.EditEventCommand = v);
-        
-        
+
         public static readonly DirectProperty<SmartEventView, ICommand?> DeselectAllRequestProperty =
             AvaloniaProperty.RegisterDirect<SmartEventView, ICommand?>(
                 nameof(DeselectAllRequest),
                 o => o.DeselectAllRequest,
                 (o, v) => o.DeselectAllRequest = v);
-        
         
         public static readonly DirectProperty<SmartEventView, ICommand?> DeselectActionsOfDeselectedEventsRequestProperty =
             AvaloniaProperty.RegisterDirect<SmartEventView, ICommand?>(
@@ -68,7 +68,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             get => directEditParameter;
             set => SetAndRaise(DirectEditParameterProperty, ref directEditParameter, value);
         }
-
+        
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             base.OnPointerPressed(e);

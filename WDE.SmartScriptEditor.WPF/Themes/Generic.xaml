@@ -152,6 +152,52 @@
         </Setter>
     </Style>
     
+    <Style TargetType="userControls:MiniEventIcon">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="userControls:MiniEventIcon">
+                    <Grid Width="12" Height="12" Margin="2,0,0,0">
+                        <Ellipse Fill="{TemplateBinding Background}"></Ellipse>
+                        <TextBlock Foreground="{DynamicResource SmartScripts.Event.Flag.Foreground}" 
+                                   Margin="0,1,0,0" 
+                                   FontSize="9" 
+                                   TextAlignment="Center" 
+                                   VerticalAlignment="Center" Text="{TemplateBinding Text}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style TargetType="userControls:SmartEventFlagsView">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="userControls:SmartEventFlagsView">
+                    <ItemsControl ItemsSource="{TemplateBinding Flags}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel MaxWidth="30" IsItemsHost="True" VerticalAlignment="Center" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplateSelector>
+                            <userControls:SmartEventFlagPhaseDataSelector>
+                                <userControls:SmartEventFlagPhaseDataSelector.FlagTemplate>
+                                    <DataTemplate>
+                                        <userControls:MiniEventIcon Background="{DynamicResource SmartScripts.Event.Flag.Background}" Text="{Binding Text}" ToolTip="{Binding ToolTip}" />
+                                    </DataTemplate>
+                                </userControls:SmartEventFlagPhaseDataSelector.FlagTemplate>
+                                <userControls:SmartEventFlagPhaseDataSelector.PhaseTemplate>
+                                    <DataTemplate>
+                                        <userControls:MiniEventIcon Background="{DynamicResource SmartScripts.Event.Phase.Background}" Text="{Binding Text}" ToolTip="{Binding ToolTip}" />
+                                    </DataTemplate>
+                                </userControls:SmartEventFlagPhaseDataSelector.PhaseTemplate>
+                            </userControls:SmartEventFlagPhaseDataSelector>
+                        </ItemsControl.ItemTemplateSelector>
+                    </ItemsControl>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     
     <Style TargetType="userControls:SmartEventView">
         <Setter Property="Template">
@@ -159,33 +205,35 @@
                 <ControlTemplate TargetType="userControls:SmartEventView">
                     <DockPanel LastChildFill="True">
                         <Border BorderThickness="1" DockPanel.Dock="Top">
-                            <TextBlock TextWrapping="WrapWithOverflow" 
-                                       helpers:SmartFormattedText.ContextArray="{Binding Context}"
-                                       helpers:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
-                                       helpers:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}" 
-                                       helpers:SmartFormattedText.SmartFormattedText="{Binding Readable}"
-                                       Padding="3">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
-                                        <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Event.Foreground}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsSelected}" Value="true">
-                                                <Setter Property="Background"
-                                                        Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
-                                                <Setter Property="Foreground"
-                                                        Value="{DynamicResource SmartScripts.Event.Selected.Foreground}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-
+                            <DockPanel LastChildFill="True">
+                                <userControls:SmartEventFlagsView DockPanel.Dock="Right" Margin="2"/>
+                                <TextBlock TextWrapping="WrapWithOverflow" 
+                                           helpers:SmartFormattedText.ContextArray="{Binding Context}"
+                                           helpers:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
+                                           helpers:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}" 
+                                           helpers:SmartFormattedText.SmartFormattedText="{Binding Readable}"
+                                           Padding="3">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Event.Foreground}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                                                    <Setter Property="Foreground"
+                                                            Value="{DynamicResource SmartScripts.Event.Selected.Foreground}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DockPanel>
                             <Border.Style>
                                 <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
                                     <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Border}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                                            <Setter Property="Background"
+                                                    Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
                                             <Setter Property="BorderBrush"
                                                     Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
                                         </DataTrigger>

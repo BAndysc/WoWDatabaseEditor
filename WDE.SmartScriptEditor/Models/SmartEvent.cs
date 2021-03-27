@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -20,7 +24,7 @@ namespace WDE.SmartScriptEditor.Models
         private ParameterValueHolder<long> cooldownMin;
         private ParameterValueHolder<long> flags;
         private ParameterValueHolder<long> phases;
-        
+
         public SmartScript Parent { get; set; }
 
         public SmartEvent(int id) : base(SmartEventParamsCount, id)
@@ -44,7 +48,7 @@ namespace WDE.SmartScriptEditor.Models
                         (ob as SmartCondition).Parent = this;
                 }
             };
-            
+
             flags = new ParameterValueHolder<long>("Flags", SmartEventFlagParameter.Instance);
             chance = new ParameterValueHolder<long>("Chance", Parameter.Instance);
             phases = new ParameterValueHolder<long>("Phases", SmartEventPhaseParameter.Instance);
@@ -96,7 +100,7 @@ namespace WDE.SmartScriptEditor.Models
                             pram2 = GetParameter(1).Value,
                             pram3 = GetParameter(2).Value,
                             pram4 = GetParameter(3).Value,
-                            source_type = (int?)Parent?.SourceType ?? 0
+                            source_type = (int?) Parent?.SourceType ?? 0
                         }))
                         {
                             readable = rule.Description;
@@ -137,7 +141,7 @@ namespace WDE.SmartScriptEditor.Models
                 }
             }
         }
-        
+
         public void AddAction(SmartAction smartAction)
         {
             Actions.Add(smartAction);
@@ -158,50 +162,105 @@ namespace WDE.SmartScriptEditor.Models
             {
                 se.GetParameter(i).Copy(GetParameter(i));
             }
+
             return se;
         }
+    }
+
+    public enum SmartEventFlag
+    {
+        [Description(
+            "The event will be fired only once until next Reset() call. If you do not want to run it again even after Reset, add flag DontReset")]
+        NotRepeatable = 1,
+
+        [Description("The event will only be fired in normal dungeon/10 man normal raid")]
+        Difficulty0 = 2,
+
+        [Description("The event will only be fired in heroic dungeon/25 man normal raid")]
+        Difficulty1 = 4,
+
+        [Description("The event will only be fired in epic dungeon/10 man heroic raid")]
+        Difficulty2 = 8,
+
+        [Description("The event will only be fired in 25 man heroic raid")]
+        Difficulty3 = 16,
+
+        [Description("The event will only be fired if TrinityCore is compiled with DEBUG flag")]
+        DebugOnly = 128,
+
+        [Description("If you set this flag, NotRepeatable will not reset after Reset() call")]
+        DontReset = 256,
+
+        [Description("Event will be fired even if NPC is charmed")]
+        WhileCharmed = 512
+    }
+
+    public enum SmartEventPhases
+    {
+        Always = 0,
+        Phase1 = 1,
+        Phase2 = 2,
+        Phase3 = 4,
+        Phase4 = 8,
+        Phase5 = 16,
+        Phase6 = 32,
+        Phase7 = 64,
+        Phase8 = 128,
+        Phase9 = 256,
+        Phase10 = 512,
+        Phase11 = 1024,
+        Phase12 = 2048
     }
 
     public class SmartEventFlagParameter : FlagParameter
     {
         public static SmartEventFlagParameter Instance { get; } = new SmartEventFlagParameter();
+
         public SmartEventFlagParameter()
         {
-            Items = new Dictionary<long, SelectOption>()
-            {
-                [1] = new("NOT_REPEATABLE"),
-                [2] = new("DIFFICULTY_0"),
-                [4] = new("DIFFICULTY_1"),
-                [8] = new("DIFFICULTY_2"),
-                [16] = new("DIFFICULTY_3"),
-                [128] = new("DEBUG_ONLY"),
-                [256] = new("DONT_RESET"),
-                [512] = new("WHILE_CHARMED"),
-            };
+            Items = Enum
+                .GetValues<SmartEventFlag>()
+                .ToDictionary(f => (long) f, f => new SelectOption(f.ToString(), f.GetDescription()));
         }
     }
-    
+
+    public static class EnumExtensions
+    {
+        public static string GetDescription<T>(this T e) where T : IConvertible
+        {
+            if (e is Enum)
+            {
+                Type type = e.GetType();
+                Array values = System.Enum.GetValues(type);
+
+                foreach (int val in values)
+                {
+                    if (val == e.ToInt32(CultureInfo.InvariantCulture))
+                    {
+                        var memInfo = type.GetMember(type.GetEnumName(val));
+                        var descriptionAttribute = memInfo[0]
+                            .GetCustomAttributes(typeof(DescriptionAttribute), false)
+                            .FirstOrDefault() as DescriptionAttribute;
+
+                        if (descriptionAttribute != null)
+                        {
+                            return descriptionAttribute.Description;
+                        }
+                    }
+                }
+            }
+            return null; // could also return string.Empty
+        }
+    }
+
     public class SmartEventPhaseParameter : FlagParameter
     {
         public static SmartEventPhaseParameter Instance { get; } = new SmartEventPhaseParameter();
         public SmartEventPhaseParameter()
         {
-            Items = new Dictionary<long, SelectOption>()
-            {
-                [0] = new("Always"),
-                [1] = new("Phase 1"),
-                [2] = new("Phase 2"),
-                [4] = new("Phase 3"),
-                [8] = new("Phase 4"),
-                [16] = new("Phase 5"),
-                [32] = new("Phase 6"),
-                [64] = new("Phase 7"),
-                [128] = new("Phase 8"),
-                [256] = new("Phase 9"),
-                [512] = new("Phase 10"),
-                [1024] = new("Phase 11"),
-                [2048] = new("Phase 12"),
-            };
+            Items = Enum
+                .GetValues<SmartEventPhases>()
+                .ToDictionary(f => (long) f, f => new SelectOption(f.ToString()));
         }
     }
 }
