@@ -153,8 +153,8 @@
                                           Content="{TemplateBinding Image}"
                                           Width="54" Height="54"
                                           Margin="0,12,0,12" />
-                        <TextBlock IsHitTestVisible="False" FontWeight="Black" Text="{TemplateBinding Title}" TextWrapping="WrapWithOverflow"/>
-                        <TextBlock IsHitTestVisible="False" Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow"/>
+                        <TextBlock IsHitTestVisible="False" FontWeight="Black" Text="{TemplateBinding Title}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center"/>
+                        <TextBlock IsHitTestVisible="False" Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Stretch"/>
                         <ContentPresenter Content="{TemplateBinding Content}" Name="Buttons" />
                     </StackPanel>
                 </Panel>
