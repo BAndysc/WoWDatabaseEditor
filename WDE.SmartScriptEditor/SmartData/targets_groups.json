@@ -2,14 +2,15 @@
     {
         "name": "Script",
         "group_members": [
-            "SMART_TARGET_NONE",
             "SMART_TARGET_SELF",
+            "SMART_TARGET_NONE",
             "SMART_TARGET_ACTION_INVOKER",
             "SMART_TARGET_ACTION_INVOKER_VEHICLE",
             "SMART_TARGET_INVOKER_PARTY",
             "SMART_TARGET_POSITION",
             "SMART_TARGET_RANDOM_POINT_AC",
-            "SMART_TARGET_STORED"
+            "SMART_TARGET_STORED",
+            "SMART_TARGET_META_LAST_INVOKER"
         ]
     },
     {

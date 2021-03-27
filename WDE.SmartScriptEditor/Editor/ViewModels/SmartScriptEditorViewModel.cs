@@ -243,13 +243,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var actionData = smartDataManager.GetRawData(SmartType.SmartAction, sourceTargetEdit.RelatedAction.Id);
                     if (sourceTargetEdit.IsSource)
                     {
-                        int? newSource = await ShowSourcePicker(actionData);
+                        int? newSource = await ShowSourcePicker(sourceTargetEdit.RelatedAction.Parent, actionData);
                         if (newSource.HasValue)
                             smartFactory.UpdateSource(sourceTargetEdit.RelatedAction.Source, newSource.Value);                        
                     }
                     else
                     {
-                        int? newTarget = await ShowTargetPicker(actionData);
+                        int? newTarget = await ShowTargetPicker(sourceTargetEdit.RelatedAction.Parent, actionData);
                         if (newTarget.HasValue)
                             smartFactory.UpdateTarget(sourceTargetEdit.RelatedAction.Target, newTarget.Value);   
                     }
@@ -922,7 +922,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SmartEvent e = obj.Event;
             if (e == null)
                 return;
-            int? sourceId = await ShowSourcePicker();
+            int? sourceId = await ShowSourcePicker(e);
 
             if (!sourceId.HasValue)
                 return;
@@ -938,7 +938,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             if (actionData.UsesTarget && !actionData.TargetIsSource)
             {
-                int? targetId = await ShowTargetPicker(actionData);
+                int? targetId = await ShowTargetPicker(e, actionData);
 
                 if (!targetId.HasValue)
                     return;
@@ -987,18 +987,27 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 data => data.ValidTypes == null || data.ValidTypes.Contains(script.SourceType));
         }
 
-        private Task<int?> ShowTargetPicker(SmartGenericJsonData actionData)
-        {
+        private Task<int?> ShowTargetPicker(SmartEvent parentEvent, SmartGenericJsonData actionData)
+        {           
+            var eventSupportsActionInvoker =
+                parentEvent?.Parent == null || parentEvent.Parent.GetEventData(parentEvent).Invoker != null;
             return smartTypeListProvider.Get(SmartType.SmartTarget,
-                data => (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
+                data => 
+                    (eventSupportsActionInvoker || !data.IsInvoker) &&
+                    (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
                         (actionData.Targets == null || actionData.Targets.Intersect(data.Types).Any()));
         }
 
-        private Task<int?> ShowSourcePicker(SmartGenericJsonData? actionData = null)
+        private Task<int?> ShowSourcePicker(SmartEvent parentEvent, SmartGenericJsonData? actionData = null)
         {
+            var eventSupportsActionInvoker =
+                parentEvent?.Parent == null || parentEvent.Parent.GetEventData(parentEvent).Invoker != null;
             return smartTypeListProvider.Get(SmartType.SmartSource,
                 data =>
                 {
+                    if (!eventSupportsActionInvoker && data.IsInvoker)
+                        return false;
+                    
                     if (data.IsOnlyTarget)
                         return false;
 
@@ -1077,7 +1086,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 actionList.Add(new EditableActionData("Type", "Source", async () =>
                 {
-                    int? newSourceIndex = await ShowSourcePicker();
+                    int? newSourceIndex = await ShowSourcePicker(obj.Parent);
                     if (!newSourceIndex.HasValue)
                         return;
 
@@ -1108,7 +1117,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
                 actionList.Add(new EditableActionData("Type", "Target", async () =>
                 {
-                    int? newTargetIndex = await ShowTargetPicker(smartDataManager.GetRawData(SmartType.SmartAction, obj.Id));
+                    int? newTargetIndex = await ShowTargetPicker(obj.Parent, smartDataManager.GetRawData(SmartType.SmartAction, obj.Id));
                     if (!newTargetIndex.HasValue)
                         return;
 

@@ -79,9 +79,10 @@
     {
         "id": 7,
         "name": "SMART_TARGET_ACTION_INVOKER",
-        "description": "Action invoker",
+        "description": "{invoker}",
         "help": "Unit who caused the event to occur",
         "name_readable": "Action invoker",
+        "is_invoker": true,
         "types": [
             "Self",
             "Creature",
@@ -255,9 +256,10 @@
     {
         "id": 16,
         "name": "SMART_TARGET_INVOKER_PARTY",
-        "description": "Party invoker",
+        "description": "{invoker}'s party",
         "help": "If in group, target will be player who created a party, if not, it will be action invoker",
         "name_readable": "Invoker's party",
+        "is_invoker": true,
         "types": [
             "Player"
         ]
@@ -368,8 +370,9 @@
     {
         "id": 22,
         "name": "SMART_TARGET_ACTION_INVOKER_VEHICLE",
-        "description": "Invoker's vehicle",
+        "description": "{invoker}'s vehicle",
         "help": "Unit's vehicle who caused this event to occur",
+        "is_invoker": true,
         "name_readable": "Invoker's vehicle",
         "types": [
             "Self",
@@ -566,6 +569,19 @@
         "description": "Players in range {pram1} yd with role {pram2}{pram3value:choose(0):| (limit to {pram3} targets)}",
         "name_readable": "Players by role",
         "types": [
+            "Player"
+        ]
+    },
+    {
+        "id": 9999,
+        "replace_with_id": 7,
+        "name": "SMART_TARGET_META_LAST_INVOKER",
+        "description": "Action invoker",
+        "help": "Unit who caused the last event to occur",
+        "name_readable": "Last action invoker",
+        "types": [
+            "Self",
+            "Creature",
             "Player"
         ]
     }

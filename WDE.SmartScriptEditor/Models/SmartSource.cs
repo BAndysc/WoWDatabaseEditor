@@ -11,6 +11,8 @@ namespace WDE.SmartScriptEditor.Models
     {
         public static readonly int SmartSourceParametersCount = 3;
 
+        private SmartAction parent;
+        
         private ParameterValueHolder<long> condition;
 
         public SmartSource(int id) : base(SmartSourceParametersCount, id)
@@ -18,6 +20,12 @@ namespace WDE.SmartScriptEditor.Models
             condition = new ParameterValueHolder<long>("Condition ID", Parameter.Instance);
         }
 
+        public SmartAction Parent
+        {
+            get => parent;
+            set => parent = value;
+        }
+        
         public ParameterValueHolder<long> Condition => condition;
 
         public override string Readable
@@ -39,6 +47,7 @@ namespace WDE.SmartScriptEditor.Models
                             y = 0.ToString(),
                             z = 0.ToString(),
                             o = 0.ToString(),
+                            invoker = GetInvokerNameWithContext(),
                             stored = "Stored target #" + GetParameter(0).Value,
                             storedPoint = "Stored point #" + GetParameter(0).Value
                         });
@@ -57,6 +66,19 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
         
+        protected string GetInvokerNameWithContext()
+        {
+            if (Parent?.Parent?.Parent == null)
+                return "Last action invoker";
+
+            var parentEventData = Parent.Parent.Parent.GetEventData(Parent.Parent);
+            
+            if (parentEventData.Invoker == null)
+                return "Last action invoker";
+
+            return parentEventData.Invoker.Name;
+        }
+
         public SmartSource Copy()
         {
             SmartSource se = new(Id) {ReadableHint = ReadableHint, DescriptionRules = DescriptionRules};

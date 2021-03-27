@@ -142,9 +142,6 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "deprecated")]
         public bool Deprecated { get; set; }
 
-        [JsonProperty(PropertyName = "invoker")]
-        public string Invoker { get; set; }
-
         [JsonProperty(PropertyName = "parameters")]
         public IList<SmartParameterJsonData> Parameters { get; set; }
 
@@ -192,6 +189,15 @@ namespace WDE.SmartScriptEditor.Data
 
         [JsonProperty(PropertyName = "is_timed")]
         public bool IsTimed { get; set; }
+        
+        [JsonProperty(PropertyName = "is_invoker")]
+        public bool IsInvoker { get; set; }
+        
+        [JsonProperty(PropertyName = "replace_with_id")]
+        public int? ReplaceWithId { get; set; }
+        
+        [JsonProperty(PropertyName = "invoker")]
+        public DataJsonInvoker Invoker { get; set; }
 
         [JsonProperty(PropertyName = "usable_with_events")]
         public IList<int> UsableWithEvents { get; set; }
@@ -209,6 +215,15 @@ namespace WDE.SmartScriptEditor.Data
         {
             return Parameters != null && Parameters.Count > 0;
         }
+    }
+
+    public class DataJsonInvoker
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+        
+        [JsonProperty(PropertyName = "types")]
+        public IList<string> Types { get; set; }
     }
 
     [ExcludeFromCodeCoverage]

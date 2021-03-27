@@ -30,6 +30,8 @@ namespace WDE.SmartScriptEditor.Models
 
             this.source = source;
             this.target = target;
+            source.Parent = this;
+            target.Parent = this;
             source.OnChanged += SourceOnOnChanged;
             target.OnChanged += SourceOnOnChanged;
             comment = new ParameterValueHolder<string>("Comment", new StringParameter());

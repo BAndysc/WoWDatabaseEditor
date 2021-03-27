@@ -147,11 +147,16 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartTarget, id))
                 throw new NullReferenceException("No data for target id " + id);
 
+            var data = smartDataManager.GetRawData(SmartType.SmartTarget, id);
+            
+            if (data.ReplaceWithId.HasValue)
+                return TargetFactory(data.ReplaceWithId.Value);
+            
             SmartTarget target = new(id);
 
-            SetParameterObjects(target, smartDataManager.GetRawData(SmartType.SmartTarget, id));
+            SetParameterObjects(target, data);
 
-            var targetTypes = smartDataManager.GetRawData(SmartType.SmartTarget, id).Types;
+            var targetTypes = data.Types;
 
             if (targetTypes != null && targetTypes.Contains("Position"))
                 target.IsPosition = true;
@@ -165,6 +170,13 @@ namespace WDE.SmartScriptEditor.Data
                 return;
 
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartTarget, id);
+
+            if (raw.ReplaceWithId.HasValue)
+            {
+                UpdateTarget(smartTarget, raw.ReplaceWithId.Value);
+                return;
+            }
+            
             SetParameterObjects(smartTarget, raw, true);
         }
 
@@ -173,9 +185,14 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartSource, id))
                 throw new NullReferenceException("No data for source id " + id);
 
+            var data = smartDataManager.GetRawData(SmartType.SmartSource, id);
+
+            if (data.ReplaceWithId.HasValue)
+                return SourceFactory(data.ReplaceWithId.Value);
+            
             SmartSource source = new(id);
 
-            SetParameterObjects(source, smartDataManager.GetRawData(SmartType.SmartSource, id));
+            SetParameterObjects(source, data);
 
             return source;
         }
@@ -186,6 +203,13 @@ namespace WDE.SmartScriptEditor.Data
                 return;
             
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartSource, id);
+            
+            if (raw.ReplaceWithId.HasValue)
+            {
+                UpdateSource(smartSource, raw.ReplaceWithId.Value);
+                return;
+            }
+            
             SetParameterObjects(smartSource, raw, true);
         }
         

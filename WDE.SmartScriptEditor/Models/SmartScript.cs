@@ -33,6 +33,9 @@ namespace WDE.SmartScriptEditor.Models
         {
             selectionHelper.Dispose();
         }
+
+        public SmartGenericJsonData GetEventData(SmartEvent e) =>
+            smartDataManager.GetRawData(SmartType.SmartEvent, e.Id);
         
         public SmartScript(SmartScriptSolutionItem item, 
             ISmartFactory smartFactory,

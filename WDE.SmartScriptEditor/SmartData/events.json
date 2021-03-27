@@ -619,7 +619,11 @@
         ],
         "name": "SMART_EVENT_AGGRO",
         "description": "On aggro",
-        "name_readable": "On aggro"
+        "name_readable": "On aggro",
+        "invoker": {
+          "name": "Attacked unit",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 5,
@@ -658,7 +662,11 @@
             }
         ],
         "description": "On kill {pram3value:choose(0):creature {pram4}|player} {pram1value:choose(0):|(wait {pram1} - {pram2} ms before next trigger of this event)}",
-        "name_readable": "On kill"
+        "name_readable": "On kill",
+        "invoker": {
+          "name": "Killed unit",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 6,
@@ -667,7 +675,11 @@
         ],
         "name": "SMART_EVENT_DEATH",
         "description": "On death",
-        "name_readable": "On death"
+        "name_readable": "On death",
+        "invoker": {
+          "name": "Killer",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 7,
@@ -716,7 +728,11 @@
             }
         ],
         "description": "On {pram1value:choose(0):any spell|spell {pram1}}{pram2value:choose(0):| of school {pram2}} hit {pram3value:choose(0):|(wait {pram3} - {pram4} ms before next trigger)}",
-        "name_readable": "On spell hit"
+        "name_readable": "On spell hit",
+        "invoker": {
+          "name": "Caster",
+          "types": ["Player", "Creature"]
+        }
     },
     {
         "id": 9,
@@ -963,7 +979,11 @@
             }
         ],
         "description": "When friendly unit in range {pram2} yards has lost more than {pram1} hp (check every {pram3} - {pram4})",
-        "name_readable": "When nerby unit health between"
+        "name_readable": "When nerby unit health between",
+        "invoker": {
+          "name": "Friendly unit",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 15,
@@ -998,7 +1018,11 @@
             }
         ],
         "description": "When friendly unit in range {pram1} yards is either: feared, charmed, stunned, frozen or confused (check every {pram3} - {pram4})",
-        "name_readable": "When nerby unit is CC"
+        "name_readable": "When nerby unit is CC",
+        "invoker": {
+          "name": "Friendly unit",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 16,
@@ -1038,7 +1062,11 @@
             }
         ],
         "description": "When friendly unit in range {pram2} yards has not got aura {pram1} (check every {pram3} - {pram4})",
-        "name_readable": "When nerby friendly missing buff"
+        "name_readable": "When nerby friendly missing buff",
+        "invoker": {
+          "name": "Friendly unit",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 17,
@@ -1073,7 +1101,11 @@
             }
         ],
         "description": "On summoned {pram1value:choose(0):any|}unit {pram1value:choose(0):|{pram1}} {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next event trigger)}",
-        "name_readable": "On creature summon"
+        "name_readable": "On creature summon",
+        "invoker": {
+          "name": "Summon",
+          "types": ["Creature"]
+        }
     },
     {
         "id": 18,
@@ -1136,7 +1168,11 @@
             }
         ],
         "description": "When player accepts {pram1value:choose(0):any quest|quest {pram1}}",
-        "name_readable": "On quest accept"
+        "name_readable": "On quest accept",
+        "invoker": {
+          "name": "Player who accepted quest",
+          "types": ["Player"]
+        }
     },
     {
         "id": 20,
@@ -1153,7 +1189,11 @@
             }
         ],
         "description": "When player rewards {pram1value:choose(0):any quest|quest {pram1}}",
-        "name_readable": "On quest reward"
+        "name_readable": "On quest reward",
+        "invoker": {
+          "name": "Rewarded player",
+          "types": ["Player"]
+        }
     },
     {
         "id": 21,
@@ -1197,7 +1237,11 @@
             }
         ],
         "description": "When emote {pram1} received from player {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next event trigger)}",
-        "name_readable": "On emote recevie"
+        "name_readable": "On emote recevie",
+        "invoker": {
+          "name": "Emote sender",
+          "types": ["Player"]
+        }
     },
     {
         "id": 23,
@@ -1356,7 +1400,11 @@
             }
         ],
         "description": "On passenger boarded (vehicle){pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
-        "name_readable": "On passenger boarded"
+        "name_readable": "On passenger boarded",
+        "invoker": {
+          "name": "Passenger",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 28,
@@ -1385,7 +1433,11 @@
             }
         ],
         "description": "On passenger removed (vehicle){pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
-        "name_readable": "On passenger removed"
+        "name_readable": "On passenger removed",
+        "invoker": {
+          "name": "Passenger",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 29,
@@ -1442,7 +1494,11 @@
             }
         ],
         "description": "When spell {pram1} {pram2value:choose(0):|of school {pram2}} hits a target{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-        "name_readable": "On spellhit target"
+        "name_readable": "On spellhit target",
+        "invoker": {
+          "name": "Spell target",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 32,
@@ -1482,7 +1538,11 @@
             }
         ],
         "description": "When creature damaged by {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-        "name_readable": "On damage take"
+        "name_readable": "On damage take",
+        "invoker": {
+          "name": "Attacker",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 33,
@@ -1528,7 +1588,11 @@
             }
         ],
         "description": "When creature deal damage to victim between {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-        "name_readable": "On damage deal"
+        "name_readable": "On damage deal",
+        "invoker": {
+          "name": "Attacked unit",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 34,
@@ -1640,7 +1704,11 @@
             }
         ],
         "description": "On summoned creature {pram1value:choose(0):|{pram1} }despawn{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
-        "name_readable": "On summon despawn"
+        "name_readable": "On summon despawn",
+        "invoker": {
+          "name": "Summoned unit",
+          "types": ["Creature"]
+        }
     },
     {
         "id": 36,
@@ -1853,7 +1921,11 @@
             }
         ],
         "description": "On trigger",
-        "name_readable": "On trigger"
+        "name_readable": "On trigger",
+        "invoker": {
+          "name": "Triggering player",
+          "types": ["Player"]
+        }
     },
     {
         "id": 47,
@@ -1862,7 +1934,11 @@
         ],
         "name": "SMART_EVENT_QUEST_ACCEPTED",
         "description": "On quest accepted",
-        "name_readable": "On quest accept"
+        "name_readable": "On quest accept",
+        "invoker": {
+          "name": "Player who accepted",
+          "types": ["Player"]
+        }
     },
     {
         "id": 48,
@@ -1877,7 +1953,11 @@
         ],
         "name": "SMART_EVENT_QUEST_OBJ_COPLETETION",
         "description": "On quest objective {pram1} completed",
-        "name_readable": "On quest objective completion"
+        "name_readable": "On quest objective completion",
+        "invoker": {
+          "name": "Player",
+          "types": ["Player"]
+        }
     },
     {
         "id": 49,
@@ -1886,7 +1966,11 @@
         ],
         "name": "SMART_EVENT_QUEST_COMPLETION",
         "description": "On quest completed",
-        "name_readable": "On quest complete"
+        "name_readable": "On quest complete",
+        "invoker": {
+          "name": "Player who accepted",
+          "types": ["Player"]
+        }
     },
     {
         "id": 50,
@@ -1895,7 +1979,11 @@
         ],
         "name": "SMART_EVENT_QUEST_REWARDED",
         "description": "On quest rewarded",
-        "name_readable": "On quest reward"
+        "name_readable": "On quest reward",
+        "invoker": {
+          "name": "Rewarded player",
+          "types": ["Player"]
+        }
     },
     {
         "id": 51,
@@ -1904,7 +1992,11 @@
         ],
         "name": "SMART_EVENT_QUEST_FAIL",
         "description": "On quest failed",
-        "name_readable": "On quest fail"
+        "name_readable": "On quest fail",
+        "invoker": {
+          "name": "Player",
+          "types": ["Player"]
+        }
     },
     {
         "id": 52,
@@ -1971,7 +2063,11 @@
             }
         ],
         "description": "When creature is healed by {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-        "name_readable": "On heal receive"
+        "name_readable": "On heal receive",
+        "invoker": {
+          "name": "Healer",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 54,
@@ -1980,7 +2076,11 @@
         ],
         "name": "SMART_EVENT_JUST_SUMMONED",
         "description": "On just summoned",
-        "name_readable": "On self summon"
+        "name_readable": "On self summon",
+        "invoker": {
+          "name": "Summoner",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 55,
@@ -2368,7 +2468,11 @@
             }
         ],
         "description": "On gossip action {pram2} from menu {pram1} selected",
-        "name_readable": "On gossip select"
+        "name_readable": "On gossip select",
+        "invoker": {
+          "name": "Gossip player",
+          "types": ["Player"]
+        }
     },
     {
         "id": 63,
@@ -2390,7 +2494,11 @@
         ],
         "name": "SMART_EVENT_GOSSIP_HELLO",
         "description": "When player opened gossip dialog",
-        "name_readable": "On gossip hello"
+        "name_readable": "On gossip hello",
+        "invoker": {
+          "name": "Gossip player",
+          "types": ["Player"]
+        }
     },
     {
         "id": 65,
@@ -2513,7 +2621,11 @@
             }
         ],
         "description": "On loot state changed to {pram1}",
-        "name_readable": "On loot state changed"
+        "name_readable": "On loot state changed",
+        "invoker": {
+          "name": "Invoker",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 71,
@@ -2553,7 +2665,11 @@
         ],
         "name": "SMART_EVENT_ON_SPELLCLICK",
         "description": "On spellclick",
-        "name_readable": "On spellclick"
+        "name_readable": "On spellclick",
+        "invoker": {
+          "name": "Clicker",
+          "types": ["Player"]
+        }
     },
     {
         "id": 74,
@@ -2599,7 +2715,11 @@
             }
         ],
         "description": "When target has HP between {pram1} - {pram2} (check every {pram3} - {pram4} ms)",
-        "name_readable": "Targets health %"
+        "name_readable": "Targets health %",
+        "invoker": {
+          "name": "Friendly unit",
+          "types": ["Creature", "Player"]
+        }
     },
     {
         "id": 75,
@@ -2631,7 +2751,11 @@
             }
         ],
         "description": "When creature {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3}",
-        "name_readable": "When creature in range"
+        "name_readable": "When creature in range",
+        "invoker": {
+          "name": "Found creature",
+          "types": ["Creature"]
+        }
     },
     {
         "id": 76,
@@ -2663,7 +2787,11 @@
             }
         ],
         "description": "When gameobject {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3}",
-        "name_readable": "When gameobject in range"
+        "name_readable": "When gameobject in range",
+        "invoker": {
+          "name": "Found gameobject",
+          "types": ["Creature"]
+        }
     },
     {
         "id": 77,
