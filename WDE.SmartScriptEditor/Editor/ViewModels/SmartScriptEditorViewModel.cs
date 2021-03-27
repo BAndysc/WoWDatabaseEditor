@@ -936,7 +936,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartTarget target = null;
 
-            if (actionData.UsesTarget && !actionData.TargetIsSource)
+            if (!actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0)
             {
                 int? targetId = await ShowTargetPicker(e, actionData);
 
@@ -992,10 +992,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var eventSupportsActionInvoker =
                 parentEvent?.Parent == null || parentEvent.Parent.GetEventData(parentEvent).Invoker != null;
             return smartTypeListProvider.Get(SmartType.SmartTarget,
-                data => 
-                    (eventSupportsActionInvoker || !data.IsInvoker) &&
-                    (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
-                        (actionData.Targets == null || actionData.Targets.Intersect(data.Types).Any()));
+                data =>
+                {
+                    return (eventSupportsActionInvoker || !data.IsInvoker) &&
+                           (data.UsableWithScriptTypes == null ||
+                            data.UsableWithScriptTypes.Contains(script.SourceType)) &&
+                           (actionData.TargetTypes == null || actionData.TargetTypes.Intersect(data.Types).Any());
+                });
         }
 
         private Task<int?> ShowSourcePicker(SmartEvent parentEvent, SmartGenericJsonData? actionData = null)
@@ -1014,29 +1017,44 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (actionData.HasValue && !IsSourceCompatibleWithAction(data.Id, actionData.Value))
                         return false;
 
-                    return data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType);
+                    return data.UsableWithScriptTypes == null || data.UsableWithScriptTypes.Contains(script.SourceType);
                 });
         }
 
         private bool IsSourceCompatibleWithAction(int sourceId, SmartGenericJsonData actionData)
         {
-            if (actionData.ImplicitSource == null)
-                return true;
+            if (actionData.ImplicitSource != null)
+            {
+                var actionImplicitSource = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource).Id;
 
-            var actionImplicitSource = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource).Id;
+                if (sourceId == actionImplicitSource)
+                    return true;
 
-            if (sourceId == actionImplicitSource)
-                return true;
+                // kinda hack to show actions with NONE source with user pick SELF source
+                // because it is natural for users to use SELF source for those actions
+                return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf;
+            }
+            else
+            {
+                if (!actionData.TargetIsSource)
+                    return true;
 
-            // kinda hack to show actions with NONE source with user pick SELF source
-            // because it is natural for users to use SELF source for those actions
-            return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf;
+                var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, sourceId);
+
+                var possibleSourcesOfAction = actionData.TargetTypes;
+                var possibleSourcesOfSource = sourceData.Types;
+
+                if (possibleSourcesOfAction == null || possibleSourcesOfSource == null)
+                    return false;
+
+                return possibleSourcesOfAction.Intersect(possibleSourcesOfSource).Any();
+            }
         }
         
         private Task<int?> ShowActionPicker(int sourceId, bool showCommentMetaAction = true)
         {
             return smartTypeListProvider.Get(SmartType.SmartAction,
-                data => (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
+                data => (data.UsableWithScriptTypes == null || data.UsableWithScriptTypes.Contains(script.SourceType)) &&
                         IsSourceCompatibleWithAction(sourceId, data) && 
                         (showCommentMetaAction || data.Id != SmartConstants.ActionComment));
         }
@@ -1080,7 +1098,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 floatParametersList.Add((obj.Target.Position[i], "Target"));
 
             var canPickTarget = obj.ToObservable(e => e.Id)
-                .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id)).Select(actionData => actionData.UsesTarget && !actionData.TargetIsSource);
+                .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id)).Select(actionData => !actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0);
 
             if (actionData.Id != SmartConstants.ActionComment)
             {
@@ -1094,13 +1112,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (!IsSourceCompatibleWithAction(newSourceIndex.Value, actionData))
                     {
                         var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, newSourceIndex.Value);
-                        messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Incorrect source for chosen action")
-                            .SetMainInstruction(
-                                $"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.NameReadable}")
-                            .SetContent(
-                                $"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}")
-                            .SetIcon(MessageBoxIcon.Information)
-                            .Build());
+                        var dialog = new MessageBoxFactory<bool>()
+                            .SetTitle("Incorrect source for chosen action")
+                            .SetMainInstruction($"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.NameReadable}");
+                        if (string.IsNullOrEmpty(actionData.ImplicitSource))
+                            dialog.SetContent($"Selected source can be one of: {string.Join(", ", sourceData.Types)}. However, current action requires one of: {string.Join(", ", actionData.TargetTypes)}");
+                        else
+                            dialog.SetContent($"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}");
+                        messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
                     }
                     
                     smartFactory.UpdateSource(obj.Source, newSourceIndex.Value);

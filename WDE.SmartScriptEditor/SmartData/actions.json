@@ -4,7 +4,6 @@
         "name": "SMART_ACTION_NONE",
         "description": "Do nothing",
         "name_readable": "None",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -30,7 +29,7 @@
         ],
         "description": "{pram3value:choose(0):{sourceid:choose(0):[s]Self[/s]|{source}}: Talk {pram1} to invoker|[s]Self[/s]: Talk {pram1} to {source}}",
         "name_readable": "Talk",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -45,7 +44,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Reset faction|Set faction to {pram1}}",
         "name_readable": "Set faction",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -65,7 +64,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Demorph|Morph to model {pram2}}|Morph to model from creature {pram1}}",
         "name_readable": "Morph to entry or model",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -88,7 +87,7 @@
         ],
         "description": "{source}: Play {pram3value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {source}|{source}}",
         "name_readable": "Sound",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -103,7 +102,7 @@
         ],
         "description": "{source}: Play emote {pram1}",
         "name_readable": "Play emote",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -118,7 +117,7 @@
         ],
         "description": "{source}: Fail quest {pram1}",
         "name_readable": "Fail quest",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -138,7 +137,7 @@
         ],
         "description": "{source}: {pram2value:choose(0):Offer quest {pram1}|Add quest {pram1} to quest log}",
         "name_readable": "Add quest",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -163,7 +162,7 @@
         ],
         "description": "{source}: Set react state to {pram1}",
         "name_readable": "Set react state",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -171,7 +170,7 @@
         "name": "SMART_ACTION_ACTIVATE_GOBJECT",
         "description": "{source}: Activate (only gameobject)",
         "name_readable": "Activate gobject",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -211,7 +210,7 @@
         ],
         "description": "{source}: Play random emote: {pram1value:choose(0):|{pram1}, }{pram2value:choose(0):|{pram2}, }{pram3value:choose(0):|{pram3}, }{pram4value:choose(0):|{pram4}, }{pram5value:choose(0):|{pram5}, }{pram6value:choose(0):|{pram6}}",
         "name_readable": "Random emote",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -238,7 +237,7 @@
         ],
         "description": "{source}: Cast spell {pram1} on{pram4value:choose(0):| random {pram4}} {target}{pram2value:choose(0):| (flags: {pram2})}",
         "name_readable": "Cast",
-        "uses_target": true,
+        "target_types": ["Player", "Creature"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -268,7 +267,7 @@
         ],
         "description": "{source}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}}{pram5value:choose(0):| and attack {target}}",
         "name_readable": "Summon creature",
-        "uses_target": true,
+        "target_types": ["Creature", "Player", "GameObject"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -307,7 +306,7 @@
         ],
         "description": "{pram5value:choose(0|1|2|3):{source}|{source}|[s]Action invoker[/s]|[s]Action invoker[/s]|{source}}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}}{pram5value:choose(0|1|2|3):|, as personal spawn||, as personal spawn|}{pram5value:choose(0):| and attack {target}}",
         "name_readable": "Summon creature",
-        "uses_target": true,
+        "target_types": ["Creature", "Player", "GameObject"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -329,7 +328,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Decrement|Increment} threat of {target} by {pram1value:choose(0):{pram2}|{pram1}}",
         "name_readable": "Threat single pct",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -350,7 +349,6 @@
         ],
         "description": "{source}: {pram1value:choose(0):Decrement|Increment} threat of all units in threat list by {pram1value:choose(0):{pram2}|{pram1}}",
         "name_readable": "Threat all pct",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -366,7 +364,7 @@
         ],
         "description": "{source}: Call quest {pram1} group event happened",
         "name_readable": "Call area explored or event happens",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -386,7 +384,7 @@
         ],
         "description": "{source}: {pram2value:choose(0):Remove|Add} phasegroup {pram1}",
         "name_readable": "Set ingame phase group",
-        "uses_target": true,
+        "target_types": ["GameObject", "Player", "Creature"],
         "target_is_source": true
     },
     {
@@ -400,7 +398,7 @@
         ],
         "description": "{source}: Set emote state (UNIT_NPC_EMOTESTATE) to {pram1}",
         "name_readable": "Set emote state",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -426,7 +424,7 @@
         ],
         "description": "{source}: Set {pram2value:choose(0):UNIT_FLAGS to {pram1}|UNIT_FLAGS_2 to {pram1value}}",
         "name_readable": "Set unit flag",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -452,7 +450,7 @@
         ],
         "description": "{source}: Remove {pram2value:choose(0):UNIT_FLAGS to {pram1}|UNIT_FLAGS_2 to {pram1value}}",
         "name_readable": "Remove unit flag",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -467,7 +465,6 @@
         ],
         "description": "{source}: {pram1value:choose(0):Disable|Enable} auto attack",
         "name_readable": "Auto attack",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -483,7 +480,6 @@
         ],
         "description": "{source}: {pram1value:choose(0):Disable|Enable} combat based movement",
         "name_readable": "Allow combat movement",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -499,7 +495,6 @@
         ],
         "description": "{source}: Set event phase to {pram1}",
         "name_readable": "Set event phase",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -518,7 +513,6 @@
         ],
         "description": "{source}: Increment phase by {pram1} and decrement by {pram2}",
         "name_readable": "Increment event phase",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -528,7 +522,6 @@
         "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
         "description": "{source}: Evade",
         "name_readable": "Evade",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -538,7 +531,7 @@
         "tags": ["Azeroth"],
         "description": "{source}: Evade",
         "name_readable": "Evade",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -553,7 +546,6 @@
         ],
         "description": "{source}: Flee for assist",
         "name_readable": "Flee for assist",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -569,7 +561,6 @@
         ],
         "description": "{source}: Call group event happened from quest {pram1} on owner",
         "name_readable": "Call group event happens",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -585,7 +576,7 @@
         ],
         "description": "{source}: Call group event happened from quest {pram1}",
         "name_readable": "Call group event happens",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -605,7 +596,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
         "name_readable": "Remove aura",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -647,7 +638,7 @@
         ],
         "description": "{source}: Follow {target} by distance {pram1}, angle {pram2}",
         "name_readable": "Follow",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -682,7 +673,6 @@
         ],
         "description": "{source}: Set random event phase between: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
         "name_readable": "Random phase",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -703,7 +693,6 @@
         ],
         "description": "{source}: Set random event phase between range {pram1} and {pram2}",
         "name_readable": "Random phase range",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -712,7 +701,7 @@
         "name": "SMART_ACTION_RESET_GOBJECT",
         "description": "{source}: Reset (gameobject)",
         "name_readable": "Reset gobject",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -726,7 +715,7 @@
         ],
         "description": "{sourceid:choose(0|1):Loot recipient|Loot recipient|{source}}: Give kill credit {pram1}",
         "name_readable": "Give killed monster credit",
-        "uses_target": true,
+        "target_types": ["Player", "Creature"],
         "target_is_source": true
     },
     {
@@ -756,7 +745,6 @@
         ],
         "description": "Set {pram3value:choose(0):instance data|boss state} #{pram1} to {pram2}",
         "name_readable": "Set instance data",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -771,7 +759,6 @@
         ],
         "description": "Set instance target (guid) #{pram1} to {target}",
         "name_readable": "Set instance guid",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -790,7 +777,7 @@
         ],
         "description": "{source}: Update template{pram2value:choose(0):| and level} as if it was creature {pram1}",
         "name_readable": "Update NPC template",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -798,7 +785,6 @@
         "name": "SMART_ACTION_DIE",
         "description": "{source}: Die",
         "name_readable": "Die",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -807,7 +793,7 @@
         "name": "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE",
         "description": "{target}: Set in combat with current zone",
         "name_readable": "Set in combat with zone",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -825,7 +811,7 @@
         ],
         "description": "{source}: Call for help within {pram1} yards{pram2value:choose(0):| with emote}",
         "name_readable": "Call for help",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -850,7 +836,6 @@
         ],
         "description": "{source}: Set sheath to {pram1}",
         "name_readable": "Set sheath",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -869,7 +854,7 @@
         ],
         "description": "{source}: Despawn {pram1value:choose(0):instantly|in {pram1} s}{pram2value:choose(0):| respawn in {pram2} seconds}",
         "name_readable": "Force despawn",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject"],
         "target_is_source": true
     },
     {
@@ -887,7 +872,7 @@
         ],
         "description": "{source}: Set invincibility to {pram2value:choose(0):{pram2}%|{pram1}} HP",
         "name_readable": "Set invincibility hp level",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -905,7 +890,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Dismount|Mount to model {pram2}}|{pram2value:choose(0):Mount to creature {pram1}|Invalid mount ({pram1}, {pram2}}}",
         "name_readable": "Mount to entry or model",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -923,7 +908,7 @@
         ],
         "description": "{source}: {pram2value:choose(0):Remove phase id {pram1}|Add phase id to {pram1}}",
         "name_readable": "Add/Remove phase id",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject", "Player"],
         "target_is_source": true
     },
     {
@@ -941,7 +926,7 @@
         ],
         "description": "{source}: Set creature data #{pram1} to {pram2}",
         "name_readable": "Set data",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject"],
         "target_is_source": true
     },
     {
@@ -955,7 +940,7 @@
         ],
         "description": "{source}: Set {pram1value:choose(0):in|}visible",
         "name_readable": "Set visibility",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -969,7 +954,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Disable active|Set active}",
         "name_readable": "Set active",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject"],
         "target_is_source": true
     },
     {
@@ -977,7 +962,7 @@
         "name": "SMART_ACTION_ATTACK_START",
         "description": "{source}: Attack {target}",
         "name_readable": "Attack start",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1009,7 +994,7 @@
         ],
         "description": "{source}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
         "name_readable": "Summon gameobject",
-        "uses_target": true,
+        "target_types": ["Player", "Creature", "GameObject"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -1019,7 +1004,7 @@
         "name": "SMART_ACTION_KILL_UNIT",
         "description": "{source}: Kill self ({source})",
         "name_readable": "Kill unit",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -1033,7 +1018,7 @@
         ],
         "description": "{source}: Take taxi {pram1}",
         "name_readable": "Activate taxi",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -1089,7 +1074,6 @@
         ],
         "description": "{source}: Start path #{pram2}, {pram1value:choose(0):walk|run}, {pram3value:choose(0):do not repeat|repeat}, {pram6}",
         "name_readable": "Waypoint path start",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1105,7 +1089,6 @@
         ],
         "description": "{source}: Pause path for {pram1} ms",
         "name_readable": "Waypoint path pause",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1139,7 +1122,6 @@
         ],
         "description": "{source}: Stop path{pram1value:choose(0):, despawn instantly|, despawn in {pram1} ms}{pram2value:choose(0):|{pram3value:choose(0):, complete|, fail} quest {pram2}}",
         "name_readable": "Waypoint path stop",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1158,7 +1140,7 @@
         ],
         "description": "{source}: Add item {pram2value:choose(1):{pram1}|{pram2}x{pram1}}",
         "name_readable": "Add item",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -1176,7 +1158,7 @@
         ],
         "description": "{source}: Remove item {pram2}x{pram1}",
         "name_readable": "Remove item",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -1190,7 +1172,6 @@
         ],
         "description": "{source}: Install AI Template {pram1}",
         "name_readable": "Install AI template",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1214,7 +1195,6 @@
         ],
         "description": "{source}: {pram1value:choose(0):Set walk|Set run}",
         "name_readable": "Set run",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1234,7 +1214,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Set walk|Set run}",
         "name_readable": "Set run",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -1250,7 +1230,6 @@
         ],
         "description": "{source}: {pram1value:choose(0):Enable|Disable} gravity",
         "name_readable": "Disable Gravity",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1274,7 +1253,6 @@
         ],
         "description": "{source}: {pram1value:choose(0):Disable|Enable} fly{pram2value:choose(0):| with fly speed {pram2}} and {pram3value:choose(0):enable|disable} gravity",
         "name_readable": "Set fly/disable gravity",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1290,7 +1268,6 @@
         ],
         "description": "{source}: {pram1value:choose(0):Disable|Enable} swimming",
         "name_readable": "Set swim",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1305,7 +1282,7 @@
         ],
         "description": "{source}: Teleport to {targetcoords} on map {pram1}",
         "name_readable": "Teleport",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true,
         "uses_target_position": true
     },
@@ -1328,7 +1305,7 @@
         ],
         "description": "{source}: {pram3value:choose(0):Smart script [p]variable_[/p]{pram1} = {pram2}|Reset smart script [p]variable_[/p]{pram1}}",
         "name_readable": "Set counter",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject"],
         "target_is_source": true
     },
     {
@@ -1342,7 +1319,7 @@
         ],
         "description": "{source}: Target_{pram1} = {target}",
         "name_readable": "Store target list",
-        "uses_target": true,
+        "target_types": ["Creature", "Player", "GameObject"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1351,7 +1328,6 @@
         "name": "SMART_ACTION_WP_RESUME",
         "description": "{source}: Resume path",
         "name_readable": "Waypoint path resume",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1361,7 +1337,6 @@
         "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "description": "{source}: {targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}",
         "name_readable": "Set orientation",
-        "uses_target": true,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -1383,7 +1358,7 @@
         ],
         "description": "{source}: {pram2value:choose(0):{targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}|Set random orientation}{pram1value:choose(0):| (instant change)}",
         "name_readable": "Set orientation",
-        "uses_target": true,
+        "target_types": ["GameObject", "Player", "Creature"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -1424,7 +1399,6 @@
         ],
         "description": "Trigger timed event #{pram1} in {pram2} - {pram3} ms{pram4value:choose(0):| and then trigger every {pram4} - {pram5} ms}{pram6value:choose(0):| with {pram6} chance}",
         "name_readable": "Create timed event",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -1439,7 +1413,7 @@
         ],
         "description": "{source}: Play movie {pram1}",
         "name_readable": "Play movie",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -1466,7 +1440,7 @@
         ],
         "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target} with offset {targetcoords}{pram4value:choose(0):| in {pram4} yd distance}} (point id {pram1}){pram3value:choose(0):| without pathfinding}",
         "name_readable": "Move to position",
-        "uses_target": true,
+        "target_types": ["GameObject", "Player", "Creature"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -1483,7 +1457,7 @@
         ],
         "description": "{source}: Enable for {pram1} ms",
         "name_readable": "Enable Temp Gobject",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -1498,7 +1472,7 @@
         ],
         "description": "{source}: Set respawn timer to {pram1} ms",
         "name_readable": "Set respawn timer/respawn",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject"],
         "target_is_source": true
     },
     {
@@ -1533,7 +1507,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Equip items {pram3}, {pram4}, {pram5}|Eqipt items from creature {pram1}}",
         "name_readable": "Equip item",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -1541,7 +1515,7 @@
         "name": "SMART_ACTION_CLOSE_GOSSIP",
         "description": "{source}: Close gossip",
         "name_readable": "Close gossip",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -1556,7 +1530,6 @@
         ],
         "description": "Trigger timed event {pram1}",
         "name_readable": "Trigger timed event",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -1572,7 +1545,6 @@
         ],
         "description": "Remove timed event {pram1}",
         "name_readable": "Remove timed event",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -1587,7 +1559,7 @@
         ],
         "description": "{source}: Add aura {pram1}",
         "name_readable": "Add aura",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -1595,7 +1567,6 @@
         "name": "SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT",
         "description": "SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT (WARNING: CAN CRASH CORE)",
         "name_readable": "Override script base object",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -1604,7 +1575,6 @@
         "name": "SMART_ACTION_RESET_SCRIPT_BASE_OBJECT",
         "description": "SMART_ACTION_RESET_SCRIPT_BASE_OBJECT",
         "name_readable": "Reset script base object",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -1613,7 +1583,6 @@
         "name": "SMART_ACTION_CALL_SCRIPT_RESET",
         "description": "{source}: Call OnReset() event",
         "name_readable": "Do Reset()",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -1632,7 +1601,7 @@
         ],
         "description": "{source}: Chase its victim in {pram1} yards (angle {pram2}\u00b0)",
         "name_readable": "Set ranged movement ",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -1647,7 +1616,6 @@
         ],
         "description": "Start timed action list id #{pram1}",
         "name_readable": "Call timed action list",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -1662,7 +1630,7 @@
         ],
         "description": "{source}: Set npc flags {pram1}",
         "name_readable": "Set NPC flags",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -1676,7 +1644,7 @@
         ],
         "description": "{source}: Add npc flags {pram1}",
         "name_readable": "Add NPC flag",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -1690,7 +1658,7 @@
         ],
         "description": "{source}: Remove npc flags {pram1}",
         "name_readable": "Remove NPC flag",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -1705,7 +1673,7 @@
         ],
         "description": "{source}: Talk {pram1}",
         "name_readable": "Simple talk",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -1732,7 +1700,7 @@
         ],
         "description": "{pram4value:choose(0):| Random {pram4}} {target}: Cast spell {pram1} on self",
         "name_readable": "Invoker cast",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false
     },
     {
@@ -1851,7 +1819,7 @@
         ],
         "description": "{pram3}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} at {target}",
         "name_readable": "Cross cast",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -1886,7 +1854,7 @@
         ],
         "description": "{source}: Call random timed action list: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
         "name_readable": "Call random timed actionlist",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject"],
         "target_is_source": true
     },
     {
@@ -1904,7 +1872,7 @@
         ],
         "description": "{source}: Call random timed action list between range {pram1} and {pram2}",
         "name_readable": "Call random range timed actionlist",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject"],
         "target_is_source": true
     },
     {
@@ -1919,7 +1887,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Stay in place|Move in radius {pram1} yards}",
         "name_readable": "Random move",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -1952,7 +1920,7 @@
         ],
         "description": "{source}: Set UNIT_FIELD_BYTES_1 with Type {pram2} to {pram1}",
         "name_readable": "Set UNIT_FIELD_BYTES_1",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -1985,7 +1953,7 @@
         ],
         "description": "{source}: Remove {pram1} bytes from UNIT_FIELD_BYTES_1 with Type {pram2}",
         "name_readable": "Remove UNIT_FIELD_BYTES_1",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2007,7 +1975,7 @@
         ],
         "description": "{source}: Interrupt casted spell {pram2}",
         "name_readable": "Interrupt spell",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2021,7 +1989,7 @@
         ],
         "description": "{source}: Play custom animation (only gameobject)",
         "name_readable": "Send gameobject custom animation",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -2064,7 +2032,7 @@
         ],
         "description": "{source}: Set dynamic flags to {pram1}",
         "name_readable": "Set dynamic flag",
-        "uses_target": true,
+        "target_types": ["GameObject", "Player", "Creature"],
         "target_is_source": true
     },
     {
@@ -2107,7 +2075,7 @@
         ],
         "description": "{source}: Add {pram1} dynamic flag",
         "name_readable": "Add dynamic flag",
-        "uses_target": true,
+        "target_types": ["GameObject", "Player", "Creature"],
         "target_is_source": true
     },
     {
@@ -2150,7 +2118,7 @@
         ],
         "description": "{source}: Remove {pram1} dynamic flags",
         "name_readable": "Remove dynamic flag",
-        "uses_target": true,
+        "target_types": ["GameObject", "Player", "Creature"],
         "target_is_source": true
     },
     {
@@ -2168,7 +2136,7 @@
         ],
         "description": "{source}: Jump to pos {targetcoords} with speed XY {pram1} and speed Z {pram2}",
         "name_readable": "Jump to pos",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true,
         "uses_target_position": true
     },
@@ -2189,7 +2157,7 @@
         ],
         "description": "{source}: Send gossip ID {pram1} with text {pram2}",
         "name_readable": "Send gossip menu",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -2217,7 +2185,7 @@
         ],
         "description": "{source}: Set loot state {pram1} (only gameobjects)",
         "name_readable": "Set gameobject loot state",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -2231,7 +2199,7 @@
         ],
         "description": "Send stored target {pram1} to {target}",
         "name_readable": "Send target to source",
-        "uses_target": true,
+        "target_types": ["Creature", "GameObject"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -2240,7 +2208,7 @@
         "name": "SMART_ACTION_SET_HOME_POS",
         "description": "{source}: Set home position to {targetid:choose(1|8):current position|{targetcoords}|position of {target}}",
         "name_readable": "Send home position",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true,
         "uses_target_position": true
     },
@@ -2255,7 +2223,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Do not regenerate HP|Regenerate HP}",
         "name_readable": "Set health regeneration",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -2269,7 +2237,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Remove|Set} rooted",
         "name_readable": "Set/Remove rooted",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -2312,7 +2280,7 @@
         ],
         "description": "{source}: Set game object flags {pram1}",
         "name_readable": "Set gameobject flags",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -2355,7 +2323,7 @@
         ],
         "description": "{source}: Add game object flag {pram1}",
         "name_readable": "Add gameobject flags",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -2398,7 +2366,7 @@
         ],
         "description": "{source}: Remove game object flag {pram1}",
         "name_readable": "Remove gameobject flags",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -2416,7 +2384,6 @@
         ],
         "description": "{source}: Summon creature group {pram1}",
         "name_readable": "Summon creature group",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -2426,51 +2393,28 @@
         "parameters": [
             {
                 "type": "SwitchParameter",
-                "name": "Flags",
+                "name": "Power type",
                 "values": {
-                    "0": {
-                        "name": "POWER_MANA"
-                    },
-                    "1": {
-                        "name": "POWER_RAGE"
-                    },
-                    "2": {
-                        "name": "POWER_FOCUS"
-                    },
-                    "3": {
-                        "name": "POWER_ENERGY"
-                    },
-                    "4": {
-                        "name": "POWER_UNUSED"
-                    },
-                    "5": {
-                        "name": "POWER_RUNES"
-                    },
-                    "6": {
-                        "name": "POWER_RUNIC_POWER"
-                    },
-                    "7": {
-                        "name": "POWER_SOUL_SHARDS"
-                    },
-                    "8": {
-                        "name": "POWER_ECLIPSE"
-                    },
-                    "9": {
-                        "name": "POWER_HOLY_POWER"
-                    },
-                    "10": {
-                        "name": "POWER_ALTERNATE_POWER"
-                    }
+                    "0": {"name": "mana"},
+                    "1": {"name": "rage"},
+                    "2": {"name": "focus"},
+                    "3": {"name": "energy"},
+                    "5": {"name": "runes"},
+                    "6": {"name": "runic power"},
+                    "7": {"name": "soul shards"},
+                    "8": {"name": "eclipse"},
+                    "9": {"name": "holy power"},
+                    "10": {"name": "alternate power"}
                 }
             },
             {
                 "type": "Parameter",
-                "name": "New Power"
+                "name": "New value"
             }
         ],
-        "description": "{source}: Set power type to {pram1} with value {pram2}",
+        "description": "{source}: Set {pram1} to {pram2}",
         "name_readable": "Set power",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2478,17 +2422,29 @@
         "name": "SMART_ACTION_ADD_POWER",
         "parameters": [
             {
-                "type": "PowerParameter",
-                "name": "Flags"
+                "type": "SwitchParameter",
+                "name": "Power type",
+                "values": {
+                    "0": {"name": "mana"},
+                    "1": {"name": "rage"},
+                    "2": {"name": "focus"},
+                    "3": {"name": "energy"},
+                    "5": {"name": "runes"},
+                    "6": {"name": "runic power"},
+                    "7": {"name": "soul shards"},
+                    "8": {"name": "eclipse"},
+                    "9": {"name": "holy power"},
+                    "10": {"name": "alternate power"}
+                }
             },
             {
                 "type": "Parameter",
                 "name": "Value"
             }
         ],
-        "description": "{source}: Add {pram2} to power {pram1}",
+        "description": "{source}: Add {pram2} to {pram1}",
         "name_readable": "Add power",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2496,17 +2452,29 @@
         "name": "SMART_ACTION_REMOVE_POWER",
         "parameters": [
             {
-                "type": "PowerParameter",
-                "name": "Flags"
+                "type": "SwitchParameter",
+                "name": "Power type",
+                "values": {
+                    "0": {"name": "mana"},
+                    "1": {"name": "rage"},
+                    "2": {"name": "focus"},
+                    "3": {"name": "energy"},
+                    "5": {"name": "runes"},
+                    "6": {"name": "runic power"},
+                    "7": {"name": "soul shards"},
+                    "8": {"name": "eclipse"},
+                    "9": {"name": "holy power"},
+                    "10": {"name": "alternate power"}
+                }
             },
             {
                 "type": "Parameter",
                 "name": "Value"
             }
         ],
-        "description": "{source}: Remove {pram2} from power {pram1}",
+        "description": "{source}: Remove {pram2} from {pram1}",
         "name_readable": "Remove power",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2520,7 +2488,6 @@
         ],
         "description": "Stop game event {pram1}",
         "name_readable": "Stop game event",
-        "uses_target": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
     {
@@ -2534,7 +2501,6 @@
         ],
         "description": "Start game event {pram1}",
         "name_readable": "Start game event",
-        "uses_target": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
     {
@@ -2568,15 +2534,15 @@
         ],
         "description": "{source}: Start closest path: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
         "name_readable": "Start closest path",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
         "id": 114,
         "name": "SMART_ACTION_MOVE_OFFSET",
-        "description": "Use target_x,  target_y,  target_z, With target_type=1",
-        "name_readable": "{source}: Move by offset {targetcoords}",
-        "uses_target": true,
+        "description": "{source}: Move by offset {targetcoords}",
+        "name_readable": "Move by offset",
+        "target_types": ["Creature"],
         "target_is_source": true,
         "uses_target_position": true
     },
@@ -2611,7 +2577,7 @@
         ],
         "description": "{source}: Play random {pram6value:choose(0):direct|distance} sound one of: {pram1}, {pram2}, {pram3}, {pram4} {pram6value:choose(0):of all|only self}",
         "name_readable": "Play random sound",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2629,7 +2595,7 @@
         ],
         "description": "{source}: Sets corpse delay to {pram1} s{pram2value:choose(0):| (multiplied by server corpse decay ratio)}",
         "name_readable": "Set corpse delay",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -2638,14 +2604,14 @@
         "parameters": [
             {
                 "type": "BoolParameter",
-                "name": "DisableEvade"
+                "name": "Disable evade"
             }
         ],
-        "description": "{source}: Evade {pram1value:choose(0):enabled|disabled}",
+        "description": "{source}: {pram1value:choose(0):Enable|Disable} evade",
         "help": "disable evade = True / re-enable = False",
         "name_readable": "Disable evade",
-        "uses_target": true,
-        "target_is_source": true
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 118,
@@ -2675,7 +2641,7 @@
         ],
         "description": "{source} state set to {pram1}",
         "name_readable": "Set gameobject state",
-        "uses_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -2689,8 +2655,8 @@
         ],
         "description": "{source}: {pram1value:choose(0):Can not|Can} Fly}",
         "name_readable": "Set can fly",
-        "uses_target": true,
-        "target_is_source": true
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
     },
     {
         "id": 120,
@@ -2703,7 +2669,7 @@
         ],
         "description": "{source}: Remove Auras with Auratype  {pram1}",
         "name_readable": "Remove auras of auratype",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2717,7 +2683,7 @@
         ],
         "description": "{source}: Sight distance set to {pram1} yards",
         "name_readable": "Set sight distance",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -2729,9 +2695,9 @@
                 "name": "FleeTime"
             }
         ],
-        "description": "{source} flees for {pram1} ms",
+        "description": "{source}: Flee for {pram1} ms",
         "name_readable": "Flee",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -2749,7 +2715,7 @@
         ],
         "description": "{source}: Adds {pram1}, negates {pram2} threat against {target}",
         "name_readable": "Add threat",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -2768,7 +2734,7 @@
         ],
         "description": "{source}: {pram2value:choose(0):Load|Force load} EquipmentId {pram1}",
         "name_readable": "Load equipement",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -2786,7 +2752,6 @@
         ],
         "description": "Triggers Events randomly with Timed EventId between {pram1} and {pram2}",
         "name_readable": "Trigger random timed event",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -2795,7 +2760,7 @@
         "name": "SMART_ACTION_REMOVE_ALL_GAMEOBJECTS",
         "description": "{source}: Removes gameobjects",
         "name_readable": "Remove all gameobjects",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2804,16 +2769,16 @@
         "parameters": [
             {
                 "type": "BoolParameter",
-                "name": "StopMoving"
+                "name": "Stop moving"
             },
             {
                 "type": "Parameter",
-                "name": "movementExpired"
+                "name": "Movement expired"
             }
         ],
         "description": "{source}: Stop movement",
         "name_readable": "Stop motion",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -2845,7 +2810,7 @@
         ],
         "description": "{source}: Plays Anim with ID {pram1}",
         "name_readable": "Play animkit",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -2859,7 +2824,7 @@
         ],
         "description": "{source}: Starts playing scene with Id: {pram1}",
         "name_readable": "Play scene",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -2873,7 +2838,7 @@
         ],
         "description": "{source}: Stops playing scene with Id: {pram1}",
         "name_readable": "Cancel scene",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -2905,7 +2870,6 @@
         ],
         "description": "{source}: Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
         "name_readable": "Spawn Spawngroup",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -2938,7 +2902,6 @@
         ],
         "description": "{source}: Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
         "name_readable": "Despawn Spawngroup",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -2961,7 +2924,6 @@
         ],
         "description": "Respawn {pram1} with guid {pram2}",
         "name_readable": "Respawn by SpawnID",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -2985,7 +2947,7 @@
         ],
         "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}",
         "name_readable": "Invoker Cast",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_ACTION_INVOKER"
     },
@@ -3001,7 +2963,7 @@
         ],
         "description": "{source}: Plays Cinematic with Entry: {pram1}",
         "name_readable": "Play Cinematic",
-        "uses_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -3035,7 +2997,7 @@
         ],
         "description": "{source}: Set movement {pram1} speed to {pram2value}.{pram3.value}",
         "name_readable": "Set Movement speed",
-        "uses_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -3058,7 +3020,7 @@
         ],
         "description": "{source}: Plays SpellVisual with SpellVisualKitId: {pram1}, KitType: {pram2} for {pram3} ms",
         "name_readable": "Play Spellvisual kit",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3085,7 +3047,6 @@
         ],
         "description": "Override light {pram2} with light {pram3} in zone {pram1} in {pram4} seconds",
         "name_readable": "Override light",
-        "uses_target": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
     {
@@ -3124,7 +3085,6 @@
         ],
         "description": "Override weather in zone {pram1} to {pram2} with {pram3value} intensity",
         "name_readable": "Override weather",
-        "uses_target": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
     {
@@ -3139,7 +3099,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Disable hover|Enable hover}",
         "name_readable": "Set hover",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3154,7 +3114,7 @@
         ],
         "description": "{source}: Set current health to {pram1}%",
         "name_readable": "Set health",
-        "uses_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3173,7 +3133,6 @@
         ],
         "description": "Start conversation {pram1}{pram2value:choose(0):| with base object dynamic actor index: {pram2_m1}}",
         "name_readable": "Start conversation",
-        "uses_target": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
     {
@@ -3188,7 +3147,7 @@
         ],
         "description": "{source}: Move to position {targetcoords}{pram1value:choose(0):| with point ID {pram1}}",
         "name_readable": "Move to position (any source)",
-        "use_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -3208,7 +3167,7 @@
         ],
         "description": "{source}: Set gameobject state to {pram1}",
         "name_readable": "Set gameobject state",
-        "use_target": true,
+        "target_types": ["GameObject"],
         "target_is_source": true
     },
     {
@@ -3217,7 +3176,7 @@
         "tags": ["Azeroth"],
         "description": "{source}: Exit vehicle",
         "name_readable": "Exit vehicle",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3232,7 +3191,7 @@
         ],
         "description": "{source}: Set unit movement flags to {pram1}",
         "name_readable": "Set unit movement flags",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3247,7 +3206,7 @@
         ],
         "description": "{source}: Set combat distance to {pram1} yd",
         "name_readable": "Set combat distance",
-        "use_target": true,
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
@@ -3266,7 +3225,6 @@
         ],
         "description": "{source}: {pram2value:choose(0):Set caster combat distance to {pram1} yd|Reset caster combat distance}",
         "name_readable": "Set caster combat distance",
-        "use_target": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
     {
@@ -3281,7 +3239,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):Disable hover|Enable hover}",
         "name_readable": "Set hover",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3304,7 +3262,7 @@
         ],
         "description": "{source}: Apply immunity {pram1} to {pram3}{pram2value:choose(0):| with spell id {pram2}}",
         "name_readable": "Apply immunity",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3327,7 +3285,7 @@
         ],
         "description": "{source}: Remove immunity {pram1} value {pram3}{pram2value:choose(0):| with spell id {pram2}}",
         "name_readable": "Remove immunity",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3336,7 +3294,7 @@
         "tags": ["Azeroth"],
         "description": "{source}: Move fall",
         "name_readable": "Move fall",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3351,7 +3309,6 @@
         ],
         "description": "{source}: {pram1value:choose(0):Disallow SAI phase reset|Allow SAI phase reset}",
         "name_readable": "Allow phase reset",
-        "use_target": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
     {
@@ -3370,7 +3327,7 @@
         ],
         "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Do nothing|Expire current movement generator}|{pram2value:choose(0):Stop moving|Stop moving and expire current movement generator}}",
         "name_readable": "Stop motion",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3379,7 +3336,7 @@
         "tags": ["Azeroth"],
         "description": "{source}: Add unit state NO_ENVIRONMENT_UPD",
         "name_readable": "Add unit state NO_ENVIRONMENT_UPD",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
     {
@@ -3388,7 +3345,7 @@
         "tags": ["Azeroth"],
         "description": "{source}: Send zone under attack",
         "name_readable": "Send zone under attack",
-        "use_target": true,
+        "target_types": ["Player", "Creature"],
         "target_is_source": true
     },
     {
@@ -3397,7 +3354,6 @@
         "tags": ["Azeroth"],
         "description": "Load grid [p]({target_x}, {target_y})[/p]",
         "name_readable": "Load grid",
-        "use_target": true,
         "implicit_source": "SMART_TARGET_NONE",
         "uses_target_position": true
     },
@@ -3426,7 +3382,7 @@
         ],
         "description": "{pram3value:choose(0|1):{source}|[s]All players in zone[/s]|[s]All players in area[/s]}: Play music {pram1}{pram2value:choose(0):| (only to self)}",
         "name_readable": "Play music",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -3467,7 +3423,7 @@
         ],
         "description": "{pram3value:choose(0|1):{source}|[s]All players in zone[/s]|[s]All players in area[/s]}: Play random music {pram1}, {pram2}, {pram3}, {pram4}{pram2value:choose(0):| (only to self)}",
         "name_readable": "Play random music",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -3499,7 +3455,7 @@
         ],
         "description": "{source}: Cast spell {pram1} with flags {pram2} on {target} with custom values:{pram3value:choose(0):| base points 0: {pram3}}{pram4value:choose(0):|, base points 1: {pram4}}{pram5value:choose(0):|, base points 2: {pram5}}",
         "name_readable": "Cast custom spell",
-        "use_target": true,
+        "target_types": ["Creature", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -3535,7 +3491,7 @@
         ],
         "description": "{source}: Summon creature {pram1}{pram2value:choose(0):| (for {pram2} seconds)} in cone shape (dist between rings: {pram3}, dist between each summon in row: {pram4}, length of cone: {pram5}, width of cone: {pram6}°",
         "name_readable": "Summon in cone shape",
-        "use_target": true,
+        "target_types": ["Creature", "GameObject", "Player"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -3555,7 +3511,7 @@
         ],
         "description": "{source}: {pram2value:choose(0):Say {pram1}|Yell {pram1}}",
         "name_readable": "Make player talk",
-        "use_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -3590,7 +3546,7 @@
         ],
         "description": "{source}: Summon creature {pram1}{pram2value:choose(0):| (for {pram2} seconds)} in vortex shape (spiral scaling: {pram3}, spiral appearance: {pram4}, range max: {pram5}, phi delta: {pram6})",
         "name_readable": "Summon vortex shape",
-        "use_target": true,
+        "target_types": ["Player", "Creature", "GameObject"],
         "implicit_source": "SMART_TARGET_SELF"
     },
     {
@@ -3599,7 +3555,7 @@
         "tags": ["Azeroth"],
         "description": "{source}: Reset cooldowns and removes Heroism debuffs",
         "name_readable": "CU encounter start",
-        "use_target": true,
+        "target_types": ["Player"],
         "target_is_source": true
     },
     {
@@ -3613,7 +3569,6 @@
         ],
         "description": "       Wait {pram1} seconds",
         "name_readable": "Wait",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     },
@@ -3622,7 +3577,6 @@
         "name": "SMART_ACTION_META_COMMENT",
         "description": "",
         "name_readable": "Comment",
-        "uses_target": false,
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     }

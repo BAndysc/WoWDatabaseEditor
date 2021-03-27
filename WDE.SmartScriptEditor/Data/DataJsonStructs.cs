@@ -175,8 +175,8 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "do_not_propose_target")]
         public bool DoNotProposeTarget { get; set; }
 
-        [JsonProperty(PropertyName = "uses_target")]
-        public bool UsesTarget { get; set; }
+        [JsonProperty(PropertyName = "target_types")]
+        public IList<string> TargetTypes { get; set; }
 
         [JsonProperty(PropertyName = "implicit_source")]
         public string? ImplicitSource { get; set; }
@@ -202,8 +202,8 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "usable_with_events")]
         public IList<int> UsableWithEvents { get; set; }
 
-        [JsonProperty(PropertyName = "usable_with_event_types")]
-        public IList<SmartScriptType> UsableWithEventTypes { get; set; }
+        [JsonProperty(PropertyName = "usable_with_script_types", ItemConverterType = typeof(StringEnumConverter))]
+        public IList<SmartScriptType> UsableWithScriptTypes { get; set; }
 
         [JsonProperty(PropertyName = "description_rules")]
         public IList<SmartDescriptionRulesJsonData> DescriptionRules { get; set; }
