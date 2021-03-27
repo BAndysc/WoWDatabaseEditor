@@ -1104,7 +1104,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     }
                     
                     smartFactory.UpdateSource(obj.Source, newSourceIndex.Value);
-                }, obj.Source.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartSource, id).Name)));
+                }, obj.Source.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartSource, id).NameReadable)));
 
                 actionList.Add(new EditableActionData("Type", "Action", async () =>
                 {
@@ -1113,7 +1113,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         return;
 
                     smartFactory.UpdateAction(obj, newActionIndex.Value);
-                }, obj.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id).Name)));
+                }, obj.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id).NameReadable)));
             
                 actionList.Add(new EditableActionData("Type", "Target", async () =>
                 {
@@ -1122,7 +1122,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         return;
 
                     smartFactory.UpdateTarget(obj.Target, newTargetIndex.Value);
-                },  obj.Target.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartTarget, id).Name), canPickTarget.Not()));   
+                },  obj.Target.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartTarget, id).NameReadable), canPickTarget.Not()));   
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
@@ -1201,7 +1201,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     return;
 
                 smartFactory.UpdateCondition(obj, newConditionId.Value);
-            }, obj.ToObservable(e => e.Id).Select(id => conditionDataManager.GetConditionData(id).Name)));
+            }, obj.ToObservable(e => e.Id).Select(id => conditionDataManager.GetConditionData(id).NameReadable)));
             
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 obj, 
@@ -1264,7 +1264,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     return;
 
                 smartFactory.UpdateEvent(ev, newEventIndex.Value);
-            }, ev.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartEvent, id).Name)));
+            }, ev.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartEvent, id).NameReadable)));
             
             for (var i = 0; i < ev.ParametersCount; ++i)
                 parametersList.Add((ev.GetParameter(i), "Event specific"));
