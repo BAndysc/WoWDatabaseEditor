@@ -55,5 +55,10 @@ namespace WoWDatabaseEditorCore.Services.FileSystemService
             path.Directory?.Create();
             return path.Open(FileMode.Create, FileAccess.Write);
         }
+
+        public FileSystemInfo ResolvePhysicalPath(string path)
+        {
+            return vfs.ResolvePath(path);
+        }
     }
 }

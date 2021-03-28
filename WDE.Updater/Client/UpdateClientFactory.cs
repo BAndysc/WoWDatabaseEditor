@@ -22,7 +22,7 @@ namespace WDE.Updater.Client
             var httpClient = new HttpClient();
             var buildVersion = applicationVersion.VersionKnown ? applicationVersion.BuildVersion : -1;
             var branch = applicationVersion.VersionKnown ? applicationVersion.Branch! : "(unknown)";
-            httpClient.DefaultRequestHeaders.Add("User-Agent", $"WoWDatabaseEditor/{buildVersion} (branch: {branch}, marketplace: {marketplace})");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", $"WoWDatabaseEditor/{buildVersion} (branch: {branch}, marketplace: {marketplace}, platform: {platform.ToString()})");
             return new UpdateClient(updateServerUrl, marketplace, key, platform, httpClient);
         }
     }
