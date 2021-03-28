@@ -17,8 +17,8 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<IImage> ManagedIconProperty =
             AvaloniaProperty.Register<ExtendedWindow, IImage>(nameof(ManagedIcon));
         
-        public static readonly StyledProperty<bool> UseSystemChromeProperty =
-            AvaloniaProperty.Register<ExtendedWindow, bool>(nameof(UseSystemChrome));
+        public static readonly StyledProperty<ExtendedWindowChrome> ChromeProperty =
+            AvaloniaProperty.Register<ExtendedWindow, ExtendedWindowChrome>(nameof(Chrome));
         
         public static readonly StyledProperty<ToolBar> ToolBarProperty =
             AvaloniaProperty.Register<ExtendedWindow, ToolBar>(nameof(ToolBar));
@@ -41,10 +41,10 @@ namespace AvaloniaStyles.Controls
             set => SetValue(ManagedIconProperty, value);
         }
         
-        public bool UseSystemChrome
+        public ExtendedWindowChrome Chrome
         {
-            get => GetValue(UseSystemChromeProperty);
-            set => SetValue(UseSystemChromeProperty, value);
+            get => GetValue(ChromeProperty);
+            set => SetValue(ChromeProperty, value);
         }
         
         public ToolBar ToolBar
@@ -95,16 +95,20 @@ namespace AvaloniaStyles.Controls
                 window.PseudoClasses.Set(":fullscreen", (WindowState)state.NewValue == WindowState.FullScreen);
             });
 
-            UseSystemChromeProperty.Changed.AddClassHandler<ExtendedWindow>((window, state) =>
+            ChromeProperty.Changed.AddClassHandler<ExtendedWindow>((window, state) =>
             {
-                if (state.NewValue is bool b)
+                if (state.NewValue is ExtendedWindowChrome b)
                     window.UpdateChromeHints(b);
             });
         }
 
-        private void UpdateChromeHints(bool useChrome)
+        private void UpdateChromeHints(ExtendedWindowChrome chrome)
         {
-            if (useChrome)
+            var useSystemChrome = chrome == ExtendedWindowChrome.AlwaysSystemChrome ||
+                                  (chrome == ExtendedWindowChrome.MacOsChrome &&
+                                   RuntimeInformation.IsOSPlatform(OSPlatform.OSX));
+            
+            if (useSystemChrome) 
             {
                 ExtendClientAreaChromeHints |= ExtendClientAreaChromeHints.SystemChrome;
                 ExtendClientAreaChromeHints &= ~ExtendClientAreaChromeHints.NoChrome;
@@ -131,7 +135,7 @@ namespace AvaloniaStyles.Controls
             base.OnApplyTemplate(e);
             
             ExtendClientAreaChromeHints |= ExtendClientAreaChromeHints.OSXThickTitleBar;
-            UpdateChromeHints(UseSystemChrome);
+            UpdateChromeHints(Chrome);
 
             if (SideBar == null && e.NameScope.Find("SidebarGrid") is Grid grid)
             {
@@ -146,6 +150,10 @@ namespace AvaloniaStyles.Controls
                 grid2.ColumnDefinitions[2].MinWidth = 0;
                 grid2.ColumnDefinitions[1].MaxWidth = 0;
                 grid2.ColumnDefinitions[1].MinWidth = 0;
+            }
+            if (SideBar == null && e.NameScope.Find("MainSplitter") is GridSplitter gridSplitter)
+            {
+                gridSplitter.MaxWidth = gridSplitter.MinWidth = gridSplitter.Width = 0;
             }
         }
 
@@ -171,5 +179,12 @@ namespace AvaloniaStyles.Controls
             else
                 WindowState = WindowState.Normal;
         }
+    }
+
+    public enum ExtendedWindowChrome
+    {
+        NoSystemChrome,
+        AlwaysSystemChrome,
+        MacOsChrome
     }
 }

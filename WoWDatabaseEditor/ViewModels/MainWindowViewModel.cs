@@ -9,6 +9,8 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
 using WDE.Module.Attributes;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WoWDatabaseEditor.Providers;
 
 namespace WoWDatabaseEditorCore.ViewModels
@@ -28,6 +30,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             IMessageBoxService messageBoxService,
             TasksViewModel tasksViewModel,
             EditorMainMenuItemsProvider menuItemProvider,
+            ISolutionSqlService solutionSqlService,
             Func<AboutViewModel> aboutViewModelCreator)
         {
             DocumentManager = documentManager;
@@ -35,7 +38,24 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.messageBoxService = messageBoxService;
             this.aboutViewModelCreator = aboutViewModelCreator;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
+            ExecuteChangedCommand = new DelegateCommand(() =>
+            {
+                DocumentManager.ActiveDocument?.Save?.Execute(null);
+            }, () => DocumentManager.ActiveDocument?.Save != null && DocumentManager.ActiveDocument.Save.CanExecute(null));
 
+            GenerateCurrentSqlCommand = new DelegateCommand(() =>
+            {
+                if (DocumentManager.ActiveDocument is ISolutionItemDocument {SolutionItem: { }} sid)
+                    solutionSqlService.OpenDocumentWithSqlFor(sid.SolutionItem);
+            }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+            
+            DocumentManager.ToObservable(dm => dm.ActiveDocument)
+                .SubscribeAction(_ =>
+                {
+                    GenerateCurrentSqlCommand.RaiseCanExecuteChanged();
+                    ExecuteChangedCommand.RaiseCanExecuteChanged();
+                });
+            
             TasksViewModel = tasksViewModel;
 
             MenuItemProviders = menuItemProvider.GetItems();
@@ -61,7 +81,11 @@ namespace WoWDatabaseEditorCore.ViewModels
         }
 
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
-
+        
+        public DelegateCommand ExecuteChangedCommand { get; }
+        
+        public DelegateCommand GenerateCurrentSqlCommand { get; }
+        
         private void ShowAbout()
         {
             DocumentManager.OpenDocument(aboutViewModelCreator());

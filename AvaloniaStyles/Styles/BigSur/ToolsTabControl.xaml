@@ -6,6 +6,7 @@
         <Setter Property="ItemTemplate">
             <DataTemplate>
                 <ContentPresenter 
+                    Background="Transparent" IsHitTestVisible="True"
                     Content="{Binding Path=(controls:ToolsTabControl.AttachedView).Icon, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}}"
                     Width="16" Height="16" />
             </DataTemplate>

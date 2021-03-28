@@ -184,12 +184,12 @@
                         <DataValidationErrors>
 
                             <Grid ColumnDefinitions="Auto,*,Auto">
-                                <ContentPresenter Grid.Column="0" Grid.ColumnSpan="1"
-                                                  Content="{TemplateBinding InnerLeftContent}" />
+                                
                                 <ScrollViewer Grid.Column="1" Grid.ColumnSpan="1"
                                               HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
                                               VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
                                     <Panel>
+                                        <ContentPresenter Content="{TemplateBinding InnerLeftContent}" />
                                         <TextBlock Name="watermark"
                                                    Opacity="0.5"
                                                    Text="{TemplateBinding Watermark}"
@@ -241,7 +241,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <DockPanel>
-                        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right"
+                        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" VerticalAlignment="Center"
                                    TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
                         <ContentPresenter Content="{Binding}">
                             <ContentPresenter.DataTemplates>
@@ -255,21 +255,24 @@
                                                         IsVisible="{Binding HasItems}" />
                                                 <controls:ParameterTextBox VerticalContentAlignment="Center"
                                                                            Text="{Binding Parameter.Value, Mode=TwoWay}"
-                                                                           FontFamily="Consolas">
+                                                                           FontFamily="Consolas"
+                                                                           Classes="InnerContentWithPadding">
                                                     <controls:ParameterTextBox.Styles>
                                                         <Style
                                                             Selector="TextBox:not(:focus-within) /template/ TextPresenter#PART_TextPresenter">
                                                             <Setter Property="IsVisible" Value="False" />
                                                         </Style>
                                                         <Style
-                                                            Selector="TextBox:focus-within ContentPresenter TextBlock">
+                                                            Selector="TextBox:focus-within ContentPresenter Border">
                                                             <Setter Property="IsVisible" Value="False" />
                                                         </Style>
                                                     </controls:ParameterTextBox.Styles>
                                                     <controls:ParameterTextBox.InnerLeftContent>
-                                                        <TextBlock Text="{Binding Parameter.String, Mode=OneWay}"
-                                                                   VerticalAlignment="Center"
-                                                                   Margin="0,1,0,0" />
+                                                        <Border Cursor="Ibeam">
+                                                            <TextBlock Text="{Binding Parameter.String, Mode=OneWay}"
+                                                                       VerticalAlignment="Center"
+                                                                       Margin="0,1,0,0" />
+                                                        </Border>
                                                     </controls:ParameterTextBox.InnerLeftContent>
                                                 </controls:ParameterTextBox>
                                             </DockPanel>
@@ -277,7 +280,7 @@
                                     </views:ParameterDataTemplateSelector.Generic>
                                     <views:ParameterDataTemplateSelector.BoolParameter>
                                         <DataTemplate>
-                                            <CheckBox Focusable="True" VerticalContentAlignment="Center"
+                                            <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
                                                       IsChecked="{Binding BoolIsChecked}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.BoolParameter>

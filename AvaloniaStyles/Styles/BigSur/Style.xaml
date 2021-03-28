@@ -15,6 +15,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/Button.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ToggleButton.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/TextBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/WindowControlButtons.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/Window.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/GridSplitter.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/StatusBar.xaml"/>

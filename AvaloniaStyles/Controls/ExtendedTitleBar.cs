@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
@@ -11,6 +12,16 @@ namespace AvaloniaStyles.Controls
             AvaloniaProperty.Register<ExtendedTitleBar, object>(nameof(LeftContent));
         public static readonly StyledProperty<object> RightContentProperty =
             AvaloniaProperty.Register<ExtendedTitleBar, object>(nameof(RightContent));
+        
+        public ExtendedTitleBar()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                PseudoClasses.Add(":macos");
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                PseudoClasses.Add(":windows");
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                PseudoClasses.Add(":linux");
+        }
         
         public object LeftContent
         {

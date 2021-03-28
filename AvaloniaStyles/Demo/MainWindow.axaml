@@ -63,7 +63,7 @@
             <TabStrip.ItemTemplate>
                 <DataTemplate>
                     <DockPanel LastChildFill="True">
-                        <Button DockPanel.Dock="Left" Classes="closeButton">Close</Button>
+                        <Button Classes="closeButton">Close</Button>
                         <TextBlock Text="{Binding }" />
                     </DockPanel>
                 </DataTemplate>

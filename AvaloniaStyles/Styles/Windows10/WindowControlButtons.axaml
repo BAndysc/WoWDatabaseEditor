@@ -11,7 +11,7 @@
                 <StackPanel Orientation="Horizontal">
                     <Button>
                         <Path Data="F1M0,6L0,9 9,9 9,6 0,6z"
-                              Fill="White" />
+                              Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" />
                         <Interaction.Behaviors>
                             <EventTriggerBehavior EventName="Click">
                                 <ChangePropertyAction PropertyName="WindowState" Value="Minimized" TargetObject="{Binding $parent[TopLevel]}" />
@@ -21,7 +21,7 @@
                     <Button>
                         <Path Width="10"
                               Height="10"
-                              Fill="White"
+                              Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
                               Name="PART_MaxRestore"/>
                         <Interaction.Behaviors>
                             <EventTriggerBehavior EventName="Click">
@@ -31,8 +31,8 @@
                     </Button>
                     <Button>
                         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Line Stroke="White" StrokeThickness="2.5" StartPoint="1,1" EndPoint="9, 9" />
-                            <Line Stroke="White" StrokeThickness="2.5" StartPoint="1,9" EndPoint="9, 1" />
+                            <Line Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2.5" StartPoint="1,1" EndPoint="9, 9" />
+                            <Line Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2.5" StartPoint="1,9" EndPoint="9, 1" />
                         </Grid>
                         <Interaction.Behaviors>
                             <EventTriggerBehavior EventName="Click">
@@ -50,6 +50,7 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
     <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="BorderThickness" Value="0" />

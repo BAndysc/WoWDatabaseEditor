@@ -41,6 +41,7 @@
       <AvaloniaResource Include="Styles\BigSur\TreeView.xaml" />
       <AvaloniaResource Include="Styles\BigSur\TreeViewItem.xaml" />
       <AvaloniaResource Include="Styles\BigSur\Window.xaml" />
+      <AvaloniaResource Include="Styles\BigSur\WindowControlButtons.xaml" />
       <AvaloniaResource Include="Styles\Catalina\Button.xaml" />
       <AvaloniaResource Include="Styles\Catalina\CheckBox.xaml" />
       <AvaloniaResource Include="Styles\Catalina\ColorsDark.xaml" />
@@ -63,6 +64,9 @@
       <AvaloniaResource Include="Styles\Catalina\TreeView.xaml" />
       <AvaloniaResource Include="Styles\Catalina\TreeViewItem.xaml" />
       <AvaloniaResource Include="Styles\Catalina\Window.xaml" />
+      <AvaloniaResource Include="Styles\Windows10Light.xaml" />
+      <AvaloniaResource Include="Styles\Windows10\ColorsLight.xaml" />
+      <AvaloniaResource Include="Styles\Windows10\ListBox.xaml" />
       <AvaloniaResource Include="Styles\Windows10\NativeMenuBar.xaml" />
       <AvaloniaResource Include="Styles\Windows10\SideBar.xaml" />
       <AvaloniaResource Include="Styles\Windows10\StatusBar.xaml" />
@@ -84,8 +88,11 @@
       <AvaloniaResource Include="Styles\MacOsCatalinaDark.xaml" />
       <AvaloniaResource Include="Styles\MacOsCatalinaLight.xaml" />
       <None Remove="Styles\Windows10.xaml" />
-      <AvaloniaResource Include="Styles\Windows10.xaml" />
       <None Remove="Styles\Windows10\ColorsDark.xaml" />
       <AvaloniaResource Include="Styles\Windows10\ColorsDark.xaml" />
+      <None Remove="Styles\Catalina\WindowControlButtons.xaml" />
+      <AvaloniaResource Include="Styles\Catalina\WindowControlButtons.xaml" />
+      <None Remove="Styles\Windows10Dark.xaml" />
+      <AvaloniaResource Include="Styles\Windows10Dark.xaml" />
     </ItemGroup>
 </Project>

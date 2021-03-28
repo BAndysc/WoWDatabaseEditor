@@ -40,6 +40,7 @@
         </Style>
         <Style Selector="Button.FlatButton:pointerover /template/ ContentPresenter">
             <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style Selector="Button.FlatButton:pressed /template/ ContentPresenter">
             <Setter Property="BorderBrush" Value="Transparent" />

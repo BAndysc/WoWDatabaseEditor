@@ -11,6 +11,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/Button.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ToggleButton.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/TextBox.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/WindowControlButtons.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/Window.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/GridSplitter.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/StatusBar.xaml"/>

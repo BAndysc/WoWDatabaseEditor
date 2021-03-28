@@ -4,6 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
         <Configurations>Debug;Release;DebugAvalonia</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <ApplicationIcon>Icon.ico</ApplicationIcon>
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
@@ -100,5 +101,8 @@
       <UpToDateCheckInput Remove="Styles\TreeView.xaml" />
       <UpToDateCheckInput Remove="Styles\TreeViewItem.xaml" />
       <UpToDateCheckInput Remove="Styles\Window.xaml" />
+    </ItemGroup>
+    <ItemGroup>
+      <Resource Include="Icon.ico" />
     </ItemGroup>
 </Project>

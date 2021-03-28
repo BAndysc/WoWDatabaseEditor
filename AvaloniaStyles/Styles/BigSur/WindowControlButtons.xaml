@@ -1,0 +1,86 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Design.PreviewWith>
+        <controls:WindowControlButtons />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|WindowControlButtons">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="13, 0, 5.5, 0">
+                    <Button Classes="minimize">
+                        <Interaction.Behaviors>
+                            <EventTriggerBehavior EventName="Click">
+                                <ChangePropertyAction PropertyName="WindowState" Value="Minimized" TargetObject="{Binding $parent[TopLevel]}" />
+                            </EventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Button>
+                    <Button Classes="maximize">
+                        <Interaction.Behaviors>
+                            <EventTriggerBehavior EventName="Click">
+                                <CallMethodAction MethodName="MaximizeNormalize" TargetObject="{Binding $parent[TopLevel]}" />
+                            </EventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Button>
+                    <Button Classes="close">
+                        <Interaction.Behaviors>
+                            <EventTriggerBehavior EventName="Click">
+                                <CallMethodAction MethodName="Close" TargetObject="{Binding $parent[TopLevel]}" />
+                            </EventTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Button>
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button">
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="CornerRadius" Value="12" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.close">
+        <Setter Property="Background" Value="#EC6A5E" />
+        <Setter Property="BorderBrush" Value="#D04F41" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.minimize">
+        <Setter Property="Background" Value="#F4BF4F" />
+        <Setter Property="BorderBrush" Value="#D6A03C" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.maximize">
+        <Setter Property="Background" Value="#61C554" />
+        <Setter Property="BorderBrush" Value="#50A63C" />
+    </Style>
+    
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.close:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#EC6A5E" />
+        <Setter Property="BorderBrush" Value="#D04F41" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.minimize:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#F4BF4F" />
+        <Setter Property="BorderBrush" Value="#D6A03C" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.maximize:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#61C554" />
+        <Setter Property="BorderBrush" Value="#50A63C" />
+    </Style>
+    
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.close:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#D04F41" />
+        <Setter Property="BorderBrush" Value="#D04F41" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.minimize:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#D6A03C" />
+        <Setter Property="BorderBrush" Value="#D6A03C" />
+    </Style>
+    <Style Selector="controls|ExtendedWindow controls|WindowControlButtons Button.maximize:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#50A63C" />
+        <Setter Property="BorderBrush" Value="#50A63C" />
+    </Style>
+
+</Styles>

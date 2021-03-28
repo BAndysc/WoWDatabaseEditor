@@ -43,7 +43,7 @@
     </DrawingImage>
     </Application.Resources>
     <Application.Styles>
-        <avaloniaStyles:SystemTheme Mode="Auto" />
+        <avaloniaStyles:SystemTheme Mode="MacOsBigSurLight" />
         <StyleInclude Source="avares://AvaloniaEdit/AvaloniaEdit.xaml" />
         <StyleInclude Source="avares://WDE.SmartScriptEditor.Avalonia/Themes/Generic.axaml"/>
         <StyleInclude Source="avares://Dock.Avalonia.Themes.Default/DefaultTheme.axaml"/>

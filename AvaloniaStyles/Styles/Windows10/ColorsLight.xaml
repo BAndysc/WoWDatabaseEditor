@@ -1,0 +1,98 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Styles.Resources>
+        <SolidColorBrush Color="#D6DBE9" x:Key="TitleBarBackground" />
+        <!-- dark window background -->
+        <SolidColorBrush Color="#293955" x:Key="MainWindowBackgroundAccent" />
+        
+        <SolidColorBrush Color="White" x:Key="SystemControlBackgroundAltHighBrush" />
+        <SolidColorBrush Color="#48A6E0" x:Key="AccentColorBackground" />
+        
+        <SolidColorBrush Color="#007ACC" x:Key="StatusBarBackground" />
+        
+        <SolidColorBrush Color="#74747F" x:Key="ContentBorderBrush" />
+        <SolidColorBrush Color="White" x:Key="ContentBackground" />
+        <SolidColorBrush Color="White" x:Key="ThemeBackgroundBrush" />
+        <SolidColorBrush Color="#DAD9D8" x:Key="ThemeBorderMidBrush" />
+        
+        <SolidColorBrush Color="#F0F0F0" x:Key="WindowContentBorderBrush" />
+        <SolidColorBrush Color="#F0F0F0" x:Key="WindowContentBackground" />
+        
+        <SolidColorBrush Color="#292929" x:Key="SystemControlForegroundBaseHighBrush" />
+        
+        <SolidColorBrush Color="#3C3C3C" x:Key="TitleBarForeground" />
+        
+        <!-- textbox -->
+        <SolidColorBrush Color="White" x:Key="TextControlBackground" />
+        <SolidColorBrush Color="#ABADB3" x:Key="TextControlBorderBrush" />
+        <SolidColorBrush Color="White" x:Key="TextControlBackgroundPointerOver" />
+        <SolidColorBrush Color="#7EB4EA" x:Key="TextControlBorderBrushPointerOver" />
+        <SolidColorBrush Color="White" x:Key="TextControlBackgroundFocused" />
+        <SolidColorBrush Color="#7EB4EA" x:Key="TextControlBorderBrushFocused" />
+        
+        <SolidColorBrush Color="#99C9EF" x:Key="TextControlSelectionHighlightColor" />
+        
+        <!-- combo box like button -->
+        <LinearGradientBrush x:Key="ComboBoxBackground" StartPoint="0%, 0%" EndPoint="0%,100%">
+            <GradientStops>
+                <GradientStop Color="#F0F0F0" Offset="0" />
+                <GradientStop Color="#E5E5E5" Offset="1"/>  
+            </GradientStops>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#ACACAC" />
+        <SolidColorBrush x:Key="ComboBoxForeground" Color="#000000" />
+        
+        <LinearGradientBrush x:Key="ComboBoxBackgroundPointerOver" StartPoint="0%, 0%" EndPoint="0%,100%">
+            <GradientStops>
+                <GradientStop Color="#ECF4FC" Offset="0" />
+                <GradientStop Color="#DDECFC" Offset="1"/>  
+            </GradientStops>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#7EB4EA" />
+        
+        <LinearGradientBrush x:Key="ComboBoxBackgroundPressed" StartPoint="0%, 0%" EndPoint="0%,100%">
+            <GradientStops>
+                <GradientStop Color="#DAECFC" Offset="0" />
+                <GradientStop Color="#C4E0FC" Offset="1"/>  
+            </GradientStops>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#569DE5" />
+        
+        <!-- checkbox -->
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillUnchecked" Color="White" />
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUnchecked" Color="#707070" />
+        
+        <!-- tools tab -->
+        <SolidColorBrush x:Key="ToolsTabItemForeground" Color="#BDBDBD" />
+        
+        <!-- message box-->
+        <SolidColorBrush x:Key="MessageBoxTitleForeground" Color="#003399" />
+        <SolidColorBrush x:Key="MessageBoxBottomPanelBackground" Color="#F0F0F0" />
+        <SolidColorBrush x:Key="MessageBoxBottomPanelBorder" Color="#DFDFDF" />
+        
+        <!-- buttons -->
+        <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
+        <Thickness x:Key="ListBoxItemPadding">7,5,7,7</Thickness>
+        <Thickness x:Key="ButtonPadding">8,5,8,6</Thickness>
+        <Thickness x:Key="ButtonBorderThemeThickness">0.5</Thickness>
+        <Thickness x:Key="ThemeBorderThickness">0.5</Thickness>
+        
+        <SolidColorBrush x:Key="ButtonBackground" Color="#E1E1E1" />
+        <SolidColorBrush x:Key="ButtonForeground" Color="#000000" />
+        <SolidColorBrush x:Key="ButtonBorderBrush" Color="#ADADAD" />
+
+        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#E7F1FA" />
+        <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#3376D0" />
+        
+        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#D1E3F5" />
+        <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#225394" />
+        
+        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#CCCCCC" />
+        <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#BFBFBF" />
+        <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#838383" />
+    </Styles.Resources>
+    
+    <Style Selector="GridSplitter">
+        <Setter Property="Background" Value="{DynamicResource MainWindowBackgroundAccent}" />
+    </Style>
+</Styles>

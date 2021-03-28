@@ -8,6 +8,7 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.History;
@@ -33,7 +34,7 @@ using WDE.SmartScriptEditor.History;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class SmartScriptEditorViewModel : ObservableBase, IDocument, IDisposable
+    public class SmartScriptEditorViewModel : ObservableBase, ISolutionItemDocument, IDisposable
     {
         private readonly IDatabaseProvider database;
         private readonly ISmartScriptDatabaseProvider smartScriptDatabase;
@@ -1344,5 +1345,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             viewModel.Dispose();
             return result;
         }
+
+        public ISolutionItem SolutionItem => item;
     }
 }

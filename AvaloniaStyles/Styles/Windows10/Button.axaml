@@ -1,9 +1,51 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:utils="clr-namespace:AvaloniaStyles.Utils">
     <Design.PreviewWith>
         <Button>Click me</Button>
     </Design.PreviewWith>
+    
+    <!-- change fluent style to windows classic -->
+    
+    <Style Selector="Button, RepeatButton, ToggleButton">
+      <Setter Property="RenderTransform" Value="none" />
+      <Setter Property="Transitions">
+        <Transitions>
+        </Transitions>
+      </Setter>
+    </Style>
+    
+    <!--<Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Transitions">
+        <Transitions>
+          <utils:SolidBrushTransition Property="Background" Duration="0:0:0.200" />
+          <utils:SolidBrushTransition Property="BorderBrush" Duration="0:0:0.200" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Transitions">
+        <Transitions>
+          <utils:SolidBrushTransition Property="Background" Duration="0:0:0.050" />
+          <utils:SolidBrushTransition Property="BorderBrush" Duration="0:0:0.050" />
+        </Transitions>
+      </Setter>
+    </Style>-->
+
+    <Style Selector="Button:pressed, RepeatButton:pressed, ToggleButton:pressed">
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+
+    <Style Selector="Button.accent:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
+    </Style>
+    
+    <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    </Style>
     
     <Style Selector="Button">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -14,5 +56,12 @@
     
     <Style Selector="controls|ToolBar Button">
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="controls|ToolBar Button:disabled">
+      <Setter Property="Opacity" Value="0.2" />
+    </Style>
+    <Style Selector="controls|ToolBar Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
     </Style>
 </Styles>
