@@ -22,12 +22,12 @@ Every commit is built by AppVeyor, here are the latest **Windows only binaries**
 ## Mac OS / Linux / Windows version
 **To run the cross platform version, you need [.NET 5 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0) for your OS**.
 
-WoW Database Editor is also shipped with experimental cross platform version. That version is compatibile with both MacOS, Linux and Windows (this Windows version IS different to version above).
+WoW Database Editor is also shipped with experimental cross platform version. That version is compatibile with both MacOS, Linux and Windows (this Windows version IS different to the version above).
 
-Every commit is built by AppVeyor, here are the latest **cross-platform binaries**: 
+**Cross-platform download links**: 
  * [WoWDatabaseEditor for Windows.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditorWindows.zip?branch=master)
- * [WoWDatabaseEditor for Linux.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditorLinux.zip?branch=master)
- * [WoWDatabaseEditor for MacOS.zip](https://ci.appveyor.com/api/projects/BAndysc/wowdatabaseeditor/artifacts/WoWDatabaseEditorMacOs.zip?branch=master)
+ * [WoWDatabaseEditor for Linux.zip](https://github.com/BAndysc/WoWDatabaseEditor/releases) (please use version from GitHub Releases and update via application if needed)
+ * [WoWDatabaseEditor for MacOS.zip](https://github.com/BAndysc/WoWDatabaseEditor/releases) (please use version from GitHub Releases and update via application if needed)
 
 This version probably will become the only option in the future, so I will appreciate any bug reports in it.
 
