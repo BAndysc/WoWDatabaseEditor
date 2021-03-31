@@ -5,6 +5,7 @@ using WDE.DbcStore.Views;
 using WDE.HistoryWindow.ViewModels;
 using WDE.HistoryWindow.Views;
 using WDE.Module;
+using WDE.MySqlDatabaseCommon.Tools;
 using WDE.Parameters.ViewModels;
 using WDE.Parameters.Views;
 using WDE.Solutions.Explorer.ViewModels;

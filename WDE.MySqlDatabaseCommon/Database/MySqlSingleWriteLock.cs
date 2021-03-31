@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WDE.TrinityMySqlDatabase.Database
+namespace WDE.MySqlDatabaseCommon.Database
 {
-    internal class MySqlSingleWriteLock
+    public class DatabaseLock
     {
         protected static SemaphoreSlim WriteMutex = new SemaphoreSlim(1);
 

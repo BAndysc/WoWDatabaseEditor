@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 
-namespace WDE.TrinityMySqlDatabase.Database
+namespace WDE.MySqlDatabaseCommon.Database
 {
     public class NullDatabaseProvider : IDatabaseProvider
     {

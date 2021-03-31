@@ -7,9 +7,9 @@ using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
-using WDE.TrinityMySqlDatabase.Services;
+using WDE.MySqlDatabaseCommon.Services;
 
-namespace WDE.TrinityMySqlDatabase.Tools
+namespace WDE.MySqlDatabaseCommon.Tools
 {
     [AutoRegister]
     [SingleInstance]
@@ -18,7 +18,7 @@ namespace WDE.TrinityMySqlDatabase.Tools
         private readonly IDatabaseLogger databaseLogger;
         private readonly IMainThread mainThread;
         public string Title => "Database query debugger";
-        public string UniqueId => "trinity_database_query_debugger";
+        public string UniqueId => "database_query_debugger";
         private bool visibility = false;
  
         public ICommand ClearConsole {get;}

@@ -1,31 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MySqlConnector;
 using WDE.Common.Database;
-using WDE.Module.Attributes;
-using WDE.TrinityMySqlDatabase.Providers;
+using WDE.MySqlDatabaseCommon.Providers;
 
-namespace WDE.TrinityMySqlDatabase.Database
+namespace WDE.MySqlDatabaseCommon.Database
 {
-    [AutoRegister]
-    [SingleInstance]
     public class MySqlExecutor : IMySqlExecutor
     {
-        private readonly MySqlSettings settings;
+        private readonly IMySqlConnectionStringProvider connectionString;
 
-        public MySqlExecutor(IConnectionSettingsProvider connectionSettingsProvider)
+        public MySqlExecutor(IMySqlConnectionStringProvider connectionString)
         {
-            settings = new MySqlSettings(connectionSettingsProvider.GetSettings());
+            this.connectionString = connectionString;
         }
 
         public async Task ExecuteSql(string query)
         {
-            using var writeLock = await MySqlSingleWriteLock.WriteLock();
+            using var writeLock = await DatabaseLock.WriteLock();
             
-            string connStr = settings.ConnectionStrings.First().ConnectionString;
-            MySqlConnection conn = new(connStr);
+            MySqlConnection conn = new(connectionString.ConnectionString);
             MySqlTransaction transaction;
             try
             {
@@ -54,10 +49,9 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public async Task<IList<Dictionary<string, object>>> ExecuteSelectSql(string query)
         {
-            using var writeLock = await MySqlSingleWriteLock.WriteLock();
+            using var writeLock = await DatabaseLock.WriteLock();
             
-            string connStr = settings.ConnectionStrings.First().ConnectionString;
-            MySqlConnection conn = new(connStr);
+            MySqlConnection conn = new(connectionString.ConnectionString);
             try
             {
                 conn.Open();

@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaEdit;
 using WDE.Common.Avalonia.Components;
+using WDE.MySqlDatabaseCommon.Tools;
 
 namespace WDE.TrinityMySqlDatabase.Tools
 {

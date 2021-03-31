@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using WDE.Module.Attributes;
 
-namespace WDE.TrinityMySqlDatabase.Services
+namespace WDE.MySqlDatabaseCommon.Services
 {
     [UniqueProvider]
     public interface IDatabaseLogger

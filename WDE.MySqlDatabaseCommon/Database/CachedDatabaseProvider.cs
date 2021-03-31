@@ -2,37 +2,36 @@
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Tasks;
-using WDE.TrinityMySqlDatabase.Models;
 
-namespace WDE.TrinityMySqlDatabase.Database
+namespace WDE.MySqlDatabaseCommon.Database
 {
     public class CachedDatabaseProvider : IDatabaseProvider
     {
-        private List<MySqlCreatureTemplate>? creatureTemplateCache;
-        private Dictionary<uint, MySqlCreatureTemplate> creatureTemplateByEntry = new();
+        private List<ICreatureTemplate>? creatureTemplateCache;
+        private Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
 
-        private List<MySqlGameObjectTemplate>? gameObjectTemplateCache;
-        private Dictionary<uint, MySqlGameObjectTemplate> gameObjectTemplateByEntry = new();
+        private List<IGameObjectTemplate>? gameObjectTemplateCache;
+        private Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
 
-        private List<MySqlQuestTemplate>? questTemplateCache;
-        private Dictionary<uint, MySqlQuestTemplate> questTemplateByEntry = new();
+        private List<IQuestTemplate>? questTemplateCache;
+        private Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
 
-        private List<MySqlAreaTriggerTemplate>? areaTriggerTemplates;
-        private List<MySqlGameEvent>? gameEventsCache;
-        private List<MySqlConversationTemplate>? conversationTemplates;
+        private List<IAreaTriggerTemplate>? areaTriggerTemplates;
+        private List<IGameEvent>? gameEventsCache;
+        private List<IConversationTemplate>? conversationTemplates;
         
-        private TrinityMySqlDatabaseProvider trinityDatabase;
+        private IAsyncDatabaseProvider nonCachedDatabase;
         private readonly ITaskRunner taskRunner;
 
-        public CachedDatabaseProvider(TrinityMySqlDatabaseProvider trinityDatabase, ITaskRunner taskRunner)
+        public CachedDatabaseProvider(IAsyncDatabaseProvider nonCachedDatabase, ITaskRunner taskRunner)
         {
-            this.trinityDatabase = trinityDatabase;
+            this.nonCachedDatabase = nonCachedDatabase;
             this.taskRunner = taskRunner;
         }
 
         public void TryConnect()
         {
-            trinityDatabase.GetCreatureTemplate(0);
+            nonCachedDatabase.GetCreatureTemplate(0);
             taskRunner.ScheduleTask(new DatabaseCacheTask(this));;
         }
 
@@ -41,7 +40,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (creatureTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return trinityDatabase.GetCreatureTemplate(entry);
+            return nonCachedDatabase.GetCreatureTemplate(entry);
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
@@ -49,7 +48,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (gameObjectTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return trinityDatabase.GetGameObjectTemplate(entry);
+            return nonCachedDatabase.GetGameObjectTemplate(entry);
         }
 
         public IQuestTemplate? GetQuestTemplate(uint entry)
@@ -57,7 +56,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (questTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return trinityDatabase.GetQuestTemplate(entry);
+            return nonCachedDatabase.GetQuestTemplate(entry);
         }
 
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
@@ -65,7 +64,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (gameObjectTemplateCache != null)
                 return gameObjectTemplateCache;
 
-            return trinityDatabase.GetGameObjectTemplates();
+            return nonCachedDatabase.GetGameObjectTemplates();
         }
 
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates()
@@ -73,7 +72,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (creatureTemplateCache != null)
                 return creatureTemplateCache;
 
-            return trinityDatabase.GetCreatureTemplates();
+            return nonCachedDatabase.GetCreatureTemplates();
         }
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates()
@@ -81,36 +80,36 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (questTemplateCache != null)
                 return questTemplateCache;
 
-            return trinityDatabase.GetQuestTemplates();
+            return nonCachedDatabase.GetQuestTemplates();
         }
 
-        public IEnumerable<IGameEvent> GetGameEvents() => gameEventsCache ?? trinityDatabase.GetGameEvents();
+        public IEnumerable<IGameEvent> GetGameEvents() => gameEventsCache ?? nonCachedDatabase.GetGameEvents();
         
-        public IEnumerable<IConversationTemplate> GetConversationTemplates() => conversationTemplates ?? trinityDatabase.GetConversationTemplates();
+        public IEnumerable<IConversationTemplate> GetConversationTemplates() => conversationTemplates ?? nonCachedDatabase.GetConversationTemplates();
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
-            areaTriggerTemplates ?? trinityDatabase.GetAreaTriggerTemplates();
+            areaTriggerTemplates ?? nonCachedDatabase.GetAreaTriggerTemplates();
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
-            return trinityDatabase.GetScriptFor(entryOrGuid, type);
+            return nonCachedDatabase.GetScriptFor(entryOrGuid, type);
         }
 
         public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)
         {
-            await trinityDatabase.InstallScriptFor(entryOrGuid, type, script);
+            await nonCachedDatabase.InstallScriptFor(entryOrGuid, type, script);
         }
 
         public async Task InstallConditions(IEnumerable<IConditionLine> conditions,
             IDatabaseProvider.ConditionKeyMask keyMask,
             IDatabaseProvider.ConditionKey? manualKey = null)
         {
-            await trinityDatabase.InstallConditions(conditions, keyMask, manualKey);
+            await nonCachedDatabase.InstallConditions(conditions, keyMask, manualKey);
         }
 
         public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
         {
-            return trinityDatabase.GetConditionsFor(sourceType, sourceEntry, sourceId);
+            return nonCachedDatabase.GetConditionsFor(sourceType, sourceEntry, sourceId);
         }
 
         private class DatabaseCacheTask : IAsyncTask
@@ -129,27 +128,27 @@ namespace WDE.TrinityMySqlDatabase.Database
                 int steps = 6;
                 
                 progress.Report(0, steps, "Loading creatures");
-                cache.creatureTemplateCache = await cache.trinityDatabase.GetCreatureTemplatesAsync();
+                cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
 
                 progress.Report(1, steps, "Loading gameobjects");
-                cache.gameObjectTemplateCache = await cache.trinityDatabase.GetGameObjectTemplatesAsync();
+                cache.gameObjectTemplateCache = await cache.nonCachedDatabase.GetGameObjectTemplatesAsync();
 
                 progress.Report(2, steps, "Loading game events");
-                cache.gameEventsCache = await cache.trinityDatabase.GetGameEventsAsync();
+                cache.gameEventsCache = await cache.nonCachedDatabase.GetGameEventsAsync();
                 
                 progress.Report(3, steps, "Loading areatrigger templates");
-                cache.areaTriggerTemplates = await cache.trinityDatabase.GetAreaTriggerTemplatesAsync();
+                cache.areaTriggerTemplates = await cache.nonCachedDatabase.GetAreaTriggerTemplatesAsync();
                 
                 progress.Report(4, steps, "Loading conversation templates");
-                cache.conversationTemplates = await cache.trinityDatabase.GetConversationTemplatesAsync();
+                cache.conversationTemplates = await cache.nonCachedDatabase.GetConversationTemplatesAsync();
                 
                 progress.Report(5, steps, "Loading quests");
 
-                cache.questTemplateCache = await cache.trinityDatabase.GetQuestTemplatesAsync();
+                cache.questTemplateCache = await cache.nonCachedDatabase.GetQuestTemplatesAsync();
 
-                Dictionary<uint, MySqlCreatureTemplate> creatureTemplateByEntry = new();
-                Dictionary<uint, MySqlGameObjectTemplate> gameObjectTemplateByEntry = new();
-                Dictionary<uint, MySqlQuestTemplate> questTemplateByEntry = new();
+                Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
+                Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
+                Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
 
                 foreach (var entity in cache.creatureTemplateCache)
                     creatureTemplateByEntry[entity.Entry] = entity;
