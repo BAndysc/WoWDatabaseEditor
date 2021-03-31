@@ -1612,9 +1612,18 @@
                 "type": "Parameter",
                 "name": "ID",
                 "description": "overwrites already running actionlist?"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Update type",
+                "values": {
+                    "0": {"name": "update out of combat"},
+                    "1": {"name": "update in combat"},
+                    "2": {"name": "update always"}
+                }
             }
         ],
-        "description": "{source}: Start timed action list id #{pram1}",
+        "description": "{source}: Start timed action list id #{pram1} ({pram2})",
         "name_readable": "Call timed action list",
         "target_is_source": true,
         "target_types": ["Creature", "GameObject"]
@@ -1852,7 +1861,7 @@
                 "name": "Action List ID 6"
             }
         ],
-        "description": "{source}: Call random timed action list: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
+        "description": "{source}: Call random timed action list: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6} {pram2value:choose(0|1):(update out of combat)|(update in combat)|(update always)}",
         "name_readable": "Call random timed actionlist",
         "target_types": ["Creature", "GameObject"],
         "target_is_source": true
@@ -1870,7 +1879,7 @@
                 "name": "Action List ID max"
             }
         ],
-        "description": "{source}: Call random timed action list between range {pram1} and {pram2}",
+        "description": "{source}: Call random timed action list between range {pram1} and {pram2} {pram2value:choose(0|1):(update out of combat)|(update in combat)|(update always)}",
         "name_readable": "Call random range timed actionlist",
         "target_types": ["Creature", "GameObject"],
         "target_is_source": true

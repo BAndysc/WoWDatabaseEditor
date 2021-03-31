@@ -71,12 +71,20 @@ namespace WDE.SmartScriptEditor.Models
             if (Parent?.Parent?.Parent == null)
                 return "Last action invoker";
 
-            var parentEventData = Parent.Parent.Parent.GetEventData(Parent.Parent);
-            
-            if (parentEventData.Invoker == null)
-                return "Last action invoker";
+            try
+            {
+                var parentEventData = Parent.Parent.Parent.GetEventData(Parent.Parent);
 
-            return parentEventData.Invoker.Name;
+                if (parentEventData.Invoker == null)
+                    return "Last action invoker";
+
+                return parentEventData.Invoker.Name;
+            }
+            catch (Exception e)
+            {
+                return "Last action invoker";
+            }
+
         }
 
         public SmartSource Copy()
