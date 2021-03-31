@@ -1614,10 +1614,10 @@
                 "description": "overwrites already running actionlist?"
             }
         ],
-        "description": "Start timed action list id #{pram1}",
+        "description": "{source}: Start timed action list id #{pram1}",
         "name_readable": "Call timed action list",
-        "target_is_source": false,
-        "implicit_source": "SMART_TARGET_NONE"
+        "target_is_source": true,
+        "target_types": ["Creature", "GameObject"]
     },
     {
         "id": 81,
