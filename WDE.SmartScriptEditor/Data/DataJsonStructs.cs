@@ -181,6 +181,9 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "implicit_source")]
         public string? ImplicitSource { get; set; }
         
+        [JsonProperty(PropertyName = "source_in_action")]
+        public bool SourceStoreInAction { get; set; }
+
         [JsonProperty(PropertyName = "uses_target_position")]
         public bool UsesTargetPosition { get; set; }
 

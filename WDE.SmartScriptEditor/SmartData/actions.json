@@ -1723,114 +1723,13 @@
             {
                 "type": "SmartCastFlagsParameter",
                 "name": "Cast Flags"
-            },
-            {
-                "type": "SwitchParameter",
-                "name": "Caster Target Type",
-                "required": true,
-                "values": {
-                    "0": {
-                        "name": "SMART_TARGET_NONE"
-                    },
-                    "1": {
-                        "name": "SMART_TARGET_SELF"
-                    },
-                    "2": {
-                        "name": "SMART_TARGET_VICTIM"
-                    },
-                    "3": {
-                        "name": "SMART_TARGET_HOSTILE_SECOND_AGGRO"
-                    },
-                    "4": {
-                        "name": "SMART_TARGET_HOSTILE_LAST_AGGRO"
-                    },
-                    "5": {
-                        "name": "SMART_TARGET_HOSTILE_RANDOM"
-                    },
-                    "6": {
-                        "name": "SMART_TARGET_HOSTILE_RANDOM_NOT_TOP"
-                    },
-                    "7": {
-                        "name": "SMART_TARGET_ACTION_INVOKER"
-                    },
-                    "8": {
-                        "name": "SMART_TARGET_POSITION"
-                    },
-                    "9": {
-                        "name": "SMART_TARGET_CREATURE_RANGE"
-                    },
-                    "10": {
-                        "name": "SMART_TARGET_CREATURE_GUID"
-                    },
-                    "11": {
-                        "name": "SMART_TARGET_CREATURE_DISTANCE"
-                    },
-                    "12": {
-                        "name": "SMART_TARGET_STORED"
-                    },
-                    "13": {
-                        "name": "SMART_TARGET_GAMEOBJECT_RANGE"
-                    },
-                    "14": {
-                        "name": "SMART_TARGET_GAMEOBJECT_GUID"
-                    },
-                    "15": {
-                        "name": "SMART_TARGET_GAMEOBJECT_DISTANCE"
-                    },
-                    "16": {
-                        "name": "SMART_TARGET_INVOKER_PARTY"
-                    },
-                    "17": {
-                        "name": "SMART_TARGET_PLAYER_RANGE"
-                    },
-                    "18": {
-                        "name": "SMART_TARGET_PLAYER_DISTANCE"
-                    },
-                    "19": {
-                        "name": "SMART_TARGET_CLOSEST_CREATURE"
-                    },
-                    "20": {
-                        "name": "SMART_TARGET_CLOSEST_GAMEOBJECT"
-                    },
-                    "21": {
-                        "name": "SMART_TARGET_CLOSEST_PLAYER"
-                    },
-                    "22": {
-                        "name": "SMART_TARGET_ACTION_INVOKER_VEHICLE"
-                    },
-                    "23": {
-                        "name": "SMART_TARGET_OWNER_OR_SUMMONER"
-                    },
-                    "24": {
-                        "name": "SMART_TARGET_THREAT_LIST"
-                    },
-                    "25": {
-                        "name": "SMART_TARGET_CLOSEST_ENEMY"
-                    },
-                    "26": {
-                        "name": "SMART_TARGET_CLOSEST_FRIENDLY"
-                    }
-                }
-            },
-            {
-                "type": "Parameter",
-                "name": "Caster Target param 1"
-            },
-            {
-                "type": "Parameter",
-                "name": "Caster Target param 2"
-            },
-            {
-                "type": "Parameter",
-                "name": "Caster Target param 3",
-                "description": "+the orignal target fields as Destination target; CasterTargets will cast spellID on all Targets (use with caution if targeting multiple * multiple units)"
             }
         ],
-        "description": "{pram3}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} at {target}",
+        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} at {target}",
         "name_readable": "Cross cast",
         "target_types": ["Creature", "Player"],
         "target_is_source": false,
-        "implicit_source": "SMART_TARGET_NONE"
+        "source_in_action": true
     },
     {
         "id": 87,

@@ -192,6 +192,13 @@ namespace WDE.SmartScriptEditor.Exporter
                     
                     if (actionData.ImplicitSource != null)
                         smartFactory.UpdateSource(actualAction.Source, smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource).Id);
+                    else if (actionData.SourceStoreInAction)
+                    {
+                        actualAction.GetParameter(2).Value = actualAction.Source.Id;
+                        actualAction.GetParameter(3).Value = actualAction.Source.GetParameter(0).Value;
+                        actualAction.GetParameter(4).Value = actualAction.Source.GetParameter(1).Value;
+                        actualAction.GetParameter(5).Value = actualAction.Source.GetParameter(2).Value;
+                    }
 
                     SmartEvent eventToSerialize = actualEvent.ShallowCopy();
                     eventToSerialize.Parent = script;

@@ -133,12 +133,27 @@ namespace WDE.SmartScriptEditor.Data
 
             if (raw.ImplicitSource != null)
                 UpdateSource(source, smartDataManager.GetDataByName(SmartType.SmartSource, raw.ImplicitSource).Id);
-
+            
             SmartAction action = ActionFactory(line.ActionType, source, target);
 
             for (var i = 0; i < SmartAction.SmartActionParametersCount; ++i)
                 action.GetParameter(i).Value = line.GetActionParam(i);
-
+            
+            if (raw.SourceStoreInAction)
+            {
+                try
+                {
+                    UpdateSource(source,
+                        smartDataManager.GetRawData(SmartType.SmartSource, (int) action.GetParameter(2).Value).Id);
+                    source.GetParameter(0).Value = action.GetParameter(3).Value;
+                    source.GetParameter(1).Value = action.GetParameter(4).Value;
+                    source.GetParameter(2).Value = action.GetParameter(5).Value;
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            
             return action;
         }
 
