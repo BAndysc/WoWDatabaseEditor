@@ -165,16 +165,16 @@ namespace WoWDatabaseEditorCore.Avalonia
             var modules = AllClasses.FromAssemblies(allAssemblies).Where(t => t.GetInterfaces().Contains(typeof(IModule))).ToList();
 
             foreach (var module in modules)
-                modulesManager!.AddModule(module.Assembly);
-
-            modules.Select(module => new ModuleInfo
-                {
-                    ModuleName = module.Name,
-                    ModuleType = module.AssemblyQualifiedName,
-                    Ref = "file://" + module.Assembly.Location
-                })
-                .ToList()
-                .ForEach(info => moduleCatalog.AddModule(info));
+            {
+                bool load = modulesManager!.AddModule(module.Assembly);
+                if (load)
+                    moduleCatalog.AddModule(new ModuleInfo
+                    {
+                        ModuleName = module.Name,
+                        ModuleType = module.AssemblyQualifiedName,
+                        Ref = "file://" + module.Assembly.Location
+                    });
+            }
         }
 
         protected override IModuleCatalog CreateModuleCatalog()

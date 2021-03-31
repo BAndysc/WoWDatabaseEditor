@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using WDE.MySqlDatabaseCommon.Tools;
 
 namespace WDE.TrinityMySqlDatabase.Tools
 {

@@ -7,19 +7,21 @@ namespace WoWDatabaseEditorCore.ModulesManagement
     {
         IEnumerable<ModuleData> Modules { get; }
         void AddConflicted(Assembly conflictingAssembly, Assembly firstAssembly);
-        void AddModule(Assembly module);
+        bool AddModule(Assembly module);
     }
 
     public class ModuleData
     {
-        public ModuleData(Assembly assembly, bool isLoaded, Assembly? conflictingAssembly = null)
+        public ModuleData(Assembly assembly, bool isEnabled, bool isLoaded, Assembly? conflictingAssembly = null)
         {
             Assembly = assembly;
+            IsEnabled = isEnabled;
             IsLoaded = isLoaded;
             ConflictingAssembly = conflictingAssembly;
         }
 
         public Assembly Assembly { get; }
+        public bool IsEnabled { get; }
         public bool IsLoaded { get; }
         public Assembly? ConflictingAssembly { get; }
     }
