@@ -34,5 +34,7 @@ namespace WDE.MySqlDatabaseCommon.Database
 
         public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId) =>
             impl.GetConditionsFor(sourceType, sourceEntry, sourceId);
+
+        public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => impl.GetSpellScriptNames(spellId);
     }
 }

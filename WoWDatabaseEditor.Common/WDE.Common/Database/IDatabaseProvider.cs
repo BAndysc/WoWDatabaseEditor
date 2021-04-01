@@ -28,7 +28,9 @@ namespace WDE.Common.Database
         Task InstallConditions(IEnumerable<IConditionLine> conditions, ConditionKeyMask keyMask, ConditionKey? manualKey = null);
 
         IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId);
-            
+
+        IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId);
+        
         [Flags]
         public enum ConditionKeyMask
         {

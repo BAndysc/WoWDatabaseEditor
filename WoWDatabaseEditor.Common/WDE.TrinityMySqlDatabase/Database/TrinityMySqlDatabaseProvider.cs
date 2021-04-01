@@ -243,6 +243,12 @@ namespace WDE.TrinityMySqlDatabase.Database
                     line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId)
                 .ToList();
         }
+
+        public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
+        {
+            using var model = new TrinityDatabase();
+            return model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToList();
+        }
     }
 
     public class ConnectionStringSettings : IConnectionStringSettings

@@ -112,6 +112,11 @@ namespace WDE.MySqlDatabaseCommon.Database
             return nonCachedDatabase.GetConditionsFor(sourceType, sourceEntry, sourceId);
         }
 
+        public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
+        {
+            return nonCachedDatabase.GetSpellScriptNames(spellId);
+        }
+
         private class DatabaseCacheTask : IAsyncTask
         {
             private readonly CachedDatabaseProvider cache;
