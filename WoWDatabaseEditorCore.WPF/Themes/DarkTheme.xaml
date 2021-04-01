@@ -254,10 +254,6 @@
             </Style>
         </Style.Resources>
     </Style>
-    
-    <Style TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-    </Style>
 
     <Style TargetType="TabControl">
         <Setter Property="Background" Value="#FF252525" />

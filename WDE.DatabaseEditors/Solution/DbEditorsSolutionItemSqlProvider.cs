@@ -21,14 +21,22 @@ namespace WDE.DatabaseEditors.Solution
         {
             var tableDefinition = GetTableDefinition(item.TableContentType);
             return GenerateQuery(item.ModifiedFields, tableDefinition.TableName,
-                tableDefinition.TablePrimaryKeyColumnName, item.Entry);
+                tableDefinition.TablePrimaryKeyColumnName, item.Entry, item.IsMultiRecord);
         }
 
-        private string GenerateQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, string keyColumnName, uint itemKey)
+        private string GenerateQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, 
+            string keyColumnName, uint itemKey, bool buildInsert)
         {
             if (fields == null || fields.Count == 0)
                 return "";
 
+            return buildInsert ? BuildInsertWithDeleteQuery(fields, tableName, keyColumnName, itemKey) 
+                : BuildUpdateQuery(fields, tableName, keyColumnName, itemKey);
+        }
+
+        private string BuildUpdateQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, 
+            string keyColumnName, uint itemKey)
+        {
             var updateParts = fields.Select(p => BuildFieldUpdateExpression(p.Value));
             string fieldsString = string.Join(", ", updateParts);
             return $"UPDATE `{tableName}` SET {fieldsString} WHERE `{keyColumnName}`= {itemKey};";
@@ -39,6 +47,12 @@ namespace WDE.DatabaseEditors.Solution
             var paramValue = modifiedField.NewValue is string ? $"\"{modifiedField.NewValue}\"" : 
                 (modifiedField.NewValue is null ? "NULL" : $"{modifiedField.NewValue}");
             return $"`{modifiedField.DbFieldName}`={paramValue}";
+        }
+
+        private string BuildInsertWithDeleteQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, 
+            string keyColumnName, uint itemKey)
+        {
+            return $"DELETE FROM `{tableName}` WHERE `{keyColumnName}`= {itemKey};";
         }
 
         private DatabaseEditorTableDefinitionJson GetTableDefinition(DbTableContentType tableContentType)

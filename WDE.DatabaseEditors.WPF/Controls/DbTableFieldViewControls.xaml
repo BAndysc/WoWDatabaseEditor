@@ -80,7 +80,7 @@
             </Button>
         </StackPanel>
     </DataTemplate>
-
+    
     <Style TargetType="controls:DbTableFieldValueView">
         <Setter Property="Template">
             <Setter.Value>
@@ -136,7 +136,8 @@
                         <TextBlock Text="{Binding FieldName}" TextWrapping="Wrap"
                                    MinHeight="15" MaxHeight="50" Width="100"
                                    Margin="0, 0, 10, 0"
-                                   VerticalAlignment="Center" />
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
                         <controls:DbTableFieldValueView />
                     </StackPanel>
                 </ControlTemplate>

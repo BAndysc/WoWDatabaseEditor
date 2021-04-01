@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -11,6 +13,7 @@ using WDE.Common.Providers;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 using WDE.Parameters.Models;
@@ -23,6 +26,8 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly Func<uint, Task<IDbTableData?>>? tableDataLoader;
         private readonly Lazy<IItemFromListProvider> itemFromListProvider;
         private readonly Lazy<IDbTableFieldFactory> fieldFactory;
+
+        private MultiRecordTableEditorHistoryHandler? historyHandler;
         
         public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName, 
             Func<uint, Task<IDbTableData?>>? tableDataLoader, Func<IHistoryManager> historyCreator,
@@ -48,6 +53,7 @@ namespace WDE.DatabaseEditors.ViewModels
             AddRow = new DelegateCommand(AddNewRow);
             DeleteRow = new DelegateCommand(DeleteExistingRow);
             Save = new DelegateCommand(SaveTable);
+            SelectedRow = -1;
             
             History = historyCreator();
             SetupHistory();
@@ -86,12 +92,26 @@ namespace WDE.DatabaseEditors.ViewModels
                 return;
             }
 
-            var data = await tableDataLoader.Invoke(solutionItem.Entry);
+            var data = await tableDataLoader.Invoke(solutionItem.Entry) as DbMultiRecordTableData;
 
             if (data == null)
                 return;
 
-            SaveLoadedTableData(data as DbMultiRecordTableData);
+            foreach (var modified in solutionItem.ModifiedFields)
+            {
+                if (!(modified.Value is DbTableSolutionItemModifiedRowField modifiedData))
+                    continue;
+                
+                var column = data.Columns.First(c => c.DbColumnName == modified.Value.DbFieldName);
+                if (column.Fields.Count < modifiedData.Row)
+                    data.FillToRow(fieldFactory.Value, modifiedData.Row);
+                
+                if (column.Fields[modifiedData.Row] is IStateRestorableField field)
+                    field.RestoreLoadedFieldState(modified.Value);
+            }
+
+            data.InitRows();
+            SaveLoadedTableData(data);
         }
         
         private async Task EditParameter(ParameterValueHolder<long>? valueHolder)
@@ -119,7 +139,27 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private void SaveTable()
         {
+            if (tableData == null)
+                return;
+
+            solutionItem.ModifiedFields.Clear();
+            foreach (var column in tableData.Columns)
+            {
+                for (int i = 0; i < column.Fields.Count; ++i)
+                {
+                    if (!column.Fields[i].IsModified)
+                        continue;
+                    
+                    if (column.Fields[i] is IStateRestorableField restorableField)
+                    {
+                        var key = $"{column.Fields[i].DbFieldName};{i}";
+                        solutionItem.ModifiedFields.Add(key, new DbTableSolutionItemModifiedRowField(i, column.Fields[i].DbFieldName,
+                            restorableField.GetOriginalValueForPersistence(), restorableField.GetValueForPersistence()));
+                    }
+                }
+            }
             
+            History.MarkAsSaved();
         }
 
         private void AddNewRow()
@@ -135,24 +175,24 @@ namespace WDE.DatabaseEditors.ViewModels
         
         private void SetupHistory()
         {
-            // if (tableData == null)
-            //     return;
-            //
-            // historyHandler = new TemplateTableEditorHistoryHandler(tableData);
-            // undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
-            // redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
-            // History.PropertyChanged += (sender, args) =>
-            // {
-            //     undoCommand.RaiseCanExecuteChanged();
-            //     redoCommand.RaiseCanExecuteChanged();
-            //     IsModified = !History.IsSaved;
-            // };
-            // History.AddHandler(historyHandler);
+            if (tableData == null)
+                return;
+            
+            historyHandler = new MultiRecordTableEditorHistoryHandler(tableData);
+            undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
+            redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
+            History.PropertyChanged += (sender, args) =>
+            {
+                undoCommand.RaiseCanExecuteChanged();
+                redoCommand.RaiseCanExecuteChanged();
+                IsModified = !History.IsSaved;
+            };
+            History.AddHandler(historyHandler);
         }
 
         public void Dispose()
         {
-            // historyHandler.Dispose();
+            historyHandler?.Dispose();
         }
 
         public string Title { get; }

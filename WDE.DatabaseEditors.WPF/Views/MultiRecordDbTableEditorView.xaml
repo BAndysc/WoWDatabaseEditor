@@ -4,15 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:WDE.DatabaseEditors.WPF.Controls"
-             xmlns:extensions="clr-namespace:WDE.DatabaseEditors.WPF.Helpers"
+             xmlns:helpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              x:Name="rootWindow">
     <UserControl.Resources>
-        <ResourceDictionary Source="../Controls/DbTableFieldViewControls.xaml"> </ResourceDictionary>
+        <ResourceDictionary Source="../Controls/DbTableFieldViewControls.xaml"></ResourceDictionary>
     </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Key="Delete" Command="{Binding DeleteRow}" />
+        <KeyBinding Modifiers="Control" Key="S" Command="Save" />
+        <KeyBinding Modifiers="Control" Key="Z" Command="{Binding Undo}"/>
+        <KeyBinding Modifiers="Control" Key="Y" Command="{Binding Redo}"/>
     </UserControl.InputBindings>
     <DockPanel LastChildFill="True">
         <Grid>
@@ -25,36 +28,21 @@
                         Margin="10, 5, 0, 5" Width="30"/>
                 <Separator HorizontalAlignment="Stretch"/>
             </StackPanel>
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding TableData.Columns}" Margin="0, 0, 0, 20">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.Template>
-                    <ControlTemplate TargetType="ItemsControl">
-                        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-                            <ItemsPresenter />
-                        </ScrollViewer>
-                    </ControlTemplate>
-                </ItemsControl.Template>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="0, 0, 0, 20">
-                            <Border>
-                                <Label Content="{Binding ColumnName}" HorizontalContentAlignment="Center" />
-                            </Border>
-                            <ItemsControl ItemsSource="{Binding Fields}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <controls:DbTableFieldValueView />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <ListView Grid.Row="1" ItemsSource="{Binding TableData.Rows}" SelectedIndex="{Binding SelectedRow, Mode=TwoWay}"
+                      ItemContainerStyle="{StaticResource ListViewItemStyle}">
+                <ListView.View>
+                    <GridView helpers:GridViewColumns.ColumnsSource="{Binding TableData.RowsDescriptors}"
+                              helpers:GridViewColumns.HeaderTextMember="HeaderText"
+                              helpers:GridViewColumns.DisplayMemberMember="DisplayMember"
+                              ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}">
+                        <helpers:GridViewColumns.ColumnCellTemplate>
+                            <DataTemplate>
+                                <controls:DbTableFieldValueView />
+                            </DataTemplate>
+                        </helpers:GridViewColumns.ColumnCellTemplate>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </Grid>
     </DockPanel>
 </UserControl>

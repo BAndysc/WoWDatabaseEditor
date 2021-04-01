@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using WDE.DatabaseEditors.Data;
 
 namespace WDE.DatabaseEditors.Models

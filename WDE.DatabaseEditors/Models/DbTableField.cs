@@ -4,7 +4,6 @@ using WDE.Common.Annotations;
 using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Solution;
-using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.Models
