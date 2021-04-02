@@ -9,6 +9,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
+using WDE.SmartScriptEditor;
 
 namespace WDE.TrinitySmartScriptEditor
 {

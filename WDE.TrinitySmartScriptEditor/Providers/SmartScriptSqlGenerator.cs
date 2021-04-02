@@ -7,6 +7,7 @@ using WDE.Common.Events;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
+using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;

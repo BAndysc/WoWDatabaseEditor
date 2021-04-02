@@ -2,6 +2,7 @@
 using WDE.Common.Managers;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
+using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
 

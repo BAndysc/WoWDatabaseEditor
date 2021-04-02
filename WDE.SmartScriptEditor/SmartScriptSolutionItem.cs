@@ -3,7 +3,7 @@ using WDE.Common;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Models;
 
-namespace WDE.TrinitySmartScriptEditor
+namespace WDE.SmartScriptEditor
 {
     public class SmartScriptSolutionItem : ISolutionItem, ISmartScriptSolutionItem
     {

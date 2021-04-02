@@ -295,6 +295,31 @@
 			"1073741824": {"name": "HOVER", "description": "hover, cannot jump"}
 		}
 	},
+	"MovementFlagExtraParameter": {
+		"isflag": true,
+		"inmenu": true,
+		"name": "Movement flag extra",
+		"prefix": "MOVEMENT_FLAG2_",
+		"values": {
+			"0": {"name": "NONE"},
+			"1": {"name": "NO_STRAFE"},
+			"2": {"name": "NO_JUMPING"},
+			"4": {"name": "DISABLE_COLLISION"},
+			"8": {"name": "FULL_SPEED_TURNING"},
+			"16": {"name": "FULL_SPEED_PITCHING"},
+			"32": {"name": "ALWAYS_ALLOW_PITCHING"},
+			"64": {"name": "IS_VEHICLE_EXIT_VOLUNTARY"},
+			"128": {"name": "IS_JUMP_SPLINE_IN_AIR"},
+			"256": {"name": "IS_ANIM_TIER_IN_TRAN"},
+			"512": {"name": "PREVENT_CHANGE_PITCH"},
+			"1024": {"name": "INTERPOLATED_MOVEMEN"},
+			"2048": {"name": "INTERPOLATED_TURNING"},
+			"4096": {"name": "INTERPOLATED_PITCHING"},
+			"8192": {"name": "VEHICLE_PASSENGER_IS_TRANSITION_ALLOWED"},
+			"16384": {"name": "CAN_TRANSITION_BETWEEN_SWIM_AND_FLY"},
+			"32768": {"name": "UNK16"}
+		}
+	},	
 	"SmartCastFlagsParameter": {
 		"isflag": true,
 		"inmenu": true,
@@ -1325,6 +1350,22 @@
 			"6": {
 				"name": "ARCANE"
 			}
+		}
+	},
+	"TypeMaskParameter": {
+		"name": "Type mask",
+		"inmenu": true,
+		"prefix": "TYPEMASK_",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "object"},
+			"2": {"name": "item"},
+			"4": {"name": "container"},
+			"8": {"name": "creature"},
+			"16": {"name": "player"},
+			"32": {"name": "gameobject"},
+			"64": {"name": "dynamic object"},
+			"128": {"name": "corpse"}
 		}
 	},
 	"UnitClassParameter": {

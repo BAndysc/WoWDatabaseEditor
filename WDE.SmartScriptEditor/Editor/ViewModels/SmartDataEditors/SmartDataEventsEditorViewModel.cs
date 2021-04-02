@@ -223,8 +223,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             ReadableName = source.NameReadable;
             Description = source.Description;
             IsTimed = source.IsTimed;
-            if (source.ValidTypes != null)
-                ValidTypes = new List<SmartScriptType>(source.ValidTypes);
+            if (source.UsableWithScriptTypes != null)
+                ValidTypes = new List<SmartScriptType>(source.UsableWithScriptTypes);
             else
                 ValidTypes = new List<SmartScriptType>();
             if (source.Parameters != null)
@@ -249,7 +249,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             obj.NameReadable = ReadableName;
             obj.Description = Description;
             if (ValidTypes.Count > 0)
-                obj.ValidTypes = ValidTypes;
+                obj.UsableWithScriptTypes = ValidTypes.ToList();
             if (Parameters.Count > 0)
                 obj.Parameters = Parameters.ToList();
             if (Conditions.Count > 0)

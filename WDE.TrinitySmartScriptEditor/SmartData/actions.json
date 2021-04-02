@@ -1707,10 +1707,10 @@
                 "name": "TargetsLimit"
             }
         ],
-        "description": "{pram4value:choose(0):| Random {pram4}} {target}: Cast spell {pram1} on self",
+        "description": "{pram4value:choose(0):| Random {pram4}} {source}: Cast spell {pram1} on self",
         "name_readable": "Invoker cast",
         "target_types": ["Creature", "Player"],
-        "target_is_source": false
+        "target_is_source": true
     },
     {
         "id": 86,
@@ -1728,6 +1728,7 @@
         "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} at {target}",
         "name_readable": "Cross cast",
         "target_types": ["Creature", "Player"],
+        "sources": ["Creature", "Player", "GameObject"],
         "target_is_source": false,
         "source_in_action": true
     },
@@ -3485,6 +3486,7 @@
         "name": "SMART_ACTION_META_COMMENT",
         "description": "",
         "name_readable": "Comment",
+        "comment_field": "Comment",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
     }

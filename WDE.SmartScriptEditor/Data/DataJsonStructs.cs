@@ -148,9 +148,6 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "conditions")]
         public IList<SmartConditionalJsonData> Conditions { get; set; }
 
-        [JsonProperty(PropertyName = "valid_types", ItemConverterType = typeof(StringEnumConverter))]
-        public IList<SmartScriptType> ValidTypes { get; set; }
-
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
 
@@ -196,17 +193,20 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "is_invoker")]
         public bool IsInvoker { get; set; }
         
+        [JsonProperty(PropertyName = "comment_field")]
+        public string CommentField { get; set; }
+        
         [JsonProperty(PropertyName = "replace_with_id")]
         public int? ReplaceWithId { get; set; }
         
         [JsonProperty(PropertyName = "invoker")]
         public DataJsonInvoker Invoker { get; set; }
 
-        [JsonProperty(PropertyName = "usable_with_events")]
-        public IList<int> UsableWithEvents { get; set; }
-
         [JsonProperty(PropertyName = "usable_with_script_types", ItemConverterType = typeof(StringEnumConverter))]
         public IList<SmartScriptType> UsableWithScriptTypes { get; set; }
+
+        [JsonProperty(PropertyName = "usable_with_event_types")]
+        public IList<int> UsableWithEventTypes { get; set; }
 
         [JsonProperty(PropertyName = "description_rules")]
         public IList<SmartDescriptionRulesJsonData> DescriptionRules { get; set; }

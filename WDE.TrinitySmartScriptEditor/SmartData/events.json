@@ -1,7 +1,7 @@
 [
     {
         "id": 0,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "TimedActionList"
         ],
@@ -261,7 +261,7 @@
     },
     {
         "id": 1,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject",
             "Instance"
@@ -522,7 +522,7 @@
     },
     {
         "id": 2,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -568,7 +568,7 @@
     },
     {
         "id": 3,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -614,7 +614,7 @@
     },
     {
         "id": 4,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_AGGRO",
@@ -627,7 +627,7 @@
     },
     {
         "id": 5,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_KILL",
@@ -670,7 +670,7 @@
     },
     {
         "id": 6,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_DEATH",
@@ -683,7 +683,7 @@
     },
     {
         "id": 7,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_EVADE",
@@ -692,7 +692,7 @@
     },
     {
         "id": 8,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -736,7 +736,7 @@
     },
     {
         "id": 9,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -782,7 +782,7 @@
     },
     {
         "id": 10,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_OOC_LOS",
@@ -821,7 +821,7 @@
     },
     {
         "id": 11,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -862,7 +862,7 @@
     },
     {
         "id": 12,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -908,7 +908,7 @@
     },
     {
         "id": 13,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -943,7 +943,7 @@
     },
     {
         "id": 14,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -987,7 +987,7 @@
     },
     {
         "id": 15,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -1026,7 +1026,7 @@
     },
     {
         "id": 16,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -1070,7 +1070,7 @@
     },
     {
         "id": 17,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -1109,7 +1109,7 @@
     },
     {
         "id": 18,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -1155,7 +1155,7 @@
     },
     {
         "id": 19,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -1176,7 +1176,7 @@
     },
     {
         "id": 20,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -1197,7 +1197,7 @@
     },
     {
         "id": 21,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_REACHED_HOME",
@@ -1206,7 +1206,7 @@
     },
     {
         "id": 22,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_RECEIVE_EMOTE",
@@ -1245,7 +1245,7 @@
     },
     {
         "id": 23,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -1285,7 +1285,7 @@
     },
     {
         "id": 24,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -1327,7 +1327,7 @@
     },
     {
         "id": 25,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_RESET",
@@ -1336,7 +1336,7 @@
     },
     {
         "id": 26,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_IC_LOS",
@@ -1375,7 +1375,7 @@
     },
     {
         "id": 27,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_PASSENGER_BOARDED",
@@ -1408,7 +1408,7 @@
     },
     {
         "id": 28,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_PASSENGER_REMOVED",
@@ -1441,7 +1441,7 @@
     },
     {
         "id": 29,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_CHARMED",
@@ -1450,7 +1450,7 @@
     },
     {
         "id": 30,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_CHARMED_TARGET",
@@ -1459,7 +1459,7 @@
     },
     {
         "id": 31,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_SPELLHIT_TARGET",
@@ -1502,7 +1502,7 @@
     },
     {
         "id": 32,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_DAMAGED",
@@ -1546,7 +1546,7 @@
     },
     {
         "id": 33,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_DAMAGED_TARGET",
@@ -1596,7 +1596,7 @@
     },
     {
         "id": 34,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_MOVEMENTINFORM",
@@ -1673,7 +1673,7 @@
     },
     {
         "id": 35,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -1712,7 +1712,7 @@
     },
     {
         "id": 36,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_CORPSE_REMOVED",
@@ -1721,7 +1721,7 @@
     },
     {
         "id": 37,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject",
             "AreaTriggerEntity",
@@ -1733,7 +1733,7 @@
     },
     {
         "id": 38,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -1773,7 +1773,7 @@
     },
     {
         "id": 39,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_WAYPOINT_START",
@@ -1803,7 +1803,7 @@
     },
     {
         "id": 40,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_WAYPOINT_REACHED",
@@ -1824,7 +1824,7 @@
     },
     {
         "id": 41,
-        "valid_types": [
+        "usable_with_script_types": [
             "Transport"
         ],
         "name": "SMART_EVENT_TRANSPORT_ADDPLAYER",
@@ -1833,7 +1833,7 @@
     },
     {
         "id": 42,
-        "valid_types": [
+        "usable_with_script_types": [
             "Transport"
         ],
         "name": "SMART_EVENT_TRANSPORT_ADDCREATURE",
@@ -1849,7 +1849,7 @@
     },
     {
         "id": 43,
-        "valid_types": [
+        "usable_with_script_types": [
             "Transport"
         ],
         "name": "SMART_EVENT_TRANSPORT_REMOVE_PLAYER",
@@ -1858,7 +1858,7 @@
     },
     {
         "id": 44,
-        "valid_types": [
+        "usable_with_script_types": [
             "Transport"
         ],
         "name": "SMART_EVENT_TRANSPORT_RELOCATE",
@@ -1873,7 +1873,7 @@
     },
     {
         "id": 45,
-        "valid_types": [
+        "usable_with_script_types": [
             "Instance"
         ],
         "name": "SMART_EVENT_INSTANCE_PLAYER_ENTER",
@@ -1907,7 +1907,7 @@
     },
     {
         "id": 46,
-        "valid_types": [
+        "usable_with_script_types": [
             "AreaTrigger",
             "AreaTriggerEntity",
             "AreaTriggerEntityServerSide"
@@ -1929,7 +1929,7 @@
     },
     {
         "id": 47,
-        "valid_types": [
+        "usable_with_script_types": [
             "Quest"
         ],
         "name": "SMART_EVENT_QUEST_ACCEPTED",
@@ -1942,7 +1942,7 @@
     },
     {
         "id": 48,
-        "valid_types": [
+        "usable_with_script_types": [
             "Quest"
         ],
         "parameters": [
@@ -1961,7 +1961,7 @@
     },
     {
         "id": 49,
-        "valid_types": [
+        "usable_with_script_types": [
             "Quest"
         ],
         "name": "SMART_EVENT_QUEST_COMPLETION",
@@ -1974,7 +1974,7 @@
     },
     {
         "id": 50,
-        "valid_types": [
+        "usable_with_script_types": [
             "Quest"
         ],
         "name": "SMART_EVENT_QUEST_REWARDED",
@@ -1987,7 +1987,7 @@
     },
     {
         "id": 51,
-        "valid_types": [
+        "usable_with_script_types": [
             "Quest"
         ],
         "name": "SMART_EVENT_QUEST_FAIL",
@@ -2000,7 +2000,7 @@
     },
     {
         "id": 52,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -2022,7 +2022,7 @@
     },
     {
         "id": 53,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_RECEIVE_HEAL",
@@ -2071,7 +2071,7 @@
     },
     {
         "id": 54,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_JUST_SUMMONED",
@@ -2084,7 +2084,7 @@
     },
     {
         "id": 55,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_WAYPOINT_PAUSED",
@@ -2105,7 +2105,7 @@
     },
     {
         "id": 56,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_WAYPOINT_RESUMED",
@@ -2126,7 +2126,7 @@
     },
     {
         "id": 57,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_WAYPOINT_STOPPED",
@@ -2147,7 +2147,7 @@
     },
     {
         "id": 58,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_WAYPOINT_ENDED",
@@ -2168,7 +2168,7 @@
     },
     {
         "id": 59,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -2185,7 +2185,7 @@
     },
     {
         "id": 60,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject",
             "AreaTriggerEntity",
@@ -2433,7 +2433,7 @@
     },
     {
         "id": 61,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject",
             "Instance",
@@ -2450,7 +2450,7 @@
     },
     {
         "id": 62,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -2476,7 +2476,7 @@
     },
     {
         "id": 63,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject",
             "AreaTriggerEntity",
@@ -2488,7 +2488,7 @@
     },
     {
         "id": 64,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -2502,7 +2502,7 @@
     },
     {
         "id": 65,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_FOLLOW_COMPLETED",
@@ -2511,7 +2511,7 @@
     },
     {
         "id": 66,
-        "valid_types": [
+        "usable_with_script_types": [
             "Spell"
         ],
         "name": "SMART_EVENT_DUMMY_EFFECT",
@@ -2530,7 +2530,7 @@
     },
     {
         "id": 67,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -2560,7 +2560,7 @@
     },
     {
         "id": 68,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -2577,7 +2577,7 @@
     },
     {
         "id": 69,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -2594,7 +2594,7 @@
     },
     {
         "id": 70,
-        "valid_types": [
+        "usable_with_script_types": [
             "Gameobject"
         ],
         "name": "SMART_EVENT_GO_STATE_CHANGED",
@@ -2629,7 +2629,7 @@
     },
     {
         "id": 71,
-        "valid_types": [
+        "usable_with_script_types": [
             "Gameobject"
         ],
         "name": "SMART_EVENT_GO_EVENT_INFORM",
@@ -2645,7 +2645,7 @@
     },
     {
         "id": 72,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_ACTION_DONE",
@@ -2660,7 +2660,7 @@
     },
     {
         "id": 73,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "name": "SMART_EVENT_ON_SPELLCLICK",
@@ -2673,7 +2673,7 @@
     },
     {
         "id": 74,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -2723,7 +2723,7 @@
     },
     {
         "id": 75,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -2759,7 +2759,7 @@
     },
     {
         "id": 76,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature"
         ],
         "is_timed": true,
@@ -2795,7 +2795,7 @@
     },
     {
         "id": 77,
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -2856,7 +2856,7 @@
                 "name": "Check cooldown"
             }
         ],
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],
@@ -2886,7 +2886,7 @@
                 "name": "Check cooldown"
             }
         ],
-        "valid_types": [
+        "usable_with_script_types": [
             "Creature",
             "Gameobject"
         ],

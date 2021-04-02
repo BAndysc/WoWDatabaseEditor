@@ -2,6 +2,7 @@
 using WDE.Common.DBC;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
+using WDE.SmartScriptEditor;
 
 namespace WDE.TrinitySmartScriptEditor.Providers
 {

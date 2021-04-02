@@ -104,12 +104,20 @@ namespace WDE.SmartScriptEditor.Data
 
             SmartAction action = new(id, source, target);
             var raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
-            action.CommentParameter.IsUsed = id == SmartConstants.ActionComment;
-            foreach (var t in action.Target.Position)
-                t.IsUsed = raw.UsesTargetPosition;
+            action.CommentParameter.IsUsed = raw.CommentField != null;
+            action.CommentParameter.Name = raw.CommentField;
+            UpdateTargetPositionVisibility(action.Target);
             SetParameterObjects(action, raw);
 
             return action;
+        }
+
+        private void UpdateTargetPositionVisibility(SmartTarget target)
+        {
+            var actionData = smartDataManager.GetRawData(SmartType.SmartAction, target.Parent?.Id ?? SmartConstants.ActionNone);
+            var targetData = smartDataManager.GetRawData(SmartType.SmartTarget, target.Id);
+            foreach (var t in target.Position)
+                t.IsUsed = actionData.UsesTargetPosition | targetData.UsesTargetPosition;
         }
 
         public void UpdateAction(SmartAction smartAction, int id)
@@ -118,9 +126,9 @@ namespace WDE.SmartScriptEditor.Data
                 return;
             
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
-            smartAction.CommentParameter.IsUsed = id == SmartConstants.ActionComment;
-            foreach (var t in smartAction.Target.Position)
-                t.IsUsed = raw.UsesTargetPosition;
+            smartAction.CommentParameter.IsUsed = raw.CommentField != null;
+            smartAction.CommentParameter.Name = raw.CommentField;
+            UpdateTargetPositionVisibility(smartAction.Target);
             SetParameterObjects(smartAction, raw, true);
         }
 
@@ -193,6 +201,7 @@ namespace WDE.SmartScriptEditor.Data
             }
             
             SetParameterObjects(smartTarget, raw, true);
+            UpdateTargetPositionVisibility(smartTarget);
         }
 
         public SmartSource SourceFactory(int id)
