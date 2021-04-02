@@ -2,13 +2,14 @@
 using SmartFormat;
 using WDE.Common.Windows;
 using WDE.Module;
+using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 
-namespace WDE.SmartScriptEditor
+namespace WDE.TrinitySmartScriptEditor
 {
-    public class SmartScriptModule : ModuleBase
+    public class SmartScriptModule : ScopedModuleBase
     {
-        public SmartScriptModule()
+        public SmartScriptModule(IScopedContainer scopedContainer) : base(scopedContainer)
         {
             Smart.Default.Parser.UseAlternativeEscapeChar();
         }
@@ -16,6 +17,8 @@ namespace WDE.SmartScriptEditor
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             base.RegisterTypes(containerRegistry);
+            AutoRegisterByConvention(typeof(SmartFactory).Assembly, moduleScope);
+            
             var t = new ToolSmartEditorViewModel();
             containerRegistry.RegisterInstance(typeof(ITool), t);
             containerRegistry.RegisterInstance(typeof(IToolSmartEditorViewModel), t);

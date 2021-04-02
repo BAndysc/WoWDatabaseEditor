@@ -1,10 +1,12 @@
 ﻿using System.IO;
-using WDE.Module.Attributes;
 using System.Threading.Tasks;
+using WDE.Module.Attributes;
+using WDE.SmartScriptEditor.Data;
 
-namespace WDE.SmartScriptEditor.Data
+namespace WDE.TrinitySmartScriptEditor.Data
 {
     [AutoRegister]
+    [SingleInstance]
     public class SmartDataJsonProvider : ISmartDataJsonProvider
     {
         public string GetActionsJson() => File.ReadAllText("SmartData/actions.json");

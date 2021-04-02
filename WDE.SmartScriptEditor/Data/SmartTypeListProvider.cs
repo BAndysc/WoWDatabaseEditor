@@ -6,6 +6,7 @@ using WDE.SmartScriptEditor.Editor.ViewModels;
 
 namespace WDE.SmartScriptEditor.Data
 {
+    [SingleInstance]
     [AutoRegister]
     public class SmartTypeListProvider : ISmartTypeListProvider
     {

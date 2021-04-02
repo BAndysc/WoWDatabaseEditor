@@ -3,10 +3,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using WDE.Common.History;
 using WDE.MVVM.Observable;
-using WDE.SmartScriptEditor.Data;
-using WDE.SmartScriptEditor.Editor.ViewModels;
+using WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors;
 
-namespace WDE.SmartScriptEditor.History
+namespace WDE.TrinitySmartScriptEditor.History
 {
     public class SmartDataGroupsHistory: HistoryHandler, IDisposable
     {

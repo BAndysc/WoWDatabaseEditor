@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Prism.Mvvm;
 using Prism.Commands;
+using Prism.Mvvm;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Data;
 
-namespace WDE.SmartScriptEditor.Editor.ViewModels
+namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 {
     class SmartDataTargetsEditorViewModel: BindableBase, ISmartDataEditorModel, IDialog
     {

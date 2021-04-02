@@ -21,6 +21,7 @@
       <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
       <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj" />
+      <ProjectReference Include="..\WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
       <ProjectReference Include="..\WDE.Updater\WDE.Updater.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />

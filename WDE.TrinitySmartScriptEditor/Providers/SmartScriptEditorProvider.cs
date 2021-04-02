@@ -3,25 +3,23 @@ using WDE.Common.Managers;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Editor.ViewModels;
+using WDE.SmartScriptEditor.Models;
 
-namespace WDE.SmartScriptEditor.Providers
+namespace WDE.TrinitySmartScriptEditor.Providers
 {
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptEditorProvider : ISolutionItemEditorProvider<SmartScriptSolutionItem>
     {
         private readonly IContainerProvider containerProvider;
-        private readonly ISolutionItemNameRegistry solutionItemNameRegistry;
 
-        public SmartScriptEditorProvider(ISolutionItemNameRegistry solutionItemNameRegistry, IContainerProvider containerProvider)
+        public SmartScriptEditorProvider(IContainerProvider containerProvider)
         {
-            this.solutionItemNameRegistry = solutionItemNameRegistry;
             this.containerProvider = containerProvider;
         }
 
         public IDocument GetEditor(SmartScriptSolutionItem item)
         {
-            SmartScriptEditorViewModel vm = containerProvider.Resolve<SmartScriptEditorViewModel>((typeof(SmartScriptSolutionItem), item));
-
+            SmartScriptEditorViewModel vm = containerProvider.Resolve<SmartScriptEditorViewModel>((typeof(ISmartScriptSolutionItem), item));
             return vm;
         }
     }

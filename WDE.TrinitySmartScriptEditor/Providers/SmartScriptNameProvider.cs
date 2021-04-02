@@ -3,10 +3,10 @@ using WDE.Common.DBC;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
 
-namespace WDE.SmartScriptEditor.Providers
+namespace WDE.TrinitySmartScriptEditor.Providers
 {
-    [AutoRegister]
-    public class  SmartScriptNameProvider : ISolutionNameProvider<SmartScriptSolutionItem>
+    [AutoRegisterToParentScopeAttribute]
+    public class SmartScriptNameProvider : ISolutionNameProvider<SmartScriptSolutionItem>
     {
         private readonly IDatabaseProvider database;
         private readonly ISpellStore spellStore;

@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
-using System.Threading.Tasks;
 using System.Linq;
-using Prism.Mvvm;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Prism.Commands;
-using WDE.Common.Managers;
+using Prism.Mvvm;
 using WDE.Common.History;
-using WDE.Common.Utils;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
-using WDE.Common.Tasks;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Data;
-using WDE.SmartScriptEditor.Providers;
-using WDE.SmartScriptEditor.History;
+using WDE.TrinitySmartScriptEditor.History;
 
-namespace WDE.SmartScriptEditor.Editor.ViewModels
+namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 {
     public class SmartDataDefinesListViewModel : BindableBase, IDocument
     {

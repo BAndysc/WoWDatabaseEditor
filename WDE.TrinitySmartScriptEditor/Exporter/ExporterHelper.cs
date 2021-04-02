@@ -4,26 +4,24 @@ using System.Text;
 using SmartFormat;
 using WDE.Common.Database;
 using WDE.Conditions.Exporter;
-using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;
 
-namespace WDE.SmartScriptEditor.Exporter
+namespace WDE.TrinitySmartScriptEditor.Exporter
 {
-    public class SmartScriptExporter
+    public class ExporterHelper
     {
         private static readonly string SaiSql =
             "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
 
         private readonly SmartScript script;
-        private readonly ISmartFactory smartFactory;
-        private readonly ISmartDataManager smartDataManager;
+        private readonly ISmartScriptExporter scriptExporter;
         private readonly StringBuilder sql = new();
 
-        public SmartScriptExporter(SmartScript script, ISmartFactory smartFactory, ISmartDataManager smartDataManager)
+        public ExporterHelper(SmartScript script, ISmartScriptExporter scriptExporter)
         {
             this.script = script;
-            this.smartFactory = smartFactory;
-            this.smartDataManager = smartDataManager;
+            this.scriptExporter = scriptExporter;
         }
 
         public string GetSql()
@@ -48,7 +46,7 @@ namespace WDE.SmartScriptEditor.Exporter
             sql.AppendLine(
                 "INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES");
 
-            var (serializedScript, serializedConditions) = script.ToSmartScriptLinesNoMetaActions(smartFactory, smartDataManager);
+            var (serializedScript, serializedConditions) = scriptExporter.ToDatabaseCompatibleSmartScript(script);
             var lines = serializedScript.Select(GenerateSingleSai);
 
             sql.Append(string.Join(",\n", lines));

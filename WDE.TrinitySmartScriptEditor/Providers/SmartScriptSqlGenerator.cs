@@ -8,28 +8,31 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Data;
-using WDE.SmartScriptEditor.Exporter;
+using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;
 
-namespace WDE.SmartScriptEditor.Providers
+namespace WDE.TrinitySmartScriptEditor.Providers
 {
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptSqlGenerator : ISolutionItemSqlProvider<SmartScriptSolutionItem>
     {
         private readonly Lazy<IDatabaseProvider> database;
         private readonly IEventAggregator eventAggregator;
         private readonly Lazy<ISmartFactory> smartFactory;
         private readonly Lazy<ISmartDataManager> smartDataManager;
+        private readonly Lazy<ISmartScriptExporter> exporter;
 
         public SmartScriptSqlGenerator(IEventAggregator eventAggregator,
             Lazy<IDatabaseProvider> database,
             Lazy<ISmartFactory> smartFactory,
-            Lazy<ISmartDataManager> smartDataManager)
+            Lazy<ISmartDataManager> smartDataManager,
+            Lazy<ISmartScriptExporter> exporter)
         {
             this.eventAggregator = eventAggregator;
             this.database = database;
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
+            this.exporter = exporter;
         }
 
         public string GenerateSql(SmartScriptSolutionItem item)
@@ -46,7 +49,7 @@ namespace WDE.SmartScriptEditor.Providers
             var lines = database.Value.GetScriptFor(item.Entry, item.SmartType).ToList();
             var conditions = database.Value.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, item.Entry, (int)item.SmartType).ToList();
             script.Load(lines, conditions);
-            return new SmartScriptExporter(script, smartFactory.Value, smartDataManager.Value).GetSql();
+            return exporter.Value.GenerateSql(script);
         }
 
         private class EmptyMessageboxService : IMessageBoxService

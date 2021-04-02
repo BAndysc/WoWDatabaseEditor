@@ -40,6 +40,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ISolutionItemNameRegistry itemNameRegistry;
         private readonly ITaskRunner taskRunner;
         private readonly IToolSmartEditorViewModel smartEditorViewModel;
+        private readonly ISmartScriptExporter smartScriptExporter;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -48,7 +49,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IWindowManager windowManager;
         private readonly IMessageBoxService messageBoxService;
 
-        private SmartScriptSolutionItem item;
+        private ISmartScriptSolutionItem item;
 
         private SmartScript script;
 
@@ -65,7 +66,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set => SetProperty(ref script, value);
         }
         
-        public SmartScriptEditorViewModel(SmartScriptSolutionItem item,
+        public SmartScriptEditorViewModel(ISmartScriptSolutionItem item,
             IHistoryManager history,
             IDatabaseProvider database,
             IEventAggregator eventAggregator,
@@ -80,7 +81,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ISolutionItemNameRegistry itemNameRegistry,
             ITaskRunner taskRunner,
             IClipboardService clipboard,
-            IToolSmartEditorViewModel smartEditorViewModel)
+            IToolSmartEditorViewModel smartEditorViewModel,
+            ISmartScriptExporter smartScriptExporter)
         {
             History = history;
             this.database = database;
@@ -94,6 +96,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.itemNameRegistry = itemNameRegistry;
             this.taskRunner = taskRunner;
             this.smartEditorViewModel = smartEditorViewModel;
+            this.smartScriptExporter = smartScriptExporter;
             this.conditionDataManager = conditionDataManager;
 
             CloseCommand = new AsyncCommand(async () =>
@@ -712,11 +715,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(args =>
                 {
-                    if (args.Item is SmartScriptSolutionItem)
+                    if (args.Item is ISmartScriptSolutionItem)
                     {
-                        SmartScriptSolutionItem itemm = args.Item as SmartScriptSolutionItem;
+                        ISmartScriptSolutionItem itemm = args.Item as ISmartScriptSolutionItem;
                         if (itemm.Entry == item.Entry && itemm.SmartType == item.SmartType)
-                            args.Sql = new SmartScriptExporter(script, smartFactory, smartDataManager).GetSql();
+                            args.Sql = smartScriptExporter.GenerateSql(script);
                     }
                 }));
 
@@ -811,7 +814,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Save => SaveCommand;
         public AsyncAwaitBestPractices.MVVM.IAsyncCommand CloseCommand { get; set; }
         
-        private void SetSolutionItem(SmartScriptSolutionItem item)
+        private void SetSolutionItem(ISmartScriptSolutionItem item)
         {
             Debug.Assert(this.item == null);
             this.item = item;
@@ -899,7 +902,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));
 
-            var (lines, conditions) = script.ToSmartScriptLinesNoMetaActions(smartFactory, smartDataManager);
+            var (lines, conditions) = smartScriptExporter.ToDatabaseCompatibleSmartScript(script);
             
             await database.InstallScriptFor((int)item.Entry, item.SmartType, lines);
             

@@ -10,7 +10,7 @@ using WDE.Common.Providers;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
 
-namespace WDE.SmartScriptEditor
+namespace WDE.TrinitySmartScriptEditor
 {
     public abstract class SmartScriptSolutionItemProvider : ISolutionItemProvider
     {
@@ -48,7 +48,7 @@ namespace WDE.SmartScriptEditor
         public abstract Task<ISolutionItem> CreateSolutionItem();
     }
 
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptCreatureProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<ICreatureEntryProviderService> creatureEntryProvider;
@@ -70,7 +70,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptGameobjectProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<IGameobjectEntryProviderService> goProvider;
@@ -92,7 +92,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptQuestProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<IQuestEntryProviderService> service;
@@ -114,7 +114,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptAuraProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<ISpellEntryProviderService> service;
@@ -136,7 +136,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptSpellProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<ISpellEntryProviderService> service;
@@ -158,7 +158,7 @@ namespace WDE.SmartScriptEditor
         }
     }
 
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptTimedActionListProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<ICreatureEntryProviderService> creatureEntryProvider;
@@ -181,7 +181,7 @@ namespace WDE.SmartScriptEditor
         }
     }
     
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptClientAreaTriggerEntityListProvider : SmartScriptSolutionItemProvider
     {
         private readonly Lazy<IItemFromListProvider> itemFromListProvider;
@@ -246,7 +246,7 @@ namespace WDE.SmartScriptEditor
         }
     }
     
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptAreaTriggerEntityListProvider : SmartScriptAreaTriggerEntityListProviderBase
     {
         public SmartScriptAreaTriggerEntityListProvider(
@@ -262,7 +262,7 @@ namespace WDE.SmartScriptEditor
             false) {}
     }
     
-    [AutoRegister]
+    [AutoRegisterToParentScopeAttribute]
     public class SmartScriptServerSideAreaTriggerEntityListProvider : SmartScriptAreaTriggerEntityListProviderBase
     {
         public SmartScriptServerSideAreaTriggerEntityListProvider(

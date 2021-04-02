@@ -1,25 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using WDE.Common.History;
-using WDE.Module.Attributes;
 using WDE.Common.Managers;
-using WDE.SmartScriptEditor.Models;
-using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.Common.Menu;
-using WDE.SmartScriptEditor.Data;
 using WDE.Common.Parameters;
-using WDE.Common.Tasks;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
+using WDE.Module.Attributes;
+using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors;
+using WDE.TrinitySmartScriptEditor.Models;
 
-namespace WDE.SmartScriptEditor.Providers
+namespace WDE.TrinitySmartScriptEditor.Providers.SmartDataPresentersProvider
 {
-    public enum SmartDataSourceMode
-    {
-        SD_SOURCE_EVENTS,
-        SD_SOURCE_ACTIONS,
-        SD_SOURCE_TARGETS,
-    }
-    [AutoRegister]
+    [AutoRegisterToParentScope]
     class SmartDataEditorsProvider : IMainMenuItem
     {
         public string ItemName { get; } = "Editors";

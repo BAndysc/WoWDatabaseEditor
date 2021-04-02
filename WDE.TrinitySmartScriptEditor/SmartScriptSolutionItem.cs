@@ -1,10 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using WDE.Common;
 using WDE.Common.Database;
+using WDE.SmartScriptEditor.Models;
 
-namespace WDE.SmartScriptEditor
+namespace WDE.TrinitySmartScriptEditor
 {
-    public class SmartScriptSolutionItem : ISolutionItem
+    public class SmartScriptSolutionItem : ISolutionItem, ISmartScriptSolutionItem
     {
         public SmartScriptSolutionItem(int entry, SmartScriptType type)
         {

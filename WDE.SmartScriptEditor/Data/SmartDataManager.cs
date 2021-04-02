@@ -32,8 +32,8 @@ namespace WDE.SmartScriptEditor.Data
         void Reload(SmartType smartType);
     }
 
-    [SingleInstance]
     [AutoRegister]
+    [SingleInstance]
     public class SmartDataManager : ISmartDataManager
     {
         private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new();

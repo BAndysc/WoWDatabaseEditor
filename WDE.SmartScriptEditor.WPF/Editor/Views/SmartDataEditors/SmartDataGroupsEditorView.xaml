@@ -9,7 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="800"
              xmlns:datas="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels"
              xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
-             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors;assembly=WDE.SmartScriptEditor"
              x:Name="rootWindow">
     <UserControl.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding Save}" />

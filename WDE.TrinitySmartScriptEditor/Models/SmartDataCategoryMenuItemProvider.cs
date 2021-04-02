@@ -1,9 +1,8 @@
 ﻿using System;
 using WDE.Common.Managers;
 using WDE.Common.Menu;
-using WDE.Common.Providers;
 
-namespace WDE.SmartScriptEditor.Models
+namespace WDE.TrinitySmartScriptEditor.Models
 {
     class SmartDataCategoryMenuItemProvider<T> : IMenuDocumentItem where T: IDocument
     {
