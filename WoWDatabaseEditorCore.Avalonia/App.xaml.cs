@@ -17,6 +17,7 @@ using Unity.RegistrationByConvention;
 using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Events;
+using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Windows;
@@ -203,6 +204,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             foreach (var module in loadedModules)
                 module.FinalizeRegistration((IContainerRegistry)Container);
             
+            Container.Resolve<IThemeManager>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
             MainApp = Container.Resolve<MainWindow>();
             MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
@@ -219,8 +221,8 @@ namespace WoWDatabaseEditorCore.Avalonia
 
         public override void Initialize()
         {
-            AvaloniaXamlLoader.Load(this);
             base.Initialize();
+            AvaloniaXamlLoader.Load(this);
         }
 
         private class Conflict

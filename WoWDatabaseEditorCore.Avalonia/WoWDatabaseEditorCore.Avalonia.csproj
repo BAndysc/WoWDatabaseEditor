@@ -52,6 +52,9 @@
         <AvaloniaResource Include="Icon.png" />
         <None Remove="IconSmall.png" />
         <AvaloniaResource Include="IconSmall.png" />
+        <Compile Update="Services\AppearanceService\Views\ThemeConfigView.axaml.cs">
+          <DependentUpon>ThemeConfigView.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="0.10.0" />
