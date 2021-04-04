@@ -63,7 +63,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             };
 
             if (asFlags)
-                Columns.Insert(0, new ColumnDescriptor("", "IsChecked", null, true));
+                Columns.Insert(0, new ColumnDescriptor("", "IsChecked", 35, true));
 
             if (items.Count == 0)
                 SearchText = current.HasValue ? current.Value.ToString() : "";
@@ -75,7 +75,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 if (SelectedItem == null && FilteredItems.Count == 1)
                     SelectedItem = FilteredItems[0];
                 CloseOk?.Invoke();
-            }, () => SelectedItem != null || FilteredItems.Count == 1 || int.TryParse(SearchText, out _));
+            }, () => asFlags || SelectedItem != null || FilteredItems.Count == 1 || int.TryParse(SearchText, out _));
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
             
             FilteredItems.ObserveCollectionChanges().Subscribe(_ => Accept.RaiseCanExecuteChanged());

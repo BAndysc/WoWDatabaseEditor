@@ -2,13 +2,15 @@
                          xmlns="https://github.com/avaloniaui"
                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                          xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
-                         xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia">
+                         xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+                         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles">
     <controls:DialogViewBase.ToolBar>
         <TextBox x:Name="SearchBox" 
                  Padding="2,4" 
                  Text="{Binding SearchText}" 
                  Width="300" 
                  utils:FocusUtils.FocusFirst="True"
+                 KeyDown="SearchBox_OnKeyDown"
                  HorizontalAlignment="Right" />
     </controls:DialogViewBase.ToolBar>
     
@@ -17,19 +19,19 @@
             <RowDefinition />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        <DataGrid 
-                utils:DataGridColumns.ColumnsSource="{Binding  Columns}"
-                x:Name="ListView" 
-                SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
-                Items="{Binding FilteredItems}" Margin="0,0,0,6"
-                IsVisible="{Binding ShowItemsList}">
-            
+        <controls1:GridView
+            SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
+            Items="{Binding FilteredItems}" Margin="0,0,0,6"
+            IsVisible="{Binding ShowItemsList}"
+            utils:DataGridColumns.ColumnsSource="{Binding  Columns}"
+            KeyDown="InputElement_OnKeyDown"
+            Name="GridView">
             <Interaction.Behaviors>
                 <EventTriggerBehavior EventName="DoubleTapped">
                     <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
                 </EventTriggerBehavior>
             </Interaction.Behaviors>
-        </DataGrid>
+        </controls1:GridView>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
