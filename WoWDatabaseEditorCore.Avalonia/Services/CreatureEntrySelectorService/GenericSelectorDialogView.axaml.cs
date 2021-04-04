@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaStyles.Controls;
 using WDE.Common.Avalonia.Controls;

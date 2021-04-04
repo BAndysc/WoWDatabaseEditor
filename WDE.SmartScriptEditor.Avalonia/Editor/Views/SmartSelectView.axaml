@@ -94,6 +94,7 @@
                                     <Rectangle Grid.Column="2" Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
                                 </Grid>
                                 <ListBox Items="{Binding}" 
+                                         KeyDown="InputElement_OnKeyDown"
                                          SelectedItem="{Binding SelectedItem}">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>

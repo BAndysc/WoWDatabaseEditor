@@ -217,8 +217,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                foreach (ContentPresenter @event in Events())
-                    SetSelected(@event.Child, false);
+                foreach (ContentPresenter @event in Children)
+                    if (@event.Child != null)
+                        SetSelected(@event.Child, false);
             }            
         }
 

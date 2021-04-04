@@ -28,7 +28,7 @@
                              utils:DataGridColumns.ColumnsSource="{Binding Columns}">
             <Interaction.Behaviors>
                 <EventTriggerBehavior EventName="DoubleTapped">
-                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
+                    <InvokeCommandAction Command="{Binding Accept}" />
                 </EventTriggerBehavior>
             </Interaction.Behaviors>
         </controls1:GridView>

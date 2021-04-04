@@ -84,14 +84,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            if (!realClosing && DataContext is IApplication closeAwareViewModel)
+            if (!realClosing && DataContext is MainWindowViewModel closeAwareViewModel)
             {
                 TryClose(closeAwareViewModel);
                 e.Cancel = true;
             }
         }
 
-        private async Task TryClose(IApplication closeAwareViewModel)
+        private async Task TryClose(MainWindowViewModel closeAwareViewModel)
         {
             if (await closeAwareViewModel.CanClose())
             {

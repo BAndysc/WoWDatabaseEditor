@@ -252,6 +252,7 @@
                                                 <Button DockPanel.Dock="Right" Content="  ...  "
                                                         Command="{Binding SelectItemAction}"
                                                         Margin="3,0,0,0"
+                                                        Focusable="False"
                                                         IsVisible="{Binding HasItems}" />
                                                 <controls:ParameterTextBox VerticalContentAlignment="Center"
                                                                            Text="{Binding Parameter.Value, Mode=TwoWay}"
