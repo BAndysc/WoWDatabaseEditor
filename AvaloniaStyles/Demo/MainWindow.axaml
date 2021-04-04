@@ -71,27 +71,43 @@
         </TabStrip>
     </controls:ExtendedWindow.TabStrip>
     
-    <StackPanel Margin="10" Spacing="10" Orientation="Vertical" Background="{DynamicResource MainColorBackground}">
-        <Button>Button</Button>
-        <Button IsEnabled="False">Disabled button</Button>
-        <CheckBox>Checkbox</CheckBox>
-        <CheckBox IsChecked="True">Checked</CheckBox>
-        <CheckBox IsChecked="{x:Null}">Indetermine</CheckBox>
-        <RadioButton>Radio</RadioButton>
-        <RadioButton IsChecked="True">Checked radio</RadioButton>
-        <TextBox Watermark="Textbox" />
-        <ComboBox Items="{Binding Themes}" SelectedItem="{Binding CurrentTheme, Mode=TwoWay}" />
-        <ListBox>
-            <ListBoxItem>A</ListBoxItem>
-            <ListBoxItem>B</ListBoxItem>
-            <ListBoxItem>C</ListBoxItem>
-            <ListBoxItem>D</ListBoxItem>
-        </ListBox>
-        <DataGrid AutoGenerateColumns="True" 
-                  CanUserResizeColumns="True"
-                  SelectionMode="Extended"
-                  Items="{Binding Items}">
-        </DataGrid>
-        <Button Click="ShowDemoDialog">Show Modal Dialog</Button>
-    </StackPanel>
+    <ScrollViewer Margin="10" Background="{DynamicResource MainColorBackground}">
+        <StackPanel Spacing="10" Orientation="Vertical">
+            <Button>Button</Button>
+            <Button IsEnabled="False">Disabled button</Button>
+            <CheckBox>Checkbox</CheckBox>
+            <CheckBox IsChecked="True">Checked</CheckBox>
+            <CheckBox IsChecked="{x:Null}">Indetermine</CheckBox>
+            <RadioButton>Radio</RadioButton>
+            <RadioButton IsChecked="True">Checked radio</RadioButton>
+            <TextBox Watermark="Textbox" />
+            <ComboBox Items="{Binding Themes}" SelectedItem="{Binding CurrentTheme, Mode=TwoWay}" />
+            <ListBox>
+                <ListBoxItem>A</ListBoxItem>
+                <ListBoxItem>B</ListBoxItem>
+                <ListBoxItem>C</ListBoxItem>
+                <ListBoxItem>D</ListBoxItem>
+            </ListBox>
+            <controls:GridView Items="{Binding Items}">
+                <controls:GridView.Columns>
+                    <controls:GridColumnDefinition Name="Bool" Property="Bool" Checkable="True" />
+                    <controls:GridColumnDefinition Name="Name" Property="Name" />
+                    <controls:GridColumnDefinition Name="Number" Property="Number" />
+                </controls:GridView.Columns>
+            </controls:GridView>
+            <controls:GridView Items="{Binding Items}">
+                <controls:GridView.Columns>
+                    <controls:GridColumnDefinition Name="Name" Property="Name" />
+                    <controls:GridColumnDefinition Name="Number" Property="Number" />
+                </controls:GridView.Columns>
+            </controls:GridView>
+            <DataGrid AutoGenerateColumns="True" 
+                      CanUserResizeColumns="True"
+                      SelectionMode="Extended"
+                      Items="{Binding Items}">
+            </DataGrid>
+            <Button Click="ShowDemoDialog">Show Modal Dialog</Button>
+        </StackPanel>
+    </ScrollViewer>
+    
 </controls:ExtendedWindow>

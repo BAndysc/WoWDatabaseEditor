@@ -1,0 +1,35 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="controls|GridView">
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}"/>
+    </Style>
+    <Style Selector="controls|GridViewHeader">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Background" Value="{DynamicResource TextControlBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}"/>
+    </Style>
+    <Style Selector="controls|GridViewColumnHeader TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+    </Style>
+    <Style Selector="controls|GridView GridSplitter">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border 
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Background="{DynamicResource TextControlBackground}"/>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|GridView ListBoxItem">
+        <Setter Property="Height" Value="26" />
+    </Style>
+    <Style Selector="controls|GridView ListBoxItem CheckBox">
+        <Setter Property="Margin" Value="0,-6,0,0" />
+    </Style>
+    <Style Selector="controls|GridView ListBoxItem TextBlock">
+        <Setter Property="Padding" Value="8,0,0,0" />
+    </Style>
+</Styles>

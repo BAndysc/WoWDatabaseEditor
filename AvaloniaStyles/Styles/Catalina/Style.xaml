@@ -3,6 +3,7 @@
     <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
     <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
     
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/PopupRoot.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/TreeView.xaml"/>
@@ -25,6 +26,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ListBox.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ListBoxItem.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/DataGrid.xaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/GridView.axaml"/>
     
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ToolsTabControl.xaml"/>
 </Styles>
