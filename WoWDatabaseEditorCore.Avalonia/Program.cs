@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Logging;
 using Avalonia.ReactiveUI;
+using WoWDatabaseEditorCore.Managers;
 
 namespace WoWDatabaseEditorCore.Avalonia
 {
@@ -19,8 +20,15 @@ namespace WoWDatabaseEditorCore.Avalonia
         public static void Main(string[] args)
         {
             FixCurrentDirectory();
-            BuildAvaloniaApp()
-                .StartWithClassicDesktopLifetime(args);
+            var app = BuildAvaloniaApp();
+            try
+            {
+                app.StartWithClassicDesktopLifetime(args);
+            }
+            catch (Exception e)
+            {
+                FatalErrorHandler.ExceptionOccured(e);
+            }
         }
 
         private static void FixCurrentDirectory()

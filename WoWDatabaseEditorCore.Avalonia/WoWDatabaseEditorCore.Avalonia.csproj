@@ -55,6 +55,10 @@
         <Compile Update="Services\AppearanceService\Views\ThemeConfigView.axaml.cs">
           <DependentUpon>ThemeConfigView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\TextDocumentView.axaml.cs">
+          <DependentUpon>TextDocumentView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="0.10.0" />

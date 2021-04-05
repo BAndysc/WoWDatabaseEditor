@@ -212,9 +212,6 @@ namespace WoWDatabaseEditorCore.Avalonia
             
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
-
-            IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
-            eventAggregator.GetEvent<AllModulesLoaded>().Publish();
         }
 
         public static MainWindow MainApp;
@@ -223,6 +220,9 @@ namespace WoWDatabaseEditorCore.Avalonia
         {
             base.Initialize();
             AvaloniaXamlLoader.Load(this);
+            
+            IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+            eventAggregator.GetEvent<AllModulesLoaded>().Publish();
         }
 
         private class Conflict
