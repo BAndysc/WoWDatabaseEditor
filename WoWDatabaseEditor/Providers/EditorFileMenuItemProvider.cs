@@ -21,13 +21,12 @@ using WoWDatabaseEditorCore.ViewModels;
 namespace WoWDatabaseEditorCore.Providers
 {
     [AutoRegister]
-    public class EditorFileMenuItemProvider: IMainMenuItem, INotifyPropertyChanged
+    public class EditorFileMenuItemProvider : IMainMenuItem, INotifyPropertyChanged
     {
         private readonly ISolutionManager solutionManager;
         private readonly IEventAggregator eventAggregator;
         private readonly INewItemService newItemService;
         private readonly IConfigureService settings;
-        private readonly Func<AboutViewModel> aboutViewModelCrator;
         public IDocumentManager DocumentManager { get; }
         
         private readonly Dictionary<ISolutionItem, IDocument> documents = new();
@@ -40,14 +39,13 @@ namespace WoWDatabaseEditorCore.Providers
 
         public EditorFileMenuItemProvider(ISolutionManager solutionManager, IEventAggregator eventAggregator, INewItemService newItemService, 
             ISolutionItemEditorRegistry solutionEditorManager, IMessageBoxService messageBoxService, IDocumentManager documentManager, IConfigureService settings,
-            Func<AboutViewModel> aboutViewModelCrator)
+            IApplication application)
         {
             this.solutionManager = solutionManager;
             this.eventAggregator = eventAggregator;
             this.newItemService = newItemService;
             DocumentManager = documentManager;
             this.settings = settings;
-            this.aboutViewModelCrator = aboutViewModelCrator;
             SubItems = new List<IMenuItem>();
             SubItems.Add(new ModuleMenuItem("_New", new AsyncAutoCommand(OpenNewItemWindow)));
             SubItems.Add(new ModuleMenuItem("_Save", new DelegateCommand(() => DocumentManager.ActiveDocument?.Save.Execute(null),
@@ -55,9 +53,8 @@ namespace WoWDatabaseEditorCore.Providers
                 ObservesProperty(() => DocumentManager.ActiveDocument.IsModified)));
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("_Settings", new DelegateCommand(OpenSettings)));
-            SubItems.Add(new ModuleMenuItem("About", new DelegateCommand(OpenAbout)));
             SubItems.Add(new ModuleManuSeparatorItem());
-            SubItems.Add(new ModuleMenuItem("_Exit", AlwaysDisabledCommand.Command));
+            SubItems.Add(new ModuleMenuItem("_Exit", new DelegateCommand(() => application.TryClose())));
             
             this.eventAggregator.GetEvent<DocumentManager.DocumentClosedEvent>()
                 .Subscribe(document =>
@@ -112,8 +109,6 @@ namespace WoWDatabaseEditorCore.Providers
             }
         }
         private void OpenSettings() => settings.ShowSettings();
-
-        private void OpenAbout() => DocumentManager.OpenDocument(aboutViewModelCrator());
 
         public event PropertyChangedEventHandler? PropertyChanged;
         
