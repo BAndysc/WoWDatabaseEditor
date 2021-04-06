@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.VisualBasic;
 using WDE.Common;
 using WDE.Common.CoreVersion;
@@ -8,7 +9,7 @@ using WDE.Module.Attributes;
 namespace WDE.Solutions
 {
     [AutoRegister]
-    public class SolutionFolderItemProvider : ISolutionItemProvider
+    public class SolutionFolderItemProvider : INamedSolutionItemProvider
     {
         public bool IsCompatibleWithCore(ICoreVersion core) => true;
 
@@ -17,12 +18,18 @@ namespace WDE.Solutions
         public ImageUri GetImage() => new ("Resources/folder.png");
 
         public string GetDescription() => "Container for solutions";
+        
+        public string GetGroupName() => "Other";
 
-        public async Task<ISolutionItem> CreateSolutionItem()
+        public Task<ISolutionItem> CreateSolutionItem()
         {
-            string input = Interaction.InputBox("Put folder name", "New Folder", "My new folder");
-            if (!string.IsNullOrEmpty(input))
-                return new SolutionFolderItem(input);
+            throw new Exception("You are not supposed to call this!");
+        }
+
+        public async Task<ISolutionItem> CreateSolutionItem(string name)
+        {
+            if (!string.IsNullOrEmpty(name))
+                return new SolutionFolderItem(name);
             return null;
         }
     }

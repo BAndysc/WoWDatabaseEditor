@@ -8,10 +8,11 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectedItem="{Binding SelectedPrototype}"
-                  ItemsSource="{Binding ItemPrototypes}" HorizontalContentAlignment="Stretch"
+                  ItemsSource="{Binding FlatItemPrototypes}" HorizontalContentAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" IsSynchronizedWithCurrentItem="True"
                   KeyDown="UIElement_OnKeyDown">
             <ListView.ItemTemplate>
@@ -33,7 +34,11 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Grid Grid.Row="2">
+        <DockPanel IsEnabled="{Binding SelectedPrototype.RequiresName}" Grid.Row="2" LastChildFill="True" Margin="0,0,0,10">
+            <TextBlock VerticalAlignment="Center">Name:</TextBlock>
+            <TextBox Text="{Binding CustomName, Mode=TwoWay}" Margin="10,0,0,0" />
+        </DockPanel>
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80" />
                 <ColumnDefinition Width="*" />

@@ -19,6 +19,8 @@ namespace WDE.Blueprints.Providers
             return new BlueprintSolutionItem();
         }
 
+        public string GetGroupName() => "Others";
+
         public string GetDescription()
         {
             return "Script in new Blueprints system";
