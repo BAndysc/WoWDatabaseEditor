@@ -1,4 +1,7 @@
 # WoW Database Editor
+
+[![Join the chat at https://gitter.im/WoWDatabaseEditor/community](https://badges.gitter.im/WoWDatabaseEditor/community.svg)](https://gitter.im/WoWDatabaseEditor/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Integrated development environment (IDE) for Smart Scripts for TrinityCore based servers.
 
 This project is continuation of [Visual SAI Studio](https://github.com/BandyscLegacy/VisualSAIStudio), but rewritten from scratch. It is still in early stages, but anyone is welcome to help :-) Together we can make great wow emu editor! **Smart script editing is already in good enough shape to use it on daily basis** 
