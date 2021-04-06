@@ -42,11 +42,11 @@
                                             Foreground="{DynamicResource TitleBarForeground}"
                                             Text="{TemplateBinding Title}" />
                                     </DockPanel>
-                                    <StackPanel HorizontalAlignment="Left" DockPanel.Dock="Top" Orientation="Horizontal" Spacing="20">
+                                    <DockPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" LastChildFill="True" Margin="10,2,10,2">
                                         <ContentPresenter Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                                         <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                                         <ContentPresenter Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                    </StackPanel>
+                                    </DockPanel>
                                 </StackPanel>
                             </Panel>
                             

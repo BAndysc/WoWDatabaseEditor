@@ -16,7 +16,7 @@
         <KeyBinding Gesture="Enter" Command="{Binding Accept}" />
     </controls:ExtendedWindow.KeyBindings>
     <controls:ExtendedWindow.ToolBar>
-        <controls:ToolBar Content="{Binding #ThisWindow.Content.ToolBar}">
+        <controls:ToolBar RightContent="{Binding #ThisWindow.Content.ToolBar}" >
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>
 </controls:ExtendedWindow>

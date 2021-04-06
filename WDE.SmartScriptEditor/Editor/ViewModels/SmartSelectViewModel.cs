@@ -203,6 +203,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private bool inEvent = false;
         public string Name => Key.Item1;
+        public string GroupName => Key.Item1;
         public int GroupOrder => Key.Item2;
         public (string, int) Key { get; private set; }
         

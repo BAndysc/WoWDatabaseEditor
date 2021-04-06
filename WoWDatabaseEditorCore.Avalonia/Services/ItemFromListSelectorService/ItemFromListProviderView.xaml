@@ -5,13 +5,12 @@
                          xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
                          xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles">
     <controls:DialogViewBase.ToolBar>
-        <TextBox x:Name="SearchBox" 
-                 Padding="2,4" 
-                 Text="{Binding SearchText}" 
-                 Width="300" 
-                 utils:FocusUtils.FocusFirst="True"
-                 KeyDown="SearchBox_OnKeyDown"
-                 HorizontalAlignment="Right" />
+        <controls:FixedTextBox x:Name="SearchBox" 
+                               Padding="2,4" 
+                               Text="{Binding SearchText}" 
+                               utils:FocusUtils.FocusFirst="True"
+                               KeyDown="SearchBox_OnKeyDown"
+                               HorizontalAlignment="Stretch" />
     </controls:DialogViewBase.ToolBar>
     
     <Grid Margin="6">
