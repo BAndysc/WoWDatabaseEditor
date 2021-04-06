@@ -15,6 +15,7 @@
             <ControlTemplate>
                 <Border BorderThickness="1" Classes="action">
                     <extendedTextBlock:FormattedTextBlock
+                        ContextArray="{Binding Context}"
                         IsSelected="{Binding IsSelected}"
                         Padding="2"
                         Text="{Binding Readable}" />
@@ -65,6 +66,7 @@
             <ControlTemplate>
                 <Border BorderThickness="1">
                     <extendedTextBlock:FormattedTextBlock Padding="2"
+                                                          ContextArray="{Binding Context}"
                                                           IsSelected="{Binding IsSelected}"
                                                           Text="{Binding Readable}" />
                 </Border>
@@ -135,6 +137,7 @@
                         <DockPanel LastChildFill="True">
                             <controls:SmartEventFlagsView DockPanel.Dock="Right"/>
                             <extendedTextBlock:FormattedTextBlock
+                                ContextArray="{Binding Context}"
                                 IsSelected="{Binding IsSelected}"
                                 Text="{Binding Readable}" />
                         </DockPanel>

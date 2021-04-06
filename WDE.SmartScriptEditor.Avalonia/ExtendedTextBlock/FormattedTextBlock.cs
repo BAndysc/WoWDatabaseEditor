@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
@@ -87,7 +88,7 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             Slash
         }
 
-        private void ParseTest(string text, Action<string, int, bool, bool> action)
+        private void ParseText(string text, Action<string, int, bool, bool, int> action)
         {
             if (text == null)
                 return;
@@ -96,6 +97,7 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             bool one = false;
             bool parameter = false;
             bool source = false;
+            int contextId = -1;
 
             State state = State.Text;
 
@@ -140,6 +142,9 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
                     if (text[startIndex] == 's')
                         source = true;
 
+                    if (text[startIndex + 1] == '=' && char.IsDigit(text[startIndex + 2]))
+                        contextId = text[startIndex + 2] - '0';
+
                     startIndex = index + 1;
                     state = State.Text;
                 }
@@ -151,6 +156,7 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
                         parameter = false;
                     if (text[startIndex] == 's')
                         source = false;
+                    contextId = -1;
                     
                     startIndex = index + 1;
                     state = State.Text;
@@ -168,10 +174,17 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
                 if (toFulsh == null)
                     continue;
 
-                action(toFulsh.ToString(), partIndex, source, parameter);
+                action(toFulsh.ToString(), partIndex, source, parameter, contextId);
             }
         }
 
+        public object? OverContext => IsOverLink
+            ? (ContextId >= 0 && ContextArray != null && ContextId < ContextArray.Count ? ContextArray[ContextId] : null)
+            : null;
+        public bool IsOverLink => wasOverLink;
+        public int ContextId => overContextId;
+
+        private int overContextId = -1;
         private bool wasOverLink = false;
         public override void Render(DrawingContext context)
         {
@@ -189,8 +202,9 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             double y = Padding.Top;
             bool wasWrapped = true;
             bool overLink = false;
+            overContextId = -1;
 
-            ParseTest(Text, (text, partIndex, source, parameter) =>
+            ParseText(Text, (text, partIndex, source, parameter, contextId) =>
             {
                 var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : (IsSelected ? STYLE_DEFAULT_SELECTED : STYLE_DEFAULT));
    
@@ -202,6 +216,7 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
                 if (overPartIndex == partIndex && (source || parameter) && IsPointerOver)
                 {
                     overLink = true;
+                    overContextId = contextId;
                     drawer.DrawUnderline(context, styleId, bounds);
                 }
 
@@ -225,7 +240,7 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             bool wasWrapped = true;
             bool everWrapped = false;
             double x = 0, y = 0;
-            ParseTest(Text, (text, partIndex, source, parameter) =>
+            ParseText(Text, (text, partIndex, source, parameter, contextId) =>
             {
                 var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : STYLE_DEFAULT);
                 (wasWrapped, bounds) = drawer!.Measure(text, styleId, !wasWrapped, ref x, ref y, availableSize.Width);
@@ -288,7 +303,10 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
         /// </summary>
         public static readonly StyledProperty<Thickness> PaddingProperty =
             Decorator.PaddingProperty.AddOwner<TextBlock>();
-        
+
+        private IList<object>? _ContextArray;
+        public static readonly DirectProperty<FormattedTextBlock, IList<object>?> ContextArrayProperty = AvaloniaProperty.RegisterDirect<FormattedTextBlock, IList<object>?>("ContextArray", o => o.ContextArray, (o, v) => o.ContextArray = v);
+
         /// <summary>
         /// Gets or sets the padding to place around the <see cref="Text"/>.
         /// </summary>
@@ -296,6 +314,12 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
         {
             get { return GetValue(PaddingProperty); }
             set { SetValue(PaddingProperty, value); }
+        }
+
+        public IList<object>? ContextArray
+        {
+            get { return _ContextArray; }
+            set { SetAndRaise(ContextArrayProperty, ref _ContextArray, value); }
         }
     }
 }

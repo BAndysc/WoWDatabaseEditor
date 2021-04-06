@@ -1,6 +1,7 @@
 ﻿using System.Windows.Input;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock;
 using AvaloniaProperty = Avalonia.AvaloniaProperty;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
@@ -52,14 +53,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             
             if (e.ClickCount == 1)
             {
-                if (DirectEditParameter != null)
+                if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
                 {
-                    /*if (e.OriginalSource is Run originalRun && originalRun.DataContext != null &&
-                        originalRun.DataContext != DataContext)
-                    {
-                        DirectEditParameter.Execute(originalRun.DataContext);
-                        return;
-                    }*/
+                    DirectEditParameter?.Execute(tb.OverContext);
+                    return;
                 }
 
                 DeselectAllButConditionsRequest?.Execute(null);
