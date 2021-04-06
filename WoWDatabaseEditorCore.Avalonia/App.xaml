@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles;assembly=AvaloniaStyles"
              xmlns:appearanceService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.AppearanceService"
-             x:Class="WoWDatabaseEditorCore.Avalonia.App">
+             x:Class="WoWDatabaseEditorCore.Avalonia.App"
+             Name="WoW Database Editor">
     <Application.Resources>
             <DrawingImage x:Key="StatusBarIconNotice">
         <DrawingImage.Drawing>

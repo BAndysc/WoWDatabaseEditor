@@ -1,6 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
     <Style Selector="Window">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="Background" Value="{DynamicResource MainColorBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
     </Style>
@@ -53,6 +54,7 @@
     </Style>
     
     <Style Selector="controls1|ExtendedWindow">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="TransparencyLevelHint" Value="AcrylicBlur" />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="38" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
@@ -115,6 +117,7 @@
     
     <!-- dialog -->
     <Style Selector="controls1|BaseMessageBoxWindow">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="Background" Value="{DynamicResource MainColorBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
         <Setter Property="Title" Value="{DynamicResource Title}"/>

@@ -1,6 +1,13 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:system="clr-namespace:System;assembly=System.Runtime">
+        <Style>
+                <Style.Resources>
+                        <system:Double x:Key="ControlContentThemeFontSize">12</system:Double>
+                        <FontFamily x:Key="MainFontSans">avares://Avalonia.Themes.Fluent/Assets#Inter</FontFamily>
+                </Style.Resources>
+        </Style>
+                
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
         
@@ -16,9 +23,4 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/DataGrid.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TextBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GridView.axaml" />
-        <Style>
-                <Style.Resources>
-                        <system:Double x:Key="ControlContentThemeFontSize">12</system:Double>
-                </Style.Resources>
-        </Style>
 </Styles>

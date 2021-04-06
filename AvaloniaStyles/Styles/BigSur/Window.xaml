@@ -6,6 +6,7 @@
         <system:Double x:Key="TitleBarHeight">38</system:Double>
     </Styles.Resources>
     <Style Selector="Window">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="Background" Value="{DynamicResource MainColorBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
     </Style>
@@ -61,6 +62,7 @@
     </Style>
     
     <Style Selector="controls1|ExtendedWindow">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="TransparencyLevelHint" Value="AcrylicBlur" />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="{StaticResource TitleBarHeight}" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
@@ -147,6 +149,7 @@
     
     <!-- dialog -->
     <Style Selector="controls1|BaseMessageBoxWindow">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="Background" Value="#8E1A1A1A" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="TransparencyLevelHint" Value="AcrylicBlur" />

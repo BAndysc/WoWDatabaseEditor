@@ -32,16 +32,20 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             if (drawer == null)
             {
                 drawer = new FormattedTextDrawer();
+                if (!Application.Current.Styles.TryGetResource("MainFontSans", out var mainFontSans)
+                    || mainFontSans is not FontFamily mainFontSansFamily)
+                    return;
+                
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Foreground", out var eventColor)
                     && eventColor is IBrush eventBrush)
                 {
-                    drawer.AddStyle(STYLE_DEFAULT, new Typeface("Open Sans"), 12, eventBrush);
+                    drawer.AddStyle(STYLE_DEFAULT, new Typeface(mainFontSansFamily), 12, eventBrush);
                 }
                 
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Selected.Foreground", out var eventSelectedColor)
                     && eventSelectedColor is IBrush eventSelectedBrush)
                 {
-                    drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface("Open Sans"), 12, eventSelectedBrush);
+                    drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface(mainFontSansFamily), 12, eventSelectedBrush);
                 }
                 
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", out var parameterColor)
