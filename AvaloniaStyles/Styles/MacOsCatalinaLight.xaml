@@ -1,5 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
+    <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/Style.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ColorsLight.xaml"/>
 </Styles>

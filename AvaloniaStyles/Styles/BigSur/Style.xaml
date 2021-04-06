@@ -5,10 +5,9 @@
             <FontFamily x:Key="MainFontSans">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
         </Style.Resources>
     </Style>
-    <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
-    <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/GroupingListBox.axaml" />
     
     <Style Selector="TextBlock">
         <Setter Property="FontSize" Value="13" />
@@ -36,6 +35,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ListBoxItem.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/DataGrid.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/GridView.axaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/GroupingListBox.axaml"/>
     
     <StyleInclude Source="avares://AvaloniaStyles/Styles/BigSur/ToolsTabControl.xaml"/>
 </Styles>

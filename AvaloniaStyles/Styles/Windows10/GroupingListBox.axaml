@@ -1,0 +1,20 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="controls|GroupingListBox">
+        <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}" />
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Grid VerticalAlignment="Center" DockPanel.Dock="Top" ColumnDefinitions="15,Auto,*">
+                        <Rectangle Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
+                        <TextBlock Grid.Column="1" Text="{Binding GroupName}" Padding="3" FontWeight="Bold" 
+                                   Foreground="#FF226E8B" Margin="0,5,0,0" />
+                        <Rectangle Grid.Column="2" Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
+                    </Grid>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</Styles>

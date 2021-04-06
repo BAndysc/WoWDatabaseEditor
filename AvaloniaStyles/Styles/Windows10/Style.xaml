@@ -10,6 +10,7 @@
                 
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/GroupingListBox.axaml" />
         
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabStrip.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/NativeMenuBar.xaml" />
@@ -23,4 +24,5 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/DataGrid.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TextBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GridView.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GroupingListBox.axaml" />
 </Styles>

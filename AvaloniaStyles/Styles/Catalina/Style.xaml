@@ -5,10 +5,9 @@
             <FontFamily x:Key="MainFontSans">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
         </Style.Resources>
     </Style>
-    <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
-    <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Default.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/GroupingListBox.axaml" />
     
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/PopupRoot.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/TreeView.xaml"/>
