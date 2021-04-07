@@ -61,6 +61,8 @@ namespace WDE.DatabaseEditors.Models
         public ParameterValueHolder<T> Parameter { get; }
         public ParameterValueHolder<T> OriginalValue { get; private set; }
         public string OriginalValueTooltip => $"Original value: {OriginalValue.String}";
+        public string SqlStringValue => (typeof(T) == typeof(string)) ? $"\"{Parameter.Value}\"" : 
+            $"{Parameter.Value}";
 
         // IStateRestorableField
         

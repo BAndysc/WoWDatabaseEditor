@@ -6,6 +6,7 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Mvvm;
+using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -26,19 +27,22 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly Func<uint, Task<IDbTableData?>>? tableDataLoader;
         private readonly Lazy<IItemFromListProvider> itemFromListProvider;
         private readonly Lazy<IDbTableFieldFactory> fieldFactory;
+        private readonly Lazy<IMySqlExecutor> sqlExecutor;
 
         private MultiRecordTableEditorHistoryHandler? historyHandler;
         
         public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName, 
             Func<uint, Task<IDbTableData?>>? tableDataLoader, Func<IHistoryManager> historyCreator,
             ITaskRunner taskRunner, Lazy<IItemFromListProvider> itemFromListProvider,
-            Lazy<IDbTableFieldFactory> fieldFactory)
+            Lazy<IDbTableFieldFactory> fieldFactory, Lazy<IMySqlExecutor> sqlExecutor)
         {
             this.solutionItem = solutionItem;
             this.tableDataLoader = tableDataLoader;
             this.itemFromListProvider = itemFromListProvider;
             this.fieldFactory = fieldFactory;
+            this.sqlExecutor = sqlExecutor;
 
+            // check if solution item already have cached data for table
             if (solutionItem.TableData != null)
                 tableData = solutionItem.TableData as DbMultiRecordTableData;
             else
@@ -97,37 +101,10 @@ namespace WDE.DatabaseEditors.ViewModels
             if (data == null)
                 return;
 
-            foreach (var modified in solutionItem.ModifiedFields)
-            {
-                if (!(modified.Value is DbTableSolutionItemModifiedRowField modifiedData))
-                    continue;
-                
-                var column = data.Columns.First(c => c.DbColumnName == modified.Value.DbFieldName);
-                if (column.Fields.Count < modifiedData.Row)
-                    data.FillToRow(fieldFactory.Value, modifiedData.Row);
-                
-                if (column.Fields[modifiedData.Row] is IStateRestorableField field)
-                    field.RestoreLoadedFieldState(modified.Value);
-            }
-
             data.InitRows();
             SaveLoadedTableData(data);
         }
-        
-        private async Task EditParameter(ParameterValueHolder<long>? valueHolder)
-        {
-            if (valueHolder == null)
-                return;
-            
-            if (valueHolder.Parameter.HasItems)
-            {
-                var result = await itemFromListProvider.Value.GetItemFromList(valueHolder.Parameter.Items,
-                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
-                if (result.HasValue)
-                    valueHolder.Value = result.Value;
-            }
-        }
-        
+
         private void SaveLoadedTableData(DbMultiRecordTableData data)
         {
             IsLoading = false;
@@ -142,24 +119,24 @@ namespace WDE.DatabaseEditors.ViewModels
             if (tableData == null)
                 return;
 
-            solutionItem.ModifiedFields.Clear();
-            foreach (var column in tableData.Columns)
-            {
-                for (int i = 0; i < column.Fields.Count; ++i)
-                {
-                    if (!column.Fields[i].IsModified)
-                        continue;
-                    
-                    if (column.Fields[i] is IStateRestorableField restorableField)
-                    {
-                        var key = $"{column.Fields[i].DbFieldName};{i}";
-                        solutionItem.ModifiedFields.Add(key, new DbTableSolutionItemModifiedRowField(i, column.Fields[i].DbFieldName,
-                            restorableField.GetOriginalValueForPersistence(), restorableField.GetValueForPersistence()));
-                    }
-                }
-            }
-            
+            var sql = MultiRecordTableSqlGenerator.GenerateSql(tableData);
+            sqlExecutor.Value.ExecuteSql(sql);
+
             History.MarkAsSaved();
+        }
+        
+        private async Task EditParameter(ParameterValueHolder<long>? valueHolder)
+        {
+            if (valueHolder == null)
+                return;
+            
+            if (valueHolder.Parameter.HasItems)
+            {
+                var result = await itemFromListProvider.Value.GetItemFromList(valueHolder.Parameter.Items,
+                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
+                if (result.HasValue)
+                    valueHolder.Value = result.Value;
+            }
         }
 
         private void AddNewRow()

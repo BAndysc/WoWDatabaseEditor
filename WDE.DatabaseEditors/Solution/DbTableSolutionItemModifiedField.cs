@@ -13,15 +13,4 @@
             NewValue = newValue;
         }
     }
-
-    public class DbTableSolutionItemModifiedRowField : DbTableSolutionItemModifiedField
-    {
-        public int Row { get; }
-        
-        public DbTableSolutionItemModifiedRowField(int row, string dbFieldName, object originalValue, object? newValue) :
-            base(dbFieldName, originalValue, newValue)
-        {
-            Row = row;
-        }
-    }
 }

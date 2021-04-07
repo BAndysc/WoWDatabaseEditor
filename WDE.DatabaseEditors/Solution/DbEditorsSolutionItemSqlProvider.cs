@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common.Solution;
 using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -11,20 +13,33 @@ namespace WDE.DatabaseEditors.Solution
     public class DbEditorsSolutionItemSqlProvider : ISolutionItemSqlProvider<DbEditorsSolutionItem>
     {
         private readonly Lazy<IDbTableDefinitionProvider> tableDefinitionProvider;
+        private readonly Lazy<IDbEditorTableDataProvider> tableDataProvider;
 
-        public DbEditorsSolutionItemSqlProvider(Lazy<IDbTableDefinitionProvider> tableDefinitionProvider)
+        public DbEditorsSolutionItemSqlProvider(Lazy<IDbTableDefinitionProvider> tableDefinitionProvider,
+            Lazy<IDbEditorTableDataProvider> tableDataProvider)
         {
             this.tableDefinitionProvider = tableDefinitionProvider;
+            this.tableDataProvider = tableDataProvider;
         }
 
         public string GenerateSql(DbEditorsSolutionItem item)
         {
+            // missing table data we have to load it
+            if (item.IsMultiRecord)
+            {
+                if (item.TableData == null)
+                    item.CacheTableData(LoadTable(item.TableContentType, item.Entry));
+
+                if (item.TableData is DbMultiRecordTableData multiRecordTableData)
+                    return MultiRecordTableSqlGenerator.GenerateSql(multiRecordTableData);
+            }
+            
             var tableDefinition = GetTableDefinition(item.TableContentType);
-            return GenerateQuery(item.ModifiedFields, tableDefinition.TableName,
+            return GenerateUpdateQuery(item.ModifiedFields, tableDefinition.TableName,
                 tableDefinition.TablePrimaryKeyColumnName, item.Entry, item.IsMultiRecord);
         }
 
-        private string GenerateQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, 
+        private string GenerateUpdateQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, 
             string keyColumnName, uint itemKey, bool buildInsert)
         {
             if (fields == null || fields.Count == 0)
@@ -68,6 +83,26 @@ namespace WDE.DatabaseEditors.Solution
                 default:
                     throw new Exception("[DbEditorsSolutionItemSqlProvider] not defined table content type!");
             }
+        }
+
+        private IDbTableData? LoadTable(DbTableContentType tableContentType, uint key)
+        {
+            Task<IDbTableData?> task;
+            switch (tableContentType)
+            {
+                case DbTableContentType.CreatureLootTemplate:
+                    task = tableDataProvider.Value.LoadCreatureLootTemplateData(key);
+                    break;
+                default:
+                    throw new Exception("[DbEditorsSolutionItemSqlProvider] not defined table content type!");
+            }
+
+            if (task == null)
+                return null;
+
+            task.Start(TaskScheduler.Default);
+            task.Wait();
+            return task.Result;
         }
     }
 }
