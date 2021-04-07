@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
@@ -18,7 +19,7 @@ namespace WDE.Solutions.Manager
                 Register((dynamic) provider);
         }
 
-        public string GenerateSql(ISolutionItem item)
+        public Task<string> GenerateSql(ISolutionItem item)
         {
             return GenerateSql((dynamic) item);
         }
@@ -28,12 +29,12 @@ namespace WDE.Solutions.Manager
             sqlProviders.Add(typeof(T), provider);
         }
 
-        private string GenerateSql<T>(T item) where T : ISolutionItem
+        private async Task<string> GenerateSql<T>(T item) where T : ISolutionItem
         {
             if (sqlProviders.TryGetValue(item.GetType(), out var provider))
             {
                 var x = provider as ISolutionItemSqlProvider<T>;
-                return x.GenerateSql(item);
+                return await x.GenerateSql(item);
             }
             else
             {
