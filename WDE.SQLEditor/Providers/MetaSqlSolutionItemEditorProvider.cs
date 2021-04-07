@@ -33,9 +33,16 @@ namespace WDE.SQLEditor.Providers
 
         public IDocument GetEditor(MetaSolutionSQL item)
         {
+            var vm = new SqlEditorViewModel(mySqlExecutor, statusBar, taskRunner, null);
+            LoadSqlDocument(vm, item);
+            return vm;
+        }
+
+        private async void LoadSqlDocument(SqlEditorViewModel vm, MetaSolutionSQL item)
+        {
             var doc = document();
-            doc.FromString(sqlGeneratorsRegistry.Value.GenerateSql(item));
-            return new SqlEditorViewModel(mySqlExecutor, statusBar, taskRunner, doc);
+            doc.FromString(await sqlGeneratorsRegistry.Value.GenerateSql(item));
+            vm.Code = doc;
         }
     }
 }
