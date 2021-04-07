@@ -11,14 +11,19 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
+using Prism.Unity.Ioc;
+using Unity;
 using Unity.RegistrationByConvention;
 using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Events;
+using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Windows;
+using WDE.Module;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.Avalonia.Managers;
 using WoWDatabaseEditorCore.Avalonia.Views;
 using WoWDatabaseEditorCore.ModulesManagement;
 using WoWDatabaseEditorCore.ViewModels;
@@ -59,7 +64,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                         return null;
                 }
 
-                assemblyToRequesting.Add(name.Name ?? "", requestingAssemblyPath);
+                assemblyToRequesting[name.Name ?? ""] = requestingAssemblyPath;
 
                 AssemblyDependencyResolver? dependencyPathResolver = new(requestingAssemblyPath);
                 string? path = dependencyPathResolver.ResolveAssemblyToPath(name);
@@ -78,7 +83,16 @@ namespace WoWDatabaseEditorCore.Avalonia
         {
             return null;//Container.Resolve<SplashScreenView>();
         }
-
+        
+        protected override IContainerExtension CreateContainerExtension()
+        {
+            var unity = new UnityContainer().AddExtension(new Diagnostic());
+            var container = new UnityContainerExtension(unity);
+            var mainScope = new ScopedContainer(container, unity);
+            container.RegisterInstance<IScopedContainer>(mainScope);
+            return container;
+        }
+        
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance(Container);
@@ -165,16 +179,16 @@ namespace WoWDatabaseEditorCore.Avalonia
             var modules = AllClasses.FromAssemblies(allAssemblies).Where(t => t.GetInterfaces().Contains(typeof(IModule))).ToList();
 
             foreach (var module in modules)
-                modulesManager!.AddModule(module.Assembly);
-
-            modules.Select(module => new ModuleInfo
-                {
-                    ModuleName = module.Name,
-                    ModuleType = module.AssemblyQualifiedName,
-                    Ref = "file://" + module.Assembly.Location
-                })
-                .ToList()
-                .ForEach(info => moduleCatalog.AddModule(info));
+            {
+                bool load = modulesManager!.AddModule(module.Assembly);
+                if (load)
+                    moduleCatalog.AddModule(new ModuleInfo
+                    {
+                        ModuleName = module.Name,
+                        ModuleType = module.AssemblyQualifiedName,
+                        Ref = "file://" + module.Assembly.Location
+                    });
+            }
         }
 
         protected override IModuleCatalog CreateModuleCatalog()
@@ -185,6 +199,12 @@ namespace WoWDatabaseEditorCore.Avalonia
         protected override void OnInitialized()
         {
             this.InitializeModules();
+
+            var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>();
+            foreach (var module in loadedModules)
+                module.FinalizeRegistration((IContainerRegistry)Container);
+            
+            Container.Resolve<IThemeManager>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
             MainApp = Container.Resolve<MainWindow>();
             MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
@@ -192,17 +212,17 @@ namespace WoWDatabaseEditorCore.Avalonia
             
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
-
-            IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
-            eventAggregator.GetEvent<AllModulesLoaded>().Publish();
         }
 
         public static MainWindow MainApp;
 
         public override void Initialize()
         {
-            AvaloniaXamlLoader.Load(this);
             base.Initialize();
+            AvaloniaXamlLoader.Load(this);
+            
+            IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+            eventAggregator.GetEvent<AllModulesLoaded>().Publish();
         }
 
         private class Conflict

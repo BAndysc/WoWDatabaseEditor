@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
+using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
 using WDE.Module.Attributes;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WoWDatabaseEditor.Providers;
+using WoWDatabaseEditorCore.Managers;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
@@ -19,6 +24,7 @@ namespace WoWDatabaseEditorCore.ViewModels
     {
         private readonly IMessageBoxService messageBoxService;
         private readonly Func<AboutViewModel> aboutViewModelCreator;
+        private readonly Func<TextDocumentViewModel> textDocumentCreator;
 
         private string title = "Visual Database Editor 2018";
         private readonly Dictionary<string, ITool> toolById = new();
@@ -28,14 +34,35 @@ namespace WoWDatabaseEditorCore.ViewModels
             IMessageBoxService messageBoxService,
             TasksViewModel tasksViewModel,
             EditorMainMenuItemsProvider menuItemProvider,
-            Func<AboutViewModel> aboutViewModelCreator)
+            ISolutionSqlService solutionSqlService,
+            Func<AboutViewModel> aboutViewModelCreator,
+            Func<TextDocumentViewModel> textDocumentCreator,
+            IEventAggregator eventAggregator)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
             this.messageBoxService = messageBoxService;
             this.aboutViewModelCreator = aboutViewModelCreator;
+            this.textDocumentCreator = textDocumentCreator;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
+            ExecuteChangedCommand = new DelegateCommand(() =>
+            {
+                DocumentManager.ActiveDocument?.Save?.Execute(null);
+            }, () => DocumentManager.ActiveDocument?.Save != null && DocumentManager.ActiveDocument.Save.CanExecute(null));
 
+            GenerateCurrentSqlCommand = new DelegateCommand(() =>
+            {
+                if (DocumentManager.ActiveDocument is ISolutionItemDocument {SolutionItem: { }} sid)
+                    solutionSqlService.OpenDocumentWithSqlFor(sid.SolutionItem);
+            }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+            
+            DocumentManager.ToObservable(dm => dm.ActiveDocument)
+                .SubscribeAction(_ =>
+                {
+                    GenerateCurrentSqlCommand.RaiseCanExecuteChanged();
+                    ExecuteChangedCommand.RaiseCanExecuteChanged();
+                });
+            
             TasksViewModel = tasksViewModel;
 
             MenuItemProviders = menuItemProvider.GetItems();
@@ -45,6 +72,26 @@ namespace WoWDatabaseEditorCore.ViewModels
 
             ShowAbout();
             //LoadDefault();
+
+            eventAggregator.GetEvent<AllModulesLoaded>()
+                .Subscribe(OpenFatalLogIfExists, ThreadOption.PublisherThread, true);
+        }
+
+        private void OpenFatalLogIfExists()
+        {
+            if (!FatalErrorHandler.HasFatalLog())
+                return;
+
+            var log = FatalErrorHandler.ConsumeFatalLog();
+            DocumentManager.OpenDocument(textDocumentCreator().Set("Crash log", log));
+            
+            messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                .SetTitle("WoW Database Editor has been closed due to the fatal error")
+                .SetIcon(MessageBoxIcon.Error)
+                .SetMainInstruction("WoW Database Editor has been closed due to the fatal error")
+                .SetContent("Sorry, the editor has been closed to the fatal error, a log with the error is now opened, you can report the bug via Help -> Report a bug and attach the log")
+                .WithOkButton(true)
+                .Build());
         }
 
         public IStatusBar StatusBar { get; }
@@ -61,7 +108,11 @@ namespace WoWDatabaseEditorCore.ViewModels
         }
 
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
-
+        
+        public DelegateCommand ExecuteChangedCommand { get; }
+        
+        public DelegateCommand GenerateCurrentSqlCommand { get; }
+        
         private void ShowAbout()
         {
             DocumentManager.OpenDocument(aboutViewModelCreator());
@@ -105,7 +156,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                         .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
                         .SetContent("Your changes will be lost if you don't save them.")
                         .SetIcon(MessageBoxIcon.Warning)
-                        .WithYesButton(MessageBoxButtonType.Ok)
+                        .WithYesButton(MessageBoxButtonType.Yes)
                         .WithNoButton(MessageBoxButtonType.No)
                         .WithCancelButton(MessageBoxButtonType.Cancel);
 

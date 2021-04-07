@@ -15,19 +15,20 @@ namespace WDE.Updater.Client
         private readonly string marketplace;
         private readonly string? key;
         private readonly Platforms platform;
+        private readonly HttpClient client;
 
-        public UpdateClient(Uri updateServerUrl, string marketplace, string? key, Platforms platform)
+        public UpdateClient(Uri updateServerUrl, string marketplace, string? key, Platforms platform, HttpClient client)
         {
             this.updateServerUrl = updateServerUrl;
             this.marketplace = marketplace;
             this.key = key;
             this.platform = platform;
+            this.client = client;
         }
 
         public async Task<CheckVersionResponse> CheckForUpdates(string branch, long version)
         {
             var request = new CheckVersionRequest(version, marketplace, branch, platform, key);
-            var client = new HttpClient();
             var response = await client.PostAsync(
                 updateServerUrl + "CheckVersion", 
                 new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json"));
@@ -43,7 +44,6 @@ namespace WDE.Updater.Client
 
         public async Task DownloadUpdate(CheckVersionResponse versionResponse, string destination, IProgress<(long, long?)>? progress = null)
         {
-            var client = new HttpClient();
             using var response = await client.GetAsync(Path.Join(updateServerUrl.AbsoluteUri, versionResponse.DownloadUrl!.TrimStart('/')), HttpCompletionOption.ResponseHeadersRead);
             var contentLength = response.Content.Headers.ContentLength;
             

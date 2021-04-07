@@ -32,8 +32,8 @@ namespace WDE.SmartScriptEditor.Data
         void Reload(SmartType smartType);
     }
 
-    [SingleInstance]
     [AutoRegister]
+    [SingleInstance]
     public class SmartDataManager : ISmartDataManager
     {
         private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new();
@@ -112,13 +112,11 @@ namespace WDE.SmartScriptEditor.Data
 
             if (!smartIdData[type].ContainsKey(data.Id))
             {
-                if (data.ValidTypes != null && data.ValidTypes.Contains(0))
-                    data.ValidTypes.Add(SmartScriptType.Creature);
                 smartIdData[type].Add(data.Id, data);
                 smartNameData[type].Add(data.Name, data);
             }
             else
-                throw new SmartDataWithSuchIdExists();
+                throw new SmartDataWithSuchIdExists($"{type} with id {data.Id} ({data.Name}) exists");
         }
 
         private void Add(SmartType type, SmartGenericJsonData data)

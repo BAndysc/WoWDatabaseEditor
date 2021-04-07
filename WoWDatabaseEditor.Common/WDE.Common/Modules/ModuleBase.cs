@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Prism.Ioc;
 using Prism.Modularity;
 using WDE.Common.Windows;
@@ -9,6 +11,10 @@ namespace WDE.Module
 {
     public abstract class ModuleBase : IModule
     {
+        public ModuleBase()
+        {
+        }
+        
         public virtual void OnInitialized(IContainerProvider containerProvider)
         {
             RegisterViews(containerProvider.Resolve<IViewLocator>());
@@ -16,46 +22,46 @@ namespace WDE.Module
 
         public virtual void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            RegisterSelf(containerRegistry);
             AutoRegisterByConvention(containerRegistry);
         }
         
-        public virtual void RegisterViews(IViewLocator viewLocator) { }
-        
-        private void AutoRegisterByConvention(IContainerRegistry containerRegistry)
+        protected void RegisterSelf(IContainerRegistry containerRegistry)
         {
-            var defaultRegisters = GetType().Assembly.GetTypes().Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true));
+            containerRegistry.RegisterInstance<ModuleBase>(this, GetType().FullName);
+        }
+        
+        public virtual void RegisterViews(IViewLocator viewLocator) { }
 
-            //HashSet<Type> alreadyInitialized = new HashSet<Type>();
+        protected void AutoRegisterByConvention(IContainerRegistry containerRegistry)
+        {
+            AutoRegisterByConvention(GetType().Assembly, containerRegistry);
+        }
+        
+        protected void AutoRegisterByConvention(Assembly assembly, IContainerRegistry containerRegistry)
+        {
+            var defaultRegisters = assembly.GetTypes().Where(t => !t.IsAbstract && t.IsDefined(typeof(AutoRegisterAttribute), true));
+
             foreach (Type register in defaultRegisters)
             {
-                if (register.IsAbstract)
-                    continue;
-
                 bool singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
 
                 foreach (Type @interface in register.GetInterfaces().Union(new[] {register}))
                 {
                     bool isUnique = !@interface.IsDefined(typeof(NonUniqueProviderAttribute), false);
 
-                    string name = null;
-
-                    //if (alreadyInitialized.Contains(interface_))
-                    name = register + @interface.ToString();
-                    //else
-                    //     alreadyInitialized.Add(interface_);
-
-                    //LifetimeManager life = null;
+                    string name = register + @interface.ToString();
 
                     if (singleton && isUnique)
                         containerRegistry.RegisterSingleton(@interface, register);
-                    //life = new ContainerControlledLifetimeManager();
                     else
                         containerRegistry.Register(@interface, register, isUnique ? null : name);
-                    // life = new TransientLifetimeManager();
-
-                    //Container.GetContainer().RegisterType(interface_, register, name, life);
                 }
             }
+        }
+
+        public virtual void FinalizeRegistration(IContainerRegistry container)
+        {
         }
     }
 }

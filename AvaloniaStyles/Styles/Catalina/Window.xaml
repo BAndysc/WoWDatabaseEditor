@@ -15,7 +15,8 @@
                 <Panel>
                     <Border Classes="Bg"/>
                     <Border Classes="Separator" />
-                    <DockPanel LastChildFill="True" Margin="78,7.5,7.5,7.5">
+                    <DockPanel LastChildFill="True">
+                        <controls1:WindowControlButtons DockPanel.Dock="Right"/>
                         <ContentPresenter Content="{TemplateBinding LeftContent}" DockPanel.Dock="Left"/>
                         <ContentPresenter Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"/>
                         <ContentPresenter Content="{TemplateBinding Content}" HorizontalContentAlignment="Stretch" Margin="10,0"/>
@@ -23,6 +24,15 @@
                 </Panel>
             </ControlTemplate>
         </Setter>
+    </Style>
+    <Style Selector="controls1|ExtendedTitleBar /template/ DockPanel">
+        <Setter Property="Margin" Value="7.5,7.5,7.5,7.5" />
+    </Style>
+    <Style Selector="controls1|ExtendedTitleBar:macos /template/ DockPanel">
+        <Setter Property="Margin" Value="78,7.5,7.5,7.5" />
+    </Style>
+    <Style Selector="controls1|ExtendedTitleBar:macos /template/ controls1|WindowControlButtons">
+        <Setter Property="IsVisible" Value="False" />
     </Style>
     <Style Selector="controls1|ExtendedWindow:fullscreen controls1|ExtendedTitleBar /template/ DockPanel">
         <Setter Property="Margin" Value="7.5"/>
@@ -46,18 +56,26 @@
         <Setter Property="TransparencyLevelHint" Value="AcrylicBlur" />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="38" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
-        <Setter Property="UseSystemChrome" Value="True" />
+        <Setter Property="Chrome" Value="MacOsChrome" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
         <Setter Property="Template">
             <ControlTemplate>
                 <VisualLayerManager>
-                    <DockPanel LastChildFill="True">
+                    <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
                         <controls1:ExtendedTitleBar DockPanel.Dock="Top"
                                                     LeftContent="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}"
                                                     RightContent="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
                             <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                         </controls1:ExtendedTitleBar>
+                        
+                        <NativeMenuBar DockPanel.Dock="Top">
+                            <NativeMenuBar.Styles>
+                                <Style Selector="Menu">
+                                    <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+                                </Style>
+                            </NativeMenuBar.Styles>
+                        </NativeMenuBar>
                         
                         <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
 
@@ -110,7 +128,8 @@
                                           Width="54" Height="54"
                                           Margin="0,0,15,0" />
                         <ContentPresenter DockPanel.Dock="Bottom" Content="{TemplateBinding Content}" Name="Buttons" HorizontalContentAlignment="Right"/>
-                        <TextBlock Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" FontSize="14" />
+                        <TextBlock Text="{TemplateBinding Header}" TextWrapping="WrapWithOverflow" FontSize="16" DockPanel.Dock="Top" />
+                        <TextBlock Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" FontSize="13" />
                     </DockPanel>
                 </Border>
             </ControlTemplate>

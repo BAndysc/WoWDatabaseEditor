@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WDE.Module.Attributes;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor.Data
 {
     [AutoRegister]
-    class SmartDataSerializationProvider: ISmartDataSerializationProvider
+    [SingleInstance]
+    public class SmartDataSerializationProvider : ISmartDataSerializationProvider
     {
         public List<T> DeserializeSmartData<T>(string json) => JsonConvert.DeserializeObject<List<T>>(json);
 

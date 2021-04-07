@@ -8,6 +8,7 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.History;
@@ -33,13 +34,16 @@ using WDE.SmartScriptEditor.History;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class SmartScriptEditorViewModel : ObservableBase, IDocument, IDisposable
+    public class SmartScriptEditorViewModel : ObservableBase, ISolutionItemDocument, IDisposable
     {
         private readonly IDatabaseProvider database;
+        private readonly ISmartScriptDatabaseProvider smartScriptDatabase;
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
         private readonly ITaskRunner taskRunner;
         private readonly IToolSmartEditorViewModel smartEditorViewModel;
+        private readonly ISmartScriptExporter smartScriptExporter;
+        private readonly IEditorFeatures editorFeatures;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -48,7 +52,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IWindowManager windowManager;
         private readonly IMessageBoxService messageBoxService;
 
-        private SmartScriptSolutionItem item;
+        private ISmartScriptSolutionItem item;
 
         private SmartScript script;
 
@@ -65,9 +69,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set => SetProperty(ref script, value);
         }
         
-        public SmartScriptEditorViewModel(SmartScriptSolutionItem item,
+        public SmartScriptEditorViewModel(ISmartScriptSolutionItem item,
             IHistoryManager history,
-            IDatabaseProvider database,
+            IDatabaseProvider databaseProvider,
+            ISmartScriptDatabaseProvider smartScriptDatabase,
             IEventAggregator eventAggregator,
             ISmartDataManager smartDataManager,
             ISmartFactory smartFactory,
@@ -80,10 +85,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ISolutionItemNameRegistry itemNameRegistry,
             ITaskRunner taskRunner,
             IClipboardService clipboard,
-            IToolSmartEditorViewModel smartEditorViewModel)
+            IToolSmartEditorViewModel smartEditorViewModel,
+            ISmartScriptExporter smartScriptExporter,
+            IEditorFeatures editorFeatures)
         {
             History = history;
-            this.database = database;
+            this.database = databaseProvider;
+            this.smartScriptDatabase = smartScriptDatabase;
             this.smartDataManager = smartDataManager;
             this.smartFactory = smartFactory;
             this.itemFromListProvider = itemFromListProvider;
@@ -94,6 +102,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.itemNameRegistry = itemNameRegistry;
             this.taskRunner = taskRunner;
             this.smartEditorViewModel = smartEditorViewModel;
+            this.smartScriptExporter = smartScriptExporter;
+            this.editorFeatures = editorFeatures;
             this.conditionDataManager = conditionDataManager;
 
             CloseCommand = new AsyncCommand(async () =>
@@ -243,13 +253,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var actionData = smartDataManager.GetRawData(SmartType.SmartAction, sourceTargetEdit.RelatedAction.Id);
                     if (sourceTargetEdit.IsSource)
                     {
-                        int? newSource = await ShowSourcePicker(actionData);
+                        int? newSource = await ShowSourcePicker(sourceTargetEdit.RelatedAction.Parent, actionData);
                         if (newSource.HasValue)
                             smartFactory.UpdateSource(sourceTargetEdit.RelatedAction.Source, newSource.Value);                        
                     }
                     else
                     {
-                        int? newTarget = await ShowTargetPicker(actionData);
+                        int? newTarget = await ShowTargetPicker(sourceTargetEdit.RelatedAction.Parent, actionData);
                         if (newTarget.HasValue)
                             smartFactory.UpdateTarget(sourceTargetEdit.RelatedAction.Target, newTarget.Value);   
                     }
@@ -712,11 +722,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(args =>
                 {
-                    if (args.Item is SmartScriptSolutionItem)
+                    if (args.Item is ISmartScriptSolutionItem)
                     {
-                        SmartScriptSolutionItem itemm = args.Item as SmartScriptSolutionItem;
+                        ISmartScriptSolutionItem itemm = args.Item as ISmartScriptSolutionItem;
                         if (itemm.Entry == item.Entry && itemm.SmartType == item.SmartType)
-                            args.Sql = new SmartScriptExporter(script, smartFactory, smartDataManager).GetSql();
+                            args.Sql = smartScriptExporter.GenerateSql(script);
                     }
                 }));
 
@@ -811,7 +821,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Save => SaveCommand;
         public AsyncAwaitBestPractices.MVVM.IAsyncCommand CloseCommand { get; set; }
         
-        private void SetSolutionItem(SmartScriptSolutionItem item)
+        private void SetSolutionItem(ISmartScriptSolutionItem item)
         {
             Debug.Assert(this.item == null);
             this.item = item;
@@ -888,7 +898,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task AsyncLoad()
         {
-            var lines = database.GetScriptFor((int)this.item.Entry, this.item.SmartType).ToList();
+            var lines = smartScriptDatabase.GetScriptFor((int)this.item.Entry, this.item.SmartType).ToList();
             var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, (int)this.item.Entry, (int)this.item.SmartType).ToList();
             script.Load(lines, conditions);
             IsLoading = false;
@@ -899,9 +909,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));
 
-            var (lines, conditions) = script.ToSmartScriptLinesNoMetaActions(smartFactory, smartDataManager);
+            var (lines, conditions) = smartScriptExporter.ToDatabaseCompatibleSmartScript(script);
             
-            await database.InstallScriptFor((int)item.Entry, item.SmartType, lines);
+            await smartScriptDatabase.InstallScriptFor((int)item.Entry, item.SmartType, lines);
             
             await database.InstallConditions(conditions, 
                 IDatabaseProvider.ConditionKeyMask.SourceEntry | IDatabaseProvider.ConditionKeyMask.SourceId,
@@ -922,12 +932,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SmartEvent e = obj.Event;
             if (e == null)
                 return;
-            int? sourceId = await ShowSourcePicker();
+            int? sourceId = await ShowSourcePicker(e);
 
             if (!sourceId.HasValue)
                 return;
 
-            int? actionId = await ShowActionPicker(sourceId.Value);
+            int? actionId = await ShowActionPicker(e, sourceId.Value);
 
             if (!actionId.HasValue)
                 return;
@@ -936,9 +946,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartTarget target = null;
 
-            if (actionData.UsesTarget && !actionData.TargetIsSource)
+            if (!actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0)
             {
-                int? targetId = await ShowTargetPicker(actionData);
+                int? targetId = await ShowTargetPicker(e, actionData);
 
                 if (!targetId.HasValue)
                     return;
@@ -984,52 +994,89 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private Task<int?> ShowEventPicker()
         {
             return smartTypeListProvider.Get(SmartType.SmartEvent,
-                data => data.ValidTypes == null || data.ValidTypes.Contains(script.SourceType));
+                data => data.UsableWithScriptTypes == null || data.UsableWithScriptTypes.Contains(script.SourceType));
         }
 
-        private Task<int?> ShowTargetPicker(SmartGenericJsonData actionData)
-        {
+        private Task<int?> ShowTargetPicker(SmartEvent parentEvent, SmartGenericJsonData actionData)
+        {           
+            var eventSupportsActionInvoker =
+                parentEvent?.Parent == null || parentEvent.Parent.GetEventData(parentEvent).Invoker != null;
             return smartTypeListProvider.Get(SmartType.SmartTarget,
-                data => (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
-                        (actionData.Targets == null || actionData.Targets.Intersect(data.Types).Any()));
+                data =>
+                {
+                    if (data.UsableWithEventTypes != null && parentEvent != null && data.UsableWithEventTypes.Contains(parentEvent.Id))
+                        return false;
+                    
+                    return (eventSupportsActionInvoker || !data.IsInvoker) &&
+                           (data.UsableWithScriptTypes == null ||
+                            data.UsableWithScriptTypes.Contains(script.SourceType)) &&
+                           (actionData.TargetTypes == null || actionData.TargetTypes.Intersect(data.Types).Any());
+                });
         }
 
-        private Task<int?> ShowSourcePicker(SmartGenericJsonData? actionData = null)
+        private Task<int?> ShowSourcePicker(SmartEvent parentEvent, SmartGenericJsonData? actionData = null)
         {
+            var eventSupportsActionInvoker =
+                parentEvent?.Parent == null || parentEvent.Parent.GetEventData(parentEvent).Invoker != null;
             return smartTypeListProvider.Get(SmartType.SmartSource,
                 data =>
                 {
+                    if (!eventSupportsActionInvoker && data.IsInvoker)
+                        return false;
+                    
                     if (data.IsOnlyTarget)
                         return false;
 
                     if (actionData.HasValue && !IsSourceCompatibleWithAction(data.Id, actionData.Value))
                         return false;
 
-                    return data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType);
+                    if (data.UsableWithEventTypes != null && parentEvent != null && !data.UsableWithEventTypes.Contains(parentEvent.Id))
+                        return false;
+                    
+                    return data.UsableWithScriptTypes == null || data.UsableWithScriptTypes.Contains(script.SourceType);
                 });
         }
 
         private bool IsSourceCompatibleWithAction(int sourceId, SmartGenericJsonData actionData)
         {
-            if (actionData.ImplicitSource == null)
-                return true;
+            if (actionData.ImplicitSource != null)
+            {
+                var actionImplicitSource = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource).Id;
 
-            var actionImplicitSource = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource).Id;
+                if (sourceId == actionImplicitSource)
+                    return true;
 
-            if (sourceId == actionImplicitSource)
-                return true;
+                // kinda hack to show actions with NONE source with user pick SELF source
+                // because it is natural for users to use SELF source for those actions
+                return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf;
+            }
+            else
+            {
+                var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, sourceId);
 
-            // kinda hack to show actions with NONE source with user pick SELF source
-            // because it is natural for users to use SELF source for those actions
-            return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf;
+                IList<string> possibleSourcesOfAction = actionData.TargetIsSource ? actionData.TargetTypes : actionData.Sources;
+                var possibleSourcesOfSource = sourceData.Types;
+
+                if (possibleSourcesOfAction == null || possibleSourcesOfSource == null)
+                    return false;
+
+                return possibleSourcesOfAction.Intersect(possibleSourcesOfSource).Any();
+            }
         }
         
-        private Task<int?> ShowActionPicker(int sourceId, bool showCommentMetaAction = true)
+        private Task<int?> ShowActionPicker(SmartEvent parentEvent, int sourceId, bool showCommentMetaAction = true)
         {
             return smartTypeListProvider.Get(SmartType.SmartAction,
-                data => (data.UsableWithEventTypes == null || data.UsableWithEventTypes.Contains(script.SourceType)) &&
-                        IsSourceCompatibleWithAction(sourceId, data) && 
-                        (showCommentMetaAction || data.Id != SmartConstants.ActionComment));
+                data =>
+                {
+                    if (data.UsableWithEventTypes != null && parentEvent != null && data.UsableWithEventTypes.Contains(parentEvent.Id))
+                        return false;
+                    
+                    return (data.UsableWithScriptTypes == null ||
+                            data.UsableWithScriptTypes.Contains(script.SourceType)) &&
+                           IsSourceCompatibleWithAction(sourceId, data) &&
+                           (showCommentMetaAction || data.Id != SmartConstants.ActionComment);
+                });
         }
 
         private async Task AddEventCommand()
@@ -1071,13 +1118,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 floatParametersList.Add((obj.Target.Position[i], "Target"));
 
             var canPickTarget = obj.ToObservable(e => e.Id)
-                .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id)).Select(actionData => actionData.UsesTarget && !actionData.TargetIsSource);
+                .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id)).Select(actionData => !actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0);
 
             if (actionData.Id != SmartConstants.ActionComment)
             {
                 actionList.Add(new EditableActionData("Type", "Source", async () =>
                 {
-                    int? newSourceIndex = await ShowSourcePicker();
+                    int? newSourceIndex = await ShowSourcePicker(obj.Parent);
                     if (!newSourceIndex.HasValue)
                         return;
 
@@ -1085,35 +1132,36 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (!IsSourceCompatibleWithAction(newSourceIndex.Value, actionData))
                     {
                         var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, newSourceIndex.Value);
-                        messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Incorrect source for chosen action")
-                            .SetMainInstruction(
-                                $"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.NameReadable}")
-                            .SetContent(
-                                $"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}")
-                            .SetIcon(MessageBoxIcon.Information)
-                            .Build());
+                        var dialog = new MessageBoxFactory<bool>()
+                            .SetTitle("Incorrect source for chosen action")
+                            .SetMainInstruction($"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.NameReadable}");
+                        if (string.IsNullOrEmpty(actionData.ImplicitSource))
+                            dialog.SetContent($"Selected source can be one of: {string.Join(", ", sourceData.Types)}. However, current action requires one of: {string.Join(", ", actionData.TargetTypes)}");
+                        else
+                            dialog.SetContent($"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}");
+                        messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
                     }
                     
                     smartFactory.UpdateSource(obj.Source, newSourceIndex.Value);
-                }, obj.Source.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartSource, id).Name)));
+                }, obj.Source.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartSource, id).NameReadable)));
 
                 actionList.Add(new EditableActionData("Type", "Action", async () =>
                 {
-                    int? newActionIndex = await ShowActionPicker(obj.Source.Id, false);
+                    int? newActionIndex = await ShowActionPicker(obj.Parent, obj.Source.Id, false);
                     if (!newActionIndex.HasValue)
                         return;
 
                     smartFactory.UpdateAction(obj, newActionIndex.Value);
-                }, obj.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id).Name)));
+                }, obj.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id).NameReadable)));
             
                 actionList.Add(new EditableActionData("Type", "Target", async () =>
                 {
-                    int? newTargetIndex = await ShowTargetPicker(smartDataManager.GetRawData(SmartType.SmartAction, obj.Id));
+                    int? newTargetIndex = await ShowTargetPicker(obj.Parent, smartDataManager.GetRawData(SmartType.SmartAction, obj.Id));
                     if (!newTargetIndex.HasValue)
                         return;
 
                     smartFactory.UpdateTarget(obj.Target, newTargetIndex.Value);
-                },  obj.Target.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartTarget, id).Name), canPickTarget.Not()));   
+                },  obj.Target.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartTarget, id).NameReadable), canPickTarget.Not()));   
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
@@ -1192,7 +1240,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     return;
 
                 smartFactory.UpdateCondition(obj, newConditionId.Value);
-            }, obj.ToObservable(e => e.Id).Select(id => conditionDataManager.GetConditionData(id).Name)));
+            }, obj.ToObservable(e => e.Id).Select(id => conditionDataManager.GetConditionData(id).NameReadable)));
             
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 obj, 
@@ -1243,10 +1291,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 (ev.Chance, "General"),
                 (ev.Flags, "General"),
-                (ev.Phases, "General"),
-                //(ev.CooldownMax, "General"),
-                //(ev.CooldownMin, "General")
+                (ev.Phases, "General")
             };
+            if (editorFeatures.SupportsEventCooldown)
+            {
+                parametersList.Add((ev.CooldownMax, "General"));
+                parametersList.Add((ev.CooldownMin, "General"));
+            }
 
             actionList.Add(new EditableActionData("Event", "General", async () =>
             {
@@ -1255,7 +1306,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     return;
 
                 smartFactory.UpdateEvent(ev, newEventIndex.Value);
-            }, ev.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartEvent, id).Name)));
+            }, ev.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartEvent, id).NameReadable)));
             
             for (var i = 0; i < ev.ParametersCount; ++i)
                 parametersList.Add((ev.GetParameter(i), "Event specific"));
@@ -1294,5 +1345,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             viewModel.Dispose();
             return result;
         }
+
+        public ISolutionItem SolutionItem => item;
     }
 }

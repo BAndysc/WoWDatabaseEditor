@@ -18,6 +18,15 @@ namespace AvaloniaStyles.Controls
             set => SetValue(MessageProperty, value);
         }
         
+        public static readonly StyledProperty<string> HeaderProperty =
+            AvaloniaProperty.Register<BaseMessageBoxWindow, string>(nameof(Header));
+        
+        public string Header
+        {
+            get => GetValue(HeaderProperty);
+            set => SetValue(HeaderProperty, value);
+        }
+        
         public static readonly StyledProperty<IControl> ImageProperty =
             AvaloniaProperty.Register<BaseMessageBoxWindow, IControl>(nameof(Image));
         

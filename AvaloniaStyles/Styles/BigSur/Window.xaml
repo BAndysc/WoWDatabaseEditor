@@ -22,12 +22,16 @@
                     <Border Classes="Bg"/>
                     <Border Classes="Separator" />
                     <DockPanel LastChildFill="True" Margin="90,7.5,7.5,7.5">
+                        <controls1:WindowControlButtons DockPanel.Dock="Right"/>
                         <ContentPresenter Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"/>
                         <ContentPresenter Content="{TemplateBinding Content}" Margin="10,0,10,0" HorizontalContentAlignment="Stretch"/>
                     </DockPanel>
                 </Panel>
             </ControlTemplate>
         </Setter>
+    </Style>
+    <Style Selector="controls1|ExtendedTitleBar:macos /template/ controls1|WindowControlButtons">
+        <Setter Property="IsVisible" Value="False" />
     </Style>
     <Style Selector="controls1|ExtendedWindow:has-sidebar controls1|ExtendedTitleBar /template/ DockPanel">
         <Setter Property="Margin" Value="7.5"/>
@@ -60,13 +64,13 @@
         <Setter Property="TransparencyLevelHint" Value="AcrylicBlur" />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="{StaticResource TitleBarHeight}" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
-        <Setter Property="UseSystemChrome" Value="True" />
+        <Setter Property="Chrome" Value="MacOsChrome" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
         <Setter Property="Template">
             <ControlTemplate>
                 <VisualLayerManager>
-                    <Grid Name="SidebarGrid">
+                    <Grid Name="SidebarGrid" Margin="{TemplateBinding OffScreenMargin}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="300" MinWidth="200"/>
                             <ColumnDefinition Width="Auto" />
@@ -97,6 +101,14 @@
                                 <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                             </controls1:ExtendedTitleBar>
                     
+                            <NativeMenuBar DockPanel.Dock="Top">
+                                <NativeMenuBar.Styles>
+                                    <Style Selector="Menu">
+                                        <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+                                    </Style>
+                                </NativeMenuBar.Styles>
+                            </NativeMenuBar>
+                            
                             <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
 
                             <ContentPresenter Content="{TemplateBinding StatusBar}" DockPanel.Dock="Bottom" Name="StatusBar"/>
@@ -113,7 +125,7 @@
     </Style>
     
     
-    <Style Selector="controls1|ExtendedWindow:not(:fullscreen) /template/ ContentPresenter#LeftPartToolBar">
+    <Style Selector="controls1|ExtendedWindow:macos:not(:fullscreen) /template/ ContentPresenter#LeftPartToolBar">
         <Setter Property="Margin" Value="78,7.5,7.5,7.5"/>
     </Style>
     <Style Selector="controls1|ExtendedWindow:fullscreen /template/ ContentPresenter#LeftPartToolBar">
@@ -153,8 +165,8 @@
                                           Content="{TemplateBinding Image}"
                                           Width="54" Height="54"
                                           Margin="0,12,0,12" />
-                        <TextBlock IsHitTestVisible="False" FontWeight="Black" Text="{TemplateBinding Title}" TextWrapping="WrapWithOverflow"/>
-                        <TextBlock IsHitTestVisible="False" Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow"/>
+                        <TextBlock IsHitTestVisible="False" FontWeight="Black" Text="{TemplateBinding Header}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center"/>
+                        <TextBlock IsHitTestVisible="False" Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Stretch"/>
                         <ContentPresenter Content="{TemplateBinding Content}" Name="Buttons" />
                     </StackPanel>
                 </Panel>

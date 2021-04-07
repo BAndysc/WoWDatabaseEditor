@@ -1,0 +1,3493 @@
+[
+    {
+        "id": 0,
+        "name": "SMART_ACTION_NONE",
+        "description": "Do nothing",
+        "name_readable": "None",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 1,
+        "name": "SMART_ACTION_TALK",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Group ID",
+                "description": "Group id from table creature_text. Random text will be said if multiple rows with the same group"
+            },
+            {
+                "type": "Parameter",
+                "name": "Delay",
+                "description": "Duration to wait before TEXT_OVER event is triggered"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "UseTalkTarget",
+                "description": "Talker will target {target}"
+            }
+        ],
+        "description": "{pram3value:choose(0):{sourceid:choose(0):[s]Self[/s]|{source}}: Talk {pram1} to invoker|[s]Self[/s]: Talk {pram1} to {source}}",
+        "name_readable": "Talk",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 2,
+        "name": "SMART_ACTION_SET_FACTION",
+        "parameters": [
+            {
+                "type": "FactionParameter",
+                "name": "Faction Id",
+                "description": "Use 0 to reset"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Reset faction|Set faction to {pram1}}",
+        "name_readable": "Set faction",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 3,
+        "name": "SMART_ACTION_MORPH_TO_ENTRY_OR_MODEL",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature",
+                "description": "Use 0 for both to reset"
+            },
+            {
+                "type": "Parameter",
+                "name": "Model id",
+                "description": "Use 0 for both to reset"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Demorph|Morph to model {pram2}}|Morph to model from creature {pram1}}",
+        "name_readable": "Morph to entry or model",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 4,
+        "name": "SMART_ACTION_SOUND",
+        "parameters": [
+            {
+                "type": "SoundParameter",
+                "name": "Sound ID"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Only to self",
+                "description": "True - only target will hear the sound, false - everyone in visibility range will hear the sound"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Distance"
+            }
+        ],
+        "description": "{source}: Play {pram3value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {source}|{source}}",
+        "name_readable": "Sound",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 5,
+        "name": "SMART_ACTION_PLAY_EMOTE",
+        "parameters": [
+            {
+                "type": "EmoteParameter",
+                "name": "Emote ID",
+                "description": "Emote id to play"
+            }
+        ],
+        "description": "{source}: Play emote {pram1}",
+        "name_readable": "Play emote",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 6,
+        "name": "SMART_ACTION_FAIL_QUEST",
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest ID",
+                "description": "Quest ID to mark as failed. Only for players"
+            }
+        ],
+        "description": "{source}: Fail quest {pram1}",
+        "name_readable": "Fail quest",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 7,
+        "name": "SMART_ACTION_OFFER_QUEST",
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest ID",
+                "description": "Add quest, only for players"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "DirectAdd",
+                "description": "True - quest is added to questlog instantly, false - Quest Window pops up"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):Offer quest {pram1}|Add quest {pram1} to quest log}",
+        "name_readable": "Add quest",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 8,
+        "name": "SMART_ACTION_SET_REACT_STATE",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "ReactState",
+                "values": {
+                    "0": {
+                        "name": "REACT_PASSIVE"
+                    },
+                    "1": {
+                        "name": "REACT_DEFENSIVE"
+                    },
+                    "2": {
+                        "name": "REACT_AGGRESSIVE"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Set react state to {pram1}",
+        "name_readable": "Set react state",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 9,
+        "name": "SMART_ACTION_ACTIVATE_GOBJECT",
+        "description": "{source}: Activate (only gameobject)",
+        "name_readable": "Activate gobject",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 10,
+        "name": "SMART_ACTION_RANDOM_EMOTE",
+        "parameters": [
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 1",
+                "description": "If 0, the emote will be skipped"
+            },
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 2",
+                "description": "If 0, the emote will be skipped"
+            },
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 3",
+                "description": "If 0, the emote will be skipped"
+            },
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 4",
+                "description": "If 0, the emote will be skipped"
+            },
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 5",
+                "description": "If 0, the emote will be skipped"
+            },
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 6",
+                "description": "If 0, the emote will be skipped"
+            }
+        ],
+        "description": "{source}: Play random emote: {pram1value:choose(0):|{pram1}, }{pram2value:choose(0):|{pram2}, }{pram3value:choose(0):|{pram3}, }{pram4value:choose(0):|{pram4}, }{pram5value:choose(0):|{pram5}, }{pram6value:choose(0):|{pram6}}",
+        "name_readable": "Random emote",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 11,
+        "name": "SMART_ACTION_CAST",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell",
+                "description": "Spell id to cast"
+            },
+            {
+                "type": "SmartCastFlagsParameter",
+                "name": "Cast Flags"
+            },
+            {
+                "type": "TriggerFlagParameter",
+                "name": "Trigger Flags"
+            },
+            {
+                "type": "Parameter",
+                "name": "TargetsLimit"
+            }
+        ],
+        "description": "{source}: Cast spell {pram1} on{pram4value:choose(0):| random {pram4}} {target}{pram2value:choose(0):| (flags: {pram2})}",
+        "name_readable": "Cast",
+        "target_types": ["Player", "Creature"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 12,
+        "name": "SMART_ACTION_SUMMON_CREATURE",
+        "tags": ["TrinityWrath", "Azeroth", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature",
+                "description": "Creature Entry to summon"
+            },
+            {
+                "type": "SummonTypeParameter",
+                "name": "Summon Type"
+            },
+            {
+                "type": "Parameter",
+                "name": "Duration",
+                "description": "In ms"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Attack Invoker"
+            }
+        ],
+        "description": "{source}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}}{pram5value:choose(0):| and attack {target}}",
+        "name_readable": "Summon creature",
+        "target_types": ["Creature", "Player", "GameObject"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 12,
+        "name": "SMART_ACTION_SUMMON_CREATURE_TC_MASTER",
+        "tags": ["TrinityMaster"],
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature",
+                "description": "Creature Entry to summon"
+            },
+            {
+                "type": "SummonTypeParameter",
+                "name": "Summon Type"
+            },
+            {
+                "type": "Parameter",
+                "name": "Duration",
+                "description": "In ms"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Attack Invoker"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "1": {"name": "personal spawn"},
+                    "2": {"name": "use invoker as summoner"}
+                }
+            }
+        ],
+        "description": "{pram5value:choose(0|1|2|3):{source}|{source}|[s]Action invoker[/s]|[s]Action invoker[/s]|{source}}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}}{pram5value:choose(0|1|2|3):|, as personal spawn||, as personal spawn|}{pram5value:choose(0):| and attack {target}}",
+        "name_readable": "Summon creature",
+        "target_types": ["Creature", "Player", "GameObject"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 13,
+        "name": "SMART_ACTION_THREAT_SINGLE_PCT",
+        "parameters": [
+            {
+                "type": "PercentageParameter",
+                "name": "Increment",
+                "description": "Modify threat of target by %"
+            },
+            {
+                "type": "PercentageParameter",
+                "name": "Decrement",
+                "description": "Modify threat of target by %"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Decrement|Increment} threat of {target} by {pram1value:choose(0):{pram2}|{pram1}}",
+        "name_readable": "Threat single pct",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 14,
+        "name": "SMART_ACTION_THREAT_ALL_PCT",
+        "parameters": [
+            {
+                "type": "PercentageParameter",
+                "name": "Increment",
+                "description": "Modify threat of all units in threat list by %"
+            },
+            {
+                "type": "PercentageParameter",
+                "name": "Decrement",
+                "description": "Modify threat of all units in threat list by %"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Decrement|Increment} threat of all units in threat list by {pram1value:choose(0):{pram2}|{pram1}}",
+        "name_readable": "Threat all pct",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 15,
+        "name": "SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS",
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest ID",
+                "description": "Trigger quest group event. Also complete the quest"
+            }
+        ],
+        "description": "{source}: Call quest {pram1} group event happened",
+        "name_readable": "Call area explored or event happens",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 16,
+        "name": "SMART_ACTION_SET_INGAME_PHASE_GROUP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "PhaseGroup",
+                "description": "This is actual unit phasegroup"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Apply",
+                "description": "true - PhaseGroup {pram1} is applied, false - true - PhaseGroup {pram1} is removed"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):Remove|Add} phasegroup {pram1}",
+        "name_readable": "Set ingame phase group",
+        "target_types": ["GameObject", "Player", "Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 17,
+        "name": "SMART_ACTION_SET_EMOTE_STATE",
+        "parameters": [
+            {
+                "type": "EmoteParameter",
+                "name": "Emote ID"
+            }
+        ],
+        "description": "{source}: Set emote state (UNIT_NPC_EMOTESTATE) to {pram1}",
+        "name_readable": "Set emote state",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 18,
+        "name": "SMART_ACTION_SET_UNIT_FLAG",
+        "parameters": [
+            {
+                "type": "UnitFlagParameter",
+                "name": "Flags"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "values": {
+                    "0": {
+                        "name": "UNIT_FLAGS"
+                    },
+                    "1": {
+                        "name": "UNIT_FLAGS_2"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Set {pram2value:choose(0):UNIT_FLAGS to {pram1}|UNIT_FLAGS_2 to {pram1value}}",
+        "name_readable": "Set unit flag",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 19,
+        "name": "SMART_ACTION_REMOVE_UNIT_FLAG",
+        "parameters": [
+            {
+                "type": "UnitFlagParameter",
+                "name": "Flags"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "values": {
+                    "0": {
+                        "name": "UNIT_FLAGS"
+                    },
+                    "1": {
+                        "name": "UNIT_FLAGS_2"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Remove {pram2value:choose(0):UNIT_FLAGS to {pram1}|UNIT_FLAGS_2 to {pram1value}}",
+        "name_readable": "Remove unit flag",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 20,
+        "name": "SMART_ACTION_AUTO_ATTACK",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Allow Attack State",
+                "description": "0 = stop attack, 1 = attack"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable|Enable} auto attack",
+        "name_readable": "Auto attack",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 21,
+        "name": "SMART_ACTION_ALLOW_COMBAT_MOVEMENT",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Allow Combat Movement",
+                "description": "0 = stop combat based movement, 1 = enable combat movement"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable|Enable} combat based movement",
+        "name_readable": "Allow combat movement",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 22,
+        "name": "SMART_ACTION_SET_EVENT_PHASE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Phase",
+                "description": "Note: This is Smart AI event phase, not actual creature phasemask"
+            }
+        ],
+        "description": "{source}: Set event phase to {pram1}",
+        "name_readable": "Set event phase",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 23,
+        "name": "SMART_ACTION_INC_EVENT_PHASE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Increment"
+            },
+            {
+                "type": "Parameter",
+                "name": "Decrement"
+            }
+        ],
+        "description": "{source}: Increment phase by {pram1} and decrement by {pram2}",
+        "name_readable": "Increment event phase",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 24,
+        "name": "SMART_ACTION_EVADE",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
+        "description": "{source}: Evade",
+        "name_readable": "Evade",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 24,
+        "name": "SMART_ACTION_EVADE_AC",
+        "tags": ["Azeroth"],
+        "description": "{source}: Evade",
+        "name_readable": "Evade",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 25,
+        "name": "SMART_ACTION_FLEE_FOR_ASSIST",
+        "parameters": [
+            {
+                "type": "EmoteParameter",
+                "name": "With Emote",
+                "description": "If set, creature will flee for assist with emote"
+            }
+        ],
+        "description": "{source}: Flee for assist",
+        "name_readable": "Flee for assist",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 26,
+        "name": "SMART_ACTION_CALL_GROUPEVENTHAPPENS",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest"
+            }
+        ],
+        "description": "{source}: Call group event happened from quest {pram1} on owner",
+        "name_readable": "Call group event happens",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 26,
+        "name": "SMART_ACTION_CALL_GROUPEVENTHAPPENS_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest"
+            }
+        ],
+        "description": "{source}: Call group event happened from quest {pram1}",
+        "name_readable": "Call group event happens",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 28,
+        "name": "SMART_ACTION_REMOVEAURASFROMSPELL",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell",
+                "description": "Spell id to remove aura, if 0, all auras will be removed"
+            },
+            {
+                "type": "Parameter",
+                "name": "Charges",
+                "description": "If 0 all charges are removed"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
+        "name_readable": "Remove aura",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 29,
+        "name": "SMART_ACTION_FOLLOW",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Distance",
+                "description": "0 = default"
+            },
+            {
+                "type": "Parameter",
+                "name": "Angle",
+                "description": "0 = default"
+            },
+            {
+                "type": "CreatureParameter",
+                "name": "EndCreatureEntry"
+            },
+            {
+                "type": "Parameter",
+                "name": "Credit"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Credit Type",
+                "values": {
+                    "0": {
+                        "name": "Monster kill",
+                        "description": "Kill credit from parameter `credit` will be counted up"
+                    },
+                    "1": {
+                        "name": "Event",
+                        "description": "has to be checked what it is"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Follow {target} by distance {pram1}, angle {pram2}",
+        "name_readable": "Follow",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 30,
+        "name": "SMART_ACTION_RANDOM_PHASE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Phase Id 1"
+            },
+            {
+                "type": "Parameter",
+                "name": "Phase Id 2"
+            },
+            {
+                "type": "Parameter",
+                "name": "Phase Id 3"
+            },
+            {
+                "type": "Parameter",
+                "name": "Phase Id 4"
+            },
+            {
+                "type": "Parameter",
+                "name": "Phase Id 5"
+            },
+            {
+                "type": "Parameter",
+                "name": "Phase Id 6"
+            }
+        ],
+        "description": "{source}: Set random event phase between: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
+        "name_readable": "Random phase",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 31,
+        "name": "SMART_ACTION_RANDOM_PHASE_RANGE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Phase Min",
+                "description": "Minimum phase to random between (SAI phase)"
+            },
+            {
+                "type": "Parameter",
+                "name": "Phase Max",
+                "description": "Maximum phase to random between (SAI phase)"
+            }
+        ],
+        "description": "{source}: Set random event phase between range {pram1} and {pram2}",
+        "name_readable": "Random phase range",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 32,
+        "name": "SMART_ACTION_RESET_GOBJECT",
+        "description": "{source}: Reset (gameobject)",
+        "name_readable": "Reset gobject",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 33,
+        "name": "SMART_ACTION_CALL_KILLEDMONSTER",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            }
+        ],
+        "description": "{sourceid:choose(0|1):Loot recipient|Loot recipient|{source}}: Give kill credit {pram1}",
+        "name_readable": "Give killed monster credit",
+        "target_types": ["Player", "Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 34,
+        "name": "SMART_ACTION_SET_INST_DATA",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Field"
+            },
+            {
+                "type": "Parameter",
+                "name": "Data"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "values": {
+                    "0": {
+                        "name": "SetData"
+                    },
+                    "1": {
+                        "name": "SetBossState"
+                    }
+                }
+            }
+        ],
+        "description": "Set {pram3value:choose(0):instance data|boss state} #{pram1} to {pram2}",
+        "name_readable": "Set instance data",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 35,
+        "name": "SMART_ACTION_SET_INST_DATA64",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Field"
+            }
+        ],
+        "description": "Set instance target (guid) #{pram1} to {target}",
+        "name_readable": "Set instance guid",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 36,
+        "name": "SMART_ACTION_UPDATE_TEMPLATE",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Entry"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "UpdateLevel"
+            }
+        ],
+        "description": "{source}: Update template{pram2value:choose(0):| and level} as if it was creature {pram1}",
+        "name_readable": "Update NPC template",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 37,
+        "name": "SMART_ACTION_DIE",
+        "description": "{source}: Die",
+        "name_readable": "Die",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 38,
+        "name": "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE",
+        "description": "{target}: Set in combat with current zone",
+        "name_readable": "Set in combat with zone",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 39,
+        "name": "SMART_ACTION_CALL_FOR_HELP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Radius"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "WithEmote"
+            }
+        ],
+        "description": "{source}: Call for help within {pram1} yards{pram2value:choose(0):| with emote}",
+        "name_readable": "Call for help",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 40,
+        "name": "SMART_ACTION_SET_SHEATH",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Sheath Type",
+                "values": {
+                    "0": {
+                        "name": "Unarmed"
+                    },
+                    "1": {
+                        "name": "Melee"
+                    },
+                    "2": {
+                        "name": "Ranged"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Set sheath to {pram1}",
+        "name_readable": "Set sheath",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 41,
+        "name": "SMART_ACTION_FORCE_DESPAWN",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Delay"
+            },
+            {
+                "type": "Parameter",
+                "name": "Force respawn timer"
+            }
+        ],
+        "description": "{source}: Despawn {pram1value:choose(0):instantly|in {pram1} s}{pram2value:choose(0):| respawn in {pram2} seconds}",
+        "name_readable": "Force despawn",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 42,
+        "name": "SMART_ACTION_SET_INVINCIBILITY_HP_LEVEL",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Min health"
+            },
+            {
+                "type": "Parameter",
+                "name": "Percent"
+            }
+        ],
+        "description": "{source}: Set invincibility to {pram2value:choose(0):{pram2}%|{pram1}} HP",
+        "name_readable": "Set invincibility hp level",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 43,
+        "name": "SMART_ACTION_MOUNT_TO_ENTRY_OR_MODEL",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature entry"
+            },
+            {
+                "type": "Parameter",
+                "name": "Model Id"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Dismount|Mount to model {pram2}}|{pram2value:choose(0):Mount to creature {pram1}|Invalid mount ({pram1}, {pram2}}}",
+        "name_readable": "Mount to entry or model",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 44,
+        "name": "SMART_ACTION_SET_INGAME_PHASE_ID",
+        "parameters": [
+            {
+                "type": "PhaseParameter",
+                "name": "Phase ID"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Apply"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):Remove phase id {pram1}|Add phase id to {pram1}}",
+        "name_readable": "Add/Remove phase id",
+        "target_types": ["Creature", "GameObject", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 45,
+        "name": "SMART_ACTION_SET_DATA",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Field"
+            },
+            {
+                "type": "Parameter",
+                "name": "Data"
+            }
+        ],
+        "description": "{source}: Set creature data #{pram1} to {pram2}",
+        "name_readable": "Set data",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 47,
+        "name": "SMART_ACTION_SET_VISIBILITY",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Visible"
+            }
+        ],
+        "description": "{source}: Set {pram1value:choose(0):in|}visible",
+        "name_readable": "Set visibility",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 48,
+        "name": "SMART_ACTION_SET_ACTIVE",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Active"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable active|Set active}",
+        "name_readable": "Set active",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 49,
+        "name": "SMART_ACTION_ATTACK_START",
+        "description": "{source}: Attack {target}",
+        "name_readable": "Attack start",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 50,
+        "name": "SMART_ACTION_SUMMON_GO",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Game Object"
+            },
+            {
+                "type": "Parameter",
+                "name": "Despawn Time",
+                "description": "In ms"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "values": {
+                    "0": {
+                        "name": "GO_SUMMON_TIMED_OR_CORPSE_DESPAWN"
+                    },
+                    "1": {
+                        "name": "GO_SUMMON_TIMED_DESPAWN"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
+        "name_readable": "Summon gameobject",
+        "target_types": ["Player", "Creature", "GameObject"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 51,
+        "name": "SMART_ACTION_KILL_UNIT",
+        "description": "{source}: Kill self ({source})",
+        "name_readable": "Kill unit",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 52,
+        "name": "SMART_ACTION_ACTIVATE_TAXI",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Taxi ID"
+            }
+        ],
+        "description": "{source}: Take taxi {pram1}",
+        "name_readable": "Activate taxi",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 53,
+        "name": "SMART_ACTION_WP_START",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Run/Walk",
+                "values": {
+                    "0": {
+                        "name": "Walk"
+                    },
+                    "1": {
+                        "name": "Run"
+                    }
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Path ID",
+                "required": true
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Repeat"
+            },
+            {
+                "type": "QuestParameter",
+                "name": "Quest",
+                "description": "Quest to complete when path ends (escort quest)"
+            },
+            {
+                "type": "Parameter",
+                "name": "Despawn time",
+                "description": "Despawn time after finishing the path"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "React State",
+                "values": {
+                    "0": {
+                        "name": "Passive"
+                    },
+                    "1": {
+                        "name": "Defensive"
+                    },
+                    "2": {
+                        "name": "Aggressive"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Start path #{pram2}, {pram1value:choose(0):walk|run}, {pram3value:choose(0):do not repeat|repeat}, {pram6}",
+        "name_readable": "Waypoint path start",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 54,
+        "name": "SMART_ACTION_WP_PAUSE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Duration",
+                "description": "Miliseconds to wait before resuming path"
+            }
+        ],
+        "description": "{source}: Pause path for {pram1} ms",
+        "name_readable": "Waypoint path pause",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 55,
+        "name": "SMART_ACTION_WP_STOP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Despawn Time",
+                "description": "Time to wait before despawn"
+            },
+            {
+                "type": "QuestParameter",
+                "name": "Quest",
+                "description": "Quest id to mark as complete or failed"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Fail/Complete",
+                "description": "Quest will be marked as either completed or failed",
+                "values": {
+                    "0": {
+                        "name": "Complete"
+                    },
+                    "1": {
+                        "name": "Fail"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Stop path{pram1value:choose(0):, despawn instantly|, despawn in {pram1} ms}{pram2value:choose(0):|{pram3value:choose(0):, complete|, fail} quest {pram2}}",
+        "name_readable": "Waypoint path stop",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 56,
+        "name": "SMART_ACTION_ADD_ITEM",
+        "parameters": [
+            {
+                "type": "ItemParameter",
+                "name": "Item"
+            },
+            {
+                "type": "Parameter",
+                "name": "Count"
+            }
+        ],
+        "description": "{source}: Add item {pram2value:choose(1):{pram1}|{pram2}x{pram1}}",
+        "name_readable": "Add item",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 57,
+        "name": "SMART_ACTION_REMOVE_ITEM",
+        "parameters": [
+            {
+                "type": "ItemParameter",
+                "name": "Item"
+            },
+            {
+                "type": "Parameter",
+                "name": "Count"
+            }
+        ],
+        "description": "{source}: Remove item {pram2}x{pram1}",
+        "name_readable": "Remove item",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 58,
+        "name": "SMART_ACTION_INSTALL_AI_TEMPLATE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "AITemplateID"
+            }
+        ],
+        "description": "{source}: Install AI Template {pram1}",
+        "name_readable": "Install AI template",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 59,
+        "name": "SMART_ACTION_SET_RUN",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Movement Type",
+                "values": {
+                    "0": {
+                        "name": "Walk"
+                    },
+                    "1": {
+                        "name": "Run"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Set walk|Set run}",
+        "name_readable": "Set run",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 59,
+        "name": "SMART_ACTION_SET_RUN_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Movement Type",
+                "values": {
+                    "0": {"name": "Walk"},
+                    "1": {"name": "Run"}
+                }
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Set walk|Set run}",
+        "name_readable": "Set run",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 60,
+        "name": "SMART_ACTION_SET_DISABLE_GRAVITY",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Disable",
+                "description": "If true, gravity is disabled"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Enable|Disable} gravity",
+        "name_readable": "Disable Gravity",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 60,
+        "name": "SMART_ACTION_SET_FLY_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Enable fly"
+            },
+            {
+                "type": "DecifloatParameter",
+                "name": "Speed"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Disable gravity"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable|Enable} fly{pram2value:choose(0):| with fly speed {pram2}} and {pram3value:choose(0):enable|disable} gravity",
+        "name_readable": "Set fly/disable gravity",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 61,
+        "name": "SMART_ACTION_SET_SWIM",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Enable",
+                "description": "If true, swimming will be enabled"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable|Enable} swimming",
+        "name_readable": "Set swim",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 62,
+        "name": "SMART_ACTION_TELEPORT",
+        "parameters": [
+            {
+                "type": "ZoneAreaParameter",
+                "name": "Map ID"
+            }
+        ],
+        "description": "{source}: Teleport to {targetcoords} on map {pram1}",
+        "name_readable": "Teleport",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true,
+        "uses_target_position": true
+    },
+    {
+        "id": 63,
+        "name": "SMART_ACTION_SET_COUNTER",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Variable ID"
+            },
+            {
+                "type": "Parameter",
+                "name": "Value"
+            },
+            {
+                "type": "Parameter",
+                "name": "Reset"
+            }
+        ],
+        "description": "{source}: {pram3value:choose(0):Smart script [p]variable_[/p]{pram1} = {pram2}|Reset smart script [p]variable_[/p]{pram1}}",
+        "name_readable": "Set counter",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 64,
+        "name": "SMART_ACTION_STORE_TARGET_LIST",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Variable ID"
+            }
+        ],
+        "description": "{source}: Target_{pram1} = {target}",
+        "name_readable": "Store target list",
+        "target_types": ["Creature", "Player", "GameObject"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 65,
+        "name": "SMART_ACTION_WP_RESUME",
+        "description": "{source}: Resume path",
+        "name_readable": "Waypoint path resume",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 66,
+        "name": "SMART_ACTION_SET_ORIENTATION",
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
+        "description": "{source}: {targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}",
+        "name_readable": "Set orientation",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 66,
+        "name": "SMART_ACTION_SET_ORIENTATION_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Instant change",
+                "description": "Calls also Unit::SetOrientation (beside Unit::SetFacingTo)"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Random"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):{targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}|Set random orientation}{pram1value:choose(0):| (instant change)}",
+        "name_readable": "Set orientation",
+        "target_types": ["GameObject", "Player", "Creature"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 67,
+        "name": "SMART_ACTION_CREATE_TIMED_EVENT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Timed event id",
+                "description": "This timed event will be triggered"
+            },
+            {
+                "type": "Parameter",
+                "name": "Initial Min",
+                "description": "In miliseconds"
+            },
+            {
+                "type": "Parameter",
+                "name": "Initial Max",
+                "description": "In miliseconds"
+            },
+            {
+                "type": "Parameter",
+                "name": "Repeat Min",
+                "description": "(only if it repeats)"
+            },
+            {
+                "type": "Parameter",
+                "name": "Repeat Max",
+                "description": "(only if it repeats)"
+            },
+            {
+                "type": "PercentageParameter",
+                "name": "Chance"
+            }
+        ],
+        "description": "Trigger timed event #{pram1} in {pram2} - {pram3} ms{pram4value:choose(0):| and then trigger every {pram4} - {pram5} ms}{pram6value:choose(0):| with {pram6} chance}",
+        "name_readable": "Create timed event",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 68,
+        "name": "SMART_ACTION_PLAYMOVIE",
+        "parameters": [
+            {
+                "type": "MovieParameter",
+                "name": "Entry"
+            }
+        ],
+        "description": "{source}: Play movie {pram1}",
+        "name_readable": "Play movie",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 69,
+        "name": "SMART_ACTION_MOVE_TO_POS",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "PointId"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "IsTransport"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Disable Pathfinding"
+            },
+            {
+                "type": "Parameter",
+                "name": "Contact Distance",
+                "description": "If > 0 contact distance + combatreach"
+            }
+        ],
+        "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target} with offset {targetcoords}{pram4value:choose(0):| in {pram4} yd distance}} (point id {pram1}){pram3value:choose(0):| without pathfinding}",
+        "name_readable": "Move to position",
+        "target_types": ["GameObject", "Player", "Creature"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 70,
+        "name": "SMART_ACTION_ENABLE_TEMP_GOBJ",
+        "tags": ["TrinityWrath", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Duration"
+            }
+        ],
+        "description": "{source}: Enable for {pram1} ms",
+        "name_readable": "Enable Temp Gobject",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 70,
+        "name": "SMART_ACTION_RESPAWN_TARGET",
+        "tags": ["Azeroth", "TrinityMaster"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Duration"
+            }
+        ],
+        "description": "{source}: Set respawn timer to {pram1} ms",
+        "name_readable": "Set respawn timer/respawn",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 71,
+        "name": "SMART_ACTION_EQUIP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Eqipment ID",
+                "description": "Entry from table creature_equip_template"
+            },
+            {
+                "type": "Parameter",
+                "name": "Slotmask",
+                "description": "If 0 (or 7) all items will be equiped, 1, 2, 4 are bits for next three items (you can add them)"
+            },
+            {
+                "type": "ItemParameter",
+                "name": "Slot 1",
+                "description": "Only if equipement id is 0"
+            },
+            {
+                "type": "ItemParameter",
+                "name": "Slot 2",
+                "description": "Only if equipement id is 0"
+            },
+            {
+                "type": "ItemParameter",
+                "name": "Slot 3",
+                "description": "Only if equipement id is 0"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Equip items {pram3}, {pram4}, {pram5}|Eqipt items from creature {pram1}}",
+        "name_readable": "Equip item",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 72,
+        "name": "SMART_ACTION_CLOSE_GOSSIP",
+        "description": "{source}: Close gossip",
+        "name_readable": "Close gossip",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 73,
+        "name": "SMART_ACTION_TRIGGER_TIMED_EVENT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "ID",
+                "description": "Must be greater or equal than 1"
+            }
+        ],
+        "description": "Trigger timed event {pram1}",
+        "name_readable": "Trigger timed event",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 74,
+        "name": "SMART_ACTION_REMOVE_TIMED_EVENT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "ID",
+                "description": "Must be greater or equal than 1"
+            }
+        ],
+        "description": "Remove timed event {pram1}",
+        "name_readable": "Remove timed event",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 75,
+        "name": "SMART_ACTION_ADD_AURA",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            }
+        ],
+        "description": "{source}: Add aura {pram1}",
+        "name_readable": "Add aura",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 76,
+        "name": "SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT",
+        "description": "SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT (WARNING: CAN CRASH CORE)",
+        "name_readable": "Override script base object",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 77,
+        "name": "SMART_ACTION_RESET_SCRIPT_BASE_OBJECT",
+        "description": "SMART_ACTION_RESET_SCRIPT_BASE_OBJECT",
+        "name_readable": "Reset script base object",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 78,
+        "name": "SMART_ACTION_CALL_SCRIPT_RESET",
+        "description": "{source}: Call OnReset() event",
+        "name_readable": "Do Reset()",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 79,
+        "name": "SMART_ACTION_SET_RANGED_MOVEMENT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Distance"
+            },
+            {
+                "type": "Parameter",
+                "name": "angle"
+            }
+        ],
+        "description": "{source}: Chase its victim in {pram1} yards (angle {pram2}\u00b0)",
+        "name_readable": "Set ranged movement ",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 80,
+        "name": "SMART_ACTION_CALL_TIMED_ACTIONLIST",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "ID",
+                "description": "overwrites already running actionlist?"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Update type",
+                "values": {
+                    "0": {"name": "update out of combat"},
+                    "1": {"name": "update in combat"},
+                    "2": {"name": "update always"}
+                }
+            }
+        ],
+        "description": "{source}: Start timed action list id #{pram1} ({pram2})",
+        "name_readable": "Call timed action list",
+        "target_is_source": true,
+        "target_types": ["Creature", "GameObject"]
+    },
+    {
+        "id": 81,
+        "name": "SMART_ACTION_SET_NPC_FLAG",
+        "parameters": [
+            {
+                "type": "NpcFlagParameter",
+                "name": "Flags"
+            }
+        ],
+        "description": "{source}: Set npc flags {pram1}",
+        "name_readable": "Set NPC flags",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 82,
+        "name": "SMART_ACTION_ADD_NPC_FLAG",
+        "parameters": [
+            {
+                "type": "NpcFlagParameter",
+                "name": "Flags"
+            }
+        ],
+        "description": "{source}: Add npc flags {pram1}",
+        "name_readable": "Add NPC flag",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 83,
+        "name": "SMART_ACTION_REMOVE_NPC_FLAG",
+        "parameters": [
+            {
+                "type": "NpcFlagParameter",
+                "name": "Flags"
+            }
+        ],
+        "description": "{source}: Remove npc flags {pram1}",
+        "name_readable": "Remove NPC flag",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 84,
+        "name": "SMART_ACTION_SIMPLE_TALK",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Group ID",
+                "description": "Makes target say its line from creature_text. If player, line from creature_text from this entry will be said. Doesn't trigger TEXT_OVER"
+            }
+        ],
+        "description": "{source}: Talk {pram1}",
+        "name_readable": "Simple talk",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 85,
+        "name": "SMART_ACTION_SELF_CAST",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell",
+                "description": "Spell id to cast"
+            },
+            {
+                "type": "SmartCastFlagsParameter",
+                "name": "Cast Flags"
+            },
+            {
+                "type": "TriggerFlagParameter",
+                "name": "Trigger Flags"
+            },
+            {
+                "type": "Parameter",
+                "name": "TargetsLimit"
+            }
+        ],
+        "description": "{pram4value:choose(0):| Random {pram4}} {source}: Cast spell {pram1} on self",
+        "name_readable": "Invoker cast",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 86,
+        "name": "SMART_ACTION_CROSS_CAST",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "SmartCastFlagsParameter",
+                "name": "Cast Flags"
+            }
+        ],
+        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} at {target}",
+        "name_readable": "Cross cast",
+        "target_types": ["Creature", "Player"],
+        "sources": ["Creature", "Player", "GameObject"],
+        "target_is_source": false,
+        "source_in_action": true
+    },
+    {
+        "id": 87,
+        "name": "SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Action List ID 1"
+            },
+            {
+                "type": "Parameter",
+                "name": "Action List ID 2"
+            },
+            {
+                "type": "Parameter",
+                "name": "Action List ID 3"
+            },
+            {
+                "type": "Parameter",
+                "name": "Action List ID 4"
+            },
+            {
+                "type": "Parameter",
+                "name": "Action List ID 5"
+            },
+            {
+                "type": "Parameter",
+                "name": "Action List ID 6"
+            }
+        ],
+        "description": "{source}: Call random timed action list: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6} {pram2value:choose(0|1):(update out of combat)|(update in combat)|(update always)}",
+        "name_readable": "Call random timed actionlist",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 88,
+        "name": "SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Action List ID min"
+            },
+            {
+                "type": "Parameter",
+                "name": "Action List ID max"
+            }
+        ],
+        "description": "{source}: Call random timed action list between range {pram1} and {pram2} {pram2value:choose(0|1):(update out of combat)|(update in combat)|(update always)}",
+        "name_readable": "Call random range timed actionlist",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 89,
+        "name": "SMART_ACTION_RANDOM_MOVE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Distance",
+                "description": "If 0, creature will stay idle in place"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Stay in place|Move in radius {pram1} yards}",
+        "name_readable": "Random move",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 90,
+        "name": "SMART_ACTION_SET_UNIT_FIELD_BYTES_1",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Value"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "required": true,
+                "values": {
+                    "0": {
+                        "name": "UNIT_BYTES_1_OFFSET_STAND_STATE"
+                    },
+                    "1": {
+                        "name": "UNIT_BYTES_1_OFFSET_PET_TALENTS"
+                    },
+                    "2": {
+                        "name": "UNIT_BYTES_1_OFFSET_VIS_FLAG"
+                    },
+                    "3": {
+                        "name": "UNIT_BYTES_1_OFFSET_ANIM_TIER"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Set UNIT_FIELD_BYTES_1 with Type {pram2} to {pram1}",
+        "name_readable": "Set UNIT_FIELD_BYTES_1",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 91,
+        "name": "SMART_ACTION_REMOVE_UNIT_FIELD_BYTES_1",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Bytes"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "required": true,
+                "values": {
+                    "0": {
+                        "name": "UNIT_BYTES_1_OFFSET_STAND_STATE"
+                    },
+                    "1": {
+                        "name": "UNIT_BYTES_1_OFFSET_PET_TALENTS"
+                    },
+                    "2": {
+                        "name": "UNIT_BYTES_1_OFFSET_VIS_FLAG"
+                    },
+                    "3": {
+                        "name": "UNIT_BYTES_1_OFFSET_ANIM_TIER"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Remove {pram1} bytes from UNIT_FIELD_BYTES_1 with Type {pram2}",
+        "name_readable": "Remove UNIT_FIELD_BYTES_1",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 92,
+        "name": "SMART_ACTION_INTERRUPT_SPELL",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "With Delay"
+            },
+            {
+                "type": "SpellParameter",
+                "name": "Spell ID"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Instant"
+            }
+        ],
+        "description": "{source}: Interrupt casted spell {pram2}",
+        "name_readable": "Interrupt spell",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 93,
+        "name": "SMART_ACTION_SEND_GO_CUSTOM_ANIM",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Animation id"
+            }
+        ],
+        "description": "{source}: Play custom animation (only gameobject)",
+        "name_readable": "Send gameobject custom animation",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 94,
+        "name": "SMART_ACTION_SET_DYNAMIC_FLAG",
+        "parameters": [
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "0": {
+                        "name": "UNIT_DYNFLAG_NONE"
+                    },
+                    "1": {
+                        "name": "UNIT_DYNFLAG_LOOTABLE"
+                    },
+                    "2": {
+                        "name": "UNIT_DYNFLAG_TRACK_UNIT"
+                    },
+                    "4": {
+                        "name": "UNIT_DYNFLAG_TAPPED"
+                    },
+                    "8": {
+                        "name": "UNIT_DYNFLAG_TAPPED_BY_PLAYER"
+                    },
+                    "16": {
+                        "name": "UNIT_DYNFLAG_SPECIALINFO"
+                    },
+                    "32": {
+                        "name": "UNIT_DYNFLAG_DEAD"
+                    },
+                    "64": {
+                        "name": "UNIT_DYNFLAG_REFER_A_FRIEND"
+                    },
+                    "128": {
+                        "name": "UNIT_DYNFLAG_TAPPED_BY_ALL_THREAT_LIST"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Set dynamic flags to {pram1}",
+        "name_readable": "Set dynamic flag",
+        "target_types": ["GameObject", "Player", "Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 95,
+        "name": "SMART_ACTION_ADD_DYNAMIC_FLAG",
+        "parameters": [
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "0": {
+                        "name": "UNIT_DYNFLAG_NONE"
+                    },
+                    "1": {
+                        "name": "UNIT_DYNFLAG_LOOTABLE"
+                    },
+                    "2": {
+                        "name": "UNIT_DYNFLAG_TRACK_UNIT"
+                    },
+                    "4": {
+                        "name": "UNIT_DYNFLAG_TAPPED"
+                    },
+                    "8": {
+                        "name": "UNIT_DYNFLAG_TAPPED_BY_PLAYER"
+                    },
+                    "16": {
+                        "name": "UNIT_DYNFLAG_SPECIALINFO"
+                    },
+                    "32": {
+                        "name": "UNIT_DYNFLAG_DEAD"
+                    },
+                    "64": {
+                        "name": "UNIT_DYNFLAG_REFER_A_FRIEND"
+                    },
+                    "128": {
+                        "name": "UNIT_DYNFLAG_TAPPED_BY_ALL_THREAT_LIST"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Add {pram1} dynamic flag",
+        "name_readable": "Add dynamic flag",
+        "target_types": ["GameObject", "Player", "Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 96,
+        "name": "SMART_ACTION_REMOVE_DYNAMIC_FLAG",
+        "parameters": [
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "0": {
+                        "name": "UNIT_DYNFLAG_NONE"
+                    },
+                    "1": {
+                        "name": "UNIT_DYNFLAG_LOOTABLE"
+                    },
+                    "2": {
+                        "name": "UNIT_DYNFLAG_TRACK_UNIT"
+                    },
+                    "4": {
+                        "name": "UNIT_DYNFLAG_TAPPED"
+                    },
+                    "8": {
+                        "name": "UNIT_DYNFLAG_TAPPED_BY_PLAYER"
+                    },
+                    "16": {
+                        "name": "UNIT_DYNFLAG_SPECIALINFO"
+                    },
+                    "32": {
+                        "name": "UNIT_DYNFLAG_DEAD"
+                    },
+                    "64": {
+                        "name": "UNIT_DYNFLAG_REFER_A_FRIEND"
+                    },
+                    "128": {
+                        "name": "UNIT_DYNFLAG_TAPPED_BY_ALL_THREAT_LIST"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Remove {pram1} dynamic flags",
+        "name_readable": "Remove dynamic flag",
+        "target_types": ["GameObject", "Player", "Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 97,
+        "name": "SMART_ACTION_JUMP_TO_POS",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Speed XY"
+            },
+            {
+                "type": "Parameter",
+                "name": "Speed Z"
+            }
+        ],
+        "description": "{source}: Jump to pos {targetcoords} with speed XY {pram1} and speed Z {pram2}",
+        "name_readable": "Jump to pos",
+        "target_types": ["Creature"],
+        "target_is_source": true,
+        "uses_target_position": true
+    },
+    {
+        "id": 98,
+        "name": "SMART_ACTION_SEND_GOSSIP_MENU",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Menu Id",
+                "description": "From gossip_menu"
+            },
+            {
+                "type": "Parameter",
+                "name": "Text Id",
+                "description": "From npc_text"
+            }
+        ],
+        "description": "{source}: Send gossip ID {pram1} with text {pram2}",
+        "name_readable": "Send gossip menu",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 99,
+        "name": "SMART_ACTION_GO_SET_LOOT_STATE",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "State",
+                "values": {
+                    "0": {
+                        "name": "GO_NOT_READY"
+                    },
+                    "1": {
+                        "name": "GO_READY"
+                    },
+                    "2": {
+                        "name": "GO_ACTIVATED"
+                    },
+                    "3": {
+                        "name": "GO_JUST_DEACTIVATED"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Set loot state {pram1} (only gameobjects)",
+        "name_readable": "Set gameobject loot state",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 100,
+        "name": "SMART_ACTION_SEND_TARGET_TO_TARGET",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Variable ID"
+            }
+        ],
+        "description": "Send stored target {pram1} to {target}",
+        "name_readable": "Send target to source",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 101,
+        "name": "SMART_ACTION_SET_HOME_POS",
+        "description": "{source}: Set home position to {targetid:choose(1|8):current position|{targetcoords}|position of {target}}",
+        "name_readable": "Send home position",
+        "target_types": ["Creature"],
+        "target_is_source": true,
+        "uses_target_position": true
+    },
+    {
+        "id": 102,
+        "name": "SMART_ACTION_SET_HEALTH_REGEN",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Regenerate HP"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Do not regenerate HP|Regenerate HP}",
+        "name_readable": "Set health regeneration",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 103,
+        "name": "SMART_ACTION_SET_ROOT",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "SetRoot"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Remove|Set} rooted",
+        "name_readable": "Set/Remove rooted",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 104,
+        "name": "SMART_ACTION_SET_GO_FLAG",
+        "parameters": [
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "0": {
+                        "name": "GO_FLAG_IN_USE"
+                    },
+                    "2": {
+                        "name": "GO_FLAG_LOCKED"
+                    },
+                    "4": {
+                        "name": "GO_FLAG_INTERACT_COND"
+                    },
+                    "8": {
+                        "name": "GO_FLAG_TRANSPORT"
+                    },
+                    "16": {
+                        "name": "GO_FLAG_NOT_SELECTABLE"
+                    },
+                    "32": {
+                        "name": "GO_FLAG_NODESPAWN"
+                    },
+                    "64": {
+                        "name": "GO_FLAG_TRIGGERED"
+                    },
+                    "512": {
+                        "name": "GO_FLAG_DAMAGED"
+                    },
+                    "1024": {
+                        "name": "GO_FLAG_DESTROYED"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Set game object flags {pram1}",
+        "name_readable": "Set gameobject flags",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 105,
+        "name": "SMART_ACTION_ADD_GO_FLAG",
+        "parameters": [
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "0": {
+                        "name": "GO_FLAG_IN_USE"
+                    },
+                    "2": {
+                        "name": "GO_FLAG_LOCKED"
+                    },
+                    "4": {
+                        "name": "GO_FLAG_INTERACT_COND"
+                    },
+                    "8": {
+                        "name": "GO_FLAG_TRANSPORT"
+                    },
+                    "16": {
+                        "name": "GO_FLAG_NOT_SELECTABLE"
+                    },
+                    "32": {
+                        "name": "GO_FLAG_NODESPAWN"
+                    },
+                    "64": {
+                        "name": "GO_FLAG_TRIGGERED"
+                    },
+                    "512": {
+                        "name": "GO_FLAG_DAMAGED"
+                    },
+                    "1024": {
+                        "name": "GO_FLAG_DESTROYED"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Add game object flag {pram1}",
+        "name_readable": "Add gameobject flags",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 106,
+        "name": "SMART_ACTION_REMOVE_GO_FLAG",
+        "parameters": [
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "0": {
+                        "name": "GO_FLAG_IN_USE"
+                    },
+                    "2": {
+                        "name": "GO_FLAG_LOCKED"
+                    },
+                    "4": {
+                        "name": "GO_FLAG_INTERACT_COND"
+                    },
+                    "8": {
+                        "name": "GO_FLAG_TRANSPORT"
+                    },
+                    "16": {
+                        "name": "GO_FLAG_NOT_SELECTABLE"
+                    },
+                    "32": {
+                        "name": "GO_FLAG_NODESPAWN"
+                    },
+                    "64": {
+                        "name": "GO_FLAG_TRIGGERED"
+                    },
+                    "512": {
+                        "name": "GO_FLAG_DAMAGED"
+                    },
+                    "1024": {
+                        "name": "GO_FLAG_DESTROYED"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Remove game object flag {pram1}",
+        "name_readable": "Remove gameobject flags",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 107,
+        "name": "SMART_ACTION_SUMMON_CREATURE_GROUP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Summon group"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Attack me"
+            }
+        ],
+        "description": "{source}: Summon creature group {pram1}",
+        "name_readable": "Summon creature group",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 108,
+        "name": "SMART_ACTION_SET_POWER",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Power type",
+                "values": {
+                    "0": {"name": "mana"},
+                    "1": {"name": "rage"},
+                    "2": {"name": "focus"},
+                    "3": {"name": "energy"},
+                    "5": {"name": "runes"},
+                    "6": {"name": "runic power"},
+                    "7": {"name": "soul shards"},
+                    "8": {"name": "eclipse"},
+                    "9": {"name": "holy power"},
+                    "10": {"name": "alternate power"}
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "New value"
+            }
+        ],
+        "description": "{source}: Set {pram1} to {pram2}",
+        "name_readable": "Set power",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 109,
+        "name": "SMART_ACTION_ADD_POWER",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Power type",
+                "values": {
+                    "0": {"name": "mana"},
+                    "1": {"name": "rage"},
+                    "2": {"name": "focus"},
+                    "3": {"name": "energy"},
+                    "5": {"name": "runes"},
+                    "6": {"name": "runic power"},
+                    "7": {"name": "soul shards"},
+                    "8": {"name": "eclipse"},
+                    "9": {"name": "holy power"},
+                    "10": {"name": "alternate power"}
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Value"
+            }
+        ],
+        "description": "{source}: Add {pram2} to {pram1}",
+        "name_readable": "Add power",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 110,
+        "name": "SMART_ACTION_REMOVE_POWER",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Power type",
+                "values": {
+                    "0": {"name": "mana"},
+                    "1": {"name": "rage"},
+                    "2": {"name": "focus"},
+                    "3": {"name": "energy"},
+                    "5": {"name": "runes"},
+                    "6": {"name": "runic power"},
+                    "7": {"name": "soul shards"},
+                    "8": {"name": "eclipse"},
+                    "9": {"name": "holy power"},
+                    "10": {"name": "alternate power"}
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Value"
+            }
+        ],
+        "description": "{source}: Remove {pram2} from {pram1}",
+        "name_readable": "Remove power",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 111,
+        "name": "SMART_ACTION_GAME_EVENT_STOP",
+        "parameters": [
+            {
+                "type": "GameEventParameter",
+                "name": "Event"
+            }
+        ],
+        "description": "Stop game event {pram1}",
+        "name_readable": "Stop game event",
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 112,
+        "name": "SMART_ACTION_GAME_EVENT_START",
+        "parameters": [
+            {
+                "type": "GameEventParameter",
+                "name": "Event"
+            }
+        ],
+        "description": "Start game event {pram1}",
+        "name_readable": "Start game event",
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 113,
+        "name": "SMART_ACTION_START_CLOSEST_WAYPOINT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Path 1"
+            },
+            {
+                "type": "Parameter",
+                "name": "Path 2"
+            },
+            {
+                "type": "Parameter",
+                "name": "Path 3"
+            },
+            {
+                "type": "Parameter",
+                "name": "Path 4"
+            },
+            {
+                "type": "Parameter",
+                "name": "Path 5"
+            },
+            {
+                "type": "Parameter",
+                "name": "Path 6"
+            }
+        ],
+        "description": "{source}: Start closest path: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
+        "name_readable": "Start closest path",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 114,
+        "name": "SMART_ACTION_MOVE_OFFSET",
+        "description": "{source}: Move by offset {targetcoords}",
+        "name_readable": "Move by offset",
+        "target_types": ["Creature"],
+        "target_is_source": true,
+        "uses_target_position": true
+    },
+    {
+        "id": 115,
+        "name": "SMART_ACTION_RANDOM_SOUND",
+        "parameters": [
+            {
+                "type": "SoundParameter",
+                "name": "SoundId 1"
+            },
+            {
+                "type": "SoundParameter",
+                "name": "SoundId 2"
+            },
+            {
+                "type": "SoundParameter",
+                "name": "SoundId 3"
+            },
+            {
+                "type": "SoundParameter",
+                "name": "SoundId 4"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "OnlySelf"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "DistanceSound"
+            }
+        ],
+        "description": "{source}: Play random {pram6value:choose(0):direct|distance} sound one of: {pram1}, {pram2}, {pram3}, {pram4} {pram6value:choose(0):of all|only self}",
+        "name_readable": "Play random sound",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 116,
+        "name": "SMART_ACTION_SET_CORPSE_DELAY",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Decay time"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Multiply by decay ratio"
+            }
+        ],
+        "description": "{source}: Sets corpse delay to {pram1} s{pram2value:choose(0):| (multiplied by server corpse decay ratio)}",
+        "name_readable": "Set corpse delay",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 117,
+        "name": "SMART_ACTION_DISABLE_EVADE",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Disable evade"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Enable|Disable} evade",
+        "help": "disable evade = True / re-enable = False",
+        "name_readable": "Disable evade",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 118,
+        "name": "SMART_ACTION_GO_SET_GO_STATE",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "State",
+                "values": {
+                    "0": {
+                        "name": "GO_STATE_ACTIVE"
+                    },
+                    "1": {
+                        "name": "GO_STATE_READY"
+                    },
+                    "2": {
+                        "name": "GO_STATE_ACTIVE_ALTERNATIVE"
+                    },
+                    "24": {
+                        "name": "GO_STATE_TRANSPORT_ACTIVE"
+                    },
+                    "25": {
+                        "name": "GO_STATE_TRANSPORT_STOPPED"
+                    }
+                }
+            }
+        ],
+        "description": "{source} state set to {pram1}",
+        "name_readable": "Set gameobject state",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 119,
+        "name": "SMART_ACTION_SET_CAN_FLY",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "CanFly"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Can not|Can} Fly}",
+        "name_readable": "Set can fly",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 120,
+        "name": "SMART_ACTION_REMOVE_AURAS_BY_TYPE",
+        "parameters": [
+            {
+                "type": "AuraTypeParameter",
+                "name": "Aura Type"
+            }
+        ],
+        "description": "{source}: Remove Auras with Auratype  {pram1}",
+        "name_readable": "Remove auras of auratype",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 121,
+        "name": "SMART_ACTION_SET_SIGHT_DIST",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Distance"
+            }
+        ],
+        "description": "{source}: Sight distance set to {pram1} yards",
+        "name_readable": "Set sight distance",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 122,
+        "name": "SMART_ACTION_FLEE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "FleeTime"
+            }
+        ],
+        "description": "{source}: Flee for {pram1} ms",
+        "name_readable": "Flee",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 123,
+        "name": "SMART_ACTION_ADD_THREAT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Threat addition"
+            },
+            {
+                "type": "Parameter",
+                "name": "Threath negation"
+            }
+        ],
+        "description": "{source}: Adds {pram1}, negates {pram2} threat against {target}",
+        "name_readable": "Add threat",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 124,
+        "name": "SMART_ACTION_LOAD_EQUIPMENT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "EquipmentId"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Force"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):Load|Force load} EquipmentId {pram1}",
+        "name_readable": "Load equipement",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 125,
+        "name": "SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Timed EventId Min"
+            },
+            {
+                "type": "Parameter",
+                "name": "Timed EventId Max"
+            }
+        ],
+        "description": "Triggers Events randomly with Timed EventId between {pram1} and {pram2}",
+        "name_readable": "Trigger random timed event",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 126,
+        "name": "SMART_ACTION_REMOVE_ALL_GAMEOBJECTS",
+        "description": "{source}: Removes gameobjects",
+        "name_readable": "Remove all gameobjects",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 127,
+        "name": "SMART_ACTION_STOP_MOTION",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Stop moving"
+            },
+            {
+                "type": "Parameter",
+                "name": "Movement expired"
+            }
+        ],
+        "description": "{source}: Stop movement",
+        "name_readable": "Stop motion",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 128,
+        "name": "SMART_ACTION_PLAY_ANIMKIT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "AnimKitID"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Flags",
+                "values": {
+                    "1": {
+                        "name": "PlayOneShotAnimKitId"
+                    },
+                    "2": {
+                        "name": "SetAIAnimKitId"
+                    },
+                    "3": {
+                        "name": "SetMeleeAnimKitId"
+                    },
+                    "4": {
+                        "name": "SetMovementAnimKitId"
+                    }
+                }
+            }
+        ],
+        "description": "{source}: Plays Anim with ID {pram1}",
+        "name_readable": "Play animkit",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 129,
+        "name": "SMART_ACTION_SCENE_PLAY",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "SceneId"
+            }
+        ],
+        "description": "{source}: Starts playing scene with Id: {pram1}",
+        "name_readable": "Play scene",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 130,
+        "name": "SMART_ACTION_SCENE_CANCEL",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "SceneId"
+            }
+        ],
+        "description": "{source}: Stops playing scene with Id: {pram1}",
+        "name_readable": "Cancel scene",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 131,
+        "name": "SMART_ACTION_SPAWN_SPAWNGROUP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "GroupID"
+            },
+            {
+                "type": "Parameter",
+                "name": "minDelay"
+            },
+            {
+                "type": "Parameter",
+                "name": "maxDelay"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Spawnflags",
+                "values": {
+                    "0": { "name": "SMARTAI_SPAWN_FLAG_NONE" },
+                    "1": { "name": "SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN" },
+                    "2": { "name": "SMARTAI_SPAWN_FLAG_FORCE_SPAWN" },
+                    "4": { "name": "SMARTAI_SPAWN_FLAG_NOSAVE_RESPAWN" }
+                }
+            }
+        ],
+        "description": "{source}: Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
+        "name_readable": "Spawn Spawngroup",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 132,
+        "name": "SMART_ACTION_DESPAWN_SPAWNGROUP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "GroupID"
+            },
+            {
+                "type": "Parameter",
+                "name": "minDelay"
+            },
+            {
+                "type": "Parameter",
+                "name": "maxDelay"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Spawnflags",
+                "values": {
+                    "0": { "name": "SMARTAI_SPAWN_FLAG_NONE" },
+                    "1": { "name": "SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN" },
+                    "2": { "name": "SMARTAI_SPAWN_FLAG_FORCE_SPAWN" },
+                    "4": { "name": "SMARTAI_SPAWN_FLAG_NOSAVE_RESPAWN" }
+                }
+            }
+        ],
+        "description": "{source}: Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
+        "name_readable": "Despawn Spawngroup",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 133,
+        "name": "SMART_ACTION_RESPAWN_BY_SPAWNID",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "SpawnType",
+                "values": {
+                    "0": { "name": "NPC" },
+                    "1": { "name": "GameObject" }
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "SpawnId (DB GUID)"
+            }
+        ],
+        "description": "Respawn {pram1} with guid {pram2}",
+        "name_readable": "Respawn by SpawnID",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 134,
+        "name": "SMART_ACTION_INVOKER_CAST",
+        "tags": ["TrinityWrath", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "SpellID"
+            },
+            {
+                "type": "SmartCastFlagsParameter",
+                "name": "CastFlags"
+            },
+            {
+                "type": "Parameter",
+                "name": "triggeredFlags"
+            }
+        ],
+        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}",
+        "name_readable": "Invoker Cast",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_ACTION_INVOKER"
+    },
+    {
+        "id": 135,
+        "name": "SMART_ACTION_PLAY_CINEMATIC",
+        "tags": ["TrinityWrath", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Entry"
+            }
+        ],
+        "description": "{source}: Plays Cinematic with Entry: {pram1}",
+        "name_readable": "Play Cinematic",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 136,
+        "name": "SMART_ACTION_SET_MOVEMENT_SPEED",
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "MovementType",
+                "values": {
+                    "0": { "name": "MOVE_WALK" },
+                    "1": { "name": "MOVE_RUN" },
+                    "2": { "name": "MOVE_RUN_BACK" },
+                    "3": { "name": "MOVE_SWIM" },
+                    "4": { "name": "MOVE_SWIM_BACK" },
+                    "5": { "name": "MOVE_TURN_RATE" },
+                    "6": { "name": "MOVE_FLIGHT" },
+                    "7": { "name": "MOVE_FLIGHT_BACK" },
+                    "8": { "name": "MOVE_PITCH_RATE" }
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Speed integer part"
+            },
+            {
+                "type": "Parameter",
+                "name": "Speed fraction"
+            }
+        ],
+        "description": "{source}: Set movement {pram1} speed to {pram2value}.{pram3.value}",
+        "name_readable": "Set Movement speed",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 137,
+        "name": "SMART_ACTION_PLAY_SPELL_VISUAL_KIT",
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "SpellVisualKitId"
+            },
+            {
+                "type": "Parameter",
+                "name": "KitType"
+            },
+            {
+                "type": "Parameter",
+                "name": "Duration"
+            }
+        ],
+        "description": "{source}: Plays SpellVisual with SpellVisualKitId: {pram1}, KitType: {pram2} for {pram3} ms",
+        "name_readable": "Play Spellvisual kit",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 138,
+        "name": "SMART_ACTION_OVERRIDE_LIGHT",
+        "tags": ["TrinityWrath", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "ZoneAreaParameter",
+                "name": "Zone or area"
+            },
+            {
+                "type": "Parameter",
+                "name": "Area Light ID"
+            },
+            {
+                "type": "Parameter",
+                "name": "Override light ID"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Transition time"
+            }
+        ],
+        "description": "Override light {pram2} with light {pram3} in zone {pram1} in {pram4} seconds",
+        "name_readable": "Override light",
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 139,
+        "name": "SMART_ACTION_OVERRIDE_WEATHER",
+        "tags": ["TrinityWrath", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "ZoneAreaParameter",
+                "name": "Zone or area"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Weather state",
+                "values": {
+                    "0": {"name": "FINE"},
+                    "1": {"name": "FOG"},
+                    "3": {"name": "LIGHT_RAIN"},
+                    "4": {"name": "MEDIUM_RAIN"},
+                    "5": {"name": "HEAVY_RAIN"},
+                    "6": {"name": "LIGHT_SNOW"},
+                    "7": {"name": "MEDIUM_SNOW"},
+                    "8": {"name": "HEAVY_SNOW"},
+                    "22": {"name": "LIGHT_SANDSTORM"},
+                    "41": {"name": "MEDIUM_SANDSTORM"},
+                    "42": {"name": "HEAVY_SANDSTORM"},
+                    "86": {"name": "THUNDERS"},
+                    "90": {"name": "BLACKRAIN"},
+                    "106": {"name": "BLACKSNOW"}
+                }
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Intense"
+            }
+        ],
+        "description": "Override weather in zone {pram1} to {pram2} with {pram3value} intensity",
+        "name_readable": "Override weather",
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 141,
+        "name": "SMART_ACTION_SET_HOVER",
+        "tags": ["TrinityWrath", "TrinityCata"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Enable"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable hover|Enable hover}",
+        "name_readable": "Set hover",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 142,
+        "name": "SMART_ACTION_SET_HEALTH_PCT",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Percent"
+            }
+        ],
+        "description": "{source}: Set current health to {pram1}%",
+        "name_readable": "Set health",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 143,
+        "name": "SMART_ACTION_TALK_CONVERSATION",
+        "tags": ["TrinityMaster"],
+        "parameters": [
+            {
+                "type": "ConversationTemplateParameter",
+                "name": "Conversation template id"
+            },
+            {
+                "type": "Parameter",
+                "name": "Base object dynamic actor index"
+            }
+        ],
+        "description": "Start conversation {pram1}{pram2value:choose(0):| with base object dynamic actor index: {pram2_m1}}",
+        "name_readable": "Start conversation",
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 201,
+        "name": "SMART_ACTION_MOVE_TO_POS_TARGET_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Point ID"
+            }
+        ],
+        "description": "{source}: Move to position {targetcoords}{pram1value:choose(0):| with point ID {pram1}}",
+        "name_readable": "Move to position (any source)",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 202,
+        "name": "SMART_ACTION_SET_GO_STATE_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "State",
+                "values": {
+                    "0": {"name": "active", "description": "show in world as used and not reset (closed door open)"},
+                    "1": {"name": "ready", "description": "show in world as ready (closed door close)"},
+                    "2": {"name": "active alternative", "description": "show in world as used in alt way and not reset (closed door open by cannon fire)"}
+                }
+            }
+        ],
+        "description": "{source}: Set gameobject state to {pram1}",
+        "name_readable": "Set gameobject state",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 203,
+        "name": "SMART_ACTION_EXIT_VEHICLE_AC",
+        "tags": ["Azeroth"],
+        "description": "{source}: Exit vehicle",
+        "name_readable": "Exit vehicle",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 204,
+        "name": "SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "MovementFlagParameter",
+                "name": "Movement flags"
+            }
+        ],
+        "description": "{source}: Set unit movement flags to {pram1}",
+        "name_readable": "Set unit movement flags",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 205,
+        "name": "SMART_ACTION_SET_COMBAT_DISTANCE_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Distance"
+            }
+        ],
+        "description": "{source}: Set combat distance to {pram1} yd",
+        "name_readable": "Set combat distance",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 206,
+        "name": "SMART_ACTION_SET_CASTER_COMBAT_DIST_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Distance"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Reset distance"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):Set caster combat distance to {pram1} yd|Reset caster combat distance}",
+        "name_readable": "Set caster combat distance",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 207,
+        "name": "SMART_ACTION_SET_HOVER_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Enable"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable hover|Enable hover}",
+        "name_readable": "Set hover",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 208,
+        "name": "SMART_ACTION_ADD_IMMUNITY_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "SpellImmunityTypeParameter",
+                "name": "type"
+            },
+            {
+                "type": "SpellParameter",
+                "name": "Id"
+            },
+            {
+                "type": "Parameter",
+                "name": "Value"
+            }
+        ],
+        "description": "{source}: Apply immunity {pram1} to {pram3}{pram2value:choose(0):| with spell id {pram2}}",
+        "name_readable": "Apply immunity",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 209,
+        "name": "SMART_ACTION_REMOVE_IMMUNITY_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "SpellImmunityTypeParameter",
+                "name": "type"
+            },
+            {
+                "type": "SpellParameter",
+                "name": "Id"
+            },
+            {
+                "type": "Parameter",
+                "name": "Value"
+            }
+        ],
+        "description": "{source}: Remove immunity {pram1} value {pram3}{pram2value:choose(0):| with spell id {pram2}}",
+        "name_readable": "Remove immunity",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 210,
+        "name": "SMART_ACTION_FALL_AC",
+        "tags": ["Azeroth"],
+        "description": "{source}: Move fall",
+        "name_readable": "Move fall",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 211,
+        "name": "SMART_ACTION_SET_EVENT_FLAG_RESET_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Allow"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disallow SAI phase reset|Allow SAI phase reset}",
+        "name_readable": "Allow phase reset",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 212,
+        "name": "SMART_ACTION_STOP_MOTION_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Call StopMoving"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Expire current movement"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Do nothing|Expire current movement generator}|{pram2value:choose(0):Stop moving|Stop moving and expire current movement generator}}",
+        "name_readable": "Stop motion",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 213,
+        "name": "SMART_ACTION_NO_ENVIRONMENT_UPDATE_AC",
+        "tags": ["Azeroth"],
+        "description": "{source}: Add unit state NO_ENVIRONMENT_UPD",
+        "name_readable": "Add unit state NO_ENVIRONMENT_UPD",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 214,
+        "name": "SMART_ACTION_ZONE_UNDER_ATTACK_AC",
+        "tags": ["Azeroth"],
+        "description": "{source}: Send zone under attack",
+        "name_readable": "Send zone under attack",
+        "target_types": ["Player", "Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 215,
+        "name": "SMART_ACTION_LOAD_GRID_AC",
+        "tags": ["Azeroth"],
+        "description": "Load grid [p]({target_x}, {target_y})[/p]",
+        "name_readable": "Load grid",
+        "implicit_source": "SMART_TARGET_NONE",
+        "uses_target_position": true
+    },
+    {
+        "id": 216,
+        "name": "SMART_ACTION_MUSIC_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Music"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Only to target"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Targets of music play",
+                "values": {
+                    "0": {"name": "Action targets"},
+                    "1": {"name": "All players in zone"},
+                    "2": {"name": "All players in area"}
+                }
+            }
+        ],
+        "description": "{pram3value:choose(0|1):{source}|[s]All players in zone[/s]|[s]All players in area[/s]}: Play music {pram1}{pram2value:choose(0):| (only to self)}",
+        "name_readable": "Play music",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 217,
+        "name": "SMART_ACTION_RANDOM_MUSIC_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Music 1"
+            },
+            {
+                "type": "Parameter",
+                "name": "Music 2"
+            },
+            {
+                "type": "Parameter",
+                "name": "Music 3"
+            },
+            {
+                "type": "Parameter",
+                "name": "Music 4"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Only to target"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Targets of music play",
+                "values": {
+                    "0": {"name": "Action targets"},
+                    "1": {"name": "All players in zone"},
+                    "2": {"name": "All players in area"}
+                }
+            }
+        ],
+        "description": "{pram3value:choose(0|1):{source}|[s]All players in zone[/s]|[s]All players in area[/s]}: Play random music {pram1}, {pram2}, {pram3}, {pram4}{pram2value:choose(0):| (only to self)}",
+        "name_readable": "Play random music",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 218,
+        "name": "SMART_ACTION_CUSTOM_CAST_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "SmartCastFlagsParameter",
+                "name": "Cast flags"
+            },
+            {
+                "type": "Parameter",
+                "name": "Base points 0"
+            },
+            {
+                "type": "Parameter",
+                "name": "Base points 1"
+            },
+            {
+                "type": "Parameter",
+                "name": "Base points 2"
+            }
+        ],
+        "description": "{source}: Cast spell {pram1} with flags {pram2} on {target} with custom values:{pram3value:choose(0):| base points 0: {pram3}}{pram4value:choose(0):|, base points 1: {pram4}}{pram5value:choose(0):|, base points 2: {pram5}}",
+        "name_readable": "Cast custom spell",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 219,
+        "name": "SMART_ACTION_CONE_SUMMON_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature entry"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Summon duration"
+            },
+            {
+                "type": "Parameter",
+                "name": "Distance between rings"
+            },
+            {
+                "type": "Parameter",
+                "name": "Distance between each summon in a row"
+            },
+            {
+                "type": "Parameter",
+                "name": "Length of cone"
+            },
+            {
+                "type": "Parameter",
+                "name": "Width of cone (angle)"
+            }
+        ],
+        "description": "{source}: Summon creature {pram1}{pram2value:choose(0):| (for {pram2} seconds)} in cone shape (dist between rings: {pram3}, dist between each summon in row: {pram4}, length of cone: {pram5}, width of cone: {pram6}°",
+        "name_readable": "Summon in cone shape",
+        "target_types": ["Creature", "GameObject", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 220,
+        "name": "SMART_ACTION_PLAYER_TALK_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "acore_string.entry"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Yell"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):Say {pram1}|Yell {pram1}}",
+        "name_readable": "Make player talk",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 221,
+        "name": "SMART_ACTION_VORTEX_SUMMON_AC",
+        "tags": ["Azeroth"],
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature entry"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Summon duration"
+            },
+            {
+                "type": "Parameter",
+                "name": "Spiral scaling"
+            },
+            {
+                "type": "Parameter",
+                "name": "Spiral appearance"
+            },
+            {
+                "type": "Parameter",
+                "name": "Range max"
+            },
+            {
+                "type": "Parameter",
+                "name": "Phi delta"
+            }
+        ],
+        "description": "{source}: Summon creature {pram1}{pram2value:choose(0):| (for {pram2} seconds)} in vortex shape (spiral scaling: {pram3}, spiral appearance: {pram4}, range max: {pram5}, phi delta: {pram6})",
+        "name_readable": "Summon vortex shape",
+        "target_types": ["Player", "Creature", "GameObject"],
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 222,
+        "name": "SMART_ACTION_CU_ENCOUNTER_START_AC",
+        "tags": ["Azeroth"],
+        "description": "{source}: Reset cooldowns and removes Heroism debuffs",
+        "name_readable": "CU encounter start",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 9999,
+        "name": "SMART_ACTION_META_WAIT",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Seconds to wait"
+            }
+        ],
+        "description": "       Wait {pram1} seconds",
+        "name_readable": "Wait",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
+        "id": 9998,
+        "name": "SMART_ACTION_META_COMMENT",
+        "description": "",
+        "name_readable": "Comment",
+        "comment_field": "Comment",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    }
+]

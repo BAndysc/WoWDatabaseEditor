@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using WDE.Common.History;
 using WDE.SmartScriptEditor.Data;
 
-namespace WDE.SmartScriptEditor.History
+namespace WDE.TrinitySmartScriptEditor.History
 {
     public class SmartDataListHistoryHandler : HistoryHandler, IDisposable
     {

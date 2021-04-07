@@ -20,4 +20,9 @@ namespace WDE.Common.Managers
         bool IsModified { get; }
         IHistoryManager History { get; }
     }
+
+    public interface ISolutionItemDocument : IDocument
+    {
+        ISolutionItem SolutionItem { get; }
+    }
 }

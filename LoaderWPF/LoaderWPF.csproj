@@ -21,12 +21,14 @@
       <ProjectReference Include="..\WDE.DatabseEditors\WDE.DatabseEditors.csproj" />
       <ProjectReference Include="..\WDE.MVVM.Test\WDE.MVVM.Test.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+      <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WDE.SmartScriptEditor.WPF\WDE.SmartScriptEditor.WPF.csproj" />
       <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
       <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj" />
       <ProjectReference Include="..\WDE.ThemeChanger\WDE.ThemeChanger.csproj" />
+      <ProjectReference Include="..\WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
       <ProjectReference Include="..\WDE.Updater\WDE.Updater.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />

@@ -22,11 +22,11 @@
     </Style>
     
     <Style Selector="TabStripItem">
-        <Setter Property="MinHeight" Value="17" />
+        <Setter Property="MinHeight" Value="19" />
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-        <Setter Property="Padding" Value="2, 1, 6,0"/>
+        <Setter Property="Padding" Value="4, 1, 2,0"/>
         <Setter Property="BorderThickness" Value="0,0,0,0"/>
         <Setter Property="Foreground" Value="White" />
     </Style>
@@ -42,6 +42,8 @@
     </Style>
     
     <Style Selector="TabStripItem Button.closeButton">
+        <Setter Property="DockPanel.Dock" Value="Right" />
+        <Setter Property="Opacity" Value="0" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Border CornerRadius="3" Margin="3" ClipToBounds="True">
@@ -68,6 +70,9 @@
                 </Border>
             </ControlTemplate>
         </Setter>
+    </Style>
+    <Style Selector="TabStripItem:pointerover Button.closeButton">
+        <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="TabStripItem Button.closeButton /template/ Border">
         <Setter Property="Background" Value="Transparent" />

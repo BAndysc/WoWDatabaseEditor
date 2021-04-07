@@ -33,8 +33,11 @@ namespace WDE.SmartScriptEditor.Models
         {
             selectionHelper.Dispose();
         }
+
+        public SmartGenericJsonData GetEventData(SmartEvent e) =>
+            smartDataManager.GetRawData(SmartType.SmartEvent, e.Id);
         
-        public SmartScript(SmartScriptSolutionItem item, 
+        public SmartScript(ISmartScriptSolutionItem item, 
             ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
             IMessageBoxService messageBoxService)
@@ -228,11 +231,14 @@ namespace WDE.SmartScriptEditor.Models
                 {
                     prevIndex = line.Id;
                     currentEvent = SafeEventFactory(line);
+                    if (currentEvent == null)
+                        continue;
+                    
                     Events.Insert(index++, currentEvent);
                     newEvents.Add(currentEvent);
                     if (conds.TryGetValue(prevIndex, out var conditionList))
                         foreach (var cond in conditionList)
-                            currentEvent.Conditions.Add(cond);                        
+                            currentEvent.Conditions.Add(cond);   
                 }
 
                 if (line.ActionType != -1)

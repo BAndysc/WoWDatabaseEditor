@@ -20,9 +20,11 @@ using WDE.Common.Tasks;
 using WDE.Common.Windows;
 using WDE.Common.WPF;
 using WDE.Common.WPF.Utils;
+using WDE.Module;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.ModulesManagement;
 using WoWDatabaseEditorCore.ViewModels;
+using WoWDatabaseEditorCore.WPF.Managers;
 using WoWDatabaseEditorCore.WPF.Views;
 
 namespace WoWDatabaseEditorCore.WPF
@@ -81,7 +83,11 @@ namespace WoWDatabaseEditorCore.WPF
 
         protected override IContainerExtension CreateContainerExtension()
         {
-            return new UnityContainerExtension(new UnityContainer().AddExtension(new Diagnostic()));
+            var unity = new UnityContainer().AddExtension(new Diagnostic());
+            var container = new UnityContainerExtension(unity);
+            var mainScope = new ScopedContainer(container, unity);
+            container.RegisterInstance<IScopedContainer>(mainScope);
+            return container;
         }
 
         protected override Window CreateShell()
@@ -175,18 +181,18 @@ namespace WoWDatabaseEditorCore.WPF
         private void AddMoulesFromLoadedAssemblies(IModuleCatalog moduleCatalog, List<Assembly> allAssemblies)
         {
             var modules = AllClasses.FromAssemblies(allAssemblies).Where(t => t.GetInterfaces().Contains(typeof(IModule))).ToList();
-
+            
             foreach (var module in modules)
-                modulesManager!.AddModule(module.Assembly);
-
-            modules.Select(module => new ModuleInfo
-                {
-                    ModuleName = module.Name,
-                    ModuleType = module.AssemblyQualifiedName,
-                    Ref = "file://" + module.Assembly.Location
-                })
-                .ToList()
-                .ForEach(info => moduleCatalog.AddModule(info));
+            {
+                bool load = modulesManager!.AddModule(module.Assembly);
+                if (load)
+                    moduleCatalog.AddModule(new ModuleInfo
+                    {
+                        ModuleName = module.Name,
+                        ModuleType = module.AssemblyQualifiedName,
+                        Ref = "file://" + module.Assembly.Location
+                    });
+            }
         }
 
         protected override IModuleCatalog CreateModuleCatalog()
@@ -196,6 +202,10 @@ namespace WoWDatabaseEditorCore.WPF
 
         protected override void OnInitialized()
         {
+            var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>();
+            foreach (var module in loadedModules)
+                module.FinalizeRegistration((IContainerRegistry)Container);
+            
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
             IClipboardService clipboardService = Container.Resolve<IClipboardService>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();

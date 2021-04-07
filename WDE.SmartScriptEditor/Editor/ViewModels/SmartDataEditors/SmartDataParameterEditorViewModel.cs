@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Prism.Mvvm;
-using Prism.Commands;
-using WDE.Common.Parameters;
-using WDE.SmartScriptEditor.Data;
-using WDE.Common.ViewHelpers;
 using System.Collections.ObjectModel;
-using System.Configuration;
+using System.Linq;
+using Prism.Commands;
+using Prism.Mvvm;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
+using WDE.Common.ViewHelpers;
+using WDE.SmartScriptEditor.Data;
 
-namespace WDE.SmartScriptEditor.Editor.ViewModels
+namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 {
     class SmartDataParameterEditorViewModel: BindableBase, IDialog
     {

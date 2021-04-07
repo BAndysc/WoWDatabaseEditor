@@ -6,7 +6,8 @@
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           Title="Document has been modified."
           SizeToContent="WidthAndHeight"
-          Message="Would you like to save the document?"
+          Header="Do you want to save the changes?"
+          Message="Unsaved changes will be lost"
           x:Class="AvaloniaStyles.Demo.MessageBox">
     <controls:BaseMessageBoxWindow.Image>
         <Border Background="#7244CC"

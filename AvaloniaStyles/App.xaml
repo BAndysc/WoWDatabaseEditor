@@ -3,6 +3,6 @@
              xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles"
              x:Class="AvaloniaStyles.App">
     <Application.Styles>
-        <avaloniaStyles:SystemTheme Mode="MacOsCatalinaLight" />
+        <avaloniaStyles:SystemTheme Mode="Windows10Dark" />
     </Application.Styles>
 </Application>

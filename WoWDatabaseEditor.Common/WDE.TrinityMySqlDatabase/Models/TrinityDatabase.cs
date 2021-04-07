@@ -20,5 +20,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlGameEvent> GameEvents => GetTable<MySqlGameEvent>();
         public ITable<MySqlConversationTemplate> ConversationTemplate => GetTable<MySqlConversationTemplate>();
         public ITable<MySqlConditionLine> Conditions => GetTable<MySqlConditionLine>();
+        public ITable<MySqlSpellScriptName> SpellScriptNames => GetTable<MySqlSpellScriptName>();
     }
 }

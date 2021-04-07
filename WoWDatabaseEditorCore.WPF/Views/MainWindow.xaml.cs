@@ -32,7 +32,7 @@ namespace WoWDatabaseEditorCore.WPF.Views
         private bool realClosing = false;
         private void OnClosing(object sender, CancelEventArgs e)
         {
-            if (!realClosing && DataContext is IApplication closeAwareViewModel)
+            if (!realClosing && DataContext is MainWindowViewModel closeAwareViewModel)
             {
                 TryClose(closeAwareViewModel);
                 e.Cancel = !realClosing;
@@ -42,7 +42,7 @@ namespace WoWDatabaseEditorCore.WPF.Views
                 LayoutUtility.SaveLayout(DockingManager, fileSystem);
         }
 
-        private async Task TryClose(IApplication closeAwareViewModel)
+        private async Task TryClose(MainWindowViewModel closeAwareViewModel)
         {
             if (await closeAwareViewModel.CanClose())
             {

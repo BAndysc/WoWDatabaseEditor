@@ -1,6 +1,6 @@
 ﻿using WDE.SmartScriptEditor.Data;
 
-namespace WDE.SmartScriptEditor.Editor.ViewModels
+namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 {
     public interface ISmartDataEditorModel
     {

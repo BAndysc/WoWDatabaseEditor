@@ -44,6 +44,7 @@
     <Style Selector="controls|ToolsTabControl TabItem">
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="4" />
+        <Setter Property="Foreground" Value="{DynamicResource ToolsTabItemForeground}" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Padding="{TemplateBinding Padding}"

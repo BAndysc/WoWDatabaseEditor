@@ -1,0 +1,12 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:utils="clr-namespace:AvaloniaStyles.Utils">
+    <Style Selector="TextBox">
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+        
+    <Style Selector="TextBox.InnerContentWithPadding /template/ ContentPresenter Border">
+        <Setter Property="Padding" Value="{Binding $parent[TextBox].Padding}" />
+    </Style>
+</Styles>

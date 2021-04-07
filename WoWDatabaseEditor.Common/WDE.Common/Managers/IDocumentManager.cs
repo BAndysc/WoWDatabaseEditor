@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Managers
 {
     [UniqueProvider]
-    public interface IDocumentManager
+    public interface IDocumentManager : INotifyPropertyChanged
     {
         IDocument ActiveDocument { get; set; }
         IReadOnlyList<ITool> AllTools { get; }

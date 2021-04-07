@@ -17,4 +17,18 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
             return ActionTemplate;
         }
     }
+    
+    public class SmartEventFlagPhaseDataSelector : DataTemplateSelector
+    {
+        public DataTemplate FlagTemplate { get; set; }
+        public DataTemplate PhaseTemplate { get; set; } 
+        
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            if (item is SmartEventFlagsView.IconViewModel {IsPhaseFlag: true})
+                return PhaseTemplate;
+            
+            return FlagTemplate;
+        }
+    }
 }

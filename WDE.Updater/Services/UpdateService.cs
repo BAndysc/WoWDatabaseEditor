@@ -32,7 +32,9 @@ namespace WDE.Updater.Services
         private readonly IFileSystem fileSystem;
         private readonly IStandaloneUpdater standaloneUpdater;
         private readonly IUpdaterSettingsProvider settings;
+        private readonly IAutoUpdatePlatformService platformService;
         private IUpdateClient? updateClient;
+        private CheckVersionResponse? cachedResponse;
 
         private IUpdateClient UpdateClient
         {
@@ -54,7 +56,8 @@ namespace WDE.Updater.Services
             IApplication application,
             IFileSystem fileSystem,
             IStandaloneUpdater standaloneUpdater,
-            IUpdaterSettingsProvider settings)
+            IUpdaterSettingsProvider settings,
+            IAutoUpdatePlatformService platformService)
         {
             this.data = data;
             this.clientFactory = clientFactory;
@@ -63,6 +66,7 @@ namespace WDE.Updater.Services
             this.fileSystem = fileSystem;
             this.standaloneUpdater = standaloneUpdater;
             this.settings = settings;
+            this.platformService = platformService;
             standaloneUpdater.RenameIfNeeded();
         }
 
@@ -80,18 +84,18 @@ namespace WDE.Updater.Services
         
         public async Task<string?> CheckForUpdates()
         {
-            var response = await InternalCheckForUpdates();
+            cachedResponse = await InternalCheckForUpdates();
             var s = settings.Settings;
             s.LastCheckedForUpdates = DateTime.Now;
             settings.Settings = s;
-            return response?.DownloadUrl;
+            return cachedResponse?.DownloadUrl;
         }
 
         public async Task DownloadLatestVersion(ITaskProgress taskProgress)
         {
-            var response = await InternalCheckForUpdates();
+            cachedResponse ??= await InternalCheckForUpdates();
             
-            if (response != null)
+            if (cachedResponse != null)
             {
                 var progress = new Progress<(long downloaded, long? totalBytes)>((v) =>
                 {
@@ -108,10 +112,11 @@ namespace WDE.Updater.Services
                             (isStatusKnown ? $"{v.downloaded / 1_000_000f:0.00}/{maxProgress / 1_000_000f:0.00}MB" : $"{v.downloaded / 1_000_000f:0.00}MB"));                        
                     }
                 });
-                await UpdateClient.DownloadUpdate(response, "update.zip", progress);
+                var physPath = fileSystem.ResolvePhysicalPath(platformService.UpdateZipFilePath);
+                await UpdateClient.DownloadUpdate(cachedResponse, physPath.FullName, progress);
 
-                if (response.ChangeLog?.Length > 0)
-                    fileSystem.WriteAllText("~/changelog.json", JsonConvert.SerializeObject(response.ChangeLog));
+                if (cachedResponse.ChangeLog?.Length > 0)
+                    fileSystem.WriteAllText("~/changelog.json", JsonConvert.SerializeObject(cachedResponse.ChangeLog));
             }
             
             taskProgress.ReportFinished();

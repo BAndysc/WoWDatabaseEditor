@@ -1,6 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
     <Style Selector="TextBox">
+        <Setter Property="Padding" Value="4"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBoxForeground}" />
         <Setter Property="BorderThickness" Value="0.5" />

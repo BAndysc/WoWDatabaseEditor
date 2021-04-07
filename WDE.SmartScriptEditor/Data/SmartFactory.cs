@@ -104,12 +104,20 @@ namespace WDE.SmartScriptEditor.Data
 
             SmartAction action = new(id, source, target);
             var raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
-            action.CommentParameter.IsUsed = id == SmartConstants.ActionComment;
-            foreach (var t in action.Target.Position)
-                t.IsUsed = raw.UsesTargetPosition;
+            action.CommentParameter.IsUsed = raw.CommentField != null;
+            action.CommentParameter.Name = raw.CommentField;
+            UpdateTargetPositionVisibility(action.Target);
             SetParameterObjects(action, raw);
 
             return action;
+        }
+
+        private void UpdateTargetPositionVisibility(SmartTarget target)
+        {
+            var actionData = smartDataManager.GetRawData(SmartType.SmartAction, target.Parent?.Id ?? SmartConstants.ActionNone);
+            var targetData = smartDataManager.GetRawData(SmartType.SmartTarget, target.Id);
+            foreach (var t in target.Position)
+                t.IsUsed = actionData.UsesTargetPosition | targetData.UsesTargetPosition;
         }
 
         public void UpdateAction(SmartAction smartAction, int id)
@@ -118,9 +126,9 @@ namespace WDE.SmartScriptEditor.Data
                 return;
             
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
-            smartAction.CommentParameter.IsUsed = id == SmartConstants.ActionComment;
-            foreach (var t in smartAction.Target.Position)
-                t.IsUsed = raw.UsesTargetPosition;
+            smartAction.CommentParameter.IsUsed = raw.CommentField != null;
+            smartAction.CommentParameter.Name = raw.CommentField;
+            UpdateTargetPositionVisibility(smartAction.Target);
             SetParameterObjects(smartAction, raw, true);
         }
 
@@ -133,12 +141,27 @@ namespace WDE.SmartScriptEditor.Data
 
             if (raw.ImplicitSource != null)
                 UpdateSource(source, smartDataManager.GetDataByName(SmartType.SmartSource, raw.ImplicitSource).Id);
-
+            
             SmartAction action = ActionFactory(line.ActionType, source, target);
 
             for (var i = 0; i < SmartAction.SmartActionParametersCount; ++i)
                 action.GetParameter(i).Value = line.GetActionParam(i);
-
+            
+            if (raw.SourceStoreInAction)
+            {
+                try
+                {
+                    UpdateSource(source,
+                        smartDataManager.GetRawData(SmartType.SmartSource, (int) action.GetParameter(2).Value).Id);
+                    source.GetParameter(0).Value = action.GetParameter(3).Value;
+                    source.GetParameter(1).Value = action.GetParameter(4).Value;
+                    source.GetParameter(2).Value = action.GetParameter(5).Value;
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            
             return action;
         }
 
@@ -147,11 +170,16 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartTarget, id))
                 throw new NullReferenceException("No data for target id " + id);
 
+            var data = smartDataManager.GetRawData(SmartType.SmartTarget, id);
+            
+            if (data.ReplaceWithId.HasValue)
+                return TargetFactory(data.ReplaceWithId.Value);
+            
             SmartTarget target = new(id);
 
-            SetParameterObjects(target, smartDataManager.GetRawData(SmartType.SmartTarget, id));
+            SetParameterObjects(target, data);
 
-            var targetTypes = smartDataManager.GetRawData(SmartType.SmartTarget, id).Types;
+            var targetTypes = data.Types;
 
             if (targetTypes != null && targetTypes.Contains("Position"))
                 target.IsPosition = true;
@@ -165,7 +193,15 @@ namespace WDE.SmartScriptEditor.Data
                 return;
 
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartTarget, id);
+
+            if (raw.ReplaceWithId.HasValue)
+            {
+                UpdateTarget(smartTarget, raw.ReplaceWithId.Value);
+                return;
+            }
+            
             SetParameterObjects(smartTarget, raw, true);
+            UpdateTargetPositionVisibility(smartTarget);
         }
 
         public SmartSource SourceFactory(int id)
@@ -173,9 +209,14 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartSource, id))
                 throw new NullReferenceException("No data for source id " + id);
 
+            var data = smartDataManager.GetRawData(SmartType.SmartSource, id);
+
+            if (data.ReplaceWithId.HasValue)
+                return SourceFactory(data.ReplaceWithId.Value);
+            
             SmartSource source = new(id);
 
-            SetParameterObjects(source, smartDataManager.GetRawData(SmartType.SmartSource, id));
+            SetParameterObjects(source, data);
 
             return source;
         }
@@ -186,6 +227,13 @@ namespace WDE.SmartScriptEditor.Data
                 return;
             
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartSource, id);
+            
+            if (raw.ReplaceWithId.HasValue)
+            {
+                UpdateSource(smartSource, raw.ReplaceWithId.Value);
+                return;
+            }
+            
             SetParameterObjects(smartSource, raw, true);
         }
         

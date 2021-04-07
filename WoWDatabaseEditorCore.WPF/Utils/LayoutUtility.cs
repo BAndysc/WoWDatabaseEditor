@@ -43,7 +43,16 @@ namespace WoWDatabaseEditorCore.WPF.Utils
                 };
 
             if (fileSystem.Exists(DockSettingsFile))
-                layoutSerializer.Deserialize(fileSystem.OpenRead(DockSettingsFile));
+            {
+                try
+                {
+                    layoutSerializer.Deserialize(fileSystem.OpenRead(DockSettingsFile));
+                }
+                catch (System.Exception _)
+                {
+                    layoutResolver.LoadDefault();
+                }
+            }
             else
                 layoutResolver.LoadDefault();
         }

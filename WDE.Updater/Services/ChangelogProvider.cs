@@ -54,7 +54,7 @@ namespace WDE.Updater.Services
                 return null;
             try
             {
-                return JsonConvert.DeserializeObject<List<ChangeLogEntry>>(fileSystem.ReadAllText("changelog.json"));
+                return JsonConvert.DeserializeObject<List<ChangeLogEntry>>(fileSystem.ReadAllText("~/changelog.json"));
             }
             catch (Exception)
             {

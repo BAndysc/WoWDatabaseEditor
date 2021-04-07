@@ -1,0 +1,14 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:utils="clr-namespace:AvaloniaStyles.Utils">
+    <Design.PreviewWith>
+        <Button>Click me</Button>
+    </Design.PreviewWith>
+    
+    <Style Selector="DataGrid">
+        <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+</Styles>

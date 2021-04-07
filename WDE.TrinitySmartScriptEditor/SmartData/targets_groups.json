@@ -1,0 +1,66 @@
+[
+    {
+        "name": "Script",
+        "group_members": [
+            "SMART_TARGET_SELF",
+            "SMART_TARGET_NONE",
+            "SMART_TARGET_ACTION_INVOKER",
+            "SMART_TARGET_ACTION_INVOKER_VEHICLE",
+            "SMART_TARGET_INVOKER_PARTY",
+            "SMART_TARGET_POSITION",
+            "SMART_TARGET_RANDOM_POINT_AC",
+            "SMART_TARGET_STORED",
+            "SMART_TARGET_META_LAST_INVOKER"
+        ]
+    },
+    {
+        "name": "Hostile",
+        "group_members": [
+            "SMART_TARGET_VICTIM",
+            "SMART_TARGET_HOSTILE_SECOND_AGGRO",
+            "SMART_TARGET_HOSTILE_LAST_AGGRO",
+            "SMART_TARGET_HOSTILE_RANDOM",
+            "SMART_TARGET_HOSTILE_RANDOM_NOT_TOP"
+        ]
+    },
+    {
+        "name": "Creature",
+        "group_members": [
+            "SMART_TARGET_CREATURE_RANGE",
+            "SMART_TARGET_CREATURE_GUID",
+            "SMART_TARGET_CREATURE_DISTANCE",
+            "SMART_TARGET_CLOSEST_CREATURE"
+        ]
+    },
+    {
+        "name": "Gameobject",
+        "group_members": [
+            "SMART_TARGET_GAMEOBJECT_RANGE",
+            "SMART_TARGET_GAMEOBJECT_GUID",
+            "SMART_TARGET_GAMEOBJECT_DISTANCE",
+            "SMART_TARGET_CLOSEST_GAMEOBJECT"
+        ]
+    },
+    {
+        "name": "Player",
+        "group_members": [
+            "SMART_TARGET_PLAYER_RANGE",
+            "SMART_TARGET_PLAYER_DISTANCE",
+            "SMART_TARGET_CLOSEST_PLAYER",
+            "SMART_TARGET_ROLE_SELECTION_AC",
+            "SMART_TARGET_PLAYER_WITH_AURA_AC"
+        ]
+    },
+    {
+        "name": "Other",
+        "group_members": [
+            "SMART_TARGET_OWNER_OR_SUMMONER",
+            "SMART_TARGET_THREAT_LIST",
+            "SMART_TARGET_CLOSEST_ENEMY",
+            "SMART_TARGET_CLOSEST_FRIENDLY",
+            "SMART_TARGET_LOOT_RECIPIENTS",
+            "SMART_TARGET_FARTHEST",
+            "SMART_TARGET_VEHICLE_ACCESSORY"
+        ]
+    }
+]

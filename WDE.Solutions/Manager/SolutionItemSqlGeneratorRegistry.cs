@@ -30,8 +30,16 @@ namespace WDE.Solutions.Manager
 
         private string GenerateSql<T>(T item) where T : ISolutionItem
         {
-            var x = sqlProviders[item.GetType()] as ISolutionItemSqlProvider<T>;
-            return x.GenerateSql(item);
+            if (sqlProviders.TryGetValue(item.GetType(), out var provider))
+            {
+                var x = provider as ISolutionItemSqlProvider<T>;
+                return x.GenerateSql(item);
+            }
+            else
+            {
+                return
+                    $"--- INTERNAL WoW Database Editor ERROR ---\n\n{item.GetType()} unknown SQL generator. Development info: You need to register class implementing ISolutionItemSqlProvider<T> interface";
+            }
         }
     }
 }

@@ -1,0 +1,14 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="controls|GridView">
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    </Style>
+    <Style Selector="controls|GridViewHeader">
+        <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
+    </Style>
+    <Style Selector="controls|GridView GridSplitter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+</Styles>

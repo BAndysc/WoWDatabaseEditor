@@ -3,6 +3,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns="https://github.com/avaloniaui"
              xmlns:parameters="clr-namespace:WDE.Parameters"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              prism:ViewModelLocator.AutoWireViewModel="False">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -29,19 +30,13 @@
             <TextBox Text="{Binding Selected.Name}" Grid.Row="1" Grid.Column="1" />
             <CheckBox IsChecked="{Binding Selected.IsFlag}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left"
                       VerticalAlignment="Top" IsHitTestVisible="False" />
-            <DataGrid CanUserResizeColumns="True" Items="{Binding Selected.Values}"  Grid.ColumnSpan="2" Grid.Row="3">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Key" 
-                                        Binding="{Binding Key}" 
-                                        Width="70" />
-                    <DataGridTextColumn Header="Name" 
-                                        Binding="{Binding Value.Name}" 
-                                        Width="120" />
-                    <DataGridTextColumn Header="Description" 
-                                        Binding="{Binding Value.Description}" 
-                                        Width="200" />
-                </DataGrid.Columns>
-            </DataGrid>
+            <controls:GridView Items="{Binding Selected.Values}"  Grid.ColumnSpan="2" Grid.Row="3">
+                <controls:GridView.Columns>
+                    <controls:GridColumnDefinition Name="Key" PreferedWidth="70" Property="Key" />
+                    <controls:GridColumnDefinition Name="Name" PreferedWidth="120" Property="Value.Name" />
+                    <controls:GridColumnDefinition Name="Description" PreferedWidth="200" Property="Value.Description" />
+                </controls:GridView.Columns>
+            </controls:GridView>
         </Grid>
     </Grid>
 </UserControl>

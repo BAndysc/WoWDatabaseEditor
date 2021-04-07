@@ -86,15 +86,58 @@
     <Style Selector="controls|SmartConditionView /template/ extendedTextBlock|FormattedTextBlock:overlink">
         <Setter Property="Cursor" Value="Hand" />
     </Style>
+    
+    <Style Selector="controls|MiniEventIcon">
+        <Setter Property="Background" Value="#1976d2" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel Width="12" Height="12" Margin="2,0,0,0">
+                    <Ellipse Fill="{TemplateBinding Background}"></Ellipse>
+                    <TextBlock Foreground="{DynamicResource SmartScripts.Event.Flag.Foreground}" 
+                               Margin="0,1,0,0" 
+                               FontSize="9" 
+                               TextAlignment="Center" 
+                               VerticalAlignment="Center" Text="{TemplateBinding Text}"/>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 
+    <Style Selector="controls|SmartEventFlagsView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ItemsPresenter Items="{TemplateBinding Flags}">
+                    <ItemsPresenter.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel MaxWidth="30" />
+                        </ItemsPanelTemplate>
+                    </ItemsPresenter.ItemsPanel>
+                    <ItemsPresenter.ItemTemplate>
+                        <controls:SmartEventFlagPhaseDataSelector>
+                            <controls:SmartEventFlagPhaseDataSelector.PhaseView>
+                                <controls:MiniEventIcon Background="{DynamicResource SmartScripts.Event.Phase.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
+                            </controls:SmartEventFlagPhaseDataSelector.PhaseView>
+                            <controls:SmartEventFlagPhaseDataSelector.FlagView>
+                                <controls:MiniEventIcon Background="{DynamicResource SmartScripts.Event.Flag.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
+                            </controls:SmartEventFlagPhaseDataSelector.FlagView>
+                        </controls:SmartEventFlagPhaseDataSelector>
+                    </ItemsPresenter.ItemTemplate>
+                </ItemsPresenter>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
     <Style Selector="controls|SmartEventView">
         <Setter Property="Template">
             <ControlTemplate>
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="1" DockPanel.Dock="Top" Padding="5">
-                        <extendedTextBlock:FormattedTextBlock
-                            IsSelected="{Binding IsSelected}"
-                            Text="{Binding Readable}" />
+                        <DockPanel LastChildFill="True">
+                            <controls:SmartEventFlagsView DockPanel.Dock="Right"/>
+                            <extendedTextBlock:FormattedTextBlock
+                                IsSelected="{Binding IsSelected}"
+                                Text="{Binding Readable}" />
+                        </DockPanel>
                     </Border>
                     <Canvas Margin="20,0,0,0" />
                 </DockPanel>
@@ -141,12 +184,12 @@
                         <DataValidationErrors>
 
                             <Grid ColumnDefinitions="Auto,*,Auto">
-                                <ContentPresenter Grid.Column="0" Grid.ColumnSpan="1"
-                                                  Content="{TemplateBinding InnerLeftContent}" />
+                                
                                 <ScrollViewer Grid.Column="1" Grid.ColumnSpan="1"
                                               HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
                                               VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
                                     <Panel>
+                                        <ContentPresenter Content="{TemplateBinding InnerLeftContent}" />
                                         <TextBlock Name="watermark"
                                                    Opacity="0.5"
                                                    Text="{TemplateBinding Watermark}"
@@ -198,7 +241,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <DockPanel>
-                        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right"
+                        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" VerticalAlignment="Center"
                                    TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
                         <ContentPresenter Content="{Binding}">
                             <ContentPresenter.DataTemplates>
@@ -209,24 +252,28 @@
                                                 <Button DockPanel.Dock="Right" Content="  ...  "
                                                         Command="{Binding SelectItemAction}"
                                                         Margin="3,0,0,0"
+                                                        Focusable="False"
                                                         IsVisible="{Binding HasItems}" />
                                                 <controls:ParameterTextBox VerticalContentAlignment="Center"
                                                                            Text="{Binding Parameter.Value, Mode=TwoWay}"
-                                                                           FontFamily="Consolas">
+                                                                           FontFamily="Consolas"
+                                                                           Classes="InnerContentWithPadding">
                                                     <controls:ParameterTextBox.Styles>
                                                         <Style
                                                             Selector="TextBox:not(:focus-within) /template/ TextPresenter#PART_TextPresenter">
                                                             <Setter Property="IsVisible" Value="False" />
                                                         </Style>
                                                         <Style
-                                                            Selector="TextBox:focus-within ContentPresenter TextBlock">
+                                                            Selector="TextBox:focus-within ContentPresenter Border">
                                                             <Setter Property="IsVisible" Value="False" />
                                                         </Style>
                                                     </controls:ParameterTextBox.Styles>
                                                     <controls:ParameterTextBox.InnerLeftContent>
-                                                        <TextBlock Text="{Binding Parameter.String, Mode=OneWay}"
-                                                                   VerticalAlignment="Center"
-                                                                   Margin="0,1,0,0" />
+                                                        <Border Cursor="Ibeam">
+                                                            <TextBlock Text="{Binding Parameter.String, Mode=OneWay}"
+                                                                       VerticalAlignment="Center"
+                                                                       Margin="0,1,0,0" />
+                                                        </Border>
                                                     </controls:ParameterTextBox.InnerLeftContent>
                                                 </controls:ParameterTextBox>
                                             </DockPanel>
@@ -234,7 +281,7 @@
                                     </views:ParameterDataTemplateSelector.Generic>
                                     <views:ParameterDataTemplateSelector.BoolParameter>
                                         <DataTemplate>
-                                            <CheckBox Focusable="True" VerticalContentAlignment="Center"
+                                            <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
                                                       IsChecked="{Binding BoolIsChecked}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.BoolParameter>

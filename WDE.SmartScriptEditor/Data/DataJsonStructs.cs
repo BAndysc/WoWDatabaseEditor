@@ -142,17 +142,11 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "deprecated")]
         public bool Deprecated { get; set; }
 
-        [JsonProperty(PropertyName = "invoker")]
-        public string Invoker { get; set; }
-
         [JsonProperty(PropertyName = "parameters")]
         public IList<SmartParameterJsonData> Parameters { get; set; }
 
         [JsonProperty(PropertyName = "conditions")]
         public IList<SmartConditionalJsonData> Conditions { get; set; }
-
-        [JsonProperty(PropertyName = "valid_types", ItemConverterType = typeof(StringEnumConverter))]
-        public IList<SmartScriptType> ValidTypes { get; set; }
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
@@ -178,12 +172,15 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "do_not_propose_target")]
         public bool DoNotProposeTarget { get; set; }
 
-        [JsonProperty(PropertyName = "uses_target")]
-        public bool UsesTarget { get; set; }
+        [JsonProperty(PropertyName = "target_types")]
+        public IList<string> TargetTypes { get; set; }
 
         [JsonProperty(PropertyName = "implicit_source")]
         public string? ImplicitSource { get; set; }
         
+        [JsonProperty(PropertyName = "source_in_action")]
+        public bool SourceStoreInAction { get; set; }
+
         [JsonProperty(PropertyName = "uses_target_position")]
         public bool UsesTargetPosition { get; set; }
 
@@ -192,12 +189,24 @@ namespace WDE.SmartScriptEditor.Data
 
         [JsonProperty(PropertyName = "is_timed")]
         public bool IsTimed { get; set; }
+        
+        [JsonProperty(PropertyName = "is_invoker")]
+        public bool IsInvoker { get; set; }
+        
+        [JsonProperty(PropertyName = "comment_field")]
+        public string CommentField { get; set; }
+        
+        [JsonProperty(PropertyName = "replace_with_id")]
+        public int? ReplaceWithId { get; set; }
+        
+        [JsonProperty(PropertyName = "invoker")]
+        public DataJsonInvoker Invoker { get; set; }
 
-        [JsonProperty(PropertyName = "usable_with_events")]
-        public IList<int> UsableWithEvents { get; set; }
+        [JsonProperty(PropertyName = "usable_with_script_types", ItemConverterType = typeof(StringEnumConverter))]
+        public IList<SmartScriptType> UsableWithScriptTypes { get; set; }
 
         [JsonProperty(PropertyName = "usable_with_event_types")]
-        public IList<SmartScriptType> UsableWithEventTypes { get; set; }
+        public IList<int> UsableWithEventTypes { get; set; }
 
         [JsonProperty(PropertyName = "description_rules")]
         public IList<SmartDescriptionRulesJsonData> DescriptionRules { get; set; }
@@ -209,6 +218,15 @@ namespace WDE.SmartScriptEditor.Data
         {
             return Parameters != null && Parameters.Count > 0;
         }
+    }
+
+    public class DataJsonInvoker
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+        
+        [JsonProperty(PropertyName = "types")]
+        public IList<string> Types { get; set; }
     }
 
     [ExcludeFromCodeCoverage]

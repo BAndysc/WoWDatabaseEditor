@@ -35,9 +35,9 @@ namespace WDE.Solutions.Explorer.ViewModels
         public SolutionExplorerViewModel(ISolutionItemNameRegistry itemNameRegistry,
             ISolutionManager solutionManager,
             IEventAggregator ea,
+            ISolutionSqlService solutionSqlService,
             INewItemService newItemService,
-            IStatusBar statusBar,
-            ISolutionItemSqlGeneratorRegistry sqlGeneratorRegistry)
+            IStatusBar statusBar)
         {
             this.itemNameRegistry = itemNameRegistry;
             this.solutionManager = solutionManager;
@@ -108,8 +108,7 @@ namespace WDE.Solutions.Explorer.ViewModels
             {
                 if (selected != null)
                 {
-                    MetaSolutionSQL solution = new(sqlGeneratorRegistry.GenerateSql(selected.Item));
-                    this.ea.GetEvent<EventRequestOpenItem>().Publish(solution);
+                    solutionSqlService.OpenDocumentWithSqlFor(selected.Item);
                 }
             });
         }

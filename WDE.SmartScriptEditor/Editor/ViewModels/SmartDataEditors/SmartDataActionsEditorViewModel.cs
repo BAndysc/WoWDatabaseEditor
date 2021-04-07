@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Prism.Mvvm;
-using Prism.Commands;
-using WDE.SmartScriptEditor.Data;
-using WDE.Common.Parameters;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using Prism.Commands;
+using Prism.Mvvm;
 using WDE.Common.Annotations;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
 using WDE.Common.Utils;
+using WDE.SmartScriptEditor.Data;
 
-namespace WDE.SmartScriptEditor.Editor.ViewModels
+namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 {
     class SmartDataActionsEditorViewModel: BindableBase, ISmartDataEditorModel, IDialog
     {
@@ -99,7 +98,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public string NameReadable { get; set; }
         public string Help { get; set; }
         public string Description { get; set; }
-        public bool UsesTarget { get; set; }
+        public ObservableCollection<string> TargetTypes { get; set; }
         public bool TargetIsSource { get; set; }
         private bool isImplicitSource;
         public bool IsImplicitSource
@@ -124,7 +123,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             NameReadable = source.NameReadable;
             Help = source.Help;
             Description = source.Description;
-            UsesTarget = source.UsesTarget;
+            TargetTypes = source.TargetTypes == null ? new ObservableCollection<string>() : new ObservableCollection<string>(source.TargetTypes);
             TargetIsSource = source.TargetIsSource;
             IsImplicitSource = source.ImplicitSource != null;
             ImplicitSource = source.ImplicitSource;
@@ -143,7 +142,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             obj.NameReadable = NameReadable;
             obj.Help = Help;
             obj.Description = Description;
-            obj.UsesTarget = UsesTarget;
+            obj.TargetTypes = TargetTypes.Count == 0 ? null : TargetTypes.ToList();
             obj.TargetIsSource = TargetIsSource;
             obj.ImplicitSource = IsImplicitSource ? ImplicitSource : null;
             obj.UsesTargetPosition = UsesTargetPosition;

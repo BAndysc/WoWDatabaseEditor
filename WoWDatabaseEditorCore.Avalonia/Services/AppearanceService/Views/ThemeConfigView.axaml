@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Views.ThemeConfigView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="False">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Content="Current:" />
+        <Label Content="{Binding CurrentThemeName}" Grid.Row="0" Grid.Column="1" />
+        <Label Content="All:" Grid.Row="1" />
+        <ComboBox Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Top" Items="{Binding Themes}"
+                  SelectedItem="{Binding ThemeName, Mode=TwoWay}" />
+    </Grid>
+</UserControl>

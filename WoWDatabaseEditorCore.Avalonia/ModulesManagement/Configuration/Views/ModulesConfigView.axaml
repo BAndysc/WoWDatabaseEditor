@@ -4,26 +4,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" xmlns:prism="http://prismlibrary.com/"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              prism:ViewModelLocator.AutoWireViewModel="False"
              d:DesignHeight="450" d:DesignWidth="800">
-    <DataGrid Items="{Binding Items}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Header="Enabled" 
-                                            IsReadOnly="True"
-                                            Binding="{Binding IsEnabled}" 
-                                            Width="2*" />
-                    <DataGridTextColumn Header="Name" 
-                                        IsReadOnly="True"
-                                        Binding="{Binding Name}" 
-                                        Width="2*" />
-                    <DataGridCheckBoxColumn Header="Is loaded" 
-                                        IsReadOnly="True"
-                                        Binding="{Binding IsLoaded}" 
-                                        Width="*" />
-                    <DataGridTextColumn Header="Details" 
-                                        IsReadOnly="True"
-                                        Binding="{Binding Details}" 
-                                        Width="*" />
-                </DataGrid.Columns>
-            </DataGrid>
+    <controls:GridView Items="{Binding Items}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <controls:GridView.Columns>
+                    <controls:GridColumnDefinition Name="Enabled" 
+                                       IsReadOnly="True"
+                                       Checkable="True"
+                                       Property="IsEnabled" 
+                                       PreferedWidth="50" />
+                    <controls:GridColumnDefinition Name="Name"
+                                                   Property="Name" 
+                                                   PreferedWidth="90" />
+                    <controls:GridColumnDefinition Name="Is loaded" 
+                                                   IsReadOnly="True"
+                                                   Property="IsLoaded" 
+                                                   Checkable="True"
+                                                   PreferedWidth="50" />
+                    <controls:GridColumnDefinition Name="Details"
+                                                   Property="Details" 
+                                                   PreferedWidth="150" />
+                </controls:GridView.Columns>
+        </controls:GridView>
 </UserControl>

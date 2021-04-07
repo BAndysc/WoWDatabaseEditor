@@ -70,6 +70,7 @@ namespace WDE.SmartScriptEditor.Models
                             y = Y.ToString(CultureInfo.InvariantCulture),
                             z = Z.ToString(CultureInfo.InvariantCulture),
                             o = O.ToString(CultureInfo.InvariantCulture),
+                            invoker = GetInvokerNameWithContext(),
                             stored = "Stored target #" + GetParameter(0).Value,
                             storedPoint = "Stored point #" + GetParameter(0).Value
                         });

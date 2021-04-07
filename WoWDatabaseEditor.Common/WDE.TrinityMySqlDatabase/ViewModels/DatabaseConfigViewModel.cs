@@ -3,6 +3,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
 using WDE.Module.Attributes;
+using WDE.TrinityMySqlDatabase.Data;
 using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase.ViewModels
@@ -10,7 +11,6 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
     [AutoRegister]
     public class DatabaseConfigViewModel : BindableBase, IConfigurable
     {
-        private readonly IConnectionSettingsProvider settings;
         private string? database;
 
         private string? host;
@@ -18,21 +18,28 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
         private string? port;
         private string? user;
 
-        public DatabaseConfigViewModel(IConnectionSettingsProvider settings)
+        public DatabaseConfigViewModel(IDatabaseSettingsProvider settingsProvider)
         {
-            database = settings.GetSettings().Database;
-            port = (settings.GetSettings().Port ?? 3306).ToString();
-            user = settings.GetSettings().User;
-            pass = settings.GetSettings().Password;
-            host = settings.GetSettings().Host;
-            this.settings = settings;
+            var dbSettings = settingsProvider.Settings;
+            database = dbSettings.Database;
+            port = (dbSettings.Port ?? 3306).ToString();
+            user = dbSettings.User;
+            pass = dbSettings.Password;
+            host = dbSettings.Host;
 
             Save = new DelegateCommand(() =>
             {
                 int? port = null;
                 if (int.TryParse(Port, out int port_))
                     port = port_;
-                settings.UpdateSettings(User, Password, Host, port, Database);
+                settingsProvider.Settings = new DbAccess()
+                {
+                    Host = host,
+                    Database = database,
+                    Password = pass,
+                    Port = port,
+                    User = user
+                };
                 IsModified = false;
             });
         }

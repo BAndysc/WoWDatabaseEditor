@@ -26,6 +26,10 @@
         <SolidColorBrush x:Key="SmartScripts.Event.Selected.Background" Color="#FFF5F2BF" />
         <SolidColorBrush x:Key="SmartScripts.Event.Selected.Foreground" Color="#FF282828" />
         <SolidColorBrush x:Key="SmartScripts.Event.Selected.Border" Color="#FFF5C61F" />
+    
+        <SolidColorBrush x:Key="SmartScripts.Event.Flag.Background" Color="#1976d2" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Phase.Background" Color="#009688" />
+        <SolidColorBrush x:Key="SmartScripts.Event.Flag.Foreground" Color="White" />
 
         <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0" />
         <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77000000" />

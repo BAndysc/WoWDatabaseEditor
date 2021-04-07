@@ -17,7 +17,7 @@ namespace WoWDatabaseEditorCore.ModulesManagement.Configuration.ViewModels
         {
             Items = new ObservableCollection<ModuleConfigModel>();
 
-            Items.AddRange(modulesManager.Modules.Select(m => new ModuleConfigModel(true,
+            Items.AddRange(modulesManager.Modules.Select(m => new ModuleConfigModel(m.IsEnabled,
                 m.Assembly.GetName().Name ?? "Unknown name",
                 m.IsLoaded,
                 GenerateDetailFor(m.ConflictingAssembly))));

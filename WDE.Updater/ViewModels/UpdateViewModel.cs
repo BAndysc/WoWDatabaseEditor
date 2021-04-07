@@ -1,9 +1,12 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
+using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -19,18 +22,27 @@ namespace WDE.Updater.ViewModels
         private readonly ITaskRunner taskRunner;
         private readonly IStatusBar statusBar;
         private readonly IUpdaterSettingsProvider settingsProvider;
-        
+        private readonly IAutoUpdatePlatformService platformService;
+        private readonly IFileSystem fileSystem;
+        private readonly IMessageBoxService messageBoxService;
+
         public ICommand CheckForUpdatesCommand { get; }
         
         public UpdateViewModel(IUpdateService updateService, 
             ITaskRunner taskRunner, 
             IStatusBar statusBar,
-            IUpdaterSettingsProvider settingsProvider)
+            IUpdaterSettingsProvider settingsProvider,
+            IAutoUpdatePlatformService platformService,
+            IFileSystem fileSystem,
+            IMessageBoxService messageBoxService)
         {
             this.updateService = updateService;
             this.taskRunner = taskRunner;
             this.statusBar = statusBar;
             this.settingsProvider = settingsProvider;
+            this.platformService = platformService;
+            this.fileSystem = fileSystem;
+            this.messageBoxService = messageBoxService;
 
             CheckForUpdatesCommand = new DelegateCommand(() =>
             {
@@ -77,7 +89,30 @@ namespace WDE.Updater.ViewModels
                 await updateService.DownloadLatestVersion(taskProgress);
                 statusBar.PublishNotification(new PlainNotification(NotificationType.Info, 
                     "Update ready to install. Click here to install",
-                    new AsyncAutoCommand(async () => await updateService.CloseForUpdate())));
+                    new AsyncAutoCommand(async () =>
+                    {
+                        if (platformService.PlatformSupportsSelfInstall)
+                            await updateService.CloseForUpdate();
+                        else
+                        {
+                            await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                                .SetTitle("Your platform doesn't support self updates")
+                                .SetContent("Sadly, self updater is not available on your operating system yet.\n\nA new version of WoW Database Editor has been downloaded, but you have to manually copy new version to the Applications folder")
+                                .Build());
+                            var physPath = fileSystem.ResolvePhysicalPath(platformService.UpdateZipFilePath);
+
+                            using Process open = new Process
+                            {
+                                StartInfo =
+                                {
+                                    FileName = "open",
+                                    Arguments = "-R " + physPath.FullName,
+                                    UseShellExecute = true
+                                }
+                            };
+                            open.Start();
+                        }
+                    })));
             }
             catch (Exception e)
             {

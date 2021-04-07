@@ -32,6 +32,10 @@ namespace WDE.SQLEditor.ViewModels
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
                     });
             });
+            Save = new DelegateCommand(() =>
+            {
+                ExecuteSql.Execute(null);
+            });
         }
 
         public INativeTextDocument Code
@@ -52,7 +56,7 @@ namespace WDE.SQLEditor.ViewModels
         public ICommand Copy { get; } = AlwaysDisabledCommand.Command;
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
-        public ICommand Save { get; } = AlwaysDisabledCommand.Command;
+        public ICommand Save { get; }
         public IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         public bool IsModified { get; } = false;

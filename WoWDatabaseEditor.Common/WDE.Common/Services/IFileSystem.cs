@@ -10,5 +10,6 @@ namespace WDE.Common.Services
 
         Stream OpenRead(string path);
         Stream OpenWrite(string path);
+        FileSystemInfo ResolvePhysicalPath(string path);
     }
 }

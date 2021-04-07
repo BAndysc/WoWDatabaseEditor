@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Prism.Mvvm;
 using Prism.Commands;
+using Prism.Mvvm;
 using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Data;
 
-namespace WDE.SmartScriptEditor.Editor.ViewModels
+namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 {
     public class SmartDataConditionEditorViewModel: BindableBase, IDialog
     {

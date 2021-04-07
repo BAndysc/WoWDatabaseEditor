@@ -8,8 +8,18 @@ namespace WDE.Updater.Services
     [AutoRegister]
     public class StandaloneUpdater : IStandaloneUpdater
     {
+        private readonly IAutoUpdatePlatformService platform;
+
+        public StandaloneUpdater(IAutoUpdatePlatformService platform)
+        {
+            this.platform = platform;
+        }
+        
         public void RenameIfNeeded()
         {
+            if (!platform.PlatformSupportsSelfInstall)
+                return;
+            
             RenameIfExist("_Updater", "Updater");
             RenameIfExist("_Updater.dll", "Updater.dll");
             RenameIfExist("_Updater.pdb", "Updater.pdb");
@@ -28,6 +38,9 @@ namespace WDE.Updater.Services
 
         public bool Launch()
         {
+            if (!platform.PlatformSupportsSelfInstall)
+                return false;
+
             if (!TryLaunch("Updater.exe"))
                 return TryLaunch("Updater");
 

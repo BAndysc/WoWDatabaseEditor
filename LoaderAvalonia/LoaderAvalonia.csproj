@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
       <ProjectReference Include="..\Updater\Updater.csproj" SkipGetTargetFrameworkProperties="true" />
+      <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
       <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
       <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
@@ -21,6 +21,7 @@
       <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
       <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj" />
+      <ProjectReference Include="..\WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
       <ProjectReference Include="..\WDE.Updater\WDE.Updater.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />

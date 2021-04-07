@@ -8,27 +8,27 @@ using LinqToDB.Configuration;
 using LinqToDB.Data;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
-using WDE.Common.Tasks;
+using WDE.MySqlDatabaseCommon.Database;
+using WDE.MySqlDatabaseCommon.Providers;
+using WDE.MySqlDatabaseCommon.Services;
 using WDE.TrinityMySqlDatabase.Data;
 using WDE.TrinityMySqlDatabase.Models;
 using WDE.TrinityMySqlDatabase.Providers;
-using WDE.TrinityMySqlDatabase.Services;
 
 namespace WDE.TrinityMySqlDatabase.Database
 {
-    public class TrinityMySqlDatabaseProvider : IDatabaseProvider
+    public class TrinityMySqlDatabaseProvider : IAsyncDatabaseProvider
     {
         private readonly ICurrentCoreVersion currentCoreVersion;
 
-        public TrinityMySqlDatabaseProvider(IConnectionSettingsProvider settings,
+        public TrinityMySqlDatabaseProvider(IDatabaseSettingsProvider settings,
             DatabaseLogger databaseLogger,
             ICurrentCoreVersion currentCoreVersion)
         {
             this.currentCoreVersion = currentCoreVersion;
-            string? host = settings.GetSettings().Host;
             DataConnection.TurnTraceSwitchOn();
             DataConnection.WriteTraceLine = databaseLogger.Log;
-            DataConnection.DefaultSettings = new MySqlSettings(settings.GetSettings());
+            DataConnection.DefaultSettings = new MySqlSettings(settings.Settings);
         }
 
         public ICreatureTemplate? GetCreatureTemplate(uint entry)
@@ -44,10 +44,10 @@ namespace WDE.TrinityMySqlDatabase.Database
             return task.Result;
         }
         
-        public async Task<List<MySqlCreatureTemplate>> GetCreatureTemplatesAsync()
+        public async Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync()
         {
             await using var model = new TrinityDatabase();
-            return await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync();
+            return await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync<ICreatureTemplate>();
         }
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
@@ -63,10 +63,10 @@ namespace WDE.TrinityMySqlDatabase.Database
             return task.Result;
         }
         
-        public async Task<List<MySqlGameEvent>> GetGameEventsAsync()
+        public async Task<List<IGameEvent>> GetGameEventsAsync()
         {
             using var model = new TrinityDatabase();
-            return await (from t in model.GameEvents orderby t.Entry select t).ToListAsync();
+            return await (from t in model.GameEvents orderby t.Entry select t).ToListAsync<IGameEvent>();
         }
         
         public IEnumerable<IConversationTemplate> GetConversationTemplates()
@@ -76,13 +76,13 @@ namespace WDE.TrinityMySqlDatabase.Database
             return task.Result;
         }
         
-        public async Task<List<MySqlConversationTemplate>> GetConversationTemplatesAsync()
+        public async Task<List<IConversationTemplate>> GetConversationTemplatesAsync()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
-                return new List<MySqlConversationTemplate>();
+                return new List<IConversationTemplate>();
             
             using var model = new TrinityDatabase();
-            return await (from t in model.ConversationTemplate orderby t.Id select t).ToListAsync();
+            return await (from t in model.ConversationTemplate orderby t.Id select t).ToListAsync<IConversationTemplate>();
         }
         
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
@@ -92,13 +92,13 @@ namespace WDE.TrinityMySqlDatabase.Database
             return task.Result;
         }
         
-        public async Task<List<MySqlAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
+        public async Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
-                return new List<MySqlAreaTriggerTemplate>();
+                return new List<IAreaTriggerTemplate>();
 
             using var model = new TrinityDatabase();
-            return await (from t in model.AreaTriggerTemplate orderby t.Id select t).ToListAsync();
+            return await (from t in model.AreaTriggerTemplate orderby t.Id select t).ToListAsync<IAreaTriggerTemplate>();
         }
         
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
@@ -108,10 +108,10 @@ namespace WDE.TrinityMySqlDatabase.Database
             return task.Result;
         }
         
-        public async Task<List<MySqlGameObjectTemplate>> GetGameObjectTemplatesAsync()
+        public async Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync()
         {
             using var model = new TrinityDatabase();
-            return await (from t in model.GameObjectTemplate orderby t.Entry select t).ToListAsync();
+            return await (from t in model.GameObjectTemplate orderby t.Entry select t).ToListAsync<IGameObjectTemplate>();
         }
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates()
@@ -121,7 +121,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return task.Result;
         }
         
-        public async Task<List<MySqlQuestTemplate>> GetQuestTemplatesAsync()
+        public async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
         {
             using var model = new TrinityDatabase();
 
@@ -129,7 +129,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                     join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
                     from subaddon in adn.DefaultIfEmpty()
                     orderby t.Entry
-                    select t.SetAddon(subaddon)).ToListAsync();
+                    select t.SetAddon(subaddon)).ToListAsync<IQuestTemplate>();
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
@@ -147,7 +147,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)
         {
-            using var writeLock = await MySqlSingleWriteLock.WriteLock();
+            using var writeLock = await DatabaseLock.WriteLock();
             await using var model = new TrinityDatabase();
 
             await model.BeginTransactionAsync(IsolationLevel.ReadCommitted);
@@ -202,7 +202,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             IDatabaseProvider.ConditionKeyMask keyMask,
             IDatabaseProvider.ConditionKey? manualKey = null)
         {
-            using var writeLock = await MySqlSingleWriteLock.WriteLock();
+            using var writeLock = await DatabaseLock.WriteLock();
             await using var model = new TrinityDatabase();
 
             var conditions = conditionLines?.ToList() ?? new List<IConditionLine>();
@@ -243,6 +243,12 @@ namespace WDE.TrinityMySqlDatabase.Database
                     line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId)
                 .ToList();
         }
+
+        public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
+        {
+            using var model = new TrinityDatabase();
+            return model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToList();
+        }
     }
 
     public class ConnectionStringSettings : IConnectionStringSettings
@@ -253,18 +259,20 @@ namespace WDE.TrinityMySqlDatabase.Database
         public bool IsGlobal => false;
     }
 
-    public class MySqlSettings : ILinqToDBSettings
+    public class MySqlSettings : ILinqToDBSettings, IMySqlConnectionStringProvider
     {
+        private readonly DbAccess access;
+
         public MySqlSettings(DbAccess access)
         {
+            this.access = access;
             ConnectionStrings = new[]
             {
                 new ConnectionStringSettings
                 {
                     Name = "Trinity",
                     ProviderName = "MySqlConnector",
-                    ConnectionString =
-                        $"Server={access.Host};Port={access.Port ?? 3306};Database={access.Database};Uid={access.User};Pwd={access.Password};AllowUserVariables=True"
+                    ConnectionString = ConnectionString
                 }
             };
         }
@@ -275,5 +283,8 @@ namespace WDE.TrinityMySqlDatabase.Database
         public string DefaultDataProvider => "MySqlConnector";
 
         public IEnumerable<IConnectionStringSettings> ConnectionStrings { get; }
+
+        public string ConnectionString =>
+            $"Server={access.Host};Port={access.Port ?? 3306};Database={access.Database};Uid={access.User};Pwd={access.Password};AllowUserVariables=True";
     }
 }

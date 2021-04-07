@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Input;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Prism.Mvvm;
+using System.Windows.Input;
 using Prism.Commands;
+using Prism.Mvvm;
 using WDE.Common.Annotations;
-using WDE.Common.Managers;
 using WDE.Common.History;
-using WDE.Common.Utils;
-using WDE.Common.Tasks;
+using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
-using WDE.SmartScriptEditor.Providers;
+using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Data;
-using WDE.SmartScriptEditor.History;
+using WDE.TrinitySmartScriptEditor.History;
 
-namespace WDE.SmartScriptEditor.Editor.ViewModels
+namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 {
     public class SmartDataGroupsEditorViewModel: BindableBase, IDocument
     {

@@ -3,7 +3,7 @@
     <Style Selector="controls|StatusBar">
         <Setter Property="Height" Value="20" />
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Background" Value="{DynamicResource AccentColorBackground}"/> 
+        <Setter Property="Background" Value="{DynamicResource StatusBarBackground}"/> 
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel>
@@ -15,5 +15,23 @@
                 </Panel>
             </ControlTemplate>
         </Setter>
+    </Style>
+    
+    <Style Selector="controls|StatusBar Button">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="TextBlock.Foreground" Value="White" />
+    </Style>
+    <Style Selector="controls|StatusBar Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="TextBlock.Foreground" Value="White" />
+    </Style>
+    <Style Selector="controls|StatusBar Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#20000000" />
+        <Setter Property="TextBlock.Foreground" Value="White" />
+    </Style>
+    <Style Selector="controls|StatusBar Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#40000000" />
+        <Setter Property="TextBlock.Foreground" Value="White" />
     </Style>
 </Styles>

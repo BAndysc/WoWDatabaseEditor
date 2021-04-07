@@ -1,0 +1,78 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Design.PreviewWith>
+        <controls:GridView />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|GridView">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
+                            <controls:GridViewHeader DockPanel.Dock="Top">
+                                <Grid Name="PART_header">
+                                </Grid>
+                            </controls:GridViewHeader>
+                            
+                            <ListBox Items="{TemplateBinding Items}" 
+                                     SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}"
+                                     ItemTemplate="{TemplateBinding ItemTemplate}"
+                                     BorderThickness="0"
+                                     Name="PART_listbox"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            </ListBox>
+                        </DockPanel>
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|GridView ListBoxItem">
+        <!-- important to have proper column widths -->
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    
+    
+    <!-- just default styles that looks on majority of usecases -->
+    <Style Selector="controls|GridView ListBoxItem TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="controls|GridView ListBoxItem CheckBox">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+        
+    <Style Selector="controls|GridViewColumnHeader">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}">
+                    <TextBlock Text="{TemplateBinding ColumnName}" Padding="10,5,5,5"  FontWeight="Bold" FontSize="11"/>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|GridViewHeader">
+        <Setter Property="BorderBrush" Value="Gray"></Setter>
+        <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ContentPresenter Content="{TemplateBinding Content}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    
+    <Style Selector="controls|GridView GridSplitter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="BorderThickness" Value="0,0,1,0" />
+    </Style>
+</Styles>

@@ -4,6 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
         <Configurations>Debug;Release;DebugAvalonia</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <ApplicationIcon>Icon.ico</ApplicationIcon>
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
@@ -51,6 +52,13 @@
         <AvaloniaResource Include="Icon.png" />
         <None Remove="IconSmall.png" />
         <AvaloniaResource Include="IconSmall.png" />
+        <Compile Update="Services\AppearanceService\Views\ThemeConfigView.axaml.cs">
+          <DependentUpon>ThemeConfigView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\TextDocumentView.axaml.cs">
+          <DependentUpon>TextDocumentView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="0.10.0" />
@@ -100,5 +108,8 @@
       <UpToDateCheckInput Remove="Styles\TreeView.xaml" />
       <UpToDateCheckInput Remove="Styles\TreeViewItem.xaml" />
       <UpToDateCheckInput Remove="Styles\Window.xaml" />
+    </ItemGroup>
+    <ItemGroup>
+      <Resource Include="Icon.ico" />
     </ItemGroup>
 </Project>
