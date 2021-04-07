@@ -22,13 +22,13 @@ namespace WDE.DatabaseEditors.Solution
             this.tableDataProvider = tableDataProvider;
         }
 
-        public string GenerateSql(DbEditorsSolutionItem item)
+        public async Task<string> GenerateSql(DbEditorsSolutionItem item)
         {
             // missing table data we have to load it
             if (item.IsMultiRecord)
             {
                 if (item.TableData == null)
-                    item.CacheTableData(LoadTable(item.TableContentType, item.Entry));
+                    item.CacheTableData(await LoadTable(item.TableContentType, item.Entry));
 
                 if (item.TableData is DbMultiRecordTableData multiRecordTableData)
                     return MultiRecordTableSqlGenerator.GenerateSql(multiRecordTableData);
@@ -85,24 +85,15 @@ namespace WDE.DatabaseEditors.Solution
             }
         }
 
-        private IDbTableData? LoadTable(DbTableContentType tableContentType, uint key)
+        private Task<IDbTableData?> LoadTable(DbTableContentType tableContentType, uint key)
         {
-            Task<IDbTableData?> task;
             switch (tableContentType)
             {
                 case DbTableContentType.CreatureLootTemplate:
-                    task = tableDataProvider.Value.LoadCreatureLootTemplateData(key);
-                    break;
+                    return tableDataProvider.Value.LoadCreatureLootTemplateData(key);
                 default:
                     throw new Exception("[DbEditorsSolutionItemSqlProvider] not defined table content type!");
             }
-
-            if (task == null)
-                return null;
-
-            task.Start(TaskScheduler.Default);
-            task.Wait();
-            return task.Result;
         }
     }
 }
