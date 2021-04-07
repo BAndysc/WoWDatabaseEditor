@@ -120,6 +120,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.MySqlDatabaseCommon", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.TrinitySmartScriptEditor", "WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj", "{506C7413-6FD7-472C-99AA-A0580B4D2E3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Model", "Dock\src\Dock.Model\Dock.Model.csproj", "{F435BC90-7D12-4BDC-B337-F83A26EB77FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Avalonia", "Dock\src\Dock.Avalonia\Dock.Avalonia.csproj", "{80EDB0DB-C085-4AAD-BF82-EACC1EB30F44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Model.ReactiveUI", "Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj", "{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -329,6 +335,24 @@ Global
 		{506C7413-6FD7-472C-99AA-A0580B4D2E3B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{506C7413-6FD7-472C-99AA-A0580B4D2E3B}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
 		{506C7413-6FD7-472C-99AA-A0580B4D2E3B}.DebugAvalonia|Any CPU.Build.0 = DebugAvalonia|Any CPU
+		{F435BC90-7D12-4BDC-B337-F83A26EB77FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F435BC90-7D12-4BDC-B337-F83A26EB77FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F435BC90-7D12-4BDC-B337-F83A26EB77FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F435BC90-7D12-4BDC-B337-F83A26EB77FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F435BC90-7D12-4BDC-B337-F83A26EB77FD}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{F435BC90-7D12-4BDC-B337-F83A26EB77FD}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
+		{80EDB0DB-C085-4AAD-BF82-EACC1EB30F44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80EDB0DB-C085-4AAD-BF82-EACC1EB30F44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80EDB0DB-C085-4AAD-BF82-EACC1EB30F44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80EDB0DB-C085-4AAD-BF82-EACC1EB30F44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80EDB0DB-C085-4AAD-BF82-EACC1EB30F44}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{80EDB0DB-C085-4AAD-BF82-EACC1EB30F44}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
+		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

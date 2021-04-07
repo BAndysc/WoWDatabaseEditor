@@ -17,6 +17,7 @@
         
         <SolidColorBrush Color="#3F3F45" x:Key="WindowContentBorderBrush" />
         <SolidColorBrush Color="#2D2D30" x:Key="WindowContentBackground" />
+        <SolidColorBrush Color="#2D2D30" x:Key="MainWindowContentBackground" />
         
         <SolidColorBrush Color="#E1E1E1" x:Key="SystemControlForegroundBaseHighBrush" />
         
@@ -50,6 +51,10 @@
         <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#454545" />
         <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#454545" />
         <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="DarkGray" />
+        
+        <!-- dock fix -->
+        <SolidColorBrush x:Key="DockThemeBackgroundBrush" Color="#252525" />
+        <SolidColorBrush x:Key="DockThemeBorderLowBrush" Color="#3F3F46" />
     </Styles.Resources>
     
     <Style Selector="GridSplitter">

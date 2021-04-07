@@ -4,19 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using AvaloniaStyles.Controls;
-using WDE.Common.Managers;
 using WDE.Common.Windows;
 using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
-    public class MainWindow : ExtendedWindow
+    public partial class MainWindow : ExtendedWindow
     {
         public static KeyGesture UndoGesture { get; } = AvaloniaLocator.Current
             .GetService<PlatformHotkeyConfiguration>()?.Undo.FirstOrDefault();
@@ -28,15 +26,19 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control);
         
         private ToolsTabControl tools;
+
         public MainWindow()
         {
-            ExtendClientAreaChromeHints =
-                ExtendClientAreaChromeHints.OSXThickTitleBar | ExtendClientAreaChromeHints.SystemChrome; 
-            
+            throw new Exception("you can't call this");
+        }
+        
+        public MainWindow(IMainWindowHolder mainWindowHolder)
+        {
             InitializeComponent();
+            mainWindowHolder.Window = this;
             this.AttachDevTools();
         }
-
+        
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);

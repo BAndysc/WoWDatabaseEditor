@@ -48,6 +48,5 @@
         <appearanceService:AvaloniaThemeStyle />
         <StyleInclude Source="avares://AvaloniaEdit/AvaloniaEdit.xaml" />
         <StyleInclude Source="avares://WDE.SmartScriptEditor.Avalonia/Themes/Generic.axaml"/>
-        <StyleInclude Source="avares://Dock.Avalonia.Themes.Default/DefaultTheme.axaml"/>
     </Application.Styles>
 </Application>

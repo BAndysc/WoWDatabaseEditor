@@ -5,23 +5,21 @@
           xmlns:mvvm="http://prismlibrary.com/"
           xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
           xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
-          xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
           xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
           xmlns:docking="clr-namespace:WoWDatabaseEditorCore.Avalonia.Docking"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
-          x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
+          x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindowWithDocking"
           TransparencyLevelHint="AcrylicBlur"
           Icon="../Icon.png"
           ManagedIcon="../Icon.png"
-          ExtendClientAreaTitleBarHeightHint="38"
-          ExtendClientAreaToDecorationsHint="True"
+          Name="Root"
+          Classes="MainWindow"
           Title="{Binding Title}">
 
     <NativeMenu.Menu>
         <NativeMenu utils:MenuBind.MenuItems="{Binding MenuItemProviders}">
-            
         </NativeMenu>
     </NativeMenu.Menu>
     
@@ -35,16 +33,6 @@
         <KeyBinding  Gesture="{x:Static TextBox.PasteGesture}" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
         <KeyBinding  Gesture="{x:Static TextBox.CutGesture}" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
     </Window.KeyBindings>
-    
-    <controls:ExtendedWindow.SideBar>
-        <views:WdeToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
-            <views:WdeToolsTabControl.Styles>
-                <Style Selector="TabItem">
-                    <Setter Property="(controls:ToolsTabControl.ToolTitle)" Value="{Binding Title}" />
-                </Style>
-            </views:WdeToolsTabControl.Styles>
-        </views:WdeToolsTabControl>
-    </controls:ExtendedWindow.SideBar>
     
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
@@ -76,32 +64,6 @@
         </controls:StatusBar>
     </controls:ExtendedWindow.StatusBar>
     
-    <controls:ExtendedWindow.TabStrip>
-        <TabStrip DockPanel.Dock="Top" 
-                  SelectedItem="{Binding DocumentManager.ActiveDocument}"
-                  Items="{Binding DocumentManager.OpenedDocuments}">
-            <TabStrip.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel LastChildFill="True">
-                        <Button Command="{Binding CloseCommand}" Classes="closeButton">Close</Button>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Title}" />
-                            <TextBlock Text="*" IsVisible="{Binding IsModified}" />
-                            <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding IsModified}" ComparisonCondition="Equal" Value="False">
-                                    <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Normal"/>
-                                </DataTriggerBehavior>
-                                <DataTriggerBehavior Binding="{Binding IsModified}" ComparisonCondition="Equal" Value="True">
-                                    <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Bold"/>
-                                </DataTriggerBehavior>
-                            </Interaction.Behaviors>
-                        </StackPanel>
-                    </DockPanel>
-                </DataTemplate>
-            </TabStrip.ItemTemplate>
-        </TabStrip>
-    </controls:ExtendedWindow.TabStrip>
-    
     <controls:ExtendedWindow.Overlay>
         <views:TasksPanel DataContext="{Binding TasksViewModel}"
                           Margin="0,0,5,0"
@@ -110,23 +72,10 @@
                           ClipToBounds="False"
                           IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
     </controls:ExtendedWindow.Overlay>
-    
-    <components:MultiViewModelContentPresenter
-        ViewModels="{Binding DocumentManager.OpenedDocuments}"
-        SelectedViewModel="{Binding DocumentManager.ActiveDocument}">
-        <components:MultiViewModelContentPresenter.Styles>
-            <Style Selector="components|MultiViewModelContentPresenter">
-                <Setter Property="Template">
-                    <ControlTemplate>
-                        <ContentPresenter DataContext="{TemplateBinding SelectedViewModel}" 
-                                          Content="{TemplateBinding SelectedView}"
-                                          HorizontalAlignment="Stretch"
-                                          VerticalAlignment="Stretch"
-                        />
-                    </ControlTemplate>
-                </Setter>
-            </Style>
-        </components:MultiViewModelContentPresenter.Styles>
-    </components:MultiViewModelContentPresenter>
-    
+
+    <idc:DockControl Name="DockControl" >
+        <idc:DockControl.DataTemplates>
+            <docking:PersistentDockDataTemplate />
+        </idc:DockControl.DataTemplates>
+    </idc:DockControl>
 </controls:ExtendedWindow>

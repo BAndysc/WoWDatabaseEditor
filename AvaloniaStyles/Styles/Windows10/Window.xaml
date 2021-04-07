@@ -52,29 +52,9 @@
                             
                             <ContentPresenter Content="{TemplateBinding StatusBar}" DockPanel.Dock="Bottom" Name="StatusBar"/>
                             
-                            <Border Background="{TemplateBinding Background}" Padding="4" Name="PART_content">
+                            <Border Padding="4" Name="PART_content">
                                 <Panel>
-                                    <DockPanel LastChildFill="True" Background="{TemplateBinding Background}">
-                            
-                                        <Grid Name="ReversedSidebarGrid">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="6" MinWidth="6" />
-                                                <ColumnDefinition Width="300" MinWidth="300"/>
-                                            </Grid.ColumnDefinitions>
-                                            <DockPanel ClipToBounds="True" LastChildFill="True">
-                                                <ContentPresenter DockPanel.Dock="Top" Name="Tabs" Content="{TemplateBinding TabStrip}" />
-                                                <ContentPresenter Content="{TemplateBinding Content}" 
-                                                                  BorderThickness="1,0,1,1"
-                                                                  BorderBrush="{DynamicResource WindowContentBorderBrush}"
-                                                                  Background="{DynamicResource WindowContentBackground}"/>
-                                            </DockPanel>
-                                            <GridSplitter Grid.Column="1" Name="MainSplitter"></GridSplitter>
-                                            <controls1:SideBar Grid.Column="2">
-                                                <ContentPresenter Content="{TemplateBinding SideBar}" />
-                                            </controls1:SideBar>
-                                        </Grid>
-                                    </DockPanel>
+                                    <ContentPresenter Content="{TemplateBinding Content}" />
                                     <ContentPresenter Content="{TemplateBinding Overlay}" />
                                 </Panel>
                             </Border>
@@ -83,6 +63,12 @@
                 </Border>
             </ControlTemplate>
         </Setter>
+    </Style>
+    <Style Selector="controls1|ExtendedWindow /template/ Border#PART_content">
+        <Setter Property="Background" Value="{DynamicResource WindowContentBackground}" />
+    </Style>
+    <Style Selector="controls1|ExtendedWindow.MainWindow /template/ Border#PART_content">
+        <Setter Property="Background" Value="{DynamicResource MainWindowContentBackground}" />
     </Style>
     <!-- for anyone using windows theme on mac, lets make it better -->
     <Style Selector="controls1|ExtendedWindow:macos /template/ Border#PART_windowBorder">

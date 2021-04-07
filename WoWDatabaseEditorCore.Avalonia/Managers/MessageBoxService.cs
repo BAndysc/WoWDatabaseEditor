@@ -13,11 +13,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
     [AutoRegister]
     public class MessageBoxService : IMessageBoxService
     {
-        private readonly Lazy<MainWindow> mainWindow;
+        private readonly IMainWindowHolder mainWindowHolder;
 
-        public MessageBoxService(Lazy<MainWindow> mainWindow)
+        public MessageBoxService(IMainWindowHolder mainWindowHolder)
         {
-            this.mainWindow = mainWindow;
+            this.mainWindowHolder = mainWindowHolder;
         }
         
         public async Task<T> ShowDialog<T>(IMessageBox<T> messageBox)
@@ -25,7 +25,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             MessageBoxView view = new MessageBoxView();
             var viewModel = new MessageBoxViewModel<T>(messageBox);
             view.DataContext = viewModel;
-            await view.ShowDialog<bool>(mainWindow.Value);
+            await view.ShowDialog<bool>(mainWindowHolder.Window);
             return viewModel.SelectedOption;
         }
     }

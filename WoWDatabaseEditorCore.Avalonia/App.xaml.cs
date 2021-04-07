@@ -24,6 +24,7 @@ using WDE.Common.Windows;
 using WDE.Module;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Managers;
+using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService;
 using WoWDatabaseEditorCore.Avalonia.Views;
 using WoWDatabaseEditorCore.ModulesManagement;
 using WoWDatabaseEditorCore.ViewModels;
@@ -107,8 +108,6 @@ namespace WoWDatabaseEditorCore.Avalonia
         {
             base.RegisterRequiredTypes(containerRegistry);
             containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
-
-            containerRegistry.RegisterSingleton<MainWindow>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -204,9 +203,19 @@ namespace WoWDatabaseEditorCore.Avalonia
             foreach (var module in loadedModules)
                 module.FinalizeRegistration((IContainerRegistry)Container);
             
-            Container.Resolve<IThemeManager>();
+            var themeManager = Container.Resolve<IThemeManager>();
+            if (AvaloniaThemeStyle.UseDock)
+            {
+                ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
+                MainApp = Container.Resolve<MainWindowWithDocking>();
+            }
+            else
+            {
+                ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
+                MainApp = Container.Resolve<MainWindow>();
+            }
+            
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
-            MainApp = Container.Resolve<MainWindow>();
             MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
             this.InitializeShell(MainApp);
             
@@ -214,7 +223,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
         }
 
-        public static MainWindow MainApp;
+        public static Window MainApp;
 
         public override void Initialize()
         {

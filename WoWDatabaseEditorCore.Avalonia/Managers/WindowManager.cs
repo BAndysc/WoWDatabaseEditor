@@ -11,11 +11,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
     [AutoRegister]
     public class WindowManager : IWindowManager
     {
-        private readonly Lazy<MainWindow> mainWindow;
+        private readonly IMainWindowHolder mainWindowHolder;
 
-        public WindowManager(Lazy<MainWindow> mainWindow)
+        public WindowManager(IMainWindowHolder mainWindowHolder)
         {
-            this.mainWindow = mainWindow;
+            this.mainWindowHolder = mainWindowHolder;
         }
         
         public async Task<bool> ShowDialog(IDialog viewModel)
@@ -24,12 +24,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             view.Height = viewModel.DesiredHeight;
             view.Width = viewModel.DesiredWidth;
             view.DataContext = viewModel;
-            return await view.ShowDialog<bool>(mainWindow.Value);
+            return await view.ShowDialog<bool>(mainWindowHolder.Window);
         }
 
         public Task<string> ShowFolderPickerDialog(string defaultDirectory)
         {
-            return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(mainWindow.Value);
+            return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(mainWindowHolder.Window);
         }
     }
 }

@@ -3,4 +3,5 @@
         <FluentTheme Mode="Light" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Style.xaml"/>
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ColorsLight.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/DockLight.axaml" />
 </Styles>
