@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.DatabaseEditors.Data;
@@ -61,8 +62,26 @@ namespace WDE.DatabaseEditors.Models
         public ParameterValueHolder<T> Parameter { get; }
         public ParameterValueHolder<T> OriginalValue { get; private set; }
         public string OriginalValueTooltip => $"Original value: {OriginalValue.String}";
-        public string SqlStringValue => (typeof(T) == typeof(string)) ? $"\"{Parameter.Value}\"" : 
-            $"{Parameter.Value}";
+
+        public string SqlStringValue()
+        {
+            if (typeof(T) == typeof(string))
+                return $"\"{Parameter.Value}\"";
+            if (Parameter.Value is float fVal)
+            {
+                NumberFormatInfo info = new();
+                info.NumberDecimalSeparator = ".";
+                return fVal.ToString(info);
+            }
+            if (Parameter.Value is double dVal)
+            {
+                NumberFormatInfo info = new();
+                info.NumberDecimalSeparator = ".";
+                return dVal.ToString(info);
+            }
+
+            return $"{Parameter.Value}";
+        }
 
         // IStateRestorableField
         

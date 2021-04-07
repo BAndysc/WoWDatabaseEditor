@@ -8,6 +8,6 @@
         bool IsModified { get; set; }
         string ValueType { get; }
         bool IsParameter { get; }
-        string SqlStringValue { get; }
+        string SqlStringValue();
     }
 }

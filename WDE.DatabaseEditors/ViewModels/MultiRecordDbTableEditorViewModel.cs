@@ -11,6 +11,7 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data;
@@ -28,19 +29,22 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly Lazy<IItemFromListProvider> itemFromListProvider;
         private readonly Lazy<IDbTableFieldFactory> fieldFactory;
         private readonly Lazy<IMySqlExecutor> sqlExecutor;
+        private readonly Lazy<IMessageBoxService> messageBoxService;
 
         private MultiRecordTableEditorHistoryHandler? historyHandler;
         
         public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName, 
             Func<uint, Task<IDbTableData?>>? tableDataLoader, Func<IHistoryManager> historyCreator,
             ITaskRunner taskRunner, Lazy<IItemFromListProvider> itemFromListProvider,
-            Lazy<IDbTableFieldFactory> fieldFactory, Lazy<IMySqlExecutor> sqlExecutor)
+            Lazy<IDbTableFieldFactory> fieldFactory, Lazy<IMySqlExecutor> sqlExecutor,
+            Lazy<IMessageBoxService> messageBoxService)
         {
             this.solutionItem = solutionItem;
             this.tableDataLoader = tableDataLoader;
             this.itemFromListProvider = itemFromListProvider;
             this.fieldFactory = fieldFactory;
             this.sqlExecutor = sqlExecutor;
+            this.messageBoxService = messageBoxService;
 
             // check if solution item already have cached data for table
             if (solutionItem.TableData != null)
@@ -99,7 +103,10 @@ namespace WDE.DatabaseEditors.ViewModels
             var data = await tableDataLoader.Invoke(solutionItem.Entry) as DbMultiRecordTableData;
 
             if (data == null)
+            {
+                IsLoading = false;
                 return;
+            }
 
             data.InitRows();
             SaveLoadedTableData(data);
@@ -120,9 +127,19 @@ namespace WDE.DatabaseEditors.ViewModels
                 return;
 
             var sql = MultiRecordTableSqlGenerator.GenerateSql(tableData);
-            sqlExecutor.Value.ExecuteSql(sql);
-
-            History.MarkAsSaved();
+            try
+            {
+                sqlExecutor.Value.ExecuteSql(sql);
+                History.MarkAsSaved();
+            }
+            catch (Exception e)
+            {
+                messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
+                    .SetMainInstruction($"Editor failed to save data to database!")
+                    .SetIcon(MessageBoxIcon.Error)
+                    .WithOkButton(true)
+                    .Build());
+            }
         }
         
         private async Task EditParameter(ParameterValueHolder<long>? valueHolder)

@@ -33,7 +33,7 @@ namespace WDE.DatabaseEditors.Data
 
         private static string MakeInsertValueLine(Dictionary<string, IDbTableField> row)
         {
-            var values = row.Values.Select(f => f.SqlStringValue);
+            var values = row.Values.Select(f => f.SqlStringValue());
             return $"({string.Join(", ", values)}),";
         }
     }

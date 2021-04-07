@@ -13,7 +13,7 @@
     </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Key="Delete" Command="{Binding DeleteRow}" />
-        <KeyBinding Modifiers="Control" Key="S" Command="Save" />
+        <KeyBinding Modifiers="Control" Key="S" Command="{Binding Save}" />
         <KeyBinding Modifiers="Control" Key="Z" Command="{Binding Undo}"/>
         <KeyBinding Modifiers="Control" Key="Y" Command="{Binding Redo}"/>
     </UserControl.InputBindings>

@@ -91,11 +91,10 @@ namespace WDE.DatabaseEditors.Data
         private ParameterValueHolder<string> CreateStringValue(object dbValue, string fieldName)
         {
             var parameter = new ParameterValueHolder<string>(new StringParameter());
-            if (dbValue is DBNull)
+            if (dbValue is DBNull || dbValue == null)
                 return parameter;
 
-            var val = Convert.ToString(dbValue);
-            if (val != null)
+            if (dbValue is string val)
             {
                 parameter.Value = val;
                 return parameter;
@@ -107,16 +106,13 @@ namespace WDE.DatabaseEditors.Data
         private ParameterValueHolder<float> CreateFloatValue(object dbValue, string fieldName)
         {
             var parameter = new ParameterValueHolder<float>(FloatParameter.Instance);
-            try
+            if (dbValue is float floatValue)
             {
-                var val = Convert.ToSingle(dbValue);
-                parameter.Value = val;
+                parameter.Value = floatValue;
                 return parameter;
             }
-            catch (Exception e)
-            {
-                throw new Exception($"Field {fieldName} db value type doesn't match declared type! Expected float, got {dbValue.GetType()}");
-            }
+            
+            throw new Exception($"Field {fieldName} db value type doesn't match declared type! Expected float, got {dbValue.GetType()}");
         }
 
         private ParameterValueHolder<long> CreateLongValue(object dbValue, string fieldName, bool asBool)
