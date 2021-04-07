@@ -36,7 +36,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
             this.exporter = exporter;
         }
 
-        public string GenerateSql(SmartScriptSolutionItem item)
+        public async Task<string> GenerateSql(SmartScriptSolutionItem item)
         {
             EventRequestGenerateSqlArgs args = new();
             args.Item = item;

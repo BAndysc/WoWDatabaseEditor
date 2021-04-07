@@ -1,4 +1,5 @@
-﻿using WDE.Module.Attributes;
+﻿using System.Threading.Tasks;
+using WDE.Module.Attributes;
 
 namespace WDE.Common.Solution
 {
@@ -10,6 +11,6 @@ namespace WDE.Common.Solution
     [NonUniqueProvider]
     public interface ISolutionItemSqlProvider<T> : ISolutionItemSqlProvider where T : ISolutionItem
     {
-        string GenerateSql(T item);
+        Task<string> GenerateSql(T item);
     }
 }

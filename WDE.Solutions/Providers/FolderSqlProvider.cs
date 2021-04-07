@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
@@ -16,13 +17,13 @@ namespace WDE.Solutions.Providers
             this.registry = registry;
         }
 
-        public string GenerateSql(SolutionFolderItem item)
+        public async Task<string> GenerateSql(SolutionFolderItem item)
         {
             StringBuilder sb = new();
             foreach (ISolutionItem i in item.Items)
             {
                 if (i.IsExportable)
-                    sb.AppendLine(registry.Value.GenerateSql(i));
+                    sb.AppendLine(await registry.Value.GenerateSql(i));
             }
 
             return sb.ToString();
