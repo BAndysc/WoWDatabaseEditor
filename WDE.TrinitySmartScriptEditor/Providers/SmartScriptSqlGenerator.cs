@@ -38,14 +38,6 @@ namespace WDE.TrinitySmartScriptEditor.Providers
 
         public async Task<string> GenerateSql(SmartScriptSolutionItem item)
         {
-            EventRequestGenerateSqlArgs args = new();
-            args.Item = item;
-
-            eventAggregator.GetEvent<EventRequestGenerateSql>().Publish(args);
-
-            if (args.Sql != null)
-                return args.Sql;
-
             SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService());
             var lines = database.Value.GetScriptFor(item.Entry, item.SmartType).ToList();
             var conditions = database.Value.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, item.Entry, (int)item.SmartType).ToList();
