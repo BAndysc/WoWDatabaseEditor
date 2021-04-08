@@ -8,21 +8,23 @@ namespace WDE.DatabaseEditors.History
         private readonly DbTableField<T> tableField;
         private readonly T oldValue;
         private readonly T newValue;
-        private readonly bool wasModified;
-        private readonly bool isModified;
 
-        public DbFieldHistoryAction(DbTableField<T> tableField, T oldValue, T newValue, bool wasModified, bool isModified)
+        public DbFieldHistoryAction(DbTableField<T> tableField, T oldValue, T newValue)
         {
             this.tableField = tableField;
             this.oldValue = oldValue;
             this.newValue = newValue;
-            this.wasModified = wasModified;
-            this.isModified = isModified;
         }
 
-        public void Undo() => tableField.RevertPropertyValueChange(oldValue, wasModified);
+        public void Undo()
+        {
+            tableField.Parameter.Value = oldValue;
+        }
 
-        public void Redo() => tableField.RevertPropertyValueChange(newValue, isModified);
+        public void Redo()
+        {
+            tableField.Parameter.Value = newValue;
+        }
 
         public string GetDescription() => $"Changed value of field {tableField.FieldName}";
     }

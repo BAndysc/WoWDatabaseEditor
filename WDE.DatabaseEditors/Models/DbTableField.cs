@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
@@ -11,18 +12,17 @@ namespace WDE.DatabaseEditors.Models
 {
     public class DbTableField<T> : IDbTableField, INotifyPropertyChanged, IDbTableHistoryActionSource, IStateRestorableField, ISwappableNameField
     {
-        public DbTableField(string fieldName, string inDbFieldName, bool isReadOnly, bool isModified, string valueType, bool isParameter,
+        public DbTableField(string fieldName, string inDbFieldName, bool isReadOnly, string valueType, bool isParameter,
             ParameterValueHolder<T> value)
         {
             FieldName = fieldName;
             OriginalName = fieldName;
             DbFieldName = inDbFieldName;
             IsReadOnly = isReadOnly;
-            this.isModified = isModified;
             ValueType = valueType;
             IsParameter = isParameter;
             Parameter = value;
-            Parameter.OnValueChanged += ParameterOnOnValueChanged;
+            Parameter.OnValueChanged += ParameterOnValueChanged;
             OriginalValue = new ParameterValueHolder<T>(Parameter.Parameter);
             OriginalValue.Copy(Parameter);
         }
@@ -33,11 +33,10 @@ namespace WDE.DatabaseEditors.Models
             OriginalName = fieldDefinition.Name;
             DbFieldName = fieldDefinition.DbColumnName;
             IsReadOnly = fieldDefinition.IsReadOnly;
-            isModified = false;
             ValueType = fieldDefinition.ValueType;
             IsParameter = fieldDefinition.ValueType.EndsWith("Parameter");
             Parameter = value;
-            Parameter.OnValueChanged += ParameterOnOnValueChanged;
+            Parameter.OnValueChanged += ParameterOnValueChanged;
             OriginalValue = new ParameterValueHolder<T>(Parameter.Parameter);
             OriginalValue.Copy(Parameter);
         }
@@ -45,17 +44,8 @@ namespace WDE.DatabaseEditors.Models
         public string FieldName { get; private set; }
         public string DbFieldName { get; }
         public bool IsReadOnly { get; }
-        private bool isModified;
-        
-        public bool IsModified
-        {
-            get => isModified;
-            set
-            {
-                isModified = value;
-                OnPropertyChanged(nameof(IsModified));
-            }
-        }
+
+        public bool IsModified => !EqualityComparer<T>.Default.Equals(Parameter.Value, OriginalValue.Value);
         public string ValueType { get; }
         public bool IsParameter { get; }
         
@@ -63,21 +53,19 @@ namespace WDE.DatabaseEditors.Models
         public ParameterValueHolder<T> OriginalValue { get; private set; }
         public string OriginalValueTooltip => $"Original value: {OriginalValue.String}";
 
+        private static NumberFormatInfo sqlNumberFormatInfo = new() {NumberDecimalSeparator = "."};
+        
         public string SqlStringValue()
         {
             if (typeof(T) == typeof(string))
-                return $"\"{Parameter.Value}\"";
+                return $"\"{Parameter.Value.ToString().Replace("\"", "\\\"")}\"";
             if (Parameter.Value is float fVal)
             {
-                NumberFormatInfo info = new();
-                info.NumberDecimalSeparator = ".";
-                return fVal.ToString(info);
+                return fVal.ToString(sqlNumberFormatInfo);
             }
             if (Parameter.Value is double dVal)
             {
-                NumberFormatInfo info = new();
-                info.NumberDecimalSeparator = ".";
-                return dVal.ToString(info);
+                return dVal.ToString(sqlNumberFormatInfo);
             }
 
             return $"{Parameter.Value}";
@@ -87,10 +75,10 @@ namespace WDE.DatabaseEditors.Models
         
         public void RestoreLoadedFieldState(DbTableSolutionItemModifiedField fieldData)
         {
-            isModified = true;
             if (fieldData.NewValue != null)
                 Parameter.Value = (T) fieldData.NewValue;
             OriginalValue.Value = (T) fieldData.OriginalValue;
+            OnPropertyChanged(nameof(IsModified));
         }
 
         public object? GetValueForPersistence() => Parameter.Value;
@@ -135,19 +123,13 @@ namespace WDE.DatabaseEditors.Models
         
         // IDbTableHistoryActionSource
         
-        private void ParameterOnOnValueChanged(ParameterValueHolder<T> param, T oldValue, T newValue)
+        private void ParameterOnValueChanged(ParameterValueHolder<T> param, T oldValue, T newValue)
         {
-            historyActionReceiver?.RegisterAction(new DbFieldHistoryAction<T>(this, oldValue, newValue, isModified, true));
-            IsModified = true;
+            historyActionReceiver?.RegisterAction(new DbFieldHistoryAction<T>(this, oldValue, newValue));
+            OnPropertyChanged(nameof(IsModified));
             // handler for logic from ISwappableNameField
             if (newValue is long longValue)
                 swapHandler?.OnFieldValueChanged(longValue, DbFieldName);
-        }
-
-        public void RevertPropertyValueChange(T previousValue, bool previousModified)
-        {
-            Parameter.Value = previousValue;
-            IsModified = previousModified; ;
         }
 
         private IDbFieldHistoryActionReceiver? historyActionReceiver;
@@ -155,5 +137,6 @@ namespace WDE.DatabaseEditors.Models
         public void RegisterActionReceiver(IDbFieldHistoryActionReceiver receiver) => historyActionReceiver = receiver;
 
         public void UnregisterActionReceiver() => historyActionReceiver = null;
+
     }
 }
