@@ -1,4 +1,5 @@
 ﻿using System;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Solution;
 using WDE.DatabaseEditors.Data;
@@ -10,10 +11,12 @@ namespace WDE.DatabaseEditors.Solution
     public class DbEditorsSolutionItemNameProvider : ISolutionNameProvider<DbEditorsSolutionItem>
     {
         private readonly Lazy<IParameterFactory> parameterFactory;
+        private readonly IDatabaseProvider databaseProvider;
 
-        public DbEditorsSolutionItemNameProvider(Lazy<IParameterFactory> parameterFactory)
+        public DbEditorsSolutionItemNameProvider(Lazy<IParameterFactory> parameterFactory, IDatabaseProvider databaseProvider)
         {
             this.parameterFactory = parameterFactory;
+            this.databaseProvider = databaseProvider;
         }
         
         public string GetName(DbEditorsSolutionItem item) => $"{GetItemDescriptionPrefix(item.TableContentType)} {GetNameOfItem(item.TableContentType, item.Entry)}";
@@ -39,17 +42,9 @@ namespace WDE.DatabaseEditors.Solution
             {
                 case DbTableContentType.CreatureTemplate:
                 case DbTableContentType.CreatureLootTemplate:
-                    var creatureParam = parameterFactory.Value.Factory("CreatureParameter");
-                    if (creatureParam != null)
-                        return creatureParam.ToString(entry);
-                    else
-                        return entry.ToString();
+                    return databaseProvider.GetCreatureTemplate(entry)?.Name ?? $"creature {entry}";
                 case DbTableContentType.GameObjectTemplate:
-                    var goParam = parameterFactory.Value.Factory("GameobjectParameter");
-                    if (goParam != null)
-                        return goParam.ToString(entry);
-                    else
-                        return entry.ToString();
+                    return databaseProvider.GetGameObjectTemplate(entry)?.Name ?? $"gameobject {entry}";
                 default:
                     throw new Exception("[DbEditorsSolutionItemNameProvider] not defined table type!");
             }

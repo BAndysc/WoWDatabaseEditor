@@ -74,9 +74,7 @@ namespace WDE.DatabaseEditors.Data
                 try
                 {
                     var longVal = Convert.ToInt64(dbValue);
-                    var paramHolder = new ParameterValueHolder<long>(parameter);
-                    paramHolder.Value = longVal;
-                    return paramHolder;
+                    return new ParameterValueHolder<long>(parameter, longVal);
                 }
                 catch (Exception e)
                 {
@@ -90,8 +88,8 @@ namespace WDE.DatabaseEditors.Data
         
         private ParameterValueHolder<string> CreateStringValue(object dbValue, string fieldName)
         {
-            var parameter = new ParameterValueHolder<string>(new StringParameter());
-            if (dbValue is DBNull || dbValue == null)
+            var parameter = new ParameterValueHolder<string>(new StringParameter(), "");
+            if (dbValue is DBNull)
                 return parameter;
 
             if (dbValue is string val)
@@ -105,24 +103,18 @@ namespace WDE.DatabaseEditors.Data
 
         private ParameterValueHolder<float> CreateFloatValue(object dbValue, string fieldName)
         {
-            var parameter = new ParameterValueHolder<float>(FloatParameter.Instance);
             if (dbValue is float floatValue)
-            {
-                parameter.Value = floatValue;
-                return parameter;
-            }
+                return new ParameterValueHolder<float>(FloatParameter.Instance, floatValue);
             
             throw new Exception($"Field {fieldName} db value type doesn't match declared type! Expected float, got {dbValue.GetType()}");
         }
 
         private ParameterValueHolder<long> CreateLongValue(object dbValue, string fieldName, bool asBool)
         {
-            var parameter = new ParameterValueHolder<long>(asBool ? new BoolParameter() : Parameter.Instance);
             try
             {
                 var val = Convert.ToInt64(dbValue);
-                parameter.Value = val;
-                return parameter;
+                return new ParameterValueHolder<long>(asBool ? new BoolParameter() : Parameter.Instance, val);
             }
             catch (Exception e)
             {

@@ -1,4 +1,5 @@
-﻿using WDE.Module.Attributes;
+﻿using System;
+using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Data
 {
@@ -32,5 +33,20 @@ namespace WDE.DatabaseEditors.Data
         public DatabaseEditorTableDefinitionJson GetGameobjectTemplateDefinition() => gameobjectTemplateDefinition;
 
         public DatabaseEditorTableDefinitionJson GetCreatureLootTemplateDefinition() => creatureLootTemplateDefinition;
+        
+        public DatabaseEditorTableDefinitionJson GetDefinition(DbTableContentType type)
+        {
+            switch (type)
+            {
+                case DbTableContentType.CreatureTemplate:
+                    return GetCreatureTemplateDefinition();
+                case DbTableContentType.GameObjectTemplate:
+                    return GetGameobjectTemplateDefinition();
+                case DbTableContentType.CreatureLootTemplate:
+                    return GetCreatureLootTemplateDefinition();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
     }
 }

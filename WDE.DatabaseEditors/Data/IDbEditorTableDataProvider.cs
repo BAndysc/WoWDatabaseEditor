@@ -10,5 +10,7 @@ namespace WDE.DatabaseEditors.Data
         Task<IDbTableData?> LoadCreatureTemplateDataEntry(uint creatureEntry);
         Task<IDbTableData?> LoadGameobjectTemplateDataEntry(uint goEntry);
         Task<IDbTableData?> LoadCreatureLootTemplateData(uint entry);
+
+        Task<IDbTableData?> Load(DbTableContentType contentType, uint entry);
     }
 }

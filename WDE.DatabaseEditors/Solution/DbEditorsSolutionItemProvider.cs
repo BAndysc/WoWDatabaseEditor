@@ -26,6 +26,6 @@ namespace WDE.DatabaseEditors.Solution
 
         public bool IsCompatibleWithCore(ICoreVersion core) => true;
 
-        public abstract Task<ISolutionItem> CreateSolutionItem();
+        public abstract Task<ISolutionItem?> CreateSolutionItem();
     }
 }

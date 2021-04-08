@@ -1,11 +1,11 @@
-﻿namespace WDE.DatabaseEditors.Models
+﻿using WDE.DatabaseEditors.Data;
+
+namespace WDE.DatabaseEditors.Models
 {
     public interface IDbTableField
     {
+        DbEditorTableGroupFieldJson FieldMetaData { get; }
         string FieldName { get; }
-        string DbFieldName { get; }
-        bool IsReadOnly { get; }
-        string ValueType { get; }
         bool IsParameter { get; }
         bool IsModified { get; }
         string SqlStringValue();

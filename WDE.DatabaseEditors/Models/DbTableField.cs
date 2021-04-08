@@ -12,41 +12,21 @@ namespace WDE.DatabaseEditors.Models
 {
     public class DbTableField<T> : IDbTableField, INotifyPropertyChanged, IDbTableHistoryActionSource, IStateRestorableField, ISwappableNameField
     {
-        public DbTableField(string fieldName, string inDbFieldName, bool isReadOnly, string valueType, bool isParameter,
-            ParameterValueHolder<T> value)
-        {
-            FieldName = fieldName;
-            OriginalName = fieldName;
-            DbFieldName = inDbFieldName;
-            IsReadOnly = isReadOnly;
-            ValueType = valueType;
-            IsParameter = isParameter;
-            Parameter = value;
-            Parameter.OnValueChanged += ParameterOnValueChanged;
-            OriginalValue = new ParameterValueHolder<T>(Parameter.Parameter);
-            OriginalValue.Copy(Parameter);
-        }
-
         public DbTableField(in DbEditorTableGroupFieldJson fieldDefinition, ParameterValueHolder<T> value)
         {
-            FieldName = fieldDefinition.Name;
-            OriginalName = fieldDefinition.Name;
-            DbFieldName = fieldDefinition.DbColumnName;
-            IsReadOnly = fieldDefinition.IsReadOnly;
-            ValueType = fieldDefinition.ValueType;
+            FieldMetaData = fieldDefinition;
+            FieldName = FieldMetaData.Name;
+            
             IsParameter = fieldDefinition.ValueType.EndsWith("Parameter");
             Parameter = value;
             Parameter.OnValueChanged += ParameterOnValueChanged;
-            OriginalValue = new ParameterValueHolder<T>(Parameter.Parameter);
+            OriginalValue = new ParameterValueHolder<T>(Parameter.Parameter, value.Value);
             OriginalValue.Copy(Parameter);
         }
 
         public string FieldName { get; private set; }
-        public string DbFieldName { get; }
-        public bool IsReadOnly { get; }
-
         public bool IsModified => !EqualityComparer<T>.Default.Equals(Parameter.Value, OriginalValue.Value);
-        public string ValueType { get; }
+        public DbEditorTableGroupFieldJson FieldMetaData { get; }
         public bool IsParameter { get; }
         
         public ParameterValueHolder<T> Parameter { get; }
@@ -58,7 +38,7 @@ namespace WDE.DatabaseEditors.Models
         public string SqlStringValue()
         {
             if (typeof(T) == typeof(string))
-                return $"\"{Parameter.Value.ToString().Replace("\"", "\\\"")}\"";
+                return $"\"{Parameter.Value!.ToString()!.Replace("\"", "\\\"")}\"";
             if (Parameter.Value is float fVal)
             {
                 return fVal.ToString(sqlNumberFormatInfo);
@@ -81,13 +61,13 @@ namespace WDE.DatabaseEditors.Models
             OnPropertyChanged(nameof(IsModified));
         }
 
-        public object? GetValueForPersistence() => Parameter.Value;
+        public object GetValueForPersistence() => Parameter.Value!;
 
-        public object GetOriginalValueForPersistence() => OriginalValue.Value;
+        public object GetOriginalValueForPersistence() => OriginalValue.Value!;
         
         // ISwappableNameField
-        
-        public string OriginalName { get; }
+
+        public string OriginalName => FieldMetaData.Name;
 
         private IDbTableFieldNameSwapHandler? swapHandler;
 
@@ -98,7 +78,7 @@ namespace WDE.DatabaseEditors.Models
             {
                 swapHandler = nameSwapHandler;
                 // initial call to swap names right after data init
-                swapHandler?.OnFieldValueChanged(longValue, DbFieldName);
+                swapHandler?.OnFieldValueChanged(longValue, FieldMetaData.DbColumnName);
             }
         }
         
@@ -112,11 +92,11 @@ namespace WDE.DatabaseEditors.Models
 
         // INotifyPropertyChanged
         
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -129,7 +109,7 @@ namespace WDE.DatabaseEditors.Models
             OnPropertyChanged(nameof(IsModified));
             // handler for logic from ISwappableNameField
             if (newValue is long longValue)
-                swapHandler?.OnFieldValueChanged(longValue, DbFieldName);
+                swapHandler?.OnFieldValueChanged(longValue, FieldMetaData.DbColumnName);
         }
 
         private IDbFieldHistoryActionReceiver? historyActionReceiver;
@@ -137,6 +117,5 @@ namespace WDE.DatabaseEditors.Models
         public void RegisterActionReceiver(IDbFieldHistoryActionReceiver receiver) => historyActionReceiver = receiver;
 
         public void UnregisterActionReceiver() => historyActionReceiver = null;
-
     }
 }

@@ -28,7 +28,7 @@ namespace WDE.DatabaseEditors.Data
         private void BindFields()
         {
             var keyField = tableData.Categories.SelectMany(c => c.Fields)
-                .First(f => f.DbFieldName == nameSwapDefinition.ConditionValueSource);
+                .First(f => f.FieldMetaData.DbColumnName == nameSwapDefinition.ConditionValueSource);
             if (keyField is ISwappableNameField swappableNameField)
                 swappableNameField.RegisterNameSwapHandler(this);
         }
@@ -36,7 +36,7 @@ namespace WDE.DatabaseEditors.Data
         private void UnbindFields()
         {
             var keyField = tableData.Categories.SelectMany(c => c.Fields)
-                .First(f => f.DbFieldName == nameSwapDefinition.ConditionValueSource);
+                .First(f => f.FieldMetaData.DbColumnName == nameSwapDefinition.ConditionValueSource);
             if (keyField is ISwappableNameField swappableNameField)
                 swappableNameField.UnregisterNameSwapHandler();
         }
@@ -62,7 +62,7 @@ namespace WDE.DatabaseEditors.Data
 
                 try
                 {
-                    var data = definitions.First(d => d.DbColumnName == field.DbFieldName);
+                    var data = definitions.First(d => d.DbColumnName == field.FieldMetaData.DbColumnName);
                     swappableNameField.UpdateFieldName(data.NewName);
                 }
                 catch

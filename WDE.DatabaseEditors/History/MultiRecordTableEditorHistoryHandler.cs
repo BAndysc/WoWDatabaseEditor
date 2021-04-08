@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using WDE.Common.History;
 using WDE.DatabaseEditors.Models;
+using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.History
 {
     public class MultiRecordTableEditorHistoryHandler : HistoryHandler, IDisposable, IDbFieldHistoryActionReceiver
     {
         private readonly DbMultiRecordTableData tableData;
+        private List<System.IDisposable> disposables = new();
         
         public MultiRecordTableEditorHistoryHandler(DbMultiRecordTableData tableData)
         {
@@ -17,7 +19,11 @@ namespace WDE.DatabaseEditors.History
 
         public void Dispose()
         {
-            UnbindTableData();
+            foreach (var d in disposables)
+                d.Dispose();
+            disposables.Clear();
+                
+            tableData.OnRowChanged -= TableDataOnOnRowChanged;
         }
 
         public void RegisterAction(IHistoryAction action) => PushAction(action);
@@ -26,11 +32,19 @@ namespace WDE.DatabaseEditors.History
         {
             foreach (var category in tableData.Columns)
             {
-                foreach (var field in category.Fields)
+                disposables.Add(category.Fields.ToStream().Subscribe(item =>
                 {
-                    if (field is IDbTableHistoryActionSource actionSource)
-                        actionSource.RegisterActionReceiver(this);
-                }
+                    if (item.Type == CollectionEventType.Add)
+                    {
+                        if (item.Item is IDbTableHistoryActionSource actionSource)
+                            actionSource.RegisterActionReceiver(this);
+                    }
+                    else if (item.Type == CollectionEventType.Remove)
+                    {
+                        if (item.Item is IDbTableHistoryActionSource actionSource)
+                            actionSource.RegisterActionReceiver(this);
+                    }
+                }));
             }
             
             tableData.OnRowChanged += TableDataOnOnRowChanged;
@@ -40,20 +54,6 @@ namespace WDE.DatabaseEditors.History
         {
             PushAction(new TableRowsChangedHistoryAction(tableData, e.Row, e.NewValues != null, 
                 e.NewValues ?? e.OldValues! ));
-        }
-
-        private void UnbindTableData()
-        {
-            foreach (var category in tableData.Columns)
-            {
-                foreach (var field in category.Fields)
-                {
-                    if (field is IDbTableHistoryActionSource actionSource)
-                        actionSource.UnregisterActionReceiver();
-                }
-            }
-            
-            tableData.OnRowChanged -= TableDataOnOnRowChanged;
         }
     }
 

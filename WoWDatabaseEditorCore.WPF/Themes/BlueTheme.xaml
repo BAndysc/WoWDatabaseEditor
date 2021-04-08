@@ -177,10 +177,11 @@
     <SolidColorBrush x:Key="ScrollBarColor" Color="#8C8C8C" />
     
     <!-- TreeViewItem -->
-    <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#bfbfbf"/>
-    <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#0000b3" />
+    <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#4E88BF"/>
+    <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#F1F1F1" />
     <SolidColorBrush x:Key="TreeViewItem.Content.Background.Modified" Color="#000099" Opacity=".3"/>
     <SolidColorBrush x:Key="TreeViewItem.Content.Background.Normal" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.NormalAlternate" Color="#F0F0F0"/>
     
     <!-- Buttons -->
     <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070" />

@@ -10,7 +10,7 @@ namespace WDE.DatabaseEditors.Data
         IDbTableData? GetDatabaseTable(in DatabaseEditorTableDefinitionJson tableDefinition, 
             Dictionary<string, object> fieldsFromDb);
 
-        IDbTableData? GetDatabaseMultiRecordTable(in DatabaseEditorTableDefinitionJson tableDefinition, 
+        IDbTableData? GetDatabaseMultiRecordTable(uint key, in DatabaseEditorTableDefinitionJson tableDefinition, 
             IList<Dictionary<string, object>> records);
     }
 }

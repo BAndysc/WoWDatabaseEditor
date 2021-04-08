@@ -11,22 +11,22 @@ namespace WDE.DatabaseEditors.Solution
     [AutoRegister]
     public class CreatureLootTemplateTableProvider : DbEditorsSolutionItemProvider
     {
-        private readonly Lazy<IDbEditorTableDataProvider> tableDataProvider;
-        private readonly Lazy<IInputEntryProvider> inputEntryProvider;
+        private readonly IDbEditorTableDataProvider tableDataProvider;
+        private readonly ICreatureEntryProviderService creatureEntryProviderService;
 
-        public CreatureLootTemplateTableProvider(Lazy<IDbEditorTableDataProvider> tableDataProvider, Lazy<IInputEntryProvider> inputEntryProvider) : 
+        public CreatureLootTemplateTableProvider(IDbEditorTableDataProvider tableDataProvider, ICreatureEntryProviderService creatureEntryProviderService) : 
             base("Creature Loot Template", "Edit or create loot data of creature.", "SmartScriptGeneric")
         {
             this.tableDataProvider = tableDataProvider;
-            this.inputEntryProvider = inputEntryProvider;
+            this.creatureEntryProviderService = creatureEntryProviderService;
         }
 
-        public override async Task<ISolutionItem> CreateSolutionItem()
+        public override async Task<ISolutionItem?> CreateSolutionItem()
         {
-            var key = await inputEntryProvider.Value.GetEntry();
+            var key = await creatureEntryProviderService.GetEntryFromService();
             if (key.HasValue)
             {
-                var data = await tableDataProvider.Value.LoadCreatureLootTemplateData(key.Value);
+                var data = await tableDataProvider.LoadCreatureLootTemplateData(key.Value);
                 if (data != null)
                     return new DbEditorsSolutionItem(key.Value, DbTableContentType.CreatureLootTemplate, true, 
                         new Dictionary<string, DbTableSolutionItemModifiedField>());

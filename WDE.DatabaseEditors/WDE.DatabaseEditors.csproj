@@ -6,6 +6,7 @@
         <Configurations>Debug;Release;DebugAvalonia</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
@@ -31,5 +32,10 @@
       <None Update="DbDefinitions\creature_loot_template.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="DynamicData">
+        <Version>7.1.1</Version>
+      </PackageReference>
     </ItemGroup>
 </Project>

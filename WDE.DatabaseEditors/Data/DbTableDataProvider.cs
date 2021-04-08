@@ -50,26 +50,23 @@ namespace WDE.DatabaseEditors.Data
             return null;
         }
 
-        public IDbTableData? GetDatabaseMultiRecordTable(in DatabaseEditorTableDefinitionJson tableDefinition,
+        public IDbTableData? GetDatabaseMultiRecordTable(uint key, in DatabaseEditorTableDefinitionJson tableDefinition,
             IList<Dictionary<string, object>> records)
         {
             // no support for swap data (at least for now) cuz simply no need for that
             // if (!string.IsNullOrWhiteSpace(tableDefinition.NameSwapFilePath))
             //     nameSwapDataManager.Value.RegisterSwapDefinition(tableDefinition.Name, tableDefinition.NameSwapFilePath);
 
-            var tableIndex = records[0][tableDefinition.TablePrimaryKeyColumnName].ToString();
-
-            var columns = new List<IDbTableColumn>(records[0].Count);
-
             try
             {
+                var columns = new List<IDbTableColumn>(tableDefinition.Groups[0].Fields.Count);
                 var group = tableDefinition.Groups[0];
                 // prepare columns
                 for (int i = 0; i < group.Fields.Count; ++i)
                 {
                     // ensure that each added field of table index column has value of key
                     object? defaultValue = group.Fields[i].DbColumnName == tableDefinition.TablePrimaryKeyColumnName
-                        ? records[0][tableDefinition.TablePrimaryKeyColumnName]
+                        ? key
                         : null;
                     columns.Insert(i, tableColumnFactory.Value.CreateColumn(group.Fields[i], defaultValue));
                 }
@@ -93,7 +90,7 @@ namespace WDE.DatabaseEditors.Data
                 
                 return new DbMultiRecordTableData(tableDefinition.Name, tableDefinition.TableName,
                     tableDefinition.TablePrimaryKeyColumnName,
-                    tableIndex ?? "Unk", columns);
+                    key.ToString(), columns);
             }
             catch (Exception e)
             {

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
-using Prism.Mvvm;
+using DynamicData;
 using Prism.Commands;
+using Prism.Events;
+using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -17,59 +20,185 @@ using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public class TemplateDbTableEditorViewModel: BindableBase, IDocument
+    public class TemplateDbTableEditorViewModel : ObservableBase, IDocument
     {
-        private readonly Lazy<IItemFromListProvider> itemFromListProvider;
-        private readonly Func<uint, Task<IDbTableData?>>? tableDataLoader;
-        private readonly Lazy<IMessageBoxService> messageBoxService;
+        private readonly IItemFromListProvider itemFromListProvider;
+        private readonly IMessageBoxService messageBoxService;
         private readonly IDbFieldNameSwapDataManager nameSwapDataManager;
 
-        private TemplateTableEditorHistoryHandler? historyHandler;
         private readonly DbEditorsSolutionItem solutionItem;
-        private DbTableFieldNameSwapHandler? tableFieldNameSwapHandler;
-        
+        private readonly IDbEditorTableDataProvider tableDataProvider;
+
         public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName,
-            Func<uint, Task<IDbTableData?>>? tableDataLoader, Lazy<IItemFromListProvider> itemFromListProvider, 
-            Func<IHistoryManager> historyCreator, ITaskRunner taskRunner, Lazy<IMessageBoxService> messageBoxService,
-            IDbFieldNameSwapDataManager nameSwapDataManager)
+            IDbEditorTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
+            IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
+            IDbFieldNameSwapDataManager nameSwapDataManager, IEventAggregator eventAggregator,
+            IQueryGenerator queryGenerator)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
-            this.tableDataLoader = tableDataLoader;
+            this.tableDataProvider = tableDataProvider;
             this.messageBoxService = messageBoxService;
             this.nameSwapDataManager = nameSwapDataManager;
-
-            if (solutionItem.TableData != null)
-                tableData = solutionItem.TableData as DbTableData;
-            else
-            {
-                IsLoading = true;
-                taskRunner.ScheduleTask($"Loading {tableName}..", LoadTableDefinition);
-            }
-
-            Title = $"{tableName} Editor";
+            History = history;
+            tableData = null!;
             
+            IsLoading = true;
+            taskRunner.ScheduleTask($"Loading {tableName}..", LoadTableDefinition);
+            
+            Title = $"{tableName} Editor";
+
+            undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
+            redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
             OpenParameterWindow = new AsyncAutoCommand<ParameterValueHolder<long>?>(EditParameter);
             saveModifiedFields = new DelegateCommand(SaveSolutionItem);
             
-            // setup history
-            History = historyCreator();
-            SetupHistory();
-            SetupSwapDataHandler();
+            var currentFilter = this.ToObservable(t => t.SearchText)
+                .Select<string, Func<DatabaseCellViewModel, bool>>(text =>
+                {
+                    if (string.IsNullOrEmpty(text))
+                        return _ => true;
+                    var lower = text.ToLower();
+                    return item => item.TableField.FieldName.ToLower().Contains(lower);
+                });
+            
+            AutoDispose(sourceFields.Connect()
+                .Filter(currentFilter)
+                .GroupOn(t => (t.CategoryName, t.CategoryIndex))
+                .Transform(group => new DatabaseCellsCategoryViewModel(group))
+                .DisposeMany()
+                .Sort(Comparer<DatabaseCellsCategoryViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder)))
+                .Bind(out ReadOnlyObservableCollection<DatabaseCellsCategoryViewModel> filteredFields)
+                .Subscribe());
+            FilteredFields = filteredFields;
+            
+            AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
+                .Subscribe(args =>
+                {
+                    if (args.Item is DbEditorsSolutionItem dbEditItem)
+                    {
+                        if (solutionItem.Equals(dbEditItem))
+                        {
+                            args.Sql = queryGenerator.GenerateQuery(tableData, solutionItem.TableContentType, solutionItem.Entry, solutionItem.IsMultiRecord,
+                                GetModifiedFields());
+                        }
+                    }
+                }));
+        }
+       
+        private async Task EditParameter(ParameterValueHolder<long>? valueHolder)
+        {
+            if (valueHolder == null)
+                return;
+            
+            if (valueHolder.Parameter.HasItems)
+            {
+                var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
+                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
+                if (result.HasValue)
+                    valueHolder.Value = result.Value;
+            }
         }
 
-        private DbTableData? tableData;
-        public DbTableData? TableData
+        private async Task LoadTableDefinition()
+        {
+            var data = await tableDataProvider.Load(solutionItem.TableContentType, solutionItem.Entry) as DbTableData;
+
+            if (data == null)
+            {
+                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
+                    .SetMainInstruction($"Editor failed to load data from database!")
+                    .SetIcon(MessageBoxIcon.Error)
+                    .WithOkButton(true)
+                    .Build());
+                return;
+            }
+
+            if (solutionItem.ModifiedFields != null)
+            {
+                foreach (var field in data.Categories.SelectMany(c => c.Fields))
+                {
+                    if (!solutionItem.ModifiedFields.TryGetValue(field.FieldMetaData.DbColumnName, out var state))
+                        continue;
+                    
+                    if (field is IStateRestorableField restorableField)
+                        restorableField.RestoreLoadedFieldState(state);
+                }
+            }
+
+            TableData = data;
+            SetupHistory();
+            SetupSwapDataHandler();
+            IsLoading = false;
+        }
+
+        private Dictionary<string, DbTableSolutionItemModifiedField> GetModifiedFields()
+        {
+            var dict = new Dictionary<string, DbTableSolutionItemModifiedField>();
+            
+            foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
+            {
+                if (field is IStateRestorableField restorableField)
+                    dict[field.FieldMetaData.DbColumnName] = new(field.FieldMetaData.DbColumnName, 
+                        restorableField.GetOriginalValueForPersistence(), 
+                        restorableField.GetValueForPersistence());
+            }
+
+            return dict;
+        }
+
+        private void SaveSolutionItem()
+        {
+            solutionItem.ModifiedFields = GetModifiedFields();
+            History.MarkAsSaved();
+        }
+        
+        private void SetupHistory()
+        {
+            var historyHandler = AutoDispose(new TemplateTableEditorHistoryHandler(tableData));
+            History.PropertyChanged += (sender, args) =>
+            {
+                undoCommand.RaiseCanExecuteChanged();
+                redoCommand.RaiseCanExecuteChanged();
+                IsModified = !History.IsSaved;
+            };
+            History.AddHandler(historyHandler);
+        }
+
+        private void SetupSwapDataHandler()
+        {
+            var swapData = nameSwapDataManager.GetSwapData(tableData.TableName);
+            if (swapData.HasValue)
+                AutoDispose(new DbTableFieldNameSwapHandler(tableData, swapData.Value));
+        }
+        
+        private SourceList<DatabaseCellViewModel> sourceFields = new();
+        public ReadOnlyObservableCollection<DatabaseCellsCategoryViewModel> FilteredFields { get; }
+
+        private DbTableData tableData;
+        public DbTableData TableData
         {
             get => tableData;
             set
             {
                 tableData = value;
                 RaisePropertyChanged(nameof(TableData));
+
+                int categoryIndex = 0;
+                int index = 0;
+                var flatFields = tableData.Categories.SelectMany(category =>
+                {
+                    categoryIndex++;
+                    return category.Fields.Select(field =>
+                        new DatabaseCellViewModel(field, category.CategoryName, categoryIndex, index++));
+                });
+                sourceFields.AddRange(flatFields);
             }
         }
         
@@ -84,121 +213,14 @@ namespace WDE.DatabaseEditors.ViewModels
         private DelegateCommand undoCommand;
         private DelegateCommand redoCommand;
         private readonly DelegateCommand saveModifiedFields;
-
-        private async Task EditParameter(ParameterValueHolder<long>? valueHolder)
+        
+        private string searchText = "";
+        public string SearchText
         {
-            if (valueHolder == null)
-                return;
-            
-            if (valueHolder.Parameter.HasItems)
-            {
-                var result = await itemFromListProvider.Value.GetItemFromList(valueHolder.Parameter.Items,
-                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
-                if (result.HasValue)
-                    valueHolder.Value = result.Value;
-            }
-        }
-
-        private async Task LoadTableDefinition()
-        {
-            if (tableDataLoader == null)
-            {
-                IsLoading = false;
-                return;
-            }
-            
-            var data = await tableDataLoader.Invoke(solutionItem.Entry) as DbTableData;
-
-            if (data == null)
-            {
-                var result = await messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
-                    .SetMainInstruction($"Editor failed to load data from database!")
-                    .SetIcon(MessageBoxIcon.Error)
-                    .WithOkButton(true)
-                    .Build());
-                return;
-            }
-
-            if (solutionItem.ModifiedFields == null)
-            {
-                SaveLoadedTableData(data);
-                return;
-            }
-
-            foreach (var field in data.Categories.SelectMany(c => c.Fields))
-            {
-                if (!solutionItem.ModifiedFields.ContainsKey(field.DbFieldName))
-                    continue;
-                    
-                if (field is IStateRestorableField restorableField)
-                    restorableField.RestoreLoadedFieldState(solutionItem.ModifiedFields[field.DbFieldName]);
-            }
-
-            SaveLoadedTableData(data);
-        }
-
-        private void SaveLoadedTableData(DbTableData data)
-        {
-            IsLoading = false;
-            TableData = data;
-            // for cache purpose
-            solutionItem.CacheTableData(data);
-            SetupHistory();
-            SetupSwapDataHandler();
-        }
-
-        private void SaveSolutionItem()
-        {
-            if (tableData == null)
-                return;
-
-            var dict = new Dictionary<string, DbTableSolutionItemModifiedField>();
-            
-            foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
-            {
-                if (field is IStateRestorableField restorableField)
-                    dict[field.DbFieldName] = new(field.DbFieldName, 
-                        restorableField.GetOriginalValueForPersistence(), 
-                        restorableField.GetValueForPersistence());
-            }
-
-            solutionItem.ModifiedFields = dict;
-            History.MarkAsSaved();
+            get => searchText;
+            set => SetProperty(ref searchText, value);
         }
         
-        public void Dispose()
-        {
-            historyHandler?.Dispose();
-            tableFieldNameSwapHandler?.Dispose();
-        }
-
-        private void SetupHistory()
-        {
-            if (tableData == null)
-                return;
-            
-            historyHandler = new TemplateTableEditorHistoryHandler(tableData);
-            undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
-            redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
-            History.PropertyChanged += (sender, args) =>
-            {
-                undoCommand.RaiseCanExecuteChanged();
-                redoCommand.RaiseCanExecuteChanged();
-                IsModified = !History.IsSaved;
-            };
-            History.AddHandler(historyHandler);
-        }
-
-        private void SetupSwapDataHandler()
-        {
-            if (tableData == null)
-                return;
-            
-            var swapData = nameSwapDataManager.GetSwapData(tableData.TableName);
-            if (swapData.HasValue)
-                tableFieldNameSwapHandler = new DbTableFieldNameSwapHandler(tableData, swapData.Value);
-        }
-
         public string Title { get; }
         public ICommand Undo => undoCommand;
         public ICommand Redo => redoCommand;
@@ -206,7 +228,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
         public ICommand Save => saveModifiedFields;
-        public IAsyncCommand CloseCommand { get; set; } = null;
+        public IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
         public bool IsModified

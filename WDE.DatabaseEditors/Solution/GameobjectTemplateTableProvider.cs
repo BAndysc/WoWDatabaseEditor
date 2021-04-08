@@ -21,7 +21,7 @@ namespace WDE.DatabaseEditors.Solution
             this.gameobjectEntryProviderService = gameobjectEntryProviderService;
         }
 
-        public override async Task<ISolutionItem> CreateSolutionItem()
+        public override async Task<ISolutionItem?> CreateSolutionItem()
         {
             var key = await gameobjectEntryProviderService.Value.GetEntryFromService();
             if (key.HasValue)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WDE.Common.Database;
@@ -27,12 +28,20 @@ namespace WDE.DatabaseEditors.Data
         {
             var tableDefinition = tableDefinitionProvider.GetCreatureTemplateDefinition();
             var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, creatureEntry);
-            var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+            try
+            {
+                var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
 
-            if (result == null || result.Count == 0)
+                if (result == null || result.Count == 0)
+                    return null;
+
+                return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0]);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
                 return null;
-
-            return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0]);
+            }
         }
 
         public async Task<IDbTableData?> LoadGameobjectTemplateDataEntry(uint goEntry)
@@ -53,10 +62,10 @@ namespace WDE.DatabaseEditors.Data
             var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, entry);
             var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
 
-            if (result == null || result.Count == 0)
+            if (result == null)
                 return null;
 
-            return tableDataProvider.GetDatabaseMultiRecordTable(in tableDefinition, result);
+            return tableDataProvider.GetDatabaseMultiRecordTable(entry, in tableDefinition, result);
         }
 
         private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, uint entry)
@@ -66,6 +75,21 @@ namespace WDE.DatabaseEditors.Data
 
             return
                 $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} = {entry};";
+        }
+
+        public Task<IDbTableData?> Load(DbTableContentType contentType, uint entry)
+        {
+            switch (contentType)
+            {
+                case DbTableContentType.CreatureTemplate:
+                    return LoadCreatureTemplateDataEntry(entry);
+                case DbTableContentType.GameObjectTemplate:
+                    return LoadGameobjectTemplateDataEntry(entry);
+                case DbTableContentType.CreatureLootTemplate:
+                    return LoadCreatureLootTemplateData(entry);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(contentType), contentType, null);
+            }
         }
     }
 }

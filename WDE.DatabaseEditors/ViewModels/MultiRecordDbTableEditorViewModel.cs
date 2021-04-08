@@ -25,35 +25,33 @@ namespace WDE.DatabaseEditors.ViewModels
     public class MultiRecordDbTableEditorViewModel : BindableBase, IDocument
     {
         private readonly DbEditorsSolutionItem solutionItem;
-        private readonly Func<uint, Task<IDbTableData?>>? tableDataLoader;
-        private readonly Lazy<IItemFromListProvider> itemFromListProvider;
-        private readonly Lazy<IDbTableFieldFactory> fieldFactory;
-        private readonly Lazy<IMySqlExecutor> sqlExecutor;
-        private readonly Lazy<IMessageBoxService> messageBoxService;
+        private readonly IDbEditorTableDataProvider tableDataProvider;
+        private readonly IItemFromListProvider itemFromListProvider;
+        private readonly IDbTableFieldFactory fieldFactory;
+        private readonly IMySqlExecutor sqlExecutor;
+        private readonly IMessageBoxService messageBoxService;
 
         private MultiRecordTableEditorHistoryHandler? historyHandler;
         
         public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName, 
-            Func<uint, Task<IDbTableData?>>? tableDataLoader, Func<IHistoryManager> historyCreator,
-            ITaskRunner taskRunner, Lazy<IItemFromListProvider> itemFromListProvider,
-            Lazy<IDbTableFieldFactory> fieldFactory, Lazy<IMySqlExecutor> sqlExecutor,
-            Lazy<IMessageBoxService> messageBoxService)
+            IDbEditorTableDataProvider tableDataProvider, IHistoryManager history,
+            ITaskRunner taskRunner, IItemFromListProvider itemFromListProvider,
+            IDbTableFieldFactory fieldFactory, IMySqlExecutor sqlExecutor,
+            IMessageBoxService messageBoxService)
         {
             this.solutionItem = solutionItem;
-            this.tableDataLoader = tableDataLoader;
+            this.tableDataProvider = tableDataProvider;
             this.itemFromListProvider = itemFromListProvider;
             this.fieldFactory = fieldFactory;
             this.sqlExecutor = sqlExecutor;
             this.messageBoxService = messageBoxService;
 
-            // check if solution item already have cached data for table
-            if (solutionItem.TableData != null)
-                tableData = solutionItem.TableData as DbMultiRecordTableData;
-            else
-            {
-                IsLoading = true;
-                taskRunner.ScheduleTask($"Loading {tableName}..", LoadTableData);
-            }
+            History = history;
+            IsLoading = true;
+            taskRunner.ScheduleTask($"Loading {tableName}..", LoadTableData);
+            
+            undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
+            redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
 
             Title = $"{tableName} Editor";
 
@@ -63,7 +61,6 @@ namespace WDE.DatabaseEditors.ViewModels
             Save = new DelegateCommand(SaveTable);
             SelectedRow = -1;
             
-            History = historyCreator();
             SetupHistory();
         }
 
@@ -94,13 +91,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private async Task LoadTableData()
         {
-            if (tableDataLoader == null)
-            {
-                IsLoading = false;
-                return;
-            }
-
-            var data = await tableDataLoader.Invoke(solutionItem.Entry) as DbMultiRecordTableData;
+            var data = await tableDataProvider.Load(solutionItem.TableContentType, solutionItem.Entry) as DbMultiRecordTableData;
 
             if (data == null)
             {
@@ -116,8 +107,6 @@ namespace WDE.DatabaseEditors.ViewModels
         {
             IsLoading = false;
             TableData = data;
-            // for cache purpose
-            solutionItem.CacheTableData(data);
             SetupHistory();
         }
 
@@ -129,12 +118,12 @@ namespace WDE.DatabaseEditors.ViewModels
             var sql = MultiRecordTableSqlGenerator.GenerateSql(tableData);
             try
             {
-                sqlExecutor.Value.ExecuteSql(sql);
+                sqlExecutor.ExecuteSql(sql);
                 History.MarkAsSaved();
             }
             catch (Exception e)
             {
-                messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
                     .SetMainInstruction($"Editor failed to save data to database!")
                     .SetIcon(MessageBoxIcon.Error)
                     .WithOkButton(true)
@@ -149,7 +138,7 @@ namespace WDE.DatabaseEditors.ViewModels
             
             if (valueHolder.Parameter.HasItems)
             {
-                var result = await itemFromListProvider.Value.GetItemFromList(valueHolder.Parameter.Items,
+                var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
                     valueHolder.Parameter is FlagParameter, valueHolder.Value);
                 if (result.HasValue)
                     valueHolder.Value = result.Value;
@@ -158,7 +147,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private void AddNewRow()
         {
-            tableData?.AddRow(fieldFactory.Value);
+            tableData?.AddRow(fieldFactory);
         }
 
         private void DeleteExistingRow()
@@ -173,8 +162,6 @@ namespace WDE.DatabaseEditors.ViewModels
                 return;
             
             historyHandler = new MultiRecordTableEditorHistoryHandler(tableData);
-            undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
-            redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
             History.PropertyChanged += (sender, args) =>
             {
                 undoCommand.RaiseCanExecuteChanged();
@@ -196,7 +183,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
         public ICommand Save { get; }
-        public IAsyncCommand CloseCommand { get; set; } = null;
+        public IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
 

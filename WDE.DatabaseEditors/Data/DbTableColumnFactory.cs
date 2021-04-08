@@ -14,22 +14,22 @@ namespace WDE.DatabaseEditors.Data
             IDbTableColumn column;
             if (definition.ValueType.Contains("Parameter"))
             {
-                column = new DbTableColumn<long>(in definition, new List<IDbTableField>(), defaultValue);
+                column = new DbTableColumn<long>(in definition, new List<IDbTableField>(), defaultValue ?? 0L);
                 return column;
             }
 
             switch (definition.ValueType)
             {
                 case "string":
-                    column = new DbTableColumn<string>(in definition, new List<IDbTableField>(), defaultValue);
+                    column = new DbTableColumn<string>(in definition, new List<IDbTableField>(), defaultValue ?? "");
                     break;
                 case "float":
-                    column = new DbTableColumn<float>(in definition, new List<IDbTableField>(), defaultValue);
+                    column = new DbTableColumn<float>(in definition, new List<IDbTableField>(), defaultValue ?? 0.0f);
                     break;
                 case "bool":
                 case "uint":
                 case "int":
-                    column = new DbTableColumn<long>(in definition, new List<IDbTableField>(), defaultValue);
+                    column = new DbTableColumn<long>(in definition, new List<IDbTableField>(), defaultValue ?? 0L);
                     break;
                 default:
                     throw new Exception($"Invalid type name for column {definition.DbColumnName}");

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using WDE.Common;
@@ -22,15 +23,29 @@ namespace WDE.DatabaseEditors.Solution
         public DbTableContentType TableContentType { get; }
         public bool IsMultiRecord { get; }
 
-        // just cache to avoid loading data from db each time
-        [JsonIgnore] public IDbTableData? TableData { get; private set; } = null;
-        public void CacheTableData(IDbTableData tableData) => TableData = tableData;
-        
         public Dictionary<string, DbTableSolutionItemModifiedField> ModifiedFields { get; set; }
 
         public bool IsContainer => false;
-        public ObservableCollection<ISolutionItem> Items { get; } = null;
+        public ObservableCollection<ISolutionItem>? Items { get; } = null;
         public string ExtraId => Entry.ToString();
         public bool IsExportable { get; } = true;
+
+        private bool Equals(DbEditorsSolutionItem other)
+        {
+            return Entry == other.Entry && TableContentType == other.TableContentType && IsMultiRecord == other.IsMultiRecord;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((DbEditorsSolutionItem) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Entry, (int) TableContentType, IsMultiRecord);
+        }
     }
 }

@@ -29,7 +29,7 @@
                 <Separator HorizontalAlignment="Stretch"/>
             </StackPanel>
             <ListView Grid.Row="1" ItemsSource="{Binding TableData.Rows}" SelectedIndex="{Binding SelectedRow, Mode=TwoWay}"
-                      ItemContainerStyle="{StaticResource ListViewItemStyle}">
+                      HorizontalContentAlignment="Stretch">
                 <ListView.View>
                     <GridView helpers:GridViewColumns.ColumnsSource="{Binding TableData.RowsDescriptors}"
                               helpers:GridViewColumns.HeaderTextMember="HeaderText"
@@ -37,11 +37,16 @@
                               ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}">
                         <helpers:GridViewColumns.ColumnCellTemplate>
                             <DataTemplate>
-                                <controls:DbTableFieldValueView />
+                                <controls:DbTableFieldValueView ShowModifiedIcon="False" />
                             </DataTemplate>
                         </helpers:GridViewColumns.ColumnCellTemplate>
                     </GridView>
                 </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource ListViewItemStyle}">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
             </ListView>
         </Grid>
     </DockPanel>
