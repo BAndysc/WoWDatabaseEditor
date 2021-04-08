@@ -7,33 +7,28 @@ namespace WDE.Common.WPF.ViewHelpers
 {
     public class BooleanToVisibilityConverter : IValueConverter
     {
+        public Visibility WhenTrue { get; set; } = Visibility.Visible;
+        public Visibility WhenFalse { get; set; } = Visibility.Hidden;
+        
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var flag = false;
             if (value is bool)
                 flag = (bool) value;
-            return flag ? Visibility.Visible : Visibility.Hidden;
+            return flag ? WhenTrue : WhenFalse;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
-        }
-    }
+            if (value is Visibility vis)
+            {
+                if (vis == WhenTrue)
+                    return true;
+                if (vis == WhenFalse)
+                    return false;
+            }
 
-    public class InverseBooleanToVisibilityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var flag = false;
-            if (value is bool)
-                flag = (bool) value;
-            return flag ? Visibility.Hidden : Visibility.Visible;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
+            return false;
         }
     }
 }
