@@ -6,13 +6,12 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Markup;
 using System.Xml;
 using WDE.Common.Types;
-using WoWDatabaseEditorCore.Extensions;
+using XamlReader = System.Windows.Markup.XamlReader;
 
 #nullable disable
-namespace WoWDatabaseEditorCore.WPF.Extensions
+namespace WDE.Common.WPF.ViewHelpers
 {
     //https://stackoverflow.com/questions/2643545/wpf-mvvm-how-to-bind-gridviewcolumn-to-viewmodel-collection
     public static class GridViewColumns
@@ -46,6 +45,12 @@ namespace WoWDatabaseEditorCore.WPF.Extensions
         public static readonly DependencyProperty ColumnHeadStyleNameProperty =
             DependencyProperty.RegisterAttached("ColumnHeadStyleName",
                 typeof(string),
+                typeof(GridViewColumns),
+                new UIPropertyMetadata(null));
+
+        public static readonly DependencyProperty ColumnCellTemplateProperty =
+            DependencyProperty.RegisterAttached("ColumnCellTemplate",
+                typeof(DataTemplate),
                 typeof(GridViewColumns),
                 new UIPropertyMetadata(null));
 
@@ -102,6 +107,17 @@ namespace WoWDatabaseEditorCore.WPF.Extensions
         public static void SetColumnHeadStyleName(DependencyObject obj, string value)
         {
             obj.SetValue(ColumnHeadStyleNameProperty, value);
+        }
+        
+        [AttachedPropertyBrowsableForType(typeof(GridView))]
+        public static DataTemplate GetColumnCellTemplate(DependencyObject obj)
+        {
+            return (DataTemplate) obj.GetValue(ColumnCellTemplateProperty);
+        }
+
+        public static void SetColumnCellTemplate(DependencyObject obj, DataTemplate value)
+        {
+            obj.SetValue(ColumnCellTemplateProperty, value);
         }
 
         private static void ColumnsSourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
@@ -240,16 +256,22 @@ namespace WoWDatabaseEditorCore.WPF.Extensions
             string displayMemberMember = GetDisplayMemberMember(gridView);
             bool checkbox = columnSource.CheckboxMember;
             string styleString = GetColumnHeadStyleName(gridView);
+            DataTemplate cellStyleTemplate = GetColumnCellTemplate(gridView);
             column.Width = 90;
             if (!string.IsNullOrEmpty(headerTextMember))
                 column.Header = GetPropertyValue(columnSource, headerTextMember);
+            
             if (!string.IsNullOrEmpty(displayMemberMember) && !checkbox)
             {
                 var propertyName = GetPropertyValue(columnSource, displayMemberMember) as string;
                 var binding = new Binding(propertyName);
                 if (columnSource.OneTime)
                     binding.Mode = BindingMode.OneTime;
-                column.DisplayMemberBinding = binding;
+
+                if (cellStyleTemplate != null)
+                    column.CellTemplate = CreateCellTemplate(cellStyleTemplate, binding);
+                else
+                    column.DisplayMemberBinding = binding;
             }
             else if (checkbox)
             {
@@ -276,6 +298,7 @@ namespace WoWDatabaseEditorCore.WPF.Extensions
                 // Set Widht to NaN in order to stretch it to match conent
                 column.Width = double.NaN;
             }
+            
             return column;
         }
 
@@ -289,6 +312,16 @@ namespace WoWDatabaseEditorCore.WPF.Extensions
             }
 
             return null;
+        }
+
+        private static DataTemplate CreateCellTemplate(DataTemplate template, Binding binding)
+        {
+            var wrapper = new DataTemplate();
+            var factory = new FrameworkElementFactory(typeof(ContentPresenter));
+            factory.SetValue(ContentPresenter.ContentTemplateProperty, template);
+            factory.SetBinding(ContentPresenter.ContentProperty, binding);
+            wrapper.VisualTree = factory;
+            return wrapper;
         }
     }
 }

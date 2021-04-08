@@ -4,6 +4,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.WPF.Extensions"
+             xmlns:helpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
              prism:ViewModelLocator.AutoWireViewModel="True"
              extensions:FocusBehavior.FocusFirst="true"
              Background="{DynamicResource MenuDefaultBackground}">
@@ -24,10 +25,10 @@
                 </b:EventTrigger>
             </b:Interaction.Triggers>
             <ListView.View>
-                <GridView extensions:GridViewColumns.HeaderTextMember="HeaderText"
-                          extensions:GridViewColumns.DisplayMemberMember="DisplayMember"
-                          extensions:GridViewColumns.ColumnsSource="{Binding Columns}"
-                          extensions:GridViewColumns.ColumnHeadStyleName="GridColumnHeaderStyle"
+                <GridView helpers:GridViewColumns.HeaderTextMember="HeaderText"
+                          helpers:GridViewColumns.DisplayMemberMember="DisplayMember"
+                          helpers:GridViewColumns.ColumnsSource="{Binding Columns}"
+                          helpers:GridViewColumns.ColumnHeadStyleName="GridColumnHeaderStyle"
                           ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}" />
             </ListView.View>
         </ListView>

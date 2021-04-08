@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.WPF.Extensions"
+        xmlns:helpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
         extensions:FocusBehavior.FocusFirst="true"
         Background="{DynamicResource MenuDefaultBackground}">
     <UserControl.Resources>
@@ -25,9 +26,9 @@
                   PreviewMouseDoubleClick="ListView_DoubleClick"
                   Visibility="{Binding ShowItemsList, Converter={StaticResource BooleanToVisibilityConverter}}">
             <ListView.View>
-                <GridView extensions:GridViewColumns.HeaderTextMember="HeaderText"
-                          extensions:GridViewColumns.DisplayMemberMember="DisplayMember"
-                          extensions:GridViewColumns.ColumnsSource="{Binding Columns}"
+                <GridView helpers:GridViewColumns.HeaderTextMember="HeaderText"
+                          helpers:GridViewColumns.DisplayMemberMember="DisplayMember"
+                          helpers:GridViewColumns.ColumnsSource="{Binding Columns}"
                           ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}" />
             </ListView.View>
         </ListView>
