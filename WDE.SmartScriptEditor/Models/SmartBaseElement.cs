@@ -54,7 +54,7 @@ namespace WDE.SmartScriptEditor.Models
             @params = new ParameterValueHolder<long>[parametersCount];
             for (int i = 0; i < parametersCount; ++i)
             {
-                @params[i] = new ParameterValueHolder<long>(Parameter.Instance);
+                @params[i] = new ParameterValueHolder<long>(Parameter.Instance, 0);
                 @params[i].PropertyChanged += (_, _) => CallOnChanged();
             }
 

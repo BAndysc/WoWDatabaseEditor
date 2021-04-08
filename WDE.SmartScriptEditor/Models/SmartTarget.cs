@@ -16,10 +16,10 @@ namespace WDE.SmartScriptEditor.Models
         {
             Position = new ParameterValueHolder<float>[4];
 
-            Position[0] = new ParameterValueHolder<float>("Target X", FloatParameter.Instance);
-            Position[1] = new ParameterValueHolder<float>("Target Y", FloatParameter.Instance);
-            Position[2] = new ParameterValueHolder<float>("Target Z", FloatParameter.Instance);
-            Position[3] = new ParameterValueHolder<float>("Target O", FloatParameter.Instance);
+            Position[0] = new ParameterValueHolder<float>("Target X", FloatParameter.Instance, 0);
+            Position[1] = new ParameterValueHolder<float>("Target Y", FloatParameter.Instance, 0);
+            Position[2] = new ParameterValueHolder<float>("Target Z", FloatParameter.Instance, 0);
+            Position[3] = new ParameterValueHolder<float>("Target O", FloatParameter.Instance, 0);
 
             for (var i = 0; i < 4; ++i)
                 Position[i].PropertyChanged += (_, _) => CallOnChanged();

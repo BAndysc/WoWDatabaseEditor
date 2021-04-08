@@ -9,6 +9,7 @@ namespace WDE.Parameters.Models
     public class ParameterValueHolder<T> : INotifyPropertyChanged
     {
         private T value;
+        [NotNull]
         public T Value
         {
             get => value;
@@ -69,17 +70,19 @@ namespace WDE.Parameters.Models
             return parameter.ToString(value);
         }
 
-        public ParameterValueHolder(IParameter<T> parameter)
+        public ParameterValueHolder(IParameter<T> parameter, T value)
         {
             IsUsed = false;
-            Name = null;
+            name = "";
+            this.value = value;
             this.parameter = parameter;
         }
 
-        public ParameterValueHolder(string name, IParameter<T> parameter)
+        public ParameterValueHolder(string name, IParameter<T> parameter, T value)
         {
-            Name = name;
+            this.name = name;
             IsUsed = true;
+            this.value = value;
             this.parameter = parameter;
         }
 
@@ -91,12 +94,12 @@ namespace WDE.Parameters.Models
             Parameter = other.Parameter;
         }
         
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public event System.Action<ParameterValueHolder<T>, T, T> OnValueChanged;
+        public event System.Action<ParameterValueHolder<T>, T, T>? OnValueChanged;
         
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName]  string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName]  string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
