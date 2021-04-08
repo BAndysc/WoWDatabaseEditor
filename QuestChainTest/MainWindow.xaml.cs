@@ -31,7 +31,6 @@ namespace QuestChainTest
 
             new TrinityMySqlDatabaseModule().OnInitialized(null);
 
-            // most probably will crash so fix it when needed..
             TrinityMySqlDatabaseProvider db = new(new DatabaseSettingsProvider(null), new DatabaseLogger(), new MockCoreVersion());
 
             ExampleQuestsProvider exampleQuestProvider = new();
