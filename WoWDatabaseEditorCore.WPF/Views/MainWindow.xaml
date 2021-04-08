@@ -13,6 +13,7 @@
                       xmlns:helpers="clr-namespace:WoWDatabaseEditorCore.WPF.Views.Helpers"
                       xmlns:views="clr-namespace:WoWDatabaseEditorCore.WPF.Views"
                       xmlns:utils="clr-namespace:WoWDatabaseEditorCore.WPF.Utils"
+                      xmlns:viewHelpers1="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
                       Style="{DynamicResource MainWindowStyle}"
                       Title="{Binding Title}"
                       WindowStartupLocation="CenterScreen"
@@ -27,7 +28,7 @@
             LightMaxButtonStyle="{DynamicResource MetroWindowButtonStyle}" />
     </Controls:MetroWindow.WindowButtonCommands>
     <Window.Resources>
-        <helpers:BooleanToHiddenVisibilityConverter x:Key="BooleanToHiddenVisibilityConverter"/>
+        <viewHelpers1:BooleanToVisibilityConverter WhenTrue="Visible" WhenFalse="Hidden" x:Key="BooleanToHiddenVisibilityConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <helpers:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
         <helpers:DocumentOrToolToTitleConverter x:Key="DocumentOrToolToTitleConverter" />
