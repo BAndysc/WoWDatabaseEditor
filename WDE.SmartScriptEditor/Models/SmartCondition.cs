@@ -31,8 +31,8 @@ namespace WDE.SmartScriptEditor.Models
             var conditionTargetParam = new Parameter();
             conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
 
-            inverted = new ParameterValueHolder<long>("Inverted", invertedParam);
-            conditionTarget = new ParameterValueHolder<long>("Condition target", conditionTargetParam);
+            inverted = new ParameterValueHolder<long>("Inverted", invertedParam, 0);
+            conditionTarget = new ParameterValueHolder<long>("Condition target", conditionTargetParam, 0);
             inverted.PropertyChanged += ((sender, value) =>
             {
                 CallOnChanged();

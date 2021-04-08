@@ -49,11 +49,11 @@ namespace WDE.SmartScriptEditor.Models
                 }
             };
 
-            flags = new ParameterValueHolder<long>("Flags", SmartEventFlagParameter.Instance);
-            chance = new ParameterValueHolder<long>("Chance", Parameter.Instance);
-            phases = new ParameterValueHolder<long>("Phases", SmartEventPhaseParameter.Instance);
-            cooldownMin = new ParameterValueHolder<long>("Cooldown min", Parameter.Instance);
-            cooldownMax = new ParameterValueHolder<long>("Cooldown max", Parameter.Instance);
+            flags = new ParameterValueHolder<long>("Flags", SmartEventFlagParameter.Instance, 0);
+            chance = new ParameterValueHolder<long>("Chance", Parameter.Instance, 0);
+            phases = new ParameterValueHolder<long>("Phases", SmartEventPhaseParameter.Instance, 0);
+            cooldownMin = new ParameterValueHolder<long>("Cooldown min", Parameter.Instance, 0);
+            cooldownMax = new ParameterValueHolder<long>("Cooldown max", Parameter.Instance, 0);
 
             flags.PropertyChanged += (_, _) => CallOnChanged();
             chance.PropertyChanged += (_, _) => CallOnChanged();

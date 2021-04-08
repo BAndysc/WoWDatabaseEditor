@@ -17,7 +17,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartSource(int id) : base(SmartSourceParametersCount, id)
         {
-            condition = new ParameterValueHolder<long>("Condition ID", Parameter.Instance);
+            condition = new ParameterValueHolder<long>("Condition ID", Parameter.Instance, 0);
         }
 
         public SmartAction Parent
