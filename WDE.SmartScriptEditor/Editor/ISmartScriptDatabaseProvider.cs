@@ -8,5 +8,7 @@ namespace WDE.SmartScriptEditor.Editor
     {
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
         Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script);
+        IEnumerable<IConditionLine> GetConditionsForScript(int entryOrGuid, SmartScriptType type);
+        Task InstallConditionsForScript(IEnumerable<IConditionLine> conditions, int entryOrGuid, SmartScriptType type);
     }
 }

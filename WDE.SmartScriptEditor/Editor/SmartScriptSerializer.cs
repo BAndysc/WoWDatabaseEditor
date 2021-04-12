@@ -182,6 +182,7 @@ namespace WDE.SmartScriptEditor.Exporter
         }
         
         public static IConditionLine[] ToConditionLines(this SmartEvent e,
+            int conditionSourceType,
             int scriptEntryOrGuid,
             SmartScriptType scriptSourceType,
             int id)
@@ -199,7 +200,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 }
                 lines.Add(new AbstractConditionLine()
                 {
-                    SourceType = SmartConstants.ConditionSourceSmartScript,
+                    SourceType = conditionSourceType,
                     SourceGroup = id + 1,
                     SourceEntry = scriptEntryOrGuid,
                     SourceId = (int)scriptSourceType,
