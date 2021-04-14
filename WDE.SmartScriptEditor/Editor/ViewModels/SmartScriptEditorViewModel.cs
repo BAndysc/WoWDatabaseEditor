@@ -387,7 +387,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         selectedEvents.SelectMany((e, index) => e.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, index))
                             .Select(s => s.SerializeToString()));
                     string conditionLines = string.Join("\n",
-                        selectedEvents.SelectMany((e, index) => e.ToConditionLines(script.EntryOrGuid, script.SourceType, index))
+                        selectedEvents.SelectMany((e, index) => e.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script.EntryOrGuid, script.SourceType, index))
                             .Select(s => s.ToSqlString())); 
                     
                     if (string.IsNullOrEmpty(conditionLines))
@@ -419,7 +419,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             fakeEvent.Conditions.Add(c.Copy());
 
                         string lines = string.Join("\n",
-                            fakeEvent.ToConditionLines(script.EntryOrGuid, script.SourceType, 0).Select(s => s.ToSqlString()));
+                            fakeEvent.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script.EntryOrGuid, script.SourceType, 0).Select(s => s.ToSqlString()));
                         clipboard.SetText("conditions:\n" + lines);
                     }
                 }
@@ -898,8 +898,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task AsyncLoad()
         {
-            var lines = smartScriptDatabase.GetScriptFor((int)this.item.Entry, this.item.SmartType).ToList();
-            var conditions = database.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, (int)this.item.Entry, (int)this.item.SmartType).ToList();
+            var lines = smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType).ToList();
+            var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.SmartType).ToList();
             script.Load(lines, conditions);
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
@@ -911,12 +911,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             var (lines, conditions) = smartScriptExporter.ToDatabaseCompatibleSmartScript(script);
             
-            await smartScriptDatabase.InstallScriptFor((int)item.Entry, item.SmartType, lines);
-            
-            await database.InstallConditions(conditions, 
-                IDatabaseProvider.ConditionKeyMask.SourceEntry | IDatabaseProvider.ConditionKeyMask.SourceId,
-                new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript, null, (int)item.Entry, (int)item.SmartType));
+            await smartScriptDatabase.InstallScriptFor(item.Entry, item.SmartType, lines);
 
+            await smartScriptDatabase.InstallConditionsForScript(conditions,
+                item.Entry, item.SmartType);
+            
             statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
             
             History.MarkAsSaved();

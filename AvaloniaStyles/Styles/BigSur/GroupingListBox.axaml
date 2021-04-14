@@ -1,0 +1,20 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="controls|GroupingListBox">
+        <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}" />
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Border BorderThickness="0,1,0,1" BorderBrush="{DynamicResource ThemeBorderMidBrush}">
+                        <TextBlock Text="{Binding GroupName}" FontWeight="Bold" FontSize="12" Padding="10,2,0,2" />
+                    </Border>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style Selector="controls|GroupingListBox /template/ ItemsControl">
+        <Setter Property="Margin" Value="0,-1,0,0" /> <!-- hiding first header top border to prevent double borders -->
+    </Style>
+</Styles>

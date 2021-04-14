@@ -25,9 +25,14 @@ namespace WoWDatabaseEditorCore.ModulesManagement
 
         public bool AddModule(Assembly module)
         {
-            bool enabled = !ignoredModules.Contains(module.GetName().Name!);
+            bool enabled = ShouldLoad(module);
             modules.Add(new ModuleData(module, enabled, enabled));
             return enabled;
+        }
+
+        public bool ShouldLoad(Assembly module)
+        {
+            return !ignoredModules.Contains(module.GetName().Name!);
         }
     }
 }

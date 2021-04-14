@@ -7,6 +7,7 @@ using Avalonia.Input;
 using Avalonia.LogicalTree;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
@@ -77,14 +78,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             
             if (e.ClickCount == 1)
             {
-                if (DirectEditParameter != null)
+                if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
                 {
-                    /*if (e.OriginalSource is Run originalRun && originalRun.DataContext != null &&
-                        originalRun.DataContext != DataContext)
-                    {
-                        DirectEditParameter.Execute(originalRun.DataContext);
-                        return;
-                    }*/
+                    DirectEditParameter?.Execute(tb.OverContext);
+                    return;
                 }
 
                 DeselectActionsOfDeselectedEventsRequest?.Execute(null);

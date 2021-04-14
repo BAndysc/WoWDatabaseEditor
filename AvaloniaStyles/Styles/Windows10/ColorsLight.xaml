@@ -17,10 +17,19 @@
         
         <SolidColorBrush Color="#F0F0F0" x:Key="WindowContentBorderBrush" />
         <SolidColorBrush Color="#F0F0F0" x:Key="WindowContentBackground" />
+        <SolidColorBrush Color="#293955" x:Key="MainWindowContentBackground" />
         
         <SolidColorBrush Color="#292929" x:Key="SystemControlForegroundBaseHighBrush" />
         
         <SolidColorBrush Color="#3C3C3C" x:Key="TitleBarForeground" />
+        
+        <!-- dock -->
+        <SolidColorBrush Color="White" x:Key="DockThemeForegroundBrush" />
+        <SolidColorBrush Color="Black" x:Key="DockApplicationAccentForegroundBrush" />
+        <SolidColorBrush Color="#8E9BBC" x:Key="DockThemeBorderLowBrush" />
+        <SolidColorBrush Color="#FFF29D" x:Key="DockThemeAccentBrush" />
+        <SolidColorBrush Color="#FFF29D" x:Key="DockApplicationAccentBrushLow" />
+        <SolidColorBrush Color="#DDD185" x:Key="DockApplicationAccentBrushMed" />
         
         <!-- textbox -->
         <SolidColorBrush Color="White" x:Key="TextControlBackground" />

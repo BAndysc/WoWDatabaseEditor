@@ -8,6 +8,7 @@ namespace WoWDatabaseEditorCore.ModulesManagement
         IEnumerable<ModuleData> Modules { get; }
         void AddConflicted(Assembly conflictingAssembly, Assembly firstAssembly);
         bool AddModule(Assembly module);
+        bool ShouldLoad(Assembly module);
     }
 
     public class ModuleData

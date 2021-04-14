@@ -1,0 +1,81 @@
+<controls:ExtendedWindow xmlns="https://github.com/avaloniaui"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:mvvm="http://prismlibrary.com/"
+          xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+          xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
+          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+          xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
+          xmlns:docking="clr-namespace:WoWDatabaseEditorCore.Avalonia.Docking"
+          mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+          mvvm:ViewModelLocator.AutoWireViewModel="True"
+          x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindowWithDocking"
+          TransparencyLevelHint="AcrylicBlur"
+          Icon="../Icon.png"
+          ManagedIcon="../Icon.png"
+          Name="Root"
+          Classes="MainWindow"
+          Title="{Binding Title}">
+
+    <NativeMenu.Menu>
+        <NativeMenu utils:MenuBind.MenuItems="{Binding MenuItemProviders}">
+        </NativeMenu>
+    </NativeMenu.Menu>
+    
+    <Window.KeyBindings>
+        <KeyBinding Gesture="{x:Static views:MainWindow.UndoGesture}" Command="{Binding DocumentManager.ActiveDocument.Undo}" />
+        <KeyBinding Gesture="{x:Static views:MainWindow.RedoGesture}" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
+
+        <KeyBinding Gesture="{x:Static views:MainWindow.SaveGesture}" Command="{Binding DocumentManager.ActiveDocument.Save}" />
+
+        <KeyBinding Gesture="{x:Static TextBox.CopyGesture}" Command="{Binding DocumentManager.ActiveDocument.Copy}" />
+        <KeyBinding  Gesture="{x:Static TextBox.PasteGesture}" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
+        <KeyBinding  Gesture="{x:Static TextBox.CutGesture}" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
+    </Window.KeyBindings>
+    
+    <controls:ExtendedWindow.ToolBar>
+        <controls:ToolBar>
+            <controls:ToolBar.LeftContent>
+                <Button Command="{Binding ExecuteChangedCommand}">
+                    <Border Background="Transparent"
+                            Width="12"
+                            Height="12"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Path Fill="{Binding $parent[Button].Foreground}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Data="M 0 0 L 6 3.5 L 0 7 Z"/>
+                    </Border>
+                </Button>
+            </controls:ToolBar.LeftContent>
+            <controls:ToolBar.RightContent>
+                <StackPanel Orientation="Horizontal">
+                    <Button Command="{Binding GenerateCurrentSqlCommand}">SQL</Button>
+                </StackPanel>
+            </controls:ToolBar.RightContent>
+        </controls:ToolBar>
+    </controls:ExtendedWindow.ToolBar>
+    
+    <controls:ExtendedWindow.StatusBar>
+        <controls:StatusBar>
+            <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{Binding StatusBar}" />
+        </controls:StatusBar>
+    </controls:ExtendedWindow.StatusBar>
+    
+    <controls:ExtendedWindow.Overlay>
+        <views:TasksPanel DataContext="{Binding TasksViewModel}"
+                          Margin="0,0,5,0"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Bottom"
+                          ClipToBounds="False"
+                          IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
+    </controls:ExtendedWindow.Overlay>
+
+    <idc:DockControl Name="DockControl" >
+        <idc:DockControl.DataTemplates>
+            <docking:PersistentDockDataTemplate />
+        </idc:DockControl.DataTemplates>
+    </idc:DockControl>
+</controls:ExtendedWindow>

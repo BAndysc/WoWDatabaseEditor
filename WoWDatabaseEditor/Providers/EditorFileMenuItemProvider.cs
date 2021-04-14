@@ -15,6 +15,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
+using WDE.Solutions;
 using WoWDatabaseEditorCore.Managers;
 using WoWDatabaseEditorCore.ViewModels;
 
@@ -105,7 +106,8 @@ namespace WoWDatabaseEditorCore.Providers
             if (item != null)
             {
                 solutionManager.Items.Add(item);
-                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
+                if (item is not SolutionFolderItem)
+                    eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
             }
         }
         private void OpenSettings() => settings.ShowSettings();

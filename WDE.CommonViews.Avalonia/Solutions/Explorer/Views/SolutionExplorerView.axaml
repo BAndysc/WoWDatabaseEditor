@@ -56,25 +56,23 @@
     </components:ToolView.Resources>
     
     <TreeView x:Name="tv" Margin="0" Items="{Binding Root}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" DoubleTapped="Tv_OnDoubleTapped">
+        <TreeView.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Add"
+                          Command="{Binding #tv.DataContext.AddItem}"
+                          IsEnabled="{Binding IsContainer}" />
+                <MenuItem Header="Remove"
+                          Command="{Binding #tv.DataContext.RemoveItem}" />
+                <Separator />
+                <MenuItem Header="Generate SQL"
+                          Command="{Binding #tv.DataContext.GenerateSQL}"
+                          IsEnabled="{Binding IsExportable}" />
+            </ContextMenu>
+        </TreeView.ContextMenu>
         <TreeView.Styles>
             <Style Selector="TreeViewItem">
                 <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
                 <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                <Setter Property="ContextMenu">
-                    <Setter.Value>
-                        <ContextMenu>
-                            <MenuItem Header="Add"
-                                      Command="{Binding #tv.DataContext.AddItem}"
-                                      IsEnabled="{Binding IsContainer}" />
-                            <MenuItem Header="Remove"
-                                      Command="{Binding #tv.DataContext.RemoveItem}" />
-                            <Separator />
-                            <MenuItem Header="Generate SQL"
-                                      Command="{Binding #tv.DataContext.GenerateSQL}"
-                                      IsEnabled="{Binding IsExportable}" />
-                        </ContextMenu>
-                    </Setter.Value>
-                </Setter>
             </Style>
         </TreeView.Styles>
         <TreeView.DataTemplates>

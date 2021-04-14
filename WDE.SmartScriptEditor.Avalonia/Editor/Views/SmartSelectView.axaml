@@ -6,6 +6,7 @@
                 xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
                 xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
                 xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
+                xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
                 Name="Root"
                 mvvm:ViewModelLocator.AutoWireViewModel="False">
     <UserControl.Styles>
@@ -57,7 +58,7 @@
     <controls:DialogViewBase.ToolBar>
         <Grid ColumnDefinitions="*,250">
             <TextBlock Text="{Binding Title}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" />
-            <userControls:FixedTextBox Grid.Column="1"
+            <controls:FixedTextBox Grid.Column="1"
                           Width="220"
                           AcceptsReturn="False"
                           Watermark="Search"
@@ -77,62 +78,41 @@
 
         <!--<TextBlock Text="{Binding SelectedItem.Help}" TextWrapping="WrapWithOverflow" />-->
         
-        <Border Grid.Row="1" Grid.ColumnSpan="2"  
-                Background="{DynamicResource ThemeBackgroundBrush}"
-                BorderBrush="#828790" 
-                Margin="0,6,0,6"
-                BorderThickness="1">
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl Items="{Binding FilteredItems}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <Grid VerticalAlignment="Center" DockPanel.Dock="Top" ColumnDefinitions="15,Auto,*">
-                                    <Rectangle Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
-                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Padding="3" FontWeight="Bold" 
-                                               Foreground="#FF226E8B" Margin="0,5,0,0" />
-                                    <Rectangle Grid.Column="2" Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
-                                </Grid>
-                                <ListBox Items="{Binding}" 
-                                         KeyDown="InputElement_OnKeyDown"
-                                         SelectedItem="{Binding SelectedItem}">
-                                    <ListBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel />
-                                        </ItemsPanelTemplate>
-                                    </ListBox.ItemsPanel>
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <Image Margin="0,0,4,0" Width="16" Height="16" Stretch="Fill" Source="{StaticResource cogIcon}">
-                                                    <Interaction.Behaviors>
-                                                        <DataTriggerBehavior Binding="{Binding IsTimed}" Value="True">
-                                                            <ChangePropertyAction PropertyName="Source" Value="{StaticResource timedIcon}"></ChangePropertyAction>
-                                                        </DataTriggerBehavior>
-                                                    </Interaction.Behaviors>
-                                                </Image>
-                                                <TextBlock Text="{Binding Name}" Width="140" VerticalAlignment="Center">
-                                                    <Interaction.Behaviors>
-                                                        <DataTriggerBehavior Binding="{Binding Deprecated}" Value="True">
-                                                            <ChangePropertyAction PropertyName="Foreground" Value="Gray" />
-                                                        </DataTriggerBehavior>
-                                                    </Interaction.Behaviors>
-                                                </TextBlock>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                    <Interaction.Behaviors>
-                                        <EventTriggerBehavior EventName="DoubleTapped">
-                                            <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
-                                        </EventTriggerBehavior>
-                                    </Interaction.Behaviors>
-                                </ListBox>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </Border>
+        <controls1:GroupingListBox Items="{Binding FilteredItems}"
+                                   Grid.Row="1" Grid.ColumnSpan="2"  
+                                   SelectedItem="{Binding SelectedItem}"
+                                   Margin="0,6,0,6">
+            <controls1:GroupingListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </controls1:GroupingListBox.ItemsPanel>
+            <controls1:GroupingListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Image Margin="0,0,4,0" Width="16" Height="16" Stretch="Fill" Source="{StaticResource cogIcon}">
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{Binding IsTimed}" Value="True">
+                                    <ChangePropertyAction PropertyName="Source" Value="{StaticResource timedIcon}"></ChangePropertyAction>
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </Image>
+                        <TextBlock Text="{Binding Name}" Width="140" VerticalAlignment="Center">
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{Binding Deprecated}" Value="True">
+                                    <ChangePropertyAction PropertyName="Foreground" Value="Gray" />
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </controls1:GroupingListBox.ItemTemplate>
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
+        </controls1:GroupingListBox>
         
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

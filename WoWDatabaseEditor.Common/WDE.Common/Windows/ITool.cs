@@ -1,10 +1,11 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Windows
 {
     [NonUniqueProvider]
-    public interface ITool
+    public interface ITool : INotifyPropertyChanged
     {
         string Title { get; }
         string UniqueId { get; }

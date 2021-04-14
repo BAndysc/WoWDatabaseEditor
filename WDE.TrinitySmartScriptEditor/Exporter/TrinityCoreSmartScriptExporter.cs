@@ -112,7 +112,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     eventToSerialize.Actions.Add(actualAction);
 
                     var serialized = eventToSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, linkTo);
-                    var serializedConditions = actualEvent.ToConditionLines(script.EntryOrGuid, script.SourceType, eventId);
+                    var serializedConditions = actualEvent.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script.EntryOrGuid, script.SourceType, eventId);
 
                     if (serialized.Length != 1)
                         throw new InvalidOperationException();

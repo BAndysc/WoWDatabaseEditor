@@ -4,22 +4,23 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:newItemService="clr-namespace:WoWDatabaseEditorCore.Services.NewItemService;assembly=WoWDatabaseEditorCore"
+             xmlns:newItemService1="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.NewItemService"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              d:DataContext="{d:DesignInstance newItemService:NewItemDialogViewModel}"
+             Name="Root"
              Margin="0,9,0,0">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectedItem="{Binding SelectedPrototype}"
-                  Items="{Binding ItemPrototypes}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  DoubleTapped="InputElement_OnDoubleTapped"
-                  KeyDown="UIElement_OnKeyDown"
-                  Name="ItemsList"
-                  >
-            <ListBox.ItemTemplate>
+        <controls:GroupingListBox Items="{Binding  ItemPrototypes}"
+                                 SelectedItem="{Binding SelectedPrototype}"
+                                 DoubleTapped="InputElement_OnDoubleTapped"
+                                 KeyDown="UIElement_OnKeyDown">
+            <controls:GroupingListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -36,9 +37,13 @@
                                    Grid.Row="1" />
                     </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <Grid Grid.Row="2">
+            </controls:GroupingListBox.ItemTemplate>
+        </controls:GroupingListBox>
+        <DockPanel IsEnabled="{Binding SelectedPrototype.RequiresName}" Grid.Row="2" LastChildFill="True" Margin="0,0,0,10">
+            <TextBlock VerticalAlignment="Center">Name:</TextBlock>
+            <TextBox Text="{Binding CustomName, Mode=TwoWay}" Margin="10,0,0,0" />
+        </DockPanel>
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80" />
                 <ColumnDefinition Width="*" />

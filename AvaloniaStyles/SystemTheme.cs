@@ -24,6 +24,9 @@ namespace AvaloniaStyles
         {
         }
 
+        public bool ThemeUsesDock =>
+            mode == SystemThemeOptions.Windows10Dark || mode == SystemThemeOptions.Windows10Light;
+        
         private SystemThemeOptions mode;
         public SystemThemeOptions Mode
         {

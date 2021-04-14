@@ -116,6 +116,10 @@
         </DataTemplate>
     </Controls:MetroWindow.TitleTemplate>
     <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="{DynamicResource MainWindowCaptionActiveBackground}">
+            <Button Margin="5,0,0,0" Command="{Binding ExecuteChangedCommand}" Content="Execute" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" />
+            <Button Command="{Binding GenerateCurrentSqlCommand}" Content="Generate SQL" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" />
+        </StackPanel>
         <views:StatusBarView DockPanel.Dock="Bottom" Height="20" DataContext="{Binding StatusBar}" />
         <Grid>
             <DockingManager

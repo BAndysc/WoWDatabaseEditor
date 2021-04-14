@@ -106,8 +106,8 @@ namespace WDE.SmartScriptEditor.Data
             var raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
             action.CommentParameter.IsUsed = raw.CommentField != null;
             action.CommentParameter.Name = raw.CommentField;
-            UpdateTargetPositionVisibility(action.Target);
             SetParameterObjects(action, raw);
+            UpdateTargetPositionVisibility(action.Target);
 
             return action;
         }
@@ -128,8 +128,8 @@ namespace WDE.SmartScriptEditor.Data
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
             smartAction.CommentParameter.IsUsed = raw.CommentField != null;
             smartAction.CommentParameter.Name = raw.CommentField;
-            UpdateTargetPositionVisibility(smartAction.Target);
             SetParameterObjects(smartAction, raw, true);
+            UpdateTargetPositionVisibility(smartAction.Target);
         }
 
         public SmartAction ActionFactory(ISmartScriptLine line)

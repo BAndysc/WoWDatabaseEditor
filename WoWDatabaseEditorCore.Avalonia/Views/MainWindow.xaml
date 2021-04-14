@@ -7,6 +7,8 @@
           xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+          xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
+          xmlns:docking="clr-namespace:WoWDatabaseEditorCore.Avalonia.Docking"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindow"
@@ -126,4 +128,5 @@
             </Style>
         </components:MultiViewModelContentPresenter.Styles>
     </components:MultiViewModelContentPresenter>
+    
 </controls:ExtendedWindow>

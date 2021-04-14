@@ -23,7 +23,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
             var vm = viewModel();
             if (await windowManager.ShowDialog(vm))
             {
-                return await vm.SelectedPrototype!.CreateSolutionItem();
+                return await vm.CreateSolutionItem();
             }
             return null;
         }

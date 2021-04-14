@@ -6,6 +6,7 @@
         <system:Double x:Key="TitleBarHeight">38</system:Double>
     </Styles.Resources>
     <Style Selector="Window">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="Background" Value="{DynamicResource MainColorBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource MainColorForeground}"/>
     </Style>
@@ -21,7 +22,7 @@
                 <Panel>
                     <Border Classes="Bg"/>
                     <Border Classes="Separator" />
-                    <DockPanel LastChildFill="True" Margin="90,7.5,7.5,7.5">
+                    <DockPanel LastChildFill="True">
                         <controls1:WindowControlButtons DockPanel.Dock="Right"/>
                         <ContentPresenter Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"/>
                         <ContentPresenter Content="{TemplateBinding Content}" Margin="10,0,10,0" HorizontalContentAlignment="Stretch"/>
@@ -33,11 +34,11 @@
     <Style Selector="controls1|ExtendedTitleBar:macos /template/ controls1|WindowControlButtons">
         <Setter Property="IsVisible" Value="False" />
     </Style>
-    <Style Selector="controls1|ExtendedWindow:has-sidebar controls1|ExtendedTitleBar /template/ DockPanel">
-        <Setter Property="Margin" Value="7.5"/>
+    <Style Selector="controls1|ExtendedWindow controls1|ExtendedTitleBar /template/ DockPanel">
+        <Setter Property="Margin" Value="6"/>
     </Style>
-    <Style Selector="controls1|ExtendedWindow:fullscreen controls1|ExtendedTitleBar /template/ DockPanel">
-        <Setter Property="Margin" Value="7.5"/>
+    <Style Selector="controls1|ExtendedWindow:mac-os:not(:fullscreen):not(:has-sidebar) controls1|ExtendedTitleBar /template/ DockPanel">
+        <Setter Property="Margin" Value="90,6,6,6"/>
     </Style>
     <Style Selector="controls1|ExtendedTitleBar /template/ Border.Bg">
         <Setter Property="IsHitTestVisible" Value="False" />
@@ -61,6 +62,7 @@
     </Style>
     
     <Style Selector="controls1|ExtendedWindow">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="TransparencyLevelHint" Value="AcrylicBlur" />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="{StaticResource TitleBarHeight}" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
@@ -147,6 +149,7 @@
     
     <!-- dialog -->
     <Style Selector="controls1|BaseMessageBoxWindow">
+        <Setter Property="FontFamily" Value="{DynamicResource MainFontSans}"/>
         <Setter Property="Background" Value="#8E1A1A1A" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="TransparencyLevelHint" Value="AcrylicBlur" />

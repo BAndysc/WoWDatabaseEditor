@@ -67,9 +67,6 @@
         <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
         <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
-        <PackageReference Include="Dock.Avalonia" Version="0.10.0" />
-        <PackageReference Include="Dock.Avalonia.Themes.Default" Version="0.10.0" />
-        <PackageReference Include="Dock.Model.Avalonia" Version="0.10.0" />
         <PackageReference Include="Prism.Avalonia" Version="7.2.0.1430" />
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
         <PackageReference Include="Prism.Unity.Avalonia" Version="7.2.0.1430" />
@@ -83,6 +80,11 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Extensions" />
+    </ItemGroup> 
+    <ItemGroup>
+        <ProjectReference Include="..\Dock\src\Dock.Model\Dock.Model.csproj" />
+        <ProjectReference Include="..\Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj" />
+        <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
     </ItemGroup>
     <ItemGroup>
       <UpToDateCheckInput Remove="Styles\Button.xaml" />
