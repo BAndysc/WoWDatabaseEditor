@@ -117,11 +117,15 @@ namespace WoWDatabaseEditorCore.Avalonia
             moduleCatalog.AddModule(typeof(MainModuleAvalonia));
             moduleCatalog.AddModule(typeof(CommonAvaloniaModule));
             
-            var dlls = GetPluginDlls().ToList();
+            List<Assembly> allAssemblies = GetPluginDlls()
+                .Select(AssemblyLoadContext.Default.LoadFromAssemblyPath)
+                .ToList();
             
-            List<Assembly> allAssemblies = GetPluginDlls().Select(AssemblyLoadContext.Default.LoadFromAssemblyPath).ToList();
+            List<Assembly> loadAssemblies = allAssemblies
+                .Where(modulesManager!.ShouldLoad)
+                .ToList();
 
-            var conflicts = DetectConflicts(allAssemblies);
+            var conflicts = DetectConflicts(loadAssemblies);
 
             foreach (var conflict in conflicts)
             {
