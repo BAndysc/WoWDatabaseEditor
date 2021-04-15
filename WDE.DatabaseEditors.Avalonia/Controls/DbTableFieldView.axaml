@@ -1,0 +1,31 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WDE.DatabaseEditors.Avalonia.Controls">
+    <Design.PreviewWith>
+        <controls:DbTableFieldView />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|DbTableFieldView">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}">
+                    <DockPanel LastChildFill="True" Margin="20, 1, 0, 1" HorizontalAlignment="Stretch">
+                        <TextBlock Text="{TemplateBinding Title}" TextWrapping="Wrap"
+                                   MinHeight="15" MaxHeight="50" Width="100"
+                                   Margin="0, 0, 10, 0"
+                                   VerticalAlignment="Center"
+                                   DockPanel.Dock="Left" />
+                        <controls:DbTableFieldValueView IsModified="{TemplateBinding IsModified}"
+                                                        IsReadOnly="{TemplateBinding IsReadOnly}"
+                                                        ChooseParameterCommand="{TemplateBinding ChooseParameterCommand}"/>
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|DbTableFieldView:modified">
+        <Setter Property="Background"
+                Value="LightGray" />
+    </Style>
+</Styles>

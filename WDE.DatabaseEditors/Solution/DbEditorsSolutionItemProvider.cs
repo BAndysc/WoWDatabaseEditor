@@ -23,6 +23,7 @@ namespace WDE.DatabaseEditors.Solution
         public ImageUri GetImage() => itemIcon;
 
         public string GetDescription() => itemDescription;
+        public string GetGroupName() => "Other";
 
         public bool IsCompatibleWithCore(ICoreVersion core) => true;
 

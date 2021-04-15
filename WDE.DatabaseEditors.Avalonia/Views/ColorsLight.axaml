@@ -1,0 +1,11 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Styles.Resources>
+        <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#4E88BF"/>
+        <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#F1F1F1" />
+        <SolidColorBrush x:Key="TreeViewItem.Content.Background.Modified" Color="#000099" Opacity=".3"/>
+        <SolidColorBrush x:Key="TreeViewItem.Content.Background.Normal" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="TreeViewItem.Content.Background.NormalAlternate" Color="#F0F0F0"/>
+
+    </Styles.Resources>
+</Styles>

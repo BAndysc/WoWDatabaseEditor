@@ -78,6 +78,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWDatabaseEditorCore.Avalo
 		{A094F0F9-C067-4B66-8FCA-ECA3747C6A4C} = {A094F0F9-C067-4B66-8FCA-ECA3747C6A4C}
 		{FF98ED22-0FFC-4C53-8946-437F5B84441F} = {FF98ED22-0FFC-4C53-8946-437F5B84441F}
 		{506C7413-6FD7-472C-99AA-A0580B4D2E3B} = {506C7413-6FD7-472C-99AA-A0580B4D2E3B}
+		{DCD5F40C-139E-4404-8EF0-DC85DD595E44} = {DCD5F40C-139E-4404-8EF0-DC85DD595E44}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoWDatabaseEditorCore.WPF", "WoWDatabaseEditorCore.WPF\WoWDatabaseEditorCore.WPF.csproj", "{60AB9143-F815-4240-9316-B0CBC8AE457A}"
@@ -131,6 +132,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Avalonia", "Dock\src\Dock.Avalonia\Dock.Avalonia.csproj", "{80EDB0DB-C085-4AAD-BF82-EACC1EB30F44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Model.ReactiveUI", "Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj", "{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseEditors.Avalonia", "WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj", "{DCD5F40C-139E-4404-8EF0-DC85DD595E44}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -371,6 +374,12 @@ Global
 		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
 		{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
+		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
+		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.DebugAvalonia|Any CPU.Build.0 = DebugAvalonia|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
