@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using WDE.Common;
 using WDE.DatabaseEditors.Data;
-using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -26,10 +23,9 @@ namespace WDE.DatabaseEditors.Solution
             var key = await creatureEntryProviderService.GetEntryFromService();
             if (key.HasValue)
             {
-                var data = await tableDataProvider.LoadCreatureTemplateDataEntry(key.Value);
+                var data = await tableDataProvider.Load("creature_template", key.Value);
                 if (data != null)
-                    return new DbEditorsSolutionItem(key.Value, DbTableContentType.CreatureTemplate,
-                        false, new Dictionary<string, DbTableSolutionItemModifiedField>());
+                    return new DbEditorsSolutionItem(key.Value, "creature_template");
             }
 
             return null;

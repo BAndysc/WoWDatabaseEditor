@@ -26,10 +26,9 @@ namespace WDE.DatabaseEditors.Solution
             var key = await creatureEntryProviderService.GetEntryFromService();
             if (key.HasValue)
             {
-                var data = await tableDataProvider.LoadCreatureLootTemplateData(key.Value);
+                var data = await tableDataProvider.Load("creature_loot_template", key.Value);
                 if (data != null)
-                    return new DbEditorsSolutionItem(key.Value, DbTableContentType.CreatureLootTemplate, true, 
-                        new Dictionary<string, DbTableSolutionItemModifiedField>());
+                    return new DbEditorsSolutionItem(key.Value, "creature_loot_template");
             }
 
             return null;

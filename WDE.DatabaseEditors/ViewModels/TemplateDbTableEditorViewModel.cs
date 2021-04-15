@@ -35,7 +35,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly DbEditorsSolutionItem solutionItem;
         private readonly IDbEditorTableDataProvider tableDataProvider;
 
-        public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName,
+        public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem,
             IDbEditorTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IDbFieldNameSwapDataManager nameSwapDataManager, IEventAggregator eventAggregator,
@@ -50,9 +50,9 @@ namespace WDE.DatabaseEditors.ViewModels
             tableData = null!;
             
             IsLoading = true;
-            taskRunner.ScheduleTask($"Loading {tableName}..", LoadTableDefinition);
+            taskRunner.ScheduleTask($"Loading {solutionItem.TableId}..", LoadTableDefinition);
             
-            Title = $"{tableName} Editor";
+            Title = $"{solutionItem.TableId} Editor";
 
             undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
@@ -85,7 +85,7 @@ namespace WDE.DatabaseEditors.ViewModels
                     {
                         if (solutionItem.Equals(dbEditItem))
                         {
-                            args.Sql = queryGenerator.GenerateQuery(tableData, solutionItem.TableContentType, solutionItem.Entry, solutionItem.IsMultiRecord,
+                            args.Sql = queryGenerator.GenerateQuery(tableData, solutionItem.TableId, solutionItem.Entry,
                                 GetModifiedFields());
                         }
                     }
@@ -108,7 +108,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private async Task LoadTableDefinition()
         {
-            var data = await tableDataProvider.Load(solutionItem.TableContentType, solutionItem.Entry) as DbTableData;
+            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entry) as DbTableData;
 
             if (data == null)
             {

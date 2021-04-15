@@ -19,35 +19,6 @@ namespace WDE.DatabaseEditors.Solution
             this.databaseProvider = databaseProvider;
         }
         
-        public string GetName(DbEditorsSolutionItem item) => $"{GetItemDescriptionPrefix(item.TableContentType)} {GetNameOfItem(item.TableContentType, item.Entry)}";
-
-        private string GetItemDescriptionPrefix(DbTableContentType contentType)
-        {
-            switch (contentType)
-            {
-                case DbTableContentType.CreatureTemplate:
-                    return "Template of";
-                case DbTableContentType.CreatureLootTemplate:
-                    return "Creature loot of";
-                case DbTableContentType.GameObjectTemplate:
-                    return "Go Template of";
-                default:
-                    throw new Exception("[DbEditorsSolutionItemNameProvider] not defined table type!");
-            }
-        }
-
-        private string GetNameOfItem(DbTableContentType contentType, uint entry)
-        {
-            switch (contentType)
-            {
-                case DbTableContentType.CreatureTemplate:
-                case DbTableContentType.CreatureLootTemplate:
-                    return databaseProvider.GetCreatureTemplate(entry)?.Name ?? $"creature {entry}";
-                case DbTableContentType.GameObjectTemplate:
-                    return databaseProvider.GetGameObjectTemplate(entry)?.Name ?? $"gameobject {entry}";
-                default:
-                    throw new Exception("[DbEditorsSolutionItemNameProvider] not defined table type!");
-            }
-        }
+        public string GetName(DbEditorsSolutionItem item) => $"{item.TableId} ({item.Entry})";
     }
 }

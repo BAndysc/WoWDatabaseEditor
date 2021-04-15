@@ -1,27 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Newtonsoft.Json;
 using WDE.Common;
-using WDE.DatabaseEditors.Data;
-using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Solution
 {
     public class DbEditorsSolutionItem : ISolutionItem
     {
-        public DbEditorsSolutionItem(uint entry, DbTableContentType tableContentType, bool isMultiRecord,
-            Dictionary<string, DbTableSolutionItemModifiedField> modifiedFields)
+        public DbEditorsSolutionItem(uint entry, string tableId)
         {
             Entry = entry;
-            TableContentType = tableContentType;
-            IsMultiRecord = isMultiRecord;
-            ModifiedFields = modifiedFields;
+            TableId = tableId;
+            ModifiedFields = new();
         }
         
-        public uint Entry { get;  }
-        public DbTableContentType TableContentType { get; }
-        public bool IsMultiRecord { get; }
+        public uint Entry { get; }
+        public string TableId { get; }
 
         public Dictionary<string, DbTableSolutionItemModifiedField> ModifiedFields { get; set; }
 
@@ -32,7 +26,7 @@ namespace WDE.DatabaseEditors.Solution
 
         private bool Equals(DbEditorsSolutionItem other)
         {
-            return Entry == other.Entry && TableContentType == other.TableContentType && IsMultiRecord == other.IsMultiRecord;
+            return Entry == other.Entry && TableId == other.TableId;
         }
 
         public override bool Equals(object? obj)
@@ -45,7 +39,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Entry, (int) TableContentType, IsMultiRecord);
+            return HashCode.Combine(Entry, TableId);
         }
     }
 }

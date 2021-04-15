@@ -24,23 +24,14 @@ namespace WDE.DatabaseEditors.Solution
 
         public async Task<string> GenerateSql(DbEditorsSolutionItem item)
         {
-            IDbTableData? tableData = null;
-            
-            if (item.IsMultiRecord)
-                tableData = await LoadTable(item.TableContentType, item.Entry);
+            IDbTableData? tableData = await LoadTable(item);
 
-            return queryGenerator.GenerateQuery(tableData, item.TableContentType, item.Entry, item.IsMultiRecord, item.ModifiedFields);
+            return queryGenerator.GenerateQuery(tableData, item.TableId, item.Entry, item.ModifiedFields);
         }
 
-        private Task<IDbTableData?> LoadTable(DbTableContentType tableContentType, uint key)
+        private Task<IDbTableData?> LoadTable(DbEditorsSolutionItem item)
         {
-            switch (tableContentType)
-            {
-                case DbTableContentType.CreatureLootTemplate:
-                    return tableDataProvider.LoadCreatureLootTemplateData(key);
-                default:
-                    throw new Exception("[DbEditorsSolutionItemSqlProvider] not defined table content type!");
-            }
+            return tableDataProvider.Load(item.TableId, item.Entry);
         }
     }
 }

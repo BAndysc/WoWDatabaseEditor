@@ -5,9 +5,6 @@ namespace WDE.DatabaseEditors.Data
     [UniqueProvider]
     public interface IDbTableDefinitionProvider
     {
-        DatabaseEditorTableDefinitionJson GetCreatureTemplateDefinition();
-        DatabaseEditorTableDefinitionJson GetGameobjectTemplateDefinition();
-        DatabaseEditorTableDefinitionJson GetCreatureLootTemplateDefinition();
-        DatabaseEditorTableDefinitionJson GetDefinition(DbTableContentType type);
+        DatabaseEditorTableDefinitionJson? GetDefinition(string tableName);
     }
 }

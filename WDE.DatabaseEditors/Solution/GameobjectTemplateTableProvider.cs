@@ -26,10 +26,9 @@ namespace WDE.DatabaseEditors.Solution
             var key = await gameobjectEntryProviderService.Value.GetEntryFromService();
             if (key.HasValue)
             {
-                var data = await tableDataProvider.Value.LoadGameobjectTemplateDataEntry(key.Value);
+                var data = await tableDataProvider.Value.Load("gameobject_template", key.Value);
                 if (data != null)
-                    return new DbEditorsSolutionItem(key.Value, DbTableContentType.GameObjectTemplate, false,
-                        new Dictionary<string, DbTableSolutionItemModifiedField>());
+                    return new DbEditorsSolutionItem(key.Value, "gameobject_template");
             }
 
             return null;

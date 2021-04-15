@@ -95,6 +95,16 @@ namespace WoWDatabaseEditorCore.Providers
                                     .WithOkButton(true)
                                     .Build());
                             }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Cannot open the editor")
+                                    .SetMainInstruction(
+                                        "Couldn't open item, because there was an internal error" + e.Message)
+                                    .SetIcon(MessageBoxIcon.Error)
+                                    .WithOkButton(true)
+                                    .Build());
+                            }
                         }
                     },
                     true);

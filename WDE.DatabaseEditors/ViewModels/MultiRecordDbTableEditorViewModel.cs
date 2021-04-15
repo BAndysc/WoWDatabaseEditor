@@ -33,7 +33,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private MultiRecordTableEditorHistoryHandler? historyHandler;
         
-        public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem, string tableName, 
+        public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem,
             IDbEditorTableDataProvider tableDataProvider, IHistoryManager history,
             ITaskRunner taskRunner, IItemFromListProvider itemFromListProvider,
             IDbTableFieldFactory fieldFactory, IMySqlExecutor sqlExecutor,
@@ -48,12 +48,12 @@ namespace WDE.DatabaseEditors.ViewModels
 
             History = history;
             IsLoading = true;
-            taskRunner.ScheduleTask($"Loading {tableName}..", LoadTableData);
+            taskRunner.ScheduleTask($"Loading {solutionItem.TableId}..", LoadTableData);
             
             undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
 
-            Title = $"{tableName} Editor";
+            Title = $"{solutionItem.TableId} Editor";
 
             OpenParameterWindow = new AsyncAutoCommand<ParameterValueHolder<long>?>(EditParameter);
             AddRow = new DelegateCommand(AddNewRow);
@@ -91,7 +91,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private async Task LoadTableData()
         {
-            var data = await tableDataProvider.Load(solutionItem.TableContentType, solutionItem.Entry) as DbMultiRecordTableData;
+            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entry) as DbMultiRecordTableData;
 
             if (data == null)
             {

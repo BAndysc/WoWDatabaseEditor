@@ -18,19 +18,21 @@ namespace WDE.DatabaseEditors.Solution
             this.tableDefinitionProvider = tableDefinitionProvider;
         }
         
-        public string GenerateQuery(IDbTableData? tableData, DbTableContentType contentType, uint entry, bool isMultiRecord,
+        public string GenerateQuery(IDbTableData? tableData, string tableName, uint entry,
             Dictionary<string, DbTableSolutionItemModifiedField> modifiedFields)
         {
+            var tableDefinition = tableDefinitionProvider.GetDefinition(tableName);
+            if (tableDefinition == null)
+                return "-- invalid table --";
             // missing table data we have to load it
-            if (isMultiRecord)
-            {
-                if (tableData is DbMultiRecordTableData multiRecordTableData)
-                    return MultiRecordTableSqlGenerator.GenerateSql(multiRecordTableData);
-            }
+            //if (isMultiRecord)
+            //{
+            //    if (tableData is DbMultiRecordTableData multiRecordTableData)
+            //        return MultiRecordTableSqlGenerator.GenerateSql(multiRecordTableData);
+            //}
             
-            var tableDefinition = tableDefinitionProvider.GetDefinition(contentType);
             return GenerateUpdateQuery(modifiedFields, tableDefinition.TableName,
-                tableDefinition.TablePrimaryKeyColumnName, entry, isMultiRecord);
+                tableDefinition.TablePrimaryKeyColumnName, entry, tableDefinition.IsMultiRecord);
         }
 
         private string GenerateUpdateQuery(Dictionary<string, DbTableSolutionItemModifiedField> fields, string tableName, 
@@ -67,7 +69,7 @@ namespace WDE.DatabaseEditors.Solution
     
     public interface IQueryGenerator
     {
-        public string GenerateQuery(IDbTableData? tableData, DbTableContentType contentType, uint entry, bool isMultiRecord,
+        public string GenerateQuery(IDbTableData? tableData, string tableName, uint entry,
             Dictionary<string, DbTableSolutionItemModifiedField> modifiedFields);
     }
 }

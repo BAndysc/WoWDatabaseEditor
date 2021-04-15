@@ -5,25 +5,28 @@ using Newtonsoft.Json;
 namespace WDE.DatabaseEditors.Data
 {
     [ExcludeFromCodeCoverage]
-    public struct DatabaseEditorTableDefinitionJson
+    public class DatabaseEditorTableDefinitionJson
     {
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        [JsonProperty(PropertyName = "name")] 
+        public string Name { get; set; } = "";
         
         [JsonProperty(PropertyName = "table_name")]
-        public string TableName { get; set; }
+        public string TableName { get; set; } = "";
         
         [JsonProperty(PropertyName = "table_index_name")]
-        public string TablePrimaryKeyColumnName { get; set; }
+        public string TablePrimaryKeyColumnName { get; set; } = "";
+        
+        [JsonProperty(PropertyName = "multi_record")]
+        public bool IsMultiRecord { get; set; }
         
         [JsonProperty(PropertyName = "table_name_source_field")]
-        public string TableNameSource { get; set; }
+        public string TableNameSource { get; set; } = "";
         
         [JsonProperty(PropertyName = "name_swap_file_path")]
-        public string NameSwapFilePath { get; set; }
-        
+        public string NameSwapFilePath { get; set; } = "";
+
         [JsonProperty(PropertyName = "groups")]
-        public IList<DbEditorTableGroupJson> Groups { get; set; }
+        public IList<DbEditorTableGroupJson> Groups { get; set; } = new List<DbEditorTableGroupJson>();
     }
 
     [ExcludeFromCodeCoverage]

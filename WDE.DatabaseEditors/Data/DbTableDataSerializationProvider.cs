@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Data

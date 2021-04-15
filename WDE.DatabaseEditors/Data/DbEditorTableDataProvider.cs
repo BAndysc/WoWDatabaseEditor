@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.DatabaseEditors.Models;
@@ -24,50 +22,6 @@ namespace WDE.DatabaseEditors.Data
             this.tableDataProvider = tableDataProvider;
         }
 
-        public async Task<IDbTableData?> LoadCreatureTemplateDataEntry(uint creatureEntry)
-        {
-            var tableDefinition = tableDefinitionProvider.GetCreatureTemplateDefinition();
-            var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, creatureEntry);
-            try
-            {
-                var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
-
-                if (result == null || result.Count == 0)
-                    return null;
-
-                return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0]);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return null;
-            }
-        }
-
-        public async Task<IDbTableData?> LoadGameobjectTemplateDataEntry(uint goEntry)
-        {
-            var tableDefinition = tableDefinitionProvider.GetGameobjectTemplateDefinition();
-            var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, goEntry);
-            var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
-
-            if (result == null || result.Count == 0)
-                return null;
-
-            return tableDataProvider.GetDatabaseTable(in tableDefinition, result[0]);
-        }
-
-        public async Task<IDbTableData?> LoadCreatureLootTemplateData(uint entry)
-        {
-            var tableDefinition = tableDefinitionProvider.GetCreatureLootTemplateDefinition();
-            var sqlStatement = BuildSQLQueryFromTableDefinition(in tableDefinition, entry);
-            var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
-
-            if (result == null)
-                return null;
-
-            return tableDataProvider.GetDatabaseMultiRecordTable(entry, in tableDefinition, result);
-        }
-
         private string BuildSQLQueryFromTableDefinition(in DatabaseEditorTableDefinitionJson tableDefinitionJson, uint entry)
         {
             var columns = tableDefinitionJson.Groups.SelectMany(x => x.Fields).Select(x => $"`{x.DbColumnName}`");
@@ -77,19 +31,22 @@ namespace WDE.DatabaseEditors.Data
                 $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} = {entry};";
         }
 
-        public Task<IDbTableData?> Load(DbTableContentType contentType, uint entry)
+        public async Task<IDbTableData?> Load(string table, uint key)
         {
-            switch (contentType)
-            {
-                case DbTableContentType.CreatureTemplate:
-                    return LoadCreatureTemplateDataEntry(entry);
-                case DbTableContentType.GameObjectTemplate:
-                    return LoadGameobjectTemplateDataEntry(entry);
-                case DbTableContentType.CreatureLootTemplate:
-                    return LoadCreatureLootTemplateData(entry);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(contentType), contentType, null);
-            }
+            var definition = tableDefinitionProvider.GetDefinition(table);
+            if (definition == null)
+                return null;
+            
+            var sqlStatement = BuildSQLQueryFromTableDefinition(definition, key);
+            var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+
+            if (result == null || result.Count == 0)
+                return null;
+
+            if (definition.IsMultiRecord)
+                return tableDataProvider.GetDatabaseMultiRecordTable(key, definition, result);
+
+            return tableDataProvider.GetDatabaseTable(definition, result[0]);
         }
     }
 }
