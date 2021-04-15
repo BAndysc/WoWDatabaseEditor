@@ -10,7 +10,7 @@
         <DataTemplate x:Key="GenericParameterView">
             <DockPanel LastChildFill="True" Background="#00000000">
             <Button Content="..." Margin="0, 0, 5, 0"
-                    Width="25" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                    Width="30" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     Command="{Binding ChooseParameterCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:DbTableFieldValueView}}"
                     CommandParameter="{Binding}"
                     IsVisible="{Binding Parameter.HasItems}"
@@ -21,6 +21,8 @@
                     AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"-->
             <controls:ParameterTextBox 
                     VerticalContentAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
                     Text="{Binding Value, Mode=TwoWay}"
                     FontFamily="Consolas,Menlo,Courier,Courier New"
                     IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:DbTableFieldValueView}, Converter={StaticResource InvertBoolConverter}}"
@@ -48,6 +50,8 @@
         <DataTemplate x:Key="BoolParameterView">
             <CheckBox IsChecked="{Binding Value, Mode=TwoWay, Converter={StaticResource LongToBoolConverter}}"
                       IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:DbTableFieldValueView}, Converter={StaticResource InvertBoolConverter}}"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Left"
                       VerticalAlignment="Center">
             </CheckBox>
         </DataTemplate>
@@ -59,10 +63,11 @@
     <Style Selector="controls|DbTableFieldValueView">
         <Setter Property="Template">
             <ControlTemplate>
-                <DockPanel LastChildFill="True" Height="20" MaxHeight="20">
+                <DockPanel LastChildFill="True" Height="24" MaxHeight="24">
                     <Image ToolTip.Tip="{Binding OriginalValueTooltip}" Source="{DynamicResource StatusBarIconNotice}"
                            Width="15" Height="15" Margin="2, 0, 2, 0" 
                            IsVisible="{TemplateBinding ShowModifiedIcon}"
+                           IsHitTestVisible="{TemplateBinding IsModified}"
                            Opacity="{TemplateBinding IsModified, Converter={StaticResource BoolToOpacityConverter}}"
                            DockPanel.Dock="Left">
                     </Image>

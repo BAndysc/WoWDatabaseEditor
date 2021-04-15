@@ -5,7 +5,7 @@
              x:Class="WoWDatabaseEditorCore.Avalonia.App"
              Name="WoW Database Editor">
     <Application.Resources>
-            <DrawingImage x:Key="StatusBarIconNotice">
+    <DrawingImage x:Key="StatusBarIconNotice">
         <DrawingImage.Drawing>
             <DrawingGroup >
                 <DrawingGroup.Transform>

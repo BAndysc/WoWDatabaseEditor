@@ -14,6 +14,18 @@
           "read_only": true
         },
         {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Subname",
+          "db_column_name": "subname",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
           "name": "Difficulty 1",
           "db_column_name": "difficulty_entry_1",
           "value_type": "CreatureParameter",
@@ -34,66 +46,12 @@
         {
           "name": "Kill credit",
           "db_column_name": "KillCredit1",
-          "value_type": "CreatureParameter",
-          "read_only": true
+          "value_type": "CreatureParameter"
         },
         {
           "name": "Kill credit 2",
           "db_column_name": "KillCredit2",
-          "value_type": "CreatureParameter",
-          "read_only": true
-        }
-      ]
-    },
-    {
-      "group_name": "Names",
-      "fields": [
-        {
-          "name": "Name",
-          "db_column_name": "name",
-          "value_type": "string",
-          "read_only": true
-        },
-        {
-          "name": "Subname",
-          "db_column_name": "subname",
-          "value_type": "string",
-          "read_only": true
-        }
-      ]
-    },
-    {
-      "group_name": "Visual",
-      "fields": [
-        {
-          "name": "Model Id 1",
-          "db_column_name": "modelid1",
-          "value_type": "uint",
-          "read_only": false
-        },
-        {
-          "name": "Model Id 2",
-          "db_column_name": "modelid2",
-          "value_type": "uint",
-          "read_only": false
-        },
-        {
-          "name": "Model Id 3",
-          "db_column_name": "modelid3",
-          "value_type": "uint",
-          "read_only": false
-        },
-        {
-          "name": "Model Id 4",
-          "db_column_name": "modelid4",
-          "value_type": "uint",
-          "read_only": false
-        },
-        {
-          "name": "Model scale",
-          "db_column_name": "scale",
-          "value_type": "float",
-          "read_only": false
+          "value_type": "CreatureParameter"
         }
       ]
     },
@@ -218,6 +176,12 @@
       "group_name": "Movement",
       "fields": [
         {
+          "name": "Vehicle ID",
+          "db_column_name": "VehicleId",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
           "name": "Walk speed",
           "db_column_name": "speed_walk",
           "value_type": "float",
@@ -246,6 +210,41 @@
           "db_column_name": "movementId",
           "value_type": "uint",
           "read_only": true
+        }
+      ]
+    },
+    {
+      "group_name": "Visual",
+      "fields": [
+        {
+          "name": "Model Id 1",
+          "db_column_name": "modelid1",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Model Id 2",
+          "db_column_name": "modelid2",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Model Id 3",
+          "db_column_name": "modelid3",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Model Id 4",
+          "db_column_name": "modelid4",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Model scale",
+          "db_column_name": "scale",
+          "value_type": "float",
+          "read_only": false
         }
       ]
     },
@@ -356,17 +355,6 @@
         {
           "name": "Max gold",
           "db_column_name": "maxgold",
-          "value_type": "uint",
-          "read_only": false
-        }
-      ]
-    },
-    {
-      "group_name": "Vehicle",
-      "fields": [
-        {
-          "name": "Vehicle ID",
-          "db_column_name": "VehicleId",
           "value_type": "uint",
           "read_only": false
         }

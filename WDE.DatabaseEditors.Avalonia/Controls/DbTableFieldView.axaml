@@ -10,14 +10,16 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Background="{TemplateBinding Background}">
-                    <DockPanel LastChildFill="True" Margin="20, 1, 0, 1" HorizontalAlignment="Stretch">
+                    <DockPanel Margin="20,0,0,0" HorizontalAlignment="Left">
                         <TextBlock Text="{TemplateBinding Title}" TextWrapping="Wrap"
-                                   MinHeight="15" MaxHeight="50" Width="100"
+                                   HorizontalAlignment="Left" Width="90"
                                    Margin="0, 0, 10, 0"
                                    VerticalAlignment="Center"
                                    DockPanel.Dock="Left" />
                         <controls:DbTableFieldValueView IsModified="{TemplateBinding IsModified}"
+                                                        Width="250"
                                                         IsReadOnly="{TemplateBinding IsReadOnly}"
+                                                        ShowModifiedIcon="True"
                                                         ChooseParameterCommand="{TemplateBinding ChooseParameterCommand}"/>
                     </DockPanel>
                 </Border>

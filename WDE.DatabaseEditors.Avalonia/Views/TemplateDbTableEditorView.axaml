@@ -45,7 +45,7 @@
                                                     <Style Selector="controls|DbTableFieldView">
                                                         <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
                                                     </Style>
-                                                    <Style Selector="controls|DbTableFieldView.odd">
+                                                    <Style Selector="controls|DbTableFieldView.odd:not(:modified)">
                                                         <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
                                                     </Style>
                                                 </controls:DbTableFieldView.Styles>
