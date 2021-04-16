@@ -57,9 +57,9 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
-                new("Key", "Entry", 50),
-                new("Name", "Name"),
-                new("Description", "Description")
+                new("Key", "Entry", 80),
+                new("Name", "Name", 270),
+                new("Description", "Description", 380)
             };
 
             if (asFlags)
@@ -69,7 +69,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 SearchText = current.HasValue ? current.Value.ToString() : "";
 
             ShowItemsList = items.Count > 0;
-            DesiredHeight = ShowItemsList ? 470 : 130;
+            DesiredHeight = ShowItemsList ? 670 : 130;
+            DesiredWidth = ShowItemsList ? 800 : 400;
             Accept = new DelegateCommand(() =>
             {
                 if (SelectedItem == null && FilteredItems.Count == 1)
@@ -138,7 +139,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         public bool ShowItemsList { get; }
         public DelegateCommand Accept { get; }
         public ICommand Cancel { get; }
-        public int DesiredWidth => 400;
+        public int DesiredWidth { get; }
         public int DesiredHeight { get; }
         public string Title => "Picker";
         public bool Resizeable => true;
