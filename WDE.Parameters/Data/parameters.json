@@ -2046,10 +2046,9 @@
 		"name": "Summon type",
 		"prefix": "TEMPSUMMON_",
 		"values": {
-			"0": {"name": "timed or dead despawn", "descrption":  "despawns after a specified time OR when the creature disappears"},
-			"1": {"name": "timed or corpse despawn", "description": "despawns after a specified time OR when the creature dies"},
-			"2": {"name": "timed despawn", "description": "despawns after a specified time OR when the creature dies"},
-			"3": {"name": "timed despawn", "description":  "despawns after a specified time"},
+			"1": {"name": "timed or dead despawn", "description":  "despawns after a specified time OR when the creature disappears"},
+			"2": {"name": "timed or corpse despawn", "description": "despawns after a specified time OR when the creature dies"},
+			"3": {"name": "timed despawn", "description": "despawns after a specified time OR when the creature dies"},
 			"4": {"name": "timed despawn out of combat", "description": "despawns after a specified time after the creature is out of combat"},
 			"5": {"name": "corpse despawn", "description":  "despawns instantly after death"},
 			"6": {"name": "corpse timed despawn", "description":  "despawns after a specified time after death"},
