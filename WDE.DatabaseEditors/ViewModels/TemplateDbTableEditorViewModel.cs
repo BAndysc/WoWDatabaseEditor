@@ -8,6 +8,7 @@ using AsyncAwaitBestPractices.MVVM;
 using DynamicData;
 using Prism.Commands;
 using Prism.Events;
+using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -26,7 +27,7 @@ using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public class TemplateDbTableEditorViewModel : ObservableBase, IDocument
+    public class TemplateDbTableEditorViewModel : ObservableBase, ISolutionItemDocument
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -41,6 +42,7 @@ namespace WDE.DatabaseEditors.ViewModels
             IDbFieldNameSwapDataManager nameSwapDataManager, IEventAggregator eventAggregator,
             IQueryGenerator queryGenerator)
         {
+            SolutionItem = solutionItem;
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
             this.tableDataProvider = tableDataProvider;
@@ -237,5 +239,6 @@ namespace WDE.DatabaseEditors.ViewModels
             private set => SetProperty(ref isModified, value);
         }
         public IHistoryManager History { get; }
+        public ISolutionItem SolutionItem { get; }
     }
 }
