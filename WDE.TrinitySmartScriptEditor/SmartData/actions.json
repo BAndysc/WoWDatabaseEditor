@@ -256,7 +256,7 @@
                 "name": "Summon Type"
             },
             {
-                "type": "Parameter",
+                "type": "FloatParameter",
                 "name": "Duration",
                 "description": "In ms"
             },
@@ -265,7 +265,7 @@
                 "name": "Attack Invoker"
             }
         ],
-        "description": "{source}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}} as summon type {pram2}{pram4value:choose(0):| and attack action invoker}",
+        "description": "{source}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}'s position, moved by offset {targetcoords}} as summon type {pram2}{pram2value:choose(8):| with duration {pram3} seconds}{pram4value:choose(0):| and attack action invoker}",
         "name_readable": "Summon creature",
         "target_types": ["Creature", "Player", "GameObject", "Position"],
         "target_is_source": false,
@@ -287,7 +287,7 @@
                 "name": "Summon Type"
             },
             {
-                "type": "Parameter",
+                "type": "FloatParameter",
                 "name": "Duration",
                 "description": "In ms"
             },
@@ -304,7 +304,7 @@
                 }
             }
         ],
-        "description": "{pram5value:choose(0|1|2|3):{source}|{source}|[s]Action invoker[/s]|[s]Action invoker[/s]|{source}}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}, moved by offset {targetcoords}} as summon type {pram2}{pram5value:choose(0|1|2|3):|, as personal spawn||, as personal spawn|}{pram4value:choose(0):| and attack action invoker}",
+        "description": "{pram5value:choose(0|1|2|3):{source}|{source}|[s]Action invoker[/s]|[s]Action invoker[/s]|{source}}: Summon creature {pram1} at {targetid:choose(8):{targetcoords}|{target}'s position, moved by offset {targetcoords}} as summon type {pram2}{pram2value:choose(8):| with duration {pram3} seconds}{pram5value:choose(0|1|2|3):|, as personal spawn||, as personal spawn|}{pram4value:choose(0):| and attack action invoker}",
         "name_readable": "Summon creature",
         "target_types": ["Creature", "Player", "GameObject", "Position"],
         "target_is_source": false,
