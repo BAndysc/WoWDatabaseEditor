@@ -55,28 +55,24 @@
         </DrawingImage>
     </UserControl.Resources>
     
-    <controls:DialogViewBase.ToolBar>
-        <Grid ColumnDefinitions="*,250">
-            <TextBlock Text="{Binding Title}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="14" />
-            <controls:FixedTextBox Grid.Column="1"
-                          Width="220"
-                          AcceptsReturn="False"
-                          Watermark="Search"
-                          Text="{Binding SearchBox}"
-                          HorizontalAlignment="Right"
-                          VerticalContentAlignment="Center"
-                          utils:FocusUtils.FocusFirst="True" />
-        </Grid>
-    </controls:DialogViewBase.ToolBar>
-    
     <Grid Margin="6">
         <Grid.RowDefinitions>
-            <RowDefinition Height="0" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
 
-        <!--<TextBlock Text="{Binding SelectedItem.Help}" TextWrapping="WrapWithOverflow" />-->
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <controls:FixedTextBox DockPanel.Dock="Right"
+                                   Width="220"
+                                   AcceptsReturn="False"
+                                   Watermark="Search"
+                                   Text="{Binding SearchBox}"
+                                   HorizontalAlignment="Right"
+                                   VerticalContentAlignment="Center"
+                                   utils:FocusUtils.FocusFirst="True" />
+            <TextBlock Text="{Binding SelectedItem.Help}" TextWrapping="WrapWithOverflow" />
+        </DockPanel>
         
         <controls1:GroupingListBox Items="{Binding FilteredItems}"
                                    Grid.Row="1" Grid.ColumnSpan="2"  
