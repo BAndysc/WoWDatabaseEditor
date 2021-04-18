@@ -38,15 +38,19 @@
                 <DataTemplate>
                     <DockPanel LastChildFill="True" Margin="7,5">
                         <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" FontSize="32" FontWeight="Light" />
-                        <TextBlock DockPanel.Dock="Top" 
-                                   TextWrapping="WrapWithOverflow" 
-                                   FontSize="18" 
-                                   FontWeight="Light"
-                                   Visibility="{Binding ShortDescription, Converter={StaticResource NullToVisibilityConverter}}"
-                                   Text="{Binding ShortDescription}"
-                                   Margin="0,0,0,17" />
-                        <ContentControl utils2:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
-                                            VerticalContentAlignment="Stretch" />
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock DockPanel.Dock="Top" 
+                                           TextWrapping="WrapWithOverflow" 
+                                           FontSize="18" 
+                                           FontWeight="Light"
+                                           Visibility="{Binding ShortDescription, Converter={StaticResource NullToVisibilityConverter}}"
+                                           Text="{Binding ShortDescription}"
+                                           Margin="0,0,0,17" />
+                                <ContentControl utils2:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                                                    VerticalContentAlignment="Stretch" />
+                            </DockPanel>
+                        </ScrollViewer>
                     </DockPanel>
                 </DataTemplate>
             </TabControl.ContentTemplate>
