@@ -58,6 +58,11 @@ namespace WDE.Common.Utils
             ((ICommand) command).Execute(parameter);
         }
 
+        public void RaiseCanExecuteChanged()
+        {
+            command.RaiseCanExecuteChanged();
+        }
+
         public event EventHandler? CanExecuteChanged
         {
             add => command.CanExecuteChanged += value;

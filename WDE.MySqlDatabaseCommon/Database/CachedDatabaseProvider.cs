@@ -35,6 +35,8 @@ namespace WDE.MySqlDatabaseCommon.Database
             taskRunner.ScheduleTask(new DatabaseCacheTask(this));;
         }
 
+        public bool IsConnected => nonCachedDatabase.IsConnected;
+
         public ICreatureTemplate? GetCreatureTemplate(uint entry)
         {
             if (creatureTemplateByEntry.TryGetValue(entry, out var template))

@@ -7,6 +7,8 @@ namespace WDE.MySqlDatabaseCommon.Database
 {
     public class NullDatabaseProvider : IDatabaseProvider
     {
+        public bool IsConnected => false;
+        
         public ICreatureTemplate? GetCreatureTemplate(uint entry) => null;
 
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates() => Enumerable.Empty<ICreatureTemplate>();
