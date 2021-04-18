@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Prism.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;

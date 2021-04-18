@@ -34,6 +34,8 @@ namespace WDE.Updater.ViewModels
             IUpdaterSettingsProvider settingsProvider,
             IAutoUpdatePlatformService platformService,
             IFileSystem fileSystem,
+            IStandaloneUpdater standaloneUpdater,
+            IApplication application,
             IMessageBoxService messageBoxService)
         {
             this.updateService = updateService;
@@ -43,7 +45,6 @@ namespace WDE.Updater.ViewModels
             this.platformService = platformService;
             this.fileSystem = fileSystem;
             this.messageBoxService = messageBoxService;
-
             CheckForUpdatesCommand = new DelegateCommand(() =>
             {
                 if (updateService.CanCheckForUpdates())
@@ -61,14 +62,31 @@ namespace WDE.Updater.ViewModels
                 string? newUpdateUrl = await updateService.CheckForUpdates();
                 if (newUpdateUrl != null)
                 {
-                    statusBar.PublishNotification(new PlainNotification(NotificationType.Info, 
-                        "New updates are ready to download. Click to download.",
-                        new DelegateCommand(() =>
+                    if (settingsProvider.Settings.EnableSilentUpdates)
+                    {
+                        DownloadUpdate();
+                        statusBar.PublishNotification(new PlainNotification(NotificationType.Info,"Downloading update..."));
+                    }
+                    else
+                    {
+                        if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("New update")
+                            .SetMainInstruction("A new update is ready to be downloaded")
+                            .SetContent("Do you want to download the update now?")
+                            .WithYesButton(true)
+                            .WithNoButton(false)
+                            .SetIcon(MessageBoxIcon.Information)
+                            .Build()))
                         {
-                            statusBar.PublishNotification(
-                                new PlainNotification(NotificationType.Info, "Downloading..."));
                             DownloadUpdate();
-                        })));
+                        }
+                        else
+                        {
+                            statusBar.PublishNotification(new PlainNotification(NotificationType.Info, 
+                                "New updates are ready to download. Click to download.",
+                                new DelegateCommand(DownloadUpdate)));
+                        }
+                    }
                 }
             }
             catch (Exception e)
@@ -79,6 +97,8 @@ namespace WDE.Updater.ViewModels
 
         private void DownloadUpdate()
         {
+            statusBar.PublishNotification(
+                new PlainNotification(NotificationType.Info, "Downloading..."));
             taskRunner.ScheduleTask("Downloading update", DownloadUpdateTask);
         }
 
@@ -88,7 +108,7 @@ namespace WDE.Updater.ViewModels
             {
                 await updateService.DownloadLatestVersion(taskProgress);
                 statusBar.PublishNotification(new PlainNotification(NotificationType.Info, 
-                    "Update ready to install. Click here to install",
+                    "Update ready to install. It will be installed on the next editor restart or when you click here",
                     new AsyncAutoCommand(async () =>
                     {
                         if (platformService.PlatformSupportsSelfInstall)

@@ -22,6 +22,7 @@ using WDE.Common.WPF;
 using WDE.Common.WPF.Utils;
 using WDE.Module;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.CoreVersion;
 using WoWDatabaseEditorCore.ModulesManagement;
 using WoWDatabaseEditorCore.ViewModels;
 using WoWDatabaseEditorCore.WPF.Managers;
@@ -79,6 +80,10 @@ namespace WoWDatabaseEditorCore.WPF
 
                 return AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
             };
+
+
+            if (ProgramBootstrap.TryLaunchUpdaterIfNeeded())
+                Current.Shutdown();
         }
 
         protected override IContainerExtension CreateContainerExtension()

@@ -22,15 +22,18 @@ namespace WDE.Updater.ViewModels
             this.settings = settings;
             Watch(settings, s => s.Settings, nameof(LastCheckForUpdates));
             Watch(this, t => t.DisableAutoUpdates, nameof(IsModified));
-
+            Watch(this, t => t.EnableSilentUpdates, nameof(IsModified));
+            
             ShowChangelog = new DelegateCommand(changelogProvider.TryShowChangelog, changelogProvider.HasChangelog);
             Save = new DelegateCommand(() =>
             {
                 var sett = settings.Settings;
                 sett.DisableAutoUpdates = DisableAutoUpdates;
+                sett.EnableSilentUpdates = EnableSilentUpdates;
                 settings.Settings = sett;
                 RaisePropertyChanged(nameof(IsModified));
             });
+            EnableSilentUpdates = settings.Settings.EnableSilentUpdates;
             DisableAutoUpdates = settings.Settings.DisableAutoUpdates;
             CheckForUpdatesCommand = updateViewModel.CheckForUpdatesCommand;
             CurrentVersion = applicationVersion.VersionKnown
@@ -50,10 +53,18 @@ namespace WDE.Updater.ViewModels
             set => SetProperty(ref disableAutoUpdates, value);
         }
         
+        private bool enableSilentUpdates;
+        public bool EnableSilentUpdates
+        {
+            get => enableSilentUpdates;
+            set => SetProperty(ref enableSilentUpdates, value);
+        }
+        
         public ICommand Save { get; }
         public string Name => "Editor updates";
         public string ShortDescription =>
-            "WoW Database Editor can automatically check for updates. No personal data is sent during checking. You can change the behaviour or check for updates manually here.";        public bool IsModified => disableAutoUpdates != settings.Settings.DisableAutoUpdates;
+            "WoW Database Editor can automatically check for updates. No personal data is sent during checking. You can change the behaviour or check for updates manually here."; 
+        public bool IsModified => disableAutoUpdates != settings.Settings.DisableAutoUpdates || enableSilentUpdates != settings.Settings.EnableSilentUpdates;
         public bool IsRestartRequired => false;
     }
 }
