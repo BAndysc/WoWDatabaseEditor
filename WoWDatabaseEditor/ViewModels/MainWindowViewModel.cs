@@ -10,6 +10,7 @@ using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -37,6 +38,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             ISolutionSqlService solutionSqlService,
             Func<AboutViewModel> aboutViewModelCreator,
             Func<TextDocumentViewModel> textDocumentCreator,
+            ISolutionTasksService solutionTasksService,
             IEventAggregator eventAggregator)
         {
             DocumentManager = documentManager;
@@ -47,8 +49,16 @@ namespace WoWDatabaseEditorCore.ViewModels
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
             ExecuteChangedCommand = new DelegateCommand(() =>
             {
-                DocumentManager.ActiveDocument?.Save?.Execute(null);
-            }, () => DocumentManager.ActiveDocument?.Save != null && DocumentManager.ActiveDocument.Save.CanExecute(null));
+                var item = DocumentManager.ActiveSolutionItemDocument?.SolutionItem;
+                if (item == null)
+                    return;
+                
+                if (solutionTasksService.CanSaveAndReloadRemotely)
+                    solutionTasksService.SaveAndReloadSolutionTask(item);
+                else if (solutionTasksService.CanSaveToDatabase)
+                    solutionTasksService.SaveSolutionToDatabaseTask(item);
+            }, () => DocumentManager.ActiveSolutionItemDocument != null &&
+                     solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase);
 
             GenerateCurrentSqlCommand = new DelegateCommand(() =>
             {

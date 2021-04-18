@@ -1,4 +1,5 @@
 ﻿using WDE.Common.Windows;
+using WDE.CommonViews.WPF.RemoteSOAP.Views;
 using WDE.CommonViews.WPF.Updater;
 using WDE.DbcStore.ViewModels;
 using WDE.DbcStore.Views;
@@ -8,6 +9,7 @@ using WDE.Module;
 using WDE.MySqlDatabaseCommon.Tools;
 using WDE.Parameters.ViewModels;
 using WDE.Parameters.Views;
+using WDE.RemoteSOAP.ViewModels;
 using WDE.Solutions.Explorer.ViewModels;
 using WDE.Solutions.Explorer.Views;
 using WDE.SQLEditor.ViewModels;
@@ -39,6 +41,8 @@ namespace WDE.CommonViews.WPF
             // updater
             viewLocator.Bind<ChangeLogViewModel, ChangeLogView>();
             viewLocator.Bind<UpdaterConfigurationViewModel, UpdaterConfigurationView>();
+            // remote soap
+            viewLocator.Bind<SoapConfigViewModel, SoapConfigView>();
         }
     }
 }

@@ -64,8 +64,14 @@
                 <MenuItem Header="Remove"
                           Command="{Binding #tv.DataContext.RemoveItem}" />
                 <Separator />
-                <MenuItem Header="Generate SQL"
+                <MenuItem Header="Generate query"
                           Command="{Binding #tv.DataContext.GenerateSQL}"
+                          IsEnabled="{Binding IsExportable}" />
+                <MenuItem Header="Save to database"
+                          Command="{Binding #tv.DataContext.UpdateDatabase}"
+                          IsEnabled="{Binding IsExportable}" />
+                <MenuItem Header="Save to database and reload server"
+                          Command="{Binding #tv.DataContext.ExportToServer}"
                           IsEnabled="{Binding IsExportable}" />
             </ContextMenu>
         </TreeView.ContextMenu>

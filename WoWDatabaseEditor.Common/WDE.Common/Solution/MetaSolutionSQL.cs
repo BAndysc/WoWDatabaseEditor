@@ -4,22 +4,15 @@ namespace WDE.Common.Solution
 {
     public class MetaSolutionSQL : ISolutionItem
     {
-        private readonly string sql;
-
-        public MetaSolutionSQL(string sql)
+        public MetaSolutionSQL(ISolutionItem itemToGenerate)
         {
-            this.sql = sql;
+            ItemToGenerate = itemToGenerate;
         }
-
+        
         public bool IsContainer => false;
         public ObservableCollection<ISolutionItem> Items => null;
         public string ExtraId => null;
-
         public bool IsExportable => false;
-
-        public string GetSql()
-        {
-            return sql;
-        }
+        public ISolutionItem ItemToGenerate { get; }
     }
 }
