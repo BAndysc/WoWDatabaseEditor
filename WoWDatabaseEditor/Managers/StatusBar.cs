@@ -1,5 +1,7 @@
-﻿using Prism.Mvvm;
+﻿using System;
+using Prism.Mvvm;
 using WDE.Common.Managers;
+using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.ViewModels;
 
@@ -10,10 +12,12 @@ namespace WoWDatabaseEditorCore.Managers
     public class StatusBar : BindableBase, IStatusBar
     {
         private readonly TasksViewModel tasksViewModel;
+        private readonly IMainThread mainThread;
 
-        public StatusBar(TasksViewModel tasksViewModel)
+        public StatusBar(TasksViewModel tasksViewModel, IMainThread mainThread)
         {
             this.tasksViewModel = tasksViewModel;
+            this.mainThread = mainThread;
         }
 
         public TasksViewModel TasksViewModel => tasksViewModel;
@@ -28,7 +32,13 @@ namespace WoWDatabaseEditorCore.Managers
 
         public void PublishNotification(INotification notification)
         {
-            CurrentNotification = notification;
+            mainThread.Dispatch(() =>
+            {
+                var time = DateTime.Now.ToString("T");
+                CurrentNotification = new PlainNotification(notification.Type,
+                    $"[{time}] {notification.Message}",
+                    notification.ClickCommand);
+            });
         }
     }
 }
