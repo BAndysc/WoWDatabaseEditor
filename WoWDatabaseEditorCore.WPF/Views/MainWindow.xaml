@@ -14,12 +14,14 @@
                       xmlns:views="clr-namespace:WoWDatabaseEditorCore.WPF.Views"
                       xmlns:utils="clr-namespace:WoWDatabaseEditorCore.WPF.Utils"
                       xmlns:viewHelpers1="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
+                      xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.WPF.Extensions"
                       Style="{DynamicResource MainWindowStyle}"
                       Title="{Binding Title}"
                       WindowStartupLocation="CenterScreen"
                       Height="695.368"
                       Width="959.421"
                       Icon="/Icon.ico"
+                      extensions:GlobalMenuHotKeys.MenuItemsGestures="{Binding MenuItemProviders}"
                       x:Name="rootWindow">
     <Controls:MetroWindow.WindowButtonCommands>
         <Controls:WindowButtonCommands
@@ -33,17 +35,6 @@
         <helpers:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
         <helpers:DocumentOrToolToTitleConverter x:Key="DocumentOrToolToTitleConverter" />
     </Window.Resources>
-    <Window.InputBindings>
-        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Undo}" />
-        <KeyBinding Key="Y" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
-        <KeyBinding Key="Z" Modifiers="Control+Shift" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
-
-        <KeyBinding Key="S" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Save}" />
-
-        <KeyBinding Key="C" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Copy}" />
-        <KeyBinding Key="V" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
-        <KeyBinding Key="X" Modifiers="Control" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
-    </Window.InputBindings>
     <Controls:MetroWindow.IconTemplate>
         <DataTemplate>
             <Grid Width="{TemplateBinding Width}"
@@ -86,6 +77,7 @@
                                 <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MetroMenuItem}">
                                     <Setter Property="Header" Value="{Binding ItemName}"/>
                                     <Setter Property="Command" Value="{Binding ItemCommand}" />
+                                    <Setter Property="InputGestureText" Value="{Binding Shortcut.InputShortcutText}"/>
                                 </Style>
                             </helpers:DynamicMenuItemStyleSelector.CommandItemStyle>
                             <helpers:DynamicMenuItemStyleSelector.SeparatorItemStyle>

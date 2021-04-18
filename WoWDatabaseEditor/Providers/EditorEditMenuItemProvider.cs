@@ -23,17 +23,30 @@ namespace WoWDatabaseEditorCore.Providers
             SubItems = new List<IMenuItem>();
             SubItems.Add(new ModuleMenuItem("_Undo", new DelegateCommand(() => DocumentManager.ActiveDocument?.Undo.Execute(null),
                 () => DocumentManager.ActiveDocument?.Undo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument).
-                ObservesProperty(() => DocumentManager.ActiveDocument.IsModified)));
+                ObservesProperty(() => DocumentManager.ActiveDocument.IsModified), new("Control+Z")));
+            
             SubItems.Add(new ModuleMenuItem("_Redo", new DelegateCommand(() => DocumentManager.ActiveDocument?.Redo.Execute(null),
                 () => DocumentManager.ActiveDocument?.Redo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument).
-                ObservesProperty(() => DocumentManager.ActiveDocument.IsModified)));
+                ObservesProperty(() => DocumentManager.ActiveDocument.IsModified), new("Control+Y")));
+            
             SubItems.Add(new ModuleManuSeparatorItem());
-            SubItems.Add(new ModuleMenuItem("_Copy", new DelegateCommand(() => DocumentManager.ActiveDocument?.Copy.Execute(null),
-                () => DocumentManager.ActiveDocument?.Copy.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument)));
-            SubItems.Add(new ModuleMenuItem("Cu_t", new DelegateCommand(() => DocumentManager.ActiveDocument?.Cut.Execute(null),
-                () => DocumentManager.ActiveDocument?.Cut.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument)));
-            SubItems.Add(new ModuleMenuItem("_Paste", new DelegateCommand(() => DocumentManager.ActiveDocument?.Paste.Execute(null),
-                () => DocumentManager.ActiveDocument?.Paste.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument)));
+            
+            SubItems.Add(new ModuleMenuItem("_Copy", 
+                new DelegateCommand(
+                    () => DocumentManager.ActiveDocument?.Copy.Execute(null),
+                () => DocumentManager.ActiveDocument?.Copy.CanExecute(null) ?? false)
+                    .ObservesProperty(() => DocumentManager.ActiveDocument), new("Control+C")));
+            
+            SubItems.Add(new ModuleMenuItem("Cu_t", 
+                new DelegateCommand(
+                    () => DocumentManager.ActiveDocument?.Cut.Execute(null),
+                () => DocumentManager.ActiveDocument?.Cut.CanExecute(null) ?? false)
+                    .ObservesProperty(() => DocumentManager.ActiveDocument), new("Control+X")));
+            
+            SubItems.Add(new ModuleMenuItem("_Paste", 
+                new DelegateCommand(() => DocumentManager.ActiveDocument?.Paste.Execute(null),
+                () => DocumentManager.ActiveDocument?.Paste.CanExecute(null) ?? false)
+                    .ObservesProperty(() => DocumentManager.ActiveDocument), new("Control+V")));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

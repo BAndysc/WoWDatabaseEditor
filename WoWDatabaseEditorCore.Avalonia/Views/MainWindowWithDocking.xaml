@@ -16,23 +16,13 @@
           ManagedIcon="../Icon.png"
           Name="Root"
           Classes="MainWindow"
+          utils:MenuBind.MenuItemsGestures="{Binding MenuItemProviders}"
           Title="{Binding Title}">
 
     <NativeMenu.Menu>
         <NativeMenu utils:MenuBind.MenuItems="{Binding MenuItemProviders}">
         </NativeMenu>
     </NativeMenu.Menu>
-    
-    <Window.KeyBindings>
-        <KeyBinding Gesture="{x:Static views:MainWindow.UndoGesture}" Command="{Binding DocumentManager.ActiveDocument.Undo}" />
-        <KeyBinding Gesture="{x:Static views:MainWindow.RedoGesture}" Command="{Binding DocumentManager.ActiveDocument.Redo}" />
-
-        <KeyBinding Gesture="{x:Static views:MainWindow.SaveGesture}" Command="{Binding DocumentManager.ActiveDocument.Save}" />
-
-        <KeyBinding Gesture="{x:Static TextBox.CopyGesture}" Command="{Binding DocumentManager.ActiveDocument.Copy}" />
-        <KeyBinding  Gesture="{x:Static TextBox.PasteGesture}" Command="{Binding DocumentManager.ActiveDocument.Paste}" />
-        <KeyBinding  Gesture="{x:Static TextBox.CutGesture}" Command="{Binding DocumentManager.ActiveDocument.Cut}" />
-    </Window.KeyBindings>
     
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
