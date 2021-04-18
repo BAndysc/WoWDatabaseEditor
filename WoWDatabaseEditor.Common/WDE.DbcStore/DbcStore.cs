@@ -36,6 +36,7 @@ namespace WDE.DbcStore
             Load();
         }
         
+        public bool IsConfigured { get; private set; }
         public Dictionary<long, string> AreaTriggerStore { get; internal set; } = new();
         public Dictionary<long, string> FactionStore { get; internal set; } = new();
         public Dictionary<long, string> SpellStore { get; internal set; } = new();
@@ -82,6 +83,7 @@ namespace WDE.DbcStore
             if (!Directory.Exists(dbcSettingsProvider.GetSettings().Path))
                 return;
 
+            IsConfigured = true;
             taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, dbcSettingsProvider, this));
         }
 

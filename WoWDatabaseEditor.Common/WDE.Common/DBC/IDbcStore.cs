@@ -6,6 +6,7 @@ namespace WDE.Common.DBC
     [UniqueProvider]
     public interface IDbcStore
     {
+        bool IsConfigured { get; }
         Dictionary<long, string> AreaTriggerStore { get; }
         Dictionary<long, string> SkillStore { get; }
         Dictionary<long, string> LanguageStore { get; }

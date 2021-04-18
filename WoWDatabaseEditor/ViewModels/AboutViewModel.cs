@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
+using Prism.Commands;
+using WDE.Common.CoreVersion;
+using WDE.Common.Database;
+using WDE.Common.DBC;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.CoreVersion;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
@@ -13,11 +20,39 @@ namespace WoWDatabaseEditorCore.ViewModels
     {
         private readonly IApplicationVersion applicationVersion;
 
-        public AboutViewModel(IApplicationVersion applicationVersion)
+        public AboutViewModel(IApplicationVersion applicationVersion,
+            IDatabaseProvider databaseProvider, 
+            IDbcStore dbcStore,
+            IConfigureService settings,
+            ICurrentCoreVersion coreVersion,
+            IRemoteConnectorService remoteConnectorService)
         {
             this.applicationVersion = applicationVersion;
+            
+            ConfigurationChecks.Add(new ConfigurationCheckup(true, 
+                "Core version compatibility mode", 
+                "WoW Database Editor supports multiple world of warcraft server cores. In order to achieve maximum compatibility, choose version that matches best.\nYou are using: " + coreVersion.Current.FriendlyName + " compatibility mode now."));
+            
+            ConfigurationChecks.Add(new ConfigurationCheckup(dbcStore.IsConfigured, 
+                "DBC settings", 
+                "DBC is DataBaseClient files provided with WoW client. Those contain a lot of useful stuff for scripting like spells data. For maximum features you have to provide DBC files path. All WoW servers require those files to work so if you have working core, you must have DBC files already."));
+            
+            ConfigurationChecks.Add(new ConfigurationCheckup(databaseProvider.IsConnected, 
+                "Database connection", 
+                "WoW Database Editor is database editor by design. It stores all data and loads things from wow database. Therefore to activate all features you have to provide wow compatible database connection settings."));
+
+            ConfigurationChecks.Add(new ConfigurationCheckup(remoteConnectorService.IsConnected, 
+                "Remote SOAP connection", 
+                "WDE can invoke reload commands for you for faster work. To enable that, you have to enable SOAP connection in your worldserver configuration and provide details in the settings."));
+
+            AllConfigured = ConfigurationChecks.All(s => s.Fulfilled);
+
+            OpenSettingsCommand = new DelegateCommand(settings.ShowSettings);
         }
 
+        public ICommand OpenSettingsCommand { get; }
+        public bool AllConfigured { get; }
+        public ObservableCollection<ConfigurationCheckup> ConfigurationChecks { get; } = new();
         public int BuildVersion => applicationVersion.BuildVersion;
         public string Branch => applicationVersion.Branch;
         public string CommitHash => applicationVersion.CommitHash;
@@ -39,6 +74,20 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public void Dispose()
         {
+        }
+
+        public class ConfigurationCheckup
+        {
+            public bool Fulfilled { get; }
+            public string Title { get; }
+            public string Description { get; }
+
+            public ConfigurationCheckup(bool fulfilled, string title, string description)
+            {
+                Fulfilled = fulfilled;
+                Title = title;
+                Description = description;
+            }
         }
     }
 
