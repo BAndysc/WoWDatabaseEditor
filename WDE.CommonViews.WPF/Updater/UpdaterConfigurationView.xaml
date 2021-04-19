@@ -7,12 +7,14 @@
              xmlns:converters="clr-namespace:WDE.Common.WPF.Converters;assembly=WDE.Common.WPF"
              xmlns:mvvm="http://prismlibrary.com/"
              xmlns:utils="clr-namespace:WDE.Common.WPF.Utils;assembly=WDE.Common.WPF"
+             xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <converters:DataTimeToStringConverter x:Key="DateConverter" Format="f" />
+        <viewHelpers:InvertedBoolConverter x:Key="InverseBoolConverter" />
     </UserControl.Resources>
-    <Grid utils:GridUtils.Rows="Auto,10,Auto,10,Auto,10,Auto,30,Auto" utils:GridUtils.Columns="Auto,10,*" VerticalAlignment="Top">
+    <Grid utils:GridUtils.Rows="Auto,10,Auto,10,Auto,10,Auto,30,Auto,Auto,Auto" utils:GridUtils.Columns="Auto,10,*" VerticalAlignment="Top">
         <TextBlock Text="Current version"
                    Grid.Row="0" />
         <TextBlock Text="{Binding CurrentVersion}"
@@ -28,9 +30,17 @@
                 Grid.Column="2"
                 Grid.Row="6">Show changelog</Button>
         
-        <TextBlock Text="Disable auto updates"
+        <TextBlock Text="Disable auto updates" VerticalAlignment="Center"
                    Grid.Row="8"/>
         <CheckBox IsChecked="{Binding DisableAutoUpdates}" 
                   Grid.Row="8" Grid.Column="2"/>
+        
+        <TextBlock Text="Enable silent updates" VerticalAlignment="Center"
+                   Grid.Row="9"/>
+        <CheckBox IsChecked="{Binding EnableSilentUpdates}" 
+                  IsEnabled="{Binding DisableAutoUpdates, Converter={StaticResource InverseBoolConverter}}"
+                  Grid.Row="9" Grid.Column="2"/>
+        <TextBlock Text="With 'silent updates' enabled, updates are downloaded and installed automatically."
+                   Grid.Row="10" Grid.Column="2"/>
     </Grid>
 </UserControl>

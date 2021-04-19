@@ -1,28 +1,54 @@
 ﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Views.AboutView"
              xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <DockPanel Margin="20" LastChildFill="True">
-        <TextBlock DockPanel.Dock="Bottom" IsVisible="{Binding VersionKnown}" Text="{Binding ReleaseData}" TextWrapping="WrapWithOverflow" />
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
+    <UserControl.Resources>
+        <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
+    </UserControl.Resources>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <DockPanel Margin="20" LastChildFill="True">
+            <TextBlock DockPanel.Dock="Bottom" IsVisible="{Binding VersionKnown}" Text="{Binding ReleaseData}" TextWrapping="WrapWithOverflow" />
             <StackPanel>
-            <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                    <Image Source="../Icon.png" Width="56" Height="56" />
-                    <TextBlock VerticalAlignment="Bottom" FontSize="34" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
-                </StackPanel>
-            </Border>
-            <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
-                <TextBlock FontWeight="Bold" Text="WoW Database Editor" />
-                <TextBlock TextWrapping="WrapWithOverflow" Text=" is an application used to create scripts (behaviours) in TrinityCore based servers." />
-            </WrapPanel>
-            <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
-                <TextBlock  TextWrapping="WrapWithOverflow" Text="To start work, add new &quot;file&quot; to the solution - File -&gt; Load. To edit script, double click on selected item in Solution Explorer." />
-            </WrapPanel>
-            <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
-                <TextBlock  TextWrapping="WrapWithOverflow" Text="Items in Solution Explorer are saved automatically, but scripts themselves are not. Remember to save them (export to database)" />
-            </WrapPanel>
-            <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
-                <TextBlock  TextWrapping="WrapWithOverflow" Text="Database is not required, but in that case features are limited. It is database editor by design." />
-            </WrapPanel>
-        </StackPanel>
-    </DockPanel>
+                <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <Image Source="../Icon.png" Width="56" Height="56" />
+                        <TextBlock VerticalAlignment="Bottom" FontSize="34" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
+                    </StackPanel>
+                </Border>
+                <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
+                    <TextBlock FontWeight="Bold" Text="WoW Database Editor" />
+                    <TextBlock TextWrapping="WrapWithOverflow" Text=" is an application used to create scripts (behaviours) in TrinityCore based servers." />
+                </WrapPanel>
+                <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
+                    <TextBlock  TextWrapping="WrapWithOverflow" Text="To start work, add new &quot;file&quot; to the solution - File -&gt; Add. To edit script, double click on selected item in Solution Explorer." />
+                </WrapPanel>
+                <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
+                    <TextBlock  TextWrapping="WrapWithOverflow" Text="Items in Solution Explorer are saved automatically, but scripts themselves are not. Remember to save them (export to database)" />
+                </WrapPanel>
+                <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
+                    <TextBlock  TextWrapping="WrapWithOverflow" Text="Database is not required, but in that case features are limited. It is database editor by design." />
+                </WrapPanel>
+                
+                <Border Margin="0,35,0,0" BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
+                    <TextBlock FontSize="26">Configuration check-up list</TextBlock>
+                </Border>
+                <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">In order to enable all features, you have to configure the editor first.</TextBlock>
+                <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow" IsVisible="{Binding AllConfigured}">Congratulations! You have everything configured properly!</TextBlock>
+                <ItemsControl Items="{Binding ConfigurationChecks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="True" Margin="0,10,0,0">
+                                <CheckBox MinWidth="0" VerticalAlignment="Center" IsChecked="{Binding Fulfilled, Mode=OneWay}" IsHitTestVisible="False" />
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock FontWeight="Bold" Text="{Binding Title}"/>
+                                    <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Description}" />
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Margin="0,10,0,0" IsVisible="{Binding AllConfigured, Converter={StaticResource InversedBoolConverter}}" Command="{Binding OpenSettingsCommand}">Open settings to configure</Button>
+            </StackPanel>
+        </DockPanel>
+    </ScrollViewer>
 </UserControl>

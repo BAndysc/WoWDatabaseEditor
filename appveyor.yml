@@ -70,6 +70,8 @@ test_script:
 - cmd: >-
     dotnet test WDE.MVVM.Test/WDE.MVVM.Test.csproj
 
+    dotnet test WDE.RemoteSOAP/WDE.RemoteSOAP.csproj
+
     dotnet test WDE.Updater/WDE.Updater.csproj
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj

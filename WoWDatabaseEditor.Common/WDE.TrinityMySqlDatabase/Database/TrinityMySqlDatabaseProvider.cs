@@ -19,6 +19,8 @@ namespace WDE.TrinityMySqlDatabase.Database
 {
     public class TrinityMySqlDatabaseProvider : IAsyncDatabaseProvider
     {
+        public bool IsConnected => true;
+        
         private readonly ICurrentCoreVersion currentCoreVersion;
 
         public TrinityMySqlDatabaseProvider(IDatabaseSettingsProvider settings,

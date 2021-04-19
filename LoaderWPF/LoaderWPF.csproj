@@ -21,6 +21,7 @@
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+      <ProjectReference Include="..\WDE.RemoteSOAP\WDE.RemoteSOAP.csproj" />
       <ProjectReference Include="..\WDE.SmartScriptEditor.WPF\WDE.SmartScriptEditor.WPF.csproj" />
       <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />

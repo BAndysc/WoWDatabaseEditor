@@ -7,6 +7,7 @@ using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Solution;
 using WDE.Common.Utils.DragDrop;
 using WDE.Common.Windows;
@@ -37,6 +38,7 @@ namespace WDE.Solutions.Explorer.ViewModels
             IEventAggregator ea,
             ISolutionSqlService solutionSqlService,
             INewItemService newItemService,
+            ISolutionTasksService solutionTasksService,
             IStatusBar statusBar)
         {
             this.itemNameRegistry = itemNameRegistry;
@@ -111,6 +113,18 @@ namespace WDE.Solutions.Explorer.ViewModels
                     solutionSqlService.OpenDocumentWithSqlFor(selected.Item);
                 }
             });
+
+            UpdateDatabase = new DelegateCommand(() =>
+            {
+                if (selected != null)
+                    solutionTasksService.SaveSolutionToDatabaseTask(selected.Item);
+            }, () => solutionTasksService.CanSaveToDatabase);
+            
+            ExportToServer = new DelegateCommand(() =>
+            {
+                if (selected != null)
+                    solutionTasksService.SaveAndReloadSolutionTask(selected.Item);
+            }, () => solutionTasksService.CanSaveAndReloadRemotely);
         }
 
         public ObservableCollection<SolutionItemViewModel> Root { get; }
@@ -120,7 +134,9 @@ namespace WDE.Solutions.Explorer.ViewModels
         public DelegateCommand GenerateSQL { get; }
         public DelegateCommand<SolutionItemViewModel> SelectedItemChangedCommand { get; }
         public DelegateCommand<SolutionItemViewModel> RequestOpenItem { get; }
-
+        public DelegateCommand ExportToServer { get; }
+        public DelegateCommand UpdateDatabase { get; }
+        
         public void DragOver(IDropInfo dropInfo)
         {
             SolutionItemViewModel sourceItem = dropInfo.Data as SolutionItemViewModel;

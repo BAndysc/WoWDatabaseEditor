@@ -21,6 +21,8 @@ namespace WDE.Updater.Test.ViewModels
         private IAutoUpdatePlatformService platformService = null!;
         private IFileSystem fileSystem = null!;
         private IMessageBoxService messageBoxService = null!;
+        private IApplication application = null!;
+        private IStandaloneUpdater standaloneUpdater = null!;
         
         [SetUp]
         public void Init()
@@ -32,13 +34,15 @@ namespace WDE.Updater.Test.ViewModels
             platformService = Substitute.For<IAutoUpdatePlatformService>();
             fileSystem = Substitute.For<IFileSystem>();
             messageBoxService = Substitute.For<IMessageBoxService>();
+            application = Substitute.For<IApplication>();
+            standaloneUpdater = Substitute.For<IStandaloneUpdater>();
         }
 
         [Test]
         public void TestNoAutoUpdate()
         {
             settingsProvider.Settings.Returns(new UpdaterSettings() {DisableAutoUpdates = true});
-            new UpdateViewModel(updateService, taskRunner, statusBar, settingsProvider, platformService, fileSystem, messageBoxService);
+            new UpdateViewModel(updateService, taskRunner, statusBar, settingsProvider, platformService, fileSystem, standaloneUpdater, application, messageBoxService);
             
             taskRunner.DidNotReceive().ScheduleTask(Arg.Any<string>(), Arg.Any<Func<Task>>());
         }
@@ -48,7 +52,7 @@ namespace WDE.Updater.Test.ViewModels
         {
             updateService.CanCheckForUpdates().Returns(true);
             settingsProvider.Settings.Returns(new UpdaterSettings() {DisableAutoUpdates = false});
-            new UpdateViewModel(updateService, taskRunner, statusBar, settingsProvider, platformService, fileSystem, messageBoxService);
+            new UpdateViewModel(updateService, taskRunner, statusBar, settingsProvider, platformService, fileSystem, standaloneUpdater, application, messageBoxService);
             
             taskRunner.Received().ScheduleTask(Arg.Any<string>(), Arg.Any<Func<Task>>());
         }
@@ -57,7 +61,7 @@ namespace WDE.Updater.Test.ViewModels
         public void TestNoUpdateIfCant()
         {
             updateService.CanCheckForUpdates().Returns(false);
-            var vm = new UpdateViewModel(updateService, taskRunner, statusBar, settingsProvider, platformService, fileSystem, messageBoxService);
+            var vm = new UpdateViewModel(updateService, taskRunner, statusBar, settingsProvider, platformService, fileSystem, standaloneUpdater, application, messageBoxService);
             
             taskRunner.DidNotReceive().ScheduleTask(Arg.Any<string>(), Arg.Any<Func<Task>>());
             Assert.IsFalse(vm.CheckForUpdatesCommand.CanExecute(null));

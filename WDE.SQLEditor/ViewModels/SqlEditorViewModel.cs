@@ -5,6 +5,7 @@ using Prism.Mvvm;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
@@ -16,8 +17,9 @@ namespace WDE.SQLEditor.ViewModels
     {
         private INativeTextDocument code;
 
-        public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
+        private SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
             IStatusBar statusBar, 
+            IDatabaseProvider databaseProvider,
             ITaskRunner taskRunner, 
             INativeTextDocument sql)
         {
@@ -31,11 +33,30 @@ namespace WDE.SQLEditor.ViewModels
                         await mySqlExecutor.ExecuteSql(Code.ToString());
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
                     });
-            });
+            }, () => databaseProvider.IsConnected);
+            IsLoading = false;
             Save = new DelegateCommand(() =>
             {
                 ExecuteSql.Execute(null);
             });
+        }
+
+        public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
+            IStatusBar statusBar,
+            IDatabaseProvider databaseProvider, 
+            ITaskRunner taskRunner, 
+            ISolutionItemSqlGeneratorRegistry sqlGeneratorsRegistry,
+            INativeTextDocument sql,
+            MetaSolutionSQL item) : this(mySqlExecutor, statusBar, databaseProvider, taskRunner, sql)
+        {
+            IsLoading = true;
+            taskRunner.ScheduleTask("Generating SQL",
+                async () =>
+                {
+                    string sql = await sqlGeneratorsRegistry.GenerateSql(item.ItemToGenerate);
+                    Code.FromString(sql);
+                    IsLoading = false;
+                });
         }
 
         public INativeTextDocument Code
@@ -50,6 +71,12 @@ namespace WDE.SQLEditor.ViewModels
         {
         }
 
+        private bool isLoading = false;
+        public bool IsLoading
+        {
+            get => isLoading;
+            set => SetProperty(ref isLoading, value);
+        }
         public string Title { get; } = "SQL Output";
         public ICommand Undo { get; } = AlwaysDisabledCommand.Command;
         public ICommand Redo { get; } = AlwaysDisabledCommand.Command;

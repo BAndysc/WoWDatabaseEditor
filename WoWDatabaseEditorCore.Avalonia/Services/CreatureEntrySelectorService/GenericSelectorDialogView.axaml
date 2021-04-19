@@ -6,21 +6,22 @@
                          xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
                          xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
                          prism:ViewModelLocator.AutoWireViewModel="False">
-    <controls:DialogViewBase.ToolBar>
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
         <controls:FixedTextBox x:Name="SearchBox" 
                                Padding="2,4" 
                                Text="{Binding SearchText}"
                                utils:FocusUtils.FocusFirst="True"
+                               Margin="0,0,0,6"
                                KeyDown="SearchBox_OnKeyDown"
+                               Watermark="Search"
                                HorizontalAlignment="Stretch" />
-    </controls:DialogViewBase.ToolBar>
-
-    <Grid Margin="6">
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
         <controls1:GridView  SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
+                             Grid.Row="1"
                              Items="{Binding FilteredItems}"
                              Margin="0,0,0,6"
                              Name="GridView"
@@ -31,7 +32,7 @@
                 </EventTriggerBehavior>
             </Interaction.Behaviors>
         </controls1:GridView>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="80" />

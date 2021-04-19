@@ -9,8 +9,9 @@
              x:Class="WDE.CommonViews.Avalonia.Updater.Views.UpdaterConfigurationView">
     <UserControl.Resources>
         <converters:DataTimeToStringConverter x:Key="DateConverter" Format="f" />
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     </UserControl.Resources>
-    <Grid RowDefinitions="Auto,10,Auto,10,Auto,10,Auto,30,Auto" ColumnDefinitions="Auto,10,*">
+    <Grid RowDefinitions="Auto,10,Auto,10,Auto,10,Auto,30,Auto,Auto,Auto" ColumnDefinitions="Auto,10,*">
         <TextBlock Text="Current version"
                    Grid.Row="0" />
         <TextBlock Text="{Binding CurrentVersion}"
@@ -26,9 +27,17 @@
                 Grid.Column="2"
                 Grid.Row="6">Show changelog</Button>
         
-        <TextBlock Text="Disable auto updates"
+        <TextBlock Text="Disable auto updates" VerticalAlignment="Center"
                 Grid.Row="8"/>
         <CheckBox IsChecked="{Binding DisableAutoUpdates}" 
                   Grid.Row="8" Grid.Column="2"/>
+                  
+        <TextBlock Text="Enable silent updates" VerticalAlignment="Center"
+                   Grid.Row="9"/>
+        <CheckBox IsChecked="{Binding EnableSilentUpdates}" 
+                  IsEnabled="{Binding DisableAutoUpdates, Converter={StaticResource InverseBoolConverter}}"
+                  Grid.Row="9" Grid.Column="2"/>
+        <TextBlock Text="With 'silent updates' enabled, updates are downloaded and installed automatically."
+                   Grid.Row="10" Grid.Column="2"/>
     </Grid>
 </UserControl>

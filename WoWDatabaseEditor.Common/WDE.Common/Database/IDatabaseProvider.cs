@@ -8,6 +8,8 @@ namespace WDE.Common.Database
     [UniqueProvider]
     public interface IDatabaseProvider
     {
+        bool IsConnected { get; }
+        
         ICreatureTemplate GetCreatureTemplate(uint entry);
         IEnumerable<ICreatureTemplate> GetCreatureTemplates();
 

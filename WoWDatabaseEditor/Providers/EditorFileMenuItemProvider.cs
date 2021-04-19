@@ -40,7 +40,7 @@ namespace WoWDatabaseEditorCore.Providers
 
         public EditorFileMenuItemProvider(ISolutionManager solutionManager, IEventAggregator eventAggregator, INewItemService newItemService, 
             ISolutionItemEditorRegistry solutionEditorManager, IMessageBoxService messageBoxService, IDocumentManager documentManager, IConfigureService settings,
-            IApplication application)
+            IApplication application, ISolutionTasksService solutionTasksService, ISolutionSqlService solutionSqlService)
         {
             this.solutionManager = solutionManager;
             this.eventAggregator = eventAggregator;
@@ -48,10 +48,26 @@ namespace WoWDatabaseEditorCore.Providers
             DocumentManager = documentManager;
             this.settings = settings;
             SubItems = new List<IMenuItem>();
-            SubItems.Add(new ModuleMenuItem("_New", new AsyncAutoCommand(OpenNewItemWindow)));
-            SubItems.Add(new ModuleMenuItem("_Save", new DelegateCommand(() => DocumentManager.ActiveDocument?.Save.Execute(null),
-                () => DocumentManager.ActiveDocument?.Save.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument).
-                ObservesProperty(() => DocumentManager.ActiveDocument.IsModified)));
+            SubItems.Add(new ModuleMenuItem("_New", new AsyncAutoCommand(OpenNewItemWindow), new("Control+N")));
+            
+            SubItems.Add(new ModuleMenuItem("_Save to database", 
+                new DelegateCommand(
+                        () => DocumentManager.ActiveDocument?.Save.Execute(null),
+                () => solutionTasksService.CanSaveToDatabase && (DocumentManager.ActiveDocument?.Save.CanExecute(null) ?? false))
+                    .ObservesProperty(() => DocumentManager.ActiveDocument)
+                    .ObservesProperty(() => DocumentManager.ActiveDocument.IsModified), new("Control+S")));
+            
+            SubItems.Add(new ModuleMenuItem("_Generate query", 
+                new DelegateCommand(
+                        () => solutionSqlService.OpenDocumentWithSqlFor(DocumentManager.ActiveSolutionItemDocument?.SolutionItem),
+                    () => DocumentManager.ActiveSolutionItemDocument != null)
+                .ObservesProperty(() => DocumentManager.ActiveSolutionItemDocument), new("F4")));
+            
+            SubItems.Add(new ModuleMenuItem("_Save to database and reload server", new DelegateCommand(
+                    () => solutionTasksService.SaveAndReloadSolutionTask(DocumentManager.ActiveSolutionItemDocument?.SolutionItem),
+                    () => DocumentManager.ActiveSolutionItemDocument != null && solutionTasksService.CanSaveAndReloadRemotely)
+                .ObservesProperty(() => DocumentManager.ActiveSolutionItemDocument), new("F5")));
+            
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("_Settings", new DelegateCommand(OpenSettings)));
             SubItems.Add(new ModuleManuSeparatorItem());

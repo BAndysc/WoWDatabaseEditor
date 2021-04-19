@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Logging;
 using Avalonia.ReactiveUI;
 using WoWDatabaseEditorCore.Managers;
 
@@ -20,6 +15,8 @@ namespace WoWDatabaseEditorCore.Avalonia
         public static void Main(string[] args)
         {
             FixCurrentDirectory();
+            if (ProgramBootstrap.TryLaunchUpdaterIfNeeded())
+                return;
             var app = BuildAvaloniaApp();
             try
             {

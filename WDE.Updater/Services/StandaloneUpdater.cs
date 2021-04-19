@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.Updater.Services
@@ -9,12 +10,19 @@ namespace WDE.Updater.Services
     public class StandaloneUpdater : IStandaloneUpdater
     {
         private readonly IAutoUpdatePlatformService platform;
+        private readonly IFileSystem fs;
 
-        public StandaloneUpdater(IAutoUpdatePlatformService platform)
+        public StandaloneUpdater(IAutoUpdatePlatformService platform, IFileSystem fs)
         {
             this.platform = platform;
+            this.fs = fs;
         }
-        
+
+        public bool HasPendingUpdate()
+        {
+            return platform.PlatformSupportsSelfInstall && fs.Exists(platform.UpdateZipFilePath);
+        }
+
         public void RenameIfNeeded()
         {
             if (!platform.PlatformSupportsSelfInstall)

@@ -7,8 +7,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
     {
         internal static SystemThemeOptions Theme = SystemThemeOptions.Auto;
 
-        internal static bool UseDock =>
-            Theme == SystemThemeOptions.Windows10Dark || Theme == SystemThemeOptions.Windows10Light;
+        internal static bool UseDock
+        {
+            get
+            {
+                var effectiveTheme = ResolveTheme(Theme);
+                return effectiveTheme == SystemThemeOptions.Windows10Dark || effectiveTheme == SystemThemeOptions.Windows10Light;
+            }
+        }
         
         public AvaloniaThemeStyle(IServiceProvider serviceProvider) : base(serviceProvider)
         {

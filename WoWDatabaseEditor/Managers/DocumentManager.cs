@@ -20,6 +20,7 @@ namespace WoWDatabaseEditorCore.Managers
     {
         private readonly IEventAggregator eventAggregator;
         private readonly IMessageBoxService messageBoxService;
+        private ISolutionItemDocument? activeSolutionItemDocument;
         private IDocument? activeDocument;
         private Dictionary<Type, ITool> typeToToolInstance = new();
         private List<ITool> allTools = new ();
@@ -52,11 +53,14 @@ namespace WoWDatabaseEditorCore.Managers
             {
                 if (value == null && activeDocument != null && OpenedDocuments.Contains(activeDocument))
                     return;
+                activeSolutionItemDocument = value as ISolutionItemDocument;
                 SetProperty(ref activeDocument, value);
+                RaisePropertyChanged(nameof(ActiveSolutionItemDocument));
                 eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
             }
         }
 
+        public ISolutionItemDocument? ActiveSolutionItemDocument => activeSolutionItemDocument;
 
         public void OpenDocument(IDocument editor)
         {

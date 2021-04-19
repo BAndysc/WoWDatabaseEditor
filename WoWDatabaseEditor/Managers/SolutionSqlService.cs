@@ -20,9 +20,11 @@ namespace WoWDatabaseEditorCore.Managers
             this.eventAggregator = eventAggregator;
         }
         
-        public async void OpenDocumentWithSqlFor(ISolutionItem solutionItem)
+        public async void OpenDocumentWithSqlFor(ISolutionItem? solutionItem)
         {
-            MetaSolutionSQL solution = new(await sqlGeneratorRegistry.GenerateSql(solutionItem));
+            if (solutionItem == null)
+                return;
+            MetaSolutionSQL solution = new(solutionItem);
             eventAggregator.GetEvent<EventRequestOpenItem>().Publish(solution);
         }
     }

@@ -26,6 +26,23 @@ namespace AvaloniaStyles
 
         public bool ThemeUsesDock =>
             mode == SystemThemeOptions.Windows10Dark || mode == SystemThemeOptions.Windows10Light;
+
+        protected static SystemThemeOptions ResolveTheme(SystemThemeOptions theme)
+        {
+            if (theme != SystemThemeOptions.Auto) 
+                return theme;
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                var version = Environment.OSVersion;
+                if (version.Version.Major >= 11)
+                    return SystemThemeOptions.MacOsBigSurLight;
+                else
+                    return SystemThemeOptions.MacOsCatalinaLight;
+            }
+            
+            return SystemThemeOptions.Windows10Dark;
+        }
         
         private SystemThemeOptions mode;
         public SystemThemeOptions Mode
@@ -34,27 +51,12 @@ namespace AvaloniaStyles
             set
             {
                 mode = value;
-                SystemThemeOptions actualTheme = Mode;
-                if (Mode == SystemThemeOptions.Auto)
-                {
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                    {
-                        var version = Environment.OSVersion;
-                        if (version.Version.Major >= 11)
-                            actualTheme = SystemThemeOptions.MacOsBigSurLight;
-                        else
-                            actualTheme = SystemThemeOptions.MacOsCatalinaLight;
-                    }
-                    else
-                        actualTheme = SystemThemeOptions.Windows10Dark;
-                }
-
-                EffectiveTheme = actualTheme;
+                EffectiveTheme = ResolveTheme(Mode);
                 EffectiveThemeIsDark = EffectiveTheme == SystemThemeOptions.Windows10Dark ||
                                        EffectiveTheme == SystemThemeOptions.MacOsCatalinaDark ||
                                        EffectiveTheme == SystemThemeOptions.MacOsBigSurDark;
 
-                switch (actualTheme)
+                switch (EffectiveTheme)
                 {
                     case SystemThemeOptions.MacOsCatalinaLight:
                         Source = new Uri("avares://AvaloniaStyles/Styles/MacOsCatalinaLight.xaml", UriKind.Absolute);

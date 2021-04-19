@@ -192,8 +192,14 @@
                             <MenuItem Header="Remove"
                                       Command="{Binding PlacementTarget.Tag.DataContext.RemoveItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                             <Separator />
-                            <MenuItem Header="Generate SQL"
+                            <MenuItem Header="Generate query"
                                       Command="{Binding PlacementTarget.Tag.DataContext.GenerateSQL, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      IsEnabled="{Binding IsExportable}" />
+                            <MenuItem Header="Save to database"
+                                      Command="{Binding PlacementTarget.Tag.DataContext.UpdateDatabase, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      IsEnabled="{Binding IsExportable}" />
+                            <MenuItem Header="Save to database and reload server"
+                                      Command="{Binding PlacementTarget.Tag.DataContext.ExportToServer, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                       IsEnabled="{Binding IsExportable}" />
                         </ContextMenu>
                     </Setter.Value>

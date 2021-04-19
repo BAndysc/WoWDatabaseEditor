@@ -8,6 +8,7 @@ namespace WDE.Updater.Data
     public struct UpdaterSettings : ISettings
     {
         public bool DisableAutoUpdates { get; set; }
+        public bool EnableSilentUpdates { get; set; }
         public long LastShowedChangelog { get; set; }
         public DateTime LastCheckedForUpdates { get; set; }
     }

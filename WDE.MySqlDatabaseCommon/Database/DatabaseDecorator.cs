@@ -12,7 +12,8 @@ namespace WDE.MySqlDatabaseCommon.Database
         {
             impl = provider;
         }
-        
+
+        public bool IsConnected => impl.IsConnected;
         public ICreatureTemplate GetCreatureTemplate(uint entry) => impl.GetCreatureTemplate(entry);
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates() => impl.GetCreatureTemplates();
         public IGameObjectTemplate GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);

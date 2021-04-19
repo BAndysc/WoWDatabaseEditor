@@ -1,4 +1,5 @@
 ﻿using System;
+using Prism.Ioc;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
@@ -12,37 +13,16 @@ namespace WDE.SQLEditor.Providers
     [AutoRegister]
     public class MetaSqlSolutionItemEditorProvider : ISolutionItemEditorProvider<MetaSolutionSQL>
     {
-        private readonly IMySqlExecutor mySqlExecutor;
-        private readonly IStatusBar statusBar;
-        private readonly Func<INativeTextDocument> document;
-        private readonly ITaskRunner taskRunner;
-        private readonly Lazy<ISolutionItemSqlGeneratorRegistry> sqlGeneratorsRegistry;
+        private readonly IContainerProvider containerProvider;
 
-        public MetaSqlSolutionItemEditorProvider(Lazy<ISolutionItemSqlGeneratorRegistry> sqlGeneratorsRegistry,
-            Func<INativeTextDocument> document,
-            IMySqlExecutor mySqlExecutor,
-            IStatusBar statusBar,
-            ITaskRunner taskRunner)
+        public MetaSqlSolutionItemEditorProvider(IContainerProvider containerProvider)
         {
-            this.sqlGeneratorsRegistry = sqlGeneratorsRegistry;
-            this.document = document;
-            this.mySqlExecutor = mySqlExecutor;
-            this.statusBar = statusBar;
-            this.taskRunner = taskRunner;
+            this.containerProvider = containerProvider;
         }
 
         public IDocument GetEditor(MetaSolutionSQL item)
         {
-            var vm = new SqlEditorViewModel(mySqlExecutor, statusBar, taskRunner, null);
-            LoadSqlDocument(vm, item);
-            return vm;
-        }
-
-        private async void LoadSqlDocument(SqlEditorViewModel vm, MetaSolutionSQL item)
-        {
-            var doc = document();
-            doc.FromString(await sqlGeneratorsRegistry.Value.GenerateSql(item));
-            vm.Code = doc;
+            return containerProvider.Resolve<SqlEditorViewModel>((typeof(MetaSolutionSQL), item));
         }
     }
 }

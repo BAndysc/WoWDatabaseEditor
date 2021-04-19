@@ -11,6 +11,7 @@ namespace WDE.Common.Managers
     public interface IDocumentManager : INotifyPropertyChanged
     {
         IDocument ActiveDocument { get; set; }
+        ISolutionItemDocument ActiveSolutionItemDocument { get; }
         IReadOnlyList<ITool> AllTools { get; }
         ObservableCollection<IDocument> OpenedDocuments { get; }
         ObservableCollection<ITool> OpenedTools { get; }
