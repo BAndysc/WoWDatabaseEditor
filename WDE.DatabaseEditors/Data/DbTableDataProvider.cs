@@ -12,24 +12,19 @@ namespace WDE.DatabaseEditors.Data
     {
         private readonly IDbTableFieldFactory tableFieldFactory;
         private readonly Lazy<IDbTableColumnFactory> tableColumnFactory;
-        private readonly Lazy<IDbFieldNameSwapDataManager> nameSwapDataManager;
         private readonly Lazy<IMessageBoxService> messageBoxService;
 
         public DbTableDataProvider(IDbTableFieldFactory tableFieldFactory, Lazy<IDbTableColumnFactory> tableColumnFactory,
-            Lazy<IDbFieldNameSwapDataManager> nameSwapDataManager, Lazy<IMessageBoxService> messageBoxService)
+            Lazy<IMessageBoxService> messageBoxService)
         {
             this.tableFieldFactory = tableFieldFactory;
             this.tableColumnFactory = tableColumnFactory;
-            this.nameSwapDataManager = nameSwapDataManager;
             this.messageBoxService = messageBoxService;
         }
         
         public IDbTableData? GetDatabaseTable(in DatabaseEditorTableDefinitionJson tableDefinition,
             Dictionary<string, object> fieldsFromDb)
         {
-            if (!string.IsNullOrWhiteSpace(tableDefinition.NameSwapFilePath))
-                nameSwapDataManager.Value.RegisterSwapDefinition(tableDefinition.Name, tableDefinition.NameSwapFilePath);
-            
             var tableCategories = new List<IDbTableFieldsCategory>(tableDefinition.Groups.Count);
             var tableIndex = fieldsFromDb[tableDefinition.TablePrimaryKeyColumnName].ToString();
 

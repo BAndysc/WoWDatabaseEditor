@@ -31,7 +31,6 @@ namespace WDE.DatabaseEditors.ViewModels
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
-        private readonly IDbFieldNameSwapDataManager nameSwapDataManager;
 
         private readonly DbEditorsSolutionItem solutionItem;
         private readonly IDbEditorTableDataProvider tableDataProvider;
@@ -39,7 +38,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem,
             IDbEditorTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IDbFieldNameSwapDataManager nameSwapDataManager, IEventAggregator eventAggregator,
+            IEventAggregator eventAggregator,
             IQueryGenerator queryGenerator)
         {
             SolutionItem = solutionItem;
@@ -47,7 +46,6 @@ namespace WDE.DatabaseEditors.ViewModels
             this.solutionItem = solutionItem;
             this.tableDataProvider = tableDataProvider;
             this.messageBoxService = messageBoxService;
-            this.nameSwapDataManager = nameSwapDataManager;
             History = history;
             tableData = null!;
             
@@ -136,7 +134,6 @@ namespace WDE.DatabaseEditors.ViewModels
 
             TableData = data;
             SetupHistory();
-            SetupSwapDataHandler();
             IsLoading = false;
         }
 
@@ -173,13 +170,6 @@ namespace WDE.DatabaseEditors.ViewModels
             History.AddHandler(historyHandler);
         }
 
-        private void SetupSwapDataHandler()
-        {
-            var swapData = nameSwapDataManager.GetSwapData(tableData.TableName);
-            if (swapData.HasValue)
-                AutoDispose(new DbTableFieldNameSwapHandler(tableData, swapData.Value));
-        }
-        
         private SourceList<DatabaseCellViewModel> sourceFields = new();
         public ReadOnlyObservableCollection<DatabaseCellsCategoryViewModel> FilteredFields { get; }
 
