@@ -84,7 +84,7 @@ namespace WDE.DatabaseEditors.History
                 if (values.Count != tableData.Columns.Count)
                     return;
                 
-                for(int i = 0; i < values.Count; ++i)
+                for (int i = 0; i < values.Count; ++i)
                     tableData.Columns[i].Fields.Insert(row, values[i]);
 
                 var dict = new Dictionary<string, IDbTableField>();
