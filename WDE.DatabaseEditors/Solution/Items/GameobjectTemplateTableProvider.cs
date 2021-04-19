@@ -9,10 +9,10 @@ namespace WDE.DatabaseEditors.Solution.Items
     [AutoRegister]
     public class GameobjectTemplateTableProvider : DatabaseTableSolutionItemProvider
     {
-        private readonly Lazy<IDatabaseTableDataProvider> tableDataProvider;
-        private readonly Lazy<IGameobjectEntryProviderService> gameobjectEntryProviderService;
+        private readonly IDatabaseTableDataProvider tableDataProvider;
+        private readonly IGameobjectEntryProviderService gameobjectEntryProviderService;
 
-        public GameobjectTemplateTableProvider(Lazy<IDatabaseTableDataProvider> tableDataProvider, Lazy<IGameobjectEntryProviderService> gameobjectEntryProviderService) : 
+        public GameobjectTemplateTableProvider(IDatabaseTableDataProvider tableDataProvider, IGameobjectEntryProviderService gameobjectEntryProviderService) : 
             base("Gameobject Template", "Edit or create data of gameobject.", "SmartScriptGeneric")
         {
             this.tableDataProvider = tableDataProvider;
@@ -21,10 +21,10 @@ namespace WDE.DatabaseEditors.Solution.Items
 
         public override async Task<ISolutionItem?> CreateSolutionItem()
         {
-            var key = await gameobjectEntryProviderService.Value.GetEntryFromService();
+            var key = await gameobjectEntryProviderService.GetEntryFromService();
             if (key.HasValue)
             {
-                var data = await tableDataProvider.Value.Load("gameobject_template", key.Value);
+                var data = await tableDataProvider.Load("gameobject_template", key.Value);
                 if (data != null)
                     return new DatabaseTableSolutionItem(key.Value, "gameobject_template");
             }

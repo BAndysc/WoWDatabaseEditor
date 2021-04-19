@@ -15,14 +15,14 @@ namespace WDE.DatabaseEditors.Loaders
     {
         private readonly ITableDefinitionProvider tableDefinitionProvider;
         private readonly IMySqlExecutor sqlExecutor;
-        private readonly IDatabaseTableModelGenerator _tableModelGenerator;
+        private readonly IDatabaseTableModelGenerator tableModelGenerator;
         
         public DatabaseTableDataProvider(ITableDefinitionProvider tableDefinitionProvider, IMySqlExecutor sqlExecutor, IDatabaseFieldFactory tableFieldFactory, 
             IDatabaseTableModelGenerator tableModelGenerator)
         {
             this.tableDefinitionProvider = tableDefinitionProvider;
             this.sqlExecutor = sqlExecutor;
-            this._tableModelGenerator = tableModelGenerator;
+            this.tableModelGenerator = tableModelGenerator;
         }
 
         private string BuildSQLQueryFromTableDefinition(in DatabaseTableDefinitionJson tableDefinitionJson, uint entry)
@@ -47,9 +47,9 @@ namespace WDE.DatabaseEditors.Loaders
                 return null;
 
             if (definition.IsMultiRecord)
-                return _tableModelGenerator.GetDatabaseMultiRecordTable(key, definition, result);
+                return tableModelGenerator.GetDatabaseMultiRecordTable(key, definition, result);
 
-            return _tableModelGenerator.GetDatabaseTable(definition, result[0]);
+            return tableModelGenerator.GetDatabaseTable(definition, result[0]);
         }
     }
 }

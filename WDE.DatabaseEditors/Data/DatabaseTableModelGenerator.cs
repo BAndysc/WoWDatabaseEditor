@@ -15,11 +15,11 @@ namespace WDE.DatabaseEditors.Data
     public class DatabaseTableModelGenerator : IDatabaseTableModelGenerator
     {
         private readonly IDatabaseFieldFactory tableFieldFactory;
-        private readonly Lazy<IDatabaseColumnFactory> tableColumnFactory;
-        private readonly Lazy<IMessageBoxService> messageBoxService;
+        private readonly IDatabaseColumnFactory tableColumnFactory;
+        private readonly IMessageBoxService messageBoxService;
 
-        public DatabaseTableModelGenerator(IDatabaseFieldFactory tableFieldFactory, Lazy<IDatabaseColumnFactory> tableColumnFactory,
-            Lazy<IMessageBoxService> messageBoxService)
+        public DatabaseTableModelGenerator(IDatabaseFieldFactory tableFieldFactory, IDatabaseColumnFactory tableColumnFactory,
+            IMessageBoxService messageBoxService)
         {
             this.tableFieldFactory = tableFieldFactory;
             this.tableColumnFactory = tableColumnFactory;
@@ -67,7 +67,7 @@ namespace WDE.DatabaseEditors.Data
                     object? defaultValue = group.Fields[i].DbColumnName == tableDefinition.TablePrimaryKeyColumnName
                         ? key
                         : null;
-                    columns.Insert(i, tableColumnFactory.Value.CreateColumn(group.Fields[i], defaultValue));
+                    columns.Insert(i, tableColumnFactory.CreateColumn(group.Fields[i], defaultValue));
                 }
 
                 foreach (var record in records)
@@ -110,11 +110,9 @@ namespace WDE.DatabaseEditors.Data
             return new DatabaseFieldsGroup(groupDefinition.Name, fields);
         }
         
-        
-
         private void ShowLoadingError(string msg)
         {
-            messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
+            messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
                 .SetMainInstruction(msg)
                 .SetIcon(MessageBoxIcon.Error)
                 .WithOkButton(true)
