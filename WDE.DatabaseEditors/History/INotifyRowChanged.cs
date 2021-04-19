@@ -12,10 +12,10 @@ namespace WDE.DatabaseEditors.History
     public class NotifyRowChangedEventArgs : EventArgs
     {
         public int Row { get; }
-        public List<IDbTableField>? NewValues { get; }
-        public List<IDbTableField>? OldValues { get; }
+        public List<IDatabaseField>? NewValues { get; }
+        public List<IDatabaseField>? OldValues { get; }
 
-        public NotifyRowChangedEventArgs(int row, List<IDbTableField>? newValues, List<IDbTableField>? oldValues)
+        public NotifyRowChangedEventArgs(int row, List<IDatabaseField>? newValues, List<IDatabaseField>? oldValues)
         {
             Row = row;
             NewValues = newValues;

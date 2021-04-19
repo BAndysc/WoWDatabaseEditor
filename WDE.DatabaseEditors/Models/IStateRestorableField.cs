@@ -4,7 +4,7 @@ namespace WDE.DatabaseEditors.Models
 {
     public interface IStateRestorableField
     {
-        void RestoreLoadedFieldState(DbTableSolutionItemModifiedField fieldData);
+        void RestoreLoadedFieldState(DatabaseSolutionItemModifiedField fieldData);
         object? GetValueForPersistence();
         object GetOriginalValueForPersistence();
     }

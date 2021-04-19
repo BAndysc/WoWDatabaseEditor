@@ -19,7 +19,9 @@ using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.History;
+using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -32,11 +34,11 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
 
-        private readonly DbEditorsSolutionItem solutionItem;
-        private readonly IDbEditorTableDataProvider tableDataProvider;
+        private readonly DatabaseTableSolutionItem solutionItem;
+        private readonly IDatabaseTableDataProvider tableDataProvider;
 
-        public TemplateDbTableEditorViewModel(DbEditorsSolutionItem solutionItem,
-            IDbEditorTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
+        public TemplateDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
+            IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator,
             IQueryGenerator queryGenerator)
@@ -81,7 +83,7 @@ namespace WDE.DatabaseEditors.ViewModels
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(args =>
                 {
-                    if (args.Item is DbEditorsSolutionItem dbEditItem)
+                    if (args.Item is DatabaseTableSolutionItem dbEditItem)
                     {
                         if (solutionItem.Equals(dbEditItem))
                         {
@@ -108,7 +110,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private async Task LoadTableDefinition()
         {
-            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entry) as DbTableData;
+            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entry) as DatabaseTableData;
 
             if (data == null)
             {
@@ -137,9 +139,9 @@ namespace WDE.DatabaseEditors.ViewModels
             IsLoading = false;
         }
 
-        private Dictionary<string, DbTableSolutionItemModifiedField> GetModifiedFields()
+        private Dictionary<string, DatabaseSolutionItemModifiedField> GetModifiedFields()
         {
-            var dict = new Dictionary<string, DbTableSolutionItemModifiedField>();
+            var dict = new Dictionary<string, DatabaseSolutionItemModifiedField>();
             
             foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
             {
@@ -173,8 +175,8 @@ namespace WDE.DatabaseEditors.ViewModels
         private SourceList<DatabaseCellViewModel> sourceFields = new();
         public ReadOnlyObservableCollection<DatabaseCellsCategoryViewModel> FilteredFields { get; }
 
-        private DbTableData tableData;
-        public DbTableData TableData
+        private DatabaseTableData tableData;
+        public DatabaseTableData TableData
         {
             get => tableData;
             set

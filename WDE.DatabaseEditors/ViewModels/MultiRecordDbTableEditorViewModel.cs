@@ -15,8 +15,11 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.History;
+using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
 using WDE.Parameters.Models;
 
@@ -24,19 +27,19 @@ namespace WDE.DatabaseEditors.ViewModels
 {
     public class MultiRecordDbTableEditorViewModel : BindableBase, IDocument
     {
-        private readonly DbEditorsSolutionItem solutionItem;
-        private readonly IDbEditorTableDataProvider tableDataProvider;
+        private readonly DatabaseTableSolutionItem solutionItem;
+        private readonly IDatabaseTableDataProvider tableDataProvider;
         private readonly IItemFromListProvider itemFromListProvider;
-        private readonly IDbTableFieldFactory fieldFactory;
+        private readonly IDatabaseFieldFactory fieldFactory;
         private readonly IMySqlExecutor sqlExecutor;
         private readonly IMessageBoxService messageBoxService;
 
         private MultiRecordTableEditorHistoryHandler? historyHandler;
         
-        public MultiRecordDbTableEditorViewModel(DbEditorsSolutionItem solutionItem,
-            IDbEditorTableDataProvider tableDataProvider, IHistoryManager history,
+        public MultiRecordDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
+            IDatabaseTableDataProvider tableDataProvider, IHistoryManager history,
             ITaskRunner taskRunner, IItemFromListProvider itemFromListProvider,
-            IDbTableFieldFactory fieldFactory, IMySqlExecutor sqlExecutor,
+            IDatabaseFieldFactory fieldFactory, IMySqlExecutor sqlExecutor,
             IMessageBoxService messageBoxService)
         {
             this.solutionItem = solutionItem;
@@ -64,8 +67,8 @@ namespace WDE.DatabaseEditors.ViewModels
             SetupHistory();
         }
 
-        private DbMultiRecordTableData? tableData;
-        public DbMultiRecordTableData? TableData
+        private DatabaseMultiRecordTableData? tableData;
+        public DatabaseMultiRecordTableData? TableData
         {
             get => tableData;
             set
@@ -91,7 +94,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private async Task LoadTableData()
         {
-            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entry) as DbMultiRecordTableData;
+            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entry) as DatabaseMultiRecordTableData;
 
             if (data == null)
             {
@@ -103,7 +106,7 @@ namespace WDE.DatabaseEditors.ViewModels
             SaveLoadedTableData(data);
         }
 
-        private void SaveLoadedTableData(DbMultiRecordTableData data)
+        private void SaveLoadedTableData(DatabaseMultiRecordTableData data)
         {
             IsLoading = false;
             TableData = data;

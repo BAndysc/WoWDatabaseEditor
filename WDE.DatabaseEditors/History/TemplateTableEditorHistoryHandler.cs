@@ -6,11 +6,11 @@ using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.History
 {
-    public class TemplateTableEditorHistoryHandler : HistoryHandler, IDisposable, IDbFieldHistoryActionReceiver
+    public class TemplateTableEditorHistoryHandler : HistoryHandler, IDisposable, IDatabaseFieldHistoryActionReceiver
     {
-        private readonly DbTableData tableData;
+        private readonly DatabaseTableData tableData;
 
-        public TemplateTableEditorHistoryHandler(DbTableData tableData)
+        public TemplateTableEditorHistoryHandler(DatabaseTableData tableData)
         {
             this.tableData = tableData;
             BindTableData();
@@ -29,7 +29,7 @@ namespace WDE.DatabaseEditors.History
             {
                 foreach (var field in category.Fields)
                 {
-                    if (field is IDbTableHistoryActionSource actionSource)
+                    if (field is IDatabaseTableHistoryActionSource actionSource)
                         actionSource.RegisterActionReceiver(this);
                 }
             }
@@ -41,7 +41,7 @@ namespace WDE.DatabaseEditors.History
             {
                 foreach (var field in category.Fields)
                 {
-                    if (field is IDbTableHistoryActionSource actionSource)
+                    if (field is IDatabaseTableHistoryActionSource actionSource)
                         actionSource.UnregisterActionReceiver();
                 }
             }

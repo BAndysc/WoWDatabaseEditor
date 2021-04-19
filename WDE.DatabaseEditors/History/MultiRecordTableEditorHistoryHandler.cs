@@ -6,12 +6,12 @@ using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.History
 {
-    public class MultiRecordTableEditorHistoryHandler : HistoryHandler, IDisposable, IDbFieldHistoryActionReceiver
+    public class MultiRecordTableEditorHistoryHandler : HistoryHandler, IDisposable, IDatabaseFieldHistoryActionReceiver
     {
-        private readonly DbMultiRecordTableData tableData;
+        private readonly DatabaseMultiRecordTableData tableData;
         private List<System.IDisposable> disposables = new();
         
-        public MultiRecordTableEditorHistoryHandler(DbMultiRecordTableData tableData)
+        public MultiRecordTableEditorHistoryHandler(DatabaseMultiRecordTableData tableData)
         {
             this.tableData = tableData;
             BindTableData();
@@ -36,12 +36,12 @@ namespace WDE.DatabaseEditors.History
                 {
                     if (item.Type == CollectionEventType.Add)
                     {
-                        if (item.Item is IDbTableHistoryActionSource actionSource)
+                        if (item.Item is IDatabaseTableHistoryActionSource actionSource)
                             actionSource.RegisterActionReceiver(this);
                     }
                     else if (item.Type == CollectionEventType.Remove)
                     {
-                        if (item.Item is IDbTableHistoryActionSource actionSource)
+                        if (item.Item is IDatabaseTableHistoryActionSource actionSource)
                             actionSource.RegisterActionReceiver(this);
                     }
                 }));
@@ -59,13 +59,13 @@ namespace WDE.DatabaseEditors.History
 
     internal class TableRowsChangedHistoryAction : IHistoryAction
     {
-        private readonly DbMultiRecordTableData tableData;
+        private readonly DatabaseMultiRecordTableData tableData;
         private readonly int row;
         private readonly bool isInsertAction;
-        private readonly List<IDbTableField> values;
+        private readonly List<IDatabaseField> values;
 
-        public TableRowsChangedHistoryAction(DbMultiRecordTableData tableData, int row,  bool isInsertAction,
-            List<IDbTableField> values)
+        public TableRowsChangedHistoryAction(DatabaseMultiRecordTableData tableData, int row,  bool isInsertAction,
+            List<IDatabaseField> values)
         {
             this.tableData = tableData;
             this.row = row;
@@ -87,7 +87,7 @@ namespace WDE.DatabaseEditors.History
                 for (int i = 0; i < values.Count; ++i)
                     tableData.Columns[i].Fields.Insert(row, values[i]);
 
-                var dict = new Dictionary<string, IDbTableField>();
+                var dict = new Dictionary<string, IDatabaseField>();
                 foreach (var field in values)
                     dict.Add(field.FieldName, field);
                 tableData.Rows.Insert(row, dict);
