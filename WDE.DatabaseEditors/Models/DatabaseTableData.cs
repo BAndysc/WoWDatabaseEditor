@@ -1,24 +1,35 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using WDE.DatabaseEditors.Data.Structs;
 
 namespace WDE.DatabaseEditors.Models
 {
     public class DatabaseTableData : IDatabaseTableData
     {
-        public string TableName { get; }
-        public string DbTableName { get; }
-        public string TableIndexFieldName { get; }
-        public string TableIndexValue { get; }
-        public List<IDatabaseFieldsGroup> Categories { get; }
+        public DatabaseTableDefinitionJson TableDefinition { get; }
+        public List<DatabaseEntity> Rows { get; }
 
-        public DatabaseTableData(string tableName, string dbTableName, string tableIndexFieldName, string tableIndexValue,
-            List<IDatabaseFieldsGroup> categories)
+        public DatabaseTableData(DatabaseTableDefinitionJson definitionJson, List<DatabaseEntity> rows)
         {
-            TableName = tableName;
-            DbTableName = dbTableName;
-            TableIndexFieldName = tableIndexFieldName;
-            TableIndexValue = tableIndexValue;
-            Categories = categories;
+            TableDefinition = definitionJson;
+            Rows = rows;
+        }
+    }
+
+    public class DatabaseEntity
+    {
+        public DatabaseEntity(Dictionary<string, IDatabaseField> cells)
+        {
+            Cells = cells;
+        }
+
+        public Dictionary<string, IDatabaseField> Cells { get; }
+
+        public IDatabaseField? GetCell(string columnName)
+        {
+            if (Cells.TryGetValue(columnName, out var cell))
+                return cell;
+            return null;
         }
     }
 }

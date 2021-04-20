@@ -29,12 +29,12 @@ namespace WDE.DatabaseEditors.Solution
         {
             IDatabaseTableData? tableData = await LoadTable(item);
 
-            return queryGenerator.GenerateQuery(tableData, item.TableId, item.Entry, item.ModifiedFields);
+            return queryGenerator.GenerateQuery(tableData, item.TableId, item.Entries[0], item.ModifiedFields);
         }
 
         private Task<IDatabaseTableData?> LoadTable(DatabaseTableSolutionItem item)
         {
-            return tableDataProvider.Load(item.TableId, item.Entry);
+            return tableDataProvider.Load(item.TableId, item.Entries[0]);
         }
     }
 }

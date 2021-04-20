@@ -9,7 +9,7 @@ namespace WDE.DatabaseEditors.Data.Interfaces
     public interface IDatabaseTableModelGenerator
     {
         IDatabaseTableData? GetDatabaseTable(in DatabaseTableDefinitionJson tableDefinition, 
-            Dictionary<string, object> fieldsFromDb);
+            IList<Dictionary<string, (System.Type type, object value)>> fieldsFromDb);
 
         IDatabaseTableData? GetDatabaseMultiRecordTable(uint key, in DatabaseTableDefinitionJson tableDefinition, 
             IList<Dictionary<string, object>> records);

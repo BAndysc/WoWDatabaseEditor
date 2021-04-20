@@ -31,9 +31,9 @@ namespace WDE.DatabaseEditors.Solution
             if (definition == null)
                 throw new Exception("Cannot find table editor for table: " + item.TableId);
 
-            if (definition.IsMultiRecord)
-                return containerRegistry.Resolve<MultiRecordDbTableEditorViewModel>(
-                    (typeof(DatabaseTableSolutionItem), item));
+            //if (definition.IsMultiRecord)
+            //    return containerRegistry.Resolve<MultiRecordDbTableEditorViewModel>(
+            //        (typeof(DatabaseTableSolutionItem), item));
             
             return containerRegistry.Resolve<TemplateDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), item));
         }

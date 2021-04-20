@@ -6,7 +6,7 @@ using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.History
 {
-    public class MultiRecordTableEditorHistoryHandler : HistoryHandler, IDisposable, IDatabaseFieldHistoryActionReceiver
+    /*public class MultiRecordTableEditorHistoryHandler : HistoryHandler, IDisposable, IDatabaseFieldHistoryActionReceiver
     {
         private readonly DatabaseMultiRecordTableData tableData;
         private List<System.IDisposable> disposables = new();
@@ -89,7 +89,7 @@ namespace WDE.DatabaseEditors.History
 
                 var dict = new Dictionary<string, IDatabaseField>();
                 foreach (var field in values)
-                    dict.Add(field.FieldName, field);
+                    dict.Add(field.FieldMetaData.Name, field);
                 tableData.Rows.Insert(row, dict);
             }
             else
@@ -102,5 +102,5 @@ namespace WDE.DatabaseEditors.History
         }
 
         public string GetDescription() => $"{(isInsertAction ? "Added" : "Removed")} row";
-    }
+    }*/
 }

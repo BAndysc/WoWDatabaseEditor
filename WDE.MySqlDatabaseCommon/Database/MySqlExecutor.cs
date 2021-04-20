@@ -47,7 +47,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             await conn.CloseAsync();
         }
 
-        public async Task<IList<Dictionary<string, object>>> ExecuteSelectSql(string query)
+        public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)
         {
             using var writeLock = await DatabaseLock.WriteLock();
             
@@ -73,12 +73,12 @@ namespace WDE.MySqlDatabaseCommon.Database
                 throw new IMySqlExecutor.QueryFailedDatabaseException(ex);
             }
 
-            List<Dictionary<string, object>> result = new();
+            List<Dictionary<string, (Type, object)>> result = new();
             while (reader.Read())
             {
-                var fields = new Dictionary<string, object>(reader.FieldCount);
+                var fields = new Dictionary<string, (Type, object)>(reader.FieldCount);
                 for (int i = 0; i < reader.FieldCount; ++i)
-                    fields.Add(reader.GetName(i), reader.GetValue(i));
+                    fields.Add(reader.GetName(i), (reader.GetFieldType(i), reader.GetValue(i)));
                 
                 result.Add(fields);
             }

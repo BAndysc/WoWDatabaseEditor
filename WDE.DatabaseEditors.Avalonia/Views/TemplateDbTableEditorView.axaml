@@ -5,14 +5,34 @@
              xmlns:controls="clr-namespace:WDE.DatabaseEditors.Avalonia.Controls"
              xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:helpers="clr-namespace:WDE.DatabaseEditors.Avalonia.Helpers"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Name="rootWindow"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.TemplateDbTableEditorView">
+    <UserControl.Resources>
+        <converters:BoolToDoubleConverter WhenFalse="0" WhenTrue="1" x:Key="BoolToDoubleConverter" />
+    </UserControl.Resources>
     <UserControl.Styles>
         <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
                                        LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/DbTableFieldView.axaml" />
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/DbTableFieldValueView.axaml" />
+        
+        
+        <Style Selector="controls|DbTableFieldValueView.Root">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
+        </Style>
+        <Style Selector="controls|DbTableFieldValueView.Root.odd:not(:modified)">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
+        </Style>
+        
+        <Style Selector="controls|DbTableFieldView">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
+        </Style>
+        <Style Selector="controls|DbTableFieldView.odd:not(:modified)">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
+        </Style>
     </UserControl.Styles>
     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
         <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
@@ -25,35 +45,49 @@
                 <TextBox Name="SearchTextBox" Width="300" HorizontalAlignment="Right" Text="{Binding SearchText, Mode=TwoWay}" />
             </StackPanel>
             <ScrollViewer Grid.Row="1">
-                <ItemsControl Focusable="False" Items="{Binding FilteredFields}" Margin="0, 0, 0, 20">
+                <ItemsControl Focusable="False" Items="{Binding Rows}" Margin="0, 0, 0, 20">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
-                                <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
-                                    <TextBlock Padding="10,0,0,0" Text="{Binding CategoryName}" Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" VerticalAlignment="Center"/>
-                                </Border>
-                                <controls1:AlternatingItemsControl Focusable="False" Items="{Binding }">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <controls:DbTableFieldView Title="{Binding FieldName}" 
-                                                                       DataContext="{Binding TableField}" 
-                                                                       IsModified="{Binding IsModified}" 
-                                                                       IsReadOnly="{Binding FieldMetaData.IsReadOnly}"
-                                                                       ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}"
-                                                                       Name="fieldView">
-                                                <controls:DbTableFieldView.Styles>
-                                                    <Style Selector="controls|DbTableFieldView">
-                                                        <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
-                                                    </Style>
-                                                    <Style Selector="controls|DbTableFieldView.odd:not(:modified)">
-                                                        <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
-                                                    </Style>
-                                                </controls:DbTableFieldView.Styles>
-                                            </controls:DbTableFieldView>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </controls1:AlternatingItemsControl>
-                            </StackPanel>
+                            <ItemsControl Focusable="False" Items="{Binding FilteredFields}" Margin="0, 0, 0, 20">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0" Name="papaparent">
+                                            <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
+                                                <TextBlock Padding="10,0,0,0" Text="{Binding CategoryName}" Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <controls1:AlternatingItemsControl Focusable="False" Items="{Binding }">
+                                                <ItemsControl.ItemTemplate>
+                                                    <helpers:FirstColumnDataTemplate>
+                                                        <helpers:FirstColumnDataTemplate.FirstColumn>
+                                                            <DataTemplate>
+                                                                <controls:DbTableFieldView IsModified="{Binding TableField.IsModified}" 
+                                                                    IsReadOnly="{Binding IsReadOnly}"
+                                                                    Title="{Binding FieldName}"
+                                                                    ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}">
+                                                                </controls:DbTableFieldView>
+                                                            </DataTemplate>
+                                                        </helpers:FirstColumnDataTemplate.FirstColumn>
+                                                        <helpers:FirstColumnDataTemplate.Column>
+                                                            <DataTemplate>
+                                                                <controls:DbTableFieldValueView IsModified="{Binding TableField.IsModified}" 
+                                                                    IsReadOnly="{Binding IsReadOnly}" Classes="Root"
+                                                                    ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}">
+                                                                </controls:DbTableFieldValueView>
+                                                            </DataTemplate>
+                                                        </helpers:FirstColumnDataTemplate.Column>
+                                                    </helpers:FirstColumnDataTemplate>
+                                                    
+                                                </ItemsControl.ItemTemplate>
+                                            </controls1:AlternatingItemsControl>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

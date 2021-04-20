@@ -6,5 +6,6 @@ namespace WDE.DatabaseEditors.Models
     {
         string CategoryName { get; }
         List<IDatabaseField> Fields { get; }
+        System.IObservable<bool>? GroupVisible { get; }
     }
 }

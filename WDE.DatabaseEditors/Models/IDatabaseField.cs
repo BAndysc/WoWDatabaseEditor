@@ -1,14 +1,11 @@
-﻿using WDE.DatabaseEditors.Data;
-using WDE.DatabaseEditors.Data.Structs;
+﻿
+using System;
+using System.ComponentModel;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public interface IDatabaseField
+    public interface IDatabaseField : INotifyPropertyChanged
     {
-        DbEditorTableGroupFieldJson FieldMetaData { get; }
-        string FieldName { get; }
-        bool IsParameter { get; }
         bool IsModified { get; }
-        string SqlStringValue();
     }
 }

@@ -32,11 +32,23 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "group_name")]
         public string Name { get; set; }
         
+        [JsonProperty(PropertyName = "show_if")]
+        public ShowIfCondition? ShowIf { get; set; }
+        
         [JsonProperty(PropertyName = "group_sort_field")]
         public string? GroupSortField { get; set; }
 
         [JsonProperty(PropertyName = "fields")]
         public IList<DbEditorTableGroupFieldJson> Fields { get; set; }
+
+        public struct ShowIfCondition
+        {
+            [JsonProperty(PropertyName = "db_column_name")]
+            public string ColumnName { get; set; }
+            
+            [JsonProperty(PropertyName = "value")]
+            public int Value { get; set; }
+        }
     }
 
     public struct DbEditorTableGroupFieldJson

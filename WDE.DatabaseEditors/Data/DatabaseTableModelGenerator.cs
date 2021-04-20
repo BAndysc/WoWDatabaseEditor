@@ -7,6 +7,9 @@ using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
+using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.Data
 {
@@ -27,18 +30,72 @@ namespace WDE.DatabaseEditors.Data
         }
         
         public IDatabaseTableData? GetDatabaseTable(in DatabaseTableDefinitionJson tableDefinition,
-            Dictionary<string, object> fieldsFromDb)
+            IList<Dictionary<string, (System.Type type, object value)>> fieldsFromDb)
         {
-            var tableCategories = new List<IDatabaseFieldsGroup>(tableDefinition.Groups.Count);
-            var tableIndex = fieldsFromDb[tableDefinition.TablePrimaryKeyColumnName].ToString();
+            //var tableCategories = new List<IDatabaseFieldsGroup>(tableDefinition.Groups.Count);
+            //var tableIndex = fieldsFromDb[tableDefinition.TablePrimaryKeyColumnName].ToString();
 
+            List<DatabaseEntity> rows = new();
+            foreach (var entity in fieldsFromDb)
+            {
+                Dictionary<string, IDatabaseField> columns = new();
+                foreach (var column in entity)
+                {
+                    IValueHolder valueHolder = null!;
+                    if (column.Value.type == typeof(string))
+                    {
+                        valueHolder = new ValueHolder<string>(column.Value.value as string ?? "");
+                    }
+                    else if (column.Value.type == typeof(float))
+                    {
+                        valueHolder = new ValueHolder<float>(column.Value.value as float? ?? 0f);
+                    }
+                    else if (column.Value.type == typeof(uint))
+                    {
+                        valueHolder = new ValueHolder<long>(column.Value.value as uint? ?? 0);
+                    }
+                    else if (column.Value.type == typeof(int))
+                    {
+                        valueHolder = new ValueHolder<long>(column.Value.value as int? ?? 0);
+                    }
+                    else if (column.Value.type == typeof(long))
+                    {
+                        valueHolder = new ValueHolder<long>(column.Value.value as long? ?? 0);
+                    }
+                    else if (column.Value.type == typeof(byte))
+                    {
+                        valueHolder = new ValueHolder<long>(column.Value.value as byte? ?? 0);
+                    }
+                    else if (column.Value.type == typeof(sbyte))
+                    {
+                        valueHolder = new ValueHolder<long>(column.Value.value as sbyte? ?? 0);
+                    }
+                    else if (column.Value.type == typeof(ushort))
+                    {
+                        valueHolder = new ValueHolder<long>(column.Value.value as ushort? ?? 0);
+                    }
+                    else if (column.Value.type == typeof(short))
+                    {
+                        valueHolder = new ValueHolder<long>(column.Value.value as short? ?? 0);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+
+                    columns[column.Key] = tableFieldFactory.CreateField(column.Key, valueHolder);
+                }
+                rows.Add(new DatabaseEntity(columns));
+            }
+            
             try
             {
                 foreach (var category in tableDefinition.Groups)
-                    tableCategories.Add(CreateCategory(in category, fieldsFromDb));
+                {
+                    //tableCategories.Add(CreateCategory(in category, fieldsFromDb));
+                }
 
-                return new DatabaseTableData(tableDefinition.Name, tableDefinition.TableName, tableDefinition.TablePrimaryKeyColumnName, 
-                    tableIndex ?? "Unk", tableCategories);
+                return new DatabaseTableData(tableDefinition, rows);
             }
             catch (Exception e)
             {
@@ -75,7 +132,7 @@ namespace WDE.DatabaseEditors.Data
                     for (int i = 0; i < group.Fields.Count; ++i)
                     {
                         var field = group.Fields[i];
-                        columns[i].Fields.Add(tableFieldFactory.CreateField(in field, record[field.DbColumnName], columns[i]));
+                        //columns[i].Fields.Add(tableFieldFactory.CreateField(in field, record[field.DbColumnName], columns[i]));
                     }
                 }
                 
@@ -86,10 +143,12 @@ namespace WDE.DatabaseEditors.Data
                     if (column.Fields.Count != firstColumnRecordsAmount)
                         throw new Exception("Detected row amount mismatch between table's columns!");
                 }
+
+                throw new Exception();
                 
-                return new DatabaseMultiRecordTableData(tableDefinition.Name, tableDefinition.TableName,
-                    tableDefinition.TablePrimaryKeyColumnName,
-                    key.ToString(), columns);
+                //return new DatabaseMultiRecordTableData(tableDefinition.Name, tableDefinition.TableName,
+                //    tableDefinition.TablePrimaryKeyColumnName,
+                //    key.ToString(), columns);
             }
             catch (Exception e)
             {
@@ -104,10 +163,22 @@ namespace WDE.DatabaseEditors.Data
             Dictionary<string, object> fieldsFromDb)
         {
             var fields = new List<IDatabaseField>(groupDefinition.Fields.Count);
-            foreach (var field in groupDefinition.Fields)
-                fields.Add(tableFieldFactory.CreateField(in field, fieldsFromDb[field.DbColumnName]));
+            IObservable<bool>? showGroup = null;
+            foreach (var column in groupDefinition.Fields)
+            {
+                //var field = tableFieldFactory.CreateField(in column, fieldsFromDb[column.DbColumnName]);
+                //fields.Add(field);
+            }
             
-            return new DatabaseFieldsGroup(groupDefinition.Name, fields);
+            /*if (groupDefinition.ShowIf.HasValue && 
+                groupDefinition.ShowIf.Value.ColumnName == column.DbColumnName &&
+                field is DatabaseField<long> longField)
+            {
+                int showIfValue = groupDefinition.ShowIf.Value.Value;
+                showGroup = longField.Parameter.ToObservable(p => p.Value).Select(val => val == showIfValue);
+            }*/
+            
+            return new DatabaseFieldsGroup(groupDefinition.Name, fields, showGroup);
         }
         
         private void ShowLoadingError(string msg)

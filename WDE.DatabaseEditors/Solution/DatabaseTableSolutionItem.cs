@@ -7,26 +7,27 @@ namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
+        
         public DatabaseTableSolutionItem(uint entry, string tableId)
         {
-            Entry = entry;
+            Entries.Add(entry);
             TableId = tableId;
             ModifiedFields = new();
         }
-        
-        public uint Entry { get; }
+
+        public List<uint> Entries { get; set; } = new();
         public string TableId { get; }
 
         public Dictionary<string, DatabaseSolutionItemModifiedField> ModifiedFields { get; set; }
 
         public bool IsContainer => false;
         public ObservableCollection<ISolutionItem>? Items { get; } = null;
-        public string ExtraId => Entry.ToString();
+        public string ExtraId => string.Join(", ", Entries);
         public bool IsExportable { get; } = true;
 
         private bool Equals(DatabaseTableSolutionItem other)
         {
-            return Entry == other.Entry && TableId == other.TableId;
+            return Entries == other.Entries && TableId == other.TableId;
         }
 
         public override bool Equals(object? obj)
@@ -39,7 +40,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Entry, TableId);
+            return HashCode.Combine(Entries, TableId);
         }
     }
 }

@@ -26,6 +26,6 @@ namespace WDE.DatabaseEditors.History
             tableField.Parameter.Value = newValue;
         }
 
-        public string GetDescription() => $"Changed value of field {tableField.FieldName}";
+        public string GetDescription() => "";// $"Changed value of field {tableField.FieldMetaData.Name}";
     }
 }

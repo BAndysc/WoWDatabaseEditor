@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Templates;
+using WDE.DatabaseEditors.Models;
 using WDE.Parameters;
 using WDE.Parameters.Models;
 
@@ -13,14 +14,14 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
 
         public IControl Build(object param)
         {
-            if (param is ParameterValueHolder<long> holder && holder.Parameter is BoolParameter)
+            if (param is ParameterValue<long> holder && holder.Parameter is BoolParameter)
                 return BoolTemplate!.Build(param);
             return GenericTemplate!.Build(param);
         }
 
         public bool Match(object data)
         {
-            return data is IParameterValueHolder;
+            return data is IParameterValue;
         }
     }
 }

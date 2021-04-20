@@ -7,7 +7,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
 {
     public static class MultiRecordTableSqlGenerator
     {
-        public static string GenerateSql(DatabaseMultiRecordTableData tableData)
+        /*public static string GenerateSql(DatabaseMultiRecordTableData tableData)
         {
             var builder = new StringBuilder();
             builder.AppendLine(MakeDeleteLine(tableData));
@@ -35,6 +35,6 @@ namespace WDE.DatabaseEditors.QueryGenerators
         {
             var values = row.Values.Select(f => f.SqlStringValue());
             return $"({string.Join(", ", values)}),";
-        }
+        }*/
     }
 }

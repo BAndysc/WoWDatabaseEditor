@@ -19,32 +19,32 @@
             </Button>
                 <!--IsReadOnly="{Binding DataContext.FieldMetaData.IsReadOnly, RelativeSource={RelativeSource 
                     AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"-->
-            <controls:ParameterTextBox 
+                <controls:ParameterTextBox 
                     VerticalContentAlignment="Center"
                     Background="Transparent"
                     BorderThickness="0"
                     Text="{Binding Value, Mode=TwoWay}"
                     FontFamily="Consolas,Menlo,Courier,Courier New"
                     IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:DbTableFieldValueView}, Converter={StaticResource InvertBoolConverter}}"
-                    Classes="InnerContentWithPadding">
-                <controls:ParameterTextBox.Styles>
-                    <Style
-                        Selector="TextBox:not(:focus-within) /template/ TextPresenter#PART_TextPresenter">
-                        <Setter Property="IsVisible" Value="False" />
-                    </Style>
-                    <Style
-                        Selector="TextBox:focus-within ContentPresenter Border">
-                        <Setter Property="IsVisible" Value="False" />
-                    </Style>
-                </controls:ParameterTextBox.Styles>
-                <controls:ParameterTextBox.InnerLeftContent>
-                    <Border Cursor="Ibeam">
-                        <TextBlock Text="{Binding String, Mode=OneWay}"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,0,0" />
-                    </Border>
-                </controls:ParameterTextBox.InnerLeftContent>
-            </controls:ParameterTextBox>
+                    Classes="InnerContentWithPadding GridViewPlainTextBox">
+                    <controls:ParameterTextBox.Styles>
+                        <Style
+                            Selector="TextBox:not(:focus-within) /template/ TextPresenter#PART_TextPresenter">
+                            <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                        <Style
+                            Selector="TextBox:focus-within ContentPresenter Border">
+                            <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                    </controls:ParameterTextBox.Styles>
+                    <controls:ParameterTextBox.InnerLeftContent>
+                        <Border Cursor="Ibeam">
+                            <TextBlock Text="{Binding String, Mode=OneWay}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,0,0" />
+                        </Border>
+                    </controls:ParameterTextBox.InnerLeftContent>
+                </controls:ParameterTextBox>
         </DockPanel>
         </DataTemplate>
         <DataTemplate x:Key="BoolParameterView">
@@ -63,22 +63,24 @@
     <Style Selector="controls|DbTableFieldValueView">
         <Setter Property="Template">
             <ControlTemplate>
-                <DockPanel LastChildFill="True" Height="24" MaxHeight="24">
-                    <Image ToolTip.Tip="{Binding OriginalValueTooltip}" Source="{DynamicResource StatusBarIconNotice}"
-                           Width="15" Height="15" Margin="2, 0, 2, 0" 
-                           IsVisible="{TemplateBinding ShowModifiedIcon}"
-                           IsHitTestVisible="{TemplateBinding IsModified}"
-                           Opacity="{TemplateBinding IsModified, Converter={StaticResource BoolToOpacityConverter}}"
-                           DockPanel.Dock="Left">
-                    </Image>
-                    <ContentPresenter DataContext="{Binding Parameter}" Content="{Binding}">
-                        <ContentPresenter.DataTemplates>
-                            <helpers:FieldValueTemplateSelector
-                                GenericTemplate="{StaticResource GenericParameterView}"
-                                BoolTemplate="{StaticResource BoolParameterView}" />
-                        </ContentPresenter.DataTemplates>
-                    </ContentPresenter>
-                </DockPanel>
+                <Border Background="{TemplateBinding Background}" Height="24" MaxHeight="24" MinHeight="24">
+                    <DockPanel LastChildFill="True" IsVisible="{Binding IsVisible}"><!--
+                        <Image ToolTip.Tip="{Binding OriginalValueTooltip}" Source="{DynamicResource StatusBarIconNotice}"
+                               Width="15" Height="15" Margin="2, 0, 2, 0" 
+                               IsVisible="{TemplateBinding ShowModifiedIcon}"
+                               IsHitTestVisible="{TemplateBinding IsModified}"
+                               Opacity="{TemplateBinding IsModified, Converter={StaticResource BoolToOpacityConverter}}"
+                               DockPanel.Dock="Left">
+                        </Image>-->
+                        <ContentPresenter Content="{Binding}" DataContext="{Binding ParameterValue}">
+                            <ContentPresenter.DataTemplates>
+                                <helpers:FieldValueTemplateSelector
+                                    GenericTemplate="{StaticResource GenericParameterView}"
+                                    BoolTemplate="{StaticResource BoolParameterView}" />
+                            </ContentPresenter.DataTemplates>
+                        </ContentPresenter>
+                    </DockPanel>
+                </Border>
             </ControlTemplate>
         </Setter>
     </Style>

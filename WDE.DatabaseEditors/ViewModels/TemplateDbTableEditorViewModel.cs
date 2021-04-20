@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -17,7 +18,8 @@ using WDE.Common.Providers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
-using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
@@ -33,14 +35,23 @@ namespace WDE.DatabaseEditors.ViewModels
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
+        private readonly IParameterFactory parameterFactory;
 
         private readonly DatabaseTableSolutionItem solutionItem;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
+        private bool Collect(System.IObservable<bool> b)
+        {
+            bool report = true;
+            b.SubscribeAction(val => report = val).Dispose();
+            return report;
+        }
+        
         public TemplateDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IEventAggregator eventAggregator,
+            IEventAggregator eventAggregator, ITableDefinitionProvider definitionProvider,
+            IParameterFactory parameterFactory,
             IQueryGenerator queryGenerator)
         {
             SolutionItem = solutionItem;
@@ -48,6 +59,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.solutionItem = solutionItem;
             this.tableDataProvider = tableDataProvider;
             this.messageBoxService = messageBoxService;
+            this.parameterFactory = parameterFactory;
             History = history;
             tableData = null!;
             
@@ -58,43 +70,35 @@ namespace WDE.DatabaseEditors.ViewModels
 
             undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
-            OpenParameterWindow = new AsyncAutoCommand<ParameterValueHolder<long>?>(EditParameter);
+            OpenParameterWindow = new AsyncAutoCommand<ParameterValue<long>?>(EditParameter);
             saveModifiedFields = new DelegateCommand(SaveSolutionItem);
+
+            TableDefinition = definitionProvider.GetDefinition(solutionItem.TableId)!;
             
-            var currentFilter = this.ToObservable(t => t.SearchText)
-                .Select<string, Func<DatabaseCellViewModel, bool>>(text =>
+            CurrentFilter = FunctionalExtensions.Select<string, Func<DatabaseCellViewModel, bool>>(this.ToObservable(t => t.SearchText), text =>
                 {
                     if (string.IsNullOrEmpty(text))
-                        return _ => true;
+                        return item => true;
                     var lower = text.ToLower();
-                    return item => item.TableField.FieldName.ToLower().Contains(lower);
+                    return item => item.FieldName.ToLower().Contains(lower);
                 });
-            
-            AutoDispose(sourceFields.Connect()
-                .Filter(currentFilter)
-                .GroupOn(t => (t.CategoryName, t.CategoryIndex))
-                .Transform(group => new DatabaseCellsCategoryViewModel(group))
-                .DisposeMany()
-                .Sort(Comparer<DatabaseCellsCategoryViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder)))
-                .Bind(out ReadOnlyObservableCollection<DatabaseCellsCategoryViewModel> filteredFields)
-                .Subscribe());
-            FilteredFields = filteredFields;
-            
-            AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
-                .Subscribe(args =>
-                {
-                    if (args.Item is DatabaseTableSolutionItem dbEditItem)
-                    {
-                        if (solutionItem.Equals(dbEditItem))
-                        {
-                            args.Sql = queryGenerator.GenerateQuery(tableData, solutionItem.TableId, solutionItem.Entry,
-                                GetModifiedFields());
-                        }
-                    }
-                }));
+
+
+            // AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
+            //     .Subscribe(args =>
+            //     {
+            //         if (args.Item is DatabaseTableSolutionItem dbEditItem)
+            //         {
+            //             if (solutionItem.Equals(dbEditItem))
+            //             {
+            //                 args.Sql = queryGenerator.GenerateQuery(tableData, solutionItem.TableId, solutionItem.Entry,
+            //                     GetModifiedFields());
+            //             }
+            //         }
+            //     }));
         }
        
-        private async Task EditParameter(ParameterValueHolder<long>? valueHolder)
+        private async Task EditParameter(ParameterValue<long>? valueHolder)
         {
             if (valueHolder == null)
                 return;
@@ -110,7 +114,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private async Task LoadTableDefinition()
         {
-            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entry) as DatabaseTableData;
+            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entries.ToArray()) as DatabaseTableData;
 
             if (data == null)
             {
@@ -121,42 +125,42 @@ namespace WDE.DatabaseEditors.ViewModels
                     .Build());
                 return;
             }
-
-            if (solutionItem.ModifiedFields != null)
-            {
-                foreach (var field in data.Categories.SelectMany(c => c.Fields))
-                {
-                    if (!solutionItem.ModifiedFields.TryGetValue(field.FieldMetaData.DbColumnName, out var state))
-                        continue;
-                    
-                    if (field is IStateRestorableField restorableField)
-                        restorableField.RestoreLoadedFieldState(state);
-                }
-            }
+            //
+            // if (solutionItem.ModifiedFields != null)
+            // {
+            //     foreach (var field in data.Categories.SelectMany(c => c.Fields))
+            //     {
+            //         if (!solutionItem.ModifiedFields.TryGetValue(field.FieldMetaData.DbColumnName, out var state))
+            //             continue;
+            //         
+            //         if (field is IStateRestorableField restorableField)
+            //             restorableField.RestoreLoadedFieldState(state);
+            //     }
+            // }
 
             TableData = data;
             SetupHistory();
             IsLoading = false;
         }
 
-        private Dictionary<string, DatabaseSolutionItemModifiedField> GetModifiedFields()
-        {
-            var dict = new Dictionary<string, DatabaseSolutionItemModifiedField>();
-            
-            foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
-            {
-                if (field is IStateRestorableField restorableField)
-                    dict[field.FieldMetaData.DbColumnName] = new(field.FieldMetaData.DbColumnName, 
-                        restorableField.GetOriginalValueForPersistence(), 
-                        restorableField.GetValueForPersistence());
-            }
-
-            return dict;
-        }
+        // private Dictionary<string, DatabaseSolutionItemModifiedField> GetModifiedFields()
+        // {
+        //     var dict = new Dictionary<string, DatabaseSolutionItemModifiedField>();
+        //     
+        //     foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
+        //     {
+        //         if (field is IStateRestorableField restorableField)
+        //             dict[field.FieldMetaData.DbColumnName] = new(field.FieldMetaData.DbColumnName, 
+        //                 restorableField.GetOriginalValueForPersistence(), 
+        //                 restorableField.GetValueForPersistence());
+        //     }
+        //
+        //     return dict;
+        // }
 
         private void SaveSolutionItem()
         {
-            solutionItem.ModifiedFields = GetModifiedFields();
+            //solutionItem.ModifiedFields = GetModifiedFields();
             History.MarkAsSaved();
         }
         
@@ -172,28 +176,66 @@ namespace WDE.DatabaseEditors.ViewModels
             History.AddHandler(historyHandler);
         }
 
-        private SourceList<DatabaseCellViewModel> sourceFields = new();
-        public ReadOnlyObservableCollection<DatabaseCellsCategoryViewModel> FilteredFields { get; }
+        public IObservable<Func<DatabaseCellViewModel, bool>> CurrentFilter { get; }
+        public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
 
+        public DatabaseTableDefinitionJson TableDefinition { get; }
         private DatabaseTableData tableData;
         public DatabaseTableData TableData
         {
             get => tableData;
             set
             {
+                foreach (var group in TableDefinition.Groups)
+                {
+                    groupVisibilityByName.Add(group.Name, new ReactiveProperty<bool>(true));
+                }
+                
                 tableData = value;
                 RaisePropertyChanged(nameof(TableData));
-
-                int categoryIndex = 0;
-                int index = 0;
-                var flatFields = tableData.Categories.SelectMany(category =>
+                var flatFields = tableData.Rows.Select(row => new DatabaseEntityViewModel(parameterFactory, this, row));
+                Rows.AddRange(flatFields);
+                IObservable<Unit> onChange = Rows[0].Observable;
+                for (var index = 1; index < Rows.Count; index++)
                 {
-                    categoryIndex++;
-                    return category.Fields.Select(field =>
-                        new DatabaseCellViewModel(field, category.CategoryName, categoryIndex, index++));
+                    onChange = Observable.Merge(Rows[index].Observable);
+                }
+
+                onChange.Subscribe(_ =>
+                {
+                    ReEvalVisibility();
                 });
-                sourceFields.AddRange(flatFields);
+
             }
+        }
+
+        private void ReEvalVisibility()
+        {
+            foreach (var group in TableDefinition.Groups)
+            {
+                if (!group.ShowIf.HasValue)
+                    continue;
+
+                groupVisibilityByName[group.Name].Value = false;
+                foreach (var row in Rows)
+                {
+                    var cell = row.GetCell(group.ShowIf.Value.ColumnName);
+                    if (cell is not DatabaseField<long> lField)
+                        continue;
+                    if (lField.Parameter.Value == group.ShowIf.Value.Value)
+                    {
+                        groupVisibilityByName[group.Name].Value = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
+
+        public System.IObservable<bool> GetGroupVisibility(string str)
+        {
+            return groupVisibilityByName[str];
         }
         
         private bool isLoading;
@@ -203,7 +245,7 @@ namespace WDE.DatabaseEditors.ViewModels
             internal set => SetProperty(ref isLoading, value);
         }
         
-        public AsyncAutoCommand<ParameterValueHolder<long>?> OpenParameterWindow { get; }
+        public AsyncAutoCommand<ParameterValue<long>?> OpenParameterWindow { get; }
         private DelegateCommand undoCommand;
         private DelegateCommand redoCommand;
         private readonly DelegateCommand saveModifiedFields;
@@ -233,4 +275,5 @@ namespace WDE.DatabaseEditors.ViewModels
         public IHistoryManager History { get; }
         public ISolutionItem SolutionItem { get; }
     }
+
 }

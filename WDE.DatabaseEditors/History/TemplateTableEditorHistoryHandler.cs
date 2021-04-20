@@ -25,26 +25,26 @@ namespace WDE.DatabaseEditors.History
 
         private void BindTableData()
         {
-            foreach (var category in tableData.Categories)
+            /*foreach (var category in tableData.Categories)
             {
                 foreach (var field in category.Fields)
                 {
                     if (field is IDatabaseTableHistoryActionSource actionSource)
                         actionSource.RegisterActionReceiver(this);
                 }
-            }
+            }*/
         }
 
         private void UnbindTableData()
         {
-            foreach (var category in tableData.Categories)
+            /*foreach (var category in tableData.Categories)
             {
                 foreach (var field in category.Fields)
                 {
                     if (field is IDatabaseTableHistoryActionSource actionSource)
                         actionSource.UnregisterActionReceiver();
                 }
-            }
+            }*/
         }
     }
 }

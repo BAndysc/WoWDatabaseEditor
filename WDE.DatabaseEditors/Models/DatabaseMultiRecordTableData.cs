@@ -8,7 +8,7 @@ using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DatabaseMultiRecordTableData : IDatabaseTableData, INotifyRowChanged
+    /*public class DatabaseMultiRecordTableData : IDatabaseTableData, INotifyRowChanged
     {
         public string TableName { get; }
         public string DbTableName { get; }
@@ -59,7 +59,7 @@ namespace WDE.DatabaseEditors.Models
                 var field = creator.CreateField(column.FieldDataSource, column.GetDefaultValue(), column);
                 values.Add(field);
                 column.Fields.Add(field);
-                dict.Add(field.FieldName, field);
+                dict.Add(field.FieldMetaData.Name, field);
             }
             
             Rows.Add(dict);
@@ -91,5 +91,5 @@ namespace WDE.DatabaseEditors.Models
         }
 
         public event EventHandler<NotifyRowChangedEventArgs> OnRowChanged = delegate {  };
-    }
+    }*/
 }

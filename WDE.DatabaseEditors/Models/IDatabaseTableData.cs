@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.Data.Structs;
 
 namespace WDE.DatabaseEditors.Models
 {
     public interface IDatabaseTableData
     {
-        string TableName { get; }
-        string DbTableName { get; }
-        string TableIndexFieldName { get; }
-        string TableIndexValue { get; }
+        DatabaseTableDefinitionJson TableDefinition { get; }
+        List<DatabaseEntity> Rows { get; }
     }
 }

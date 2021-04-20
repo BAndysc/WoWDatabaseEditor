@@ -25,7 +25,7 @@ using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public class MultiRecordDbTableEditorViewModel : BindableBase, IDocument
+    /*public class MultiRecordDbTableEditorViewModel : BindableBase, IDocument
     {
         private readonly DatabaseTableSolutionItem solutionItem;
         private readonly IDatabaseTableDataProvider tableDataProvider;
@@ -196,5 +196,5 @@ namespace WDE.DatabaseEditors.ViewModels
             set => SetProperty(ref isModified, value);
         }
         public IHistoryManager History { get; }
-    }
+    }*/
 }

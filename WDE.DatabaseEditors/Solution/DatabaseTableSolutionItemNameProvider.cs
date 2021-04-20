@@ -19,6 +19,6 @@ namespace WDE.DatabaseEditors.Solution
             this.databaseProvider = databaseProvider;
         }
         
-        public string GetName(DatabaseTableSolutionItem item) => $"{item.TableId} ({item.Entry})";
+        public string GetName(DatabaseTableSolutionItem item) => $"{item.TableId} ({item.ExtraId})";
     }
 }

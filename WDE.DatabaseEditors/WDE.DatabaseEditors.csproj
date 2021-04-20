@@ -26,9 +26,6 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <None Remove="DbDefinitions\gameobject_template_names_swap.json" />
-      <Content Include="DbDefinitions\gameobject_template_names_swap.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
       <None Update="DbDefinitions\creature_loot_template.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

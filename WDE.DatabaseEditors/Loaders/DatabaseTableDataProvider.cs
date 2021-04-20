@@ -25,31 +25,31 @@ namespace WDE.DatabaseEditors.Loaders
             this.tableModelGenerator = tableModelGenerator;
         }
 
-        private string BuildSQLQueryFromTableDefinition(in DatabaseTableDefinitionJson tableDefinitionJson, uint entry)
+        private string BuildSQLQueryFromTableDefinition(in DatabaseTableDefinitionJson tableDefinitionJson, uint[] entries)
         {
-            var columns = tableDefinitionJson.Groups.SelectMany(x => x.Fields).Select(x => $"`{x.DbColumnName}`");
+            var columns = tableDefinitionJson.Groups.SelectMany(x => x.Fields).Select(x => $"`{x.DbColumnName}`").Distinct();
             var names = string.Join(",", columns);
 
             return
-                $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} = {entry};";
+                $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} IN ({string.Join(", ", entries)});";
         }
 
-        public async Task<IDatabaseTableData?> Load(string table, uint key)
+        public async Task<IDatabaseTableData?> Load(string table, params uint[] keys)
         {
             var definition = tableDefinitionProvider.GetDefinition(table);
             if (definition == null)
                 return null;
             
-            var sqlStatement = BuildSQLQueryFromTableDefinition(definition, key);
+            var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
             var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
 
             if (result == null || result.Count == 0)
                 return null;
 
-            if (definition.IsMultiRecord)
-                return tableModelGenerator.GetDatabaseMultiRecordTable(key, definition, result);
+            //if (definition.IsMultiRecord)
+            //    return tableModelGenerator.GetDatabaseMultiRecordTable(key, definition, result);
 
-            return tableModelGenerator.GetDatabaseTable(definition, result[0]);
+            return tableModelGenerator.GetDatabaseTable(definition, result);
         }
     }
 }
