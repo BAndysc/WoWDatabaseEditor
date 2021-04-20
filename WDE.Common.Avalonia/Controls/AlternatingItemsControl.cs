@@ -18,7 +18,12 @@ namespace WDE.Common.Avalonia.Controls
             LogicalChildren.CollectionChanged += LogicalChildrenOnCollectionChanged;
         }
 
-        
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            LogicalChildrenOnCollectionChanged(null, null);
+        }
+
         private void LogicalChildrenOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             foreach (var child in LogicalChildren)

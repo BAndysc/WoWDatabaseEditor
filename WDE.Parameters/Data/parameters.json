@@ -2055,5 +2055,25 @@
 			"7": {"name": "dead despawn", "description": "despawns when the creature disappears"},
 			"8": {"name": "manual despawn", "description": "despawns when Despawn action is called"}
 		}
+	},
+	"PageTextMaterialParameter": {
+		"name": "Page text material",
+		"values": {
+			"1": {"name": "Parchment"},
+			"2": {"name": "Stone"},
+			"3": {"name": "Marble"},
+			"4": {"name": "Silver"},
+			"5": {"name": "Bronze"},
+			"6": {"name": "Valentine"},
+			"8": {"name": "Parchment large"}
+		}
+	},
+	"TrapTypeParameter": {
+		"name": "Trap type",
+		"values": {
+			"0": {"name": "trap with no despawn after cast"},
+			"1": {"name": "trap despawns after cast"},
+			"2": {"name": "bomb casts on spawn"}
+		}
 	}
 }

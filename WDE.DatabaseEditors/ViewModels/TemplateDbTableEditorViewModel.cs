@@ -70,19 +70,33 @@ namespace WDE.DatabaseEditors.ViewModels
 
             undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
-            OpenParameterWindow = new AsyncAutoCommand<ParameterValue<long>?>(EditParameter);
+            OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
             saveModifiedFields = new DelegateCommand(SaveSolutionItem);
 
             TableDefinition = definitionProvider.GetDefinition(solutionItem.TableId)!;
             
-            CurrentFilter = FunctionalExtensions.Select<string, Func<DatabaseCellViewModel, bool>>(this.ToObservable(t => t.SearchText), text =>
+            CurrentFilter = FunctionalExtensions.Select<string, Func<DatabaseRowViewModel, bool>>(this.ToObservable(t => t.SearchText), text =>
                 {
                     if (string.IsNullOrEmpty(text))
                         return item => true;
                     var lower = text.ToLower();
-                    return item => item.FieldName.ToLower().Contains(lower);
+                    return item => item.Name.ToLower().Contains(lower);
                 });
 
+            AutoDispose(Rows.Connect()
+                .Filter(CurrentFilter)
+                .GroupOn(t => (t.CategoryName, t.CategoryIndex))
+                .Transform(group => new DatabaseRowsGroupViewModel(group, GetGroupVisibility(group.GroupKey.CategoryName)))
+                .DisposeMany()
+                .FilterOnObservable(t => t.ShowGroup)
+                //.Filter(model => Collect(model.ShowGroup))
+                .Sort(Comparer<DatabaseRowsGroupViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder)))
+                .Bind(out ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> filteredFields)
+                .Subscribe(a =>
+                {
+                    
+                }, b => throw b));
+            FilteredRows = filteredFields;
 
             // AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
             //     .Subscribe(args =>
@@ -98,11 +112,13 @@ namespace WDE.DatabaseEditors.ViewModels
             //     }));
         }
        
-        private async Task EditParameter(ParameterValue<long>? valueHolder)
+        private async Task EditParameter(DatabaseCellViewModel cell)
         {
+            var valueHolder = cell.ParameterValue as ParameterValue<long>;
+            
             if (valueHolder == null)
                 return;
-            
+
             if (valueHolder.Parameter.HasItems)
             {
                 var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
@@ -143,6 +159,18 @@ namespace WDE.DatabaseEditors.ViewModels
             IsLoading = false;
         }
 
+        private void SetupHistory()
+        {
+            var historyHandler = AutoDispose(new TemplateTableEditorHistoryHandler(this));
+            History.PropertyChanged += (sender, args) =>
+            {
+                undoCommand.RaiseCanExecuteChanged();
+                redoCommand.RaiseCanExecuteChanged();
+                IsModified = !History.IsSaved;
+            };
+            History.AddHandler(historyHandler);
+        }
+
         // private Dictionary<string, DatabaseSolutionItemModifiedField> GetModifiedFields()
         // {
         //     var dict = new Dictionary<string, DatabaseSolutionItemModifiedField>();
@@ -164,20 +192,12 @@ namespace WDE.DatabaseEditors.ViewModels
             History.MarkAsSaved();
         }
         
-        private void SetupHistory()
-        {
-            var historyHandler = AutoDispose(new TemplateTableEditorHistoryHandler(tableData));
-            History.PropertyChanged += (sender, args) =>
-            {
-                undoCommand.RaiseCanExecuteChanged();
-                redoCommand.RaiseCanExecuteChanged();
-                IsModified = !History.IsSaved;
-            };
-            History.AddHandler(historyHandler);
-        }
-
-        public IObservable<Func<DatabaseCellViewModel, bool>> CurrentFilter { get; }
-        public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
+        public ObservableCollection<DatabaseEntity> Entities { get; } = new();
+        public ObservableCollection<string> Header { get; } = new();
+        public ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> FilteredRows { get; }
+        public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
+        public SourceList<DatabaseRowViewModel> Rows { get; } = new();
+//        public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
 
         public DatabaseTableDefinitionJson TableDefinition { get; }
         private DatabaseTableData tableData;
@@ -193,19 +213,68 @@ namespace WDE.DatabaseEditors.ViewModels
                 
                 tableData = value;
                 RaisePropertyChanged(nameof(TableData));
-                var flatFields = tableData.Rows.Select(row => new DatabaseEntityViewModel(parameterFactory, this, row));
-                Rows.AddRange(flatFields);
-                IObservable<Unit> onChange = Rows[0].Observable;
-                for (var index = 1; index < Rows.Count; index++)
+
+                int categoryIndex = 0;
+                int columnIndex = 0;
+                Entities.AddRange(tableData.Entities);
+                foreach (var entity in tableData.Entities)
                 {
-                    onChange = Observable.Merge(Rows[index].Observable);
+                    Header.Add(entity.GetCell("name")?.ToString() ?? "???");
+                }
+                foreach (var group in TableDefinition.Groups)
+                {
+                    categoryIndex++;
+                    groupVisibilityByName[group.Name] = new ReactiveProperty<bool>(true);
+
+                    foreach (var column in group.Fields)
+                    {
+                        var row = new DatabaseRowViewModel(column, group.Name, categoryIndex, columnIndex++);
+                        foreach (var entity in tableData.Entities)
+                        {
+                            var cell = entity.GetCell(column.DbColumnName);
+                            if (cell == null)
+                                throw new Exception("this should never happen");
+                            
+                            IParameterValue parameterValue = null!;
+                            if (cell is DatabaseField<long> longParam)
+                            {
+                                parameterValue = new ParameterValue<long>(longParam.Parameter, longParam.OriginalValue.Value, parameterFactory.Factory(column.ValueType));
+                            }
+                            else if (cell is DatabaseField<string> stringParam)
+                            {
+                                parameterValue = new ParameterValue<string>(stringParam.Parameter, stringParam.OriginalValue.Value,new StringParameter());
+                            }
+                            else if (cell is DatabaseField<float> floatParameter)
+                            {
+                                parameterValue = new ParameterValue<float>(floatParameter.Parameter, floatParameter.OriginalValue.Value,new FloatParameter());
+                            }
+
+                            IObservable<bool>? cellVisible = null;
+                            if (group.ShowIf.HasValue)
+                            {
+                                var compareCell = entity.GetCell(group.ShowIf.Value.ColumnName);
+                                if (compareCell != null && compareCell is DatabaseField<long> lField)
+                                {
+                                    var comparedValue = group.ShowIf.Value.Value;
+                                    cellVisible = Observable.Select(lField.Parameter.ToObservable(p => p.Value), val => val == comparedValue);
+                                }
+                            }
+
+                            var cellViewModel = new DatabaseCellViewModel(row, cell, parameterValue, cellVisible);
+                            row.Cells.Add(cellViewModel);
+                        }
+                        Rows.Add(row);
+                    }
                 }
 
-                onChange.Subscribe(_ =>
+                foreach (var e in tableData.Entities)
                 {
-                    ReEvalVisibility();
-                });
-
+                    var cell = e.GetCell("type");
+                    if (cell == null)
+                        continue;
+                    cell.PropertyChanged += (_, _) => ReEvalVisibility();
+                }
+                ReEvalVisibility();
             }
         }
 
@@ -217,9 +286,9 @@ namespace WDE.DatabaseEditors.ViewModels
                     continue;
 
                 groupVisibilityByName[group.Name].Value = false;
-                foreach (var row in Rows)
+                foreach (var entity in tableData.Entities)
                 {
-                    var cell = row.GetCell(group.ShowIf.Value.ColumnName);
+                    var cell = entity.GetCell(group.ShowIf.Value.ColumnName);
                     if (cell is not DatabaseField<long> lField)
                         continue;
                     if (lField.Parameter.Value == group.ShowIf.Value.Value)
@@ -245,7 +314,7 @@ namespace WDE.DatabaseEditors.ViewModels
             internal set => SetProperty(ref isLoading, value);
         }
         
-        public AsyncAutoCommand<ParameterValue<long>?> OpenParameterWindow { get; }
+        public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         private DelegateCommand undoCommand;
         private DelegateCommand redoCommand;
         private readonly DelegateCommand saveModifiedFields;

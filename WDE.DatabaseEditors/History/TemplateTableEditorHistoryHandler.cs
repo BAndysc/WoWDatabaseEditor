@@ -3,16 +3,19 @@ using System.ComponentModel;
 using WDE.Common.History;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.ViewModels;
+using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.History
 {
     public class TemplateTableEditorHistoryHandler : HistoryHandler, IDisposable, IDatabaseFieldHistoryActionReceiver
     {
-        private readonly DatabaseTableData tableData;
-
-        public TemplateTableEditorHistoryHandler(DatabaseTableData tableData)
+        private readonly TemplateDbTableEditorViewModel viewModel;
+        private IDisposable? disposable;
+        
+        public TemplateTableEditorHistoryHandler(TemplateDbTableEditorViewModel viewModel)
         {
-            this.tableData = tableData;
+            this.viewModel = viewModel;
             BindTableData();
         }
 
@@ -25,26 +28,23 @@ namespace WDE.DatabaseEditors.History
 
         private void BindTableData()
         {
-            /*foreach (var category in tableData.Categories)
+            disposable = viewModel.Entities.ToStream().SubscribeAction(e =>
             {
-                foreach (var field in category.Fields)
+                if (e.Type == CollectionEventType.Add)
                 {
-                    if (field is IDatabaseTableHistoryActionSource actionSource)
-                        actionSource.RegisterActionReceiver(this);
+                    e.Item.OnAction += PushAction;
                 }
-            }*/
+                else if (e.Type == CollectionEventType.Remove)
+                {
+                    e.Item.OnAction -= PushAction;
+                }
+            });
         }
 
         private void UnbindTableData()
         {
-            /*foreach (var category in tableData.Categories)
-            {
-                foreach (var field in category.Fields)
-                {
-                    if (field is IDatabaseTableHistoryActionSource actionSource)
-                        actionSource.UnregisterActionReceiver();
-                }
-            }*/
+            disposable?.Dispose();
+            disposable = null;
         }
     }
 }

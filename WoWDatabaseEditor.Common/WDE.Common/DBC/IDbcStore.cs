@@ -20,5 +20,6 @@ namespace WDE.Common.DBC
         Dictionary<long, string> EmoteStore { get; }
         Dictionary<long, string> AchievementStore { get; }
         Dictionary<long, string> ItemStore { get; }
+        Dictionary<long, string> SpellFocusObjectStore { get; }
     }
 }

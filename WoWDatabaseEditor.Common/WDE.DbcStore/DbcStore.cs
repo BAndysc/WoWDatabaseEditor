@@ -52,6 +52,7 @@ namespace WDE.DbcStore
         public Dictionary<long, string> EmoteStore { get;internal set; } = new();
         public Dictionary<long, string> AchievementStore { get; internal set;} = new();
         public Dictionary<long, string> ItemStore { get; internal set;} = new();
+        public Dictionary<long, string> SpellFocusObjectStore { get; internal set; } = new();
 
         public IEnumerable<uint> Spells
         {
@@ -108,6 +109,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> EmoteStore { get; } = new();
             public Dictionary<long, string> AchievementStore { get; } = new();
             public Dictionary<long, string> ItemStore { get; } = new();
+            public Dictionary<long, string> SpellFocusObjectStore { get; } = new();
 
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -151,6 +153,7 @@ namespace WDE.DbcStore
                 store.EmoteStore = EmoteStore;
                 store.AchievementStore = AchievementStore;
                 store.ItemStore = ItemStore;
+                store.SpellFocusObjectStore = SpellFocusObjectStore;
                 
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
                 parameterFactory.Register("FactionParameter", new DbcParameter(FactionStore));
@@ -164,6 +167,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("ZoneParameter", new DbcParameter(AreaStore));
                 parameterFactory.Register("MapParameter", new DbcParameter(MapStore));
                 parameterFactory.Register("PhaseParameter", new DbcParameter(PhaseStore));
+                parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore));
             }
 
             private int max = 0;
@@ -192,6 +196,7 @@ namespace WDE.DbcStore
                         Load("chrRaces.dbc", 0, 14, RaceStore);
                         Load("Emotes.dbc", 0, 1, EmoteStore);
                         Load("SoundEntries.dbc", 0, 2, SoundStore);
+                        Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore);
                         break;
                     }
                     case DBCVersions.CATA_15595:
@@ -211,6 +216,7 @@ namespace WDE.DbcStore
                         Load("item-sparse.db2", 0, 99, ItemStore);
                         Load("Phase.dbc", 0, 1, PhaseStore);
                         Load("SoundEntries.dbc", 0, 2, SoundStore);
+                        Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore);
                         break;
                     }
                     case DBCVersions.LEGION_26972:
@@ -227,6 +233,7 @@ namespace WDE.DbcStore
                         Load("Languages.db2", 1, 0, LanguageStore);
                         // Load("Phase.db2", 1, 0, PhaseStore); // no names in legion :(
                         Load("SoundKitName.db2", 0, 1, SoundStore);
+                        Load("SpellFocusObject.db2", 0, 1, SpellFocusObjectStore);
                         break;
                     }
                     default:

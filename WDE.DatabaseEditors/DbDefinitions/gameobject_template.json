@@ -43,7 +43,7 @@
           "read_only": false
         },
         {
-          "name": "IconName",
+          "name": "Icon name",
           "db_column_name": "IconName",
           "value_type": "string",
           "read_only": true
@@ -65,8 +65,8 @@
       "fields": [
         {
           "db_column_name": "Data0",
-          "name": "Start open (flag)",
-          "value_type": "uint"
+          "name": "Start as opened",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data1",
@@ -80,8 +80,8 @@
         },
         {
           "db_column_name": "Data3",
-          "name": "Immune to damage (flag)",
-          "value_type": "uint"
+          "name": "Immune to damage",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data4",
@@ -95,8 +95,8 @@
         },
         {
           "db_column_name": "Data6",
-          "name": "Ignored by pathfinding (flag)",
-          "value_type": "uint"
+          "name": "Ignored by pathfinding",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data7",
@@ -114,8 +114,8 @@
       "fields": [
         {
           "db_column_name": "Data0",
-          "name": "Start open",
-          "value_type": "uint"
+          "name": "Start as opened",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data1",
@@ -130,17 +130,17 @@
         {
           "db_column_name": "Data3",
           "name": "Linked trap entry",
-          "value_type": "uint"
+          "value_type": "GameobjectParameter"
         },
         {
           "db_column_name": "Data4",
-          "name": "Immune to damage (flag)",
-          "value_type": "uint"
+          "name": "Immune to damage",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data5",
-          "name": "Is large (flag)",
-          "value_type": "uint"
+          "name": "Is large",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data6",
@@ -154,8 +154,8 @@
         },
         {
           "db_column_name": "Data8",
-          "name": "Los ok (flag)",
-          "value_type": "uint"
+          "name": "LOS ok",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data9",
@@ -183,13 +183,13 @@
         },
         {
           "db_column_name": "Data2",
-          "name": "Page material id",
-          "value_type": "uint"
+          "name": "Page material",
+          "value_type": "PageTextMaterialParameter"
         },
         {
           "db_column_name": "Data3",
           "name": "Gossip Id",
-          "value_type": "uint"
+          "value_type": "GossipMenuParameter"
         },
         {
           "db_column_name": "Data4",
@@ -199,7 +199,7 @@
         {
           "db_column_name": "Data5",
           "name": "Immune to damage",
-          "value_type": "uint"
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data6",
@@ -208,18 +208,18 @@
         },
         {
           "db_column_name": "Data7",
-          "name": "Los ok (flag)",
-          "value_type": "uint"
+          "name": "Los ok",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data8",
-          "name": "Allow mounted (flag)",
-          "value_type": "uint"
+          "name": "Allow mounted",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data9",
-          "name": "Is large (flag)",
-          "value_type": "uint"
+          "name": "Is large",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data10",
@@ -243,7 +243,7 @@
         {
           "db_column_name": "Data1",
           "name": "Loot id",
-          "value_type": "uint"
+          "value_type": "GameObjectLootParameter"
         },
         {
           "db_column_name": "Data2",
@@ -252,8 +252,8 @@
         },
         {
           "db_column_name": "Data3",
-          "name": "Is consumable (flag)",
-          "value_type": "uint"
+          "name": "Is consumable",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data4",
@@ -273,12 +273,12 @@
         {
           "db_column_name": "Data7",
           "name": "Linked trap entry",
-          "value_type": "uint"
+          "value_type": "GameobjectParameter"
         },
         {
           "db_column_name": "Data8",
           "name": "Required quest id to open",
-          "value_type": "uint"
+          "value_type": "QuestParameter"
         },
         {
           "db_column_name": "Data9",
@@ -287,23 +287,23 @@
         },
         {
           "db_column_name": "Data10",
-          "name": "Los ok (flag)",
-          "value_type": "uint"
+          "name": "Los ok",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data11",
-          "name": "Leave loot (flag)",
-          "value_type": "uint"
+          "name": "Leave loot",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data12",
-          "name": "Not in combat (flag)",
-          "value_type": "uint"
+          "name": "Not in combat",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data13",
-          "name": "Log loot (flag)",
-          "value_type": "uint"
+          "name": "Log loot",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data14",
@@ -313,12 +313,12 @@
         {
           "db_column_name": "Data15",
           "name": "Use group loot rules",
-          "value_type": "uint"
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data16",
-          "name": "Floating tooltip (flag)",
-          "value_type": "uint"
+          "name": "Floating tooltip",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data17",
@@ -336,33 +336,33 @@
       "fields": [
         {
           "db_column_name": "Data0",
-          "name": "Floating tooltip (flag)",
-          "value_type": "uint"
+          "name": "Floating tooltip",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data1",
-          "name": "Highlight (flag)",
-          "value_type": "uint"
+          "name": "Highlight",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data2",
           "name": "Server only",
-          "value_type": "uint"
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data3",
-          "name": "Is large (flag)",
-          "value_type": "uint"
+          "name": "Is large",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data4",
-          "name": "Float on water (flag)",
-          "value_type": "uint"
+          "name": "Float on water",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data5",
           "name": "Required quest id to open",
-          "value_type": "uint"
+          "value_type": "QuestParameter"
         },
         {
           "db_column_name": "Data6",
@@ -396,12 +396,12 @@
         {
           "db_column_name": "Data3",
           "name": "Spell id",
-          "value_type": "uint"
+          "value_type": "SpellParameter"
         },
         {
           "db_column_name": "Data4",
           "name": "Trap type",
-          "value_type": "uint"
+          "value_type": "TrapTypeParameter"
         },
         {
           "db_column_name": "Data5",
@@ -421,22 +421,22 @@
         {
           "db_column_name": "Data8",
           "name": "Server only",
-          "value_type": "uint"
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data9",
-          "name": "Is stealthed (flag)",
-          "value_type": "uint"
+          "name": "Is stealthed",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data10",
-          "name": "Is large (flag)",
-          "value_type": "uint"
+          "name": "Is large",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data11",
-          "name": "Is stealth affected (flag)",
-          "value_type": "uint"
+          "name": "Is stealth affected",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data12",
@@ -450,8 +450,8 @@
         },
         {
           "db_column_name": "Data14",
-          "name": "Ignore totems (flag)",
-          "value_type": "uint"
+          "name": "Ignore totems",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data15",
@@ -480,7 +480,7 @@
         {
           "db_column_name": "Data2",
           "name": "Usable only by creator",
-          "value_type": "uint"
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data3",
@@ -503,8 +503,8 @@
       "fields": [
         {
           "db_column_name": "Data0",
-          "name": "Spell focus type id",
-          "value_type": "uint"
+          "name": "Spell focus type",
+          "value_type": "SpellFocusObjectParameter"
         },
         {
           "db_column_name": "Data1",
@@ -514,32 +514,32 @@
         {
           "db_column_name": "Data2",
           "name": "Linked trap entry",
-          "value_type": "uint"
+          "value_type": "GameobjectParameter"
         },
         {
           "db_column_name": "Data3",
           "name": "Server only",
-          "value_type": "uint"
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data4",
           "name": "Required quest id to open",
-          "value_type": "uint"
+          "value_type": "QuestParameter"
         },
         {
           "db_column_name": "Data5",
-          "name": "Is large (flag)",
-          "value_type": "uint"
+          "name": "Is large",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data6",
-          "name": "Floating tooltip (flag)",
-          "value_type": "uint"
+          "name": "Floating tooltip",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data7",
-          "name": "Float on water (flag)",
-          "value_type": "uint"
+          "name": "Float on water",
+          "value_type": "BoolParameter"
         },
         {
           "db_column_name": "Data8",

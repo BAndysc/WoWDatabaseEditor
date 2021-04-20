@@ -4,33 +4,26 @@ using Prism.Mvvm;
 using WDE.Common.Parameters;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
+using WDE.MVVM;
 using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public class DatabaseCellViewModel : BindableBase
+    public class DatabaseCellViewModel : ObservableBase
     {
-        public DatabaseEntityViewModel ParentEntity { get; }
+        public DatabaseRowViewModel Parent { get; }
         private static ReactiveProperty<bool> alwaysTrueProperty = new ReactiveProperty<bool>(true);
-        public string CategoryName { get; }
-        public string FieldName { get; }
-        public bool IsReadOnly { get; }
         public IDatabaseField TableField { get; }
-        public int CategoryIndex { get; }
-        public int Order { get; }
         public System.IObservable<bool> CellVisible { get; }
         public IParameterValue ParameterValue { get; }
         public bool IsVisible { get; private set; }
-        
+        public bool IsModified { get; private set; }
+        public string? OriginalValueTooltip { get; private set; }
 
-        public DatabaseCellViewModel(DatabaseEntityViewModel parent, IDatabaseField tableField, IParameterValue parameterValue, DbEditorTableGroupFieldJson columnData, string category, int categoryIndex, int order, System.IObservable<bool>? cellVisibleellVisible)
+        public DatabaseCellViewModel(DatabaseRowViewModel parent, IDatabaseField tableField, IParameterValue parameterValue, System.IObservable<bool>? cellVisibleellVisible)
         {
-            ParentEntity = parent;
-            CategoryName = category;
-            FieldName = columnData.Name;
-            IsReadOnly = columnData.IsReadOnly;
-            CategoryIndex = categoryIndex;
-            Order = order;
+            Link(tableField, tf => tf.IsModified, () => IsModified);
+            Parent = parent;
             TableField = tableField;
             CellVisible = cellVisibleellVisible ?? new SingleObservable<bool>(this, true);
             ParameterValue = parameterValue;
@@ -39,6 +32,24 @@ namespace WDE.DatabaseEditors.ViewModels
                 IsVisible = v;
                 RaisePropertyChanged(nameof(IsVisible));
             });
+            parameterValue.ToObservable().SubscribeAction(_ =>
+            {
+                OriginalValueTooltip = tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
+                RaisePropertyChanged(nameof(OriginalValueTooltip));
+                RaisePropertyChanged(nameof(AsBoolValue));
+            });
+        }
+
+        public bool AsBoolValue
+        {
+            get => ((ParameterValue as ParameterValue<long>)?.Value ?? 0) != 0;
+            set
+            {
+                if (ParameterValue is ParameterValue<long> longParam)
+                {
+                    longParam.Value = value ? 1 : 0;
+                }
+            }
         }
     }
     
@@ -55,7 +66,6 @@ namespace WDE.DatabaseEditors.ViewModels
         
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            Console.WriteLine("Sub: " + databaseCellViewModel.FieldName);
             observer.OnNext(value);
             observer.OnCompleted();
             return Disposable.Empty;

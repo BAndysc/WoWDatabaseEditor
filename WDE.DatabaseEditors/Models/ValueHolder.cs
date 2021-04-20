@@ -11,11 +11,13 @@ namespace WDE.DatabaseEditors.Models
     {
     }
 
-    public interface IParameterValue
+    public interface IParameterValue : INotifyPropertyChanged
     {
+        string String { get; }
+        string OriginalString { get; }
     }
 
-    public class ParameterValue<T> : IParameterValue, INotifyPropertyChanged
+    public class ParameterValue<T> : IParameterValue
     {
         private readonly ValueHolder<T> value;
         public T Value
@@ -45,10 +47,11 @@ namespace WDE.DatabaseEditors.Models
             }
         }
 
-        public ParameterValue(ValueHolder<T> value, IParameter<T> parameter)
+        public ParameterValue(ValueHolder<T> value, T originalValue, IParameter<T> parameter)
         {
             this.value = value;
             this.parameter = parameter;
+            OriginalString = parameter.ToString(originalValue);
             value.PropertyChanged += (sender, args) =>
             {
                 OnPropertyChanged(nameof(String));
@@ -57,6 +60,7 @@ namespace WDE.DatabaseEditors.Models
         }
 
         public string String => ToString();
+        public string OriginalString { get; }
 
         public override string ToString()
         {
@@ -85,6 +89,7 @@ namespace WDE.DatabaseEditors.Models
                 var old = this.value;
                 this.value = value;
                 OnPropertyChanged();
+                ValueChanged?.Invoke(old, value);
             }
         }
 
@@ -94,6 +99,12 @@ namespace WDE.DatabaseEditors.Models
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+        public event Action<T, T>? ValueChanged;
+
+        public override string ToString()
+        {
+            return value?.ToString() ?? "(null)";
+        }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]  string? propertyName = null)

@@ -72,13 +72,14 @@
                                Opacity="{TemplateBinding IsModified, Converter={StaticResource BoolToOpacityConverter}}"
                                DockPanel.Dock="Left">
                         </Image>-->
+                        <TextBlock Text="{Binding ParameterValue.String}"/><!--
                         <ContentPresenter Content="{Binding}" DataContext="{Binding ParameterValue}">
                             <ContentPresenter.DataTemplates>
                                 <helpers:FieldValueTemplateSelector
                                     GenericTemplate="{StaticResource GenericParameterView}"
                                     BoolTemplate="{StaticResource BoolParameterView}" />
                             </ContentPresenter.DataTemplates>
-                        </ContentPresenter>
+                        </ContentPresenter>-->
                     </DockPanel>
                 </Border>
             </ControlTemplate>
