@@ -35,7 +35,7 @@ namespace WDE.Common.Avalonia.Controls
                 {
                     if (child is ContentPresenter cp)
                     {
-                        cp.Child.Classes.Set("odd", i % 2 == 1);
+                        cp.Child?.Classes?.Set("odd", i % 2 == 1);
                         i++;
                     }
                 }   
