@@ -16,7 +16,7 @@
             <ControlTemplate>
                 <CheckBox HorizontalAlignment="Center" 
                           IsEnabled="{TemplateBinding IsReadOnly, Converter={StaticResource InvertBoolConverter}}"
-                          IsChecked="{TemplateBinding Value, Mode=TwoWay, Converter={StaticResource LongToBoolConverter}}"
+                          IsChecked="{TemplateBinding Value, Mode=TwoWay}"
                           HorizontalContentAlignment="Center">
                 </CheckBox>
             </ControlTemplate>

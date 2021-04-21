@@ -106,7 +106,7 @@
                                                                             IsActive="{Binding IsVisible}"
                                                                             IsModified="{Binding IsModified}" 
                                                                             IsReadOnly="{Binding Parent.IsReadOnly}"
-                                                                            Value="{Binding ParameterValue.Value}" />
+                                                                            Value="{Binding AsBoolValue}" />
                                                                     </DataTemplate>
                                                                 </helpers:FieldValueTemplateSelector.BoolTemplate>
                                                                 <helpers:FieldValueTemplateSelector.GenericTemplate>
