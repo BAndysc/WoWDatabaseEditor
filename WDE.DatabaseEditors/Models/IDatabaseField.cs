@@ -9,6 +9,7 @@ namespace WDE.DatabaseEditors.Models
     {
         string FieldName { get; }
         bool IsModified { get; }
+        object? OriginalValue { get; set; }
         event Action<IHistoryAction> OnChanged;
         string ToQueryString();
     }

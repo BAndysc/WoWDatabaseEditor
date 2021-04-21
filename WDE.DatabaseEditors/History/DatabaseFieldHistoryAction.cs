@@ -20,12 +20,12 @@ namespace WDE.DatabaseEditors.History
 
         public void Undo()
         {
-            tableField.CurrentValue.Value = oldValue;
+            tableField.Current.Value = oldValue;
         }
 
         public void Redo()
         {
-            tableField.CurrentValue.Value = newValue;
+            tableField.Current.Value = newValue;
         }
 
         public string GetDescription()

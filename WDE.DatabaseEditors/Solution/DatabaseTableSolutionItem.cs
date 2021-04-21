@@ -12,14 +12,13 @@ namespace WDE.DatabaseEditors.Solution
         {
             Entries.Add(entry);
             TableId = tableId;
-            ModifiedFields = new();
         }
 
         public List<uint> Entries { get; set; } = new();
         
         public string TableId { get; }
 
-        public Dictionary<string, DatabaseSolutionItemModifiedField> ModifiedFields { get; set; }
+        public Dictionary<uint, List<EntityModifiedField>> OriginalValues { get; set; } = new();
 
         [JsonIgnore]
         public bool IsContainer => false;
@@ -50,5 +49,11 @@ namespace WDE.DatabaseEditors.Solution
         {
             return HashCode.Combine(Entries, TableId);
         }
+    }
+
+    public class EntityModifiedField
+    {
+        public string ColumnName { get; set; } = "";
+        public object? OriginalValue { get; set; }
     }
 }

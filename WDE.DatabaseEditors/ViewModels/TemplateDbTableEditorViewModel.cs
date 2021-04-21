@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -14,6 +15,7 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
@@ -35,6 +37,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
+        private readonly ISolutionTasksService solutionTasksService;
 
         private readonly DatabaseTableSolutionItem solutionItem;
         private readonly IDatabaseTableDataProvider tableDataProvider;
@@ -43,7 +46,7 @@ namespace WDE.DatabaseEditors.ViewModels
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator, ITableDefinitionProvider definitionProvider,
-            IParameterFactory parameterFactory,
+            IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             IQueryGenerator queryGenerator)
         {
             SolutionItem = solutionItem;
@@ -52,6 +55,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.tableDataProvider = tableDataProvider;
             this.messageBoxService = messageBoxService;
             this.parameterFactory = parameterFactory;
+            this.solutionTasksService = solutionTasksService;
             History = history;
             tableData = null!;
             
@@ -142,18 +146,26 @@ namespace WDE.DatabaseEditors.ViewModels
                     .Build());
                 return;
             }
-            //
-            // if (solutionItem.ModifiedFields != null)
-            // {
-            //     foreach (var field in data.Categories.SelectMany(c => c.Fields))
-            //     {
-            //         if (!solutionItem.ModifiedFields.TryGetValue(field.FieldMetaData.DbColumnName, out var state))
-            //             continue;
-            //         
-            //         if (field is IStateRestorableField restorableField)
-            //             restorableField.RestoreLoadedFieldState(state);
-            //     }
-            // }
+            
+            if (solutionItem.OriginalValues != null)
+            {
+                foreach (var entity in data.Entities)
+                {
+                    var key = entity.GetCell(data.TableDefinition.TablePrimaryKeyColumnName);
+                    if (key == null || key is not DatabaseField<long> longKey)
+                        continue;
+                    if (solutionItem.OriginalValues.TryGetValue((uint) longKey.Current.Value, out var originals))
+                    {
+                        foreach (var original in originals)
+                        {
+                            var cell = entity.GetCell(original.ColumnName);
+                            if (cell == null)
+                                continue;
+                            cell.OriginalValue = original.OriginalValue;
+                        }
+                    }
+                }
+            }
 
             TableData = data;
             SetupHistory();
@@ -172,24 +184,33 @@ namespace WDE.DatabaseEditors.ViewModels
             History.AddHandler(historyHandler);
         }
 
-        // private Dictionary<string, DatabaseSolutionItemModifiedField> GetModifiedFields()
-        // {
-        //     var dict = new Dictionary<string, DatabaseSolutionItemModifiedField>();
-        //     
-        //     foreach (var field in tableData.Categories.SelectMany(c => c.Fields).Where(f => f.IsModified))
-        //     {
-        //         if (field is IStateRestorableField restorableField)
-        //             dict[field.FieldMetaData.DbColumnName] = new(field.FieldMetaData.DbColumnName, 
-        //                 restorableField.GetOriginalValueForPersistence(), 
-        //                 restorableField.GetValueForPersistence());
-        //     }
-        //
-        //     return dict;
-        // }
+        private Dictionary<uint, List<EntityModifiedField>> GetModifiedFields()
+        {
+            var dict = new Dictionary<uint, List<EntityModifiedField>>();
+            
+            foreach (var entity in tableData.Entities)
+            {
+                var modified = entity.Fields.Where(f => f.IsModified).ToList();
+                if (modified.Count == 0)
+                    continue;
+
+                var keyField = entity.GetCell(tableData.TableDefinition.TablePrimaryKeyColumnName);
+                
+                if (keyField == null || keyField is not DatabaseField<long> keyLong)
+                    continue;
+
+                var key = keyLong.Current.Value;
+                dict[(uint) key] = modified.Select(f => new EntityModifiedField()
+                    {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
+            }
+        
+            return dict;
+        }
 
         private void SaveSolutionItem()
         {
-            //solutionItem.ModifiedFields = GetModifiedFields();
+            solutionItem.OriginalValues = GetModifiedFields();
+            solutionTasksService.SaveSolutionToDatabaseTask(solutionItem);
             History.MarkAsSaved();
         }
         
@@ -238,15 +259,15 @@ namespace WDE.DatabaseEditors.ViewModels
                             IParameterValue parameterValue = null!;
                             if (cell is DatabaseField<long> longParam)
                             {
-                                parameterValue = new ParameterValue<long>(longParam.CurrentValue, longParam.OriginalValue, parameterFactory.Factory(column.ValueType));
+                                parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
                             }
                             else if (cell is DatabaseField<string> stringParam)
                             {
-                                parameterValue = new ParameterValue<string>(stringParam.CurrentValue, stringParam.OriginalValue, StringParameter.Instance);
+                                parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
                             }
                             else if (cell is DatabaseField<float> floatParameter)
                             {
-                                parameterValue = new ParameterValue<float>(floatParameter.CurrentValue, floatParameter.OriginalValue, FloatParameter.Instance);
+                                parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                             }
 
                             IObservable<bool>? cellVisible = null;
@@ -256,7 +277,7 @@ namespace WDE.DatabaseEditors.ViewModels
                                 if (compareCell != null && compareCell is DatabaseField<long> lField)
                                 {
                                     var comparedValue = group.ShowIf.Value.Value;
-                                    cellVisible = Observable.Select(lField.CurrentValue.ToObservable(p => p.Value), val => val == comparedValue);
+                                    cellVisible = Observable.Select(lField.Current.ToObservable(p => p.Value), val => val == comparedValue);
                                 }
                             }
 
@@ -291,7 +312,7 @@ namespace WDE.DatabaseEditors.ViewModels
                     var cell = entity.GetCell(group.ShowIf.Value.ColumnName);
                     if (cell is not DatabaseField<long> lField)
                         continue;
-                    if (lField.CurrentValue.Value == group.ShowIf.Value.Value)
+                    if (lField.Current.Value == group.ShowIf.Value.Value)
                     {
                         groupVisibilityByName[group.Name].Value = true;
                         break;

@@ -13,12 +13,12 @@ namespace WDE.DatabaseEditors.Models
     {
         private readonly string columnName;
 
-        public DatabaseField(string columnName, ValueHolder<T> currentValue)
+        public DatabaseField(string columnName, ValueHolder<T> current)
         {
             this.columnName = columnName;
-            CurrentValue = currentValue;
-            OriginalValue = new ValueHolder<T>(currentValue.Value);
-            CurrentValue.ValueChanged += OnValueChanged;
+            Current = current;
+            Original = new ValueHolder<T>(current.Value);
+            Current.ValueChanged += OnValueChanged;
         }
 
         private void OnValueChanged(T? old, T? nnew)
@@ -27,22 +27,61 @@ namespace WDE.DatabaseEditors.Models
             OnPropertyChanged(nameof(IsModified));
         }
 
-        public ValueHolder<T> CurrentValue { get; }
-        public ValueHolder<T> OriginalValue { get; }
+        public ValueHolder<T> Current { get; }
+        public ValueHolder<T> Original { get; }
+
+        public object? OriginalValue
+        {
+            get => Original.Value;
+            set
+            {
+                if (value == null)
+                    Original.Value = default;
+                else
+                {
+                    if (value is T t)
+                    {
+                        Original.Value = t;
+                    }
+                    else if (Original is ValueHolder<long> originalLong)
+                    {
+                        try
+                        {
+                            originalLong.Value = Convert.ToInt64(value);
+                        }
+                        catch (Exception _)
+                        {
+                            // cannot restore
+                        }
+                    }
+                    else if (Original is ValueHolder<float> originalFloat)
+                    {
+                        try
+                        {
+                            originalFloat.Value = (float)Convert.ToDouble(value);
+                        }
+                        catch (Exception _)
+                        {
+                            // cannot restore
+                        }
+                    }
+                }
+            }
+        }
         public string FieldName => columnName;
-        public bool IsModified => CurrentValue.IsNull != OriginalValue.IsNull || Comparer<T>.Default.Compare(CurrentValue.Value, OriginalValue.Value) != 0;
+        public bool IsModified => Current.IsNull != Original.IsNull || Comparer<T>.Default.Compare(Current.Value, Original.Value) != 0;
         public event Action<IHistoryAction>? OnChanged;
         public string ToQueryString()
         {
-            if (CurrentValue.IsNull)
+            if (Current.IsNull)
                 return "NULL";
             if (typeof(T) == typeof(long))
-                return CurrentValue.Value!.ToString()!;
+                return Current.Value!.ToString()!;
             if (typeof(T) == typeof(float))
-                return (CurrentValue.Value as float?)!.Value.ToString(CultureInfo.InvariantCulture)!;
+                return (Current.Value as float?)!.Value.ToString(CultureInfo.InvariantCulture)!;
             if (typeof(T) == typeof(string))
             {
-                var value = CurrentValue.Value as string;
+                var value = Current.Value as string;
                 return "\"" +  value!.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
             }
 
@@ -53,7 +92,7 @@ namespace WDE.DatabaseEditors.Models
 
         public override string? ToString()
         {
-            return CurrentValue.ToString();
+            return Current.ToString();
         }
         
         [NotifyPropertyChangedInvocator]

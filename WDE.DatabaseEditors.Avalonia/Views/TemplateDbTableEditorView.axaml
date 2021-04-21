@@ -79,7 +79,7 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-                                                        <TextBlock Width="200" 
+                                                        <TextBlock Width="300" 
                                                                    Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
                                                                    TextAlignment="Center" 
                                                                    VerticalAlignment="Center"
@@ -100,7 +100,7 @@
                                                             <helpers:FieldValueTemplateSelector>
                                                                 <helpers:FieldValueTemplateSelector.BoolTemplate>
                                                                     <DataTemplate>
-                                                                        <controls:FastBoolCellView Width="200" Margin="0,0,10,0"
+                                                                        <controls:FastBoolCellView Width="300" Margin="0,0,10,0"
                                                                             ToolTip.Tip="{Binding OriginalValueTooltip}"
                                                                             Focusable="False"
                                                                             IsActive="{Binding IsVisible}"
@@ -111,7 +111,7 @@
                                                                 </helpers:FieldValueTemplateSelector.BoolTemplate>
                                                                 <helpers:FieldValueTemplateSelector.GenericTemplate>
                                                                     <DataTemplate>
-                                                                        <controls:FastCellView Width="200" Margin="0,0,10,0"
+                                                                        <controls:FastCellView Width="300" Margin="0,0,10,0"
                                                                             ToolTip.Tip="{Binding OriginalValueTooltip}"
                                                                             Focusable="False"
                                                                             IsActive="{Binding IsVisible}"
