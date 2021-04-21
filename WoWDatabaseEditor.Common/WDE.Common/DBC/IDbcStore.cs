@@ -21,5 +21,7 @@ namespace WDE.Common.DBC
         Dictionary<long, string> AchievementStore { get; }
         Dictionary<long, string> ItemStore { get; }
         Dictionary<long, string> SpellFocusObjectStore { get; }
+        Dictionary<long, string> QuestInfoStore { get; }
+        Dictionary<long, string> CharTitleStore { get; }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 using WDE.Common;
 
 namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
-        
         public DatabaseTableSolutionItem(uint entry, string tableId)
         {
             Entries.Add(entry);
@@ -16,14 +16,22 @@ namespace WDE.DatabaseEditors.Solution
         }
 
         public List<uint> Entries { get; set; } = new();
+        
         public string TableId { get; }
 
         public Dictionary<string, DatabaseSolutionItemModifiedField> ModifiedFields { get; set; }
 
+        [JsonIgnore]
         public bool IsContainer => false;
+
+        [JsonIgnore]
         public ObservableCollection<ISolutionItem>? Items { get; } = null;
+        
+        [JsonIgnore]
         public string ExtraId => string.Join(", ", Entries);
-        public bool IsExportable { get; } = true;
+
+        [JsonIgnore]
+        public bool IsExportable => true;
 
         private bool Equals(DatabaseTableSolutionItem other)
         {

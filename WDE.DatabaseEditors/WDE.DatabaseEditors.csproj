@@ -29,6 +29,9 @@
       <None Update="DbDefinitions\creature_loot_template.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="DbDefinitions\quest_template.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="DynamicData">

@@ -14,6 +14,7 @@ namespace WDE.DatabaseEditors.Data
             {
                 File.ReadAllText("DbDefinitions/creature_template.json"),
                 File.ReadAllText("DbDefinitions/gameobject_template.json"),
+                File.ReadAllText("DbDefinitions/quest_template.json"),
                 File.ReadAllText("DbDefinitions/creature_loot_template.json")
             };
         }

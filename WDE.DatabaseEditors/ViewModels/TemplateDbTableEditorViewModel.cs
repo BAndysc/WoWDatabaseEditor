@@ -219,7 +219,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 Entities.AddRange(tableData.Entities);
                 foreach (var entity in tableData.Entities)
                 {
-                    Header.Add(entity.GetCell("name")?.ToString() ?? "???");
+                    Header.Add(entity.GetCell(tableData.TableDefinition.TableNameSource)?.ToString() ?? "???");
                 }
                 foreach (var group in TableDefinition.Groups)
                 {
