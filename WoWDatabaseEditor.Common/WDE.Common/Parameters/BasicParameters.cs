@@ -43,6 +43,8 @@ namespace WDE.Common.Parameters
     
     public class StringParameter : GenericBaseParameter<string>
     {
+        public static StringParameter Instance { get; } = new StringParameter();
+        
         public override string ToString(string value) => value;
     }
 

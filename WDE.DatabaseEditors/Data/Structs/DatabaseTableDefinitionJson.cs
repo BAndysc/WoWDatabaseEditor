@@ -64,5 +64,8 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "read_only")]
         public bool IsReadOnly { get; set; }
+        
+        [JsonProperty(PropertyName = "can_be_null")]
+        public bool CanBeNull { get; set; }
     }
 }

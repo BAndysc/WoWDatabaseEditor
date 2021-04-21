@@ -31,6 +31,8 @@ namespace WDE.DatabaseEditors.Models
             }
         }
 
+        public IEnumerable<IDatabaseField> Fields => Cells.Values;
+
         public event System.Action<IHistoryAction>? OnAction;
 
         public Dictionary<string, IDatabaseField> Cells { get; }

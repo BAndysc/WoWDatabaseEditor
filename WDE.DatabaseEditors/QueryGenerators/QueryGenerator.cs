@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
@@ -18,12 +21,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
             this.tableDefinitionProvider = tableDefinitionProvider;
         }
         
-        public string GenerateQuery(IDatabaseTableData? tableData, string tableName, uint entry,
-            Dictionary<string, DatabaseSolutionItemModifiedField> modifiedFields)
+        public string GenerateQuery(IDatabaseTableData tableData)
         {
-            var tableDefinition = tableDefinitionProvider.GetDefinition(tableName);
-            if (tableDefinition == null)
-                return "-- invalid table --";
             // missing table data we have to load it
             //if (isMultiRecord)
             //{
@@ -31,18 +30,33 @@ namespace WDE.DatabaseEditors.QueryGenerators
             //        return MultiRecordTableSqlGenerator.GenerateSql(multiRecordTableData);
             //}
             
-            return GenerateUpdateQuery(modifiedFields, tableDefinition.TableName,
-                tableDefinition.TablePrimaryKeyColumnName, entry, tableDefinition.IsMultiRecord);
+            return GenerateUpdateQuery(tableData);
         }
 
-        private string GenerateUpdateQuery(Dictionary<string, DatabaseSolutionItemModifiedField> fields, string tableName, 
-            string keyColumnName, uint itemKey, bool buildInsert)
+        private string GenerateUpdateQuery(IDatabaseTableData tableData)
         {
-            if (fields == null || fields.Count == 0)
-                return "";
+            StringBuilder query = new();
+            
+            foreach (var entity in tableData.Entities)
+            {
+                var keyColumn = entity.GetCell(tableData.TableDefinition.TablePrimaryKeyColumnName);
 
-            return buildInsert ? BuildInsertWithDeleteQuery(fields, tableName, keyColumnName, itemKey) 
-                : BuildUpdateQuery(fields, tableName, keyColumnName, itemKey);
+                if (keyColumn == null)
+                    throw new Exception("Cannot generate update query from entity that doesn't have key column");
+                
+                var updates = string.Join(", ",
+                    entity.Fields
+                        .Where(f => f.IsModified)
+                        .Select(f => $"`{f.FieldName}` = {f.ToQueryString()}"));
+                
+                if (string.IsNullOrEmpty(updates))
+                    continue;
+                
+                var updateQuery = $"UPDATE `{tableData.TableDefinition.TableName}` SET {updates} WHERE `{tableData.TableDefinition.TablePrimaryKeyColumnName}`= {keyColumn.ToQueryString()}";
+                query.AppendLine(updateQuery);
+            }
+
+            return query.ToString();
         }
 
         private string BuildUpdateQuery(Dictionary<string, DatabaseSolutionItemModifiedField> fields, string tableName, 
@@ -69,7 +83,6 @@ namespace WDE.DatabaseEditors.QueryGenerators
     
     public interface IQueryGenerator
     {
-        public string GenerateQuery(IDatabaseTableData? tableData, string tableName, uint entry,
-            Dictionary<string, DatabaseSolutionItemModifiedField> modifiedFields);
+        public string GenerateQuery(IDatabaseTableData tableData);
     }
 }

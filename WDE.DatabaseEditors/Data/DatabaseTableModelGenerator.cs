@@ -44,11 +44,11 @@ namespace WDE.DatabaseEditors.Data
                     IValueHolder valueHolder = null!;
                     if (column.Value.type == typeof(string))
                     {
-                        valueHolder = new ValueHolder<string>(column.Value.value as string ?? "");
+                        valueHolder = new ValueHolder<string>(column.Value.value as string ?? null);
                     }
                     else if (column.Value.type == typeof(float))
                     {
-                        valueHolder = new ValueHolder<float>(column.Value.value as float? ?? 0f);
+                        valueHolder = new ValueHolder<float>(column.Value.value as float? ?? 0);
                     }
                     else if (column.Value.type == typeof(uint))
                     {

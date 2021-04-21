@@ -120,7 +120,20 @@
                                                                             IsReadOnly="{Binding Parent.IsReadOnly}"
                                                                             Value="{Binding ParameterValue.Value}"
                                                                             ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}"
-                                                                            StringValue="{Binding ParameterValue.String}" />
+                                                                            StringValue="{Binding ParameterValue.String}">
+                                                                            <controls:FastCellView.ContextMenu>
+                                                                                <ContextMenu>
+                                                                                    <MenuItem Header="Revert" 
+                                                                                        IsEnabled="{Binding CanBeReverted}"
+                                                                                        Command="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand}"
+                                                                                        CommandParameter="{Binding}" />
+                                                                                    <MenuItem Header="Set to null" 
+                                                                                        IsEnabled="{Binding CanBeSetToNull}"
+                                                                                        Command="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand}"
+                                                                                        CommandParameter="{Binding}" />
+                                                                                </ContextMenu>
+                                                                            </controls:FastCellView.ContextMenu>
+                                                                        </controls:FastCellView>
                                                                         <!--<controls:DbTableFieldValueView Width="200" IsModified="{Binding TableField.IsModified}" 
                                                                     IsReadOnly="{Binding IsReadOnly}" Classes="Root"
                                                                     ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}">

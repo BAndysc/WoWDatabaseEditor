@@ -11,10 +11,12 @@ namespace WDE.DatabaseEditors.ViewModels
         public string Name { get; } = "";
         public int Order { get; }
         public bool IsReadOnly { get; }
+        public bool CanBeNull { get; }
         public ObservableCollection<DatabaseCellViewModel> Cells { get; } = new();
 
         public DatabaseRowViewModel(DbEditorTableGroupFieldJson columnData, string categoryName, int categoryIndex, int index)
         {
+            CanBeNull = columnData.CanBeNull;
             IsReadOnly = columnData.IsReadOnly;
             CategoryName = categoryName;
             CategoryIndex = categoryIndex;

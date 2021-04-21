@@ -9,18 +9,23 @@ namespace WDE.DatabaseEditors.Models
 {
     public interface IValueHolder
     {
+        bool IsNull { get; }
     }
 
     public interface IParameterValue : INotifyPropertyChanged
     {
         string String { get; }
         string OriginalString { get; }
+        void SetNull();
+        void Revert();
     }
 
     public class ParameterValue<T> : IParameterValue
     {
         private readonly ValueHolder<T> value;
-        public T Value
+        private readonly ValueHolder<T> originalValue;
+
+        public T? Value
         {
             get => value.Value;
             set
@@ -47,11 +52,12 @@ namespace WDE.DatabaseEditors.Models
             }
         }
 
-        public ParameterValue(ValueHolder<T> value, T originalValue, IParameter<T> parameter)
+        public ParameterValue(ValueHolder<T> value, ValueHolder<T> originalValue, IParameter<T> parameter)
         {
             this.value = value;
+            this.originalValue = originalValue;
             this.parameter = parameter;
-            OriginalString = parameter.ToString(originalValue);
+            OriginalString = originalValue.IsNull ? "(null)" : parameter.ToString(originalValue.Value!);
             value.PropertyChanged += (sender, args) =>
             {
                 OnPropertyChanged(nameof(String));
@@ -61,10 +67,20 @@ namespace WDE.DatabaseEditors.Models
 
         public string String => ToString();
         public string OriginalString { get; }
+        
+        public void SetNull()
+        {
+            value.Value = default;
+        }
+
+        public void Revert()
+        {
+            value.Value = originalValue.Value;
+        }
 
         public override string ToString()
         {
-            return parameter.ToString(Value);
+            return value.IsNull ? "(null)" : parameter.ToString(Value!);
         }
         
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -77,8 +93,8 @@ namespace WDE.DatabaseEditors.Models
 
     public class ValueHolder<T> : INotifyPropertyChanged, IValueHolder
     {
-        private T value;
-        public T Value
+        private T? value;
+        public T? Value
         {
             get => value;
             set
@@ -93,17 +109,17 @@ namespace WDE.DatabaseEditors.Models
             }
         }
 
-        public ValueHolder(T initial)
+        public ValueHolder(T? initial)
         {
             value = initial;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        public event Action<T, T>? ValueChanged;
+        public event Action<T?, T?>? ValueChanged;
 
         public override string ToString()
         {
-            return value?.ToString() ?? "(null)";
+            return IsNull || value == null ? "(null)" : value.ToString()!;
         }
 
         [NotifyPropertyChangedInvocator]
@@ -111,5 +127,7 @@ namespace WDE.DatabaseEditors.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public bool IsNull => value == null;
     }
 }

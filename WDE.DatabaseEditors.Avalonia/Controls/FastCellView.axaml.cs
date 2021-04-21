@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Reactive.Disposables;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -33,12 +35,14 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             }
         }
 
+        private Panel? partPanel;
         private TextBlock? partText;
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             base.OnApplyTemplate(e);
-            
+
+            partPanel = e.NameScope.Find<Panel>("PART_Panel");
             partText = e.NameScope.Find<TextBlock>("PART_text");
             
             if (!isReadOnly)
@@ -55,7 +59,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                     CommandParameter = DataContext
                 };
                     
-                e.NameScope.Find<Panel>("PART_Panel").Children.Add(chooseButton);
+                partPanel.Children.Add(chooseButton);
             }
         }
         //
@@ -69,16 +73,39 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             base.OnPointerPressed(e);
             if (isReadOnly)
                 return;
-            if (e.Source != partText)
+
+            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+                return;
+            
+            if (e.Source != this && e.Source != partPanel && e.Source != partText)
                 return;
 
+            e.Handled = true;
             OpenForEditing();
         }
 
         private System.IDisposable? subscriptionsOnOpen;
 
-        private void EndEditing()
+        private void EndEditing(bool commit = true)
         {
+            textBoxDisposable?.Dispose();
+            textBoxDisposable = null;
+            if (textBox != null && commit)
+            {
+                if (Value is long)
+                {
+                    if (long.TryParse(textBox.Text, out var value))
+                        Value = value;
+                }
+                else if (Value is float)
+                {
+                    if (float.TryParse(textBox.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+                        Value = value;
+                }
+                else
+                    Value = textBox.Text;
+            }
+            
             Opacity = 1;
             subscriptionsOnOpen?.Dispose();
             subscriptionsOnOpen = null;
@@ -100,6 +127,8 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             //OpenForEditing();
         }
 
+        private System.IDisposable? textBoxDisposable;
+
         private void OpenForEditing()
         {
             if (opened || isReadOnly)
@@ -113,12 +142,26 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             };
             textBox.Classes.Add("GridViewPlainTextBox");
             textBox.DataContext = this;
-            textBox.Bind(TextBox.TextProperty, new Binding("Value"));
+            textBox.Bind(TextBox.TextProperty, new Binding("Value", BindingMode.OneTime));
             textBox.Margin = partText?.Margin ?? BorderThickness;
-            textBox.LostFocus += (sender, args) =>
+            var disposable1 = textBox.AddDisposableHandler(KeyDownEvent, (sender, args) =>
+            {
+                if (args.Key is Key.Return or Key.Enter)
+                {
+                    EndEditing();
+                    args.Handled = true;
+                }
+                else if (args.Key == Key.Escape)
+                {
+                    EndEditing(false);
+                    args.Handled = true;
+                }
+            });
+            var disposable2 = textBox.AddDisposableHandler(LostFocusEvent, (sender, args) =>
             {
                 EndEditing();
-            };
+            });
+            textBoxDisposable = new CompositeDisposable(disposable1, disposable2);
             adornerLayer = AdornerLayer.GetAdornerLayer(this);
             if (adornerLayer == null)
             {

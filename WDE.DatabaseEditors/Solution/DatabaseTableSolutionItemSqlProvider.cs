@@ -29,7 +29,10 @@ namespace WDE.DatabaseEditors.Solution
         {
             IDatabaseTableData? tableData = await LoadTable(item);
 
-            return queryGenerator.GenerateQuery(tableData, item.TableId, item.Entries[0], item.ModifiedFields);
+            if (tableData == null)
+                return $"-- Unable to load data for {item} from the database";
+
+            return queryGenerator.GenerateQuery(tableData);
         }
 
         private Task<IDatabaseTableData?> LoadTable(DatabaseTableSolutionItem item)

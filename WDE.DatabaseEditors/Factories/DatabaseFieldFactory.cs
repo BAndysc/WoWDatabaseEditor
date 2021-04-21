@@ -23,15 +23,15 @@ namespace WDE.DatabaseEditors.Factories
         {
             if (valueHolder is ValueHolder<string> stringHolder)
             {
-                return new DatabaseField<string>(stringHolder);
+                return new DatabaseField<string>(columnName, stringHolder);
             }
             else if (valueHolder is ValueHolder<long> longHolder)
             {
-                return new DatabaseField<long>(longHolder);
+                return new DatabaseField<long>(columnName, longHolder);
             }
             else if (valueHolder is ValueHolder<float> floatHolder)
             {
-                return new DatabaseField<float>(floatHolder);
+                return new DatabaseField<float>(columnName, floatHolder);
             }
 
             throw new Exception("unexpected type: " + valueHolder.GetType());
