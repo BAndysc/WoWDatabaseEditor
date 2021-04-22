@@ -35,7 +35,7 @@ namespace WDE.DatabaseEditors.Solution
 
         private Task<IDatabaseTableData?> LoadTable(DatabaseTableSolutionItem item)
         {
-            return tableDataProvider.Load(item.TableId, item.Entries[0]);
+            return tableDataProvider.Load(item.DefinitionId, item.Entries[0]);
         }
     }
 }

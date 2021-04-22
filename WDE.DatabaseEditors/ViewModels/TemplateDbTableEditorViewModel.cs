@@ -66,9 +66,9 @@ namespace WDE.DatabaseEditors.ViewModels
             tableDefinition = null!;
             
             IsLoading = true;
-            taskRunner.ScheduleTask($"Loading {solutionItem.TableId}..", LoadTableDefinition);
-
             title = solutionItemName.GetName(solutionItem);
+            
+            taskRunner.ScheduleTask($"Loading {title}..", LoadTableDefinition);
 
             undoCommand = new DelegateCommand(History.Undo, CanUndo);
             redoCommand = new DelegateCommand(History.Redo, CanRedo);
@@ -201,7 +201,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private async Task LoadTableDefinition()
         {
-            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entries.ToArray()) as DatabaseTableData;
+            var data = await tableDataProvider.Load(solutionItem.DefinitionId, solutionItem.Entries.ToArray()) as DatabaseTableData;
 
             if (data == null)
             {

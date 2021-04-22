@@ -7,6 +7,6 @@ namespace WDE.DatabaseEditors.Loaders
     [UniqueProvider]
     public interface IDatabaseTableDataProvider
     {
-        Task<IDatabaseTableData?> Load(string tableName, params uint[] keys);
+        Task<IDatabaseTableData?> Load(string definition, params uint[] keys);
     }
 }

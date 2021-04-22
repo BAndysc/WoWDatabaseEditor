@@ -42,9 +42,9 @@ namespace WDE.DatabaseEditors.Loaders
                 $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} IN ({string.Join(", ", entries)});";
         }
 
-        public async Task<IDatabaseTableData?> Load(string table, params uint[] keys)
+        public async Task<IDatabaseTableData?> Load(string definitionId, params uint[] keys)
         {
-            var definition = tableDefinitionProvider.GetDefinition(table);
+            var definition = tableDefinitionProvider.GetDefinition(definitionId);
             if (definition == null)
                 return null;
             

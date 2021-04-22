@@ -1,4 +1,6 @@
 ﻿{
+  "id": "gameobject_template_tc_335",
+  "compatibility": ["TrinityWrath"],
   "name": "Gameobject Template",
   "description": "Edit existing gameobject templates",
   "table_name": "gameobject_template",

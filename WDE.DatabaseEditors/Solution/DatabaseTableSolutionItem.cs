@@ -8,15 +8,15 @@ namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
-        public DatabaseTableSolutionItem(uint entry, string tableId)
+        public DatabaseTableSolutionItem(uint entry, string definitionId)
         {
             Entries.Add(entry);
-            TableId = tableId;
+            DefinitionId = definitionId;
         }
 
         public List<uint> Entries { get; set; } = new();
         
-        public string TableId { get; }
+        public string DefinitionId { get; }
 
         public Dictionary<uint, List<EntityOrigianlField>> OriginalValues { get; set; } = new();
 
@@ -34,7 +34,7 @@ namespace WDE.DatabaseEditors.Solution
 
         private bool Equals(DatabaseTableSolutionItem other)
         {
-            return Entries == other.Entries && TableId == other.TableId;
+            return Entries == other.Entries && DefinitionId == other.DefinitionId;
         }
 
         public override bool Equals(object? obj)
@@ -47,7 +47,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Entries, TableId);
+            return HashCode.Combine(Entries, DefinitionId);
         }
     }
 

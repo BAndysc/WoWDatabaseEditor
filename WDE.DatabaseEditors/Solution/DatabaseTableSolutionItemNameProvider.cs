@@ -24,9 +24,9 @@ namespace WDE.DatabaseEditors.Solution
 
         public string GetName(DatabaseTableSolutionItem item)
         {
-            var definition = tableDefinitionProvider.GetDefinition(item.TableId);
+            var definition = tableDefinitionProvider.GetDefinition(item.DefinitionId);
             if (definition == null)
-                return item.TableId;
+                return $"Unknown item (" + item.DefinitionId + ")";
 
             var parameter = parameterFactory.Factory(definition.Picker);
 

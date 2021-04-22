@@ -1,4 +1,6 @@
 ﻿{
+  "id": "creature_template_tc_335",
+  "compatibility": ["TrinityWrath"],
   "name": "Creature Template",
   "description": "Edit existing creature templates",
   "table_name": "creature_template",

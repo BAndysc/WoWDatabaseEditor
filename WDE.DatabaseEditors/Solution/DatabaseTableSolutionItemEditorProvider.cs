@@ -26,9 +26,9 @@ namespace WDE.DatabaseEditors.Solution
         
         public IDocument GetEditor(DatabaseTableSolutionItem item)
         {
-            var definition = tableDefinitionProvider.GetDefinition(item.TableId);
+            var definition = tableDefinitionProvider.GetDefinition(item.DefinitionId);
             if (definition == null)
-                throw new Exception("Cannot find table editor for table: " + item.TableId);
+                throw new Exception("Cannot find table editor with definition " + item.DefinitionId);
 
             //if (definition.IsMultiRecord)
             //    return containerRegistry.Resolve<MultiRecordDbTableEditorViewModel>(

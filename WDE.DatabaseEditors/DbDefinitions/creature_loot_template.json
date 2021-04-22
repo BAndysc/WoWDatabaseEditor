@@ -1,4 +1,6 @@
 ﻿{
+  "id": "creature_loot_template_tc_335",
+  "compatibility": ["TrinityWrath"],
   "name": "Creature Loot Template",
   "table_name": "creature_loot_template",
   "table_index_name": "Entry",
@@ -19,56 +21,47 @@
         {
           "name": "Item",
           "db_column_name": "Item",
-          "value_type": "ItemParameter",
-          "read_only": false
+          "value_type": "ItemParameter"
         },
         {
           "name": "Loot table reference",
           "db_column_name": "Reference",
-          "value_type": "uint",
-          "read_only": false
+          "value_type": "uint"
         },
         {
           "name": "Chance",
           "db_column_name": "Chance",
-          "value_type": "float",
-          "read_only": false
+          "value_type": "float"
         },
         {
           "name": "Required quest",
           "db_column_name": "QuestRequired",
-          "value_type": "QuestParameter",
-          "read_only": false
+          "value_type": "QuestParameter"
         },
         {
           "name": "Loot mode",
           "db_column_name": "LootMode",
-          "value_type": "LootModeParameter",
-          "read_only": false
+          "value_type": "LootModeParameter"
         },
         {
           "name": "GroupId",
           "db_column_name": "GroupId",
-          "value_type": "uint",
-          "read_only": false
+          "value_type": "uint"
         },
         {
           "name": "Min count",
           "db_column_name": "MinCount",
-          "value_type": "uint",
-          "read_only": false
+          "value_type": "uint"
         },
         {
           "name": "Max count",
           "db_column_name": "MaxCount",
-          "value_type": "uint",
-          "read_only": false
+          "value_type": "uint"
         },
         {
           "name": "Comment",
           "db_column_name": "Comment",
-          "value_type": "string",
-          "read_only": false
+          "value_type": "string"
         }
       ]
     }

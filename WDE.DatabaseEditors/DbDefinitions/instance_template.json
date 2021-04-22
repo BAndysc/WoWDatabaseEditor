@@ -1,4 +1,6 @@
 {
+  "id": "instance_template_tc_335",
+  "compatibility": ["TrinityWrath"],
   "name": "Instance Template",
   "description": "Edit or create instance templates",
   "table_name": "instance_template",

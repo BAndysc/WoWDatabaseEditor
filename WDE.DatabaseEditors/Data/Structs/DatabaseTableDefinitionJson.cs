@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace WDE.DatabaseEditors.Data.Structs
@@ -7,6 +8,12 @@ namespace WDE.DatabaseEditors.Data.Structs
     [ExcludeFromCodeCoverage]
     public class DatabaseTableDefinitionJson
     {
+        [JsonProperty(PropertyName = "id")] 
+        public string Id { get; set; } = "";
+
+        [JsonProperty(PropertyName = "compatibility")] 
+        public IList<string> Compatibility { get; set; } = System.Array.Empty<string>();
+        
         [JsonProperty(PropertyName = "name")] 
         public string Name { get; set; } = "";
         

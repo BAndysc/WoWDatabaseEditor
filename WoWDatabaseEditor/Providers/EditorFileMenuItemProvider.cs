@@ -116,7 +116,8 @@ namespace WoWDatabaseEditorCore.Providers
                                 Console.WriteLine(e);
                                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Cannot open the editor")
                                     .SetMainInstruction(
-                                        "Couldn't open item, because there was an internal error" + e.Message)
+                                        "Couldn't open item, because there was an error")
+                                    .SetContent(e.Message)
                                     .SetIcon(MessageBoxIcon.Error)
                                     .WithOkButton(true)
                                     .Build());

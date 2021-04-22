@@ -1,4 +1,6 @@
 {
+  "id": "quest_template_tc_335",
+  "compatibility": ["TrinityWrath"],
   "name": "Quest Template",
   "description": "Edit existing quest templates",
   "table_name": "quest_template",
