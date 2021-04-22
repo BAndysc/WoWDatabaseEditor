@@ -119,7 +119,7 @@ namespace WDE.DatabaseEditors.ViewModels
             if (!selected.HasValue)
                 return;
 
-            var data = await tableDataProvider.Load(tableDefinition.TableName, (uint) selected);
+            var data = await tableDataProvider.Load(tableDefinition.Id, (uint) selected);
             if (data == null) 
                 return;
 

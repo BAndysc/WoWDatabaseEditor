@@ -69,7 +69,7 @@
 
         private async Task LoadTableData()
         {
-            var data = await tableDataProvider.Load(solutionItem.TableId, solutionItem.Entry) as DatabaseMultiRecordTableData;
+            var data = await tableDataProvider.Load(solutionItem.DefinitionId, solutionItem.Entry) as DatabaseMultiRecordTableData;
 
             if (data == null)
             {

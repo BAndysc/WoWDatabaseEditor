@@ -2,6 +2,7 @@
 using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
+using WDE.Common.Tasks;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.ViewModels;
@@ -26,6 +27,9 @@ namespace WDE.DatabaseEditors.Solution
         
         public IDocument GetEditor(DatabaseTableSolutionItem item)
         {
+            if (GlobalApplication.Backend == GlobalApplication.AppBackend.WPF)
+                throw new Exception("Table editors are not supported in WPF version");
+            
             var definition = tableDefinitionProvider.GetDefinition(item.DefinitionId);
             if (definition == null)
                 throw new Exception("Cannot find table editor with definition " + item.DefinitionId);
