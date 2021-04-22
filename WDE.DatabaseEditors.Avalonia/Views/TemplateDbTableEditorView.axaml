@@ -61,6 +61,21 @@
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.GenericTemplate>
         </helpers:FieldValueTemplateSelector>
+        
+        <DataTemplate x:Key="RowHeaderTemplate">
+            <TextBlock Width="300" 
+                       Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
+                       TextAlignment="Center" 
+                       VerticalAlignment="Center"
+                       Text="{Binding ., Mode=OneTime}" />
+        </DataTemplate>
+        <DataTemplate x:Key="RowTemplate">
+            <DockPanel LastChildFill="True" Classes="alternating" Height="24">
+                <TextBlock Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
+                <ItemsPresenter Items="{Binding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                </ItemsPresenter>
+            </DockPanel>
+        </DataTemplate>
     </UserControl.Resources>
     <UserControl.Styles>
         <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
@@ -87,7 +102,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <DockPanel Margin="10" VerticalAlignment="Center">
-                <Button Command="{Binding AddNewCommand}">
+                <Button Command="{Binding AddNewCommand, Mode=OneTime}">
                     Add new
                 </Button>
                 <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
@@ -108,34 +123,11 @@
                                                        Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
                                                        Width="150"
                                                        VerticalAlignment="Center"/>
-                                            <ItemsControl Items="{Binding DataContext.Header, ElementName=rootWindow, Mode=OneTime}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Horizontal" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Width="300" 
-                                                                   Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
-                                                                   TextAlignment="Center" 
-                                                                   VerticalAlignment="Center"
-                                                                   Text="{Binding ., Mode=OneTime}" />
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
+                                            <ItemsControl ItemTemplate="{StaticResource RowHeaderTemplate}" Items="{Binding DataContext.Header, ElementName=rootWindow, Mode=OneTime}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
                                             </ItemsControl>
                                         </StackPanel>
                                     </Border>
-                                    <controls1:AlternatingItemsControl Focusable="False" Items="{Binding ., Mode=OneTime}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <DockPanel LastChildFill="True" Classes="alternating" Height="24">
-                                                    <TextBlock Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
-                                                    <ItemsPresenter Items="{Binding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
-                                                    </ItemsPresenter>
-                                                </DockPanel>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
+                                    <controls1:AlternatingItemsControl ItemTemplate="{StaticResource RowTemplate}" Focusable="False" Items="{Binding ., Mode=OneTime}">
                                     </controls1:AlternatingItemsControl>
                                 </StackPanel>
                             </DataTemplate>
