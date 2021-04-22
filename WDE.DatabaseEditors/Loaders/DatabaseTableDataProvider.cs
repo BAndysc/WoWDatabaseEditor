@@ -44,7 +44,16 @@ namespace WDE.DatabaseEditors.Loaders
                 return null;
             
             var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
-            var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+            IList<Dictionary<string, (Type, object)>>? result = null;
+            
+            try
+            {
+                result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+            }
+            catch (Exception e)
+            {
+
+            }
 
             if (result == null || result.Count == 0)
                 result = BuildEmptyEntities(definition, keys).ToList();

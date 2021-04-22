@@ -68,8 +68,6 @@ namespace WDE.DatabaseEditors.ViewModels
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
             Save = new DelegateCommand(SaveSolutionItem);
 
-            TableDefinition = definitionProvider.GetDefinition(solutionItem.TableId)!;
-            
             CurrentFilter = FunctionalExtensions.Select<string, Func<DatabaseRowViewModel, bool>>(this.ToObservable(t => t.SearchText), text =>
                 {
                     if (string.IsNullOrEmpty(text))
@@ -113,16 +111,16 @@ namespace WDE.DatabaseEditors.ViewModels
             {
                 if (view.CanBeNull && !view.Parent.IsReadOnly)
                     view.ParameterValue.SetNull();
-            }, view => view.CanBeNull && !view.Parent.IsReadOnly);
+            });
 
             AddNewCommand = new AsyncAutoCommand(async () =>
             {
-                var parameter = this.parameterFactory.Factory(TableDefinition.Picker);
+                var parameter = this.parameterFactory.Factory(tableData.TableDefinition.Picker);
                 var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
                 if (!selected.HasValue)
                     return;
 
-                var data = await tableDataProvider.Load(TableDefinition.TableName, (uint) selected);
+                var data = await tableDataProvider.Load(tableData.TableDefinition.TableName, (uint) selected);
                 TableData = (DatabaseTableData)data!;
             });
         }
@@ -229,7 +227,6 @@ namespace WDE.DatabaseEditors.ViewModels
         public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
         public SourceList<DatabaseRowViewModel> Rows { get; } = new();
 
-        public DatabaseTableDefinitionJson TableDefinition { get; }
         private DatabaseTableData tableData;
         public DatabaseTableData TableData
         {
@@ -249,7 +246,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 foreach (var entity in tableData.Entities)
                     Header.Add(entity.GetCell(tableData.TableDefinition.TableNameSource)?.ToString() ?? "???");
 
-                foreach (var group in TableDefinition.Groups)
+                foreach (var group in tableData.TableDefinition.Groups)
                 {
                     categoryIndex++;
                     groupVisibilityByName[group.Name] = new ReactiveProperty<bool>(true);
@@ -308,7 +305,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private void ReEvalVisibility()
         {
-            foreach (var group in TableDefinition.Groups)
+            foreach (var group in tableData.TableDefinition.Groups)
             {
                 if (!group.ShowIf.HasValue)
                     continue;
