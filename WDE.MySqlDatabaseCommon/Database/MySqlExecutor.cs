@@ -18,6 +18,9 @@ namespace WDE.MySqlDatabaseCommon.Database
 
         public async Task ExecuteSql(string query)
         {
+            if (string.IsNullOrEmpty(query))
+                return;
+            
             using var writeLock = await DatabaseLock.WriteLock();
             
             MySqlConnection conn = new(connectionString.ConnectionString);

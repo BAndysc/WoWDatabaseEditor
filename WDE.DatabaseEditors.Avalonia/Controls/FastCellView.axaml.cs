@@ -29,14 +29,19 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         public bool ShowChooseButton
         {
             get => showChooseButton;
-            set
-            {
-                SetAndRaise(ShowChooseButtonProperty, ref showChooseButton, value);
-            }
+            set => SetAndRaise(ShowChooseButtonProperty, ref showChooseButton, value);
         }
 
         private Panel? partPanel;
         private TextBlock? partText;
+
+        private System.IDisposable? subscriptionsOnOpen;
+
+        private TextBox? textBox;
+        private AdornerLayer? adornerLayer;
+        private bool opened = false;
+
+        private System.IDisposable? textBoxDisposable;
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
@@ -62,12 +67,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 partPanel.Children.Add(chooseButton);
             }
         }
-        //
-        // static FastCellView()
-        // {
-        //     AffectsRender<FastCellView>(IsModifiedProperty);
-        // }
-
+        
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             base.OnPointerPressed(e);
@@ -83,8 +83,6 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             e.Handled = true;
             OpenForEditing();
         }
-
-        private System.IDisposable? subscriptionsOnOpen;
 
         private void EndEditing(bool commit = true)
         {
@@ -106,29 +104,17 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                     Value = textBox.Text;
             }
             
+            if (textBox != null && adornerLayer != null)
+                adornerLayer.Children.Remove(textBox);
+            
             Opacity = 1;
             subscriptionsOnOpen?.Dispose();
             subscriptionsOnOpen = null;
-            if (textBox != null && adornerLayer != null)
-                adornerLayer.Children.Remove(textBox);
             textBox = null;
             adornerLayer = null;
-
             opened = false;
         }
         
-        private TextBox? textBox;
-        private AdornerLayer? adornerLayer;
-        private bool opened = false;
-        
-        protected override void OnGotFocus(GotFocusEventArgs e)
-        {
-            base.OnGotFocus(e);
-            //OpenForEditing();
-        }
-
-        private System.IDisposable? textBoxDisposable;
-
         private void OpenForEditing()
         {
             if (opened || isReadOnly)
@@ -168,6 +154,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 EndEditing();
                 return;
             }
+            
             adornerLayer.Children.Add(textBox);
             AdornerLayer.SetAdornedElement(textBox, this);
             textBox.Focus();
@@ -191,7 +178,6 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                     }
                     if (!hitTextbox)
                         EndEditing();
-                    //ev.Handled = true;
                 }, RoutingStrategies.Tunnel);
             }
         }

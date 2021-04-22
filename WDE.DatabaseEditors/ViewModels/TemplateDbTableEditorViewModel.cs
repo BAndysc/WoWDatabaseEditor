@@ -28,7 +28,6 @@ using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
-using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
@@ -116,7 +115,7 @@ namespace WDE.DatabaseEditors.ViewModels
                     view.ParameterValue.SetNull();
             }, view => view.CanBeNull && !view.Parent.IsReadOnly);
         }
-       
+
         private async Task EditParameter(DatabaseCellViewModel cell)
         {
             var valueHolder = cell.ParameterValue as ParameterValue<long>;
@@ -184,9 +183,9 @@ namespace WDE.DatabaseEditors.ViewModels
             History.AddHandler(historyHandler);
         }
 
-        private Dictionary<uint, List<EntityModifiedField>> GetModifiedFields()
+        private Dictionary<uint, List<EntityOrigianlField>> GetOriginalFields()
         {
-            var dict = new Dictionary<uint, List<EntityModifiedField>>();
+            var dict = new Dictionary<uint, List<EntityOrigianlField>>();
             
             foreach (var entity in tableData.Entities)
             {
@@ -199,8 +198,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 if (keyField == null || keyField is not DatabaseField<long> keyLong)
                     continue;
 
-                var key = keyLong.Current.Value;
-                dict[(uint) key] = modified.Select(f => new EntityModifiedField()
+                dict[(uint) keyLong.Current.Value] = modified.Select(f => new EntityOrigianlField()
                     {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
             }
         
@@ -209,7 +207,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private void SaveSolutionItem()
         {
-            solutionItem.OriginalValues = GetModifiedFields();
+            solutionItem.OriginalValues = GetOriginalFields();
             solutionTasksService.SaveSolutionToDatabaseTask(solutionItem);
             History.MarkAsSaved();
         }
@@ -233,15 +231,13 @@ namespace WDE.DatabaseEditors.ViewModels
                 }
                 
                 tableData = value;
-                RaisePropertyChanged(nameof(TableData));
 
                 int categoryIndex = 0;
                 int columnIndex = 0;
                 Entities.AddRange(tableData.Entities);
                 foreach (var entity in tableData.Entities)
-                {
                     Header.Add(entity.GetCell(tableData.TableDefinition.TableNameSource)?.ToString() ?? "???");
-                }
+
                 foreach (var group in TableDefinition.Groups)
                 {
                     categoryIndex++;
@@ -281,7 +277,7 @@ namespace WDE.DatabaseEditors.ViewModels
                                 }
                             }
 
-                            var cellViewModel = new DatabaseCellViewModel(row, cell, parameterValue, cellVisible);
+                            var cellViewModel = AutoDispose(new DatabaseCellViewModel(row, cell, parameterValue, cellVisible));
                             row.Cells.Add(cellViewModel);
                         }
                         Rows.Add(row);

@@ -28,18 +28,20 @@ namespace WDE.DatabaseEditors.ViewModels
             TableField = tableField;
             ParameterValue = parameterValue;
 
-            cellIsVisible?.Subscribe(v =>
+            if (cellIsVisible != null)
+                AutoDispose(cellIsVisible.Subscribe(v =>
+                {
+                    IsVisible = v;
+                    RaisePropertyChanged(nameof(IsVisible));
+                }));
+
+            AutoDispose(parameterValue.ToObservable().SubscribeAction(_ =>
             {
-                IsVisible = v;
-                RaisePropertyChanged(nameof(IsVisible));
-            });
-            
-            parameterValue.ToObservable().SubscribeAction(_ =>
-            {
-                OriginalValueTooltip = tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
+                OriginalValueTooltip =
+                    tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
                 RaisePropertyChanged(nameof(OriginalValueTooltip));
                 RaisePropertyChanged(nameof(AsBoolValue));
-            });
+            }));
         }
 
         public bool AsBoolValue

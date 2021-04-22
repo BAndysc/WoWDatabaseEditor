@@ -18,7 +18,7 @@ namespace WDE.DatabaseEditors.Solution
         
         public string TableId { get; }
 
-        public Dictionary<uint, List<EntityModifiedField>> OriginalValues { get; set; } = new();
+        public Dictionary<uint, List<EntityOrigianlField>> OriginalValues { get; set; } = new();
 
         [JsonIgnore]
         public bool IsContainer => false;
@@ -51,7 +51,7 @@ namespace WDE.DatabaseEditors.Solution
         }
     }
 
-    public class EntityModifiedField
+    public class EntityOrigianlField
     {
         public string ColumnName { get; set; } = "";
         public object? OriginalValue { get; set; }
