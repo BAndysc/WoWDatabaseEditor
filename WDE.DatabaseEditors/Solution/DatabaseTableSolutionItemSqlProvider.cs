@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common.Solution;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Loaders;
@@ -35,7 +36,7 @@ namespace WDE.DatabaseEditors.Solution
 
         private Task<IDatabaseTableData?> LoadTable(DatabaseTableSolutionItem item)
         {
-            return tableDataProvider.Load(item.DefinitionId, item.Entries[0]);
+            return tableDataProvider.Load(item.DefinitionId, item.Entries.Select(e => e.Key).ToArray());
         }
     }
 }

@@ -32,7 +32,7 @@ namespace WDE.DatabaseEditors.Solution
 
             if (item.Entries.Count == 1)
             {
-                var name = parameter.ToString(item.Entries[0]);
+                var name = parameter.ToString(item.Entries[0].Key);
                 return definition.SingleSolutionName.Replace("{name}", name);
             }
 

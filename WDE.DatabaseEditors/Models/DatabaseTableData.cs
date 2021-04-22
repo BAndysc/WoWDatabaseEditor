@@ -24,7 +24,7 @@ namespace WDE.DatabaseEditors.Models
 
         public event System.Action<IHistoryAction>? OnAction;
         
-        public bool ExistInDatabase { get; }
+        public bool ExistInDatabase { get; set; }
         
         public uint Key { get; }
         

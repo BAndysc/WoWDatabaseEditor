@@ -134,7 +134,17 @@ namespace WDE.DatabaseEditors.ViewModels
                         .Build());
                     continue;
                 }
-
+                if (!entity.ExistInDatabase)
+                {
+                    if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetTitle("Entity doesn't exist in database")
+                        .SetMainInstruction($"Entity {entity.Key} doesn't exist in the database")
+                        .SetContent(
+                            "WoW Database Editor will be generating DELETE/INSERT query instead of UPDATE. Do you want to continue?")
+                        .WithYesButton(true)
+                        .WithNoButton(false).Build()))
+                        continue;
+                }
                 await AddEntity(entity);
             }
         }
@@ -201,7 +211,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private async Task LoadTableDefinition()
         {
-            var data = await tableDataProvider.Load(solutionItem.DefinitionId, solutionItem.Entries.ToArray()) as DatabaseTableData;
+            var data = await tableDataProvider.Load(solutionItem.DefinitionId, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData;
 
             if (data == null)
             {
@@ -214,24 +224,22 @@ namespace WDE.DatabaseEditors.ViewModels
             }
             
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (solutionItem.OriginalValues != null)
+            foreach (var solutionEntity in solutionItem.Entries)
             {
-                foreach (var entity in data.Entities)
-                {
-                    var key = entity.GetCell(data.TableDefinition.TablePrimaryKeyColumnName);
-                    if (key == null || key is not DatabaseField<long> longKey)
-                        continue;
-                    if (solutionItem.OriginalValues.TryGetValue((uint) longKey.Current.Value, out var originals))
+                var entity = data.Entities.FirstOrDefault(e => e.Key == solutionEntity.Key);
+                if (entity == null)
+                    continue;
+                
+                entity.ExistInDatabase = solutionEntity.ExistsInDatabase;
+                
+                if (solutionEntity.OriginalValues != null)
+                    foreach (var original in solutionEntity.OriginalValues)
                     {
-                        foreach (var original in originals)
-                        {
-                            var cell = entity.GetCell(original.ColumnName);
-                            if (cell == null)
-                                continue;
-                            cell.OriginalValue = original.OriginalValue;
-                        }
+                        var cell = entity.GetCell(original.ColumnName);
+                        if (cell == null)
+                            continue;
+                        cell.OriginalValue = original.OriginalValue;
                     }
-                }
             }
 
             {
@@ -275,32 +283,20 @@ namespace WDE.DatabaseEditors.ViewModels
             History.AddHandler(historyHandler);
         }
 
-        private Dictionary<uint, List<EntityOrigianlField>> GetOriginalFields()
+        private List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
         {
-            var dict = new Dictionary<uint, List<EntityOrigianlField>>();
+            var modified = entity.Fields.Where(f => f.IsModified).ToList();
+            if (modified.Count == 0)
+                return null;
             
-            foreach (var entity in Entities)
-            {
-                var modified = entity.Fields.Where(f => f.IsModified).ToList();
-                if (modified.Count == 0)
-                    continue;
-
-                var keyField = entity.GetCell(tableDefinition.TablePrimaryKeyColumnName);
-                
-                if (keyField == null || keyField is not DatabaseField<long> keyLong)
-                    continue;
-
-                dict[(uint) keyLong.Current.Value] = modified.Select(f => new EntityOrigianlField()
-                    {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
-            }
-        
-            return dict;
+            return modified.Select(f => new EntityOrigianlField()
+                {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
         }
 
         private void SaveSolutionItem()
         {
-            solutionItem.Entries = Entities.Select(e => e.Key).ToList();
-            solutionItem.OriginalValues = GetOriginalFields();
+            solutionItem.Entries = Entities.Select(e =>
+                new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, GetOriginalFields(e))).ToList();
             solutionManager.Refresh(solutionItem);
             solutionTasksService.SaveSolutionToDatabaseTask(solutionItem);
             History.MarkAsSaved();
@@ -345,18 +341,6 @@ namespace WDE.DatabaseEditors.ViewModels
         
         public async Task<bool> AddEntity(DatabaseEntity entity)
         {
-            if (!entity.ExistInDatabase)
-            {
-                if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                    .SetTitle("Entity doesn't exist in database")
-                    .SetMainInstruction($"Entity {entity.Key} doesn't exist in the database")
-                    .SetContent(
-                        "WoW Database Editor was mainly designed for `updating` existing items in the database, its features are limited when adding new templates.\n\nDo you want to continue?")
-                    .WithYesButton(true)
-                    .WithNoButton(false).Build()))
-                    return false;
-            }
-
             return ForceInsertEntity(entity, Entities.Count);
         }
 

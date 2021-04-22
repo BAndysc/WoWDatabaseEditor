@@ -8,17 +8,15 @@ namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
-        public DatabaseTableSolutionItem(uint entry, string definitionId)
+        public DatabaseTableSolutionItem(uint entry, bool existsInDatabase, string definitionId)
         {
-            Entries.Add(entry);
+            Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase));
             DefinitionId = definitionId;
         }
 
-        public List<uint> Entries { get; set; } = new();
+        public List<SolutionItemDatabaseEntity> Entries { get; set; } = new();
         
         public string DefinitionId { get; }
-
-        public Dictionary<uint, List<EntityOrigianlField>> OriginalValues { get; set; } = new();
 
         [JsonIgnore]
         public bool IsContainer => false;
@@ -47,7 +45,26 @@ namespace WDE.DatabaseEditors.Solution
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Entries, DefinitionId);
+            return HashCode.Combine(DefinitionId);
+        }
+    }
+
+    public class SolutionItemDatabaseEntity
+    {
+        public SolutionItemDatabaseEntity(uint key, bool existsInDatabase, List<EntityOrigianlField>? originalValues = null)
+        {
+            Key = key;
+            ExistsInDatabase = existsInDatabase;
+            OriginalValues = originalValues;
+        }
+
+        public uint Key { get; set; }
+        public bool ExistsInDatabase { get; set; }
+        public List<EntityOrigianlField>? OriginalValues { get; set; }
+
+        public override string ToString()
+        {
+            return Key.ToString();
         }
     }
 
