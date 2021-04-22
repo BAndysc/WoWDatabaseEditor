@@ -14,6 +14,9 @@
              x:Class="WDE.DatabaseEditors.Avalonia.Views.TemplateDbTableEditorView">
     <UserControl.Resources>
         <converters:BoolToDoubleConverter WhenFalse="0" WhenTrue="1" x:Key="IsActiveToOpacityConverter" />
+        <ItemsPanelTemplate x:Key="HorizontalStackPanelTemplate">
+            <StackPanel Orientation="Horizontal"></StackPanel>
+        </ItemsPanelTemplate>
         <helpers:FieldValueTemplateSelector x:Key="FieldValueTemplateSelector">
             <helpers:FieldValueTemplateSelector.BoolTemplate>
                 <DataTemplate>
@@ -33,10 +36,10 @@
                         Focusable="False"
                         IsActive="{Binding IsVisible}"
                         IsModified="{Binding IsModified}" 
-                        ShowChooseButton="{Binding ParameterValue.Parameter.HasItems}"
-                        IsReadOnly="{Binding Parent.IsReadOnly}"
+                        ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
+                        IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
                         Value="{Binding ParameterValue.Value}"
-                        ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}"
+                        ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
                         StringValue="{Binding ParameterValue.String}">
                         <controls:FastCellView.ContextMenu>
                             <ContextMenu>
@@ -101,11 +104,11 @@
                                     <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Padding="10,0,0,0" 
-                                                       Text="{Binding GroupName}" 
+                                                       Text="{Binding GroupName, Mode=OneTime}" 
                                                        Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
                                                        Width="150"
                                                        VerticalAlignment="Center"/>
-                                            <ItemsControl Items="{Binding DataContext.Header, ElementName=rootWindow}">
+                                            <ItemsControl Items="{Binding DataContext.Header, ElementName=rootWindow, Mode=OneTime}">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
                                                         <StackPanel Orientation="Horizontal" />
@@ -128,12 +131,7 @@
                                             <DataTemplate>
                                                 <DockPanel LastChildFill="True" Classes="alternating" Height="24">
                                                     <TextBlock Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
-                                                    <ItemsPresenter Items="{Binding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}">
-                                                        <ItemsPresenter.ItemsPanel>
-                                                            <ItemsPanelTemplate>
-                                                                <StackPanel Orientation="Horizontal"></StackPanel>
-                                                            </ItemsPanelTemplate>
-                                                        </ItemsPresenter.ItemsPanel>
+                                                    <ItemsPresenter Items="{Binding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
                                                     </ItemsPresenter>
                                                 </DockPanel>
                                             </DataTemplate>
