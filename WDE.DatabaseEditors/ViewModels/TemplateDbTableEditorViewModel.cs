@@ -34,6 +34,7 @@ namespace WDE.DatabaseEditors.ViewModels
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
+        private readonly ISolutionManager solutionManager;
         private readonly IParameterFactory parameterFactory;
         private readonly ISolutionTasksService solutionTasksService;
         private readonly IQueryGenerator queryGenerator;
@@ -44,7 +45,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public TemplateDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IEventAggregator eventAggregator, 
+            IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             IQueryGenerator queryGenerator)
         {
@@ -53,6 +54,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.solutionItem = solutionItem;
             this.tableDataProvider = tableDataProvider;
             this.messageBoxService = messageBoxService;
+            this.solutionManager = solutionManager;
             this.parameterFactory = parameterFactory;
             this.solutionTasksService = solutionTasksService;
             this.queryGenerator = queryGenerator;
@@ -207,6 +209,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 return;
             }
             
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (solutionItem.OriginalValues != null)
             {
                 foreach (var entity in data.Entities)
@@ -259,7 +262,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private void SetupHistory()
         {
             var historyHandler = AutoDispose(new TemplateTableEditorHistoryHandler(this));
-            History.PropertyChanged += (sender, args) =>
+            History.PropertyChanged += (_, _) =>
             {
                 undoCommand.RaiseCanExecuteChanged();
                 redoCommand.RaiseCanExecuteChanged();
@@ -292,7 +295,9 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private void SaveSolutionItem()
         {
+            solutionItem.Entries = Entities.Select(e => e.Key).ToList();
             solutionItem.OriginalValues = GetOriginalFields();
+            solutionManager.Refresh(solutionItem);
             solutionTasksService.SaveSolutionToDatabaseTask(solutionItem);
             History.MarkAsSaved();
         }

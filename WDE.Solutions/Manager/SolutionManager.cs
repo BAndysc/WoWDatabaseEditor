@@ -24,7 +24,14 @@ namespace WDE.Solutions.Manager
             Items.CollectionChanged += ItemsOnCollectionChanged;
         }
 
+        public event System.Action<ISolutionItem>? RefreshRequest;
         public ObservableCollection<ISolutionItem> Items { get; }
+
+        public void Refresh(ISolutionItem item)
+        {
+            RefreshRequest?.Invoke(item);
+            Save();
+        }
 
         public void Initialize()
         {

@@ -32,6 +32,9 @@
       <None Update="DbDefinitions\quest_template.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="DbDefinitions\instance_template.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="DynamicData">
