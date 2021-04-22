@@ -18,7 +18,10 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "multi_record")]
         public bool IsMultiRecord { get; set; }
-        
+
+        [JsonProperty(PropertyName = "picker")]
+        public string Picker { get; set; } = "";
+
         [JsonProperty(PropertyName = "table_name_source_field")]
         public string TableNameSource { get; set; } = "";
         

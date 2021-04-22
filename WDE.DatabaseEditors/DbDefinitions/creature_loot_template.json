@@ -3,6 +3,7 @@
   "table_name": "creature_loot_template",
   "table_index_name": "Entry",
   "table_name_source_field": "",
+  "picker": "CreatureParameter",
   "multi_record": true,
   "groups": [
     {

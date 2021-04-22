@@ -3,6 +3,7 @@
   "table_name": "quest_template",
   "table_index_name": "ID",
   "table_name_source_field": "LogTitle",
+  "picker": "QuestParameter",
   "groups": [
     {
       "group_name": "Entries",

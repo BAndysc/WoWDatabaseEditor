@@ -90,11 +90,6 @@ namespace WDE.DatabaseEditors.Data
             
             try
             {
-                foreach (var category in tableDefinition.Groups)
-                {
-                    //tableCategories.Add(CreateCategory(in category, fieldsFromDb));
-                }
-
                 return new DatabaseTableData(tableDefinition, rows);
             }
             catch (Exception e)

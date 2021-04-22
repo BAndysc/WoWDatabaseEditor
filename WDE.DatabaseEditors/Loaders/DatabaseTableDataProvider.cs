@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Loaders
@@ -44,12 +47,50 @@ namespace WDE.DatabaseEditors.Loaders
             var result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
 
             if (result == null || result.Count == 0)
-                return null;
+                result = BuildEmptyEntities(definition, keys).ToList();
 
             //if (definition.IsMultiRecord)
             //    return tableModelGenerator.GetDatabaseMultiRecordTable(key, definition, result);
 
             return tableModelGenerator.GetDatabaseTable(definition, result);
+        }
+
+        private IEnumerable<Dictionary<string, (Type, object)>> BuildEmptyEntities(DatabaseTableDefinitionJson definition, uint[] keys)
+        {
+            foreach (var key in keys)
+            {
+                Dictionary<string, (Type type, object value)> entity = new();
+                foreach (var column in definition.Groups.SelectMany(t => t.Fields)
+                    .Distinct(
+                        EqualityComparerFactory.Create<DbEditorTableGroupFieldJson>(
+                            f => f.DbColumnName.GetHashCode(),
+                            (a, b) => a.DbColumnName.Equals(b.DbColumnName))))
+                {
+                    Type type = typeof(string);
+                    object value = "";
+                    if (column.ValueType == "float")
+                    {
+                        type = typeof(float);
+                        value = 0.0f;
+                    }
+                    else if (column.ValueType.EndsWith("Parameter") || column.ValueType == "int" ||
+                             column.ValueType == "uint")
+                    {
+                        type = typeof(int);
+                        value = 0;
+                    }
+
+                    if (column.DbColumnName == definition.TablePrimaryKeyColumnName)
+                    {
+                        type = typeof(int);
+                        value = (int)key;
+                    }
+
+                    entity[column.DbColumnName] = (type, value);
+                }
+
+                yield return entity;
+            }
         }
     }
 }

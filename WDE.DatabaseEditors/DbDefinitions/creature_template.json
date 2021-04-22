@@ -3,6 +3,7 @@
   "table_name": "creature_template",
   "table_index_name": "entry",
   "table_name_source_field": "name",
+  "picker": "CreatureParameter",
   "groups": [
     {
       "group_name": "Entries",

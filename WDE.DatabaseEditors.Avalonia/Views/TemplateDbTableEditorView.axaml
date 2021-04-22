@@ -34,32 +34,22 @@
         </Style>
     </UserControl.Styles>
     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
-        <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0,10,0,0">
+        <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Padding="0,0,15,0">Search: </TextBlock>
-                <TextBox Name="SearchTextBox" Width="300" HorizontalAlignment="Right" Text="{Binding SearchText, Mode=TwoWay}" />
-            </StackPanel>
+            <DockPanel Margin="10" VerticalAlignment="Center">
+                <Button Command="{Binding AddNewCommand}">
+                    Add new
+                </Button>
+                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Padding="0,0,15,0">Search: </TextBlock>
+                    <TextBox Name="SearchTextBox" Width="300" HorizontalAlignment="Right" Text="{Binding SearchText, Mode=TwoWay}" />
+                </StackPanel>
+            </DockPanel>
             <ScrollViewer Grid.Row="1">
                 <StackPanel>
-                    <!--<StackPanel Height="24" Orientation="Horizontal">
-                        <Panel Width="150" />
-                        <ItemsControl Items="{Binding Header}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Width="200" TextAlignment="Center" Text="{Binding}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>-->
                     <ItemsRepeater Focusable="False" Items="{Binding FilteredRows}" Margin="0, 0, 0, 20">
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate>

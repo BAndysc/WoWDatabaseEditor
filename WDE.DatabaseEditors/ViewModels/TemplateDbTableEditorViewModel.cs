@@ -114,6 +114,17 @@ namespace WDE.DatabaseEditors.ViewModels
                 if (view.CanBeNull && !view.Parent.IsReadOnly)
                     view.ParameterValue.SetNull();
             }, view => view.CanBeNull && !view.Parent.IsReadOnly);
+
+            AddNewCommand = new AsyncAutoCommand(async () =>
+            {
+                var parameter = this.parameterFactory.Factory(TableDefinition.Picker);
+                var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
+                if (!selected.HasValue)
+                    return;
+
+                var data = await tableDataProvider.Load(TableDefinition.TableName, (uint) selected);
+                TableData = (DatabaseTableData)data!;
+            });
         }
 
         private async Task EditParameter(DatabaseCellViewModel cell)
@@ -225,11 +236,11 @@ namespace WDE.DatabaseEditors.ViewModels
             get => tableData;
             set
             {
-                foreach (var group in TableDefinition.Groups)
-                {
-                    groupVisibilityByName.Add(group.Name, new ReactiveProperty<bool>(true));
-                }
+                Rows.Clear();
+                Entities.Clear();
+                Header.Clear();
                 
+                groupVisibilityByName.Clear();
                 tableData = value;
 
                 int categoryIndex = 0;
@@ -331,6 +342,7 @@ namespace WDE.DatabaseEditors.ViewModels
             internal set => SetProperty(ref isLoading, value);
         }
         
+        public AsyncAutoCommand AddNewCommand { get; }
         public DelegateCommand<DatabaseCellViewModel> RevertCommand { get; }
         public DelegateCommand<DatabaseCellViewModel> SetNullCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
