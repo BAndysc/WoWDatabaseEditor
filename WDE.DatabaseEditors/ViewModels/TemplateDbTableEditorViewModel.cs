@@ -90,8 +90,8 @@ namespace WDE.DatabaseEditors.ViewModels
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(ExecuteSql));
 
-            RevertCommand = new DelegateCommand<DatabaseCellViewModel>(Revert);
-            SetNullCommand = new DelegateCommand<DatabaseCellViewModel>(SetNull);
+            RevertCommand = new DelegateCommand<DatabaseCellViewModel>(Revert, vm => vm.CanBeReverted && vm.IsModified);
+            SetNullCommand = new DelegateCommand<DatabaseCellViewModel>(SetNull, vm => vm.CanBeSetToNull);
 
             AddNewCommand = new AsyncAutoCommand(AddNew);
         }
@@ -316,6 +316,8 @@ namespace WDE.DatabaseEditors.ViewModels
             Entities.Add(entity);
             Header.Add(entity.GetCell(tableData.TableDefinition.TableNameSource)?.ToString() ?? "???");
 
+            Dictionary<string, IObservable<bool>?> groupVisibility = new();
+            
             foreach (var row in Rows.Items)
             {
                 var column = row.ColumnData;
@@ -338,15 +340,19 @@ namespace WDE.DatabaseEditors.ViewModels
                     parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                 }
 
-                IObservable<bool>? cellVisible = null;
+                IObservable<bool>? cellVisible = null!;
                 var group = row.GroupData;
                 if (group.ShowIf.HasValue)
                 {
-                    var compareCell = entity.GetCell(group.ShowIf.Value.ColumnName);
-                    if (compareCell != null && compareCell is DatabaseField<long> lField)
+                    if (!groupVisibility.TryGetValue(group.Name, out cellVisible))
                     {
-                        var comparedValue = group.ShowIf.Value.Value;
-                        cellVisible = Observable.Select(lField.Current.ToObservable(p => p.Value), val => val == comparedValue);
+                        var compareCell = entity.GetCell(group.ShowIf.Value.ColumnName);
+                        if (compareCell != null && compareCell is DatabaseField<long> lField)
+                        {
+                            var comparedValue = group.ShowIf.Value.Value;
+                            cellVisible = Observable.Select(lField.Current.ToObservable(p => p.Value), val => val == comparedValue);
+                        }
+                        groupVisibility[group.Name] = cellVisible;
                     }
                 }
 

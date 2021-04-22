@@ -36,8 +36,10 @@
                         IsActive="{Binding IsVisible}"
                         IsModified="{Binding IsModified}" 
                         IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
-                        Value="{Binding AsBoolValue}"
-                        ContextMenu="{StaticResource CellContextMenu}"/>
+                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        Value="{Binding AsBoolValue}"/>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.BoolTemplate>
             <helpers:FieldValueTemplateSelector.GenericTemplate>
@@ -51,8 +53,10 @@
                         IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
                         Value="{Binding ParameterValue.Value}"
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
-                        StringValue="{Binding ParameterValue.String}"
-                        ContextMenu="{StaticResource CellContextMenu}">
+                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        StringValue="{Binding ParameterValue.String}">
                     </controls:FastCellView>
                     <!--<controls:DbTableFieldValueView Width="200" IsModified="{Binding TableField.IsModified}" 
                 IsReadOnly="{Binding IsReadOnly}" Classes="Root"

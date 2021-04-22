@@ -16,8 +16,8 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
     public class FastCellView : FastCellViewBase
     {
         private bool showChooseButton;
-        private ICommand? chooseParameterCommand;
         public static readonly DirectProperty<FastCellView, bool> ShowChooseButtonProperty = AvaloniaProperty.RegisterDirect<FastCellView, bool>("ShowChooseButton", o => o.ShowChooseButton, (o, v) => o.ShowChooseButton = v);
+        private ICommand? chooseParameterCommand;
         public static readonly DirectProperty<FastCellView, ICommand?> ChooseParameterCommandProperty = AvaloniaProperty.RegisterDirect<FastCellView, ICommand?>("ChooseParameterCommand", o => o.ChooseParameterCommand, (o, v) => o.ChooseParameterCommand = v);
 
         public ICommand? ChooseParameterCommand
@@ -71,7 +71,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             base.OnPointerPressed(e);
-            if (isReadOnly)
+            if (isReadOnly || e.Handled)
                 return;
 
             if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)

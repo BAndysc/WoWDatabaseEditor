@@ -1,12 +1,19 @@
+using System.Windows.Input;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Media;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
     public abstract class FastCellViewBase : TemplatedControl
     {
+        private static ContextMenu contextMenu;
+        private static MenuItem revertMenuItem;
+        private static MenuItem setNullMenuItem;
+        
         protected object cellValue = "(null)";
         public static readonly DirectProperty<FastCellViewBase, object> ValueProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, object>("Value", o => o.Value, (o, v) => o.Value = v, defaultBindingMode: BindingMode.TwoWay);
         protected string stringValue = "(null)";
@@ -17,7 +24,29 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         public static readonly DirectProperty<FastCellViewBase, bool> IsModifiedProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, bool>("IsModified", o => o.IsModified, (o, v) => o.IsModified = v);
         protected bool isActive;
         public static readonly DirectProperty<FastCellViewBase, bool> IsActiveProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, bool>("IsActive", o => o.IsActive, (o, v) => o.IsActive = v);
+        private bool canBeNull;
+        public static readonly DirectProperty<FastCellViewBase, bool> CanBeNullProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, bool>("CanBeNull", o => o.CanBeNull, (o, v) => o.CanBeNull = v);
+        private ICommand? revertCommand;
+        public static readonly DirectProperty<FastCellViewBase, ICommand?> RevertCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(RevertCommand), o => o.RevertCommand, (o, v) => o.RevertCommand = v);
+        private ICommand? setNullCommand;
+        public static readonly DirectProperty<FastCellViewBase, ICommand?> SetNullCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(SetNullCommand), o => o.SetNullCommand, (o, v) => o.SetNullCommand = v);
+
+        public ICommand? SetNullCommand
+        {
+            get => setNullCommand;
+            set => SetAndRaise(SetNullCommandProperty, ref setNullCommand, value);
+        }
+        public ICommand? RevertCommand
+        {
+            get => revertCommand;
+            set => SetAndRaise(RevertCommandProperty, ref revertCommand, value);
+        }
         
+        public bool CanBeNull
+        {
+            get => canBeNull;
+            set => SetAndRaise(CanBeNullProperty, ref canBeNull, value);
+        }
         public string StringValue
         {
             get => stringValue;
@@ -69,6 +98,25 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         static FastCellViewBase()
         {
             AffectsRender<FastCellViewBase>(IsModifiedProperty);
+            
+            // I am doing it in code behind for performance reason
+            // I do not know why Avalonia allocates tooooons of memory
+            // when it is in xaml...
+            contextMenu = new ContextMenu();
+            revertMenuItem = new MenuItem() {Header = "Revert value"};
+            setNullMenuItem = new MenuItem() {Header = "Set to null"};
+            contextMenu.Items = new[]
+            {
+                revertMenuItem,
+                setNullMenuItem
+            };
+            contextMenu.MenuClosed += (sender, args) =>
+            {
+                revertMenuItem.CommandParameter = null!;
+                setNullMenuItem.CommandParameter = null!;
+                revertMenuItem.Command = null;
+                setNullMenuItem.Command = null;
+            };
         }
 
         public override void Render(DrawingContext context)
@@ -77,6 +125,22 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             if (isModified)
             {
                 context.DrawRectangle(Brushes.Red, null, new Rect(0, 6, 12, 12));
+            }
+        }
+
+        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        {
+            base.OnPointerPressed(e);
+            if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+            {
+                revertMenuItem.IsEnabled = revertCommand?.CanExecute(DataContext!) ?? false;
+                setNullMenuItem.IsEnabled = setNullCommand?.CanExecute(DataContext!) ?? false;
+                revertMenuItem.CommandParameter = DataContext!;
+                setNullMenuItem.CommandParameter = DataContext!;
+                revertMenuItem.Command = revertCommand;
+                setNullMenuItem.Command = setNullCommand;
+                contextMenu.Open(this);
+                e.Handled = true;
             }
         }
     }
