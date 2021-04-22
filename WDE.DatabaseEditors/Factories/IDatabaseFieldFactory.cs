@@ -1,5 +1,4 @@
-﻿using WDE.DatabaseEditors.Data.Structs;
-using WDE.DatabaseEditors.Models;
+﻿using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Factories
 {

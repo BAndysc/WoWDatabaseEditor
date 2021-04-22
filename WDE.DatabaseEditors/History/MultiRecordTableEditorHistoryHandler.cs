@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using WDE.Common.History;
-using WDE.DatabaseEditors.Models;
-using WDE.MVVM.Observable;
-
-namespace WDE.DatabaseEditors.History
+﻿namespace WDE.DatabaseEditors.History
 {
     /*public class MultiRecordTableEditorHistoryHandler : HistoryHandler, IDisposable, IDatabaseFieldHistoryActionReceiver
     {

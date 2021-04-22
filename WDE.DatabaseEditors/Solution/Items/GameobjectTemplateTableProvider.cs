@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using WDE.Common;
 using WDE.DatabaseEditors.Loaders;
 using WDE.Module.Attributes;

@@ -17,16 +17,6 @@
         <ItemsPanelTemplate x:Key="HorizontalStackPanelTemplate">
             <StackPanel Orientation="Horizontal"></StackPanel>
         </ItemsPanelTemplate>
-        <ContextMenu x:Key="CellContextMenu">
-            <MenuItem Header="Revert" 
-                      IsEnabled="{Binding CanBeReverted}"
-                      Command="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
-                      CommandParameter="{Binding .}" />
-            <MenuItem Header="Set to null" 
-                      IsEnabled="{Binding CanBeSetToNull}"
-                      Command="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
-                      CommandParameter="{Binding .}" />
-        </ContextMenu>
         <helpers:FieldValueTemplateSelector x:Key="FieldValueTemplateSelector">
             <helpers:FieldValueTemplateSelector.BoolTemplate>
                 <DataTemplate>
@@ -39,6 +29,7 @@
                         SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
                         RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
                         CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
                         Value="{Binding AsBoolValue}"/>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.BoolTemplate>
@@ -55,13 +46,10 @@
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
                         SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
                         RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
                         CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
                         StringValue="{Binding ParameterValue.String}">
                     </controls:FastCellView>
-                    <!--<controls:DbTableFieldValueView Width="200" IsModified="{Binding TableField.IsModified}" 
-                IsReadOnly="{Binding IsReadOnly}" Classes="Root"
-                ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}">
-            </controls:DbTableFieldValueView>-->
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.GenericTemplate>
         </helpers:FieldValueTemplateSelector>
@@ -71,7 +59,8 @@
                        Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
                        TextAlignment="Center" 
                        VerticalAlignment="Center"
-                       Text="{Binding ., Mode=OneTime}" />
+                       Text="{Binding ., Mode=OneTime}">
+            </TextBlock>
         </DataTemplate>
         <DataTemplate x:Key="RowTemplate">
             <DockPanel LastChildFill="True" Classes="alternating" Height="24">

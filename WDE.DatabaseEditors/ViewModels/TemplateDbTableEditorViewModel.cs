@@ -19,7 +19,6 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
-using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
@@ -45,7 +44,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public TemplateDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
-            IEventAggregator eventAggregator, ITableDefinitionProvider definitionProvider,
+            IEventAggregator eventAggregator, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             IQueryGenerator queryGenerator)
         {
@@ -58,7 +57,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.solutionTasksService = solutionTasksService;
             this.queryGenerator = queryGenerator;
             History = history;
-            tableData = null!;
+            tableDefinition = null!;
             
             IsLoading = true;
             taskRunner.ScheduleTask($"Loading {solutionItem.TableId}..", LoadTableDefinition);
@@ -90,32 +89,33 @@ namespace WDE.DatabaseEditors.ViewModels
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(ExecuteSql));
 
-            RevertCommand = new DelegateCommand<DatabaseCellViewModel>(Revert, vm => vm.CanBeReverted && vm.IsModified);
-            SetNullCommand = new DelegateCommand<DatabaseCellViewModel>(SetNull, vm => vm.CanBeSetToNull);
-
-            AddNewCommand = new AsyncAutoCommand(AddNew);
+            RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
+            RevertCommand = new DelegateCommand<DatabaseCellViewModel?>(Revert, vm => vm != null && vm.CanBeReverted && vm.IsModified);
+            SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
+            AddNewCommand = new AsyncAutoCommand(AddNewEntity);
         }
 
         private void ExecuteSql(EventRequestGenerateSqlArgs args)
         {
-            if (args.Item is DatabaseTableSolutionItem dbEditItem)
-            {
-                if (solutionItem.Equals(dbEditItem))
-                {
-                    args.Sql = queryGenerator.GenerateQuery(tableData);
-                }
-            }
+            if (args.Item is not DatabaseTableSolutionItem dbEditItem) 
+                return;
+            
+            if (!solutionItem.Equals(dbEditItem)) 
+                return;
+            
+            args.Sql = queryGenerator.GenerateQuery(new DatabaseTableData(tableDefinition, Entities));
         }
         
-        private async Task AddNew()
+        private async Task AddNewEntity()
         {
-            var parameter = this.parameterFactory.Factory(tableData.TableDefinition.Picker);
+            var parameter = parameterFactory.Factory(tableDefinition.Picker);
             var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
-            if (!selected.HasValue) return;
+            if (!selected.HasValue)
+                return;
 
-            var data = await tableDataProvider.Load(tableData.TableDefinition.TableName, (uint) selected);
-
-            if (data == null) return;
+            var data = await tableDataProvider.Load(tableDefinition.TableName, (uint) selected);
+            if (data == null) 
+                return;
 
             foreach (var entity in data.Entities)
             {
@@ -129,18 +129,28 @@ namespace WDE.DatabaseEditors.ViewModels
                     continue;
                 }
 
-                if (await AddEntity(entity)) tableData.Entities.Add(entity);
+                await AddEntity(entity);
             }
         }
         
-        private void SetNull(DatabaseCellViewModel view)
+        private void SetToNull(DatabaseCellViewModel? view)
         {
-            if (view.CanBeNull && !view.Parent.IsReadOnly) view.ParameterValue.SetNull();
+            if (view != null && view.CanBeNull && !view.Parent.IsReadOnly) 
+                view.ParameterValue.SetNull();
         }
 
-        private void Revert(DatabaseCellViewModel view)
+        private void Revert(DatabaseCellViewModel? view)
         {
-            if (!view.Parent.IsReadOnly) view.ParameterValue.Revert();
+            if (view != null && !view.Parent.IsReadOnly) 
+                view.ParameterValue.Revert();
+        }
+
+        private void RemoveTemplate(DatabaseCellViewModel? view)
+        {
+            if (view == null)
+                return;
+
+            RemoveEntity(view.ParentEntity);
         }
 
         private DatabaseRowsGroupViewModel GroupCreate(IGroup<DatabaseRowViewModel, (string CategoryName, int CategoryIndex)> @group)
@@ -156,15 +166,8 @@ namespace WDE.DatabaseEditors.ViewModels
             return item => item.Name.ToLower().Contains(lower);
         }
 
-        private bool CanRedo()
-        {
-            return History.CanRedo;
-        }
-
-        private bool CanUndo()
-        {
-            return History.CanUndo;
-        }
+        private bool CanRedo() => History.CanRedo;
+        private bool CanUndo() => History.CanUndo;
 
         private bool ContainsEntity(DatabaseEntity entity)
         {
@@ -181,13 +184,13 @@ namespace WDE.DatabaseEditors.ViewModels
             if (valueHolder == null)
                 return;
 
-            if (valueHolder.Parameter.HasItems)
-            {
-                var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
-                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
-                if (result.HasValue)
-                    valueHolder.Value = result.Value;
-            }
+            if (!valueHolder.Parameter.HasItems)
+                return;
+
+            var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
+                valueHolder.Parameter is FlagParameter, valueHolder.Value);
+            if (result.HasValue)
+                valueHolder.Value = result.Value; 
         }
 
         private async Task LoadTableDefinition()
@@ -229,12 +232,12 @@ namespace WDE.DatabaseEditors.ViewModels
                 Entities.Clear();
                 Header.Clear();
                 groupVisibilityByName.Clear();
-                tableData = data;
+                tableDefinition = data.TableDefinition;
 
                 int categoryIndex = 0;
                 int columnIndex = 0;
 
-                foreach (var group in tableData.TableDefinition.Groups)
+                foreach (var group in tableDefinition.Groups)
                 {
                     categoryIndex++;
                     groupVisibilityByName[group.Name] = new ReactiveProperty<bool>(true);
@@ -246,7 +249,7 @@ namespace WDE.DatabaseEditors.ViewModels
                     }
                 }
 
-                await AsyncAddEntities(tableData.Entities);
+                await AsyncAddEntities(data.Entities);
             }
             
             SetupHistory();
@@ -269,13 +272,13 @@ namespace WDE.DatabaseEditors.ViewModels
         {
             var dict = new Dictionary<uint, List<EntityOrigianlField>>();
             
-            foreach (var entity in tableData.Entities)
+            foreach (var entity in Entities)
             {
                 var modified = entity.Fields.Where(f => f.IsModified).ToList();
                 if (modified.Count == 0)
                     continue;
 
-                var keyField = entity.GetCell(tableData.TableDefinition.TablePrimaryKeyColumnName);
+                var keyField = entity.GetCell(tableDefinition.TablePrimaryKeyColumnName);
                 
                 if (keyField == null || keyField is not DatabaseField<long> keyLong)
                     continue;
@@ -300,6 +303,36 @@ namespace WDE.DatabaseEditors.ViewModels
         public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
         public SourceList<DatabaseRowViewModel> Rows { get; } = new();
 
+        public async Task<bool> RemoveEntity(DatabaseEntity entity)
+        {
+            if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                .SetTitle("Delete entity")
+                .SetMainInstruction($"Do you want to delete entity with key {entity.Key} from the editor?")
+                .SetContent(
+                    "It will be removed only from the project editor, it will not be removed from the database.")
+                .WithYesButton(true)
+                .WithNoButton(false).Build()))
+                return false;
+
+            return ForceRemoveEntity(entity);
+        }
+
+        public bool ForceRemoveEntity(DatabaseEntity entity)
+        {
+            var indexOfEntity = Entities.IndexOf(entity);
+            if (indexOfEntity == -1)
+                return false;
+            
+            Entities.RemoveAt(indexOfEntity);
+            Header.RemoveAt(indexOfEntity);
+            foreach (var row in Rows.Items)
+                row.Cells.RemoveAt(indexOfEntity);
+
+            ReEvalVisibility();
+            
+            return true;
+        }
+        
         public async Task<bool> AddEntity(DatabaseEntity entity)
         {
             if (!entity.ExistInDatabase)
@@ -313,9 +346,12 @@ namespace WDE.DatabaseEditors.ViewModels
                     .WithNoButton(false).Build()))
                     return false;
             }
-            Entities.Add(entity);
-            Header.Add(entity.GetCell(tableData.TableDefinition.TableNameSource)?.ToString() ?? "???");
 
+            return ForceInsertEntity(entity, Entities.Count);
+        }
+
+        public bool ForceInsertEntity(DatabaseEntity entity, int index)
+        {
             Dictionary<string, IObservable<bool>?> groupVisibility = new();
             
             foreach (var row in Rows.Items)
@@ -356,43 +392,46 @@ namespace WDE.DatabaseEditors.ViewModels
                     }
                 }
 
-                var cellViewModel = AutoDispose(new DatabaseCellViewModel(row, cell, parameterValue, cellVisible));
-                row.Cells.Add(cellViewModel);
+                var cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, cell, parameterValue, cellVisible));
+                row.Cells.Insert(index, cellViewModel);
             }
-            
+
+            Entities.Insert(index, entity);
+            Header.Insert(index, entity.GetCell(tableDefinition.TableNameSource)?.ToString() ?? "???");
+
             var typeCell = entity.GetCell("type");
             if (typeCell == null)
                 return true;
             typeCell.PropertyChanged += (_, _) => ReEvalVisibility();
 
+            ReEvalVisibility();
+            
             return true;
         }
         
-        private DatabaseTableData tableData;
+        private DatabaseTableDefinitionJson tableDefinition;
 
-        private async Task AsyncAddEntities(List<DatabaseEntity> tableDataEntities)
+        private async Task AsyncAddEntities(IList<DatabaseEntity> tableDataEntities)
         {
             List<DatabaseEntity> finalList = new();
-            foreach (var entity in tableData.Entities)
+            foreach (var entity in tableDataEntities)
             {
                 if (await AddEntity(entity))
                     finalList.Add(entity);
             }
-
-            tableData = new DatabaseTableData(tableData.TableDefinition, finalList);
 
             ReEvalVisibility();
         }
 
         private void ReEvalVisibility()
         {
-            foreach (var group in tableData.TableDefinition.Groups)
+            foreach (var group in tableDefinition.Groups)
             {
                 if (!group.ShowIf.HasValue)
                     continue;
 
                 groupVisibilityByName[group.Name].Value = false;
-                foreach (var entity in tableData.Entities)
+                foreach (var entity in Entities)
                 {
                     var cell = entity.GetCell(group.ShowIf.Value.ColumnName);
                     if (cell is not DatabaseField<long> lField)
@@ -421,8 +460,9 @@ namespace WDE.DatabaseEditors.ViewModels
         }
         
         public AsyncAutoCommand AddNewCommand { get; }
-        public DelegateCommand<DatabaseCellViewModel> RevertCommand { get; }
-        public DelegateCommand<DatabaseCellViewModel> SetNullCommand { get; }
+        public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
+        public DelegateCommand<DatabaseCellViewModel?> RevertCommand { get; }
+        public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         private DelegateCommand undoCommand;
         private DelegateCommand redoCommand;

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Reactive.Disposables;
-using Prism.Mvvm;
-using WDE.Common.Parameters;
-using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -12,6 +8,7 @@ namespace WDE.DatabaseEditors.ViewModels
     public class DatabaseCellViewModel : ObservableBase
     {
         public DatabaseRowViewModel Parent { get; }
+        public DatabaseEntity ParentEntity { get; }
         public IDatabaseField TableField { get; }
         public IParameterValue ParameterValue { get; }
         public bool IsVisible { get; private set; } = true;
@@ -21,9 +18,10 @@ namespace WDE.DatabaseEditors.ViewModels
         public bool CanBeSetToNull => CanBeNull && !Parent.IsReadOnly;
         public bool CanBeReverted => !Parent.IsReadOnly;
 
-        public DatabaseCellViewModel(DatabaseRowViewModel parent, IDatabaseField tableField, IParameterValue parameterValue, IObservable<bool>? cellIsVisible)
+        public DatabaseCellViewModel(DatabaseRowViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue, IObservable<bool>? cellIsVisible)
         {
             Link(tableField, tf => tf.IsModified, () => IsModified);
+            ParentEntity = parentEntity;
             Parent = parent;
             TableField = tableField;
             ParameterValue = parameterValue;

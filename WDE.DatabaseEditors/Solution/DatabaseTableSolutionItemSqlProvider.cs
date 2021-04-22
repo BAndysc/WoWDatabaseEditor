@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using WDE.Common.Solution;
-using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;

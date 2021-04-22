@@ -1,14 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
 using WDE.Common.History;
-using WDE.Common.Utils;
-using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels;
 using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.History
 {
-    public class TemplateTableEditorHistoryHandler : HistoryHandler, IDisposable, IDatabaseFieldHistoryActionReceiver
+    public class TemplateTableEditorHistoryHandler : HistoryHandler, IDisposable
     {
         private readonly TemplateDbTableEditorViewModel viewModel;
         private IDisposable? disposable;
@@ -24,8 +21,6 @@ namespace WDE.DatabaseEditors.History
             UnbindTableData();
         }
 
-        public void RegisterAction(IHistoryAction action) => PushAction(action);
-
         private void BindTableData()
         {
             disposable = viewModel.Entities.ToStream().SubscribeAction(e =>
@@ -33,9 +28,11 @@ namespace WDE.DatabaseEditors.History
                 if (e.Type == CollectionEventType.Add)
                 {
                     e.Item.OnAction += PushAction;
+                    PushAction(new DatabaseEntityAddedHistoryAction(e.Item, e.Index, viewModel));
                 }
                 else if (e.Type == CollectionEventType.Remove)
                 {
+                    PushAction(new DatabaseEntityRemovedHistoryAction(e.Item, e.Index, viewModel));
                     e.Item.OnAction -= PushAction;
                 }
             });

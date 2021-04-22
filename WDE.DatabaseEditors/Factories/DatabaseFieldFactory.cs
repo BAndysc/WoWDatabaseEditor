@@ -1,10 +1,7 @@
 ﻿using System;
 using WDE.Common.Parameters;
-using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
-using WDE.Parameters;
-using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.Factories
 {

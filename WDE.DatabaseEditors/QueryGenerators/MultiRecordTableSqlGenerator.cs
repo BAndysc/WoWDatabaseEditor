@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using WDE.DatabaseEditors.Models;
-
-namespace WDE.DatabaseEditors.QueryGenerators
+﻿namespace WDE.DatabaseEditors.QueryGenerators
 {
     public static class MultiRecordTableSqlGenerator
     {

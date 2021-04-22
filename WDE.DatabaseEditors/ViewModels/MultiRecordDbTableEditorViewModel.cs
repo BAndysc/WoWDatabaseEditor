@@ -1,29 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using AsyncAwaitBestPractices.MVVM;
-using Prism.Commands;
-using Prism.Mvvm;
-using WDE.Common.Database;
-using WDE.Common.History;
-using WDE.Common.Managers;
-using WDE.Common.Parameters;
-using WDE.Common.Providers;
-using WDE.Common.Services.MessageBox;
-using WDE.Common.Tasks;
-using WDE.Common.Utils;
-using WDE.DatabaseEditors.Data;
-using WDE.DatabaseEditors.Factories;
-using WDE.DatabaseEditors.History;
-using WDE.DatabaseEditors.Loaders;
-using WDE.DatabaseEditors.Models;
-using WDE.DatabaseEditors.QueryGenerators;
-using WDE.DatabaseEditors.Solution;
-using WDE.Parameters.Models;
-
-namespace WDE.DatabaseEditors.ViewModels
+﻿namespace WDE.DatabaseEditors.ViewModels
 {
     /*public class MultiRecordDbTableEditorViewModel : BindableBase, IDocument
     {

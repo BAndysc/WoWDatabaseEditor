@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using WDE.Common.Types;
-using WDE.DatabaseEditors.Data;
-using WDE.DatabaseEditors.Factories;
-using WDE.DatabaseEditors.History;
-
-namespace WDE.DatabaseEditors.Models
+﻿namespace WDE.DatabaseEditors.Models
 {
     /*public class DatabaseMultiRecordTableData : IDatabaseTableData, INotifyRowChanged
     {

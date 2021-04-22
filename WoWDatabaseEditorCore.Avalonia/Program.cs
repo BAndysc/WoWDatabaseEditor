@@ -39,8 +39,9 @@ namespace WoWDatabaseEditorCore.Avalonia
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .With(new AvaloniaNativePlatformOptions { UseGpu = false })
-                .With(new Win32PlatformOptions(){AllowEglInitialization = false})
+                .With(new AvaloniaNativePlatformOptions { UseGpu = true })
+               // .With(new AvaloniaNativePlatformOptions { UseGpu = false })
+                //.With(new Win32PlatformOptions(){AllowEglInitialization = false})
                 .UseReactiveUI()
                 .LogToTrace();
     }

@@ -2,7 +2,6 @@
 using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
-using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.ViewModels;

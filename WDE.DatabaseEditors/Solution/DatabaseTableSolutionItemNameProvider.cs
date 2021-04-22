@@ -1,8 +1,6 @@
-﻿using System;
-using WDE.Common.Database;
+﻿using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Solution;
-using WDE.DatabaseEditors.Data;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution

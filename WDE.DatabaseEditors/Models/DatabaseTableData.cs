@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using WDE.Common.History;
 using WDE.DatabaseEditors.Data.Structs;
 
@@ -8,9 +7,9 @@ namespace WDE.DatabaseEditors.Models
     public class DatabaseTableData : IDatabaseTableData
     {
         public DatabaseTableDefinitionJson TableDefinition { get; }
-        public List<DatabaseEntity> Entities { get; }
+        public IList<DatabaseEntity> Entities { get; }
 
-        public DatabaseTableData(DatabaseTableDefinitionJson definitionJson, List<DatabaseEntity> entities)
+        public DatabaseTableData(DatabaseTableDefinitionJson definitionJson, IList<DatabaseEntity> entities)
         {
             TableDefinition = definitionJson;
             Entities = entities;

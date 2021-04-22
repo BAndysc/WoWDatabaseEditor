@@ -13,6 +13,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         private static ContextMenu contextMenu;
         private static MenuItem revertMenuItem;
         private static MenuItem setNullMenuItem;
+        private static MenuItem deleteMenuItem;
         
         protected object cellValue = "(null)";
         public static readonly DirectProperty<FastCellViewBase, object> ValueProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, object>("Value", o => o.Value, (o, v) => o.Value = v, defaultBindingMode: BindingMode.TwoWay);
@@ -30,7 +31,14 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         public static readonly DirectProperty<FastCellViewBase, ICommand?> RevertCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(RevertCommand), o => o.RevertCommand, (o, v) => o.RevertCommand = v);
         private ICommand? setNullCommand;
         public static readonly DirectProperty<FastCellViewBase, ICommand?> SetNullCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(SetNullCommand), o => o.SetNullCommand, (o, v) => o.SetNullCommand = v);
+        private ICommand? removeTemplateCommand;
+        public static readonly DirectProperty<FastCellViewBase, ICommand?> RemoveTemplateCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(RemoveTemplateCommand), o => o.RemoveTemplateCommand, (o, v) => o.RemoveTemplateCommand = v);
 
+        public ICommand? RemoveTemplateCommand
+        {
+            get => removeTemplateCommand;
+            set => SetAndRaise(RemoveTemplateCommandProperty, ref removeTemplateCommand, value);
+        }
         public ICommand? SetNullCommand
         {
             get => setNullCommand;
@@ -105,17 +113,22 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             contextMenu = new ContextMenu();
             revertMenuItem = new MenuItem() {Header = "Revert value"};
             setNullMenuItem = new MenuItem() {Header = "Set to null"};
-            contextMenu.Items = new[]
+            deleteMenuItem = new MenuItem() {Header = "Delete item from the editor"};
+            contextMenu.Items = new Control[]
             {
                 revertMenuItem,
-                setNullMenuItem
+                setNullMenuItem,
+                new Separator(),
+                deleteMenuItem
             };
             contextMenu.MenuClosed += (sender, args) =>
             {
                 revertMenuItem.CommandParameter = null!;
                 setNullMenuItem.CommandParameter = null!;
+                deleteMenuItem.CommandParameter = null!;
                 revertMenuItem.Command = null;
                 setNullMenuItem.Command = null;
+                deleteMenuItem.Command = null;
             };
         }
 
@@ -137,8 +150,10 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 setNullMenuItem.IsEnabled = setNullCommand?.CanExecute(DataContext!) ?? false;
                 revertMenuItem.CommandParameter = DataContext!;
                 setNullMenuItem.CommandParameter = DataContext!;
+                deleteMenuItem.CommandParameter = DataContext!;
                 revertMenuItem.Command = revertCommand;
                 setNullMenuItem.Command = setNullCommand;
+                deleteMenuItem.Command = removeTemplateCommand;
                 contextMenu.Open(this);
                 e.Handled = true;
             }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Structs;
 
 namespace WDE.DatabaseEditors.Models

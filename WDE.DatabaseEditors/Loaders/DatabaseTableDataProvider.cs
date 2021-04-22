@@ -8,7 +8,6 @@ using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.Models;
-using WDE.DatabaseEditors.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Loaders

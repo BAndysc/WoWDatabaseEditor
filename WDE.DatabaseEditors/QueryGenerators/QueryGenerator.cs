@@ -38,7 +38,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     if (string.IsNullOrEmpty(updates))
                         continue;
                 
-                    var updateQuery = $"UPDATE `{tableData.TableDefinition.TableName}` SET {updates} WHERE `{tableData.TableDefinition.TablePrimaryKeyColumnName}`= {entity.Key}";
+                    var updateQuery = $"UPDATE `{tableData.TableDefinition.TableName}` SET {updates} WHERE `{tableData.TableDefinition.TablePrimaryKeyColumnName}`= {entity.Key};";
                     query.AppendLine(updateQuery);
                 }
                 else
