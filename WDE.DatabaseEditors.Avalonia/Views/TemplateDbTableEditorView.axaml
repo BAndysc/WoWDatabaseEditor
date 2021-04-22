@@ -17,6 +17,16 @@
         <ItemsPanelTemplate x:Key="HorizontalStackPanelTemplate">
             <StackPanel Orientation="Horizontal"></StackPanel>
         </ItemsPanelTemplate>
+        <ContextMenu x:Key="CellContextMenu">
+            <MenuItem Header="Revert" 
+                      IsEnabled="{Binding CanBeReverted}"
+                      Command="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                      CommandParameter="{Binding .}" />
+            <MenuItem Header="Set to null" 
+                      IsEnabled="{Binding CanBeSetToNull}"
+                      Command="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                      CommandParameter="{Binding .}" />
+        </ContextMenu>
         <helpers:FieldValueTemplateSelector x:Key="FieldValueTemplateSelector">
             <helpers:FieldValueTemplateSelector.BoolTemplate>
                 <DataTemplate>
@@ -26,7 +36,8 @@
                         IsActive="{Binding IsVisible}"
                         IsModified="{Binding IsModified}" 
                         IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
-                        Value="{Binding AsBoolValue}" />
+                        Value="{Binding AsBoolValue}"
+                        ContextMenu="{StaticResource CellContextMenu}"/>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.BoolTemplate>
             <helpers:FieldValueTemplateSelector.GenericTemplate>
@@ -40,19 +51,8 @@
                         IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
                         Value="{Binding ParameterValue.Value}"
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
-                        StringValue="{Binding ParameterValue.String}">
-                        <controls:FastCellView.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Revert" 
-                                    IsEnabled="{Binding CanBeReverted, Mode=OneTime}"
-                                    Command="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
-                                    CommandParameter="{Binding ., Mode=OneTime}" />
-                                <MenuItem Header="Set to null" 
-                                    IsEnabled="{Binding CanBeSetToNull, Mode=OneTime}"
-                                    Command="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
-                                    CommandParameter="{Binding ., Mode=OneTime}" />
-                            </ContextMenu>
-                        </controls:FastCellView.ContextMenu>
+                        StringValue="{Binding ParameterValue.String}"
+                        ContextMenu="{StaticResource CellContextMenu}">
                     </controls:FastCellView>
                     <!--<controls:DbTableFieldValueView Width="200" IsModified="{Binding TableField.IsModified}" 
                 IsReadOnly="{Binding IsReadOnly}" Classes="Root"

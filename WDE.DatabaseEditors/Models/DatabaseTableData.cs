@@ -19,8 +19,20 @@ namespace WDE.DatabaseEditors.Models
 
     public class DatabaseEntity
     {
-        public DatabaseEntity(Dictionary<string, IDatabaseField> cells)
+        public Dictionary<string, IDatabaseField> Cells { get; }
+        
+        public IEnumerable<IDatabaseField> Fields => Cells.Values;
+
+        public event System.Action<IHistoryAction>? OnAction;
+        
+        public bool ExistInDatabase { get; }
+        
+        public uint Key { get; }
+        
+        public DatabaseEntity(bool existInDatabase, uint key, Dictionary<string, IDatabaseField> cells)
         {
+            ExistInDatabase = existInDatabase;
+            Key = key;
             Cells = cells;
             foreach (var databaseField in Cells)
             {
@@ -30,12 +42,6 @@ namespace WDE.DatabaseEditors.Models
                 };
             }
         }
-
-        public IEnumerable<IDatabaseField> Fields => Cells.Values;
-
-        public event System.Action<IHistoryAction>? OnAction;
-
-        public Dictionary<string, IDatabaseField> Cells { get; }
 
         public IDatabaseField? GetCell(string columnName)
         {

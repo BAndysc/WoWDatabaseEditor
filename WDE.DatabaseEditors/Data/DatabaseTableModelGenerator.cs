@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -29,15 +31,50 @@ namespace WDE.DatabaseEditors.Data
             this.messageBoxService = messageBoxService;
         }
         
-        public IDatabaseTableData? GetDatabaseTable(in DatabaseTableDefinitionJson tableDefinition,
+        
+        private DatabaseEntity BuildEmptyEntity(DatabaseTableDefinitionJson definition, uint key)
+        {
+            Dictionary<string, IDatabaseField> columns = new();
+            
+            foreach (var column in definition.Groups.SelectMany(t => t.Fields)
+                .Distinct(
+                    EqualityComparerFactory.Create<DbEditorTableGroupFieldJson>(
+                        f => f.DbColumnName.GetHashCode(),
+                        (a, b) => a.DbColumnName.Equals(b.DbColumnName))))
+            {
+                IValueHolder valueHolder;
+                if (column.ValueType == "float")
+                {
+                    valueHolder = new ValueHolder<float>(0.0f);
+                }
+                else if (column.ValueType.EndsWith("Parameter") || column.ValueType == "int" ||
+                         column.ValueType == "uint")
+                {
+                    if (column.DbColumnName == definition.TablePrimaryKeyColumnName)
+                        valueHolder = new ValueHolder<long>(key);
+                    else
+                        valueHolder = new ValueHolder<long>(0);
+                }
+                else
+                    valueHolder = new ValueHolder<string>("");
+
+
+                columns[column.DbColumnName] = tableFieldFactory.CreateField(column.DbColumnName, valueHolder);
+            }
+
+            return new DatabaseEntity(false, key, columns);
+        }
+        
+        public IDatabaseTableData? CreateDatabaseTable(DatabaseTableDefinitionJson tableDefinition,
+            uint[] keys,
             IList<Dictionary<string, (System.Type type, object value)>> fieldsFromDb)
         {
-            //var tableCategories = new List<IDatabaseFieldsGroup>(tableDefinition.Groups.Count);
-            //var tableIndex = fieldsFromDb[tableDefinition.TablePrimaryKeyColumnName].ToString();
-
+            HashSet<uint> providedKeys = new();
+            
             List<DatabaseEntity> rows = new();
             foreach (var entity in fieldsFromDb)
             {
+                uint? key = null;
                 Dictionary<string, IDatabaseField> columns = new();
                 foreach (var column in entity)
                 {
@@ -83,11 +120,27 @@ namespace WDE.DatabaseEditors.Data
                         throw new NotImplementedException();
                     }
 
+                    if (column.Key == tableDefinition.TablePrimaryKeyColumnName)
+                    {
+                        if (valueHolder is ValueHolder<long> longKey)
+                        {
+                            key = (uint)longKey.Value;
+                            providedKeys.Add(key.Value);
+                        }
+                    }
+                    
                     columns[column.Key] = tableFieldFactory.CreateField(column.Key, valueHolder);
                 }
-                rows.Add(new DatabaseEntity(columns));
+                if (key.HasValue)
+                    rows.Add(new DatabaseEntity(true, key.Value, columns));
             }
-            
+
+            foreach (var key in keys)
+            {
+                if (!providedKeys.Contains(key))
+                    rows.Add(BuildEmptyEntity(tableDefinition, key));
+            }
+
             try
             {
                 return new DatabaseTableData(tableDefinition, rows);
@@ -104,10 +157,6 @@ namespace WDE.DatabaseEditors.Data
         public IDatabaseTableData? GetDatabaseMultiRecordTable(uint key, in DatabaseTableDefinitionJson tableDefinition,
             IList<Dictionary<string, object>> records)
         {
-            // no support for swap data (at least for now) cuz simply no need for that
-            // if (!string.IsNullOrWhiteSpace(tableDefinition.NameSwapFilePath))
-            //     nameSwapDataManager.Value.RegisterSwapDefinition(tableDefinition.Name, tableDefinition.NameSwapFilePath);
-
             try
             {
                 var columns = new List<IDatabaseColumn>(tableDefinition.Groups[0].Fields.Count);

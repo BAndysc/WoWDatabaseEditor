@@ -121,8 +121,35 @@ namespace WDE.DatabaseEditors.ViewModels
                     return;
 
                 var data = await tableDataProvider.Load(tableData.TableDefinition.TableName, (uint) selected);
-                TableData = (DatabaseTableData)data!;
+                
+                if (data == null)
+                    return;
+
+                foreach (var entity in data.Entities)
+                {
+                    if (ContainsEntity(entity))
+                    {
+                        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Entity already added")
+                            .SetMainInstruction($"Entity {entity.Key} is already added to the editor")
+                            .WithOkButton(false)
+                            .SetIcon(MessageBoxIcon.Information)
+                            .Build());
+                        continue;
+                    }
+                    
+                    if (await AddEntity(entity))
+                        tableData.Entities.Add(entity);
+                }
             });
+        }
+
+        private bool ContainsEntity(DatabaseEntity entity)
+        {
+            foreach (var e in Entities)
+                if (e.Key == entity.Key)
+                    return true;
+            return false;
         }
 
         private async Task EditParameter(DatabaseCellViewModel cell)
@@ -175,7 +202,31 @@ namespace WDE.DatabaseEditors.ViewModels
                 }
             }
 
-            TableData = data;
+            {
+                Rows.Clear();
+                Entities.Clear();
+                Header.Clear();
+                groupVisibilityByName.Clear();
+                tableData = data;
+
+                int categoryIndex = 0;
+                int columnIndex = 0;
+
+                foreach (var group in tableData.TableDefinition.Groups)
+                {
+                    categoryIndex++;
+                    groupVisibilityByName[group.Name] = new ReactiveProperty<bool>(true);
+
+                    foreach (var column in group.Fields)
+                    {
+                        var row = new DatabaseRowViewModel(column, group, categoryIndex, columnIndex++);
+                        Rows.Add(row);
+                    }
+                }
+
+                await AsyncAddEntities(tableData.Entities);
+            }
+            
             SetupHistory();
             IsLoading = false;
         }
@@ -227,80 +278,82 @@ namespace WDE.DatabaseEditors.ViewModels
         public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
         public SourceList<DatabaseRowViewModel> Rows { get; } = new();
 
-        private DatabaseTableData tableData;
-        public DatabaseTableData TableData
+        public async Task<bool> AddEntity(DatabaseEntity entity)
         {
-            get => tableData;
-            set
+            if (!entity.ExistInDatabase)
             {
-                Rows.Clear();
-                Entities.Clear();
-                Header.Clear();
+                if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Entity doesn't exist in database")
+                    .SetMainInstruction($"Entity {entity.Key} doesn't exist in the database")
+                    .SetContent(
+                        "WoW Database Editor was mainly designed for `updating` existing items in the database, its features are limited when adding new templates.\n\nDo you want to continue?")
+                    .WithYesButton(true)
+                    .WithNoButton(false).Build()))
+                    return false;
+            }
+            Entities.Add(entity);
+            Header.Add(entity.GetCell(tableData.TableDefinition.TableNameSource)?.ToString() ?? "???");
+
+            foreach (var row in Rows.Items)
+            {
+                var column = row.ColumnData;
                 
-                groupVisibilityByName.Clear();
-                tableData = value;
-
-                int categoryIndex = 0;
-                int columnIndex = 0;
-                Entities.AddRange(tableData.Entities);
-                foreach (var entity in tableData.Entities)
-                    Header.Add(entity.GetCell(tableData.TableDefinition.TableNameSource)?.ToString() ?? "???");
-
-                foreach (var group in tableData.TableDefinition.Groups)
-                {
-                    categoryIndex++;
-                    groupVisibilityByName[group.Name] = new ReactiveProperty<bool>(true);
-
-                    foreach (var column in group.Fields)
-                    {
-                        var row = new DatabaseRowViewModel(column, group.Name, categoryIndex, columnIndex++);
-                        foreach (var entity in tableData.Entities)
-                        {
-                            var cell = entity.GetCell(column.DbColumnName);
-                            if (cell == null)
-                                throw new Exception("this should never happen");
+                var cell = entity.GetCell(column.DbColumnName);
+                if (cell == null)
+                    throw new Exception("this should never happen");
                             
-                            IParameterValue parameterValue = null!;
-                            if (cell is DatabaseField<long> longParam)
-                            {
-                                parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
-                            }
-                            else if (cell is DatabaseField<string> stringParam)
-                            {
-                                parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
-                            }
-                            else if (cell is DatabaseField<float> floatParameter)
-                            {
-                                parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
-                            }
+                IParameterValue parameterValue = null!;
+                if (cell is DatabaseField<long> longParam)
+                {
+                    parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
+                }
+                else if (cell is DatabaseField<string> stringParam)
+                {
+                    parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
+                }
+                else if (cell is DatabaseField<float> floatParameter)
+                {
+                    parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
+                }
 
-                            IObservable<bool>? cellVisible = null;
-                            if (group.ShowIf.HasValue)
-                            {
-                                var compareCell = entity.GetCell(group.ShowIf.Value.ColumnName);
-                                if (compareCell != null && compareCell is DatabaseField<long> lField)
-                                {
-                                    var comparedValue = group.ShowIf.Value.Value;
-                                    cellVisible = Observable.Select(lField.Current.ToObservable(p => p.Value), val => val == comparedValue);
-                                }
-                            }
-
-                            var cellViewModel = AutoDispose(new DatabaseCellViewModel(row, cell, parameterValue, cellVisible));
-                            row.Cells.Add(cellViewModel);
-                        }
-                        Rows.Add(row);
+                IObservable<bool>? cellVisible = null;
+                var group = row.GroupData;
+                if (group.ShowIf.HasValue)
+                {
+                    var compareCell = entity.GetCell(group.ShowIf.Value.ColumnName);
+                    if (compareCell != null && compareCell is DatabaseField<long> lField)
+                    {
+                        var comparedValue = group.ShowIf.Value.Value;
+                        cellVisible = Observable.Select(lField.Current.ToObservable(p => p.Value), val => val == comparedValue);
                     }
                 }
 
-                foreach (var e in tableData.Entities)
-                {
-                    var cell = e.GetCell("type");
-                    if (cell == null)
-                        continue;
-                    cell.PropertyChanged += (_, _) => ReEvalVisibility();
-                }
-                ReEvalVisibility();
+                var cellViewModel = AutoDispose(new DatabaseCellViewModel(row, cell, parameterValue, cellVisible));
+                row.Cells.Add(cellViewModel);
             }
+            
+            var typeCell = entity.GetCell("type");
+            if (typeCell == null)
+                return true;
+            typeCell.PropertyChanged += (_, _) => ReEvalVisibility();
+
+            return true;
+        }
+        
+        private DatabaseTableData tableData;
+
+        private async Task AsyncAddEntities(List<DatabaseEntity> tableDataEntities)
+        {
+            List<DatabaseEntity> finalList = new();
+            foreach (var entity in tableData.Entities)
+            {
+                if (await AddEntity(entity))
+                    finalList.Add(entity);
+            }
+
+            tableData = new DatabaseTableData(tableData.TableDefinition, finalList);
+
+            ReEvalVisibility();
         }
 
         private void ReEvalVisibility()

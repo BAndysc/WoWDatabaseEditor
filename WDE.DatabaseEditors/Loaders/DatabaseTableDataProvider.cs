@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Factories;
@@ -18,13 +19,18 @@ namespace WDE.DatabaseEditors.Loaders
     {
         private readonly ITableDefinitionProvider tableDefinitionProvider;
         private readonly IMySqlExecutor sqlExecutor;
+        private readonly IMessageBoxService messageBoxService;
         private readonly IDatabaseTableModelGenerator tableModelGenerator;
         
-        public DatabaseTableDataProvider(ITableDefinitionProvider tableDefinitionProvider, IMySqlExecutor sqlExecutor, IDatabaseFieldFactory tableFieldFactory, 
+        public DatabaseTableDataProvider(ITableDefinitionProvider tableDefinitionProvider, 
+            IMySqlExecutor sqlExecutor,
+            IDatabaseFieldFactory tableFieldFactory, 
+            IMessageBoxService messageBoxService,
             IDatabaseTableModelGenerator tableModelGenerator)
         {
             this.tableDefinitionProvider = tableDefinitionProvider;
             this.sqlExecutor = sqlExecutor;
+            this.messageBoxService = messageBoxService;
             this.tableModelGenerator = tableModelGenerator;
         }
 
@@ -45,61 +51,34 @@ namespace WDE.DatabaseEditors.Loaders
             
             var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
             IList<Dictionary<string, (Type, object)>>? result = null;
-            
+
             try
             {
                 result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
             }
+            catch (IMySqlExecutor.CannotConnectToDatabaseException e)
+            {
+            }
             catch (Exception e)
             {
-
+                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Database error")
+                    .SetMainInstruction(
+                        "Unable to execute SQL query. Most likely your database is incompatible with provided database schema, if you think this is a bug, report it via Help -> Report Bug")
+                    .SetContent(e.ToString())
+                    .SetIcon(MessageBoxIcon.Error)
+                    .WithOkButton(false)
+                    .Build());
+                return null;
             }
 
-            if (result == null || result.Count == 0)
-                result = BuildEmptyEntities(definition, keys).ToList();
+            if (result == null)
+                result = new List<Dictionary<string, (Type, object)>>();
 
             //if (definition.IsMultiRecord)
             //    return tableModelGenerator.GetDatabaseMultiRecordTable(key, definition, result);
 
-            return tableModelGenerator.GetDatabaseTable(definition, result);
-        }
-
-        private IEnumerable<Dictionary<string, (Type, object)>> BuildEmptyEntities(DatabaseTableDefinitionJson definition, uint[] keys)
-        {
-            foreach (var key in keys)
-            {
-                Dictionary<string, (Type type, object value)> entity = new();
-                foreach (var column in definition.Groups.SelectMany(t => t.Fields)
-                    .Distinct(
-                        EqualityComparerFactory.Create<DbEditorTableGroupFieldJson>(
-                            f => f.DbColumnName.GetHashCode(),
-                            (a, b) => a.DbColumnName.Equals(b.DbColumnName))))
-                {
-                    Type type = typeof(string);
-                    object value = "";
-                    if (column.ValueType == "float")
-                    {
-                        type = typeof(float);
-                        value = 0.0f;
-                    }
-                    else if (column.ValueType.EndsWith("Parameter") || column.ValueType == "int" ||
-                             column.ValueType == "uint")
-                    {
-                        type = typeof(int);
-                        value = 0;
-                    }
-
-                    if (column.DbColumnName == definition.TablePrimaryKeyColumnName)
-                    {
-                        type = typeof(int);
-                        value = (int)key;
-                    }
-
-                    entity[column.DbColumnName] = (type, value);
-                }
-
-                yield return entity;
-            }
+            return tableModelGenerator.CreateDatabaseTable(definition, keys, result);
         }
     }
 }
