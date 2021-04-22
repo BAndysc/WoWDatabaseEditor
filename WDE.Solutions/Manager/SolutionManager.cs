@@ -27,6 +27,11 @@ namespace WDE.Solutions.Manager
         public event System.Action<ISolutionItem>? RefreshRequest;
         public ObservableCollection<ISolutionItem> Items { get; }
 
+        public void RefreshAll()
+        {
+            RefreshRequest?.Invoke(null);
+        }
+
         public void Refresh(ISolutionItem item)
         {
             RefreshRequest?.Invoke(item);

@@ -1,8 +1,11 @@
 ﻿{
   "name": "Creature Template",
+  "description": "Edit existing creature templates",
   "table_name": "creature_template",
   "table_index_name": "entry",
   "table_name_source_field": "name",
+  "single_solution_name": "Creature {name} template",
+  "multi_solution_name": "Multiple creatures template",
   "picker": "CreatureParameter",
   "groups": [
     {

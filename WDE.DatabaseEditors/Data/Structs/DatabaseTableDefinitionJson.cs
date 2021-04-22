@@ -10,6 +10,15 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "name")] 
         public string Name { get; set; } = "";
         
+        [JsonProperty(PropertyName = "single_solution_name")] 
+        public string SingleSolutionName { get; set; } = "";
+        
+        [JsonProperty(PropertyName = "multi_solution_name")] 
+        public string MultiSolutionName { get; set; } = "";
+        
+        [JsonProperty(PropertyName = "description")] 
+        public string Description { get; set; } = "";
+        
         [JsonProperty(PropertyName = "table_name")]
         public string TableName { get; set; } = "";
         

@@ -41,9 +41,8 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates()
         {
-            var task = GetCreatureTemplatesAsync();
-            task.Wait();
-            return task.Result;
+            using var model = new TrinityDatabase();
+            return model.CreatureTemplate.OrderBy(t => t.Entry).ToList<ICreatureTemplate>();
         }
         
         public async Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync()
@@ -60,22 +59,23 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<IGameEvent> GetGameEvents()
         {
-            var task = GetGameEventsAsync();
-            task.Wait();
-            return task.Result;
+            using var model = new TrinityDatabase();
+            return (from t in model.GameEvents orderby t.Entry select t).ToList<IGameEvent>();
         }
         
         public async Task<List<IGameEvent>> GetGameEventsAsync()
         {
-            using var model = new TrinityDatabase();
+            await using var model = new TrinityDatabase();
             return await (from t in model.GameEvents orderby t.Entry select t).ToListAsync<IGameEvent>();
         }
         
         public IEnumerable<IConversationTemplate> GetConversationTemplates()
         {
-            var task = GetConversationTemplatesAsync();
-            task.Wait();
-            return task.Result;
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
+                return new List<IConversationTemplate>();
+            
+            using var model = new TrinityDatabase();
+            return (from t in model.ConversationTemplate orderby t.Id select t).ToList<IConversationTemplate>();
         }
         
         public async Task<List<IConversationTemplate>> GetConversationTemplatesAsync()
@@ -83,7 +83,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
                 return new List<IConversationTemplate>();
             
-            using var model = new TrinityDatabase();
+            await using var model = new TrinityDatabase();
             return await (from t in model.ConversationTemplate orderby t.Id select t).ToListAsync<IConversationTemplate>();
         }
         
@@ -99,39 +99,42 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
                 return new List<IAreaTriggerTemplate>();
 
-            using var model = new TrinityDatabase();
+            await using var model = new TrinityDatabase();
             return await (from t in model.AreaTriggerTemplate orderby t.Id select t).ToListAsync<IAreaTriggerTemplate>();
         }
         
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
         {
-            var task = GetGameObjectTemplatesAsync();
-            task.Wait();
-            return task.Result;
+            using var model = new TrinityDatabase();
+            return (from t in model.GameObjectTemplate orderby t.Entry select t).ToList<IGameObjectTemplate>();
         }
         
         public async Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync()
         {
-            using var model = new TrinityDatabase();
+            await using var model = new TrinityDatabase();
             return await (from t in model.GameObjectTemplate orderby t.Entry select t).ToListAsync<IGameObjectTemplate>();
         }
-
-        public IEnumerable<IQuestTemplate> GetQuestTemplates()
+        
+        private IQueryable<MySqlQuestTemplate> GetQuestsQuery(TrinityDatabase model)
         {
-            var task = GetQuestTemplatesAsync();
-            task.Wait();
-            return task.Result;
+            return (from t in model.QuestTemplate
+                join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
+                from subaddon in adn.DefaultIfEmpty()
+                orderby t.Entry
+                select t.SetAddon(subaddon));
         }
         
-        public async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+        public IEnumerable<IQuestTemplate> GetQuestTemplates()
         {
             using var model = new TrinityDatabase();
 
-            return await (from t in model.QuestTemplate
-                    join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
-                    from subaddon in adn.DefaultIfEmpty()
-                    orderby t.Entry
-                    select t.SetAddon(subaddon)).ToListAsync<IQuestTemplate>();
+            return GetQuestsQuery(model).ToList<IQuestTemplate>();
+        }
+
+        public async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+        {
+            await using var model = new TrinityDatabase();
+            return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)

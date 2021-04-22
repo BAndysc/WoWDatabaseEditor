@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using WDBXEditor.Reader;
 using WDBXEditor.Storage;
+using WDE.Common;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Tasks;
@@ -24,14 +25,16 @@ namespace WDE.DbcStore
     public class DbcStore : IDbcStore, ISpellStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
+        private readonly ISolutionManager solutionManager;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
 
-        public DbcStore(IParameterFactory parameterFactory, ITaskRunner taskRunner, IDbcSettingsProvider settingsProvider)
+        public DbcStore(IParameterFactory parameterFactory, ITaskRunner taskRunner, IDbcSettingsProvider settingsProvider, ISolutionManager solutionManager)
         {
             this.parameterFactory = parameterFactory;
             this.taskRunner = taskRunner;
             dbcSettingsProvider = settingsProvider;
+            this.solutionManager = solutionManager;
 
             Load();
         }
@@ -176,6 +179,8 @@ namespace WDE.DbcStore
                 parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore));
                 parameterFactory.Register("QuestInfoParameter", new DbcParameter(QuestInfoStore));
                 parameterFactory.Register("CharTitleParameter", new DbcParameter(CharTitleStore));
+                
+                store.solutionManager.RefreshAll();
             }
 
             private int max = 0;

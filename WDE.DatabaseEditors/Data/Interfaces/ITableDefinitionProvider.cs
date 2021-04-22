@@ -1,4 +1,5 @@
-﻿using WDE.DatabaseEditors.Data.Structs;
+﻿using System.Collections.Generic;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Data.Interfaces
@@ -7,5 +8,6 @@ namespace WDE.DatabaseEditors.Data.Interfaces
     public interface ITableDefinitionProvider
     {
         DatabaseTableDefinitionJson? GetDefinition(string tableName);
+        IEnumerable<DatabaseTableDefinitionJson> Definitions { get; }
     }
 }

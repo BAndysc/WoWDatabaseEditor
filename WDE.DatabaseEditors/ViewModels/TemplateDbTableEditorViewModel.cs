@@ -17,6 +17,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Structs;
@@ -37,6 +38,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly ISolutionManager solutionManager;
         private readonly IParameterFactory parameterFactory;
         private readonly ISolutionTasksService solutionTasksService;
+        private readonly ISolutionItemNameRegistry solutionItemName;
         private readonly IQueryGenerator queryGenerator;
 
         private readonly DatabaseTableSolutionItem solutionItem;
@@ -47,6 +49,7 @@ namespace WDE.DatabaseEditors.ViewModels
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
+            ISolutionItemNameRegistry solutionItemName,
             IQueryGenerator queryGenerator)
         {
             SolutionItem = solutionItem;
@@ -57,14 +60,15 @@ namespace WDE.DatabaseEditors.ViewModels
             this.solutionManager = solutionManager;
             this.parameterFactory = parameterFactory;
             this.solutionTasksService = solutionTasksService;
+            this.solutionItemName = solutionItemName;
             this.queryGenerator = queryGenerator;
             History = history;
             tableDefinition = null!;
             
             IsLoading = true;
             taskRunner.ScheduleTask($"Loading {solutionItem.TableId}..", LoadTableDefinition);
-            
-            Title = $"{solutionItem.TableId} Editor";
+
+            title = solutionItemName.GetName(solutionItem);
 
             undoCommand = new DelegateCommand(History.Undo, CanUndo);
             redoCommand = new DelegateCommand(History.Redo, CanRedo);
@@ -300,6 +304,7 @@ namespace WDE.DatabaseEditors.ViewModels
             solutionManager.Refresh(solutionItem);
             solutionTasksService.SaveSolutionToDatabaseTask(solutionItem);
             History.MarkAsSaved();
+            Title = solutionItemName.GetName(solutionItem);
         }
         
         public ObservableCollection<DatabaseEntity> Entities { get; } = new();
@@ -402,7 +407,8 @@ namespace WDE.DatabaseEditors.ViewModels
             }
 
             Entities.Insert(index, entity);
-            Header.Insert(index, entity.GetCell(tableDefinition.TableNameSource)?.ToString() ?? "???");
+            var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key);
+            Header.Insert(index, name);
 
             var typeCell = entity.GetCell("type");
             if (typeCell == null)
@@ -478,8 +484,13 @@ namespace WDE.DatabaseEditors.ViewModels
             get => searchText;
             set => SetProperty(ref searchText, value);
         }
-        
-        public string Title { get; }
+
+        private string title;
+        public string Title
+        {
+            get => title;
+            set => SetProperty(ref title, value);
+        }
         public ICommand Undo => undoCommand;
         public ICommand Redo => redoCommand;
         public ICommand Copy => AlwaysDisabledCommand.Command;

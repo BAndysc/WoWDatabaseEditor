@@ -27,5 +27,7 @@ namespace WDE.DatabaseEditors.Data
                 return definition;
             return null;
         }
+
+        public IEnumerable<DatabaseTableDefinitionJson> Definitions => definitions.Values;
     }
 }

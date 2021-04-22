@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
 using WDE.Common.Types;
@@ -18,6 +19,13 @@ namespace WDE.Common
         bool IsCompatibleWithCore(ICoreVersion core);
 
         Task<ISolutionItem> CreateSolutionItem();
+    }
+    
+    // Dynamic provider of ISolutionItemProvider
+    [NonUniqueProvider]
+    public interface ISolutionItemProviderProvider
+    {
+        IEnumerable<ISolutionItemProvider> Provide();
     }
 
     public interface INamedSolutionItemProvider : ISolutionItemProvider

@@ -1,8 +1,11 @@
 {
   "name": "Quest Template",
+  "description": "Edit existing quest templates",
   "table_name": "quest_template",
   "table_index_name": "ID",
   "table_name_source_field": "LogTitle",
+  "single_solution_name": "Quest {name} template",
+  "multi_solution_name": "Multiple quests template",
   "picker": "QuestParameter",
   "groups": [
     {
