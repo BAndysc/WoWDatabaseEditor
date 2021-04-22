@@ -37,6 +37,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
         private readonly ISolutionTasksService solutionTasksService;
+        private readonly IQueryGenerator queryGenerator;
 
         private readonly DatabaseTableSolutionItem solutionItem;
         private readonly IDatabaseTableDataProvider tableDataProvider;
@@ -55,6 +56,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.messageBoxService = messageBoxService;
             this.parameterFactory = parameterFactory;
             this.solutionTasksService = solutionTasksService;
+            this.queryGenerator = queryGenerator;
             History = history;
             tableData = null!;
             
@@ -63,26 +65,21 @@ namespace WDE.DatabaseEditors.ViewModels
             
             Title = $"{solutionItem.TableId} Editor";
 
-            undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
-            redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
+            undoCommand = new DelegateCommand(History.Undo, CanUndo);
+            redoCommand = new DelegateCommand(History.Redo, CanRedo);
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
             Save = new DelegateCommand(SaveSolutionItem);
 
-            CurrentFilter = FunctionalExtensions.Select<string, Func<DatabaseRowViewModel, bool>>(this.ToObservable(t => t.SearchText), text =>
-                {
-                    if (string.IsNullOrEmpty(text))
-                        return item => true;
-                    var lower = text.ToLower();
-                    return item => item.Name.ToLower().Contains(lower);
-                });
+            CurrentFilter = FunctionalExtensions.Select(this.ToObservable(t => t.SearchText), FilterItem);
 
+            var comparer = Comparer<DatabaseRowsGroupViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder));
             AutoDispose(Rows.Connect()
                 .Filter(CurrentFilter)
                 .GroupOn(t => (t.CategoryName, t.CategoryIndex))
-                .Transform(group => new DatabaseRowsGroupViewModel(group, GetGroupVisibility(group.GroupKey.CategoryName)))
+                .Transform(GroupCreate)
                 .DisposeMany()
                 .FilterOnObservable(t => t.ShowGroup)
-                .Sort(Comparer<DatabaseRowsGroupViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder)))
+                .Sort(comparer)
                 .Bind(out ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> filteredFields)
                 .Subscribe(a =>
                 {
@@ -91,57 +88,82 @@ namespace WDE.DatabaseEditors.ViewModels
             FilteredRows = filteredFields;
 
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
-                .Subscribe(args =>
+                .Subscribe(ExecuteSql));
+
+            RevertCommand = new DelegateCommand<DatabaseCellViewModel>(Revert);
+            SetNullCommand = new DelegateCommand<DatabaseCellViewModel>(SetNull);
+
+            AddNewCommand = new AsyncAutoCommand(AddNew);
+        }
+
+        private void ExecuteSql(EventRequestGenerateSqlArgs args)
+        {
+            if (args.Item is DatabaseTableSolutionItem dbEditItem)
+            {
+                if (solutionItem.Equals(dbEditItem))
                 {
-                    if (args.Item is DatabaseTableSolutionItem dbEditItem)
-                    {
-                        if (solutionItem.Equals(dbEditItem))
-                        {
-                            args.Sql = queryGenerator.GenerateQuery(tableData);
-                        }
-                    }
-                }));
-
-            RevertCommand = new DelegateCommand<DatabaseCellViewModel>(view =>
-            {
-                if (!view.Parent.IsReadOnly)
-                    view.ParameterValue.Revert();
-            });
-            SetNullCommand = new DelegateCommand<DatabaseCellViewModel>(view =>
-            {
-                if (view.CanBeNull && !view.Parent.IsReadOnly)
-                    view.ParameterValue.SetNull();
-            });
-
-            AddNewCommand = new AsyncAutoCommand(async () =>
-            {
-                var parameter = this.parameterFactory.Factory(tableData.TableDefinition.Picker);
-                var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
-                if (!selected.HasValue)
-                    return;
-
-                var data = await tableDataProvider.Load(tableData.TableDefinition.TableName, (uint) selected);
-                
-                if (data == null)
-                    return;
-
-                foreach (var entity in data.Entities)
-                {
-                    if (ContainsEntity(entity))
-                    {
-                        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                            .SetTitle("Entity already added")
-                            .SetMainInstruction($"Entity {entity.Key} is already added to the editor")
-                            .WithOkButton(false)
-                            .SetIcon(MessageBoxIcon.Information)
-                            .Build());
-                        continue;
-                    }
-                    
-                    if (await AddEntity(entity))
-                        tableData.Entities.Add(entity);
+                    args.Sql = queryGenerator.GenerateQuery(tableData);
                 }
-            });
+            }
+        }
+        
+        private async Task AddNew()
+        {
+            var parameter = this.parameterFactory.Factory(tableData.TableDefinition.Picker);
+            var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
+            if (!selected.HasValue) return;
+
+            var data = await tableDataProvider.Load(tableData.TableDefinition.TableName, (uint) selected);
+
+            if (data == null) return;
+
+            foreach (var entity in data.Entities)
+            {
+                if (ContainsEntity(entity))
+                {
+                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Entity already added")
+                        .SetMainInstruction($"Entity {entity.Key} is already added to the editor")
+                        .WithOkButton(false)
+                        .SetIcon(MessageBoxIcon.Information)
+                        .Build());
+                    continue;
+                }
+
+                if (await AddEntity(entity)) tableData.Entities.Add(entity);
+            }
+        }
+        
+        private void SetNull(DatabaseCellViewModel view)
+        {
+            if (view.CanBeNull && !view.Parent.IsReadOnly) view.ParameterValue.SetNull();
+        }
+
+        private void Revert(DatabaseCellViewModel view)
+        {
+            if (!view.Parent.IsReadOnly) view.ParameterValue.Revert();
+        }
+
+        private DatabaseRowsGroupViewModel GroupCreate(IGroup<DatabaseRowViewModel, (string CategoryName, int CategoryIndex)> @group)
+        {
+            return new (@group, GetGroupVisibility(@group.GroupKey.CategoryName));
+        }
+
+        private Func<DatabaseRowViewModel, bool> FilterItem(string text)
+        {
+            if (string.IsNullOrEmpty(text)) 
+                return _ => true;
+            var lower = text.ToLower();
+            return item => item.Name.ToLower().Contains(lower);
+        }
+
+        private bool CanRedo()
+        {
+            return History.CanRedo;
+        }
+
+        private bool CanUndo()
+        {
+            return History.CanUndo;
         }
 
         private bool ContainsEntity(DatabaseEntity entity)
