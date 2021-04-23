@@ -8,6 +8,7 @@
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
           xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
           xmlns:docking="clr-namespace:WoWDatabaseEditorCore.Avalonia.Docking"
+          xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindowWithDocking"
@@ -19,6 +20,10 @@
           utils:MenuBind.MenuItemsGestures="{Binding MenuItemProviders}"
           Title="{Binding Title}">
 
+    <controls:ExtendedWindow.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </controls:ExtendedWindow.Resources>
+    
     <NativeMenu.Menu>
         <NativeMenu utils:MenuBind.MenuItems="{Binding MenuItemProviders}">
         </NativeMenu>
@@ -67,5 +72,10 @@
         <idc:DockControl.DataTemplates>
             <docking:PersistentDockDataTemplate />
         </idc:DockControl.DataTemplates>
+        <idc:DockControl.Styles>
+            <Style Selector="idc|DocumentControl ContentControl#PART_ContentPresenter ContentPresenter">
+                <Setter Property="IsVisible" Value="{Binding IsLoading, FallbackValue=true, Converter={StaticResource InverseBoolConverter}}" />
+            </Style>
+        </idc:DockControl.Styles>
     </idc:DockControl>
 </controls:ExtendedWindow>
