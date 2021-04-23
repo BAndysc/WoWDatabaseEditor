@@ -8,6 +8,7 @@
   "table_name_source_field": "LogTitle",
   "single_solution_name": "Quest {name} template",
   "multi_solution_name": "Multiple quests template",
+  "reload_command": "reload quest_template",
   "picker": "QuestParameter",
   "foreign_tables": [
     {

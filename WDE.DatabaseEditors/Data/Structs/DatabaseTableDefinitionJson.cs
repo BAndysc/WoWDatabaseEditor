@@ -34,7 +34,10 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "multi_record")]
         public bool IsMultiRecord { get; set; }
-
+        
+        [JsonProperty(PropertyName = "reload_command")]
+        public string? ReloadCommand { get; set; }
+        
         [JsonProperty(PropertyName = "picker")]
         public string Picker { get; set; } = "";
 

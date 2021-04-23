@@ -22,6 +22,7 @@ using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
@@ -247,25 +248,8 @@ namespace WDE.DatabaseEditors.ViewModels
                     .Build());
                 return;
             }
-            
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            foreach (var solutionEntity in solutionItem.Entries)
-            {
-                var entity = data.Entities.FirstOrDefault(e => e.Key == solutionEntity.Key);
-                if (entity == null)
-                    continue;
-                
-                entity.ExistInDatabase = solutionEntity.ExistsInDatabase;
-                
-                if (solutionEntity.OriginalValues != null)
-                    foreach (var original in solutionEntity.OriginalValues)
-                    {
-                        var cell = entity.GetCell(original.ColumnName);
-                        if (cell == null)
-                            continue;
-                        cell.OriginalValue = original.OriginalValue;
-                    }
-            }
+
+            solutionItem.UpdateEntitiesWithOriginalValues(Entities);
 
             {
                 Rows.Clear();

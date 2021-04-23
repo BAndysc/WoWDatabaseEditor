@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using WDE.Common.Solution;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
@@ -31,6 +32,7 @@ namespace WDE.DatabaseEditors.Solution
             if (tableData == null)
                 return $"-- Unable to load data for {item} from the database";
 
+            item.UpdateEntitiesWithOriginalValues(tableData.Entities);
             return queryGenerator.GenerateQuery(tableData);
         }
 

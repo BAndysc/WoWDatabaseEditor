@@ -8,6 +8,7 @@
   "table_name_source_field": "name",
   "single_solution_name": "Creature {name} template",
   "multi_solution_name": "Multiple creatures template",
+  "reload_command": "reload creature_template",
   "picker": "CreatureParameter",
   "foreign_tables": [
     {
