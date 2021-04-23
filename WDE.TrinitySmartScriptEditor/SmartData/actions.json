@@ -819,19 +819,8 @@
         "name": "SMART_ACTION_SET_SHEATH",
         "parameters": [
             {
-                "type": "SwitchParameter",
-                "name": "Sheath Type",
-                "values": {
-                    "0": {
-                        "name": "Unarmed"
-                    },
-                    "1": {
-                        "name": "Melee"
-                    },
-                    "2": {
-                        "name": "Ranged"
-                    }
-                }
+                "type": "SheathStateParameter",
+                "name": "Sheath Type"
             }
         ],
         "description": "{source}: Set sheath to {pram1}",
@@ -2301,20 +2290,8 @@
         "name": "SMART_ACTION_SET_POWER",
         "parameters": [
             {
-                "type": "SwitchParameter",
-                "name": "Power type",
-                "values": {
-                    "0": {"name": "mana"},
-                    "1": {"name": "rage"},
-                    "2": {"name": "focus"},
-                    "3": {"name": "energy"},
-                    "5": {"name": "runes"},
-                    "6": {"name": "runic power"},
-                    "7": {"name": "soul shards"},
-                    "8": {"name": "eclipse"},
-                    "9": {"name": "holy power"},
-                    "10": {"name": "alternate power"}
-                }
+                "type": "PowerTypeParameter",
+                "name": "Power type"
             },
             {
                 "type": "Parameter",
@@ -2331,20 +2308,8 @@
         "name": "SMART_ACTION_ADD_POWER",
         "parameters": [
             {
-                "type": "SwitchParameter",
-                "name": "Power type",
-                "values": {
-                    "0": {"name": "mana"},
-                    "1": {"name": "rage"},
-                    "2": {"name": "focus"},
-                    "3": {"name": "energy"},
-                    "5": {"name": "runes"},
-                    "6": {"name": "runic power"},
-                    "7": {"name": "soul shards"},
-                    "8": {"name": "eclipse"},
-                    "9": {"name": "holy power"},
-                    "10": {"name": "alternate power"}
-                }
+                "type": "PowerTypeParameter",
+                "name": "Power type"
             },
             {
                 "type": "Parameter",
@@ -2361,20 +2326,8 @@
         "name": "SMART_ACTION_REMOVE_POWER",
         "parameters": [
             {
-                "type": "SwitchParameter",
-                "name": "Power type",
-                "values": {
-                    "0": {"name": "mana"},
-                    "1": {"name": "rage"},
-                    "2": {"name": "focus"},
-                    "3": {"name": "energy"},
-                    "5": {"name": "runes"},
-                    "6": {"name": "runic power"},
-                    "7": {"name": "soul shards"},
-                    "8": {"name": "eclipse"},
-                    "9": {"name": "holy power"},
-                    "10": {"name": "alternate power"}
-                }
+                "type": "PowerTypeParameter",
+                "name": "Power type"
             },
             {
                 "type": "Parameter",

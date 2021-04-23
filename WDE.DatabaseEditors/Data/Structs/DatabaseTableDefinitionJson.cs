@@ -49,6 +49,9 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         [JsonIgnore] 
         public IDictionary<string, DbEditorTableGroupFieldJson> TableColumns { get; set; } = null!;
+        
+        [JsonIgnore] 
+        public IDictionary<string, DatabaseForeignTableJson> ForeignTableByName { get; set; } = null!;
     }
 
     public struct DatabaseForeignTableJson

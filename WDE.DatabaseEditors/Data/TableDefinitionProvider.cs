@@ -29,6 +29,15 @@ namespace WDE.DatabaseEditors.Data
                         definition.TableColumns[column.DbColumnName] = column;
                     }
                 }
+
+                if (definition.ForeignTable != null)
+                {
+                    definition.ForeignTableByName = new Dictionary<string, DatabaseForeignTableJson>();
+                    foreach (var foreign in definition.ForeignTable)
+                    {
+                        definition.ForeignTableByName[foreign.TableName] = foreign;
+                    }
+                }
                 
                 if (definition.Compatibility.Contains(currentCoreVersion.Current.Tag))
                     definitions[definition.Id] = definition;

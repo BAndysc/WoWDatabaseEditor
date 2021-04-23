@@ -2116,5 +2116,136 @@
 			"512": {"name": "DAMAGED", "description": "Gameobject has been siege damaged"},
 			"1024": {"name": "DESTROYED", "description": "Gameobject has been destroyed"}
 		}
+	},
+	"GenderParameter": {
+		"name": "Gender",
+		"values": {
+			"0": {"name": "male"},
+			"1": {"name": "female"},
+			"2": {"name": "none"}
+		}
+	},
+	"PowerTypeParameter": {
+		"name": "Power type",
+		"values": {
+			"0": {"name": "mana"},
+			"1": {"name": "rage"},
+			"2": {"name": "focus"},
+			"3": {"name": "energy"},
+			"5": {"name": "runes"},
+			"6": {"name": "runic power"},
+			"7": {"name": "soul shards"},
+			"8": {"name": "eclipse"},
+			"9": {"name": "holy power"},
+			"10": {"name": "alternate power"}
+		}
+	},
+	"StandStateParameter": {
+		"prefix": "UNIT_STAND_",
+		"name": "Stand state",
+		"values": {
+			"0": {"name": "STAND"},
+			"1": {"name": "SIT"},
+			"2": {"name": "SIT_CHAIR"},
+			"3": {"name": "SLEEP"},
+			"4": {"name": "SIT_LOW_CHAIR"},
+			"5": {"name": "SIT_MEDIUM_CHAIR"},
+			"6": {"name": "SIT_HIGH_CHAIR power"},
+			"7": {"name": "DEAD"},
+			"8": {"name": "KNEEL"},
+			"9": {"name": "SUBMERGED"}
+		}
+	},
+	"UnitStandFlagParameter": {
+		"isflag": true,
+		"prefix": "UNIT_STAND_FLAGS_",
+		"name": "Unit stand",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "UNK1"},
+			"2": {"name": "CREEP"},
+			"4": {"name": "UNTRACKABLE"},
+			"8": {"name": "UNK4"},
+			"16": {"name": "UNK5"}
+		}
+	},
+	"AnimationTierParameter": {
+		"name": "Animation tier",
+		"values": {
+			"0": {"name": "Ground"},
+			"1": {"name": "Swim"},
+			"2": {"name": "Hover"},
+			"3": {"name": "Fly"},
+			"4": {"name": "Submerged"}
+		}
+	},
+	"SheathStateParameter": {
+		"name": "Sheath state",
+		"values": {
+			"0": {"name": "Unarmed"},
+			"1": {"name": "Melee"},
+			"2": {"name": "Ranged"}
+		}
+	},
+	"UnitPVPStateFlagParameter": {
+		"isflag": true,
+		"prefix": "UNIT_BYTE2_FLAG_",
+		"name": "Unit stand",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "PVP"},
+			"2": {"name": "UNK1"},
+			"4": {"name": "FFA_PVP"},
+			"8": {"name": "SANCTUARY"},
+			"16": {"name": "UNK4"},
+			"32": {"name": "UNK5"},
+			"64": {"name": "UNK6"},
+			"128": {"name": "UNK7"}
+		}
+	},
+	"UnitBytesPetFlagParameter": {
+		"isflag": true,
+		"name": "Pet flags (bytes 2)",
+		"values": {
+			"1": {"name": "can be renamed"},
+			"2": {"name": "can be abandoned"}
+		}
+	},
+	"ShapeshiftFormParameter": {
+		"prefix": "FORM_",
+		"name": "Shapeshift form",
+		"values": {
+			"0": {"name": "NONE"},
+			"1": {"name": "CAT"},
+			"2": {"name": "TREE"},
+			"3": {"name": "TRAVEL"},
+			"4": {"name": "AQUA"},
+			"5": {"name": "BEAR"},
+			"6": {"name": "AMBIENT"},
+			"7": {"name": "GHOUL"},
+			"8": {"name": "DIREBEAR"},
+			"9": {"name": "STEVES_GHOUL"},
+			"10": {"name": "THARONJA_SKELETON"},
+			"11": {"name": "TEST_OF_STRENGTH"},
+			"12": {"name": "BLB_PLAYER"},
+			"13": {"name": "SHADOW_DANCE"},
+			"14": {"name": "CREATUREBEAR"},
+			"15": {"name": "CREATURECAT"},
+			"16": {"name": "GHOSTWOLF"},
+			"17": {"name": "BATTLESTANCE"},
+			"18": {"name": "DEFENSIVESTANCE"},
+			"19": {"name": "BERSERKERSTANCE"},
+			"20": {"name": "TEST"},
+			"21": {"name": "ZOMBIE"},
+			"22": {"name": "METAMORPHOSIS"},
+			"25": {"name": "UNDEAD"},
+			"26": {"name": "MASTER_ANGLER"},
+			"27": {"name": "FLIGHT_EPIC"},
+			"28": {"name": "SHADOW"},
+			"29": {"name": "FLIGHT"},
+			"30": {"name": "STEALTH"},
+			"31": {"name": "MOONKIN"},
+			"32": {"name": "SPIRITOFREDEMPTION"}
+		}
 	}
 }

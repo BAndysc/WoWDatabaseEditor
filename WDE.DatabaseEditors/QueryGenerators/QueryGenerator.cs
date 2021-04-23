@@ -27,8 +27,13 @@ namespace WDE.DatabaseEditors.QueryGenerators
         public string GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity,
             IDatabaseField field)
         {
+            var column = table.TableColumns[field.FieldName];
+            string primaryKeyColumn = table.TablePrimaryKeyColumnName;
+            if (column.ForeignTable != null)
+                primaryKeyColumn = table.ForeignTableByName[column.ForeignTable].ForeignKey;
+            
             return
-                $"UPDATE {table.TableName} SET `{field.FieldName}` = {field.ToQueryString()} WHERE `{table.TablePrimaryKeyColumnName}` = {entity.Key};";
+                $"UPDATE {table.TableName} SET `{field.FieldName}` = {field.ToQueryString()} WHERE `{primaryKeyColumn}` = {entity.Key};";
         }
         
         private string GenerateUpdateQuery(IDatabaseTableData tableData)
@@ -45,7 +50,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         .ToDictionary(g => g.Key, g => g.ToList());
 
                     foreach (var foreign in tableData.TableDefinition.ForeignTable)
-                        fieldsByTable[foreign.TableName].Insert(0, entity.GetCell(tableData.TableDefinition.TablePrimaryKeyColumnName)!);
+                        fieldsByTable[foreign.TableName].Insert(0, new DatabaseField<uint>(foreign.ForeignKey, new ValueHolder<uint>(entity.Key)));
                 }
                 else
                 {
@@ -65,11 +70,15 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         if (string.IsNullOrEmpty(updates))
                             continue;
 
+                        string primaryKeyColumn = tableData.TableDefinition.TablePrimaryKeyColumnName;
                         if (table.Key != tableData.TableDefinition.TableName)
+                        {
+                            primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKey;
                             query.AppendLine(
-                                $"INSERT IGNORE INTO {table.Key} (`{tableData.TableDefinition.TablePrimaryKeyColumnName}`) VALUES ({entity.Key});");
+                                $"INSERT IGNORE INTO {table.Key} (`{primaryKeyColumn}`) VALUES ({entity.Key});");
+                        }
                         
-                        var updateQuery = $"UPDATE `{table.Key}` SET {updates} WHERE `{tableData.TableDefinition.TablePrimaryKeyColumnName}`= {entity.Key};";
+                        var updateQuery = $"UPDATE `{table.Key}` SET {updates} WHERE `{primaryKeyColumn}`= {entity.Key};";
                         query.AppendLine(updateQuery);
                     }
                 }
@@ -77,8 +86,12 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 {
                     foreach (var table in fieldsByTable)
                     {
+                        string primaryKeyColumn = tableData.TableDefinition.TablePrimaryKeyColumnName;
+                        if (table.Key != tableData.TableDefinition.TableName)
+                            primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKey;
+                        
                         query.AppendLine(
-                            $"DELETE FROM {table.Key} WHERE `{tableData.TableDefinition.TablePrimaryKeyColumnName}` = {entity.Key};");
+                            $"DELETE FROM {table.Key} WHERE `{primaryKeyColumn}` = {entity.Key};");
                         var columns = string.Join(", ", table.Value.Select(f => $"`{f.FieldName}`"));
                         query.AppendLine($"INSERT INTO {table.Key} ({columns}) VALUES");
                         var values = string.Join(", ", table.Value.Select(f => f.ToQueryString()));
