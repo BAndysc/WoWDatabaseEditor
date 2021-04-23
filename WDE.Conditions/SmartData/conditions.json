@@ -560,7 +560,7 @@
 		"help": "Condition is met if there is gameobject nearby target",
 		"parameters": [
 			{
-				"type": "GameObjectParameter",
+				"type": "GameobjectParameter",
 				"name": "Gameobject"
 			},
 			{
