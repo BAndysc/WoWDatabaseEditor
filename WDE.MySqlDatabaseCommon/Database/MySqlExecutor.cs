@@ -12,18 +12,23 @@ namespace WDE.MySqlDatabaseCommon.Database
     public class MySqlExecutor : IMySqlExecutor
     {
         private readonly IMySqlConnectionStringProvider connectionString;
+        private readonly IDatabaseProvider databaseProvider;
         private readonly DatabaseLogger databaseLogger;
+        
+        public bool IsConnected => databaseProvider.IsConnected;
 
         public MySqlExecutor(IMySqlConnectionStringProvider connectionString,
+            IDatabaseProvider databaseProvider,
             DatabaseLogger databaseLogger)
         {
             this.connectionString = connectionString;
+            this.databaseProvider = databaseProvider;
             this.databaseLogger = databaseLogger;
         }
 
         public async Task ExecuteSql(string query)
         {
-            if (string.IsNullOrEmpty(query))
+            if (string.IsNullOrEmpty(query) || !IsConnected)
                 return;
 
             databaseLogger.Log(query, null, TraceLevel.Info);
@@ -59,7 +64,7 @@ namespace WDE.MySqlDatabaseCommon.Database
 
         public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)
         {
-            if (string.IsNullOrEmpty(query))
+            if (string.IsNullOrEmpty(query) || !IsConnected)
                 return new List<Dictionary<string, (Type, object)>>();
 
             databaseLogger.Log(query, null, TraceLevel.Info);

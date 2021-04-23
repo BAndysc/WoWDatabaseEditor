@@ -10,6 +10,7 @@ using DynamicData;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -39,6 +40,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly IParameterFactory parameterFactory;
         private readonly ISolutionTasksService solutionTasksService;
         private readonly ISolutionItemNameRegistry solutionItemName;
+        private readonly IMySqlExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
 
         private readonly DatabaseTableSolutionItem solutionItem;
@@ -49,7 +51,7 @@ namespace WDE.DatabaseEditors.ViewModels
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
-            ISolutionItemNameRegistry solutionItemName,
+            ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
             IQueryGenerator queryGenerator)
         {
             SolutionItem = solutionItem;
@@ -61,6 +63,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.parameterFactory = parameterFactory;
             this.solutionTasksService = solutionTasksService;
             this.solutionItemName = solutionItemName;
+            this.mySqlExecutor = mySqlExecutor;
             this.queryGenerator = queryGenerator;
             History = history;
             tableDefinition = null!;
@@ -96,7 +99,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 .Subscribe(ExecuteSql));
 
             RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
-            RevertCommand = new DelegateCommand<DatabaseCellViewModel?>(Revert, vm => vm != null && vm.CanBeReverted && vm.IsModified);
+            RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.IsModified);
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
         }
@@ -155,10 +158,32 @@ namespace WDE.DatabaseEditors.ViewModels
                 view.ParameterValue.SetNull();
         }
 
-        private void Revert(DatabaseCellViewModel? view)
+        private async Task Revert(DatabaseCellViewModel? view)
         {
-            if (view != null && !view.Parent.IsReadOnly) 
-                view.ParameterValue.Revert();
+            if (view == null || view.Parent.IsReadOnly)
+                return;
+            
+            view.ParameterValue.Revert();
+            
+            if (!view.ParentEntity.ExistInDatabase)
+                return;
+            
+            if (!mySqlExecutor.IsConnected)
+                return;
+
+            if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                .SetTitle("Reverting")
+                .SetMainInstruction("Do you want to revert field in the database?")
+                .SetContent(
+                    "Reverted field will become unmodified field and unmodified fields are not generated in query. Therefore if you want to revert the field in the database, it can be done now.\n\nDo you want to revert the field in the database now (this will execute query)?")
+                .SetIcon(MessageBoxIcon.Information)
+                .WithYesButton(true)
+                .WithNoButton(false)
+                .Build()))
+                return;
+
+            var query = queryGenerator.GenerateUpdateFieldQuery(tableDefinition, view.ParentEntity, view.TableField);
+            await mySqlExecutor.ExecuteSql(query);
         }
 
         private void RemoveTemplate(DatabaseCellViewModel? view)
@@ -456,7 +481,7 @@ namespace WDE.DatabaseEditors.ViewModels
         
         public AsyncAutoCommand AddNewCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
-        public DelegateCommand<DatabaseCellViewModel?> RevertCommand { get; }
+        public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         private DelegateCommand undoCommand;

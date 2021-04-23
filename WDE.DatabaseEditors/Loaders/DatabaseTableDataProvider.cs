@@ -76,7 +76,7 @@ namespace WDE.DatabaseEditors.Loaders
                     .SetTitle("Database error")
                     .SetMainInstruction(
                         "Unable to execute SQL query. Most likely your database is incompatible with provided database schema, if you think this is a bug, report it via Help -> Report Bug")
-                    .SetContent(e.Message)
+                    .SetContent(e.ToString())
                     .SetIcon(MessageBoxIcon.Error)
                     .WithOkButton(false)
                     .Build());

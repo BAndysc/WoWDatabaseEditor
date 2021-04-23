@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
 
@@ -23,6 +24,13 @@ namespace WDE.DatabaseEditors.QueryGenerators
             return GenerateUpdateQuery(tableData);
         }
 
+        public string GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity,
+            IDatabaseField field)
+        {
+            return
+                $"UPDATE {table.TableName} SET `{field.FieldName}` = {field.ToQueryString()} WHERE `{table.TablePrimaryKeyColumnName}` = {entity.Key};";
+        }
+        
         private string GenerateUpdateQuery(IDatabaseTableData tableData)
         {
             StringBuilder query = new();
@@ -86,5 +94,6 @@ namespace WDE.DatabaseEditors.QueryGenerators
     public interface IQueryGenerator
     {
         public string GenerateQuery(IDatabaseTableData tableData);
+        public string GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity, IDatabaseField field);
     }
 }
