@@ -97,5 +97,18 @@ namespace WDE.Solutions.Explorer.ViewModels
         {
             itemToViewmodel[sourceItem.Item] = sourceItem;
         }
+
+        public void Refresh()
+        {
+            if (Children != null)
+            {
+                foreach (var child in Children)
+                {
+                    child.Refresh();
+                }
+            }
+            RaisePropertyChanged(nameof(ExtraId));
+            RaisePropertyChanged(nameof(Name));
+        }
     }
 }

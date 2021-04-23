@@ -75,6 +75,14 @@ namespace WDE.Solutions.Explorer.ViewModels
                 }
             };
 
+            solutionManager.RefreshRequest += item =>
+            {
+                foreach (var root in Root)
+                {
+                    root.Refresh();
+                }
+            };
+
             AddItem = new DelegateCommand(async () =>
             {
                 ISolutionItem item = await newItemService.GetNewSolutionItem();

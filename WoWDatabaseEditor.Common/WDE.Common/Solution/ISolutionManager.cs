@@ -8,5 +8,9 @@ namespace WDE.Common
     {
         ObservableCollection<ISolutionItem> Items { get; }
         void Initialize();
+        void Refresh(ISolutionItem item);
+        void RefreshAll();
+
+        event System.Action<ISolutionItem> RefreshRequest;
     }
 }
