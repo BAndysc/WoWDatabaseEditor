@@ -2018,6 +2018,7 @@
 	},
 	"LootModeParameter": {
 		"name": "Modes of loot",
+		"isflag": true,
 		"prefix": "LOOT_MODE",
 		"values": {
 			"0": {
@@ -2084,6 +2085,36 @@
 			"1": {"name": "disabled", "description": "Quest is disabled (not yet implemented in the core)."},
 			"2": {"name": "enabled", "description": "Quest is enabled (does not auto-complete)."},
 			"3": {"name": "world quest", "description": "Quest is a World Quest."}
+		}
+	},
+	"QuestSpecialFlagParameter": {
+		"name": "Quest special flags",
+		"isflag": true,
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "repeatable"},
+			"2": {"name": "completable only by external event"},
+			"4": {"name": "auto-accept", "description": "As of patch 3.3.5a only quests in the starter area need this flag."},
+			"8": {"name": "Dungeon Finder quest"},
+			"16": {"name": "monthly"},
+			"32": {"name": "use spell cast kill credit", "description": "The quest requires RequiredOrNpcGo killcredit (a spell cast), but NOT an actual NPC kill. This action usually involves killing an invisible \"bunny\" NPC."}
+		}
+	},
+	"GameObjectFlagParameter": {
+		"name": "Gameobject flags",
+		"isflag": true,
+		"prefix": "GO_FLAG_",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "IN_USE", "description": "Gameobject in use - Disables interaction while being animated"},
+			"2": {"name": "LOCKED", "description": "Makes the Gameobject Locked. Requires a key, spell, or event to be opened. \"Locked\" appears in tooltip"},
+			"4": {"name": "INTERACT_COND", "description": "Untargetable, cannot interact"},
+			"8": {"name": "TRANSPORT", "description": "Gameobject can transport (boat, elevator, car)"},
+			"16": {"name": "NOT_SELECTABLE", "description": "Not selectable (Not even in GM-mode)"},
+			"32": {"name": "NODESPAWN", "description": "Never despawns. Typical for gameobjects with on/off state (doors for example)"},
+			"64": {"name": "TRIGGERED", "description": "typically, summoned objects. Triggered by spell or other events"},
+			"512": {"name": "DAMAGED", "description": "Gameobject has been siege damaged"},
+			"1024": {"name": "DESTROYED", "description": "Gameobject has been destroyed"}
 		}
 	}
 }

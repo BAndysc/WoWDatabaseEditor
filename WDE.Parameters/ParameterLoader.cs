@@ -33,6 +33,7 @@ namespace WDE.Parameters
             factory.Register("GameEventParameter", new GameEventParameter(database));
             factory.Register("CreatureParameter", new CreatureParameter(database));
             factory.Register("QuestParameter", new QuestParameter(database));
+            factory.Register("PrevQuestParameter", new PrevQuestParameter(database));
             factory.Register("GameobjectParameter", new GameobjectParameter(database));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
@@ -104,6 +105,26 @@ namespace WDE.Parameters
         }
     }
     
+    public class PrevQuestParameter : LazyLoadParameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public PrevQuestParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+
+        protected override void LazyLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (IQuestTemplate item in database.GetQuestTemplates())
+            {
+                Items.Add(-item.Entry, new SelectOption(item.Name, "quest must be active"));
+                Items.Add(item.Entry, new SelectOption(item.Name, "quest must be completed"));
+            }
+        }
+    }
+
     public class GameEventParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;

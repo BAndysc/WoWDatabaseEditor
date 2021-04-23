@@ -35,11 +35,23 @@ namespace WDE.DatabaseEditors.Loaders
 
         private string BuildSQLQueryFromTableDefinition(in DatabaseTableDefinitionJson tableDefinitionJson, uint[] entries)
         {
-            var columns = tableDefinitionJson.Groups.SelectMany(x => x.Fields).Select(x => $"`{x.DbColumnName}`").Distinct();
+            var tableName = tableDefinitionJson.TableName;
+            var tablePrimaryKey = tableDefinitionJson.TablePrimaryKeyColumnName;
+            var columns = tableDefinitionJson.Groups
+                .SelectMany(x => x.Fields)
+                .Select(x => $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`")
+                .Distinct();
             var names = string.Join(",", columns);
+            var joins = "";
 
+            if (tableDefinitionJson.ForeignTable != null)
+            {
+                joins += string.Join(" ", tableDefinitionJson.ForeignTable.Select(table =>
+                    $"LEFT JOIN `{table.TableName}` ON `{table.TableName}`.`{table.ForeignKey}` = `{tableName}`.`{tablePrimaryKey}`"));
+            }
+            
             return
-                $"SELECT {names} FROM {tableDefinitionJson.TableName} WHERE {tableDefinitionJson.TablePrimaryKeyColumnName} IN ({string.Join(", ", entries)});";
+                $"SELECT {names} FROM {tableDefinitionJson.TableName} {joins} WHERE `{tableName}`.`{tablePrimaryKey}` IN ({string.Join(", ", entries)});";
         }
 
         public async Task<IDatabaseTableData?> Load(string definitionId, params uint[] keys)
@@ -64,7 +76,7 @@ namespace WDE.DatabaseEditors.Loaders
                     .SetTitle("Database error")
                     .SetMainInstruction(
                         "Unable to execute SQL query. Most likely your database is incompatible with provided database schema, if you think this is a bug, report it via Help -> Report Bug")
-                    .SetContent(e.ToString())
+                    .SetContent(e.Message)
                     .SetIcon(MessageBoxIcon.Error)
                     .WithOkButton(false)
                     .Build());

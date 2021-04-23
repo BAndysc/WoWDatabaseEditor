@@ -9,6 +9,12 @@
   "single_solution_name": "Creature {name} template",
   "multi_solution_name": "Multiple creatures template",
   "picker": "CreatureParameter",
+  "foreign_tables": [
+    {
+      "table_name": "creature_template_addon",
+      "foreign_key": "entry"
+    }
+  ],
   "groups": [
     {
       "group_name": "Entries",
@@ -180,6 +186,54 @@
         }
       ]
     },
+    {
+      "group_name": "Addon",
+      "fields": [
+        {
+          "name": "Path id",
+          "db_column_name": "path_id",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Mount",
+          "db_column_name": "mount",
+          "foreign_table": "creature_template_addon",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Bytes 1",
+          "db_column_name": "bytes1",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Bytes 2",
+          "db_column_name": "bytes2",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "emote",
+          "foreign_table": "creature_template_addon",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Visibility distance type",
+          "db_column_name": "visibilityDistanceType",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Auras",
+          "db_column_name": "auras",
+          "foreign_table": "creature_template_addon",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    },    
     {
       "group_name": "Movement",
       "fields": [

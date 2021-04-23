@@ -9,6 +9,12 @@
   "single_solution_name": "Gameobject {name} template",
   "multi_solution_name": "Multiple gameobjects template",
   "picker": "GameobjectParameter",
+  "foreign_tables": [
+    {
+      "table_name": "gameobject_template_addon",
+      "foreign_key": "entry"
+    }
+  ],
   "groups": [
     {
       "group_name": "General",
@@ -28,8 +34,19 @@
         {
           "name": "Type",
           "db_column_name": "type",
-          "value_type": "GameobjectTypeParameter",
-          "read_only": false
+          "value_type": "GameobjectTypeParameter"
+        },
+        {
+          "name": "Faction",
+          "db_column_name": "faction",
+          "value_type": "FactionParameter",
+          "foreign_table": "gameobject_template_addon"
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "flags",
+          "value_type": "GameObjectFlagParameter",
+          "foreign_table": "gameobject_template_addon"
         }
       ]
     },
@@ -45,8 +62,7 @@
         {
           "name": "Size",
           "db_column_name": "size",
-          "value_type": "float",
-          "read_only": false
+          "value_type": "float"
         },
         {
           "name": "Icon name",
@@ -1512,8 +1528,50 @@
         {
           "name": "Script name",
           "db_column_name": "ScriptName",
-          "value_type": "string",
-          "read_only": false
+          "value_type": "string"
+        }
+      ]
+    },
+    {
+      "group_name": "Addon",
+      "fields": [
+        {
+          "name": "Min gold",
+          "db_column_name": "mingold",
+          "value_type": "uint",
+          "foreign_table": "gameobject_template_addon",
+          "help": "Minimum money, in copper, that the gameobject can drop when accessed / used."
+        },
+        {
+          "name": "Max gold",
+          "db_column_name": "maxgold",
+          "value_type": "uint",
+          "foreign_table": "gameobject_template_addon",
+          "help": "Maximum money, in copper, that the gameobject can drop when accessed / used."
+        },
+        {
+          "name": "Art kit 0",
+          "db_column_name": "artkit0",
+          "value_type": "int",
+          "foreign_table": "gameobject_template_addon"
+        },
+        {
+          "name": "Art kit 1",
+          "db_column_name": "artkit1",
+          "value_type": "int",
+          "foreign_table": "gameobject_template_addon"
+        },
+        {
+          "name": "Art kit 2",
+          "db_column_name": "artkit2",
+          "value_type": "int",
+          "foreign_table": "gameobject_template_addon"
+        },
+        {
+          "name": "Art kit 3",
+          "db_column_name": "artkit3",
+          "value_type": "int",
+          "foreign_table": "gameobject_template_addon"
         }
       ]
     }

@@ -9,6 +9,12 @@
   "single_solution_name": "Quest {name} template",
   "multi_solution_name": "Multiple quests template",
   "picker": "QuestParameter",
+  "foreign_tables": [
+    {
+      "table_name": "quest_template_addon",
+      "foreign_key": "ID"
+    }
+  ],
   "groups": [
     {
       "group_name": "Entries",
@@ -36,9 +42,23 @@
           "value_type": "QuestFlagParameter"
         },
         {
+          "name": "Special flags",
+          "db_column_name": "SpecialFlags",
+          "foreign_table": "quest_template_addon",
+          "value_type": "QuestSpecialFlagParameter",
+          "help": "This field is for controlling server side quest functions. Blizzard keeps these data server-side and they are not sent to the client, so we have to populate the field manually."
+        },
+        {
           "name": "Allowable races",
           "db_column_name": "AllowableRaces",
           "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Allowable classes",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "AllowableClasses",
+          "value_type": "ClassMaskParameter",
+          "help": "Classes required to get the quest. 0 means the quest is available for all classes."
         },
         {
           "name": "Quest level",
@@ -51,6 +71,13 @@
           "db_column_name": "MinLevel",
           "value_type": "uint",
           "help": "Minimum level at which a player can get the quest."
+        },
+        {
+          "name": "Max player level",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "MaxLevel",
+          "value_type": "uint",
+          "help": "Maximum player level at which a character can get the quest"
         },
         {
           "name": "Quest sort ID",
@@ -76,6 +103,20 @@
           "help": "Items given by the quest giver at beginning of the quest. Items will be deleted when quest is abandoned."
         },
         {
+          "name": "Provided start item count",
+          "db_column_name": "ProvidedItemCount",
+          "foreign_table": "quest_template_addon",
+          "help": "Number of items given to the player (inserted in the player's bags) upon accepting the quest.",
+          "value_type": "uint"
+        },
+        {
+          "name": "Cast spell on start",
+          "db_column_name": "SourceSpellID",
+          "foreign_table": "quest_template_addon",
+          "value_type": "SpellParameter",
+          "help": "The spell ID cast on player upon starting the quest."
+        },
+        {
           "name": "Time allowed",
           "db_column_name": "TimeAllowed",
           "value_type": "uint"
@@ -92,9 +133,35 @@
       "group_name": "Chaining",
       "fields": [
         {
+          "name": "Previous quest",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "PrevQuestId",
+          "value_type": "PrevQuestParameter"
+        },
+        {
+          "name": "Next quest",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "NextQuestID",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Exclusive group",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "ExclusiveGroup",
+          "value_type": "int",
+          "help": "if ExclusiveGroup > 0: \nAllows to define a group of quests of which only one may be chosen and completed. E.g. if from quests 1200, 1201 and 1202 only one should be allowed to be chosen, insert 1200 into ExclusiveGroup of all 3 quests.\n\nif ExclusiveGroup < 0\nAllows to define a group of quests of which all must be completed and rewarded to start next quest. E.g. if quest 1000 dependent from one of quests 1200, 1201 and 1202 and all this quests have same negative exclusive group then all this quest must be completed and rewarded before quest 1000 can be started."
+        },
+        {
           "name": "Reward next quest",
           "db_column_name": "RewardNextQuest",
           "value_type": "QuestParameter"
+        },
+        {
+          "name": "Breadcrumb for quest",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "BreadcrumbForQuestId",
+          "value_type": "QuestParameter",
+          "help": "Breadcrumb quests exist for the sole purpose of guiding the player to a new zone or subzone to quest in. They are often given by NPCs upon completing the previous quest hub, as well as Hero's Call Boards, Warchief's Command Boards, and the Adventure Guide. Often there are multiple breadcrumb quests followed by the same follow-up quest, and normally they are mutually exclusive, meaning that accepting one breadcrumb quest will make all the others leading to the same location unavailable. Also, normally completing the follow-up quest will make any breadcrumb quests leading to it unavailable, whether or not they were completed."
         }
       ]
     },
@@ -226,6 +293,103 @@
           "name": "Required faction value 2",
           "db_column_name": "RequiredFactionValue2",
           "value_type": "int"
+        },
+        {
+          "name": "Required skill",
+          "db_column_name": "RequiredSkillID",
+          "foreign_table": "quest_template_addon",
+          "value_type": "SkillParameter"
+        },
+        {
+          "name": "Required skill points",
+          "db_column_name": "RequiredSkillPoints",
+          "foreign_table": "quest_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required min reputation faction",
+          "db_column_name": "RequiredMinRepFaction",
+          "foreign_table": "quest_template_addon",
+          "value_type": "FactionParameter"
+        },
+        {
+          "name": "Required min reputation value",
+          "db_column_name": "RequiredMinRepValue",
+          "foreign_table": "quest_template_addon",
+          "value_type": "int",
+          "help": "Players must have this reputation or higher in order to receive the quest."
+        },
+        {
+          "name": "Required max reputation faction",
+          "db_column_name": "RequiredMaxRepFaction",
+          "foreign_table": "quest_template_addon",
+          "value_type": "FactionParameter",
+          "help": "The Faction ID for the faction that controls the maximum reputation value that the player can have and still get the quest."
+        },
+        {
+          "name": "Required max reputation value",
+          "db_column_name": "RequiredMaxRepValue",
+          "foreign_table": "quest_template_addon",
+          "value_type": "int",
+          "help": "The maximum reputation value that the player can have with a faction and still get the quest. If the player has more reputation than the value in this field, the quest will not be able to be taken anymore."
+        }
+      ]
+    },
+    {
+      "group_name": "Texts",
+      "fields": [
+        {
+          "name": "Log description",
+          "db_column_name": "LogDescription",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Quest description",
+          "db_column_name": "QuestDescription",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Area description",
+          "db_column_name": "AreaDescription",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "QuestCompletionLog",
+          "db_column_name": "QuestCompletionLog",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Unknown 0",
+          "db_column_name": "Unknown0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Objective text 1",
+          "db_column_name": "ObjectiveText1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Objective text 2",
+          "db_column_name": "ObjectiveText2",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Objective text 3",
+          "db_column_name": "ObjectiveText3",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Objective text 4",
+          "db_column_name": "ObjectiveText4",
+          "value_type": "string",
+          "can_be_null": true
         }
       ]
     },
@@ -469,7 +633,21 @@
           "name": "Reward faction override 5",
           "db_column_name": "RewardFactionOverride5",
           "value_type": "int"
-        }        
+        },
+        {
+          "name": "Reward mail template ID",
+          "db_column_name": "RewardMailTemplateID",
+          "foreign_table": "quest_template_addon",
+          "value_type": "uint",
+          "help": "If the quest gives as a reward an item from a possible list of items, the ID here corresponds to the proper loot template in quest_mail_loot_template. According to the rules in that loot template, items \"looted\" will be sent by mail at the completion of the quest."
+        },
+        {
+          "name": "Reward mail delay (seconds)",
+          "db_column_name": "RewardMailDelay",
+          "foreign_table": "quest_template_addon",
+          "value_type": "uint",
+          "help": "How many seconds to wait until the mail is sent to the character that turned in a quest rewarding items from a loot template defined in RewardMailTemplateId"
+        }
       ]
     },
     {
@@ -541,64 +719,6 @@
           "name": "POI priority",
           "db_column_name": "POIPriority",
           "value_type": "uint"
-        }
-      ]
-    },
-    {
-      "group_name": "Texts",
-      "fields": [
-        {
-          "name": "Log description",
-          "db_column_name": "LogDescription",
-          "value_type": "string",
-          "can_be_null": true
-        },
-        {
-          "name": "Quest description",
-          "db_column_name": "QuestDescription",
-          "value_type": "string",
-          "can_be_null": true
-        },
-        {
-          "name": "Area description",
-          "db_column_name": "AreaDescription",
-          "value_type": "string",
-          "can_be_null": true
-        },
-        {
-          "name": "QuestCompletionLog",
-          "db_column_name": "QuestCompletionLog",
-          "value_type": "string",
-          "can_be_null": true
-        },
-        {
-          "name": "Unknown 0",
-          "db_column_name": "Unknown0",
-          "value_type": "uint"
-        },
-        {
-          "name": "Objective text 1",
-          "db_column_name": "ObjectiveText1",
-          "value_type": "string",
-          "can_be_null": true
-        },
-        {
-          "name": "Objective text 2",
-          "db_column_name": "ObjectiveText2",
-          "value_type": "string",
-          "can_be_null": true
-        },
-        {
-          "name": "Objective text 3",
-          "db_column_name": "ObjectiveText3",
-          "value_type": "string",
-          "can_be_null": true
-        },
-        {
-          "name": "Objective text 4",
-          "db_column_name": "ObjectiveText4",
-          "value_type": "string",
-          "can_be_null": true
         }
       ]
     }

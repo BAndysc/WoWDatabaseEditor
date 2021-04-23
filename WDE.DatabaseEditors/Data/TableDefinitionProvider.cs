@@ -20,6 +20,16 @@ namespace WDE.DatabaseEditors.Data
             {
                 var definition =
                     serializationProvider.DeserializeTableDefinition<DatabaseTableDefinitionJson>(source);
+
+                definition.TableColumns = new Dictionary<string, DbEditorTableGroupFieldJson>();
+                foreach (var group in definition.Groups)
+                {
+                    foreach (var column in group.Fields)
+                    {
+                        definition.TableColumns[column.DbColumnName] = column;
+                    }
+                }
+                
                 if (definition.Compatibility.Contains(currentCoreVersion.Current.Tag))
                     definitions[definition.Id] = definition;
             }

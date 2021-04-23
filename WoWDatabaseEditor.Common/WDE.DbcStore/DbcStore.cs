@@ -170,6 +170,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore));
+                parameterFactory.Register("ClassMaskParameter", new DbcMaskParameter(ClassStore, -1));
                 parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
                 parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore));
                 parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore));
@@ -271,4 +272,15 @@ namespace WDE.DbcStore
                 Items.Add(key, new SelectOption(storage[key]));
         }
     }
+    
+    public class DbcMaskParameter : FlagParameter
+    {
+        public DbcMaskParameter(Dictionary<long, string> storage, int offset)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (int key in storage.Keys)
+                Items.Add(1 << (key + offset), new SelectOption(storage[key]));
+        }
+    }
+    
 }

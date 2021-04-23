@@ -41,8 +41,23 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "table_name_source_field")]
         public string TableNameSource { get; set; } = "";
         
+        [JsonProperty(PropertyName = "foreign_tables")]
+        public IList<DatabaseForeignTableJson>? ForeignTable { get; set; }
+        
         [JsonProperty(PropertyName = "groups")]
         public IList<DatabaseColumnsGroupJson> Groups { get; set; } = new List<DatabaseColumnsGroupJson>();
+
+        [JsonIgnore] 
+        public IDictionary<string, DbEditorTableGroupFieldJson> TableColumns { get; set; } = null!;
+    }
+
+    public struct DatabaseForeignTableJson
+    {
+        [JsonProperty(PropertyName = "table_name")]
+        public string TableName { get; set; }
+        
+        [JsonProperty(PropertyName = "foreign_key")]
+        public string ForeignKey { get; set; }
     }
 
     [ExcludeFromCodeCoverage]
@@ -77,6 +92,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "db_column_name")]
         public string DbColumnName { get; set; }
+        
+        [JsonProperty(PropertyName = "foreign_table")]
+        public string? ForeignTable { get; set; }
         
         [JsonProperty(PropertyName = "value_type")]
         public string ValueType { get; set; }

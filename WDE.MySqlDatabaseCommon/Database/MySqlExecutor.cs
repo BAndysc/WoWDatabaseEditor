@@ -1,25 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using MySqlConnector;
 using WDE.Common.Database;
 using WDE.MySqlDatabaseCommon.Providers;
+using WDE.MySqlDatabaseCommon.Services;
 
 namespace WDE.MySqlDatabaseCommon.Database
 {
     public class MySqlExecutor : IMySqlExecutor
     {
         private readonly IMySqlConnectionStringProvider connectionString;
+        private readonly DatabaseLogger databaseLogger;
 
-        public MySqlExecutor(IMySqlConnectionStringProvider connectionString)
+        public MySqlExecutor(IMySqlConnectionStringProvider connectionString,
+            DatabaseLogger databaseLogger)
         {
             this.connectionString = connectionString;
+            this.databaseLogger = databaseLogger;
         }
 
         public async Task ExecuteSql(string query)
         {
             if (string.IsNullOrEmpty(query))
                 return;
+
+            databaseLogger.Log(query, null, TraceLevel.Info);
             
             using var writeLock = await DatabaseLock.WriteLock();
             
@@ -52,6 +59,10 @@ namespace WDE.MySqlDatabaseCommon.Database
 
         public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)
         {
+            if (string.IsNullOrEmpty(query))
+                return new List<Dictionary<string, (Type, object)>>();
+
+            databaseLogger.Log(query, null, TraceLevel.Info);
             using var writeLock = await DatabaseLock.WriteLock();
             
             MySqlConnection conn = new(connectionString.ConnectionString);
