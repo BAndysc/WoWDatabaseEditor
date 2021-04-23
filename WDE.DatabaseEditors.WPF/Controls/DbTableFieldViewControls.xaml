@@ -1,0 +1,138 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:controls="clr-namespace:WDE.DatabaseEditors.WPF.Controls"
+                    xmlns:helpers="clr-namespace:WDE.DatabaseEditors.WPF.Helpers"
+                    xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
+                    xmlns:converters="clr-namespace:WDE.Common.WPF.Converters;assembly=WDE.Common.WPF">
+    <viewHelpers:LongToBoolConverter x:Key="LongToBoolConverter" />
+    <viewHelpers:BooleanToVisibilityConverter WhenTrue="Visible" WhenFalse="Collapsed" x:Key="BoolToVisibilityConverter" />
+    <converters:BoolToDoubleConverter WhenTrue="1" WhenFalse="0" x:Key="BoolToOpacityConverter" />
+    <DataTemplate x:Key="BoolParameterView">
+        <CheckBox IsChecked="{Binding Value, Mode=TwoWay, Converter={StaticResource LongToBoolConverter}}"
+                  VerticalAlignment="Center">
+            <CheckBox.Style>
+                <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
+                    <Style.Triggers>
+                        <DataTrigger
+                            Binding="{Binding DataContext.FieldMetaData.IsReadOnly, RelativeSource={RelativeSource 
+                                AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"
+                            Value="True">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding DataContext.FieldMetaData.IsReadOnly, RelativeSource={RelativeSource 
+                                AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"
+                            Value="False">
+                            <Setter Property="IsEnabled" Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </CheckBox.Style>
+        </CheckBox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="GenericParameterView">
+        <DockPanel LastChildFill="True" Background="#00000000">
+            <Button Content="..." Margin="0, 0, 5, 0"
+                    Width="25" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                    Command="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow}"
+                    CommandParameter="{Binding}"
+                    DockPanel.Dock="Right">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="Width" Value="25"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Parameter.HasItems}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger
+                                Binding="{Binding DataContext.FieldMetaData.IsReadOnly, RelativeSource={RelativeSource 
+                                    AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"
+                                Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <TextBox
+                IsReadOnly="{Binding DataContext.FieldMetaData.IsReadOnly, RelativeSource={RelativeSource 
+                AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"
+                MaxLines="3" MaxHeight="50"
+                TextAlignment="Left" VerticalContentAlignment="Center">
+                <TextBox.Style>
+                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                        <Style.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="Text" Value="{Binding Value, Mode=TwoWay}" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="False">
+                                <Setter Property="Text" Value="{Binding String, Mode=OneWay}" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+        </DockPanel>
+    </DataTemplate>
+    
+    <Style TargetType="controls:DbTableFieldValueView">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:DbTableFieldValueView">
+                    <DockPanel LastChildFill="True" Height="20" MaxHeight="20">
+                        <Image ToolTip="{Binding OriginalValueTooltip}" Source="{DynamicResource StatusBarIconNotice}"
+                               Width="15" Height="15" Margin="2, 0, 2, 0" 
+                               Visibility="{TemplateBinding ShowModifiedIcon, Converter={StaticResource BoolToVisibilityConverter}}"
+                               Opacity="{TemplateBinding IsModified, Converter={StaticResource BoolToOpacityConverter}}"
+                               DockPanel.Dock="Left">
+                        </Image>
+                        <ContentPresenter Content="{Binding Parameter}">
+                            <ContentPresenter.ContentTemplateSelector>
+                                <helpers:FieldValueTemplateSelector
+                                    GenericTemplate="{StaticResource GenericParameterView}"
+                                    BoolTemplate="{StaticResource BoolParameterView}" />
+                            </ContentPresenter.ContentTemplateSelector>
+                        </ContentPresenter>
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style TargetType="controls:DbTableFieldView">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:DbTableFieldView">
+                    <Border Background="{TemplateBinding Background}">
+                        <DockPanel LastChildFill="True" Margin="20, 1, 0, 1" HorizontalAlignment="Stretch">
+                            <DockPanel.Style>
+                                <Style TargetType="{x:Type DockPanel}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsModified, RelativeSource={RelativeSource Mode= TemplatedParent}}" Value="True">
+                                            <Setter Property="Background"
+                                                    Value="{DynamicResource TreeViewItem.Content.Background.Modified}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DockPanel.Style>
+                            <TextBlock Text="{TemplateBinding Title}" TextWrapping="Wrap"
+                                       MinHeight="15" MaxHeight="50" Width="100"
+                                       Margin="0, 0, 10, 0"
+                                       VerticalAlignment="Center"
+                                       DockPanel.Dock="Left"
+                                       Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+                            <controls:DbTableFieldValueView IsModified="{TemplateBinding IsModified}" />
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

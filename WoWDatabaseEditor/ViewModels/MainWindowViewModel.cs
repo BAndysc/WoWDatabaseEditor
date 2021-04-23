@@ -27,7 +27,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<AboutViewModel> aboutViewModelCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
 
-        private string title = "Visual Database Editor 2018";
+        private string title = "Visual Database Editor 2021";
         private readonly Dictionary<string, ITool> toolById = new();
 
         public MainWindowViewModel(IDocumentManager documentManager,

@@ -1,0 +1,88 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WDE.DatabaseEditors.Avalonia.Controls"
+        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+        xmlns:helpers="clr-namespace:WDE.DatabaseEditors.Avalonia.Helpers">
+    <Styles.Resources>
+        <converters:LongToBoolConverter x:Key="LongToBoolConverter" />
+        <converters:BoolToDoubleConverter WhenTrue="1" WhenFalse="0" x:Key="BoolToOpacityConverter" />
+        <converters:InvertBoolConverter x:Key="InvertBoolConverter" />
+        <DataTemplate x:Key="GenericParameterView">
+            <DockPanel LastChildFill="True" Background="#00000000">
+            <Button Content="..." Margin="0, 0, 5, 0"
+                    Width="30" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                    Command="{Binding ChooseParameterCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:DbTableFieldValueView}}"
+                    CommandParameter="{Binding}"
+                    IsVisible="{Binding Parameter.HasItems}"
+                    IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:DbTableFieldValueView}, Converter={StaticResource InvertBoolConverter}}"
+                    DockPanel.Dock="Right">
+            </Button>
+                <!--IsReadOnly="{Binding DataContext.FieldMetaData.IsReadOnly, RelativeSource={RelativeSource 
+                    AncestorType={x:Type controls:DbTableFieldValueView}, Mode=FindAncestor}}"-->
+                <controls:ParameterTextBox 
+                    VerticalContentAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Text="{Binding Value, Mode=TwoWay}"
+                    FontFamily="Consolas,Menlo,Courier,Courier New"
+                    IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:DbTableFieldValueView}, Converter={StaticResource InvertBoolConverter}}"
+                    Classes="InnerContentWithPadding GridViewPlainTextBox">
+                    <controls:ParameterTextBox.Styles>
+                        <Style
+                            Selector="TextBox:not(:focus-within) /template/ TextPresenter#PART_TextPresenter">
+                            <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                        <Style
+                            Selector="TextBox:focus-within ContentPresenter Border">
+                            <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                    </controls:ParameterTextBox.Styles>
+                    <controls:ParameterTextBox.InnerLeftContent>
+                        <Border Cursor="Ibeam">
+                            <TextBlock Text="{Binding String, Mode=OneWay}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,0,0" />
+                        </Border>
+                    </controls:ParameterTextBox.InnerLeftContent>
+                </controls:ParameterTextBox>
+        </DockPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="BoolParameterView">
+            <CheckBox IsChecked="{Binding Value, Mode=TwoWay, Converter={StaticResource LongToBoolConverter}}"
+                      IsEnabled="{Binding IsReadOnly, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:DbTableFieldValueView}, Converter={StaticResource InvertBoolConverter}}"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Left"
+                      VerticalAlignment="Center">
+            </CheckBox>
+        </DataTemplate>
+    </Styles.Resources>
+    <Design.PreviewWith>
+        <controls:DbTableFieldValueView />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|DbTableFieldValueView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}" Height="24" MaxHeight="24" MinHeight="24">
+                    <DockPanel LastChildFill="True" IsVisible="{Binding IsVisible}"><!--
+                        <Image ToolTip.Tip="{Binding OriginalValueTooltip}" Source="{DynamicResource StatusBarIconNotice}"
+                               Width="15" Height="15" Margin="2, 0, 2, 0" 
+                               IsVisible="{TemplateBinding ShowModifiedIcon}"
+                               IsHitTestVisible="{TemplateBinding IsModified}"
+                               Opacity="{TemplateBinding IsModified, Converter={StaticResource BoolToOpacityConverter}}"
+                               DockPanel.Dock="Left">
+                        </Image>-->
+                        <TextBlock Text="{Binding ParameterValue.String}"/><!--
+                        <ContentPresenter Content="{Binding}" DataContext="{Binding ParameterValue}">
+                            <ContentPresenter.DataTemplates>
+                                <helpers:FieldValueTemplateSelector
+                                    GenericTemplate="{StaticResource GenericParameterView}"
+                                    BoolTemplate="{StaticResource BoolParameterView}" />
+                            </ContentPresenter.DataTemplates>
+                        </ContentPresenter>-->
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

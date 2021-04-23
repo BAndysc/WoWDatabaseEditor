@@ -14,6 +14,8 @@
       <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+      <ProjectReference Include="..\WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
       <ProjectReference Include="..\WDE.MVVM.Test\WDE.MVVM.Test.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />

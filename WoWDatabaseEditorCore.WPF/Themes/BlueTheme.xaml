@@ -176,6 +176,13 @@
     
     <SolidColorBrush x:Key="ScrollBarColor" Color="#8C8C8C" />
     
+    <!-- TreeViewItem -->
+    <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#4E88BF"/>
+    <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#F1F1F1" />
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.Modified" Color="#000099" Opacity=".3"/>
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.Normal" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.NormalAlternate" Color="#F0F0F0"/>
+    
     <!-- Buttons -->
     <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070" />
     <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD" />
@@ -193,7 +200,7 @@
                 <DrawingGroup.Transform>
                     <TranslateTransform X="0.00029201540746726096" Y="0" />
                 </DrawingGroup.Transform>
-                <GeometryDrawing Brush="#FFFFFFFF"
+                <GeometryDrawing Brush="#FFB3B3B3"
                                  Geometry="F1 M20,20z M0,0z M10,0A10,10,0,1,0,20,10A10,10,0,0,0,10,0z M11,16L9,16 9,14 11,14z M11,12L9,12 9,4 11,4z" />
             </DrawingGroup>
         </DrawingImage.Drawing>
