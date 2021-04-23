@@ -43,6 +43,8 @@ namespace WoWDatabaseEditor.Services.SolutionService
         
         public void SaveSolutionToDatabaseTask(ISolutionItem item)
         {
+            if (!CanSaveToDatabase)
+                return;
             var itemName = solutionItemNameRegistry.GetName(item);
             
             taskRunner.ScheduleTask($"Export {itemName} to database",

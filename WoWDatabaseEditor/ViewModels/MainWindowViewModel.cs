@@ -52,11 +52,21 @@ namespace WoWDatabaseEditorCore.ViewModels
                 var item = DocumentManager.ActiveSolutionItemDocument?.SolutionItem;
                 if (item == null)
                     return;
-                
-                if (solutionTasksService.CanSaveAndReloadRemotely)
-                    solutionTasksService.SaveAndReloadSolutionTask(item);
-                else if (solutionTasksService.CanSaveToDatabase)
-                    solutionTasksService.SaveSolutionToDatabaseTask(item);
+
+                if (DocumentManager.ActiveSolutionItemDocument!.Save?.CanExecute(null) ?? false)
+                {
+                    DocumentManager.ActiveSolutionItemDocument.Save.Execute(null);
+
+                    if (solutionTasksService.CanReloadRemotely)
+                        solutionTasksService.ReloadSolutionRemotelyTask(item);
+                }
+                else
+                {
+                    if (solutionTasksService.CanSaveAndReloadRemotely)
+                        solutionTasksService.SaveAndReloadSolutionTask(item);
+                    else if (solutionTasksService.CanSaveToDatabase)
+                        solutionTasksService.SaveSolutionToDatabaseTask(item);
+                }
             }, () => DocumentManager.ActiveSolutionItemDocument != null &&
                      solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase);
 
