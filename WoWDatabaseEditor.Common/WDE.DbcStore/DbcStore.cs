@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using WDBXEditor.Reader;
 using WDBXEditor.Storage;
+using WDE.Common;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Tasks;
@@ -24,14 +25,16 @@ namespace WDE.DbcStore
     public class DbcStore : IDbcStore, ISpellStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
+        private readonly ISolutionManager solutionManager;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
 
-        public DbcStore(IParameterFactory parameterFactory, ITaskRunner taskRunner, IDbcSettingsProvider settingsProvider)
+        public DbcStore(IParameterFactory parameterFactory, ITaskRunner taskRunner, IDbcSettingsProvider settingsProvider, ISolutionManager solutionManager)
         {
             this.parameterFactory = parameterFactory;
             this.taskRunner = taskRunner;
             dbcSettingsProvider = settingsProvider;
+            this.solutionManager = solutionManager;
 
             Load();
         }
@@ -52,6 +55,9 @@ namespace WDE.DbcStore
         public Dictionary<long, string> EmoteStore { get;internal set; } = new();
         public Dictionary<long, string> AchievementStore { get; internal set;} = new();
         public Dictionary<long, string> ItemStore { get; internal set;} = new();
+        public Dictionary<long, string> SpellFocusObjectStore { get; internal set; } = new();
+        public Dictionary<long, string> QuestInfoStore { get; internal set; } = new();
+        public Dictionary<long, string> CharTitleStore { get; internal set; } = new();
 
         public IEnumerable<uint> Spells
         {
@@ -108,7 +114,10 @@ namespace WDE.DbcStore
             public Dictionary<long, string> EmoteStore { get; } = new();
             public Dictionary<long, string> AchievementStore { get; } = new();
             public Dictionary<long, string> ItemStore { get; } = new();
-
+            public Dictionary<long, string> SpellFocusObjectStore { get; } = new();
+            public Dictionary<long, string> QuestInfoStore { get; } = new();
+            public Dictionary<long, string> CharTitleStore { get; } = new();
+            
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
             
@@ -151,6 +160,9 @@ namespace WDE.DbcStore
                 store.EmoteStore = EmoteStore;
                 store.AchievementStore = AchievementStore;
                 store.ItemStore = ItemStore;
+                store.SpellFocusObjectStore = SpellFocusObjectStore;
+                store.QuestInfoStore = QuestInfoStore;
+                store.CharTitleStore = CharTitleStore;
                 
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
                 parameterFactory.Register("FactionParameter", new DbcParameter(FactionStore));
@@ -158,12 +170,18 @@ namespace WDE.DbcStore
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore));
+                parameterFactory.Register("ClassMaskParameter", new DbcMaskParameter(ClassStore, -1));
                 parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
                 parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore));
                 parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore));
                 parameterFactory.Register("ZoneParameter", new DbcParameter(AreaStore));
                 parameterFactory.Register("MapParameter", new DbcParameter(MapStore));
                 parameterFactory.Register("PhaseParameter", new DbcParameter(PhaseStore));
+                parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore));
+                parameterFactory.Register("QuestInfoParameter", new DbcParameter(QuestInfoStore));
+                parameterFactory.Register("CharTitleParameter", new DbcParameter(CharTitleStore));
+                
+                store.solutionManager.RefreshAll();
             }
 
             private int max = 0;
@@ -179,7 +197,7 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 12;
+                        max = 15;
                         Load("AreaTrigger.dbc", 0, 0, AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 3, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -192,11 +210,14 @@ namespace WDE.DbcStore
                         Load("chrRaces.dbc", 0, 14, RaceStore);
                         Load("Emotes.dbc", 0, 1, EmoteStore);
                         Load("SoundEntries.dbc", 0, 2, SoundStore);
+                        Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore);
+                        Load("QuestInfo.dbc", 0, 1, QuestInfoStore);
+                        Load("CharTitles.dbc", 0, 2, CharTitleStore);
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 14;
+                        max = 17;
                         Load("AreaTrigger.dbc", 0, 0,  AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -211,11 +232,14 @@ namespace WDE.DbcStore
                         Load("item-sparse.db2", 0, 99, ItemStore);
                         Load("Phase.dbc", 0, 1, PhaseStore);
                         Load("SoundEntries.dbc", 0, 2, SoundStore);
+                        Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore);
+                        Load("QuestInfo.dbc", 0, 1, QuestInfoStore);
+                        Load("CharTitles.dbc", 0, 2, CharTitleStore);
                         break;
                     }
                     case DBCVersions.LEGION_26972:
                     {
-                        max = 10;
+                        max = 13;
                         Load("AreaTrigger.db2", 16, 16, AreaTriggerStore);
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
@@ -227,6 +251,9 @@ namespace WDE.DbcStore
                         Load("Languages.db2", 1, 0, LanguageStore);
                         // Load("Phase.db2", 1, 0, PhaseStore); // no names in legion :(
                         Load("SoundKitName.db2", 0, 1, SoundStore);
+                        Load("SpellFocusObject.db2", 0, 1, SpellFocusObjectStore);
+                        Load("QuestInfo.db2", 0, 1, QuestInfoStore);
+                        Load("CharTitles.db2", 0, 1, CharTitleStore);
                         break;
                     }
                     default:
@@ -245,4 +272,15 @@ namespace WDE.DbcStore
                 Items.Add(key, new SelectOption(storage[key]));
         }
     }
+    
+    public class DbcMaskParameter : FlagParameter
+    {
+        public DbcMaskParameter(Dictionary<long, string> storage, int offset)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (int key in storage.Keys)
+                Items.Add(1 << (key + offset), new SelectOption(storage[key]));
+        }
+    }
+    
 }
