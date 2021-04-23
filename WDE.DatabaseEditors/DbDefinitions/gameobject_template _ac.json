@@ -1,0 +1,1524 @@
+﻿{
+  "id": "gameobject_template_tc_335",
+  "compatibility": ["Azeroth"],
+  "name": "Gameobject Template",
+  "description": "Edit existing gameobject templates",
+  "table_name": "gameobject_template",
+  "table_index_name": "entry",
+  "table_name_source_field": "name",
+  "single_solution_name": "Gameobject {name} template",
+  "multi_solution_name": "Multiple gameobjects template",
+  "picker": "GameobjectParameter",
+  "foreign_tables": [
+    {
+      "table_name": "gameobject_template_addon",
+      "foreign_key": "entry"
+    }
+  ],
+  "groups": [
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Type",
+          "db_column_name": "type",
+          "value_type": "GameobjectTypeParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Visual",
+      "fields": [
+        {
+          "name": "Display",
+          "db_column_name": "displayId",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Size",
+          "db_column_name": "size",
+          "value_type": "float"
+        },
+        {
+          "name": "Icon name",
+          "db_column_name": "IconName",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Cast bar caption",
+          "db_column_name": "castBarCaption",
+          "value_type": "string",
+          "read_only": true
+        }
+      ]
+    },
+    {
+      "group_name": "Type: door",
+      "show_if": {
+        "value": 0,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Start as opened",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Lock Id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Time in ms to auto close",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Immune to damage",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "On close broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Ignored by pathfinding",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: button",
+      "show_if": {
+        "value": 1,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Start as opened",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Auto close",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Linked trap entry",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Immune to damage",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Is large",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "On close broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "LOS ok",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data9",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: quest giver",
+      "show_if": {
+        "value": 2,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Quest list id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Page material",
+          "value_type": "PageTextMaterialParameter"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Gossip Id",
+          "value_type": "GossipMenuParameter"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Custom anim",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Immune to damage",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Los ok",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Allow mounted",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data9",
+          "name": "Is large",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data10",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: Chest",
+      "show_if": {
+        "value": 3,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Loot id",
+          "value_type": "GameObjectLootParameter"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Restock time in sec",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Is consumable",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Min success opens",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Max success opens",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "On loot event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Linked trap entry",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Required quest id to open",
+          "value_type": "QuestParameter"
+        },
+        {
+          "db_column_name": "Data9",
+          "name": "Min level to open",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data10",
+          "name": "Los ok",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data11",
+          "name": "Leave loot",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data12",
+          "name": "Not in combat",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data13",
+          "name": "Log loot",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data14",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data15",
+          "name": "Use group loot rules",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data16",
+          "name": "Floating tooltip",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data17",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: Generic",
+      "show_if": {
+        "value": 5,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Floating tooltip",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Highlight",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Server only",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Is large",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Float on water",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Required quest id to open",
+          "value_type": "QuestParameter"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: Trap",
+      "show_if": {
+        "value": 6,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Object level",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Diameter (radius x 2)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Spell id",
+          "value_type": "SpellParameter"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Trap type",
+          "value_type": "TrapTypeParameter"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Cooldown time in sec",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Auto close time",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Start delay time in sec",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Server only",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data9",
+          "name": "Is stealthed",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data10",
+          "name": "Is large",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data11",
+          "name": "Is stealth affected",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data12",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data13",
+          "name": "On close broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data14",
+          "name": "Ignore totems",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data15",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: chair",
+      "show_if": {
+        "value": 7,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Amount of slots",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Height",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Usable only by creator",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Triggered event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: spell focus",
+      "show_if": {
+        "value": 8,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Spell focus type",
+          "value_type": "SpellFocusObjectParameter"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Radius",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Linked trap entry",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Server only",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Required quest id to open",
+          "value_type": "QuestParameter"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Is large",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Floating tooltip",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Float on water",
+          "value_type": "BoolParameter"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: Text",
+      "show_if": {
+        "value": 9,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Page id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Language",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Page material",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Allow mounted (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Condition id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: Goober",
+      "show_if": {
+        "value": 10,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Required quest id to open",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Triggered event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Auto close time in ms",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Custom anim",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Is consumable (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Cooldown time in sec",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Page id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Language",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data9",
+          "name": "Page material",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data10",
+          "name": "Spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data11",
+          "name": "Immune to damage (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data12",
+          "name": "Linked trap entry",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data13",
+          "name": "Is large (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data14",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data15",
+          "name": "On close broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data16",
+          "name": "Los ok",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data17",
+          "name": "Usable while mounted (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data18",
+          "name": "Floating tooltip (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data19",
+          "name": "Gossip id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data20",
+          "name": "Allow multi interaction",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data21",
+          "name": "Float on water (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data22",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: transport",
+      "show_if": {
+        "value": 11,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Time to pause",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Start open",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Time to auto close in sec",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Pause 1 event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Pause 2 event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Map id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: area damage",
+      "show_if": {
+        "value": 12,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Radius",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Min damage",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Max damage",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Damage school",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Time to auto close in sec",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "On close broadcast text id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: camera",
+      "show_if": {
+        "value": 13,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Cinematic id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Triggered event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: map object",
+      "show_if": {
+        "value": 15,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Taxi path id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Move speed",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Acceleration rate",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "On start event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "On end event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Transport physics",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Map id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "World state",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Allow stops (flag)",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: ritual",
+      "show_if": {
+        "value": 18,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Required amount of casters",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Anim spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Is ritual persistent (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Caster target spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Caster target spell targets (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Casters grouped",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Ritual dont check target (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: guard post",
+      "show_if": {
+        "value": 21,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Creature entry",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Charges",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: spell caster",
+      "show_if": {
+        "value": 22,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Charges",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Party only (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Allow while mounted (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Is large (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: meeting stone",
+      "show_if": {
+        "value": 23,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Min level",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Max level",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Area id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: flag stand",
+      "show_if": {
+        "value": 24,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "On pickup spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Radius",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "On return aura spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "On return spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Immune to damage (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Los ok",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Condition Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: fishing hole",
+      "show_if": {
+        "value": 25,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Radius",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Loot id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Min success opens",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Max success opens",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Lock Id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: flag drop",
+      "show_if": {
+        "value": 26,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Lock id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Triggered event id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "On pickup spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Immune to damage (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "On open broadcast text id",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: capture point",
+      "show_if": {
+        "value": 29,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Radius",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "World state 1",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "World state 2",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "On win event id 1",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "On win event id 2",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "On contested event id 1",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "On contested event id 2",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "On progress event id 1",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data9",
+          "name": "On progress event id 2",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data10",
+          "name": "On neutral event id 1",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data11",
+          "name": "On neutral event id 2",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data12",
+          "name": "Neutral pct",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data13",
+          "name": "World state 3",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data14",
+          "name": "Min superiority",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data15",
+          "name": "Max superiority",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data16",
+          "name": "Min time",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data17",
+          "name": "Max time",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data18",
+          "name": "Is large (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data19",
+          "name": "Highlight (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data20",
+          "name": "Starting value",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data21",
+          "name": "Unidirectional",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: aura generator",
+      "show_if": {
+        "value": 30,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Start open (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Radius",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Aura 1 spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Condition Id 1",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Aura 2 spell id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Condition Id 2",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Server only",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: dungeon difficulty",
+      "show_if": {
+        "value": 31,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Map id",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Difficulty",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: barber chair",
+      "show_if": {
+        "value": 32,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Chair height",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Height offset",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: drstructible building",
+      "show_if": {
+        "value": 33,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "Intact num hits",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Credit proxy creature",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data3",
+          "name": "Intact event",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data4",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data5",
+          "name": "Damaged num hits",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data6",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data7",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data8",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data9",
+          "name": "Damaged event",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data10",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data11",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data12",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data13",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data14",
+          "name": "Destroyed event",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data15",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data16",
+          "name": "Time to rebuild in sec",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data17",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data18",
+          "name": "Destructible data",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data19",
+          "name": "Rebuilding event",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data20",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data21",
+          "name": "Unused",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data22",
+          "name": "Damage event",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data23",
+          "name": "Unused",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Type: trap door",
+      "show_if": {
+        "value": 35,
+        "db_column_name": "type"
+      },
+      "fields": [
+        {
+          "db_column_name": "Data0",
+          "name": "",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data1",
+          "name": "Start open (flag)",
+          "value_type": "uint"
+        },
+        {
+          "db_column_name": "Data2",
+          "name": "Auto close (flag)",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Scripts",
+      "fields": [
+        {
+          "name": "AI name",
+          "db_column_name": "AIName",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Script name",
+          "db_column_name": "ScriptName",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

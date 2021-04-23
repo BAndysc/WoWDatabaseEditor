@@ -1,0 +1,485 @@
+﻿{
+  "id": "creature_template_tc_335",
+  "compatibility": ["Azeroth"],
+  "name": "Creature Template",
+  "description": "Edit existing creature templates",
+  "table_name": "creature_template",
+  "table_index_name": "entry",
+  "table_name_source_field": "name",
+  "single_solution_name": "Creature {name} template",
+  "multi_solution_name": "Multiple creatures template",
+  "reload_command": "reload creature_template",
+  "picker": "CreatureParameter",
+  "foreign_tables": [
+    {
+      "table_name": "creature_template_addon",
+      "foreign_key": "entry"
+    }
+  ],
+  "groups": [
+    {
+      "group_name": "Entries",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Subname",
+          "db_column_name": "subname",
+          "value_type": "string",
+          "read_only": true,
+          "can_be_null": true
+        },
+        {
+          "name": "Difficulty 1",
+          "db_column_name": "difficulty_entry_1",
+          "value_type": "CreatureParameter",
+          "read_only": true
+        },
+        {
+          "name": "Difficulty 2",
+          "db_column_name": "difficulty_entry_2",
+          "value_type": "CreatureParameter",
+          "read_only": true
+        },
+        {
+          "name": "Difficulty 3",
+          "db_column_name": "difficulty_entry_3",
+          "value_type": "CreatureParameter",
+          "read_only": true
+        },
+        {
+          "name": "Kill credit",
+          "db_column_name": "KillCredit1",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Kill credit 2",
+          "db_column_name": "KillCredit2",
+          "value_type": "CreatureParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Gossip",
+      "fields": [
+        {
+          "name": "Icon name",
+          "db_column_name": "IconName",
+          "value_type": "string",
+          "read_only": false,
+          "can_be_null": true
+        },
+        {
+          "name": "Gossip menu ID",
+          "db_column_name": "gossip_menu_id",
+          "value_type": "uint",
+          "read_only": false
+        }
+      ]
+    },
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Faction",
+          "db_column_name": "faction",
+          "value_type": "FactionParameter",
+          "read_only": false
+        },
+        {
+          "name": "Min level",
+          "db_column_name": "minlevel",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Max level",
+          "db_column_name": "maxlevel",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Expansion",
+          "db_column_name": "exp",
+          "value_type": "ExpansionParameter",
+          "read_only": false
+        },
+        {
+          "name": "Rank",
+          "db_column_name": "rank",
+          "value_type": "NpcRankParameter",
+          "read_only": false
+        },
+        {
+          "name": "Unit class",
+          "db_column_name": "unit_class",
+          "value_type": "UnitClassParameter",
+          "read_only": false
+        },
+        {
+          "name": "Family",
+          "db_column_name": "family",
+          "value_type": "CreatureFamilyParameter",
+          "read_only": false
+        },
+        {
+          "name": "Creature type",
+          "db_column_name": "type",
+          "value_type": "CreatureTypeParameter",
+          "read_only": false
+        },
+        {
+          "name": "Racial leader",
+          "db_column_name": "RacialLeader",
+          "value_type": "bool",
+          "read_only": false
+        }
+      ]
+    },
+    {
+      "group_name": "Flags",
+      "fields": [
+        {
+          "name": "NPC Flags",
+          "db_column_name": "npcflag",
+          "value_type": "NpcFlagParameter",
+          "read_only": false
+        },
+        {
+          "name": "Unit Flags",
+          "db_column_name": "unit_flags",
+          "value_type": "UnitFlagParameter",
+          "read_only": false
+        },
+        {
+          "name": "Unit Flags 2",
+          "db_column_name": "unit_flags2",
+          "value_type": "UnitFlags2Parameter",
+          "read_only": false
+        },
+        {
+          "name": "Dynamic Flags",
+          "db_column_name": "dynamicflags",
+          "value_type": "DynamicFlagsParameter",
+          "read_only": false
+        },
+        {
+          "name": "Type Flags",
+          "db_column_name": "type_flags",
+          "value_type": "TypeFlagsParameter",
+          "read_only": false
+        },
+        {
+          "name": "Extra Flags",
+          "db_column_name": "flags_extra",
+          "value_type": "ExtraFlagParameter",
+          "read_only": false
+        },
+        {
+          "name": "Trainer Type",
+          "db_column_name": "trainer_type",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Trainer Spell",
+          "db_column_name": "trainer_spell",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Trainer Class",
+          "db_column_name": "trainer_class",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Trainer Race",
+          "db_column_name": "trainer_race",
+          "value_type": "uint",
+          "read_only": false
+        }
+
+      ]
+    },
+    {
+      "group_name": "Addon",
+      "fields": [
+        {
+          "name": "Path id",
+          "db_column_name": "path_id",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Mount",
+          "db_column_name": "mount",
+          "foreign_table": "creature_template_addon",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Bytes 1",
+          "db_column_name": "bytes1",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Bytes 2",
+          "db_column_name": "bytes2",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "emote",
+          "foreign_table": "creature_template_addon",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Auras",
+          "db_column_name": "auras",
+          "foreign_table": "creature_template_addon",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    },    
+    {
+      "group_name": "Movement",
+      "fields": [
+        {
+          "name": "Vehicle ID",
+          "db_column_name": "VehicleId",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Walk speed",
+          "db_column_name": "speed_walk",
+          "value_type": "float",
+          "read_only": false
+        },
+        {
+          "name": "Run speed",
+          "db_column_name": "speed_run",
+          "value_type": "float",
+          "read_only": false
+        },
+        {
+          "name": "Movement type",
+          "db_column_name": "MovementType",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Hover height",
+          "db_column_name": "HoverHeight",
+          "value_type": "float",
+          "read_only": true
+        },
+        {
+          "name": "Movement ID",
+          "db_column_name": "movementId",
+          "value_type": "uint",
+          "read_only": true
+        }
+      ]
+    },
+    {
+      "group_name": "Visual",
+      "fields": [
+        {
+          "name": "Model Id 1",
+          "db_column_name": "modelid1",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Model Id 2",
+          "db_column_name": "modelid2",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Model Id 3",
+          "db_column_name": "modelid3",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Model Id 4",
+          "db_column_name": "modelid4",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Model scale",
+          "db_column_name": "scale",
+          "value_type": "float",
+          "read_only": false
+        }
+      ]
+    },
+    {
+      "group_name": "Combat",
+      "fields": [
+        {
+          "name": "Damage school",
+          "db_column_name": "dmgschool",
+          "value_type": "SpellSchoolParameter",
+          "read_only": false
+        },
+        {
+          "name": "Melee attack time",
+          "db_column_name": "BaseAttackTime",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Ranged attack time",
+          "db_column_name": "RangeAttackTime",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "BaseVariance",
+          "db_column_name": "BaseVariance",
+          "value_type": "float",
+          "read_only": false
+        },
+        {
+          "name": "RangeVariance",
+          "db_column_name": "RangeVariance",
+          "value_type": "float",
+          "read_only": false
+        },
+        {
+          "name": "Pet spell ID",
+          "db_column_name": "PetSpellDataId",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Health regen",
+          "db_column_name": "RegenHealth",
+          "value_type": "bool",
+          "read_only": false
+        },
+        {
+          "name": "Health mod",
+          "db_column_name": "HealthModifier",
+          "value_type": "float",
+          "read_only": true
+        },
+        {
+          "name": "Mana mod",
+          "db_column_name": "ManaModifier",
+          "value_type": "float",
+          "read_only": true
+        },
+        {
+          "name": "Armor mod",
+          "db_column_name": "ArmorModifier",
+          "value_type": "float",
+          "read_only": true
+        },
+        {
+          "name": "Damage mod",
+          "db_column_name": "DamageModifier",
+          "value_type": "float",
+          "read_only": false
+        }
+      ]
+    },
+    {
+      "group_name": "Loot",
+      "fields": [
+        {
+          "name": "Loot ID",
+          "db_column_name": "lootid",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Skinning loot ID",
+          "db_column_name": "skinloot",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Pickpocket loot ID",
+          "db_column_name": "pickpocketloot",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Min gold",
+          "db_column_name": "mingold",
+          "value_type": "uint",
+          "read_only": false
+        },
+        {
+          "name": "Max gold",
+          "db_column_name": "maxgold",
+          "value_type": "uint",
+          "read_only": false
+        }
+      ]
+    },
+    {
+      "group_name": "Immunities",
+      "fields": [
+        {
+          "name": "Mechanic immune mask",
+          "db_column_name": "mechanic_immune_mask",
+          "value_type": "SpellMechanicParameter",
+          "read_only": false
+        },
+        {
+          "name": "School immune mask",
+          "db_column_name": "spell_school_immune_mask",
+          "value_type": "SpellSchoolMaskParameter",
+          "read_only": false
+        }
+      ]
+    },
+    {
+      "group_name": "Scripts",
+      "fields": [
+        {
+          "name": "AI name",
+          "db_column_name": "AIName",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Script name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "read_only": false
+        }
+      ]
+    },
+    {
+      "group_name": "Build",
+      "fields":[
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "string",
+          "read_only": false
+        }
+      ]
+    }
+  ]
+}
