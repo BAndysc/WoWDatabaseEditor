@@ -59,38 +59,39 @@
 		"name": "Quest flags",
 		"prefix": "QUEST_FLAGS_",
 		"values": {
-			"1": {"name": "STAY_ALIVE"},
-			"2": {"name": "PARTY_ACCEPT"},
-			"4": {"name": "EXPLORATION"},
-			"8": {"name": "SHARABLE"},
-			"16": {"name": "HAS_CONDITION"},
-			"32": {"name": "HIDE_REWARD_POI"},
-			"64": {"name": "TIMED"},
-			"128": {"name": "EXPANSION_ONLY"},
-			"256": {"name": "NO_MONEY_FROM_XP"},
-			"512": {"name": "HIDDEN_REWARDS"},
-			"1024": {"name": "TRACKING"},
-			"2048": {"name": "DEPRECATE_REPUTATION"},
-			"4096": {"name": "DAILY"},
-			"8192": {"name": "FLAGS_PVP"},
-			"16384": {"name": "UNAVAILABLE"},
-			"32768": {"name": "WEEKLY"},
-			"65536": {"name": "AUTOCOMPLETE"},
-			"131072": {"name": "DISPLAY_ITEM_IN_TRACKER"},
-			"262144": {"name": "DISABLE_COMPLETION_TEXT"},
-			"524288": {"name": "AUTO_ACCEPT"},
-			"1048576": {"name": "CAST_ON_ACCEPT"},
-			"2097152": {"name": "CAST_ON_COMPLETE"},
-			"4194304": {"name": "PHASE_SHIFT_UPDATE"},
-			"8388608": {"name": "SORWHITE_LIST"},
+			"0": {"name": "NONE"},
+			"1": {"name": "STAY_ALIVE", "description":  "If the player dies, the quest is failed.(question)"},
+			"2": {"name": "PARTY_ACCEPT", "description":  "Escort quests or any other event-driven quests. If player in party, all players that can accept this quest will receive confirmation box to accept quest."},
+			"4": {"name": "EXPLORATION", "description":  "Involves the activation of an areatrigger."},
+			"8": {"name": "SHARABLE", "description":  "Allows the quest to be shared with other players."},
+			"16": {"name": "HAS_CONDITION", "description":  "Not used currently"},
+			"32": {"name": "HIDE_REWARD_POI", "description":  "Not used currently: Unsure of content"},
+			"64": {"name": "RAID", "description":  "Can be completed while in raid"},
+			"128": {"name": "TBC", "description":  "Not used currently: Available if TBC expansion enabled only"},
+			"256": {"name": "NO_MONEY_FROM_XP", "description":  "Not used currently: Experience is not converted to gold at max level"},
+			"512": {"name": "HIDDEN_REWARDS", "description":  "Item and monetary rewards are hidden in the initial quest details page and in the quest log but will appear once ready to be rewarded."},
+			"1024": {"name": "TRACKING", "description":  "These quests are automatically rewarded on quest complete and they will never appear in quest log client side."},
+			"2048": {"name": "DEPRECATE_REPUTATION", "description":  "Not used currently"},
+			"4096": {"name": "DAILY", "description":  "Daily repeatable quests (only flag that the core applies specific behavior for)"},
+			"8192": {"name": "FLAGS_PVP", "description":  "Having this quest in log forces PvP flag"},
+			"16384": {"name": "UNAVAILABLE", "description":  "Used on quests that are not generically available"},
+			"32768": {"name": "WEEKLY", "description":  "Weekly repeatable quests (only flag that the core applies specific behavior for)"},
+			"65536": {"name": "AUTOCOMPLETE", "description":  "Auto complete"},
+			"131072": {"name": "DISPLAY_ITEM_IN_TRACKER", "description":  "Displays usable item in quest tracker"},
+			"262144": {"name": "OBJ_TEXT", "description":  "Use Objective text as Complete text"},
+			"524288": {"name": "AUTO_ACCEPT", "description":  "The client recognizes this flag as auto-accept. However, NONE of the current quests (3.3.5a) have this flag. Maybe blizz used to use it, or will use it in the future."},
+			"1048576": {"name": "PLAYER_CAST_ON_ACCEPT", "description":  "Quests with this flag player submit automatically by special button in player GUI"},
+			"2097152": {"name": "PLAYER_CAST_ON_COMPLETE", "description":  "Automatically suggestion of accepting quest. Not from npc."},
+			"4194304": {"name": "UPDATE_PHASE_SHIFT"},
+			"8388608": {"name": "SOR_WHITELIST"},
 			"16777216": {"name": "LAUNCH_GOSSIP_COMPLETE"},
 			"33554432": {"name": "REMOVE_EXTRA_GET_ITEMS"},
 			"67108864": {"name": "HIDE_UNTIL_DISCOVERED"},
 			"134217728": {"name": "PORTRAIT_IN_QUEST_LOG"},
 			"268435456": {"name": "SHOW_ITEM_WHEN_COMPLETED"},
 			"536870912": {"name": "LAUNCH_GOSSIP_ACCEPT"},
-			"1073741824": {"name": "ITEMS_GLOW_WHEN_DONE"}
-			//"2147483648": {"name": "FAIL_ON_LOGOUT"}
+			"1073741824": {"name": "ITEMS_GLOW_WHEN_DONE"},
+			"2147483648": {"name": "FAIL_ON_LOGOUT"}
 		}
 	},
 	"UnitFlagParameter": {
@@ -2017,6 +2018,7 @@
 	},
 	"LootModeParameter": {
 		"name": "Modes of loot",
+		"isflag": true,
 		"prefix": "LOOT_MODE",
 		"values": {
 			"0": {
@@ -2054,6 +2056,196 @@
 			"6": {"name": "corpse timed despawn", "description":  "despawns after a specified time after death"},
 			"7": {"name": "dead despawn", "description": "despawns when the creature disappears"},
 			"8": {"name": "manual despawn", "description": "despawns when Despawn action is called"}
+		}
+	},
+	"PageTextMaterialParameter": {
+		"name": "Page text material",
+		"values": {
+			"1": {"name": "Parchment"},
+			"2": {"name": "Stone"},
+			"3": {"name": "Marble"},
+			"4": {"name": "Silver"},
+			"5": {"name": "Bronze"},
+			"6": {"name": "Valentine"},
+			"8": {"name": "Parchment large"}
+		}
+	},
+	"TrapTypeParameter": {
+		"name": "Trap type",
+		"values": {
+			"0": {"name": "trap with no despawn after cast"},
+			"1": {"name": "trap despawns after cast"},
+			"2": {"name": "bomb casts on spawn"}
+		}
+	},
+	"QuestTypeParameter": {
+		"name": "Quest type",
+		"values": {
+			"0": {"name": "enabled, autocomplete", "description": "Quest is enabled, but it is auto-completed when accepted; this skips quest objectives and quest details."},
+			"1": {"name": "disabled", "description": "Quest is disabled (not yet implemented in the core)."},
+			"2": {"name": "enabled", "description": "Quest is enabled (does not auto-complete)."},
+			"3": {"name": "world quest", "description": "Quest is a World Quest."}
+		}
+	},
+	"QuestSpecialFlagParameter": {
+		"name": "Quest special flags",
+		"isflag": true,
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "repeatable"},
+			"2": {"name": "completable only by external event"},
+			"4": {"name": "auto-accept", "description": "As of patch 3.3.5a only quests in the starter area need this flag."},
+			"8": {"name": "Dungeon Finder quest"},
+			"16": {"name": "monthly"},
+			"32": {"name": "use spell cast kill credit", "description": "The quest requires RequiredOrNpcGo killcredit (a spell cast), but NOT an actual NPC kill. This action usually involves killing an invisible \"bunny\" NPC."}
+		}
+	},
+	"GameObjectFlagParameter": {
+		"name": "Gameobject flags",
+		"isflag": true,
+		"prefix": "GO_FLAG_",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "IN_USE", "description": "Gameobject in use - Disables interaction while being animated"},
+			"2": {"name": "LOCKED", "description": "Makes the Gameobject Locked. Requires a key, spell, or event to be opened. \"Locked\" appears in tooltip"},
+			"4": {"name": "INTERACT_COND", "description": "Untargetable, cannot interact"},
+			"8": {"name": "TRANSPORT", "description": "Gameobject can transport (boat, elevator, car)"},
+			"16": {"name": "NOT_SELECTABLE", "description": "Not selectable (Not even in GM-mode)"},
+			"32": {"name": "NODESPAWN", "description": "Never despawns. Typical for gameobjects with on/off state (doors for example)"},
+			"64": {"name": "TRIGGERED", "description": "typically, summoned objects. Triggered by spell or other events"},
+			"512": {"name": "DAMAGED", "description": "Gameobject has been siege damaged"},
+			"1024": {"name": "DESTROYED", "description": "Gameobject has been destroyed"}
+		}
+	},
+	"GenderParameter": {
+		"name": "Gender",
+		"values": {
+			"0": {"name": "male"},
+			"1": {"name": "female"},
+			"2": {"name": "none"}
+		}
+	},
+	"PowerTypeParameter": {
+		"name": "Power type",
+		"values": {
+			"0": {"name": "mana"},
+			"1": {"name": "rage"},
+			"2": {"name": "focus"},
+			"3": {"name": "energy"},
+			"5": {"name": "runes"},
+			"6": {"name": "runic power"},
+			"7": {"name": "soul shards"},
+			"8": {"name": "eclipse"},
+			"9": {"name": "holy power"},
+			"10": {"name": "alternate power"}
+		}
+	},
+	"StandStateParameter": {
+		"prefix": "UNIT_STAND_",
+		"name": "Stand state",
+		"values": {
+			"0": {"name": "STAND"},
+			"1": {"name": "SIT"},
+			"2": {"name": "SIT_CHAIR"},
+			"3": {"name": "SLEEP"},
+			"4": {"name": "SIT_LOW_CHAIR"},
+			"5": {"name": "SIT_MEDIUM_CHAIR"},
+			"6": {"name": "SIT_HIGH_CHAIR power"},
+			"7": {"name": "DEAD"},
+			"8": {"name": "KNEEL"},
+			"9": {"name": "SUBMERGED"}
+		}
+	},
+	"UnitStandFlagParameter": {
+		"isflag": true,
+		"prefix": "UNIT_STAND_FLAGS_",
+		"name": "Unit stand",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "UNK1"},
+			"2": {"name": "CREEP"},
+			"4": {"name": "UNTRACKABLE"},
+			"8": {"name": "UNK4"},
+			"16": {"name": "UNK5"}
+		}
+	},
+	"AnimationTierParameter": {
+		"name": "Animation tier",
+		"values": {
+			"0": {"name": "Ground"},
+			"1": {"name": "Swim"},
+			"2": {"name": "Hover"},
+			"3": {"name": "Fly"},
+			"4": {"name": "Submerged"}
+		}
+	},
+	"SheathStateParameter": {
+		"name": "Sheath state",
+		"values": {
+			"0": {"name": "Unarmed"},
+			"1": {"name": "Melee"},
+			"2": {"name": "Ranged"}
+		}
+	},
+	"UnitPVPStateFlagParameter": {
+		"isflag": true,
+		"prefix": "UNIT_BYTE2_FLAG_",
+		"name": "Unit stand",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "PVP"},
+			"2": {"name": "UNK1"},
+			"4": {"name": "FFA_PVP"},
+			"8": {"name": "SANCTUARY"},
+			"16": {"name": "UNK4"},
+			"32": {"name": "UNK5"},
+			"64": {"name": "UNK6"},
+			"128": {"name": "UNK7"}
+		}
+	},
+	"UnitBytesPetFlagParameter": {
+		"isflag": true,
+		"name": "Pet flags (bytes 2)",
+		"values": {
+			"1": {"name": "can be renamed"},
+			"2": {"name": "can be abandoned"}
+		}
+	},
+	"ShapeshiftFormParameter": {
+		"prefix": "FORM_",
+		"name": "Shapeshift form",
+		"values": {
+			"0": {"name": "NONE"},
+			"1": {"name": "CAT"},
+			"2": {"name": "TREE"},
+			"3": {"name": "TRAVEL"},
+			"4": {"name": "AQUA"},
+			"5": {"name": "BEAR"},
+			"6": {"name": "AMBIENT"},
+			"7": {"name": "GHOUL"},
+			"8": {"name": "DIREBEAR"},
+			"9": {"name": "STEVES_GHOUL"},
+			"10": {"name": "THARONJA_SKELETON"},
+			"11": {"name": "TEST_OF_STRENGTH"},
+			"12": {"name": "BLB_PLAYER"},
+			"13": {"name": "SHADOW_DANCE"},
+			"14": {"name": "CREATUREBEAR"},
+			"15": {"name": "CREATURECAT"},
+			"16": {"name": "GHOSTWOLF"},
+			"17": {"name": "BATTLESTANCE"},
+			"18": {"name": "DEFENSIVESTANCE"},
+			"19": {"name": "BERSERKERSTANCE"},
+			"20": {"name": "TEST"},
+			"21": {"name": "ZOMBIE"},
+			"22": {"name": "METAMORPHOSIS"},
+			"25": {"name": "UNDEAD"},
+			"26": {"name": "MASTER_ANGLER"},
+			"27": {"name": "FLIGHT_EPIC"},
+			"28": {"name": "SHADOW"},
+			"29": {"name": "FLIGHT"},
+			"30": {"name": "STEALTH"},
+			"31": {"name": "MOONKIN"},
+			"32": {"name": "SPIRITOFREDEMPTION"}
 		}
 	}
 }

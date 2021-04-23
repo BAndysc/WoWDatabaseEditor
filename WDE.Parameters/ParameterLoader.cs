@@ -33,6 +33,7 @@ namespace WDE.Parameters
             factory.Register("GameEventParameter", new GameEventParameter(database));
             factory.Register("CreatureParameter", new CreatureParameter(database));
             factory.Register("QuestParameter", new QuestParameter(database));
+            factory.Register("PrevQuestParameter", new PrevQuestParameter(database));
             factory.Register("GameobjectParameter", new GameobjectParameter(database));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
@@ -48,7 +49,29 @@ namespace WDE.Parameters
         }
     }
 
-    public class CreatureParameter : Parameter
+    public abstract class LazyLoadParameter : Parameter
+    {
+        public override bool HasItems
+        {
+            get
+            {
+                if (Items == null)
+                    LazyLoad();
+                return Items!.Count > 0;
+            }
+        }
+
+        public override string ToString(long key)
+        {
+            if (Items == null)
+                LazyLoad();
+            return base.ToString(key);
+        }
+
+        protected abstract void LazyLoad();
+    }
+
+    public class CreatureParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -57,19 +80,15 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(long key)
+        protected override void LazyLoad()
         {
-            if (Items == null)
-            {
-                Items = new Dictionary<long, SelectOption>();
-                foreach (ICreatureTemplate item in database.GetCreatureTemplates())
-                    Items.Add(item.Entry, new SelectOption(item.Name));
-            }
-            return base.ToString(key);
+            Items = new Dictionary<long, SelectOption>();
+            foreach (ICreatureTemplate item in database.GetCreatureTemplates())
+                Items.Add(item.Entry, new SelectOption(item.Name));
         }
     }
 
-    public class QuestParameter : Parameter
+    public class QuestParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -78,19 +97,35 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(long key)
+        protected override void LazyLoad()
         {
-            if (Items == null)
-            {
-                Items = new Dictionary<long, SelectOption>();
-                foreach (IQuestTemplate item in database.GetQuestTemplates())
-                    Items.Add(item.Entry, new SelectOption(item.Name));
-            }
-            return base.ToString(key);
+            Items = new Dictionary<long, SelectOption>();
+            foreach (IQuestTemplate item in database.GetQuestTemplates())
+                Items.Add(item.Entry, new SelectOption(item.Name));
         }
     }
     
-    public class GameEventParameter : Parameter
+    public class PrevQuestParameter : LazyLoadParameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public PrevQuestParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+
+        protected override void LazyLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (IQuestTemplate item in database.GetQuestTemplates())
+            {
+                Items.Add(-item.Entry, new SelectOption(item.Name, "quest must be active"));
+                Items.Add(item.Entry, new SelectOption(item.Name, "quest must be completed"));
+            }
+        }
+    }
+
+    public class GameEventParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -99,19 +134,15 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(long key)
+        protected override void LazyLoad()
         {
-            if (Items == null)
-            {
-                Items = new Dictionary<long, SelectOption>();
-                foreach (IGameEvent item in database.GetGameEvents())
-                    Items.Add(item.Entry, new SelectOption(item.Description));
-            }
-            return base.ToString(key);
+            Items = new Dictionary<long, SelectOption>();
+            foreach (IGameEvent item in database.GetGameEvents())
+                Items.Add(item.Entry, new SelectOption(item.Description));
         }
     }
 
-    public class GameobjectParameter : Parameter
+    public class GameobjectParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -120,20 +151,16 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override string ToString(long key)
+        protected override void LazyLoad()
         {
-            if (Items == null)
-            {
-                Items = new Dictionary<long, SelectOption>();
-                foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
-                    Items.Add(item.Entry, new SelectOption(item.Name));
-            }
-            return base.ToString(key);
+            Items = new Dictionary<long, SelectOption>();
+            foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
+                Items.Add(item.Entry, new SelectOption(item.Name));
         }
     }
     
     
-    public class ConversationTemplateParameter : Parameter
+    public class ConversationTemplateParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -141,21 +168,17 @@ namespace WDE.Parameters
         {
             this.database = database;
         }
-
-        public override string ToString(long key)
+        
+        protected override void LazyLoad()
         {
-            if (Items == null)
+            Items = new Dictionary<long, SelectOption>();
+            foreach (IConversationTemplate item in database.GetConversationTemplates())
             {
-                Items = new Dictionary<long, SelectOption>();
-                foreach (IConversationTemplate item in database.GetConversationTemplates())
-                {
-                    var name = $"conversation with first line id: {item.FirstLineId}";
-                    if (!string.IsNullOrEmpty(item.ScriptName))
-                        name += $", script name: {item.ScriptName}";
-                    Items.Add(item.Id, new SelectOption(name));
-                }
+                var name = $"conversation with first line id: {item.FirstLineId}";
+                if (!string.IsNullOrEmpty(item.ScriptName))
+                    name += $", script name: {item.ScriptName}";
+                Items.Add(item.Id, new SelectOption(name));
             }
-            return base.ToString(key);
         }
     }
     

@@ -6,7 +6,11 @@ using WDE.Common.Parameters;
 
 namespace WDE.Parameters.Models
 {
-    public class ParameterValueHolder<T> : INotifyPropertyChanged
+    public interface IParameterValueHolder
+    {
+    }
+
+    public class ParameterValueHolder<T> : IParameterValueHolder, INotifyPropertyChanged
     {
         private T value;
         [NotNull]
