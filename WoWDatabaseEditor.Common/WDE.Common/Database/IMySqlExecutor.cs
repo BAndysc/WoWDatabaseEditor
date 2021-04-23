@@ -8,8 +8,10 @@ namespace WDE.Common.Database
     [UniqueProvider]
     public interface IMySqlExecutor
     {
+        bool IsConnected { get; }
+        
         Task ExecuteSql(string query);
-        Task<IList<Dictionary<string, object>>> ExecuteSelectSql(string query);
+        Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query);
 
         public class DatabaseExecutorException : Exception
         {

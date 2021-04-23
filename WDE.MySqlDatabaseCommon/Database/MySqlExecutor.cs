@@ -1,23 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using MySqlConnector;
 using WDE.Common.Database;
 using WDE.MySqlDatabaseCommon.Providers;
+using WDE.MySqlDatabaseCommon.Services;
 
 namespace WDE.MySqlDatabaseCommon.Database
 {
     public class MySqlExecutor : IMySqlExecutor
     {
         private readonly IMySqlConnectionStringProvider connectionString;
+        private readonly IDatabaseProvider databaseProvider;
+        private readonly DatabaseLogger databaseLogger;
+        
+        public bool IsConnected => databaseProvider.IsConnected;
 
-        public MySqlExecutor(IMySqlConnectionStringProvider connectionString)
+        public MySqlExecutor(IMySqlConnectionStringProvider connectionString,
+            IDatabaseProvider databaseProvider,
+            DatabaseLogger databaseLogger)
         {
             this.connectionString = connectionString;
+            this.databaseProvider = databaseProvider;
+            this.databaseLogger = databaseLogger;
         }
 
         public async Task ExecuteSql(string query)
         {
+            if (string.IsNullOrEmpty(query) || !IsConnected)
+                return;
+
+            databaseLogger.Log(query, null, TraceLevel.Info);
+            
             using var writeLock = await DatabaseLock.WriteLock();
             
             MySqlConnection conn = new(connectionString.ConnectionString);
@@ -47,8 +62,12 @@ namespace WDE.MySqlDatabaseCommon.Database
             await conn.CloseAsync();
         }
 
-        public async Task<IList<Dictionary<string, object>>> ExecuteSelectSql(string query)
+        public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)
         {
+            if (string.IsNullOrEmpty(query) || !IsConnected)
+                return new List<Dictionary<string, (Type, object)>>();
+
+            databaseLogger.Log(query, null, TraceLevel.Info);
             using var writeLock = await DatabaseLock.WriteLock();
             
             MySqlConnection conn = new(connectionString.ConnectionString);
@@ -73,12 +92,12 @@ namespace WDE.MySqlDatabaseCommon.Database
                 throw new IMySqlExecutor.QueryFailedDatabaseException(ex);
             }
 
-            List<Dictionary<string, object>> result = new();
+            List<Dictionary<string, (Type, object)>> result = new();
             while (reader.Read())
             {
-                var fields = new Dictionary<string, object>(reader.FieldCount);
+                var fields = new Dictionary<string, (Type, object)>(reader.FieldCount);
                 for (int i = 0; i < reader.FieldCount; ++i)
-                    fields.Add(reader.GetName(i), reader.GetValue(i));
+                    fields.Add(reader.GetName(i), (reader.GetFieldType(i), reader.GetValue(i)));
                 
                 result.Add(fields);
             }
