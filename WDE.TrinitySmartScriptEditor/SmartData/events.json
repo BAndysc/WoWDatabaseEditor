@@ -44,10 +44,10 @@
         ],
       "is_timed": true,
       "description": "When in combat and timer at the begining between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
-      "name_readable": "Every X seconds (in combat)",
+      "name_readable": "Every X milliseconds (in combat)",
     "description_rules": [
       {
-        "description": "After {pram1} seconds",
+        "description": "After {pram1} milliseconds",
         "conditions": [
           {
             "warning_type": "NOT_SET",
@@ -305,10 +305,10 @@
             }
         ],
         "description": "When out of combat and timer at the begining between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
-        "name_readable": "Every X seconds (out of combat)",
+        "name_readable": "Every X milliseconds (out of combat)",
     "description_rules": [
       {
-        "description": "After {pram1} seconds",
+        "description": "After {pram1} milliseconds",
         "conditions": [
           {
             "warning_type": "NOT_SET",
@@ -2216,10 +2216,10 @@
         ],
         "is_timed": true,
         "description": "Every {pram3} and {pram4} ms (for the first time, timer between {pram1} and {pram2} ms)",
-        "name_readable": "Every X seconds",
+        "name_readable": "Every X milliseconds",
     "description_rules": [
       {
-        "description": "After {pram1} seconds",
+        "description": "After {pram1} milliseconds",
         "conditions": [
           {
             "warning_type": "NOT_SET",
