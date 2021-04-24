@@ -1,0 +1,69 @@
+﻿{
+  "id": "creature_loot_template_tc_335",
+  "compatibility": ["Azeroth"],
+  "name": "Creature Loot Template",
+  "table_name": "creature_loot_template",
+  "table_index_name": "Entry",
+  "table_name_source_field": "",
+  "picker": "CreatureParameter",
+  "multi_record": true,
+  "groups": [
+    {
+      "group_name": "Items",
+      "group_sort_field": "Item",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "Entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Item",
+          "db_column_name": "Item",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Loot table reference",
+          "db_column_name": "Reference",
+          "value_type": "uint"
+        },
+        {
+          "name": "Chance",
+          "db_column_name": "Chance",
+          "value_type": "float"
+        },
+        {
+          "name": "Required quest",
+          "db_column_name": "QuestRequired",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Loot mode",
+          "db_column_name": "LootMode",
+          "value_type": "LootModeParameter"
+        },
+        {
+          "name": "GroupId",
+          "db_column_name": "GroupId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min count",
+          "db_column_name": "MinCount",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max count",
+          "db_column_name": "MaxCount",
+          "value_type": "uint"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}
