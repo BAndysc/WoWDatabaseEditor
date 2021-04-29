@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using AvaloniaEdit;
+using AvaloniaEdit.Editing;
+using Prism.Commands;
 using WDE.Common.Menu;
 
 namespace WDE.Common.Avalonia.Utils
@@ -80,10 +85,72 @@ namespace WDE.Common.Avalonia.Utils
                         continue;
                     
                     var keyGesture = new KeyGesture(key, cmd.Shortcut.Value.Control ? systemWideControlModifier : KeyModifiers.None);
-                    window.KeyBindings.Add(new KeyBinding(){Command = cmd.ItemCommand, Gesture = keyGesture});
+                    var command = cmd.ItemCommand;
+                    // ok, so this is terrible, but TextBox gestures handling is inside OnKeyDown
+                    // which is executed AFTER handling application wise shortcuts
+                    // However application wise shortcuts take higher priority
+                    // and effectively TextBox doesn't handle copy/paste/cut/undo/redo -.-
+                    command = OverrideCommand<TextBox>(command, Key.C, key, cmd, tb => tb.Copy());
+                    command = OverrideCommand<TextBox>(command, Key.X, key, cmd, tb => tb.Cut());
+                    command = OverrideCommand<TextBox>(command, Key.V, key, cmd, tb => tb.Paste());
+                    command = OverrideCommand<TextBox>(command, Key.Z, key, cmd, Undo);
+                    command = OverrideCommand<TextBox>(command, Key.Y, key, cmd, Redo);
+                    
+                    command = OverrideCommand<TextArea>(command, Key.C, key, cmd, tb => ApplicationCommands.Copy.Execute(null, tb));
+                    command = OverrideCommand<TextArea>(command, Key.X, key, cmd, tb => ApplicationCommands.Cut.Execute(null, tb));
+                    command = OverrideCommand<TextArea>(command, Key.V, key, cmd, tb => ApplicationCommands.Paste.Execute(null, tb));
+                    
+                    window.KeyBindings.Add(new KeyBinding(){Command = command, Gesture = keyGesture});
                 }
             }
             return viewModel;
+        }
+
+        private static void Redo(TextBox tb)
+        {
+            ExecuteUndoRedo(tb, "Redo");
+        }
+
+        private static void Undo(TextBox tb)
+        {
+            ExecuteUndoRedo(tb, "Undo");
+        }
+
+        private static void ExecuteUndoRedo(TextBox tb, string methodName)
+        {
+            var field = tb.GetType().GetField("_undoRedoHelper", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (field == null)
+                return;
+            
+            object undoHelper = field.GetValue(tb);
+            if (undoHelper == null)
+                return;
+
+            var undoMethod = undoHelper.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+
+            if (undoMethod == null)
+                return;
+
+            undoMethod.Invoke(undoHelper, null);
+        }
+
+        private static ICommand OverrideCommand<T>(ICommand command, Key require, Key commandKey, IMenuCommandItem item, Action<T> func)
+        {
+            if (require != commandKey || !item.Shortcut.Value.Control)
+                return command;
+
+            return new DelegateCommand(() =>
+            {
+                if (FocusManager.Instance.Current is T t)
+                    func(t);
+                else if (command.CanExecute(null))
+                    command.Execute(null);
+            }, () =>
+            {
+                if (FocusManager.Instance.Current is T t)
+                    return true;
+                return command.CanExecute(null);
+            });
         }
     }
 }
