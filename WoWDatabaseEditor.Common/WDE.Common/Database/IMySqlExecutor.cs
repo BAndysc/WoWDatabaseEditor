@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WDE.Common.Annotations;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Database
@@ -12,6 +13,8 @@ namespace WDE.Common.Database
         
         Task ExecuteSql(string query);
         Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query);
+        Task<IList<string>> GetTables();
+        Task<IList<MySqlDatabaseColumn>> GetTableColumns(string table);
 
         public class DatabaseExecutorException : Exception
         {
@@ -33,5 +36,15 @@ namespace WDE.Common.Database
             {
             }
         }
+    }
+
+    public struct MySqlDatabaseColumn
+    {
+        public string ColumnName { get; set; }
+        public bool Nullable { get; set; }
+        public bool PrimaryKey { get; set; }
+        public string DatabaseType { get; set; }
+        public Type? ManagedType { get; set; }
+        public object DefaultValue { get; set; }
     }
 }

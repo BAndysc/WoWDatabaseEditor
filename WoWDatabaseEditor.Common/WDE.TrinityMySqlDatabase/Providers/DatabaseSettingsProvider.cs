@@ -17,6 +17,7 @@ namespace WDE.TrinityMySqlDatabase.Providers
         }
 
         public string ConnectionString => $"Server={Settings.Host};Port={Settings.Port ?? 3306};Database={Settings.Database};Uid={Settings.User};Pwd={Settings.Password};AllowUserVariables=True";
+        public string DatabaseName => Settings.Database ?? "";
 
         public DbAccess Settings
         {

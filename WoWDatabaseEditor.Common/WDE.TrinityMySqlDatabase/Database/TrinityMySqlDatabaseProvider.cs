@@ -271,6 +271,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         public MySqlSettings(DbAccess access)
         {
             this.access = access;
+            DatabaseName = access.Database ?? "";
             ConnectionStrings = new[]
             {
                 new ConnectionStringSettings
@@ -291,5 +292,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public string ConnectionString =>
             $"Server={access.Host};Port={access.Port ?? 3306};Database={access.Database};Uid={access.User};Pwd={access.Password};AllowUserVariables=True";
+
+        public string DatabaseName { get; }
     }
 }
