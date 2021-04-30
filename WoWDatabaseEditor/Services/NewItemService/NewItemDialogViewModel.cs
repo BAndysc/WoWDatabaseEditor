@@ -20,16 +20,12 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
         private string customName = "New folder";
         private NewItemPrototypeInfo? selectedPrototype;
 
-        public NewItemDialogViewModel(IEnumerable<ISolutionItemProvider> items, 
-            IEnumerable<ISolutionItemProviderProvider> providers,
-            ICurrentCoreVersion coreVersion)
+        public NewItemDialogViewModel(ISolutionItemProvideService provider)
         {
             Dictionary<string, NewItemPrototypeGroup> groups = new();
             ItemPrototypes = new ObservableCollection<NewItemPrototypeGroup>();
 
-            items = items.Concat(providers.SelectMany(p => p.Provide()));
-            
-            foreach (var item in items.Where(i => i.IsCompatibleWithCore(coreVersion.Current)))
+            foreach (var item in provider.AllCompatible)
             {
                 if (!groups.TryGetValue(item.GetGroupName(), out var group))
                 {

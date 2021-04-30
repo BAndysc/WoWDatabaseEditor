@@ -28,6 +28,12 @@ namespace WDE.Common
         IEnumerable<ISolutionItemProvider> Provide();
     }
 
+    [UniqueProvider]
+    public interface ISolutionItemProvideService
+    {
+        IEnumerable<ISolutionItemProvider> AllCompatible { get; }
+    }
+
     public interface INamedSolutionItemProvider : ISolutionItemProvider
     {
         Task<ISolutionItem> CreateSolutionItem(string name);

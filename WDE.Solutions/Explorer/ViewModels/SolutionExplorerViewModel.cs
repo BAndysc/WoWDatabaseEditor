@@ -39,7 +39,8 @@ namespace WDE.Solutions.Explorer.ViewModels
             ISolutionSqlService solutionSqlService,
             INewItemService newItemService,
             ISolutionTasksService solutionTasksService,
-            IStatusBar statusBar)
+            IStatusBar statusBar,
+            ISolutionItemProvideService provider)
         {
             this.itemNameRegistry = itemNameRegistry;
             this.solutionManager = solutionManager;
@@ -83,6 +84,22 @@ namespace WDE.Solutions.Explorer.ViewModels
                 }
             };
 
+            Dictionary<string, AddItemCategoryMenuViewModel> byNameCategories = new();
+            foreach (var item in provider.AllCompatible)
+            {
+                if (item is INamedSolutionItemProvider)
+                    continue;
+                
+                if (!byNameCategories.TryGetValue(item.GetGroupName(), out var category))
+                {
+                    category = new AddItemCategoryMenuViewModel(item.GetGroupName());
+                    byNameCategories.Add(category.Name, category);
+                    AddItems.Add(category);
+                }
+                
+                category.Items.Add(new SolutionItemMenuViewModel(item, solutionManager, this.ea));
+            }
+
             AddItem = new DelegateCommand(async () =>
             {
                 ISolutionItem item = await newItemService.GetNewSolutionItem();
@@ -92,6 +109,9 @@ namespace WDE.Solutions.Explorer.ViewModels
                         solutionManager.Items.Add(item);
                     else
                         selected.Item.Items.Add(item);
+                    
+                    if (item is not SolutionFolderItem)
+                        ea.GetEvent<EventRequestOpenItem>().Publish(item);
                 }
             });
 
@@ -136,7 +156,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         }
 
         public ObservableCollection<SolutionItemViewModel> Root { get; }
-
+        public ObservableCollection<AddItemCategoryMenuViewModel> AddItems { get; } = new();
         public DelegateCommand AddItem { get; }
         public DelegateCommand RemoveItem { get; }
         public DelegateCommand GenerateSQL { get; }

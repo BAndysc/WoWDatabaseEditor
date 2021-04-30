@@ -59,8 +59,23 @@
         <TreeView.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="Add"
-                          Command="{Binding #tv.DataContext.AddItem}"
-                          IsEnabled="{Binding IsContainer}" />
+                          IsEnabled="{Binding IsContainer}"
+                          Command="{Binding #tv.DataContext.AddItem}" />
+                <MenuItem Header="Quick add"
+                          IsEnabled="{Binding IsContainer}"
+                          Classes="Parent"
+                          Items="{Binding #tv.DataContext.AddItems}">
+                    <MenuItem.Styles>
+                        <Style Selector="MenuItem.Parent > MenuItem">
+                            <Setter Property="Header" Value="{Binding Name}"/>
+                            <Setter Property="Items" Value="{Binding Items}"/>
+                        </Style>
+                        <Style Selector="MenuItem.Parent > MenuItem > MenuItem">
+                            <Setter Property="Header" Value="{Binding Name}"/>
+                            <Setter Property="Command" Value="{Binding Command}"/>
+                        </Style>
+                    </MenuItem.Styles>
+                </MenuItem>
                 <MenuItem Header="Remove"
                           Command="{Binding #tv.DataContext.RemoveItem}" />
                 <Separator />
