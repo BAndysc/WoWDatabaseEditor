@@ -2247,5 +2247,71 @@
 			"31": {"name": "MOONKIN"},
 			"32": {"name": "SPIRITOFREDEMPTION"}
 		}
+	},
+	"QuestStatusParameter": {
+		"isflag": true,
+		"prefix": "QUEST_STATUS",
+		"name": "Quest status (mask)",
+		"values": {
+			"1": {"name": "none", "description": "Player does not have or had quest at all. He could accept it, but he did not (yet)."},
+			"2": {"name": "complete", "description": "Player fulfilled objectives, but did not hand it in yet."},
+			"8": {"name": "incomplete", "description": "Player did not fulfill objectives yet"},
+			"32": {"name": "failed", "description": "Player failed to fulfill objectives for any reason, e.g. time limit"},
+			"64": {"name": "rewarded", "description": "Player handed quest in and this is sort of a post-quest interaction"}
+		}
+	},
+	"CreatureTextTypeParameter": {
+		"name": "Creature text type",
+		"values": {
+			"12": {"name": "Say"},
+			"14": {"name": "Yell"},
+			"15": {"name": "Whisper"},
+			"16": {"name": "Emote"},
+			"41": {"name": "Boss emote"},
+			"42": {"name": "Boss whisper"}
+		}
+	},
+	"GossipIconParameter": {
+		"name": "Gossip icons for gossip_menu",
+		"prefix": "GOSSIP_ICON_",
+		"values": {
+			"0": {"name": "Chat", "description": "White chat bubble"},
+			"1": {"name": "Vendor", "description": "Brown bag"},
+			"2": {"name": "Taxi", "description": "Flight"},
+			"3": {"name": "Trainer", "description": "Book"},
+			"4": {"name": "Interact 1", "description": "Interaction wheel"},
+			"5": {"name": "Interact 2", "description": "Interaction wheel"},
+			"6": {"name": "Money bag", "description": "Brown bag with yellow dot (gold)"},
+			"7": {"name": "Talk", "description": "White chat bubble with black dots (...)"},
+			"8": {"name": "Tabard", "description": "Tabard"},
+			"9": {"name": "Battle", "description": "Two swords"},
+			"10": {"name": "Dot", "description": "Yellow dot"}
+		}
+	},
+	"GossipOptionTypeParameter": {
+		"name": "Gossip menu option types",
+		"prefix": "GOSSIP_OPTION_",
+		"values": {
+			"0": {"name": "None", "description": "Requires npc flag NONE"},
+			"1": {"name": "Gossip", "description": "Requires npc flag GOSSIP"},
+			"2": {"name": "Questgiver", "description": "Requires npc flag QUESTGIVER"},
+			"3": {"name": "Vendor", "description": "Requires npc flag VENDOR (Make sure there is npc_vendor data for this creature)"},
+			"4": {"name": "Taxi vendor", "description": "Requires npc flag TAXIVENDOR"},
+			"5": {"name": "Trainer", "description": "Requires npc flag TRAINER (Remember to set trainer_class in creature_template) "},
+			"6": {"name": "Spirit healer", "description": "Requires npc flag SPIRITHEALER"},
+			"7": {"name": "Spirit guide", "description": "Requires npc flag SPIRITGUIDE"},
+			"8": {"name": "Innkeeper", "description": "Requires npc flag INNKEEPER"},
+			"9": {"name": "Banker", "description": "Requires npc flag BANKER"},
+			"10": {"name": "Petitioner", "description": "Requires npc flag PETITIONER"},
+			"11": {"name": "Tabard designer", "description": "Requires npc flag TABARDDESIGNER"},
+			"12": {"name": "Battlefield", "description": "Requires npc flag BATTLEFIELDPERSON"},
+			"13": {"name": "Auctioneer", "description": "Requires npc flag AUCTIONEER"},
+			"14": {"name": "Stable pet", "description": "Requires npc flag STABLE"},
+			"15": {"name": "Armorer", "description": "Requires npc flag ARMORER (not used)"},
+			"16": {"name": "Unlearn talents", "description": "Requires npc flag TRAINER (bonus option for GOSSIP_OPTION_TRAINER)"},
+			"17": {"name": "Unlearn pet talents", "description": "Requires npc flag TRAINER (bonus option for GOSSIP_OPTION_TRAINER)"},
+			"18": {"name": "Learn dual spec", "description": "Requires npc flag TRAINER (bonus option for GOSSIP_OPTION_TRAINER)"},
+			"19": {"name": "Outdoor pvp"}
+		}
 	}
 }
