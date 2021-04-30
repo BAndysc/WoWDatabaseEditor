@@ -15,8 +15,8 @@ namespace WDE.Trinity
         public string FriendlyName => "TrinityCore Shadowlands";
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
-        
-        public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>();
+
+        public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText)};
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {
             SmartScriptType.Creature,

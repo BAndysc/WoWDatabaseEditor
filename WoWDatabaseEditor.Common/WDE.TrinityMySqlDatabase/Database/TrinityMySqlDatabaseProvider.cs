@@ -90,10 +90,19 @@ namespace WDE.TrinityMySqlDatabase.Database
         public IEnumerable<IGossipMenu> GetGossipMenus()
         {
             using var model = new TrinityDatabase();
-            var gossips = (from gossip in model.GossipMenus
-                join p in model.NpcTexts on gossip.TextId equals p.Id into lj
-                from lp in lj.DefaultIfEmpty()
-                select gossip.SetText(lp)).ToList();
+
+            List<MySqlGossipMenuLine> gossips;
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            {
+                gossips = model.GossipMenus.ToList();
+            }
+            else
+            {
+                gossips = (from gossip in model.GossipMenus
+                    join p in model.NpcTexts on gossip.TextId equals p.Id into lj
+                    from lp in lj.DefaultIfEmpty()
+                    select gossip.SetText(lp)).ToList();   
+            }
 
             return gossips.GroupBy(g => g.MenuId)
                 .Select(t => new MySqlGossipMenu(t.Key, t.Where(t => t.Text != null).Select(t => t.Text!).ToList()))
@@ -103,10 +112,19 @@ namespace WDE.TrinityMySqlDatabase.Database
         public async Task<List<IGossipMenu>> GetGossipMenusAsync()
         {
             await using var model = new TrinityDatabase();
-            var gossips = await (from gossip in model.GossipMenus
-                join p in model.NpcTexts on gossip.TextId equals p.Id into lj
-                from lp in lj.DefaultIfEmpty()
-                select gossip.SetText(lp)).ToListAsync();
+
+            List<MySqlGossipMenuLine> gossips;
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            {
+                gossips = await model.GossipMenus.ToListAsync();
+            }
+            else
+            {
+                gossips = await (from gossip in model.GossipMenus
+                    join p in model.NpcTexts on gossip.TextId equals p.Id into lj
+                    from lp in lj.DefaultIfEmpty()
+                    select gossip.SetText(lp)).ToListAsync();   
+            }
 
             return gossips.GroupBy(g => g.MenuId)
                 .Select(t => new MySqlGossipMenu(t.Key, t.Where(t => t.Text != null).Select(t => t.Text!).ToList()))
@@ -115,12 +133,18 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<INpcText> GetNpcTexts()
         {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+                return new List<INpcText>();
+            
             using var model = new TrinityDatabase();
             return (from t in model.NpcTexts orderby t.Id select t).ToList<INpcText>();
         }
 
         public async Task<List<INpcText>> GetNpcTextsAsync()
         {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+                return new List<INpcText>();
+            
             await using var model = new TrinityDatabase();
             return await (from t in model.NpcTexts orderby t.Id select t).ToListAsync<INpcText>();
         }

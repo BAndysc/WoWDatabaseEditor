@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.Managers;
 using WDE.Common.Tasks;
 
 namespace WDE.MySqlDatabaseCommon.Database
@@ -25,11 +27,14 @@ namespace WDE.MySqlDatabaseCommon.Database
         
         private IAsyncDatabaseProvider nonCachedDatabase;
         private readonly ITaskRunner taskRunner;
+        private readonly IStatusBar statusBar;
 
-        public CachedDatabaseProvider(IAsyncDatabaseProvider nonCachedDatabase, ITaskRunner taskRunner)
+        public CachedDatabaseProvider(IAsyncDatabaseProvider nonCachedDatabase,
+            ITaskRunner taskRunner, IStatusBar statusBar)
         {
             this.nonCachedDatabase = nonCachedDatabase;
             this.taskRunner = taskRunner;
+            this.statusBar = statusBar;
         }
 
         public void TryConnect()
@@ -139,48 +144,56 @@ namespace WDE.MySqlDatabaseCommon.Database
 
             public async Task Run(ITaskProgress progress)
             {
-                int steps = 8;
-                
-                progress.Report(0, steps, "Loading creatures");
-                cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
+                try
+                {
+                    int steps = 8;
 
-                progress.Report(1, steps, "Loading gameobjects");
-                cache.gameObjectTemplateCache = await cache.nonCachedDatabase.GetGameObjectTemplatesAsync();
+                    progress.Report(0, steps, "Loading creatures");
+                    cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
 
-                progress.Report(2, steps, "Loading game events");
-                cache.gameEventsCache = await cache.nonCachedDatabase.GetGameEventsAsync();
-                
-                progress.Report(3, steps, "Loading areatrigger templates");
-                cache.areaTriggerTemplates = await cache.nonCachedDatabase.GetAreaTriggerTemplatesAsync();
-                
-                progress.Report(4, steps, "Loading conversation templates");
-                cache.conversationTemplates = await cache.nonCachedDatabase.GetConversationTemplatesAsync();
-                
-                progress.Report(5, steps, "Loading gossip menus");
-                cache.gossipMenusCache = await cache.nonCachedDatabase.GetGossipMenusAsync();
-                
-                progress.Report(6, steps, "Loading npc texts");
-                cache.npcTextsCache = await cache.nonCachedDatabase.GetNpcTextsAsync();
+                    progress.Report(1, steps, "Loading gameobjects");
+                    cache.gameObjectTemplateCache = await cache.nonCachedDatabase.GetGameObjectTemplatesAsync();
 
-                progress.Report(7, steps, "Loading quests");
-                cache.questTemplateCache = await cache.nonCachedDatabase.GetQuestTemplatesAsync();
+                    progress.Report(2, steps, "Loading game events");
+                    cache.gameEventsCache = await cache.nonCachedDatabase.GetGameEventsAsync();
 
-                Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
-                Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
-                Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
+                    progress.Report(3, steps, "Loading areatrigger templates");
+                    cache.areaTriggerTemplates = await cache.nonCachedDatabase.GetAreaTriggerTemplatesAsync();
 
-                foreach (var entity in cache.creatureTemplateCache)
-                    creatureTemplateByEntry[entity.Entry] = entity;
+                    progress.Report(4, steps, "Loading conversation templates");
+                    cache.conversationTemplates = await cache.nonCachedDatabase.GetConversationTemplatesAsync();
 
-                foreach (var entity in cache.gameObjectTemplateCache)
-                    gameObjectTemplateByEntry[entity.Entry] = entity;
+                    progress.Report(5, steps, "Loading gossip menus");
+                    cache.gossipMenusCache = await cache.nonCachedDatabase.GetGossipMenusAsync();
 
-                foreach (var entity in cache.questTemplateCache)
-                    questTemplateByEntry[entity.Entry] = entity;
+                    progress.Report(6, steps, "Loading npc texts");
+                    cache.npcTextsCache = await cache.nonCachedDatabase.GetNpcTextsAsync();
 
-                cache.creatureTemplateByEntry = creatureTemplateByEntry;
-                cache.gameObjectTemplateByEntry = gameObjectTemplateByEntry;
-                cache.questTemplateByEntry = questTemplateByEntry;
+                    progress.Report(7, steps, "Loading quests");
+                    cache.questTemplateCache = await cache.nonCachedDatabase.GetQuestTemplatesAsync();
+
+                    Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
+                    Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
+                    Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
+
+                    foreach (var entity in cache.creatureTemplateCache)
+                        creatureTemplateByEntry[entity.Entry] = entity;
+
+                    foreach (var entity in cache.gameObjectTemplateCache)
+                        gameObjectTemplateByEntry[entity.Entry] = entity;
+
+                    foreach (var entity in cache.questTemplateCache)
+                        questTemplateByEntry[entity.Entry] = entity;
+
+                    cache.creatureTemplateByEntry = creatureTemplateByEntry;
+                    cache.gameObjectTemplateByEntry = gameObjectTemplateByEntry;
+                    cache.questTemplateByEntry = questTemplateByEntry;
+                }
+                catch (Exception e)
+                {
+                    cache.statusBar.PublishNotification(new PlainNotification(NotificationType.Error, $"Error while connecting to the database. Make sure you have correct core version in the settings: {e.Message}"));
+                    throw;
+                }
             }
         }
     }

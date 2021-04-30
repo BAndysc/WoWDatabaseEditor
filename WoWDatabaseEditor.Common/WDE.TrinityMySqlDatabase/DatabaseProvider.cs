@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
@@ -16,18 +17,22 @@ namespace WDE.TrinityMySqlDatabase
     [SingleInstance]
     public class DatabaseProvider : DatabaseDecorator
     {
+        private readonly IStatusBar statusBar;
+
         public DatabaseProvider(TrinityMySqlDatabaseProvider trinityDatabase,
             NullDatabaseProvider nullDatabaseProvider,
             IDatabaseSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
+            IStatusBar statusBar,
             ITaskRunner taskRunner) : base(nullDatabaseProvider)
         {
+            this.statusBar = statusBar;
             if (settingsProvider.Settings.IsEmpty)
                 return;
 
             try
             {
-                var cachedDatabase = new CachedDatabaseProvider(trinityDatabase, taskRunner);
+                var cachedDatabase = new CachedDatabaseProvider(trinityDatabase, taskRunner, statusBar);
                 cachedDatabase.TryConnect();
                 impl = cachedDatabase;
             }
