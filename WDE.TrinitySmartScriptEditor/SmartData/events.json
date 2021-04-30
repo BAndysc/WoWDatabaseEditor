@@ -2457,7 +2457,7 @@
         "name": "SMART_EVENT_GOSSIP_SELECT",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "GossipMenuParameter",
                 "name": "Menu ID",
                 "description": "Menu ID (gossip_menu)"
             },
@@ -2467,7 +2467,7 @@
                 "description": "Option ID (gossip_menu_option)"
             }
         ],
-        "description": "On gossip action {pram2} from menu {pram1} selected",
+        "description": "On gossip action {pram2} from menu {pram1value} selected",
         "name_readable": "On gossip select",
         "invoker": {
           "name": "Gossip player",

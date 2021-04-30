@@ -23,6 +23,8 @@ namespace WDE.Common.Database
 
         IEnumerable<IGameEvent> GetGameEvents();
         IEnumerable<IConversationTemplate> GetConversationTemplates();
+        IEnumerable<IGossipMenu> GetGossipMenus();
+        IEnumerable<INpcText> GetNpcTexts();
 
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
 

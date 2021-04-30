@@ -26,6 +26,10 @@ namespace WDE.MySqlDatabaseCommon.Database
         public IEnumerable<IGameEvent> GetGameEvents() => Enumerable.Empty<IGameEvent>();
         
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => Enumerable.Empty<IConversationTemplate>();
+        
+        public IEnumerable<IGossipMenu> GetGossipMenus() => Enumerable.Empty<IGossipMenu>();
+        
+        public IEnumerable<INpcText> GetNpcTexts() => Enumerable.Empty<INpcText>();
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
 

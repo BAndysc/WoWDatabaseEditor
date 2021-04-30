@@ -2043,17 +2043,17 @@
         "name": "SMART_ACTION_SEND_GOSSIP_MENU",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "GossipMenuParameter",
                 "name": "Menu Id",
                 "description": "From gossip_menu"
             },
             {
-                "type": "Parameter",
+                "type": "NpcTextParameter",
                 "name": "Text Id",
                 "description": "From npc_text"
             }
         ],
-        "description": "{source}: Send gossip ID {pram1} with text {pram2}",
+        "description": "{source}: Send gossip ID {pram1value} with text {pram2}",
         "name_readable": "Send gossip menu",
         "target_types": ["Player"],
         "target_is_source": true

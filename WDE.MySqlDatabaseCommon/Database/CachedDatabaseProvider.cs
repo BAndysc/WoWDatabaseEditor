@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Tasks;
@@ -19,6 +20,8 @@ namespace WDE.MySqlDatabaseCommon.Database
         private List<IAreaTriggerTemplate>? areaTriggerTemplates;
         private List<IGameEvent>? gameEventsCache;
         private List<IConversationTemplate>? conversationTemplates;
+        private List<IGossipMenu>? gossipMenusCache;
+        private List<INpcText>? npcTextsCache;
         
         private IAsyncDatabaseProvider nonCachedDatabase;
         private readonly ITaskRunner taskRunner;
@@ -89,6 +92,10 @@ namespace WDE.MySqlDatabaseCommon.Database
         
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => conversationTemplates ?? nonCachedDatabase.GetConversationTemplates();
 
+        public IEnumerable<IGossipMenu> GetGossipMenus() => gossipMenusCache ?? nonCachedDatabase.GetGossipMenus();
+        
+        public IEnumerable<INpcText> GetNpcTexts() => npcTextsCache ?? nonCachedDatabase.GetNpcTexts();
+        
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
             areaTriggerTemplates ?? nonCachedDatabase.GetAreaTriggerTemplates();
 
@@ -132,7 +139,7 @@ namespace WDE.MySqlDatabaseCommon.Database
 
             public async Task Run(ITaskProgress progress)
             {
-                int steps = 6;
+                int steps = 8;
                 
                 progress.Report(0, steps, "Loading creatures");
                 cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
@@ -149,8 +156,13 @@ namespace WDE.MySqlDatabaseCommon.Database
                 progress.Report(4, steps, "Loading conversation templates");
                 cache.conversationTemplates = await cache.nonCachedDatabase.GetConversationTemplatesAsync();
                 
-                progress.Report(5, steps, "Loading quests");
+                progress.Report(5, steps, "Loading gossip menus");
+                cache.gossipMenusCache = await cache.nonCachedDatabase.GetGossipMenusAsync();
+                
+                progress.Report(6, steps, "Loading npc texts");
+                cache.npcTextsCache = await cache.nonCachedDatabase.GetNpcTextsAsync();
 
+                progress.Report(7, steps, "Loading quests");
                 cache.questTemplateCache = await cache.nonCachedDatabase.GetQuestTemplatesAsync();
 
                 Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();

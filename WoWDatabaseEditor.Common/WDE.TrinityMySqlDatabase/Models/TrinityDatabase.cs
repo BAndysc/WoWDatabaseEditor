@@ -21,5 +21,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlConversationTemplate> ConversationTemplate => GetTable<MySqlConversationTemplate>();
         public ITable<MySqlConditionLine> Conditions => GetTable<MySqlConditionLine>();
         public ITable<MySqlSpellScriptName> SpellScriptNames => GetTable<MySqlSpellScriptName>();
+        public ITable<MySqlGossipMenuLine> GossipMenus => GetTable<MySqlGossipMenuLine>();
+        public ITable<MySqlNpcText> NpcTexts => GetTable<MySqlNpcText>();
     }
 }

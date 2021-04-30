@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
@@ -35,6 +36,8 @@ namespace WDE.Parameters
             factory.Register("QuestParameter", new QuestParameter(database));
             factory.Register("PrevQuestParameter", new PrevQuestParameter(database));
             factory.Register("GameobjectParameter", new GameobjectParameter(database));
+            factory.Register("GossipMenuParameter", new GossipMenuParameter(database));
+            factory.Register("NpcTextParameter", new NpcTextParameter(database));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
@@ -87,7 +90,41 @@ namespace WDE.Parameters
                 Items.Add(item.Entry, new SelectOption(item.Name));
         }
     }
+    
+    public class GossipMenuParameter : LazyLoadParameter
+    {
+        private readonly IDatabaseProvider database;
 
+        public GossipMenuParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+
+        protected override void LazyLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (IGossipMenu item in database.GetGossipMenus())
+                Items.Add(item.MenuId, new SelectOption(item.Text.Select(t => t.Text0_0 ?? t.Text0_1 ?? "").FirstOrDefault() ?? ""));
+        }
+    }
+
+    public class NpcTextParameter : LazyLoadParameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public NpcTextParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+
+        protected override void LazyLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (INpcText item in database.GetNpcTexts())
+                Items.Add(item.Id, new SelectOption(item.Text0_0 ?? item.Text0_1 ?? ""));
+        }
+    }
+    
     public class QuestParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;

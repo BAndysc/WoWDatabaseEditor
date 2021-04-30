@@ -87,6 +87,44 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await (from t in model.ConversationTemplate orderby t.Id select t).ToListAsync<IConversationTemplate>();
         }
         
+        public IEnumerable<IGossipMenu> GetGossipMenus()
+        {
+            using var model = new TrinityDatabase();
+            var gossips = (from gossip in model.GossipMenus
+                join p in model.NpcTexts on gossip.TextId equals p.Id into lj
+                from lp in lj.DefaultIfEmpty()
+                select gossip.SetText(lp)).ToList();
+
+            return gossips.GroupBy(g => g.MenuId)
+                .Select(t => new MySqlGossipMenu(t.Key, t.Where(t => t.Text != null).Select(t => t.Text!).ToList()))
+                .ToList<IGossipMenu>();
+        }
+        
+        public async Task<List<IGossipMenu>> GetGossipMenusAsync()
+        {
+            await using var model = new TrinityDatabase();
+            var gossips = await (from gossip in model.GossipMenus
+                join p in model.NpcTexts on gossip.TextId equals p.Id into lj
+                from lp in lj.DefaultIfEmpty()
+                select gossip.SetText(lp)).ToListAsync();
+
+            return gossips.GroupBy(g => g.MenuId)
+                .Select(t => new MySqlGossipMenu(t.Key, t.Where(t => t.Text != null).Select(t => t.Text!).ToList()))
+                .ToList<IGossipMenu>();
+        }
+
+        public IEnumerable<INpcText> GetNpcTexts()
+        {
+            using var model = new TrinityDatabase();
+            return (from t in model.NpcTexts orderby t.Id select t).ToList<INpcText>();
+        }
+
+        public async Task<List<INpcText>> GetNpcTextsAsync()
+        {
+            await using var model = new TrinityDatabase();
+            return await (from t in model.NpcTexts orderby t.Id select t).ToListAsync<INpcText>();
+        }
+
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
         {
             var task = GetAreaTriggerTemplatesAsync();

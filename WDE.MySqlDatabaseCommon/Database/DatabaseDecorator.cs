@@ -23,6 +23,8 @@ namespace WDE.MySqlDatabaseCommon.Database
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => impl.GetConversationTemplates();
+        public IEnumerable<INpcText> GetNpcTexts() => impl.GetNpcTexts();
+        public IEnumerable<IGossipMenu> GetGossipMenus() => impl.GetGossipMenus();
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) =>
             impl.GetScriptFor(entryOrGuid, type);
         public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script) =>
