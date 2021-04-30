@@ -1,0 +1,99 @@
+{
+  "id": "creature_text",
+  "compatibility": [
+    "TrinityWrath", "Azeroth", "TrinityMaster", "TrinityCata"
+  ],
+  "name": "Creature texts",
+  "description": "Creature texts that can be spoken via custom creature scripts",
+  "table_name": "creature_text",
+  "table_index_name": "CreatureID",
+  "single_solution_name": "{name}'s texts",
+  "multi_solution_name": "Texts for multiple npcs",
+  "reload_command": "reload creature_text",
+  "multi_record": true,
+  "picker": "CreatureParameter",
+  "group_name": "Common scripting tables",
+  "primary_key": ["CreatureID", "GroupID", "ID"],
+  "groups": [
+    {
+      "group_name": "only",
+      "fields": [
+        {
+          "name": "Creature",
+          "db_column_name": "CreatureID",
+          "read_only": true,
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Group",
+          "db_column_name": "GroupID",
+          "value_type": "uint",
+          "autoincrement": true,
+          "preferred_width": 40
+        },
+        {
+          "name": "Id",
+          "db_column_name": "ID",
+          "value_type": "uint",
+          "preferred_width": 40
+        },
+        {
+          "name": "Text",
+          "db_column_name": "Text",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 190
+        },
+        {
+          "name": "Type",
+          "db_column_name": "Type",
+          "default": 12,
+          "value_type": "CreatureTextTypeParameter",
+          "preferred_width": 150
+        },
+        {
+          "name": "Language",
+          "db_column_name": "Language",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability",
+          "db_column_name": "Probability",
+          "default": 100,
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "Emote",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Duration",
+          "db_column_name": "Duration",
+          "value_type": "uint"
+        },
+        {
+          "name": "Sound",
+          "db_column_name": "Sound",
+          "value_type": "SoundParameter"
+        },
+        {
+          "name": "Broadcast text",
+          "db_column_name": "BroadcastTextId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Text range",
+          "db_column_name": "TextRange",
+          "value_type": "uint"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "can_be_null": true,
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

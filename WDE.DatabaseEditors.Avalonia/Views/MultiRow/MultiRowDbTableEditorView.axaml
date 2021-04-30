@@ -1,0 +1,141 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:helpers="clr-namespace:WDE.DatabaseEditors.Avalonia.Helpers"
+             xmlns:controls2="clr-namespace:WDE.DatabaseEditors.Avalonia.Controls"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="rootWindow"
+             x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorView">
+    <UserControl.Resources>
+        <ItemsPanelTemplate x:Key="HorizontalRowPanel">
+            <Grid helpers:GridColumnsBinder.Columns="{Binding DataContext.Columns, ElementName=rootWindow}">
+                                                            
+            </Grid>
+        </ItemsPanelTemplate>
+        <DataTemplate x:Key="RowTemplate">
+            <Panel Classes="alternating">
+                <ItemsPresenter Items="{Binding Cells, Mode=OneTime}" ItemsPanel="{StaticResource HorizontalRowPanel}">
+                    <ItemsPresenter.Styles>
+                        <Style Selector="Grid > ContentPresenter">
+                            <Setter Property="(Grid.Column)" Value="{Binding ColumnIndex}" />
+                        </Style>
+                    </ItemsPresenter.Styles>
+                </ItemsPresenter>
+            </Panel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
+                                       LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
+        <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastCellView.axaml" />
+        <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastBoolCellView.axaml" />
+        <Style Selector="Panel.alternating">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
+        </Style>
+        <Style Selector="Panel.alternating.odd">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
+        </Style>
+        <Style Selector="Border.header">
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Background" Value="{DynamicResource TextControlBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+        <Style Selector="Border.header GridSplitter">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border BorderThickness="0,0,1,0" 
+                                Background="Transparent"
+                                BorderBrush="{DynamicResource TextControlBorderBrush}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style Selector="Border.header TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        </Style>
+        <Style Selector="GridSplitter">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border 
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Background="{DynamicResource TextControlBackground}"/>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
+    <UserControl.DataTemplates>
+        <helpers:FieldValueTemplateSelector>
+            <helpers:FieldValueTemplateSelector.BoolTemplate>
+                <DataTemplate>
+                    <controls2:FastBoolCellView Height="24" Margin="0,0,10,0"
+                        ToolTip.Tip="{Binding OriginalValueTooltip}"
+                        Focusable="False"
+                        IsActive="True"
+                        IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
+                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
+                        Value="{Binding AsBoolValue}"/>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.BoolTemplate>
+            <helpers:FieldValueTemplateSelector.GenericTemplate>
+                <DataTemplate>
+                    <controls2:FastCellView Height="24" Margin="0,0,10,0"
+                        ToolTip.Tip="{Binding OriginalValueTooltip}"
+                        Focusable="False"
+                        IsActive="True"
+                        ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
+                        IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
+                        Value="{Binding ParameterValue.Value}"
+                        ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
+                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        DuplicateCommand="{Binding ElementName=rootWindow, Path=DataContext.DuplicateCommand, Mode=OneTime}"
+                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
+                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        StringValue="{Binding ParameterValue.String}">
+                    </controls2:FastCellView>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.GenericTemplate>
+        </helpers:FieldValueTemplateSelector>
+    </UserControl.DataTemplates>
+    
+    <DockPanel LastChildFill="True">
+        <StackPanel Margin="10" VerticalAlignment="Center" DockPanel.Dock="Top">
+            <Button Command="{Binding AddNewCommand, Mode=OneTime}" HorizontalAlignment="Left">
+                Add new key
+            </Button>
+        </StackPanel>
+        <ScrollViewer>
+            <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
+                <Border Classes="header" DockPanel.Dock="Top">
+                    <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{Binding Columns, Mode=OneTime}" />
+                </Border>
+                <ItemsPresenter Items="{Binding Rows, Mode=OneTime}">
+                    <ItemsPresenter.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}">
+                                    <controls1:GroupingHeader.CustomContent>
+                                        <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRow, Mode=OneTime}" CommandParameter="{Binding ., Mode=OneTime}">+</Button>
+                                    </controls1:GroupingHeader.CustomContent>
+                                </controls1:GroupingHeader>
+                                <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}" MinHeight="20" ItemTemplate="{StaticResource RowTemplate}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsPresenter.ItemTemplate>
+                </ItemsPresenter>
+            </DockPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,29 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WDE.DatabaseEditors.Avalonia.Controls">
+    <Design.PreviewWith>
+        <controls:FastCellView />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|FastCellView">
+        <Setter Property="FontFamily" Value="Consolas,Menlo,Courier,Courier New" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel Background="Transparent" Name="PART_Panel">
+                    <TextBlock Name="PART_text"
+                               Background="Transparent" 
+                               Padding="16,0,0,0"
+                               Text="{TemplateBinding StringValue}" 
+                               FontWeight="{TemplateBinding FontWeight}"
+                               VerticalAlignment="Center" />
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|FastCellView Button">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="controls|FastCellView:pointerover Button">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+</Styles>

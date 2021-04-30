@@ -217,7 +217,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border x:Name="Border" Padding="0,0,0,0" BorderBrush="#515159" BorderThickness="1">
+                    <Border x:Name="Border" Padding="0,0,0,0" BorderBrush="#515159" Background="#404042" BorderThickness="1">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -443,6 +443,23 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
     
+    <Style TargetType="DataGrid">
+        <Setter Property="Background" Value="#303030" />
+        <Setter Property="Foreground" Value="#FFEEEEEE" />
+    </Style>
+    
+    <Style TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="#303030" />
+        <Setter Property="Foreground" Value="#FFEEEEEE" />
+        <Setter Property="MinHeight" Value="25"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    
+    <Style TargetType="DataGridRowHeader">
+        <Setter Property="Background" Value="#303030" />
+        <Setter Property="Foreground" Value="#FFEEEEEE" />
+    </Style>
+    
     <!-- SmartScripts -->
     <SolidColorBrush x:Key="SmartScripts.Background" Color="#303030" />
     
@@ -616,7 +633,11 @@
     <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Stroke" Color="#007ACC" />
     <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Fill" Color="#007ACC" />
     <SolidColorBrush x:Key="TreeViewItem.TreeArrow.MouseOver.Checked.Stroke" Color="#007ACC" />
-
+    <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#2D619E"/>
+    <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#F2F2F2" />
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.Modified" Color="#023e7d" Opacity=".5"/>
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.Normal" Color="#FF252526"/>
+    <SolidColorBrush x:Key="TreeViewItem.Content.Background.NormalAlternate" Color="#3B3B3D"/>
     <!-- Button -->
     <SolidColorBrush x:Key="Button.Static.Border" Color="#515159" />
     <SolidColorBrush x:Key="Button.Static.Background" Color="#3F3F46" />

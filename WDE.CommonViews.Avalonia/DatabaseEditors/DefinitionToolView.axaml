@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.CommonViews.Avalonia.DatabaseEditors.DefinitionToolView">
+    <UserControl.Resources>
+        <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </UserControl.Resources>
+    <TabControl>
+        <TabItem Header="Definition generator">
+            <Grid ColumnDefinitions="200,10,*" DataContext="{Binding Definitions}">
+                <DockPanel LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" FontWeight="Bold" Padding="4">Connected database tables:</TextBlock>
+                    <ListBox Items="{Binding Tables, Mode=OneTime}"
+                             IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                             SelectedItem="{Binding SelectedTable, Mode=TwoWay}">
+                                  
+                    </ListBox>                    
+                </DockPanel>
+                <GridSplitter Grid.Column="1" />
+                <avaloniaEdit:TextEditor Grid.Column="2"
+                                         IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                                         SyntaxHighlighting="Json" 
+                                         Document="{Binding Definition, Converter={StaticResource DocumentConverter}}" 
+                                         Padding="5"
+                                         ShowLineNumbers="True"
+                                         FontFamily="Consolas,Menlo,Courier,Courier New">
+                </avaloniaEdit:TextEditor>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Compatibility checker">
+            <Grid ColumnDefinitions="200,10,*" DataContext="{Binding Compatibility}">
+                <DockPanel LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">All provided table definitions:</TextBlock>
+                    <ListBox Items="{Binding Definitions, Mode=OneTime}"
+                             VirtualizationMode="None"
+                             SelectedItem="{Binding SelectedDefinition, Mode=TwoWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{Binding Name, Mode=OneTime}" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding FileName, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                                    <TextBlock Text="{Binding Description, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>                    
+                </DockPanel>
+                <GridSplitter Grid.Column="1" />
+                <DockPanel Grid.Column="2">
+                    <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">Raport:</TextBlock>
+                    <avaloniaEdit:TextEditor Document="{Binding Raport, Converter={StaticResource DocumentConverter}}" 
+                                             Padding="5"
+                                             ShowLineNumbers="True"
+                                             FontFamily="Consolas,Menlo,Courier,Courier New">
+                    </avaloniaEdit:TextEditor>
+                </DockPanel>
+            </Grid>
+        </TabItem>
+    </TabControl>
+</UserControl>

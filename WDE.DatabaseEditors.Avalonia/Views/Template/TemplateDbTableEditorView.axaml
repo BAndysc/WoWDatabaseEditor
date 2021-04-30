@@ -1,0 +1,119 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             d:DataContext="{d:DesignInstance viewModels:TemplateDbTableEditorViewModel}"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:WDE.DatabaseEditors.Avalonia.Controls"
+             xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:helpers="clr-namespace:WDE.DatabaseEditors.Avalonia.Helpers"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseEditors.ViewModels.Template;assembly=WDE.DatabaseEditors"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Name="rootWindow"
+             x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorView">
+    <UserControl.Resources>
+        <converters:BoolToDoubleConverter WhenFalse="0" WhenTrue="1" x:Key="IsActiveToOpacityConverter" />
+        <ItemsPanelTemplate x:Key="HorizontalStackPanelTemplate">
+            <StackPanel Orientation="Horizontal"></StackPanel>
+        </ItemsPanelTemplate>
+        <helpers:FieldValueTemplateSelector x:Key="FieldValueTemplateSelector">
+            <helpers:FieldValueTemplateSelector.BoolTemplate>
+                <DataTemplate>
+                    <controls:FastBoolCellView Width="300" Margin="0,0,10,0"
+                        ToolTip.Tip="{Binding OriginalValueTooltip}"
+                        Focusable="False"
+                        IsActive="{Binding IsVisible}"
+                        IsModified="{Binding IsModified}" 
+                        IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
+                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
+                        Value="{Binding AsBoolValue}"/>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.BoolTemplate>
+            <helpers:FieldValueTemplateSelector.GenericTemplate>
+                <DataTemplate>
+                    <controls:FastCellView Width="300" Margin="0,0,10,0"
+                        ToolTip.Tip="{Binding OriginalValueTooltip}"
+                        Focusable="False"
+                        IsActive="{Binding IsVisible}"
+                        IsModified="{Binding IsModified}" 
+                        ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
+                        IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
+                        Value="{Binding ParameterValue.Value}"
+                        ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
+                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
+                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        StringValue="{Binding ParameterValue.String}">
+                    </controls:FastCellView>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.GenericTemplate>
+        </helpers:FieldValueTemplateSelector>
+        
+        <DataTemplate x:Key="RowHeaderTemplate">
+            <TextBlock Width="300" 
+                       Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
+                       TextAlignment="Center" 
+                       VerticalAlignment="Center"
+                       Text="{Binding ., Mode=OneTime}">
+            </TextBlock>
+        </DataTemplate>
+        <DataTemplate x:Key="RowTemplate">
+            <DockPanel LastChildFill="True" Classes="alternating" Height="24">
+                <TextBlock Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
+                <ItemsPresenter Items="{Binding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                </ItemsPresenter>
+            </DockPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
+                                       LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
+        <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastCellView.axaml" />
+        <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastBoolCellView.axaml" />
+        <Style Selector="DockPanel.alternating">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
+        </Style>
+        <Style Selector="DockPanel.alternating.odd">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
+        </Style>
+    </UserControl.Styles>
+    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
+        <DockPanel Margin="10" VerticalAlignment="Center" DockPanel.Dock="Top">
+            <Button DockPanel.Dock="Left" Command="{Binding AddNewCommand, Mode=OneTime}">
+                Add new
+            </Button>
+            <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Padding="0,0,15,0">Search: </TextBlock>
+                <TextBox Name="SearchTextBox" Width="300" HorizontalAlignment="Right" Text="{Binding SearchText, Mode=TwoWay}" />
+            </StackPanel>
+        </DockPanel>
+        <ScrollViewer>
+            <ItemsPresenter Focusable="False" Items="{Binding FilteredRows, Mode=OneTime}" Margin="0, 0, 0, 20">
+                <ItemsPresenter.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
+                            <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Padding="10,0,0,0" 
+                                               Text="{Binding GroupName, Mode=OneTime}" 
+                                               Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
+                                               Width="150"
+                                               VerticalAlignment="Center"/>
+                                    <ItemsControl ItemTemplate="{StaticResource RowHeaderTemplate}" Items="{Binding DataContext.Header, ElementName=rootWindow, Mode=OneTime}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                            <controls1:AlternatingItemsControl ItemTemplate="{StaticResource RowTemplate}" Focusable="False" Items="{Binding ., Mode=OneTime}">
+                            </controls1:AlternatingItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsPresenter.ItemTemplate>
+            </ItemsPresenter>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

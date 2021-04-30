@@ -1,0 +1,731 @@
+{
+  "id": "quest_template",
+  "compatibility": ["TrinityWrath"],
+  "name": "Quest Template",
+  "description": "Edit existing quest templates",
+  "table_name": "quest_template",
+  "table_index_name": "ID",
+  "table_name_source_field": "LogTitle",
+  "single_solution_name": "Quest {name} template",
+  "multi_solution_name": "Multiple quests template",
+  "reload_command": "reload quest_template",
+  "group_name": "Templates",
+  "picker": "QuestParameter",
+  "foreign_tables": [
+    {
+      "table_name": "quest_template_addon",
+      "foreign_key": "ID"
+    }
+  ],
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "Entries",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "ID",
+          "read_only": true,
+          "value_type": "uint"
+        },
+        {
+          "name": "Log title",
+          "db_column_name": "LogTitle",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Quest type",
+          "db_column_name": "QuestType",
+          "value_type": "QuestTypeParameter"
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "QuestFlagParameter"
+        },
+        {
+          "name": "Special flags",
+          "db_column_name": "SpecialFlags",
+          "foreign_table": "quest_template_addon",
+          "value_type": "QuestSpecialFlagParameter",
+          "help": "This field is for controlling server side quest functions. Blizzard keeps these data server-side and they are not sent to the client, so we have to populate the field manually."
+        },
+        {
+          "name": "Allowable races",
+          "db_column_name": "AllowableRaces",
+          "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Allowable classes",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "AllowableClasses",
+          "value_type": "ClassMaskParameter",
+          "help": "Classes required to get the quest. 0 means the quest is available for all classes."
+        },
+        {
+          "name": "Quest level",
+          "db_column_name": "QuestLevel",
+          "value_type": "int",
+          "help": "Level of quest. Player receives full experience amount only if their level is less than or equal to Level+5. If Level is set to -1, the player's level will be used as (Quest)Level for the experience calculation."
+        },
+        {
+          "name": "Min player level",
+          "db_column_name": "MinLevel",
+          "value_type": "uint",
+          "help": "Minimum level at which a player can get the quest."
+        },
+        {
+          "name": "Max player level",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "MaxLevel",
+          "value_type": "uint",
+          "help": "Maximum player level at which a character can get the quest"
+        },
+        {
+          "name": "Quest sort ID",
+          "db_column_name": "QuestSortID",
+          "value_type": "int",
+          "help": "This field defines under what category the quest falls in the quest log."
+        },
+        {
+          "name": "Quest info",
+          "db_column_name": "QuestInfoID",
+          "value_type": "QuestInfoParameter"
+        },
+        {
+          "name": "Suggested group size",
+          "db_column_name": "SuggestedGroupNum",
+          "value_type": "uint",
+          "help": "Recommended number of players to do the quest together."
+        },
+        {
+          "name": "Start item",
+          "db_column_name": "StartItem",
+          "value_type": "ItemParameter",
+          "help": "Items given by the quest giver at beginning of the quest. Items will be deleted when quest is abandoned."
+        },
+        {
+          "name": "Provided start item count",
+          "db_column_name": "ProvidedItemCount",
+          "foreign_table": "quest_template_addon",
+          "help": "Number of items given to the player (inserted in the player's bags) upon accepting the quest.",
+          "value_type": "uint"
+        },
+        {
+          "name": "Cast spell on start",
+          "db_column_name": "SourceSpellID",
+          "foreign_table": "quest_template_addon",
+          "value_type": "SpellParameter",
+          "help": "The spell ID cast on player upon starting the quest."
+        },
+        {
+          "name": "Time allowed",
+          "db_column_name": "TimeAllowed",
+          "value_type": "uint"
+        },
+        {
+          "name": "Verified build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }      
+      ]
+    },
+    {
+      "group_name": "Chaining",
+      "fields": [
+        {
+          "name": "Previous quest",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "PrevQuestID",
+          "value_type": "PrevQuestParameter"
+        },
+        {
+          "name": "Next quest",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "NextQuestID",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Exclusive group",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "ExclusiveGroup",
+          "value_type": "int",
+          "help": "if ExclusiveGroup > 0: \nAllows to define a group of quests of which only one may be chosen and completed. E.g. if from quests 1200, 1201 and 1202 only one should be allowed to be chosen, insert 1200 into ExclusiveGroup of all 3 quests.\n\nif ExclusiveGroup < 0\nAllows to define a group of quests of which all must be completed and rewarded to start next quest. E.g. if quest 1000 dependent from one of quests 1200, 1201 and 1202 and all this quests have same negative exclusive group then all this quest must be completed and rewarded before quest 1000 can be started."
+        },
+        {
+          "name": "Reward next quest",
+          "db_column_name": "RewardNextQuest",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Breadcrumb for quest",
+          "foreign_table": "quest_template_addon",
+          "db_column_name": "BreadcrumbForQuestId",
+          "value_type": "QuestParameter",
+          "help": "Breadcrumb quests exist for the sole purpose of guiding the player to a new zone or subzone to quest in. They are often given by NPCs upon completing the previous quest hub, as well as Hero's Call Boards, Warchief's Command Boards, and the Adventure Guide. Often there are multiple breadcrumb quests followed by the same follow-up quest, and normally they are mutually exclusive, meaning that accepting one breadcrumb quest will make all the others leading to the same location unavailable. Also, normally completing the follow-up quest will make any breadcrumb quests leading to it unavailable, whether or not they were completed."
+        }
+      ]
+    },
+    {
+      "group_name": "Objectives",
+      "fields": [
+        {
+          "name": "Required npc or go 1",
+          "db_column_name": "RequiredNpcOrGo1",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Required npc or go count 1",
+          "db_column_name": "RequiredNpcOrGoCount1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required npc or go 2",
+          "db_column_name": "RequiredNpcOrGo2",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Required npc or go count 2",
+          "db_column_name": "RequiredNpcOrGoCount2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required npc or go 3",
+          "db_column_name": "RequiredNpcOrGo3",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Required npc or go count 3",
+          "db_column_name": "RequiredNpcOrGoCount3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required npc or go 4",
+          "db_column_name": "RequiredNpcOrGo4",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Required npc or go count 4",
+          "db_column_name": "RequiredNpcOrGoCount4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required item id 1",
+          "db_column_name": "RequiredItemId1",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Required item count 1",
+          "db_column_name": "RequiredItemCount1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required item id 2",
+          "db_column_name": "RequiredItemId2",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Required item count 2",
+          "db_column_name": "RequiredItemCount2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required item id 3",
+          "db_column_name": "RequiredItemId3",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Required item count 3",
+          "db_column_name": "RequiredItemCount3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required item id 4",
+          "db_column_name": "RequiredItemId4",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Required item count 4",
+          "db_column_name": "RequiredItemCount4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required item id 5",
+          "db_column_name": "RequiredItemId5",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Required item count 5",
+          "db_column_name": "RequiredItemCount5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required item id 6",
+          "db_column_name": "RequiredItemId6",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Required item count 6",
+          "db_column_name": "RequiredItemCount6",
+          "value_type": "uint"
+        },        
+        {
+          "name": "RequiredPlayerKills",
+          "db_column_name": "RequiredPlayerKills",
+          "value_type": "uint",
+          "help": "Displays how much players you need to kill before completing the quest."
+        },
+        {
+          "name": "Required faction id 1",
+          "db_column_name": "RequiredFactionId1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required faction value 1",
+          "db_column_name": "RequiredFactionValue1",
+          "value_type": "int"
+        },
+        {
+          "name": "Required faction id 2",
+          "db_column_name": "RequiredFactionId2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required faction value 2",
+          "db_column_name": "RequiredFactionValue2",
+          "value_type": "int"
+        },
+        {
+          "name": "Required skill",
+          "db_column_name": "RequiredSkillID",
+          "foreign_table": "quest_template_addon",
+          "value_type": "SkillParameter"
+        },
+        {
+          "name": "Required skill points",
+          "db_column_name": "RequiredSkillPoints",
+          "foreign_table": "quest_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required min reputation faction",
+          "db_column_name": "RequiredMinRepFaction",
+          "foreign_table": "quest_template_addon",
+          "value_type": "FactionParameter"
+        },
+        {
+          "name": "Required min reputation value",
+          "db_column_name": "RequiredMinRepValue",
+          "foreign_table": "quest_template_addon",
+          "value_type": "int",
+          "help": "Players must have this reputation or higher in order to receive the quest."
+        },
+        {
+          "name": "Required max reputation faction",
+          "db_column_name": "RequiredMaxRepFaction",
+          "foreign_table": "quest_template_addon",
+          "value_type": "FactionParameter",
+          "help": "The Faction ID for the faction that controls the maximum reputation value that the player can have and still get the quest."
+        },
+        {
+          "name": "Required max reputation value",
+          "db_column_name": "RequiredMaxRepValue",
+          "foreign_table": "quest_template_addon",
+          "value_type": "int",
+          "help": "The maximum reputation value that the player can have with a faction and still get the quest. If the player has more reputation than the value in this field, the quest will not be able to be taken anymore."
+        }
+      ]
+    },
+    {
+      "group_name": "Texts",
+      "fields": [
+        {
+          "name": "Log description",
+          "db_column_name": "LogDescription",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Quest description",
+          "db_column_name": "QuestDescription",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Area description",
+          "db_column_name": "AreaDescription",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "QuestCompletionLog",
+          "db_column_name": "QuestCompletionLog",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Unknown 0",
+          "db_column_name": "Unknown0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Objective text 1",
+          "db_column_name": "ObjectiveText1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Objective text 2",
+          "db_column_name": "ObjectiveText2",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Objective text 3",
+          "db_column_name": "ObjectiveText3",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Objective text 4",
+          "db_column_name": "ObjectiveText4",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    },
+    {
+      "group_name": "Item rewards",
+      "fields": [
+
+        {
+          "name": "Reward choice item 1",
+          "db_column_name": "RewardChoiceItemID1",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward choice item quantity 1",
+          "db_column_name": "RewardChoiceItemQuantity1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward choice item 2",
+          "db_column_name": "RewardChoiceItemID2",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward choice item quantity 2",
+          "db_column_name": "RewardChoiceItemQuantity2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward choice item 3",
+          "db_column_name": "RewardChoiceItemID3",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward choice item quantity 3",
+          "db_column_name": "RewardChoiceItemQuantity3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward choice item 4",
+          "db_column_name": "RewardChoiceItemID4",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward choice item quantity 4",
+          "db_column_name": "RewardChoiceItemQuantity4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward choice item 5",
+          "db_column_name": "RewardChoiceItemID5",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward choice item quantity 5",
+          "db_column_name": "RewardChoiceItemQuantity5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward choice item 6",
+          "db_column_name": "RewardChoiceItemID6",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward choice item quantity 6",
+          "db_column_name": "RewardChoiceItemQuantity6",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward item 1",
+          "db_column_name": "RewardItem1",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward amount 1",
+          "db_column_name": "RewardAmount1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward item 2",
+          "db_column_name": "RewardItem2",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward amount 2",
+          "db_column_name": "RewardAmount2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward item 3",
+          "db_column_name": "RewardItem3",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward amount 3",
+          "db_column_name": "RewardAmount3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Reward item 4",
+          "db_column_name": "RewardItem4",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Reward amount 4",
+          "db_column_name": "RewardAmount4",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Rewards",
+      "fields": [
+        {
+          "name": "Reward XP difficulty",
+          "db_column_name": "RewardXPDifficulty",
+          "value_type": "uint",
+          "help": "According to the Level, the basic experience with index RewardXPDifficulty is taken from QuestXP.dbc."
+        },
+        {
+          "name": "Reward money",
+          "db_column_name": "RewardMoney",
+          "value_type": "int",
+          "help": "Money earned by completing the quest (if value > 0) or money requirement to complete the quest (if value < 0)."
+        },
+        {
+          "name": "Reward bonus money",
+          "db_column_name": "RewardBonusMoney",
+          "value_type": "uint",
+          "help": "The money a character at level 80 would get when they complete this quest."
+        },
+        {
+          "name": "Reward display spell",
+          "db_column_name": "RewardDisplaySpell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Reward spell",
+          "db_column_name": "RewardSpell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Reward honor",
+          "db_column_name": "RewardHonor",
+          "value_type": "int",
+          "help": "Number of honorable kill honor rewarded for completing this quest."
+        },
+        {
+          "name": "Reward kill honor",
+          "db_column_name": "RewardKillHonor",
+          "value_type": "float"
+        },
+        {
+          "name": "Reward title",
+          "db_column_name": "RewardTitle",
+          "value_type": "CharTitleParameter"
+        },
+        {
+          "name": "Reward talents",
+          "db_column_name": "RewardTalents",
+          "value_type": "uint",
+          "help": "Will give X bonus talents to the player completed the quest. Leave '0' for No Bonus Talent Points."
+        },
+        {
+          "name": "Reward arena points",
+          "db_column_name": "RewardArenaPoints",
+          "value_type": "uint",
+          "help": "Will Give X Arena Points to the player that completes the quest. Leave '0' For no Arena Points Reward."
+        },
+        {
+          "name": "Reward faction id 1",
+          "db_column_name": "RewardFactionID1",
+          "value_type": "FactionParameter",
+          "help": "Faction for which the quest give reputation points.\nNumber of gain or lost reputation points for Faction at quest completion. This is special reputation rewarding. Normal reputation reward to quest rewarding creature faction calculated and added automatically."
+        },
+        {
+          "name": "Reward faction value 1",
+          "db_column_name": "RewardFactionValue1",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction override 1",
+          "db_column_name": "RewardFactionOverride1",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction id 2",
+          "db_column_name": "RewardFactionID2",
+          "value_type": "FactionParameter"
+        },
+        {
+          "name": "Reward faction value 2",
+          "db_column_name": "RewardFactionValue2",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction override 2",
+          "db_column_name": "RewardFactionOverride2",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction id 3",
+          "db_column_name": "RewardFactionID3",
+          "value_type": "FactionParameter"
+        },
+        {
+          "name": "Reward faction value 3",
+          "db_column_name": "RewardFactionValue3",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction override 3",
+          "db_column_name": "RewardFactionOverride3",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction id 4",
+          "db_column_name": "RewardFactionID4",
+          "value_type": "FactionParameter"
+        },
+        {
+          "name": "Reward faction value 4",
+          "db_column_name": "RewardFactionValue4",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction override 4",
+          "db_column_name": "RewardFactionOverride4",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction id 5",
+          "db_column_name": "RewardFactionID5",
+          "value_type": "FactionParameter"
+        },
+        {
+          "name": "Reward faction value 5",
+          "db_column_name": "RewardFactionValue5",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward faction override 5",
+          "db_column_name": "RewardFactionOverride5",
+          "value_type": "int"
+        },
+        {
+          "name": "Reward mail template ID",
+          "db_column_name": "RewardMailTemplateID",
+          "foreign_table": "quest_template_addon",
+          "value_type": "uint",
+          "help": "If the quest gives as a reward an item from a possible list of items, the ID here corresponds to the proper loot template in quest_mail_loot_template. According to the rules in that loot template, items \"looted\" will be sent by mail at the completion of the quest."
+        },
+        {
+          "name": "Reward mail delay (seconds)",
+          "db_column_name": "RewardMailDelay",
+          "foreign_table": "quest_template_addon",
+          "value_type": "uint",
+          "help": "How many seconds to wait until the mail is sent to the character that turned in a quest rewarding items from a loot template defined in RewardMailTemplateId"
+        }
+      ]
+    },
+    {
+      "group_name": "Items dropping",
+      "fields": [
+        {
+          "name": "Item drop 1",
+          "db_column_name": "ItemDrop1",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Item drop quantity 1",
+          "db_column_name": "ItemDropQuantity1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Item drop 2",
+          "db_column_name": "ItemDrop2",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Item drop quantity 2",
+          "db_column_name": "ItemDropQuantity2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Item drop 3",
+          "db_column_name": "ItemDrop3",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Item drop quantity 3",
+          "db_column_name": "ItemDropQuantity3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Item drop 4",
+          "db_column_name": "ItemDrop4",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Item drop quantity 4",
+          "db_column_name": "ItemDropQuantity4",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "POI",
+      "fields": [
+
+        {
+          "name": "POI Continent",
+          "db_column_name": "POIContinent",
+          "value_type": "uint",
+          "help": "MapId of a quest point of interest (POI - Point Of Interest). POI will be shown on the map when quest is active."
+        },
+        {
+          "name": "POI x coord",
+          "db_column_name": "POIx",
+          "value_type": "float"
+        },
+        {
+          "name": "POI y coord",
+          "db_column_name": "POIy",
+          "value_type": "float"
+        },
+        {
+          "name": "POI priority",
+          "db_column_name": "POIPriority",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

@@ -30,6 +30,7 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
         <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />
         <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
         <ProjectReference Include="..\WDE.RemoteSOAP\WDE.RemoteSOAP.csproj" />

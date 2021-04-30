@@ -1,0 +1,25 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WDE.DatabaseEditors.Avalonia.Controls"
+        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
+    <Styles.Resources>
+        <converters:InverseBoolConverter x:Key="InvertBoolConverter" />
+        <converters:LongToBoolConverter x:Key="LongToBoolConverter" />
+    </Styles.Resources>
+    <Design.PreviewWith>
+        <controls:FastBoolCellView />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|FastBoolCellView">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <CheckBox HorizontalAlignment="Center" 
+                          IsEnabled="{TemplateBinding IsReadOnly, Converter={StaticResource InvertBoolConverter}}"
+                          IsChecked="{TemplateBinding Value, Mode=TwoWay}"
+                          HorizontalContentAlignment="Center">
+                </CheckBox>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

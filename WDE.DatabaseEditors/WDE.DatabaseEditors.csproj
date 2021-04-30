@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net5.0;net5.0-windows7.0</TargetFrameworks>
+        <OutputType>Library</OutputType>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='DebugAvalonia'">
+        <DefineConstants>AVALONIA</DefineConstants>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+      <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Update="DbDefinitions\**\*.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="DynamicData">
+        <Version>7.1.1</Version>
+      </PackageReference>
+    </ItemGroup>
+</Project>

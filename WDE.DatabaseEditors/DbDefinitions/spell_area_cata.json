@@ -1,0 +1,84 @@
+{
+  "id": "spell_area",
+  "compatibility": [
+    "TrinityCata", "TrinityMaster"
+  ],
+  "name": "Spell area",
+  "description": "Spell area table is responsible for applying auras in specific areas or zones",
+  "table_name": "spell_area",
+  "table_index_name": "area",
+  "single_solution_name": "spell_area in {name}",
+  "multi_solution_name": "spell_area in many areas",
+  "reload_command": "reload spell_area",
+  "multi_record": true,
+  "picker": "ZoneAreaParameter",
+  "group_name": "Common scripting tables",
+  "primary_key": ["spell", "area", "quest_start", "aura_spell", "racemask", "gender"],
+  "groups": [
+    {
+      "group_name": "only",
+      "fields": [
+        {
+          "name": "Area",
+          "db_column_name": "area",
+          "read_only": true,
+          "value_type": "ZoneAreaParameter",
+          "preferred_width": 80
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "spell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Quest start",
+          "db_column_name": "quest_start",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Quest start status",
+          "db_column_name": "quest_start_status",
+          "default": 64,
+          "value_type": "QuestStatusParameter",
+          "preferred_width": 150
+        },
+        {
+          "name": "Quest end",
+          "db_column_name": "quest_end",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Quest end status",
+          "db_column_name": "quest_end_status",
+          "default": 11,
+          "value_type": "QuestStatusParameter",
+          "preferred_width": 150
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "flags",
+          "value_type": "SpellAreaFlagsParameter",
+          "default": 3,
+          "preferred_width": 70
+        },
+        {
+          "name": "Aura condition",
+          "db_column_name": "aura_spell",
+          "value_type": "SpellAreaSpellParameter"
+        },
+        {
+          "name": "Race condition",
+          "db_column_name": "racemask",
+          "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Gender condition",
+          "db_column_name": "gender",
+          "default": 2,
+          "value_type": "GenderParameter",
+          "preferred_width": 90
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 using WDE.Common.Windows;
+using WDE.CommonViews.Avalonia.DatabaseEditors;
 using WDE.CommonViews.Avalonia.RemoteSOAP.Views;
 using WDE.CommonViews.Avalonia.Updater.Views;
+using WDE.DatabaseEditors.Tools;
 using WDE.DbcStore.ViewModels;
 using WDE.DbcStore.Views;
 using WDE.HistoryWindow.ViewModels;
@@ -43,6 +45,8 @@ namespace WDE.CommonViews.Avalonia
             viewLocator.Bind<UpdaterConfigurationViewModel, UpdaterConfigurationView>();
             // remote soap
             viewLocator.Bind<SoapConfigViewModel, SoapConfigView>();
+            // table editor
+            viewLocator.Bind<ToolsViewModel, DefinitionToolView>();
         }
     }
 }

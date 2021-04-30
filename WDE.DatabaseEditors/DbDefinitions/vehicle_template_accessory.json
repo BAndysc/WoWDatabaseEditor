@@ -1,0 +1,65 @@
+{
+  "id": "vehicle_template_accessory",
+  "compatibility": [
+    "TrinityWrath", "Azeroth", "TrinityMaster", "TrinityCata"
+  ],
+  "name": "Vehicle Template Accessory",
+  "single_solution_name": "{name}'s vehicle accessories",
+  "multi_solution_name": "Multiple vehicles accessories",
+  "description": "Use this table to define creatures that will spawn automatically on a vehicle",
+  "table_name": "vehicle_template_accessory",
+  "table_index_name": "entry",
+  "multi_record": true,
+  "reload_command": "reload vehicle_template_accessory",
+  "group_name": "Common scripting tables",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "entry",
+    "seat_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "CreatureParameter",
+          "read_only": true
+        },
+        {
+          "name": "Accessory",
+          "db_column_name": "accessory_entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Seat Id",
+          "db_column_name": "seat_id",
+          "value_type": "int"
+        },
+        {
+          "name": "Die when vehicle dies?",
+          "db_column_name": "minion",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Summon Type",
+          "db_column_name": "summontype",
+          "value_type": "SummonTypeParameter",
+          "default": 6
+        },
+        {
+          "name": "Summon timer (ms)",
+          "db_column_name": "summontimer",
+          "value_type": "uint",
+          "default": 30000
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "description",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

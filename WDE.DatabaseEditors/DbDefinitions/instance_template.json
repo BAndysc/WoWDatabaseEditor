@@ -1,0 +1,44 @@
+{
+  "id": "instance_template",
+  "compatibility": ["TrinityWrath", "TrinityMaster", "TrinityCata", "Azeroth"],
+  "name": "Instance Template",
+  "description": "Edit or create instance templates",
+  "table_name": "instance_template",
+  "table_index_name": "map",
+  "table_name_source_field": "script",
+  "single_solution_name": "Instance {name} template",
+  "multi_solution_name": "Multiple instances template",
+  "picker": "MapParameter",
+  "group_name": "Templates",
+  "primary_key": [
+    "map"
+  ],
+  "groups": [
+    {
+      "group_name": "Instance",
+      "fields": [
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter",
+          "read_only": true
+        },
+        {
+          "name": "Parent map",
+          "db_column_name": "parent",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Script name",
+          "db_column_name": "script",
+          "value_type": "string"
+        },
+        {
+          "name": "Allow mounts",
+          "db_column_name": "allowMount",
+          "value_type": "BoolParameter"
+        }
+      ]
+    }
+  ]
+}

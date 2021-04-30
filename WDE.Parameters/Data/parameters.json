@@ -2313,5 +2313,13 @@
 			"18": {"name": "Learn dual spec", "description": "Requires npc flag TRAINER (bonus option for GOSSIP_OPTION_TRAINER)"},
 			"19": {"name": "Outdoor pvp"}
 		}
+	},
+	"SpellAreaFlagsParameter": {
+		"name": "Spell area flags",
+		"isflag": true,
+		"values": {
+			"1": {"name": "autocast"},
+			"2": {"name": "autoremove"}
+		}
 	}
 }

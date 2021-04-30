@@ -1,0 +1,48 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewHelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
+    xmlns:local="clr-namespace:WDE.DatabaseEditors.WPF.Controls">
+    <viewHelpers:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+    <Style TargetType="{x:Type local:FastBoolCellView}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FastBoolCellView}">
+                    <Grid Background="Transparent">
+                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center"
+                          IsEnabled="{TemplateBinding IsReadOnly, Converter={StaticResource InvertedBoolConverter}}"
+                          IsChecked="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                          HorizontalContentAlignment="Center">
+                        </CheckBox>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type local:FastCellView}">
+        <Style.Resources>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Visibility" Value="Hidden" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:FastCellView},AncestorLevel=1}, Path=IsMouseOver}" Value="True" >
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Style.Resources>
+        <Setter Property="FontFamily" Value="Consolas,Menlo,Courier,Courier New" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:FastCellView}">
+                    <Grid Background="Transparent" Name="PART_Panel"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <TextBlock Name="PART_text"
+                               Background="Transparent" Padding="16,0,0,0"
+                               Text="{TemplateBinding StringValue}" 
+                               FontWeight="{TemplateBinding FontWeight}"
+                               VerticalAlignment="Center" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
