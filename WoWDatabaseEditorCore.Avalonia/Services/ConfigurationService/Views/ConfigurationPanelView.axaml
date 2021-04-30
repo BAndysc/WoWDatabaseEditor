@@ -35,19 +35,17 @@
             </ListBox>
             <DockPanel Grid.Column="1" LastChildFill="True" Margin="7,0">
                 <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedTabItem.Name}" FontSize="32" FontWeight="Light" />
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                    <DockPanel LastChildFill="True">
-                        <TextBlock DockPanel.Dock="Top" 
-                                   TextWrapping="WrapWithOverflow" 
-                                   FontSize="18" 
-                                   FontWeight="Light"
-                                   Margin="0,0,0,17" 
-                                   IsVisible="{Binding SelectedTabItem.ShortDescription, Converter={StaticResource IsNullConverter}}"
-                                   Text="{Binding SelectedTabItem.ShortDescription}" />
-                        <ContentControl DataContext="{Binding SelectedTabItem}" utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
-                                        VerticalContentAlignment="Stretch" />
-                    </DockPanel>
-                </ScrollViewer>
+                <DockPanel LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Top" 
+                               TextWrapping="WrapWithOverflow" 
+                               FontSize="18" 
+                               FontWeight="Light"
+                               Margin="0,0,0,17" 
+                               IsVisible="{Binding SelectedTabItem.ShortDescription, Converter={StaticResource IsNullConverter}}"
+                               Text="{Binding SelectedTabItem.ShortDescription}" />
+                    <ContentControl DataContext="{Binding SelectedTabItem}" utils:ViewBind.Model="{Binding}" HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch" />
+                </DockPanel>
             </DockPanel>
         </Grid>
         <Button Margin="0,10,0,0" Content="Save" Grid.Row="1" HorizontalAlignment="Left" Width="119"

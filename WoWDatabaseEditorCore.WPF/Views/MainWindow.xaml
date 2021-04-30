@@ -16,6 +16,7 @@
                       xmlns:viewHelpers1="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF"
                       xmlns:extensions="clr-namespace:WoWDatabaseEditorCore.WPF.Extensions"
                       Style="{DynamicResource MainWindowStyle}"
+                      Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
                       Title="{Binding Title}"
                       WindowStartupLocation="CenterScreen"
                       Height="695.368"

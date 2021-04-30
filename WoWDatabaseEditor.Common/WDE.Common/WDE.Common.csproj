@@ -5,6 +5,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configurations>Debug;Release;DebugAvalonia</Configurations>
     <Platforms>AnyCPU</Platforms>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
       <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
@@ -33,8 +34,5 @@
     <PackageReference Include="Unity.RegistrationByConvention">
       <Version>5.11.1</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewHelpers" />
   </ItemGroup>
 </Project>

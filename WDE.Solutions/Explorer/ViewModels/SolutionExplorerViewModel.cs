@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -9,6 +10,7 @@ using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Solution;
+using WDE.Common.Utils;
 using WDE.Common.Utils.DragDrop;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
@@ -85,6 +87,12 @@ namespace WDE.Solutions.Explorer.ViewModels
             };
 
             Dictionary<string, AddItemCategoryMenuViewModel> byNameCategories = new();
+            Func<ISolutionItemProvider, Task> insertItemCommand = async provider =>
+            {
+                var item = await provider.CreateSolutionItem();
+                if (item != null)
+                    DoAddItem(item);
+            };
             foreach (var item in provider.AllCompatible)
             {
                 if (item is INamedSolutionItemProvider)
@@ -97,22 +105,14 @@ namespace WDE.Solutions.Explorer.ViewModels
                     AddItems.Add(category);
                 }
                 
-                category.Items.Add(new SolutionItemMenuViewModel(item, solutionManager, this.ea));
+                category.Items.Add(new SolutionItemMenuViewModel(item, insertItemCommand));
             }
 
             AddItem = new DelegateCommand(async () =>
             {
                 ISolutionItem item = await newItemService.GetNewSolutionItem();
                 if (item != null)
-                {
-                    if (selected == null || selected.Item.Items == null)
-                        solutionManager.Items.Add(item);
-                    else
-                        selected.Item.Items.Add(item);
-                    
-                    if (item is not SolutionFolderItem)
-                        ea.GetEvent<EventRequestOpenItem>().Publish(item);
-                }
+                    DoAddItem(item);
             });
 
             RemoveItem = new DelegateCommand(() =>
@@ -153,6 +153,17 @@ namespace WDE.Solutions.Explorer.ViewModels
                 if (selected != null)
                     solutionTasksService.SaveAndReloadSolutionTask(selected.Item);
             }, () => solutionTasksService.CanSaveAndReloadRemotely);
+        }
+
+        private void DoAddItem(ISolutionItem item)
+        {
+            if (selected == null || selected.Item.Items == null)
+                solutionManager.Items.Add(item);
+            else
+                selected.Item.Items.Add(item);
+                    
+            if (item is not SolutionFolderItem)
+                ea.GetEvent<EventRequestOpenItem>().Publish(item);
         }
 
         public ObservableCollection<SolutionItemViewModel> Root { get; }

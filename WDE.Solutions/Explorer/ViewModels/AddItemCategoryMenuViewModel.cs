@@ -1,10 +1,13 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Events;
+using WDE.Common.Utils;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {
@@ -25,20 +28,13 @@ namespace WDE.Solutions.Explorer.ViewModels
         public ICommand Command { get; }
         
         public SolutionItemMenuViewModel(ISolutionItemProvider provider, 
-            ISolutionManager solutionManager,
-            IEventAggregator eventAggregator)
+            Func<ISolutionItemProvider, Task> addCommand)
         {
             Name = provider.GetName();
 
             Command = new AsyncCommand(async () =>
             {
-                var item = await provider.CreateSolutionItem();
-                if (item != null)
-                {
-                    solutionManager.Items.Add(item);
-                    if (item is not SolutionFolderItem)
-                        eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
-                }
+                await addCommand.Invoke(provider);
             });
         }
     }

@@ -167,6 +167,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
                 parameterFactory.Register("FactionParameter", new DbcParameter(FactionStore));
                 parameterFactory.Register("SpellParameter", new DbcParameter(SpellStore));
+                parameterFactory.Register("SpellAreaSpellParameter", new SpellAreaSpellParameter(SpellStore));
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore));
@@ -174,7 +175,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
                 parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore));
                 parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore));
-                parameterFactory.Register("ZoneParameter", new DbcParameter(AreaStore));
+                parameterFactory.Register("ZoneAreaParameter", new DbcParameter(AreaStore));
                 parameterFactory.Register("MapParameter", new DbcParameter(MapStore));
                 parameterFactory.Register("PhaseParameter", new DbcParameter(PhaseStore));
                 parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore));
@@ -270,6 +271,19 @@ namespace WDE.DbcStore
             Items = new Dictionary<long, SelectOption>();
             foreach (int key in storage.Keys)
                 Items.Add(key, new SelectOption(storage[key]));
+        }
+    }
+
+    public class SpellAreaSpellParameter : Parameter
+    {
+        public SpellAreaSpellParameter(Dictionary<long, string> storage)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (int key in storage.Keys)
+            {
+                Items.Add(-key, new SelectOption(storage[key], "If the player HAS aura, then the spell will not be activated"));
+                Items.Add(key, new SelectOption(storage[key], "If the player has NO aura, then the spell will not be activated"));
+            }
         }
     }
     

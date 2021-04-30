@@ -28,7 +28,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         private readonly bool asFlags;
         private string search = "";
         
-        public ItemFromListProviderViewModel(Dictionary<long, SelectOption> items, bool asFlags, long? current = null)
+        public ItemFromListProviderViewModel(Dictionary<long, SelectOption>? items, bool asFlags, long? current = null)
         {
             this.asFlags = asFlags;
             
@@ -42,18 +42,21 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 .Bind(out outFilteredList)
                 .Subscribe());
             FilteredItems = outFilteredList;
-            
-            this.items.Edit(list =>
+
+            if (items != null)
             {
-                foreach (long key in items.Keys)
+                this.items.Edit(list =>
                 {
-                    bool isSelected = current.HasValue && ((current == 0 && key == 0) || (key > 0) && (current & key) == key);
-                    var item = new CheckableSelectOption(key, items[key], isSelected);
-                    if (isSelected)
-                        SelectedItem = item;
-                    list.Add(item);
-                }
-            });
+                    foreach (long key in items.Keys)
+                    {
+                        bool isSelected = current.HasValue && ((current == 0 && key == 0) || (key > 0) && (current & key) == key);
+                        var item = new CheckableSelectOption(key, items[key], isSelected);
+                        if (isSelected)
+                            SelectedItem = item;
+                        list.Add(item);
+                    }
+                });
+            }
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
@@ -65,10 +68,10 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             if (asFlags)
                 Columns.Insert(0, new ColumnDescriptor("", "IsChecked", 35, true));
 
-            if (items.Count == 0)
+            if (items == null || items.Count == 0)
                 SearchText = current.HasValue ? current.Value.ToString() : "";
 
-            ShowItemsList = items.Count > 0;
+            ShowItemsList = items?.Count > 0;
             DesiredHeight = ShowItemsList ? 670 : 130;
             DesiredWidth = ShowItemsList ? 800 : 400;
             Accept = new DelegateCommand(() =>

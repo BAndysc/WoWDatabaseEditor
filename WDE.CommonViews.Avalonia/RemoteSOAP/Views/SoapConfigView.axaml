@@ -6,31 +6,32 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="False"
              x:Class="WDE.CommonViews.Avalonia.RemoteSOAP.Views.SoapConfigView">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="20" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <TextBlock Text="Host" VerticalAlignment="Center" />
-        <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
-        <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
-        <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
-        <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host, Mode=TwoWay}" />
-        <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" />
-        <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding User, Mode=TwoWay}" />
-        <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Password, Mode=TwoWay}" />
+    <ScrollViewer>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Host" VerticalAlignment="Center" />
+            <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
+            <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
+            <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host, Mode=TwoWay}" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding User, Mode=TwoWay}" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Password, Mode=TwoWay}" />
         
-        <Button Grid.Row="5" Grid.Column="1" Content="Test connection" Command="{Binding TestConnection}" />
-        <TextBox IsReadOnly="True" BorderThickness="0" Grid.ColumnSpan="2" Grid.Row="6" Text="{Binding TestConnectionOutput}" /> 
-
-    </Grid>
+            <Button Grid.Row="5" Grid.Column="1" Content="Test connection" Command="{Binding TestConnection}" />
+            <TextBox IsReadOnly="True" BorderThickness="0" Grid.ColumnSpan="2" Grid.Row="6" Text="{Binding TestConnectionOutput}" /> 
+        </Grid>
+    </ScrollViewer>
 </UserControl>

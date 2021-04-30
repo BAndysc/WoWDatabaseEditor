@@ -14,6 +14,37 @@ using Avalonia.VisualTree;
 
 namespace AvaloniaStyles.Controls
 {
+    public class GroupingHeader : TemplatedControl
+    {
+        public static readonly DirectProperty<GroupingHeader, string> GroupNameProperty =
+            AvaloniaProperty.RegisterDirect<GroupingHeader, string>(
+                nameof(GroupName),
+                o => o.GroupName,
+                (o, v) => o.GroupName = v);
+
+        private string groupName;
+        
+        [Content]
+        public string GroupName
+        {
+            get => groupName;
+            set => SetAndRaise(GroupNameProperty, ref groupName, value);
+        }
+        
+        public static readonly DirectProperty<GroupingHeader, IControl> CustomContentProperty =
+            AvaloniaProperty.RegisterDirect<GroupingHeader, IControl>(
+                nameof(CustomContent),
+                o => o.CustomContent,
+                (o, v) => o.CustomContent = v);
+
+        private IControl customContent;
+        public IControl CustomContent
+        {
+            get => customContent;
+            set => SetAndRaise(CustomContentProperty, ref customContent, value);
+        }
+    }
+    
     // yes, this implementation is quite dirty
     // this is in order to make SelectionItem working
     public class GroupingListBox : TemplatedControl

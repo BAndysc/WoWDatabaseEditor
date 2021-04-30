@@ -15,6 +15,7 @@ namespace WDE.History
         private readonly Stack<IHistoryAction> history;
         
         private IHistoryAction savedPoint;
+        private bool forceNoSave;
         private bool acceptNew;
         private bool canRedo;
         private bool canUndo;
@@ -26,6 +27,7 @@ namespace WDE.History
             future = new Stack<IHistoryAction>();
             savedPoint = null;
             acceptNew = true;
+            forceNoSave = false;
             RecalculateValues();
         }
 
@@ -116,6 +118,14 @@ namespace WDE.History
         {
             if (history.Count > 0)
                 savedPoint = history.Peek();
+            forceNoSave = false;
+            RecalculateValues();
+        }
+
+        public void MarkNoSave()
+        {
+            savedPoint = null;
+            forceNoSave = true;
             RecalculateValues();
         }
 
@@ -135,7 +145,7 @@ namespace WDE.History
         {
             CanUndo = history.Count > 0;
             CanRedo = future.Count > 0;
-            IsSaved = (history.Count == 0 && savedPoint == null) || (history.Count > 0 && savedPoint == history.Peek());
+            IsSaved = !forceNoSave && ((history.Count == 0 && savedPoint == null) || (history.Count > 0 && savedPoint == history.Peek()));
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName]

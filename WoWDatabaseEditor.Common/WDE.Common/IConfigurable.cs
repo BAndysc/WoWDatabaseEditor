@@ -15,5 +15,7 @@ namespace WDE.Common
         [CanBeNull] string ShortDescription { get; }
         bool IsModified { get; }
         bool IsRestartRequired { get; }
+        
+        void ConfigurableOpened() { }
     }
 }

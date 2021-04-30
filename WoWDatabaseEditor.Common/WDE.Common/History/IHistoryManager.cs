@@ -18,6 +18,7 @@ namespace WDE.Common.History
         void Redo();
         void Undo();
         void MarkAsSaved();
+        void MarkNoSave();
 
         void AddHandler(HistoryHandler handler);
     }

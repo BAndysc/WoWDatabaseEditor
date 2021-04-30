@@ -32,6 +32,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/DataGrid.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/GridView.axaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/NativeMenuBar.axaml"/>
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/GroupingListBox.axaml"/>
     
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/ToolsTabControl.xaml"/>
 </Styles>

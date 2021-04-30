@@ -45,7 +45,11 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
         public IConfigurable? SelectedTabItem
         {
             get => selectedTabItem;
-            set => SetProperty(ref selectedTabItem, value);
+            set
+            {
+                SetProperty(ref selectedTabItem, value);
+                value?.ConfigurableOpened();
+            }
         }
 
         private void SaveAll()

@@ -12,6 +12,8 @@
         
         <SolidColorBrush Color="#3F3F45" x:Key="ContentBorderBrush" />
         <SolidColorBrush Color="#252526" x:Key="ContentBackground" />
+        <SolidColorBrush Color="#252526" x:Key="SystemAltMediumLowColor" />
+        
         <SolidColorBrush Color="#252526" x:Key="ThemeBackgroundBrush" />
         <SolidColorBrush Color="#3F3F45" x:Key="ThemeBorderMidBrush" />
         

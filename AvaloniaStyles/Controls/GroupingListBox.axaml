@@ -4,7 +4,20 @@
     <Design.PreviewWith>
         <controls:GroupingListBox />
     </Design.PreviewWith>
-
+    
+    <Style Selector="controls|GroupingHeader">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <ContentPresenter Content="{TemplateBinding CustomContent}" VerticalAlignment="Center" />
+                        <ContentPresenter Content="{TemplateBinding GroupName}"  VerticalAlignment="Center"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style Selector="controls|GroupingListBox">
         <Setter Property="Background" Value="White" />
         <Setter Property="BorderBrush" Value="#828790" />
@@ -12,7 +25,7 @@
         <Setter Property="HeaderTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <TextBlock Text="{Binding GroupName}" />
+                    <controls:GroupingHeader GroupName="{Binding GroupName}" /> 
                 </DataTemplate>
             </Setter.Value>
         </Setter>
