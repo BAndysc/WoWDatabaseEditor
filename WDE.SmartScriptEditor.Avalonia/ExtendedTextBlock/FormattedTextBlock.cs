@@ -40,25 +40,25 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Foreground", out var eventColor)
                     && eventColor is IBrush eventBrush)
                 {
-                    drawer.AddStyle(STYLE_DEFAULT, new Typeface(mainFontSansFamily), 12, eventBrush);
+                    drawer.AddStyle(STYLE_DEFAULT, new Typeface(mainFontSansFamily), 12, eventBrush, 0);
                 }
                 
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Selected.Foreground", out var eventSelectedColor)
                     && eventSelectedColor is IBrush eventSelectedBrush)
                 {
-                    drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface(mainFontSansFamily), 12, eventSelectedBrush);
+                    drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface(mainFontSansFamily), 12, eventSelectedBrush, 0);
                 }
                 
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", out var parameterColor)
                     && parameterColor is IBrush parameterBrush)
                 {
-                    drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush);
+                    drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush, 1);
                 }
                 
                 if (Application.Current.Styles.TryGetResource("SmartScripts.Source.Foreground", out var sourceColor)
                     && sourceColor is IBrush sourceBrush)
                 {
-                    drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush);
+                    drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush, 1);
                 }
             }
         }
@@ -286,13 +286,13 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             set => SetAndRaise(IsSelectedProperty, ref isSelected, value);
         }
         
-        public static readonly StyledProperty<IBrush> BackgroundProperty =
+        public static readonly StyledProperty<IBrush?> BackgroundProperty =
             Border.BackgroundProperty.AddOwner<TextBlock>();
 
         /// <summary>
         /// Gets or sets a brush used to paint the control's background.
         /// </summary>
-        public IBrush Background
+        public IBrush? Background
         {
             get => GetValue(BackgroundProperty);
             set => SetValue(BackgroundProperty, value);

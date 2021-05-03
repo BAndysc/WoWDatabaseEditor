@@ -9,13 +9,13 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
     {
         private double lineHeight = 0;
         private FormattedTextCache cache = new();
-        private Dictionary<int, (IBrush brush, IPen pen)> styles = new();
+        private Dictionary<int, (IBrush brush, IPen pen, int yoffset)> styles = new();
         public double LineHeight => lineHeight;
 
-        public void AddStyle(int index, Typeface fontFamily, int fontSize, IBrush color)
+        public void AddStyle(int index, Typeface fontFamily, int fontSize, IBrush color, int yoffset)
         {
             cache.AddStyle(index, fontFamily, fontSize);
-            styles[index] = (color, new Pen(color));
+            styles[index] = (color, new Pen(color), yoffset);
         }
         
         public (bool, Rect) Draw(DrawingContext context, string text, int styleId, bool canWrap, ref double x, ref double y, double leftPadding, double maxX)
@@ -37,7 +37,7 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
             
             double alignedY = y + (lineHeight - ft.Bounds.Height);
             
-            context.DrawText(style.brush, new Point(x, alignedY), ft);
+            context.DrawText(style.brush, new Point(x, alignedY + style.yoffset), ft);
 
             double startX = x;
             x += ft.Bounds.Width;
