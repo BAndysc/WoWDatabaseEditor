@@ -17,6 +17,9 @@
         <SolidColorBrush x:Key="ContentBackground" Color="White" />
         <SolidColorBrush x:Key="ContentAlternateRowBackground" Color="#F4F5F5" />
         <SolidColorBrush x:Key="MainColorForeground" Color="#282828" />	
+        
+        <SolidColorBrush Color="#F2F2F2" x:Key="TeachingTipBackground" />
+        <SolidColorBrush Color="#BABABA" x:Key="TeachingTipBorderBrush" />
         <!-- generic content like button or textarea -->
         
         <!-- bs -->

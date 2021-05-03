@@ -25,6 +25,9 @@
         
         <SolidColorBrush Color="#999999" x:Key="TitleBarForeground" />
         
+        <SolidColorBrush Color="#2D2D2D" x:Key="TeachingTipBackground" />
+        <SolidColorBrush Color="#101010" x:Key="TeachingTipBorderBrush" />
+        
         <!-- tools tab -->
         <SolidColorBrush x:Key="ToolsTabItemForeground" Color="#9C9C9C" />
 

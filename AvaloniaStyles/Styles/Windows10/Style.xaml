@@ -28,4 +28,5 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GridView.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/CheckBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GroupingListBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TeachingTip.axaml" />
 </Styles>

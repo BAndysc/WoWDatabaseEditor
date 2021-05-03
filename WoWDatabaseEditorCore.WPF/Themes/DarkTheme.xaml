@@ -217,7 +217,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border x:Name="Border" Padding="0,0,0,0" BorderBrush="#515159" Background="#404042" BorderThickness="1">
+                    <Border x:Name="Border" Padding="{TemplateBinding Padding}" BorderBrush="#515159" Background="#404042" BorderThickness="1">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -241,7 +241,6 @@
             </Setter.Value>
         </Setter>
         <Setter Property="Panel.Background" Value="#3F3F46" />
-        <Setter Property="MinWidth" Value="50" />
     </Style>
 
     <Style TargetType="TextBox">
@@ -855,4 +854,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+    
+    <SolidColorBrush Color="#2D2D2D" x:Key="TeachingTipBackground" />
+    <SolidColorBrush Color="#101010" x:Key="TeachingTipBorderBrush" />
 </ResourceDictionary>

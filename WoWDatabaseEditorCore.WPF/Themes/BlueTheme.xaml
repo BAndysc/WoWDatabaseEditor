@@ -250,4 +250,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+    
+    <SolidColorBrush Color="#F2F2F2" x:Key="TeachingTipBackground" />
+    <SolidColorBrush Color="#BABABA" x:Key="TeachingTipBorderBrush" />
 </ResourceDictionary>

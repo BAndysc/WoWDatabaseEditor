@@ -24,6 +24,9 @@
         
         <SolidColorBrush Color="#3C3C3C" x:Key="TitleBarForeground" />
         
+        <SolidColorBrush Color="#F2F2F2" x:Key="TeachingTipBackground" />
+        <SolidColorBrush Color="#BABABA" x:Key="TeachingTipBorderBrush" />
+        
         <!-- dock -->
         <SolidColorBrush Color="White" x:Key="DockThemeForegroundBrush" />
         <SolidColorBrush Color="Black" x:Key="DockApplicationAccentForegroundBrush" />

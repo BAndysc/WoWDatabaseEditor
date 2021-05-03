@@ -1,0 +1,48 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Design.PreviewWith>
+        <controls:TeachingTip>
+            
+        </controls:TeachingTip>
+    </Design.PreviewWith>
+
+    <Style Selector="controls|TeachingTip">
+        <Setter Property="Background" Value="{DynamicResource TeachingTipBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TeachingTipBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="IsVisible" Value="False" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border MaxWidth="300"
+                            BoxShadow="0 5 20 2 #40000000" 
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            CornerRadius="5"
+                            Padding="12,16">
+                        <Panel>
+                            <StackPanel ClipToBounds="True">
+                                <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Text="{TemplateBinding Header}" Margin="0,0,0,10" />
+                                <ContentPresenter Content="{TemplateBinding Content}" />
+                                <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.5" Margin="0,10,0,0">Do not worry, you won't see this tooltip again.</TextBlock>
+                            </StackPanel>
+                            <Button Command="{Binding CloseCommand, RelativeSource={RelativeSource Mode=TemplatedParent}}" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="4" Margin="0,-5,0,0">
+                                <Path Data="M 0,0 L 9,9 M 9,0 L 0,9" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" />
+                            </Button>
+                        </Panel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|TeachingTip TextBlock">
+        <Setter Property="TextWrapping" Value="WrapWithOverflow"></Setter>
+    </Style>
+</Styles>

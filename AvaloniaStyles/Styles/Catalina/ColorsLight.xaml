@@ -12,6 +12,9 @@
         <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#C4C4C4" />
         <Thickness x:Key="BorderThickness">0.5</Thickness>
         
+        <SolidColorBrush Color="#F2F2F2" x:Key="TeachingTipBackground" />
+        <SolidColorBrush Color="#BABABA" x:Key="TeachingTipBorderBrush" />
+        
         <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#282828" />
         <SolidColorBrush x:Key="MainColorBackground" Color="#ECECEC" />
         <SolidColorBrush x:Key="ContentBackground" Color="White" />
