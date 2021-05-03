@@ -100,7 +100,7 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <DockPanel LastChildFill="True" Height="24" Name="row">
-                                                <TextBlock Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
+                                                <TextBlock ToolTip="{Binding Help, Mode=OneTime}" Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
                                                 <ItemsControl ItemsSource="{Binding Cells}" ItemTemplateSelector="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
                                                 </ItemsControl>
                                             </DockPanel>

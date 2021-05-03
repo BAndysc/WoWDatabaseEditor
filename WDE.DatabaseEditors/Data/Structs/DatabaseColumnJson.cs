@@ -7,6 +7,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "name")] 
         public string Name { get; set; } = "";
         
+        [JsonProperty(PropertyName = "help")] 
+        public string? Help { get; set; } = null;
+        
         [JsonProperty(PropertyName = "db_column_name")]
         public string DbColumnName { get; set; } = "";
         

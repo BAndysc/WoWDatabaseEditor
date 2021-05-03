@@ -9,6 +9,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public string CategoryName { get; }
         public int CategoryIndex { get; }
         public string Name { get; } = "";
+        public string? Help { get; } = null;
         public int Order { get; }
         public bool IsReadOnly { get; }
         public bool CanBeNull { get; }
@@ -26,6 +27,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             CategoryIndex = categoryIndex;
             Order = index;
             Name = columnData.Name;
+            Help = columnData.Help;
         }
     }
 }

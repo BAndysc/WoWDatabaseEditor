@@ -64,7 +64,7 @@
         </DataTemplate>
         <DataTemplate x:Key="RowTemplate">
             <DockPanel LastChildFill="True" Classes="alternating" Height="24">
-                <TextBlock Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
+                <TextBlock ToolTip.Tip="{Binding Help, Mode=OneTime}" Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
                 <ItemsPresenter Items="{Binding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
                 </ItemsPresenter>
             </DockPanel>

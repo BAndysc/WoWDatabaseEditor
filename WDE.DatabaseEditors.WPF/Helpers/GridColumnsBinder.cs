@@ -84,6 +84,7 @@ namespace WDE.DatabaseEditors.WPF.Helpers
 
                     var tb = new TextBlock() { Text = column.Name, Padding = new Thickness(16,6,6,6) };
                     tb.SetValue(Grid.ColumnProperty, index * 2);
+                    tb.SetValue(ToolTip.ToolTipProperty, column.Help);
                     grid.Children.Add(tb);
 
                     var splitter = new GridSplitter() { };

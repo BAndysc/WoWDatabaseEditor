@@ -84,6 +84,7 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
 
                         var tb = new TextBlock() {Text = column.Name};
                         tb.SetValue(Grid.ColumnProperty, index * 2);
+                        tb.SetValue(ToolTip.TipProperty, column.Help);
                         grid.Children.Add(tb);
 
                         var splitter = new GridSplitter() {};
