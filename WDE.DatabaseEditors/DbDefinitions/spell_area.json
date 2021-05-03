@@ -36,7 +36,7 @@
           "value_type": "QuestParameter"
         },
         {
-          "name": "Quest start status",
+          "name": "Quest start required status",
           "db_column_name": "quest_start_status",
           "default": 64,
           "value_type": "QuestStatusParameter",
@@ -48,7 +48,7 @@
           "value_type": "QuestParameter"
         },
         {
-          "name": "Quest end status",
+          "name": "Quest end required status",
           "db_column_name": "quest_end_status",
           "default": 11,
           "value_type": "QuestStatusParameter",

@@ -60,8 +60,7 @@
         {
           "name": "Display",
           "db_column_name": "displayId",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "uint"
         },
         {
           "name": "Size",
@@ -71,14 +70,12 @@
         {
           "name": "Icon name",
           "db_column_name": "IconName",
-          "value_type": "string",
-          "read_only": true
+          "value_type": "string"
         },
         {
           "name": "Cast bar caption",
           "db_column_name": "castBarCaption",
-          "value_type": "string",
-          "read_only": true
+          "value_type": "string"
         }
       ]
     },
@@ -1526,8 +1523,7 @@
         {
           "name": "AI name",
           "db_column_name": "AIName",
-          "value_type": "string",
-          "read_only": true
+          "value_type": "string"
         },
         {
           "name": "Script name",
