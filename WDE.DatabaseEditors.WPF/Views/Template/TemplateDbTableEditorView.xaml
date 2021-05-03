@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:WDE.DatabaseEditors.WPF.Controls"
              xmlns:utils="clr-namespace:WDE.Common.WPF.Utils;assembly=WDE.Common.WPF" xmlns:helpers="clr-namespace:WDE.DatabaseEditors.WPF.Helpers"
+             xmlns:components="clr-namespace:WDE.Common.WPF.Components;assembly=WDE.Common.WPF"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              x:Name="rootWindow">
@@ -55,71 +56,78 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
-        <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <DockPanel Margin="10" VerticalAlignment="Center">
-                <Button Command="{Binding AddNewCommand, Mode=OneTime}">
-                    Add new
-                </Button>
-                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
-                    <TextBlock VerticalAlignment="Center" Padding="0,0,15,0">Search:</TextBlock>
-                    <TextBox Name="SearchTextBox" Width="300" HorizontalAlignment="Right" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </DockPanel>
-            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <ItemsControl Focusable="False" ItemsSource="{Binding FilteredRows, Mode=OneTime}" Margin="0, 0, 0, 30">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
-                                <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Padding="10,0,0,0" 
-                                                       Text="{Binding GroupName, Mode=OneTime}" 
-                                                       Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
-                                                       Width="150"
-                                                       VerticalAlignment="Center"/>
-                                        <ItemsControl ItemsSource="{Binding DataContext.Header, ElementName=rootWindow, Mode=OneTime}"  ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <TextBlock Width="300" 
-                                                       Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
-                                                       TextAlignment="Center" 
-                                                       VerticalAlignment="Center"
-                                                       Text="{Binding ., Mode=OneTime}">
-                                                    </TextBlock>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </StackPanel>
-                                </Border>
-                                <ItemsControl Focusable="False" ItemsSource="{Binding ., Mode=OneTime}"  AlternationCount="2">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <DockPanel LastChildFill="True" Height="24" Name="row">
-                                                <TextBlock ToolTip="{Binding Help, Mode=OneTime}" Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
-                                                <ItemsControl ItemsSource="{Binding Cells}" ItemTemplateSelector="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
-                                                </ItemsControl>
-                                            </DockPanel>
-                                            <DataTemplate.Triggers>
-                                                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                                                    <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" TargetName="row" />
-                                                </Trigger>
-                                                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                                                    <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" TargetName="row"/>
-                                                </Trigger>
-                                            </DataTemplate.Triggers>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </Grid>
-    </DockPanel>
+    <Grid>
+        <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
+            <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <DockPanel Margin="10" VerticalAlignment="Center">
+                    <Button Command="{Binding AddNewCommand, Mode=OneTime}">
+                        Add new
+                    </Button>
+                    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center" Padding="0,0,15,0">Search:</TextBlock>
+                        <TextBox Name="SearchTextBox" Width="300" HorizontalAlignment="Right" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </DockPanel>
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl Focusable="False" ItemsSource="{Binding FilteredRows, Mode=OneTime}" Margin="0, 0, 0, 30">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
+                                    <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Padding="10,0,0,0" 
+                                                           Text="{Binding GroupName, Mode=OneTime}" 
+                                                           Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
+                                                           Width="150"
+                                                           VerticalAlignment="Center"/>
+                                            <ItemsControl ItemsSource="{Binding DataContext.Header, ElementName=rootWindow, Mode=OneTime}"  ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Width="300" 
+                                                           Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
+                                                           TextAlignment="Center" 
+                                                           VerticalAlignment="Center"
+                                                           Text="{Binding ., Mode=OneTime}">
+                                                        </TextBlock>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                    <ItemsControl Focusable="False" ItemsSource="{Binding ., Mode=OneTime}"  AlternationCount="2">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel LastChildFill="True" Height="24" Name="row">
+                                                    <TextBlock ToolTip="{Binding Help, Mode=OneTime}" Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
+                                                    <ItemsControl ItemsSource="{Binding Cells}" ItemTemplateSelector="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                                                    </ItemsControl>
+                                                </DockPanel>
+                                                <DataTemplate.Triggers>
+                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                                                        <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" TargetName="row" />
+                                                    </Trigger>
+                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                                        <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" TargetName="row"/>
+                                                    </Trigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </DockPanel>
+        
+        <components:TeachingTip IsOpened="{Binding YouCanRevertTipOpened}" 
+                               VerticalAlignment="Bottom" Margin="20" 
+                               Header="The editor remembers previous values!"
+                               Content="In the template editing, the editor remembers previous field value (even between application restarts). As long as you do not remove this item from solution, you can revert to previous value with right click menu." />
+    </Grid>
 </UserControl>

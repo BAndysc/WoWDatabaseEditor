@@ -29,6 +29,8 @@ namespace WDE.SmartScriptEditor.Models
         
         public ObservableCollection<object> AllSmartObjectsFlat { get; } 
         
+        public ObservableCollection<SmartAction> AllActions { get; } 
+        
         ~SmartScript()
         {
             selectionHelper.Dispose();
@@ -51,6 +53,7 @@ namespace WDE.SmartScriptEditor.Models
             selectionHelper = new SmartSelectionHelper(this);
             selectionHelper.ScriptSelectedChanged += CallScriptSelectedChanged;
             AllSmartObjectsFlat = selectionHelper.AllSmartObjectsFlat;
+            AllActions = selectionHelper.AllActions;
             
             Events.ToStream()
                 .Subscribe((e) =>

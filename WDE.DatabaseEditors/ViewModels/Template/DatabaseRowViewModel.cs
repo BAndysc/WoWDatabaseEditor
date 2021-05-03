@@ -29,5 +29,12 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             Name = columnData.Name;
             Help = columnData.Help;
         }
+
+        public void AnyFieldModified()
+        {
+            FieldModified?.Invoke();
+        }
+
+        public event System.Action? FieldModified;
     }
 }

@@ -13,6 +13,7 @@ namespace WDE.SmartScriptEditor.Models.Helpers
         private Dictionary<SmartAction, IDisposable> actionToDisposables = new();
         private Dictionary<SmartCondition, IDisposable> conditionToDisposables = new();
         public ObservableCollection<object> AllSmartObjectsFlat { get; } = new();
+        public ObservableCollection<SmartAction> AllActions { get; } = new();
 
         public event Action ScriptSelectedChanged;
         
@@ -64,12 +65,14 @@ namespace WDE.SmartScriptEditor.Models.Helpers
         {
             if (collectionEvent.Type == CollectionEventType.Add)
             {
+                AllActions.Add(collectionEvent.Item);
                 AllSmartObjectsFlat.Add(collectionEvent.Item);
                 actionToDisposables.Add(collectionEvent.Item,
                     collectionEvent.Item.ToObservable(e => e.IsSelected).Subscribe(SelectionChanged));
             }
             else if (collectionEvent.Type == CollectionEventType.Remove)
             {
+                AllActions.Remove(collectionEvent.Item);
                 AllSmartObjectsFlat.Remove(collectionEvent.Item);
                 actionToDisposables[collectionEvent.Item].Dispose();
                 actionToDisposables.Remove(collectionEvent.Item);

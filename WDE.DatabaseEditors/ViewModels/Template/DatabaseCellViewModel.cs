@@ -17,8 +17,13 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public bool CanBeNull => Parent.CanBeNull;
         public bool CanBeSetToNull => CanBeNull && !Parent.IsReadOnly;
         public bool CanBeReverted => !Parent.IsReadOnly;
+        private bool inConstructor = true;
 
-        public DatabaseCellViewModel(DatabaseRowViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue, IObservable<bool>? cellIsVisible)
+        public DatabaseCellViewModel(DatabaseRowViewModel parent, 
+            DatabaseEntity parentEntity, 
+            IDatabaseField tableField, 
+            IParameterValue parameterValue, 
+            IObservable<bool>? cellIsVisible)
         {
             Link(tableField, tf => tf.IsModified, () => IsModified);
             ParentEntity = parentEntity;
@@ -35,11 +40,14 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
             AutoDispose(parameterValue.ToObservable().SubscribeAction(_ =>
             {
+                if (!inConstructor)
+                  parent.AnyFieldModified();
                 OriginalValueTooltip =
                     tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
                 RaisePropertyChanged(nameof(OriginalValueTooltip));
                 RaisePropertyChanged(nameof(AsBoolValue));
             }));
+            inConstructor = false;
         }
 
         public bool AsBoolValue

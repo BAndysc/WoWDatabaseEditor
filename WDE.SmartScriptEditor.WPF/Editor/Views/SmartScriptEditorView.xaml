@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.UserControls"
              xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime">
-    <userControls:SmartScriptView userControls:DeleteEventCommand="{Binding DeleteEvent}" />
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:components="clr-namespace:WDE.Common.WPF.Components;assembly=WDE.Common.WPF">
+    <Grid>
+        <userControls:SmartScriptView userControls:DeleteEventCommand="{Binding DeleteEvent}" />
+        <components:TeachingTip IsOpened="{Binding TeachingTips.WaitActionTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Have you checked WAIT action yet?" Content="WoW Database Editor has special 'wait' action that can be used instead of timed action lists. Check it out!" />
+        <components:TeachingTip IsOpened="{Binding TeachingTips.MultipleActionsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Multiple actions in one event" Content="In the WoW Database Editor you can have many actions in a single event. You do not have to copy-paste events." />
+    </Grid>
 </UserControl>

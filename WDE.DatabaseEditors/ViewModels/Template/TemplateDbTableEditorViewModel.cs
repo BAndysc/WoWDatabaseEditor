@@ -4,16 +4,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using AsyncAwaitBestPractices.MVVM;
 using DynamicData;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.Database;
-using WDE.Common.Events;
 using WDE.Common.History;
-using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
@@ -21,8 +17,6 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
-using WDE.DatabaseEditors.Data.Structs;
-using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
@@ -35,11 +29,14 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 {
     public class TemplateDbTableEditorViewModel : ViewModelBase
     {
+        private const string TipYouCanRevertId = "TableEditor.YouCanRevert";
+    
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
         private readonly IMySqlExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
+        private readonly ITeachingTipService teachingTipService;
 
         private readonly IDatabaseTableDataProvider tableDataProvider;
         
@@ -55,6 +52,9 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
 
         public AsyncAutoCommand AddNewCommand { get; }
+
+        private bool canOpenRevertTip;
+        public bool YouCanRevertTipOpened { get; set; }
         
         public TemplateDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
@@ -62,7 +62,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
-            IQueryGenerator queryGenerator) : base(history, solutionItem, solutionItemName, 
+            IQueryGenerator queryGenerator, ITeachingTipService teachingTipService) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory)
         {
@@ -72,6 +72,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             this.parameterFactory = parameterFactory;
             this.mySqlExecutor = mySqlExecutor;
             this.queryGenerator = queryGenerator;
+            this.teachingTipService = teachingTipService;
             tableDefinition = null!;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
@@ -98,6 +99,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
 
+            canOpenRevertTip = !teachingTipService.IsTipShown(TipYouCanRevertId);
+            
             ScheduleLoading();
         }
 
@@ -347,6 +350,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 foreach (var column in group.Fields)
                 {
                     var row = new DatabaseRowViewModel(column, group, categoryIndex, columnIndex++);
+                    if (canOpenRevertTip)
+                        row.FieldModified += RowOnFieldModified;
                     Rows.Add(row);
                 }
             }
@@ -354,6 +359,15 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             await AsyncAddEntities(data.Entities);
             
             History.AddHandler(AutoDispose(new TemplateTableEditorHistoryHandler(this)));
+        }
+
+        private void RowOnFieldModified()
+        {
+            if (teachingTipService.ShowTip(TipYouCanRevertId))
+            {
+                YouCanRevertTipOpened = true;
+                RaisePropertyChanged(nameof(YouCanRevertTipOpened));
+            }
         }
 
         private async Task AsyncAddEntities(IList<DatabaseEntity> tableDataEntities)

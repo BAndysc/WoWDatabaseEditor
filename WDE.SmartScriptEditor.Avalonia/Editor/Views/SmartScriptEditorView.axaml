@@ -4,6 +4,11 @@
              xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
              xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls">
-    <userControls1:SmartScriptView Focusable="True"/>
+             xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles">
+    <Panel>
+        <userControls1:SmartScriptView Focusable="True"/>
+        <controls:TeachingTip IsOpened="{Binding TeachingTips.WaitActionTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Have you checked WAIT action yet?">WoW Database Editor has special "wait" action that can be used instead of timed action lists. Check it out!</controls:TeachingTip>
+        <controls:TeachingTip IsOpened="{Binding TeachingTips.MultipleActionsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Multiple actions in one event">In the WoW Database Editor you can have many actions in a single event. You do not have to copy-paste events.</controls:TeachingTip>
+    </Panel>
 </UserControl>

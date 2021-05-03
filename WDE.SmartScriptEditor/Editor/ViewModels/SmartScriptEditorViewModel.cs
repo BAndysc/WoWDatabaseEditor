@@ -44,6 +44,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IToolSmartEditorViewModel smartEditorViewModel;
         private readonly ISmartScriptExporter smartScriptExporter;
         private readonly IEditorFeatures editorFeatures;
+        private readonly ITeachingTipService teachingTipService;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -53,9 +54,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IMessageBoxService messageBoxService;
 
         private ISmartScriptSolutionItem item;
-
         private SmartScript script;
 
+        public SmartTeachingTips TeachingTips { get; private set; }
+        
         private bool isLoading = true;
         public bool IsLoading
         {
@@ -87,7 +89,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IClipboardService clipboard,
             IToolSmartEditorViewModel smartEditorViewModel,
             ISmartScriptExporter smartScriptExporter,
-            IEditorFeatures editorFeatures)
+            IEditorFeatures editorFeatures,
+            ITeachingTipService teachingTipService)
         {
             History = history;
             this.database = databaseProvider;
@@ -104,6 +107,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.smartEditorViewModel = smartEditorViewModel;
             this.smartScriptExporter = smartScriptExporter;
             this.editorFeatures = editorFeatures;
+            this.teachingTipService = teachingTipService;
             this.conditionDataManager = conditionDataManager;
 
             CloseCommand = new AsyncCommand(async () =>
@@ -828,6 +832,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Title = itemNameRegistry.GetName(item);
             
             Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService);
+            TeachingTips = AutoDispose(new SmartTeachingTips(teachingTipService, Script));
             Script.ScriptSelectedChanged += EventChildrenSelectionChanged;
             
             Together.Add(new NewActionViewModel());
@@ -903,6 +908,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             script.Load(lines, conditions);
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
+            TeachingTips.Start();
         }
         
         private async Task SaveAllToDb()
