@@ -4,8 +4,13 @@
         xmlns:views="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views"
         xmlns:controls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
         xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
-        xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles">
+        xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
 
+    <Styles.Resources>
+        <converters:NullConverter x:Key="NullToBoolConverter" Inverted="True" />
+    </Styles.Resources>
+    
     <styles:StyleIncludeColorAware DarkSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsDark.axaml"
                                    LightSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsLight.axaml"/>
 
@@ -136,6 +141,9 @@
                     <Border BorderThickness="1" DockPanel.Dock="Top" Padding="5">
                         <DockPanel LastChildFill="True">
                             <controls:SmartEventFlagsView DockPanel.Dock="Right"/>
+                            <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{Binding ChanceString, Converter={StaticResource NullToBoolConverter}}">
+                                <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{Binding ChanceString}"/>
+                            </Border>
                             <extendedTextBlock:FormattedTextBlock
                                 ContextArray="{Binding Context}"
                                 IsSelected="{Binding IsSelected}"

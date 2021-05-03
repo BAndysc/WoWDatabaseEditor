@@ -492,6 +492,8 @@
     <SolidColorBrush x:Key="SmartScripts.Event.Phase.Background" Color="#81c784" />
     <SolidColorBrush x:Key="SmartScripts.Event.Flag.Foreground" Color="#444444" />
     
+    <SolidColorBrush x:Key="SmartScripts.Event.Chance.Background" Color="#198948" />
+    
     <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#404040" />
     <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77FFFFFF" />
     <SolidColorBrush x:Key="SmartScripts.Condition.Selected.Foreground" Color="#3B3B3B" />

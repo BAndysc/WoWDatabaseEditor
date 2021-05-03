@@ -3,8 +3,11 @@
                     xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.UserControls"
                     xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.Views.Helpers"
                     xmlns:editing="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.Views.Editing"
-                    xmlns:b="http://schemas.microsoft.com/xaml/behaviors">
+                    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:viewhelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF">
 
+    <viewhelpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+    
     <Style x:Key="ParameterTextStyle" TargetType="Run">
         <Setter Property="FontFamily" Value="Consolas"/>
         <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Parameter.Foreground}" />
@@ -207,6 +210,9 @@
                         <Border BorderThickness="1" DockPanel.Dock="Top">
                             <DockPanel LastChildFill="True">
                                 <userControls:SmartEventFlagsView DockPanel.Dock="Right" Margin="2"/>
+                                <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" Visibility="{Binding ChanceString, Converter={StaticResource NullToVisibilityConverter}}">
+                                    <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{Binding ChanceString}"/>
+                                </Border>
                                 <TextBlock TextWrapping="WrapWithOverflow" 
                                            helpers:SmartFormattedText.ContextArray="{Binding Context}"
                                            helpers:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 

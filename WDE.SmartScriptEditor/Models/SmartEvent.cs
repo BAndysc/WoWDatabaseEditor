@@ -8,6 +8,7 @@ using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
+using WDE.Common.Annotations;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Models;
@@ -56,7 +57,11 @@ namespace WDE.SmartScriptEditor.Models
             cooldownMax = new ParameterValueHolder<long>("Cooldown max", Parameter.Instance, 0);
 
             flags.PropertyChanged += (_, _) => CallOnChanged();
-            chance.PropertyChanged += (_, _) => CallOnChanged();
+            chance.PropertyChanged += (_, _) =>
+            {
+                CallOnChanged();
+                OnPropertyChanged(nameof(ChanceString));
+            };
             phases.PropertyChanged += (_, _) => CallOnChanged();
             cooldownMin.PropertyChanged += (_, _) => CallOnChanged();
             cooldownMax.PropertyChanged += (_, _) => CallOnChanged();
@@ -75,6 +80,8 @@ namespace WDE.SmartScriptEditor.Models
                 OnPropertyChanged();
             }
         }
+
+        [CanBeNull] public string ChanceString => chance.Value == 100 ? null : $"{chance.Value}%";
 
         public ParameterValueHolder<long> CooldownMax => cooldownMax;
         public ParameterValueHolder<long> CooldownMin => cooldownMin;
