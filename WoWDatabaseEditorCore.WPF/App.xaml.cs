@@ -40,6 +40,7 @@ namespace WoWDatabaseEditorCore.WPF
 
         public App()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             /*
              * .net core (and .net 5) changed the way assembly and type resolving work.
              * Preferred way to implement "plugins" is using custom AssemblyLoadContext per plugin

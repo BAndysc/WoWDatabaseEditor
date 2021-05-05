@@ -17,6 +17,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             FixCurrentDirectory();
             if (ProgramBootstrap.TryLaunchUpdaterIfNeeded())
                 return;
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             var app = BuildAvaloniaApp();
             try
             {
