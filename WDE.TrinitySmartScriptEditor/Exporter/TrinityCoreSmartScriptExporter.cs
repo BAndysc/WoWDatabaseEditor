@@ -88,18 +88,19 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
                     var actionData = smartDataManager.GetRawData(SmartType.SmartAction, actualAction.Id);
                     
+                    if (actionData.ImplicitSource != null)
+                        smartFactory.UpdateSource(actualAction.Source, smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource).Id);
+
                     if (actionData.TargetIsSource)
                     {
                         smartFactory.UpdateTarget(actualAction.Target, actualAction.Source.Id);
                         for (int i = 0; i < actualAction.Target.ParametersCount; ++i)
                             actualAction.Target.GetParameter(i).Copy(actualAction.Source.GetParameter(i));
                         
-                        smartFactory.UpdateSource(actualAction.Source, 0);
+                        // do not reset source, it doesn't matter, but at least correct comment will be generated
+                        // smartFactory.UpdateSource(actualAction.Source, 0);
                     }
-                    
-                    if (actionData.ImplicitSource != null)
-                        smartFactory.UpdateSource(actualAction.Source, smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource).Id);
-                    else if (actionData.SourceStoreInAction)
+                    if (actionData.SourceStoreInAction)
                     {
                         actualAction.GetParameter(2).Value = actualAction.Source.Id;
                         actualAction.GetParameter(3).Value = actualAction.Source.GetParameter(0).Value;
