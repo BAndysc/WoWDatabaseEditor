@@ -983,7 +983,7 @@
         ],
         "description": "{source}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
         "name_readable": "Summon gameobject",
-        "target_types": ["Player", "Creature", "GameObject"],
+        "target_types": ["Player", "Creature", "GameObject", "Position"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -3353,7 +3353,7 @@
         ],
         "description": "{source}: Summon creature {pram1}{pram2value:choose(0):| (for {pram2} seconds)} in cone shape (dist between rings: {pram3}, dist between each summon in row: {pram4}, length of cone: {pram5}, width of cone: {pram6}°",
         "name_readable": "Summon in cone shape",
-        "target_types": ["Creature", "GameObject", "Player"],
+        "target_types": ["Creature", "GameObject", "Player", "Position"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
     },
@@ -3408,7 +3408,7 @@
         ],
         "description": "{source}: Summon creature {pram1}{pram2value:choose(0):| (for {pram2} seconds)} in vortex shape (spiral scaling: {pram3}, spiral appearance: {pram4}, range max: {pram5}, phi delta: {pram6})",
         "name_readable": "Summon vortex shape",
-        "target_types": ["Player", "Creature", "GameObject"],
+        "target_types": ["Player", "Creature", "GameObject", "Position"],
         "implicit_source": "SMART_TARGET_SELF"
     },
     {
