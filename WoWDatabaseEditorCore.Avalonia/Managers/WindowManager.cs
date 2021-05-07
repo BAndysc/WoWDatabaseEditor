@@ -20,11 +20,19 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         
         public async Task<bool> ShowDialog(IDialog viewModel)
         {
-            DialogWindow view = new DialogWindow();
-            view.Height = viewModel.DesiredHeight;
-            view.Width = viewModel.DesiredWidth;
-            view.DataContext = viewModel;
-            return await view.ShowDialog<bool>(mainWindowHolder.Window);
+            try
+            {
+                DialogWindow view = new DialogWindow();
+                view.Height = viewModel.DesiredHeight;
+                view.Width = viewModel.DesiredWidth;
+                view.DataContext = viewModel;
+                return await view.ShowDialog<bool>(mainWindowHolder.Window);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public Task<string> ShowFolderPickerDialog(string defaultDirectory)

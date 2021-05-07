@@ -5,7 +5,7 @@
     <Setter Property="Template">
         <ControlTemplate>
             <Menu
-                Items="{Binding $parent[TopLevel].(NativeMenu.Menu).Items}">
+                Items="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
                 <Menu.Styles>
                     <Style Selector="MenuItem">
                         <Setter Property="Header" Value="{Binding Header}"/>
