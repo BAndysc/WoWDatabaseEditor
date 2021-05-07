@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using SmartFormat;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
-using WDE.SmartScriptEditor.Utils;
 
 namespace WDE.SmartScriptEditor.Exporter
 {

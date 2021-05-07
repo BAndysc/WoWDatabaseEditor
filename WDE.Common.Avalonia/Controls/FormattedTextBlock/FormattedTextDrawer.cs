@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Media;
 
-namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
+namespace WDE.Common.Avalonia.Controls
 {
     public class FormattedTextDrawer
     {

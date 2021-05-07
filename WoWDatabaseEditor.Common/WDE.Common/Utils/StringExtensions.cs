@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace WDE.SmartScriptEditor.Utils
+namespace WDE.Common.Utils
 {
     public static class StringExtensions
     {

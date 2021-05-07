@@ -1,12 +1,11 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:extendedTextBlock="clr-namespace:WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock"
+        xmlns:extendedTextBlock="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
         xmlns:views="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views"
         xmlns:controls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
         xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
         xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
-        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
-        xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia">
+        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
 
     <Styles.Resources>
         <converters:NullConverter x:Key="NullToBoolConverter" Inverted="True" />
@@ -188,7 +187,7 @@
                                 <views:ParameterDataTemplateSelector>
                                     <views:ParameterDataTemplateSelector.Generic>
                                         <DataTemplate>
-                                            <controls1:ParameterValueHolderView DataContext="{Binding Parameter}" PickCommand="{Binding DataContext.SelectItemAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}" />
+                                            <extendedTextBlock:ParameterValueHolderView DataContext="{Binding Parameter}" PickCommand="{Binding DataContext.SelectItemAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.Generic>
                                     <views:ParameterDataTemplateSelector.ButtonParameter>

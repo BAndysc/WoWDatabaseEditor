@@ -1,7 +1,6 @@
 ﻿using System.Windows.Input;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock;
+using WDE.Common.Avalonia.Controls;
 using AvaloniaProperty = Avalonia.AvaloniaProperty;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mvvm="http://prismlibrary.com/"
              xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
-             xmlns:extendedTextBlock="clr-namespace:WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              mvvm:ViewModelLocator.AutoWireViewModel="False">
     
     <Grid Margin="6">
@@ -12,7 +12,7 @@
             <RowDefinition />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        <extendedTextBlock:FormattedTextBlock
+        <controls:FormattedTextBlock
             IsHitTestVisible="False"
             Text="{Binding Readable}"
             Margin="0,0,0,10" />
@@ -34,7 +34,7 @@
                 </ItemsPresenter.ItemTemplate>
             </ItemsPresenter>
         </ScrollViewer>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" IsVisible="{Binding ShowCloseButtons}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80" />
                 <ColumnDefinition Width="*" />
@@ -42,15 +42,6 @@
             </Grid.ColumnDefinitions>
             <Button Command="{Binding Cancel}"  Content="Cancel" />
             <Button Command="{Binding Accept}" Grid.Column="2" Content="Ok" />
-            <!-- <Grid.Style> -->
-            <!--     <Style TargetType="Grid"> -->
-            <!--         <Style.Triggers> -->
-            <!--             <DataTrigger Binding="{Binding ShowCloseButtons}" Value="False"> -->
-            <!--                 <Setter Property="Visibility" Value="Collapsed"></Setter> -->
-            <!--             </DataTrigger> -->
-            <!--         </Style.Triggers> -->
-            <!--     </Style> -->
-            <!-- </Grid.Style> -->
         </Grid>
     </Grid>
 </UserControl>

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.LogicalTree;
-using WDE.MVVM;
-using WDE.MVVM.Observable;
-using WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock;
-using WDE.SmartScriptEditor.Models;
+using WDE.Common.Avalonia.Controls;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {

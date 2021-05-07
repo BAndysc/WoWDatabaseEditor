@@ -7,7 +7,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Metadata;
 
-namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
+namespace WDE.Common.Avalonia.Controls
 {
     public class FormattedTextBlock : Control
     {
@@ -210,7 +210,7 @@ namespace WDE.SmartScriptEditor.Avalonia.ExtendedTextBlock
    
                 Rect bounds;
                 sw2.Start();
-                (wasWrapped, bounds) = drawer!.Draw(context, text, styleId, !wasWrapped, ref x, ref y, Padding.Left, Bounds.Width);
+                (wasWrapped, bounds) = drawer!.Draw(context, text, styleId, !wasWrapped, ref x, ref y, Padding.Left, Bounds.Width + 5);
                 sw2.Stop();
 
                 if (overPartIndex == partIndex && (source || parameter) && IsPointerOver)
