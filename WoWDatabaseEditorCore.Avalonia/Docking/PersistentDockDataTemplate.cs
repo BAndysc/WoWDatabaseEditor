@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Styling;
 using Avalonia.VisualTree;
 using Microsoft.CSharp.RuntimeBinder;
 using WDE.Common.Avalonia.Utils;
@@ -40,6 +41,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 if (ViewBind.TryResolve(documentDockWrapper.ViewModel, out var documentView))
                 {
                     documents[documentDockWrapper.ViewModel] = documentView as IControl;
+                    documents[documentDockWrapper.ViewModel].Classes.Add("documentView");
                     documents[documentDockWrapper.ViewModel].DataContext = documentDockWrapper.ViewModel;
                     return documentView as IControl;
                 }

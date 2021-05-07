@@ -73,8 +73,8 @@
             <docking:PersistentDockDataTemplate />
         </idc:DockControl.DataTemplates>
         <idc:DockControl.Styles>
-            <Style Selector="idc|DocumentControl ContentControl#PART_ContentPresenter ContentPresenter">
-                <Setter Property="IsVisible" Value="{Binding IsLoading, FallbackValue=true, Converter={StaticResource InverseBoolConverter}}" />
+            <Style Selector="idc|DocumentControl ContentControl#PART_ContentPresenter > ContentPresenter ContentPresenter.documentView">
+                <Setter Property="IsVisible" Value="{Binding ViewModel.IsLoading, FallbackValue=true, Converter={StaticResource InverseBoolConverter}}" />
             </Style>
         </idc:DockControl.Styles>
     </idc:DockControl>
