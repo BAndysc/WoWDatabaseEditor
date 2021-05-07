@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Styling;
 
-namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
+namespace WDE.Common.Avalonia.Controls
 {
     public class ParameterTextBox : TextBox, IStyleable
     {

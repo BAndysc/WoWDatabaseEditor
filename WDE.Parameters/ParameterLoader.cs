@@ -46,6 +46,8 @@ namespace WDE.Parameters
 
     public class BoolParameter : Parameter
     {
+        public new static BoolParameter Instance { get; } = new BoolParameter();
+        
         public BoolParameter()
         {
             Items = new Dictionary<long, SelectOption> {{0, new SelectOption("No")}, {1, new SelectOption("Yes")}};

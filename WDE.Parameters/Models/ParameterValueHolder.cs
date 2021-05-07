@@ -42,6 +42,7 @@ namespace WDE.Parameters.Models
                 parameter = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(String));
+                OnPropertyChanged(nameof(HasItems));
             }
         }
 
@@ -66,6 +67,8 @@ namespace WDE.Parameters.Models
                 OnPropertyChanged();
             }
         }
+
+        public bool HasItems => Parameter.HasItems;
 
         public string String => ToString();
 

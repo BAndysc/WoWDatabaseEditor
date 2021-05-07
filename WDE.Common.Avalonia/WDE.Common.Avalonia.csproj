@@ -22,6 +22,7 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+      <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
     <ItemGroup>
