@@ -13,7 +13,7 @@
 		"name": "CONDITION_NONE",
 		"name_readable": "Always",
 		"help": "Condition always met",
-		"description": "Always"
+		"description": "{negate:Always|Never}"
 	},
 
 	{
@@ -38,7 +38,7 @@
 				"description": "Each spell has 'effects', you can see them in Spell Work"
 			}
 		],
-		"description": "{target} has aura of spell {pram1}, effect {pram2}"
+		"description": "{target} {negate:has|has not} aura of spell {pram1}, effect {pram2}"
 	},
 
 	{
@@ -62,7 +62,7 @@
 				"description": "If true, core will check items in bank too"
 			}
 		],
-		"description": "{target} has {pram2} of item {pram1} in backpack{pram3value:choose(0):| or in bank}"
+		"description": "{target} {negate:has|has not} {pram2} of item {pram1} in backpack{pram3value:choose(0):| or in bank}"
 	},
 
 	{
@@ -77,7 +77,7 @@
 				"description": "Item id to check (this condition applies only to players!)"
 			}
 		],
-		"description": "{target} has equiped item {pram1}"
+		"description": "{target} {negate:has|has not} equipped item {pram1}"
 	},
 
 	{
@@ -91,7 +91,7 @@
 				"name": "Zone"
 			}
 		],
-		"description": "{target} in zone {pram1}"
+		"description": "{target} {negate:in|is not in} zone {pram1}"
 	},
 
 	{
@@ -121,7 +121,7 @@
 				}
 			}
 		],
-		"description": "{target} has at least reputation {pram2} to faction {pram1}"
+		"description": "{target} {negate:has at least|has no more than} reputation {pram2} to faction {pram1}"
 	},
 
 	{
@@ -140,7 +140,7 @@
 				}
 			}
 		],
-		"description": "{target} belongs to {pram1}"
+		"description": "{target} {negate:belongs|doesn't belong to} to {pram1}"
 	},
 
 	{
@@ -159,7 +159,7 @@
 				"name": "Minimum skill value"
 			}
 		],
-		"description": "{target} has at least value {pram2} for skill {pram1}"
+		"description": "{target} {negate:has at least|has no more than} value {pram2} for skill {pram1}"
 	},
 
 	{
@@ -174,7 +174,7 @@
 				"description": "Quest ID to check"
 			}
 		],
-		"description": "{target} has quest {pram1} rewarded"
+		"description": "{target} {negate:has|has not} quest {pram1} rewarded"
 	},
 
 	{
@@ -189,7 +189,7 @@
 				"description": "Quest ID to check"
 			}
 		],
-		"description": "{target} has quest {pram1} active"
+		"description": "{target} {negate:has|doesn't have} quest {pram1} active"
 	},
 
 	{
@@ -209,7 +209,7 @@
 				}
 			}
 		],
-		"description": "{target} has drunk state {pram1}"
+		"description": "{target} {negate:has|doesn't have} drunk state {pram1}"
 	},
 	{
 		"id": 11,
@@ -226,7 +226,7 @@
 				"name": "Variable Value"
 			}
 		],
-		"description": "world variable {pram1} is set to {pram2}"
+		"description": "World variable {pram1} {negate:is|is not} set to {pram2}"
 	},
 
 	{
@@ -240,7 +240,7 @@
 				"name": "Event"
 			}
 		],
-		"description": "event {pram1} is active"
+		"description": "Event {pram1} is {negate:active|inactive}"
 	},
 
 	{
@@ -270,7 +270,7 @@
 				}
 			}
 		],
-		"description": "{pram3value:choose(0|1|2|3):instance data {pram1} equals {pram2}|??????|boss {pram1} {pram2value:choose(0|1|2|3|4|5):has not started|is in progress|failed|special state|is to be decided?}|data64[{pram1}] = {pram2}}"
+		"description": "{negate:|NOT }{pram3value:choose(0|1|2|3):instance data {pram1} equals {pram2}|??????|boss {pram1} {pram2value:choose(0|1|2|3|4|5):has not started|is in progress|failed|special state|is to be decided?}|data64[{pram1}] = {pram2}}"
 	},
 
 	{
@@ -285,7 +285,7 @@
 				"description": "Quest ID to check"
 			}
 		],
-		"description": "{target} has never finished nor has active quest {pram1}"
+		"description": "{target} {negate:has never finished nor has active|has finished or active} quest {pram1}"
 	},
 
 	{
@@ -300,7 +300,7 @@
 				"description": "Only for players"
 			}
 		],
-		"description": "{target} is class {pram1}"
+		"description": "{target} {negate:is|is not} class {pram1}"
 	},
 
 	{
@@ -315,7 +315,7 @@
 				"description": "Only for players"
 			}
 		],
-		"description": "{target} is race {pram1}"
+		"description": "{target} {negate:is|is not} race {pram1}"
 	},
 
 	{
@@ -329,7 +329,7 @@
 				"name": "Achievement"
 			}
 		],
-		"description": "{target} has achievement {pram1} completed"
+		"description": "{target} {negate:has|doesn't have} achievement {pram1} completed"
 	},
 
 	{
@@ -343,7 +343,7 @@
 				"name": "Title ID"
 			}
 		],
-		"description": "{target} has title {pram1}"
+		"description": "{target} {negate:has|doesn't have} title {pram1}"
 	},
 
 	{
@@ -357,7 +357,7 @@
 				"name": "Spawn mask"
 			}
 		],
-		"description": "{target} in spawn mask {pram1}"
+		"description": "{target} {negate:in|is not in} spawn mask {pram1}"
 	},
 
 	{
@@ -376,7 +376,7 @@
 				}
 			}
 		],
-		"description": "{target} is {pram1}"
+		"description": "{target} {negate:is|is not} {pram1}"
 	},
 
 	{
@@ -418,7 +418,7 @@
 				}
 			}
 		],
-		"description": "{target} has unit state {pram1}"
+		"description": "{target} {negate:has|doesn't have} unit state {pram1}"
 	},
 
 	{
@@ -432,7 +432,7 @@
 				"name": "Map"
 			}
 		],
-		"description": "{target} in map {pram1}"
+		"description": "{target} {negate:in|is not in} map {pram1}"
 	},
 
 	{
@@ -446,7 +446,7 @@
 				"name": "Area"
 			}
 		],
-		"description": "{target} in area {pram1}"
+		"description": "{target} {negate:in|is not in} area {pram1}"
 	},
 
 	{
@@ -461,7 +461,7 @@
 				"description": "From creature_template.type"
 			}
 		],
-		"description": "{target} is {pram1}"
+		"description": "{target} {negate:is|is not} {pram1}"
 	},
 
 	{
@@ -476,7 +476,7 @@
 				"description": "Only for players"
 			}
 		],
-		"description": "{target} has learned spell {pram1}"
+		"description": "{target} {negate:has learned|hasn't learned} spell {pram1}"
 	},
 
 	{
@@ -490,7 +490,7 @@
 				"name": "Phase"
 			}
 		],
-		"description": "{target} in phase {pram1}"
+		"description": "{target} {negate:in|is not in} phase {pram1}"
 	},
 
 	{
@@ -517,7 +517,7 @@
 				"description": "Comparison type"
 			}
 		],
-		"description": "{target}'s level {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+		"description": "{target}'s level {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>}} {pram1}"
 	},
 
 	{
@@ -532,9 +532,8 @@
 				"description": "Quest id which player has to have completed with all objectives, but not yet rewarded"
 			}
 		],
-		"description": "{target} has completed quest {pram1} (but not yet rewarded)"
+		"description": "{target} {negate:has completed quest|hasn't completed} quest {pram1} {negate:(but not yet rewarded)|(or completed and rewarded)}"
 	},
-
 	{
 		"id": 29,
 		"name": "CONDITION_NEAR_CREATURE",
@@ -550,7 +549,7 @@
 				"name": "Distance"
 			}
 		],
-		"description": "there is creature {pram1} within range {pram2} yards to {target}"
+		"description": "There is {negate:|no }creature {pram1} within range {pram2} yards to {target}"
 	},
 
 	{
@@ -568,7 +567,7 @@
 				"name": "Distance"
 			}
 		],
-		"description": "there is gameobject {pram1} within range {pram2} yards to {target}"
+		"description": "There is {negate:|no }gameobject {pram1} within range {pram2} yards to {target}"
 	},
 
 	{
@@ -602,7 +601,7 @@
 				"name": "Guid from DB"
 			}
 		],
-		"description": "{target} is {pram1}{pram2value:choose(0):|, entry is {pram2}} and guid is {pram3}"
+		"description": "{target} {negate:is|is not} {pram1}{pram2value:choose(0):|, entry is {pram2}} and guid is {pram3}"
 	},
 
 	{
@@ -628,7 +627,7 @@
 				}
 			}
 		],
-		"description": "{target} is of type {pram1}"
+		"description": "{target} {negate:is|is not} of type {pram1}"
 	},
 
 	{
@@ -658,7 +657,7 @@
 				}
 			}
 		],
-		"description": "{target} {pram2value:choose(0|1|2|3|4|5):is {pram1}|is in party with {pram2}|is in raid or party with {pram2}|is owned by {pram1}|is passenger of {pram1}|is summoned by {pram1}}"
+		"description": "{negate:|NOT }{target} {pram2value:choose(0|1|2|3|4|5):is {pram1}|is in party with {pram2}|is in raid or party with {pram2}|is owned by {pram1}|is passenger of {pram1}|is summoned by {pram1}}"
 	},
 
 	{
@@ -690,7 +689,7 @@
 				}
 			}
 		],
-		"description": "{target} reaction to {pram1} is {pram2}"
+		"description": "{target} reaction to {pram1} {negate:is|is not} {pram2}"
 	},
 	{
 		"id": 35,
@@ -722,7 +721,7 @@
 				}
 			}
 		],
-		"description": "{target} distance to {pram1} {pram3value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram2} yards"
+		"description": "{target} distance to {pram1} {negate:{pram3value:choose(0|1|2|3|4):=|>|<|>=|<=}|{pram3value:choose(0|1|2|3|4):!=|<=|>=|<|>}} {pram2} yards"
 	},
 
 	{
@@ -730,7 +729,7 @@
 		"name": "CONDITION_ALIVE",
 		"name_readable": "Is alive",
 		"help": "Condition is met if target is alive",
-		"description": "{target} is alvie"
+		"description": "{target} {negate:is alive|is dead}"
 	},
 
 	{
@@ -755,7 +754,7 @@
 				}
 			}
 		],
-		"description": "{target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}"
+		"description": "{target}'s HP {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>}} {pram1}"
 	},
 
 	{
@@ -780,7 +779,7 @@
 				}
 			}
 		],
-		"description": "{target}'s HP {pram2value:choose(0|1|2|3|4):=|>|<|>=|<=} {pram1}%"
+		"description": "{target}'s HP {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>}} {pram1}%"
 	},
 
 	{
@@ -795,7 +794,7 @@
 				"description": "To explain"
 			}
 		],
-		"description": "{target} in terrain swap {pram1}"
+		"description": "{target} {negate:in|is not in} terrain swap {pram1}"
 	}
 
 ]

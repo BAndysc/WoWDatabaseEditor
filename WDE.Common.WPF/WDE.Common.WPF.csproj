@@ -11,6 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <PackageReference Include="AvalonEdit">
             <Version>6.1.0-preview1</Version>

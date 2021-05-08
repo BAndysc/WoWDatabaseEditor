@@ -5,6 +5,7 @@
              xmlns:mvvm="http://prismlibrary.com/"
              xmlns:editing="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.Views.Editing"
              xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.Views.Helpers"
+             xmlns:attached="clr-namespace:WDE.Common.WPF.Attached;assembly=WDE.Common.WPF"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              Background="{DynamicResource SmartScripts.Background}">
     <UserControl.Resources>
@@ -23,9 +24,9 @@
         <TextBlock
             TextWrapping="Wrap"
             IsHitTestVisible="False"
-            helpers:SmartFormattedText.SourceStyle="{DynamicResource SourceTextStyle}" 
-            helpers:SmartFormattedText.ParamStyle="{DynamicResource ParameterTextStyle}" 
-            helpers:SmartFormattedText.SmartFormattedText="{Binding Readable}"
+            attached:SmartFormattedText.SourceStyle="{DynamicResource SourceTextStyle}" 
+            attached:SmartFormattedText.ParamStyle="{DynamicResource ParameterTextStyle}" 
+            attached:SmartFormattedText.Text="{Binding Readable}"
             Margin="0,0,0,10" />
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
             <ItemsControl Focusable="False" ItemsSource="{Binding FilteredParameters}" x:Name="Parameters">

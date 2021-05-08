@@ -13,6 +13,7 @@
       <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
       <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.Conditions.Avalonia\WDE.Conditions.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
       <ProjectReference Include="..\WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />

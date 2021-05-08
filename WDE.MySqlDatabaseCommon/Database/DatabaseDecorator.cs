@@ -38,6 +38,9 @@ namespace WDE.MySqlDatabaseCommon.Database
         public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId) =>
             impl.GetConditionsFor(sourceType, sourceEntry, sourceId);
 
+        public Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key) =>
+            impl.GetConditionsForAsync(keyMask, key);
+
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => impl.GetSpellScriptNames(spellId);
     }
 }

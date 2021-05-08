@@ -16,11 +16,15 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
     {
         private readonly ISmartFactory smartFactory;
         private readonly ISmartDataManager smartDataManager;
+        private readonly IConditionQueryGenerator conditionQueryGenerator;
 
-        public TrinityCoreSmartScriptExporter(ISmartFactory smartFactory, ISmartDataManager smartDataManager)
+        public TrinityCoreSmartScriptExporter(ISmartFactory smartFactory,
+            ISmartDataManager smartDataManager,
+            IConditionQueryGenerator conditionQueryGenerator)
         {
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
+            this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
         public (ISmartScriptLine[], IConditionLine[]) ToDatabaseCompatibleSmartScript(SmartScript script)
@@ -131,7 +135,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         public string GenerateSql(SmartScript script)
         {
-            return new ExporterHelper(script, this).GetSql();
+            return new ExporterHelper(script, this, conditionQueryGenerator).GetSql();
         }
     }
 }

@@ -311,6 +311,17 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToList();
         }
 
+        public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
+        {
+            await using var model = new TrinityDatabase();
+
+            return await model.Conditions.Where(x => x.SourceType == key.SourceType &&
+                                                     (!keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceGroup) || x.SourceGroup == (key.SourceGroup ?? 0)) &&
+                                                     (!keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceEntry)  || x.SourceEntry == (key.SourceEntry ?? 0)) &&
+                                                     (!keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceId)  || x.SourceId == (key.SourceId ?? 0)))
+                .ToListAsync<IConditionLine>();
+        }
+
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
         {
             using var model = new TrinityDatabase();

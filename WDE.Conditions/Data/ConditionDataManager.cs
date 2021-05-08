@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.Parameters;
 using WDE.Module.Attributes;
 
 namespace WDE.Conditions.Data
@@ -22,6 +23,8 @@ namespace WDE.Conditions.Data
 
         bool HasConditionData(int id);
         bool HasConditionData(string typeName);
+        bool HasConditionSourceData(int id);
+        bool HasConditionSourceData(string typeName);
 
         ConditionSourcesJsonData GetConditionSourceData(int id);
         ConditionSourcesJsonData GetConditionSourceData(string name);
@@ -37,12 +40,42 @@ namespace WDE.Conditions.Data
         Dictionary<string, ConditionSourcesJsonData> conditionSourceDataByName = new ();
 
         private readonly IConditionDataProvider provider;
+        private readonly IParameterFactory parameterFactory;
 
-        public ConditionDataManager(IConditionDataProvider provider)
+        public ConditionDataManager(IConditionDataProvider provider, IParameterFactory parameterFactory)
         {
             this.provider = provider;
+            this.parameterFactory = parameterFactory;
             LoadConditions(provider.GetConditions());
             LoadConditionSources(provider.GetConditionSources());
+
+            RegisterDynamicParameters();
+        }
+
+        private void RegisterDynamicParameters()
+        {
+            foreach (var cond in conditionData.Values)
+            {
+                if (cond.Parameters == null)
+                    continue;
+
+                for (var index = 0; index < cond.Parameters.Count; index++)
+                {
+                    var param = cond.Parameters[index];
+                    if (param.Values == null || param.Values.Count == 0)
+                        continue;
+
+                    string key = $"condition_{cond.Name}_{index}";
+                    if (!parameterFactory.IsRegistered(key))
+                        parameterFactory.Register(key,
+                            param.Type == "FlagParameter"
+                                ? new FlagParameter() {Items = param.Values}
+                                : new Parameter() {Items = param.Values});
+
+                    param.Type = key;
+                    cond.Parameters[index] = param;
+                }
+            }
         }
 
         private void LoadConditions(IEnumerable<ConditionJsonData> data)
@@ -67,10 +100,20 @@ namespace WDE.Conditions.Data
         {
             return conditionData.ContainsKey(id);
         }
-
+        
         public bool HasConditionData(string typeName)
         {
             return conditionDataByName.ContainsKey(typeName);
+        }
+
+        public bool HasConditionSourceData(int id)
+        {
+            return conditionSourceData.ContainsKey(id);
+        }
+        
+        public bool HasConditionSourceData(string typeName)
+        {
+            return conditionSourceDataByName.ContainsKey(typeName);
         }
 
         public ConditionJsonData GetConditionData(int id)

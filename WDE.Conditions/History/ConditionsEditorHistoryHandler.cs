@@ -6,11 +6,11 @@ using WDE.Conditions.Data;
 
 namespace WDE.Conditions.History
 {
-    public class ConditionsEditorHistoryHandler : HistoryHandler, IDisposable
+    public class ConditionsDefinitionEditorHistoryHandler : HistoryHandler, IDisposable
     {
         private readonly ObservableCollection<ConditionJsonData> conditionsList;
 
-        public ConditionsEditorHistoryHandler(ObservableCollection<ConditionJsonData> conditionsList)
+        public ConditionsDefinitionEditorHistoryHandler(ObservableCollection<ConditionJsonData> conditionsList)
         {
             this.conditionsList = conditionsList;
             conditionsList.CollectionChanged += OnDataCollectionChanged;

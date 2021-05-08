@@ -98,6 +98,7 @@ namespace WDE.SmartScriptEditor.Models
                     pram1value = GetParameter(0).Value,
                     pram2value = GetParameter(1).Value,
                     pram3value = GetParameter(2).Value,
+                    negate = inverted.Value == 0
                 });
             }
         }

@@ -1,0 +1,24 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WDE.Conditions.Avalonia.Views">
+    <Design.PreviewWith>
+        <controls:LabeledControl />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|LabeledControl">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <TextBlock VerticalAlignment="Center" 
+                               HorizontalAlignment="Left" 
+                               Padding="10"
+                               DockPanel.Dock="Left"
+                               Width="150"
+                               TextWrapping="WrapWithOverflow"
+                               Text="{TemplateBinding Header}" />
+                    <ContentPresenter Content="{TemplateBinding Content}" />
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

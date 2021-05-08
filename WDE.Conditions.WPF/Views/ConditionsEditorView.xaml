@@ -1,0 +1,131 @@
+﻿<UserControl x:Class="WDE.Conditions.WPF.Views.ConditionsEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dd="urn:gong-wpf-dragdrop"
+             xmlns:attached="clr-namespace:WDE.Common.WPF.Attached;assembly=WDE.Common.WPF"
+             xmlns:local="clr-namespace:WDE.Conditions.WPF.Views" xmlns:viewhelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF" xmlns:controls="clr-namespace:WDE.Common.WPF.Components;assembly=WDE.Common.WPF"
+             mc:Ignorable="d"  x:Name="RoootWindow"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RemoveItemCommand}" Key="Delete" />
+        <KeyBinding Command="{Binding RemoveItemCommand}" Key="Back" />
+
+        <KeyBinding Command="{Binding UndoCommand}" Key="Z" Modifiers="Ctrl" />
+        <KeyBinding Command="{Binding RedoCommand}" Key="Y" Modifiers="Ctrl" />
+
+        <KeyBinding Command="{Binding CopyCommand}" Key="C" Modifiers="Ctrl" />
+        <KeyBinding Command="{Binding PasteCommand}" Key="V" Modifiers="Ctrl" />
+        <KeyBinding Command="{Binding CutCommand}" Key="X" Modifiers="Ctrl" />
+    </UserControl.InputBindings>
+    <UserControl.Resources>
+        <viewhelpers:NullToVisibilityConverter WhenNull="Collapsed" x:Key="NullToVisibilityConverter"/>
+        <viewhelpers:BooleanToVisibilityConverter WhenFalse="Collapsed" x:Key="BoolToVisibilityConverter" />
+
+        <Style x:Key="ParameterTextStyle" TargetType="Run">
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Parameter.Foreground}" />
+        </Style>
+        <Style x:Key="SourceTextStyle" TargetType="Run">
+            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Source.Foreground}" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+        <ToolBarTray>
+            <ToolBar>
+                <Button Command="{Binding UndoCommand}">
+                    <Image Source="{DynamicResource IconUndo}" />
+                </Button>
+                <Button Command="{Binding RedoCommand}">
+                    <Image Source="{DynamicResource IconRedo}" />
+                </Button>
+                <Border Width="20" />
+
+                <Button Command="{Binding CopyCommand}">
+                    <Image Source="{DynamicResource IconCopy}" />
+                </Button>
+                <Button Command="{Binding CutCommand}">
+                    <Image Source="{DynamicResource IconCut}" />
+                </Button>
+                <Button Command="{Binding PasteCommand}">
+                    <Image Source="{DynamicResource IconPaste}" />
+                </Button>
+                <Border Width="20" />
+                <Button Command="{Binding AddItemCommand}">
+                    <Image Source="{DynamicResource IconAdd}" />
+                </Button>
+                <Button Command="{Binding RemoveItemCommand}">
+                    <Image Source="{DynamicResource IconRemove}" />
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <ListBox Grid.Row="1" dd:DragDrop.IsDragSource="True"
+              dd:DragDrop.IsDropTarget="True" attached:GongDragAndDrop.WdeDropHandler="{Binding}" ItemsSource="{Binding Conditions, Mode=OneTime}" SelectedItem="{Binding SelectedCondition}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock IsHitTestVisible="False" 
+                                   TextWrapping="WrapWithOverflow" 
+                                   attached:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
+                                   attached:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}"
+                                   attached:SmartFormattedText.Text="{Binding Readable}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <GridSplitter Grid.Row="2" />
+        <Border Padding="10" Grid.Row="3"
+                Visibility="{Binding SelectedCondition, Converter={StaticResource NullToVisibilityConverter}}"
+                ClipToBounds="True">
+            <StackPanel 
+                DataContext="{Binding SelectedCondition}">
+                <ComboBox SelectedItem="{Binding Path=DataContext.SelectedConditionsType, ElementName=RoootWindow}" 
+                          ItemsSource="{Binding Path=DataContext.ConditionTypes, ElementName=RoootWindow}" 
+                          HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding NameReadable}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <local:LabeledControl Header="{Binding Name}" Margin="0,0,0,2" DataContext="{Binding Invert, Mode=OneWay}">
+                    <controls:ParameterValueHolderView PickCommand="{Binding DataContext.PickCommand, ElementName=RoootWindow}" />
+                </local:LabeledControl>
+                <local:LabeledControl Header="{Binding Name}" Margin="0,0,0,2" Visibility="{Binding IsUsed, Converter={StaticResource BoolToVisibilityConverter}}" DataContext="{Binding ConditionTarget, Mode=OneWay}">
+                    <controls:ParameterValueHolderView PickCommand="{Binding DataContext.PickCommand, ElementName=RoootWindow}" />
+                </local:LabeledControl>
+                <local:LabeledControl Header="{Binding Name}" Margin="0,0,0,2" Visibility="{Binding IsUsed, Converter={StaticResource BoolToVisibilityConverter}}" DataContext="{Binding ConditionValue1, Mode=OneWay}">
+                    <controls:ParameterValueHolderView PickCommand="{Binding DataContext.PickCommand, ElementName=RoootWindow}" />
+                </local:LabeledControl>
+                <local:LabeledControl Header="{Binding Name}" Margin="0,0,0,2" Visibility="{Binding IsUsed, Converter={StaticResource BoolToVisibilityConverter}}" DataContext="{Binding ConditionValue2, Mode=OneWay}">
+                    <controls:ParameterValueHolderView PickCommand="{Binding DataContext.PickCommand, ElementName=RoootWindow}" />
+                </local:LabeledControl>
+                <local:LabeledControl Header="{Binding Name}" Margin="0,0,0,2" Visibility="{Binding IsUsed, Converter={StaticResource BoolToVisibilityConverter}}" DataContext="{Binding ConditionValue3, Mode=OneWay}">
+                    <controls:ParameterValueHolderView PickCommand="{Binding DataContext.PickCommand, ElementName=RoootWindow}" />
+                </local:LabeledControl>
+            </StackPanel>
+        </Border>
+
+        <Border Padding="10" Grid.Row="4">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
+                <Button Command="{Binding Cancel}">Cancel</Button>
+                <Button Grid.Column="2" Command="{Binding Accept}">Ok</Button>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

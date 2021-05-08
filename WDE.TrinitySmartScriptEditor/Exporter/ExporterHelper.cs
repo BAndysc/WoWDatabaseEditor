@@ -16,12 +16,16 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         private readonly SmartScript script;
         private readonly ISmartScriptExporter scriptExporter;
+        private readonly IConditionQueryGenerator conditionQueryGenerator;
         private readonly StringBuilder sql = new();
 
-        public ExporterHelper(SmartScript script, ISmartScriptExporter scriptExporter)
+        public ExporterHelper(SmartScript script, 
+            ISmartScriptExporter scriptExporter,
+            IConditionQueryGenerator conditionQueryGenerator)
         {
             this.script = script;
             this.scriptExporter = scriptExporter;
+            this.conditionQueryGenerator = conditionQueryGenerator;
         }
 
         public string GetSql()
@@ -55,13 +59,12 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             sql.AppendLine();
             sql.AppendLine();
 
-            var conditionsExporter = new ConditionsExporter(serializedConditions,
-                new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript,
-                    null,
-                    script.EntryOrGuid,
-                    (int) script.SourceType));
-
-            sql.AppendLine(conditionsExporter.GetSql());
+            sql.AppendLine(conditionQueryGenerator.BuildDeleteQuery(new IDatabaseProvider.ConditionKey(
+                SmartConstants.ConditionSourceSmartScript,
+                null,
+                script.EntryOrGuid,
+                (int) script.SourceType)));
+            sql.AppendLine(conditionQueryGenerator.BuildInsertQuery(serializedConditions));
         }
 
         private string GenerateSingleSai(ISmartScriptLine line)

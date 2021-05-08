@@ -4,14 +4,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
-namespace WDE.SmartScriptEditor.WPF.Editor.Views.Helpers
+namespace WDE.Common.WPF.Attached
 {
-    public static class SmartFormattedText
+    public class SmartFormattedText
     {
-        public static string GetSmartFormattedText(DependencyObject obj) => (string)obj.GetValue(SmartFormattedTextProperty);
-        public static void SetSmartFormattedText(DependencyObject obj, string value) => obj.SetValue(SmartFormattedTextProperty, value);
-        public static readonly DependencyProperty SmartFormattedTextProperty =
-        DependencyProperty.RegisterAttached("SmartFormattedText", typeof(string), typeof(SmartFormattedText), new PropertyMetadata("", AllowOnlyString));
+        public static string GetText(DependencyObject obj) => (string)obj.GetValue(TextProperty);
+        public static void SetText(DependencyObject obj, string value) => obj.SetValue(TextProperty, value);
+        public static readonly DependencyProperty TextProperty =
+        DependencyProperty.RegisterAttached("Text", typeof(string), typeof(SmartFormattedText), new PropertyMetadata("", AllowOnlyString));
 
         public static Style GetParamStyle(DependencyObject obj) => (Style)obj.GetValue(ParamStyleProperty);
         public static void SetParamStyle(DependencyObject obj, Style value) => obj.SetValue(ParamStyleProperty, value);
@@ -29,11 +29,12 @@ namespace WDE.SmartScriptEditor.WPF.Editor.Views.Helpers
         public static readonly DependencyProperty SourceStyleProperty =
         DependencyProperty.RegisterAttached("SourceStyle", typeof(Style), typeof(SmartFormattedText), new PropertyMetadata(null, AllowOnlyString));
 
+
         private static void AllowOnlyString(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is TextBlock tb)
             {
-                var text = GetSmartFormattedText(d);
+                var text = GetText(d);
                 var paramStyle = GetParamStyle(d);
                 var sourceStyle = GetSourceStyle(d);
                 var contextArray = GetContextArray(d);
@@ -47,7 +48,7 @@ namespace WDE.SmartScriptEditor.WPF.Editor.Views.Helpers
                 State state = State.Text;
                 Styles currentStyle = Styles.Normal;
                 int currentContextIndex = -1;
-                Run lastRun = null;
+                Run? lastRun = null;
 
                 void Append(string s)
                 {
@@ -56,14 +57,14 @@ namespace WDE.SmartScriptEditor.WPF.Editor.Views.Helpers
                         lastRun.Text += s;
                         return;
                     }
-                    
+
                     lastRun = new Run(s);
 
                     if (contextArray != null && currentContextIndex >= 0 && currentContextIndex < contextArray.Count)
                         lastRun.DataContext = contextArray[currentContextIndex];
                     else
                         lastRun.DataContext = null;
-                    
+
                     if (currentStyle.HasFlag(Styles.Parameter) && paramStyle != null)
                         lastRun.Style = paramStyle;
 
@@ -112,16 +113,16 @@ namespace WDE.SmartScriptEditor.WPF.Editor.Views.Helpers
                             currentStyle = currentStyle | Styles.Source;
                         }
 
-                        if (text[start + 1] == '=' && Char.IsDigit(text[start + 2]))
+                        if (text[start + 1] == '=' && char.IsDigit(text[start + 2]))
                             currentContextIndex = text[start + 2] - '0';
-                        
+
                         start = i + 1;
                         state = State.Text;
                     }
                     else if (l == ']' && state == State.InClosingTag)
                     {
                         if (text[start] == 'p')
-                            currentStyle = currentStyle &~Styles.Parameter;
+                            currentStyle = currentStyle & ~Styles.Parameter;
                         else if (text[start] == 's')
                             currentStyle = currentStyle & ~Styles.Source;
 

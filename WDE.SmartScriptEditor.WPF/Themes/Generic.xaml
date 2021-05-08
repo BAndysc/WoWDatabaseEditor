@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.UserControls"
                     xmlns:helpers="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.Views.Helpers"
+                    xmlns:attached="clr-namespace:WDE.Common.WPF.Attached;assembly=WDE.Common.WPF"
                     xmlns:editing="clr-namespace:WDE.SmartScriptEditor.WPF.Editor.Views.Editing"
                     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:viewhelpers="clr-namespace:WDE.Common.WPF.ViewHelpers;assembly=WDE.Common.WPF">
@@ -83,10 +84,10 @@
             <TextBlock 
                 Padding="2" 
                 TextWrapping="WrapWithOverflow" 
-                helpers:SmartFormattedText.ContextArray="{Binding Context}"
-                helpers:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
-                helpers:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}" 
-                helpers:SmartFormattedText.SmartFormattedText="{Binding Readable}">
+                attached:SmartFormattedText.ContextArray="{Binding Context}"
+                attached:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
+                attached:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}" 
+                attached:SmartFormattedText.Text="{Binding Readable}">
                 <TextBlock.Style>
                     <Style TargetType="{x:Type TextBlock}">
                         <Style.Triggers>
@@ -145,10 +146,10 @@
 
                         <TextBlock Padding="2" 
                                    TextWrapping="WrapWithOverflow" 
-                                   helpers:SmartFormattedText.ContextArray="{Binding Context}"
-                                   helpers:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
-                                   helpers:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}" 
-                                   helpers:SmartFormattedText.SmartFormattedText="{Binding Readable}" />
+                                   attached:SmartFormattedText.ContextArray="{Binding Context}"
+                                   attached:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
+                                   attached:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}" 
+                                   attached:SmartFormattedText.Text="{Binding Readable}" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -214,10 +215,10 @@
                                     <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{Binding ChanceString}"/>
                                 </Border>
                                 <TextBlock TextWrapping="WrapWithOverflow" 
-                                           helpers:SmartFormattedText.ContextArray="{Binding Context}"
-                                           helpers:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
-                                           helpers:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}" 
-                                           helpers:SmartFormattedText.SmartFormattedText="{Binding Readable}"
+                                           attached:SmartFormattedText.ContextArray="{Binding Context}"
+                                           attached:SmartFormattedText.SourceStyle="{StaticResource SourceTextStyle}" 
+                                           attached:SmartFormattedText.ParamStyle="{StaticResource ParameterTextStyle}" 
+                                           attached:SmartFormattedText.Text="{Binding Readable}"
                                            Padding="3">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">

@@ -33,6 +33,8 @@ namespace WDE.Common.Database
 
         IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId);
 
+        Task<IList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ConditionKey manualKey);
+        
         IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId);
         
         [Flags]
@@ -41,7 +43,8 @@ namespace WDE.Common.Database
             SourceGroup = 1,
             SourceEntry = 2,
             SourceId = 4,
-            All = SourceGroup | SourceEntry | SourceId
+            All = SourceGroup | SourceEntry | SourceId,
+            None = 0
         }
 
         public struct ConditionKey

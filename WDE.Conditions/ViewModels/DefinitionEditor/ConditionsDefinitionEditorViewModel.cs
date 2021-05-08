@@ -19,7 +19,7 @@ namespace WDE.Conditions.ViewModels
 {
     public class ConditionsDefinitionEditorViewModel: BindableBase, IDocument
     {
-        private readonly ConditionsEditorHistoryHandler historyHandler;
+        private readonly ConditionsDefinitionEditorHistoryHandler historyHandler;
         private readonly IConditionDataProvider conditionDataProvider;
         private readonly IWindowManager windowManager;
         private readonly IParameterFactory parameterFactory;
@@ -41,7 +41,7 @@ namespace WDE.Conditions.ViewModels
             AddItem = new AsyncCommand(AddNewItem);
             EditItem = new AsyncCommand<ConditionJsonData?>(EditCondition);
             // history setup
-            historyHandler = new ConditionsEditorHistoryHandler(SourceItems);
+            historyHandler = new ConditionsDefinitionEditorHistoryHandler(SourceItems);
             History = historyCreator();
             undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);

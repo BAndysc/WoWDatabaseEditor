@@ -84,6 +84,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWDatabaseEditorCore.Avalo
 		{506C7413-6FD7-472C-99AA-A0580B4D2E3B} = {506C7413-6FD7-472C-99AA-A0580B4D2E3B}
 		{DCD5F40C-139E-4404-8EF0-DC85DD595E44} = {DCD5F40C-139E-4404-8EF0-DC85DD595E44}
 		{1879936C-7EB8-4A2F-9791-4EF49ED2B6B5} = {1879936C-7EB8-4A2F-9791-4EF49ED2B6B5}
+		{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC} = {93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoWDatabaseEditorCore.WPF", "WoWDatabaseEditorCore.WPF\WoWDatabaseEditorCore.WPF.csproj", "{60AB9143-F815-4240-9316-B0CBC8AE457A}"
@@ -139,6 +140,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Model.ReactiveUI", "Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj", "{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseEditors.Avalonia", "WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj", "{DCD5F40C-139E-4404-8EF0-DC85DD595E44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Conditions.Avalonia", "WDE.Conditions.Avalonia\WDE.Conditions.Avalonia.csproj", "{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -393,6 +396,10 @@ Global
 		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
 		{DCD5F40C-139E-4404-8EF0-DC85DD595E44}.DebugAvalonia|Any CPU.Build.0 = DebugAvalonia|Any CPU
+		{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
+		{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}.DebugAvalonia|Any CPU.Build.0 = DebugAvalonia|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

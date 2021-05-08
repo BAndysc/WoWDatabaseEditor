@@ -10,5 +10,6 @@
         <ResourceDictionary Source="ScrollBars.xaml" />
         <ResourceDictionary Source="WindowCommands.xaml" />
         <ResourceDictionary Source="Button.xaml" />
+        <ResourceDictionary Source="../Icons.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

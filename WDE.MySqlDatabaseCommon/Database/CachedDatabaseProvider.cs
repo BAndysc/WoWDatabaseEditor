@@ -125,6 +125,11 @@ namespace WDE.MySqlDatabaseCommon.Database
         {
             return nonCachedDatabase.GetConditionsFor(sourceType, sourceEntry, sourceId);
         }
+        
+        public Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
+        {
+            return nonCachedDatabase.GetConditionsForAsync(keyMask, key);
+        }
 
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
         {
