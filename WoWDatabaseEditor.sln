@@ -143,6 +143,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseEditors.Avaloni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Conditions.Avalonia", "WDE.Conditions.Avalonia\WDE.Conditions.Avalonia.csproj", "{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SmartScriptEditor.Test", "WDE.SmartScriptEditor.Test\WDE.SmartScriptEditor.Test.csproj", "{AB6F5059-FE3C-4884-B4B8-2E3405CFE9A4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -400,6 +402,12 @@ Global
 		{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
 		{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}.DebugAvalonia|Any CPU.Build.0 = DebugAvalonia|Any CPU
+		{AB6F5059-FE3C-4884-B4B8-2E3405CFE9A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB6F5059-FE3C-4884-B4B8-2E3405CFE9A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB6F5059-FE3C-4884-B4B8-2E3405CFE9A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB6F5059-FE3C-4884-B4B8-2E3405CFE9A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB6F5059-FE3C-4884-B4B8-2E3405CFE9A4}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB6F5059-FE3C-4884-B4B8-2E3405CFE9A4}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
