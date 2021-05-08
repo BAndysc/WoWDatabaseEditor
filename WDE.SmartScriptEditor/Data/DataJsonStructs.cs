@@ -33,83 +33,14 @@ namespace WDE.SmartScriptEditor.Data
         public Dictionary<long, SelectOption> Values { get; set; }
     }
 
-    public enum WarningType
-    {
-        NOT_SET,
-        INVALID_TARGET,
-        INVALID_PARAMETER,
-        INVALID_VALUE
-    }
-
-    public enum CompareType
-    {
-        [Description("equal")]
-        EQUALS,
-
-        [Description("not equal")]
-        NOT_EQUALS,
-
-        [Description("lower than")]
-        LOWER_THAN,
-
-        [Description("greater than")]
-        GREATER_THAN,
-
-        [Description("lower or equal")]
-        LOWER_OR_EQUALS,
-
-        [Description("greater or equal")]
-        GREATER_OR_EQUALS,
-
-        [Description("between")]
-        BETWEEN
-    }
-
-    [ExcludeFromCodeCoverage]
-    public struct SmartConditionalJsonData
-    {
-        [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty(PropertyName = "warning_type")]
-        public WarningType WarningType { get; set; }
-
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        [JsonProperty(PropertyName = "compare_type")]
-        public CompareType CompareType { get; set; }
-
-        [JsonProperty(PropertyName = "type")]
-        public string Type { get; set; }
-
-        [JsonProperty(PropertyName = "invert")]
-        public bool Invert { get; set; }
-
-        [JsonProperty(PropertyName = "compared_parameter_id")]
-        public int ComparedParameterId { get; set; }
-
-        [JsonProperty(PropertyName = "compare_to_parameter_id")]
-        public int CompareToParameterId { get; set; }
-
-        [JsonProperty(PropertyName = "compare_to_value")]
-        public int CompareToValue { get; set; }
-
-        [JsonProperty(PropertyName = "compared_any_param")]
-        public string ComparedAnyParam { get; set; }
-
-        [JsonProperty(PropertyName = "compared_to_any_param")]
-        public string ComparedToAnyParam { get; set; }
-
-        [JsonProperty(PropertyName = "error")]
-        public string Error { get; set; }
-    }
-
     [ExcludeFromCodeCoverage]
     public struct SmartDescriptionRulesJsonData
     {
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
 
-        [JsonProperty(PropertyName = "conditions")]
-        public IList<SmartConditionalJsonData> Conditions { get; set; }
+        [JsonProperty(PropertyName = "condition")]
+        public string Condition { get; set; }
     }
     
     // Kind of hackfix due to lack of string enums in C# :<
@@ -144,9 +75,6 @@ namespace WDE.SmartScriptEditor.Data
 
         [JsonProperty(PropertyName = "parameters")]
         public IList<SmartParameterJsonData>? Parameters { get; set; }
-
-        [JsonProperty(PropertyName = "conditions")]
-        public IList<SmartConditionalJsonData>? Conditions { get; set; }
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }

@@ -99,16 +99,11 @@ namespace WDE.SmartScriptEditor.Models
                 string? readable = ReadableHint;
                 if (DescriptionRules != null)
                 {
+                    var context = new SmartValidationContext(Parent, this, null);
+                    
                     foreach (DescriptionRule rule in DescriptionRules)
                     {
-                        if (rule.Matches(new DescriptionParams
-                        {
-                            pram1 = GetParameter(0).Value,
-                            pram2 = GetParameter(1).Value,
-                            pram3 = GetParameter(2).Value,
-                            pram4 = GetParameter(3).Value,
-                            source_type = (int?) Parent?.SourceType ?? 0
-                        }))
+                        if (rule.Matches(context))
                         {
                             readable = rule.Description;
                             break;

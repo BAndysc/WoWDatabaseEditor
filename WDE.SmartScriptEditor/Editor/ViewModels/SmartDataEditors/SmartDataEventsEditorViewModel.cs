@@ -38,10 +38,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             });
             EditParameter = new AsyncAutoCommand<SmartParameterJsonData?>(EditParam);
             AddParameter = new AsyncAutoCommand(AddParam);
-            EditCondition = new AsyncAutoCommand<SmartConditionalJsonData?>(EditCond);
-            AddCondition = new AsyncAutoCommand(AddCond);
-            EditDescriptionDefinition = new AsyncAutoCommand<SmartDescriptionRulesJsonData?>(EditDescDefinition);
-            AddDescriptionDefinition = new AsyncAutoCommand(AddDescDef);
             DeleteActiveItem = new DelegateCommand(DeleteItem);
             SelectedParamIndex = -1;
             SelectedCondIndex = -1;
@@ -62,7 +58,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         public DelegateCommand SaveItem { get; }
         public AsyncAutoCommand<SmartParameterJsonData?> EditParameter { get; }
         public AsyncAutoCommand AddParameter { get; }
-        public AsyncAutoCommand<SmartConditionalJsonData?> EditCondition { get; }
         public AsyncAutoCommand AddCondition { get; }
         public AsyncAutoCommand<SmartDescriptionRulesJsonData?> EditDescriptionDefinition { get; }
         public AsyncAutoCommand AddDescriptionDefinition { get; }
@@ -80,30 +75,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             await OpenParameterEditor(temp, true);
         }
 
-        private async Task EditCond(SmartConditionalJsonData? cond)
-        {
-            if (cond.HasValue)
-                await OpenConditionEditor(cond.Value, false);
-        }
-
-        private async Task AddCond()
-        {
-            var temp = new SmartConditionalJsonData();
-            await OpenConditionEditor(temp, true);
-        }
-
-        private async Task EditDescDefinition(SmartDescriptionRulesJsonData? descRule)
-        {
-            if (descRule.HasValue)
-                await OpenDescriptionRuleEditor(descRule.Value, false);
-        }
-
-        private async Task AddDescDef()
-        {
-            var temp = new SmartDescriptionRulesJsonData();
-            await OpenDescriptionRuleEditor(temp, true);
-        }
-
         private void DeleteItem()
         {
             switch (SelectedTab)
@@ -113,8 +84,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
                         Source.Parameters.RemoveAt(SelectedParamIndex);
                     break;
                 case 1:
-                    if (SelectedCondIndex >= 0)
-                        Source.Conditions.RemoveAt(SelectedCondIndex);
                     break;
                 case 2:
                     if (SelectedDescRuleIndex >= 0)
@@ -140,40 +109,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             }
         }
 
-        private async Task OpenConditionEditor(SmartConditionalJsonData item, bool insertOnSave)
-        {
-            var vm = new SmartDataConditionEditorViewModel(in item, insertOnSave, false);
-            if (await windowManager.ShowDialog(vm) && !vm.IsSourceEmpty())
-            {
-                if (vm.InsertOnSave)
-                    Source.Conditions.Add(vm.GetSource());
-                else
-                {
-                    var newItem = vm.GetSource();
-                    var index = Source.Conditions.IndexOf(item);
-                    if (index != -1)
-                        Source.Conditions[index] = newItem;
-                }
-            }
-        }
-
-        private async Task OpenDescriptionRuleEditor(SmartDescriptionRulesJsonData item, bool insertOnSave)
-        {
-            var vm = new SmartDataDescRuleEditorViewModel(windowManager, in item, insertOnSave);
-            if (await windowManager.ShowDialog(vm) && !vm.IsSourceEmpty())
-            {
-                if (vm.InsertOnSave)
-                    Source.DescriptionRules.Add(vm.GetSource());
-                else
-                {
-                    var newItem = vm.GetSource();
-                    var index = Source.DescriptionRules.IndexOf(item);
-                    if (index != -1)
-                        Source.DescriptionRules[index] = newItem;
-                }
-            }
-        }
-        
         public int DesiredWidth { get; } = 473;
         public int DesiredHeight { get; } = 676;
         public string Title { get; } = "Event Editor";
@@ -206,7 +141,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         
         public List<SmartScriptType> ValidTypes { get; set; }
         public ObservableCollection<SmartParameterJsonData> Parameters { get; set; }
-        public ObservableCollection<SmartConditionalJsonData> Conditions { get; set; }
         public ObservableCollection<SmartDescriptionRulesJsonData> DescriptionRules { get; set; }
         
         public SmartDataEventsEditorData(in SmartGenericJsonData source)
@@ -226,10 +160,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
                 Parameters = new ObservableCollection<SmartParameterJsonData>(source.Parameters);
             else
                 Parameters = new ObservableCollection<SmartParameterJsonData>();
-            if (source.Conditions != null)
-                Conditions = new ObservableCollection<SmartConditionalJsonData>(source.Conditions);
-            else
-                Conditions = new ObservableCollection<SmartConditionalJsonData>();
             if (source.DescriptionRules != null)
                 DescriptionRules = new ObservableCollection<SmartDescriptionRulesJsonData>(source.DescriptionRules);
             else
@@ -247,8 +177,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
                 obj.UsableWithScriptTypes = ValidTypes.ToList();
             if (Parameters.Count > 0)
                 obj.Parameters = Parameters.ToList();
-            if (Conditions.Count > 0)
-                obj.Conditions = Conditions.ToList();
             if (DescriptionRules.Count > 0)
                 obj.DescriptionRules = DescriptionRules.ToList();
             return obj;
