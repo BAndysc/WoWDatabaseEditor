@@ -31,6 +31,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "can_be_null")]
         public bool CanBeNull { get; set; }
         
+        [JsonProperty(PropertyName = "is_condition")]
+        public bool IsConditionColumn { get; set; }
+        
         [JsonProperty(PropertyName = "preferred_width")]
         public float? PreferredWidth { get; set; }
     }

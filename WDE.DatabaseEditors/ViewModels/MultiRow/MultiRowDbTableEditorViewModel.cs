@@ -23,6 +23,8 @@ using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
@@ -34,6 +36,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IMySqlExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
         private readonly IDatabaseTableModelGenerator modelGenerator;
+        private readonly IConditionEditService conditionEditService;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private Dictionary<uint, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
@@ -48,6 +51,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public AsyncAutoCommand AddNewCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
+        public AsyncAutoCommand<DatabaseCellViewModel?> EditConditionsCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> DuplicateCommand { get; }
         public DelegateCommand<DatabaseEntitiesGroupViewModel> AddRowCommand { get; }
@@ -63,7 +67,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
-            IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator) : base(history, solutionItem, solutionItemName, 
+            IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
+            IConditionEditService conditionEditService) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory)
         {
@@ -75,12 +80,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.mySqlExecutor = mySqlExecutor;
             this.queryGenerator = queryGenerator;
             this.modelGenerator = modelGenerator;
+            this.conditionEditService = conditionEditService;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
             RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
-            RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.TableField.IsModified);
+            RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && (vm.TableField?.IsModified ?? false));
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             DuplicateCommand = new DelegateCommand<DatabaseCellViewModel?>(Duplicate, vm => vm != null);
+            EditConditionsCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(EditConditions);
             AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRow);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
             
@@ -144,7 +151,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private void SetToNull(DatabaseCellViewModel? view)
         {
             if (view != null && view.CanBeNull && !view.IsReadOnly) 
-                view.ParameterValue.SetNull();
+                view.ParameterValue?.SetNull();
         }
 
         private void Duplicate(DatabaseCellViewModel? view)
@@ -155,13 +162,27 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 ForceInsertEntity(duplicate, 0);
             }
         }
+
+        private async Task EditConditions(DatabaseCellViewModel? view)
+        {
+            if (view == null)
+                return;
+            
+            var conditionList = view.ParentEntity.Conditions;
+            
+            var newConditions = await conditionEditService.EditConditions(tableDefinition.Condition!.SourceType, conditionList);
+            if (newConditions == null)
+                return;
+            
+            view.ParentEntity.Conditions = newConditions.ToList();
+        }
         
         private async Task Revert(DatabaseCellViewModel? view)
         {
             if (view == null || view.IsReadOnly)
                 return;
             
-            view.ParameterValue.Revert();
+            view.ParameterValue?.Revert();
         }
 
         private void RemoveTemplate(DatabaseCellViewModel? view)
@@ -199,7 +220,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             autoIncrementColumn = columns.FirstOrDefault(c => c.AutoIncrement);
             Columns.Clear();
             Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)));
-                
+            
             foreach (var entity in solutionItem.Entries)
                 EnsureKey(entity.Key);
 
@@ -299,29 +320,39 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             int columnIndex = 0;
             foreach (var column in columns)
             {
-                var cell = entity.GetCell(column.DbColumnName);
-                if (cell == null)
-                    throw new Exception("this should never happen");
+                DatabaseCellViewModel cellViewModel;
 
-                IParameterValue parameterValue = null!;
-                if (cell is DatabaseField<long> longParam)
+                if (column.IsConditionColumn)
                 {
-                    parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
+                    var label = entity.ToObservable(e => e.Conditions).Select(c => "Edit (" + (c?.Count ?? 0) + ")");
+                    cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, "conditions", EditConditionsCommand, row, entity, label));
                 }
-                else if (cell is DatabaseField<string> stringParam)
+                else
                 {
-                    parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
-                }
-                else if (cell is DatabaseField<float> floatParameter)
-                {
-                    parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
-                }
+                    var cell = entity.GetCell(column.DbColumnName);
+                    if (cell == null)
+                        throw new Exception("this should never happen");
 
-                var cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column, row, entity, cell, parameterValue));
+                    IParameterValue parameterValue = null!;
+                    if (cell is DatabaseField<long> longParam)
+                    {
+                        parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
+                    }
+                    else if (cell is DatabaseField<string> stringParam)
+                    {
+                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
+                    }
+                    else if (cell is DatabaseField<float> floatParameter)
+                    {
+                        parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
+                    }
+
+                    cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column, row, entity, cell, parameterValue));
+                }
                 row.Cells.Add(cellViewModel);
                 columnIndex++;
             }
-
+            
             Entities.Insert(index, entity);
             EnsureKey(entity.Key);
             

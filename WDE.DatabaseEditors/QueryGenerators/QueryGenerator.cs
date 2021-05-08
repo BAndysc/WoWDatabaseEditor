@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using WDE.Common.Database;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
@@ -15,10 +16,12 @@ namespace WDE.DatabaseEditors.QueryGenerators
     public class QueryGenerator : IQueryGenerator
     {       
         private readonly ITableDefinitionProvider tableDefinitionProvider;
+        private readonly IConditionQueryGenerator conditionQueryGenerator;
 
-        public QueryGenerator(ITableDefinitionProvider tableDefinitionProvider)
+        public QueryGenerator(ITableDefinitionProvider tableDefinitionProvider, IConditionQueryGenerator conditionQueryGenerator)
         {
             this.tableDefinitionProvider = tableDefinitionProvider;
+            this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
         public string GenerateQuery(ICollection<uint> keys, IDatabaseTableData tableData)
@@ -76,8 +79,68 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 foreach (var line in duplicates)
                     query.AppendLine(" -- " + line);
             }
-            
+
+            if (tableData.TableDefinition.Condition != null)
+            {
+                query.AppendLine(BuildConditionsDeleteQuery(keys, tableData));
+                List<IConditionLine> conditions = new();
+                int sourceType = tableData.TableDefinition.Condition.SourceType;
+                    
+                foreach (var entity in tableData.Entities)
+                {
+                    if (entity.Conditions == null)
+                        continue;
+
+                    int sourceGroup = 0;
+                    int sourceEntry = 0;
+                    int sourceId = 0;
+
+                    if (tableData.TableDefinition.Condition.SourceEntryColumn != null &&
+                        entity.GetCell(tableData.TableDefinition.Condition.SourceEntryColumn) is DatabaseField<long>
+                            entryCell)
+                        sourceEntry = (int)entryCell.Current.Value;
+                    
+                    if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
+                        entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn) is DatabaseField<long>
+                            groupCell)
+                        sourceGroup = (int)groupCell.Current.Value;
+                    
+                    if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
+                        entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn) is DatabaseField<long>
+                            idCell)
+                        sourceId = (int)idCell.Current.Value;
+                    
+                    foreach (var condition in entity.Conditions)
+                        conditions.Add(new AbstractConditionLine(sourceType, sourceGroup, sourceEntry, sourceId, condition));
+                }
+                query.AppendLine(conditionQueryGenerator.BuildInsertQuery(conditions));
+            }
+
             return query.ToString();
+        }
+
+        private string BuildConditionsDeleteQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        {
+            if (tableData.TableDefinition.Condition == null)
+                return "";
+
+            string? columnKey = null;
+
+            if (tableData.TableDefinition.Condition.SourceEntryColumn ==
+                tableData.TableDefinition.TablePrimaryKeyColumnName)
+                columnKey = "SourceEntry";
+            else if (tableData.TableDefinition.Condition.SourceGroupColumn ==
+                     tableData.TableDefinition.TablePrimaryKeyColumnName)
+                columnKey = "SourceGroup";
+            else if (tableData.TableDefinition.Condition.SourceIdColumn ==
+                     tableData.TableDefinition.TablePrimaryKeyColumnName)
+                columnKey = "SourceId";
+
+            if (columnKey == null)
+                throw new Exception("No condition source group/entry/id is table primary key. Unable to generate SQL.");
+            
+            string c = string.Join(", ", keys.Distinct());
+            return $"DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = {tableData.TableDefinition.Condition.SourceType} AND `{columnKey}` IN ({c});";
         }
 
         public string GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity,

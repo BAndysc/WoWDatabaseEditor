@@ -17,6 +17,21 @@
     "MenuID",
     "OptionID"
   ],
+  "conditions": {
+    "source_type": 15,
+    "source_group": "MenuID",
+    "source_entry": "OptionID",
+    "targets": [
+      {
+        "id": 0,
+        "name": "player"
+      },
+      {
+        "id": 1,
+        "name": "gossip sender"
+      }
+    ]
+  },
   "groups": [
     {
       "group_name": "group",
@@ -69,6 +84,11 @@
           "name": "Submenu id",
           "db_column_name": "ActionMenuID",
           "value_type": "GossipMenuParameter"
+        },
+        {
+          "is_condition": true,
+          "name": "Conditions",
+          "db_column_name": "conditions"
         },
         {
           "name": "Action Poi ID",

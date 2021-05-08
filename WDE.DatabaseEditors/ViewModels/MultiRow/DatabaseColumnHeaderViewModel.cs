@@ -17,5 +17,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             Help = column.Help;
             PreferredWidth = column.PreferredWidth;
         }
+
+        public DatabaseColumnHeaderViewModel(string name, string databaseName)
+        {
+            Name = name;
+            DatabaseName = databaseName;
+        }
     }
 }

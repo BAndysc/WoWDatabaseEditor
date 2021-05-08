@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
@@ -55,7 +56,7 @@ namespace WDE.DatabaseEditors.Data
                 columns[column.DbColumnName] = databaseFieldFactory.CreateField(column.DbColumnName, valueHolder);
             }
 
-            return new DatabaseEntity(false, key, columns);
+            return new DatabaseEntity(false, key, columns, null);
         }
         
         public IDatabaseTableData? CreateDatabaseTable(DatabaseTableDefinitionJson tableDefinition,
@@ -63,7 +64,8 @@ namespace WDE.DatabaseEditors.Data
             IList<Dictionary<string, (System.Type type, object value)>> fieldsFromDb)
         {
             HashSet<uint> providedKeys = new();
-            
+
+            IList<IConditionLine>? conditions = null;
             List<DatabaseEntity> rows = new();
             foreach (var entity in fieldsFromDb)
             {
@@ -112,6 +114,11 @@ namespace WDE.DatabaseEditors.Data
                     {
                         valueHolder = new ValueHolder<long>(column.Value.value is DBNull ? 0 : ((bool)column.Value.value ? 1 : 0));
                     }
+                    else if (column.Value.type == typeof(IList<IConditionLine>))
+                    {
+                        conditions = ((IList<IConditionLine>)column.Value.value);
+                        continue;
+                    }
                     else
                     {
                         throw new NotImplementedException();
@@ -129,7 +136,7 @@ namespace WDE.DatabaseEditors.Data
                     columns[column.Key] = databaseFieldFactory.CreateField(column.Key, valueHolder);
                 }
                 if (key.HasValue)
-                    rows.Add(new DatabaseEntity(true, key.Value, columns));
+                    rows.Add(new DatabaseEntity(true, key.Value, columns, conditions?.ToList<ICondition>()));
             }
 
             if (!tableDefinition.IsMultiRecord)

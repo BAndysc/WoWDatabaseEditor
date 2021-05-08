@@ -49,6 +49,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "primary_key")]
         public IList<string>? PrimaryKey { get; set; }
         
+        [JsonProperty(PropertyName = "conditions")]
+        public DatabaseConditionReferenceJson? Condition { get; set; }
+
         [JsonProperty(PropertyName = "foreign_tables")]
         public IList<DatabaseForeignTableJson>? ForeignTable { get; set; }
         
@@ -63,5 +66,32 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonIgnore] 
         public IDictionary<string, DatabaseForeignTableJson> ForeignTableByName { get; set; } = null!;
+    }
+    
+    public class DatabaseConditionReferenceJson
+    {
+        [JsonProperty(PropertyName = "source_type")]
+        public int SourceType { get; set; }
+        
+        [JsonProperty(PropertyName = "source_group")]
+        public string? SourceGroupColumn { get; set; }
+        
+        [JsonProperty(PropertyName = "source_entry")]
+        public string? SourceEntryColumn { get; set; }
+        
+        [JsonProperty(PropertyName = "source_id")]
+        public string? SourceIdColumn { get; set; }
+        
+        [JsonProperty(PropertyName = "targets")]
+        public IList<DatabaseConditionTargetJson>? Targets { get; set; }
+    }
+
+    public class DatabaseConditionTargetJson
+    {
+        [JsonProperty(PropertyName = "id")]
+        public uint Id { get; set; }
+
+        [JsonProperty(PropertyName = "name")] 
+        public string Name { get; set; } = "";
     }
 }

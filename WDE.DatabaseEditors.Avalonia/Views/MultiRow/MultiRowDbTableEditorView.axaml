@@ -74,6 +74,11 @@
     </UserControl.Styles>
     <UserControl.DataTemplates>
         <helpers:FieldValueTemplateSelector>
+            <helpers:FieldValueTemplateSelector.CommandTemplate>
+                <DataTemplate>
+                    <Button Command="{Binding ActionCommand}" CommandParameter="{Binding}" Content="{Binding ActionLabel}" />
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.CommandTemplate>
             <helpers:FieldValueTemplateSelector.BoolTemplate>
                 <DataTemplate>
                     <controls2:FastBoolCellView Height="24" Margin="0,0,10,0"

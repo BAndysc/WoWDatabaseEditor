@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using WDE.Common.Database;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;

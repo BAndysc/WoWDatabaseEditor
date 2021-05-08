@@ -10,9 +10,12 @@ namespace WDE.DatabaseEditors.WPF.Helpers
     {
         public DataTemplate GenericTemplate { get; set; }
         public DataTemplate BoolTemplate { get; set; }
+        public DataTemplate CommandTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object param, DependencyObject container)
         {
+            if (param is ViewModels.MultiRow.DatabaseCellViewModel vm3 && vm3.ActionCommand != null)
+                return CommandTemplate;
             if ((param is DatabaseCellViewModel vm && vm.ParameterValue is ParameterValue<long> holder && holder.Parameter is BoolParameter) ||
                 (param is ViewModels.MultiRow.DatabaseCellViewModel vm2 && vm2.ParameterValue is ParameterValue<long> holder2 && holder2.Parameter is BoolParameter))
                 return BoolTemplate;

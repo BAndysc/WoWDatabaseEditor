@@ -54,6 +54,11 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplateSelector>
                                                     <helpers:FieldValueTemplateSelector>
+                                                        <helpers:FieldValueTemplateSelector.CommandTemplate>
+                                                            <DataTemplate>
+                                                                <Button Command="{Binding ActionCommand}" CommandParameter="{Binding}" Content="{Binding ActionLabel}" />
+                                                            </DataTemplate>
+                                                        </helpers:FieldValueTemplateSelector.CommandTemplate>
                                                         <helpers:FieldValueTemplateSelector.BoolTemplate>
                                                             <DataTemplate>
                                                                 <controls:FastBoolCellView Height="24" Margin="0,0,10,0"

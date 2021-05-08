@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.MVVM;
@@ -10,8 +11,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
     {
         public DatabaseEntityViewModel Parent { get; }
         public DatabaseEntity ParentEntity { get; }
-        public IDatabaseField TableField { get; }
-        public IParameterValue ParameterValue { get; }
+        public IDatabaseField? TableField { get; }
+        public IParameterValue? ParameterValue { get; }
         public bool IsVisible { get; private set; } = true;
         public string? OriginalValueTooltip { get; private set; }
         public bool CanBeNull { get; }
@@ -19,6 +20,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public bool CanBeSetToNull => CanBeNull && !IsReadOnly;
         public bool CanBeReverted => !IsReadOnly;
         public int ColumnIndex { get; }
+        public ICommand? ActionCommand { get; }
+        public string ActionLabel { get; set; } = "";
         
         public string ColumnName { get; }
 
@@ -39,6 +42,23 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
                 RaisePropertyChanged(nameof(OriginalValueTooltip));
                 RaisePropertyChanged(nameof(AsBoolValue));
+            }));
+        }
+
+        public DatabaseCellViewModel(int columnIndex, string columnName, ICommand action, DatabaseEntityViewModel parent, DatabaseEntity entity, System.IObservable<string> label)
+        {
+            Parent = parent;
+            ParentEntity = entity;
+            ColumnIndex = columnIndex * 2;
+            CanBeNull = false;
+            IsReadOnly = false;
+            ColumnName = columnName;
+            OriginalValueTooltip = null;
+            ActionCommand = action;
+            AutoDispose(label.SubscribeAction(s =>
+            {
+                ActionLabel = s;
+                RaisePropertyChanged(nameof(ActionLabel));
             }));
         }
 
