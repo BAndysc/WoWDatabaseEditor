@@ -103,10 +103,18 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             set
             {
                 SetProperty(ref search, value);
+                var lowerSearchText = SearchText.ToLower();
                 if (string.IsNullOrEmpty(SearchText))
                     currentFilter.Value = _ => true;
+                else if (long.TryParse(SearchText, out var searchNumber))
+                    currentFilter.Value = model =>
+                    {
+                        if (model.Entry.ToString().Contains(SearchText))
+                            return true;
+                        return model.Name.ToLower().Contains(lowerSearchText);
+                    };
                 else
-                   currentFilter.Value = model => model.Name.ToLower().Contains(SearchText.ToLower());
+                   currentFilter.Value = model => model.Name.ToLower().Contains(lowerSearchText);
             }
         }
         
