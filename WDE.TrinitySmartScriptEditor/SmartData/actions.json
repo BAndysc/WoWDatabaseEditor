@@ -859,7 +859,7 @@
                 "name": "Percent"
             }
         ],
-        "description": "{source}: Set invincibility to {pram2value:choose(0):{pram2}%|{pram1}} HP",
+        "description": "{source}: Set invincibility to {pram2value:choose(0):{pram1}|{pram2}%} HP",
         "name_readable": "Set invincibility hp level",
         "target_types": ["Creature"],
         "target_is_source": true
@@ -916,6 +916,30 @@
         "description": "{source}: Set creature data #{pram1} to {pram2}",
         "name_readable": "Set data",
         "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 46,
+        "tags": ["Azeroth"],
+        "name": "SMART_ACTION_MOVE_FORWARD_AC",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Distance"
+            }
+        ],
+        "description": "{source}: Move forward {pram1} yards",
+        "name_readable": "Move forward",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 46,
+        "tags": ["TrinityWrath", "TrinityCata"],
+        "name": "SMART_ACTION_ATTACK_STOP",
+        "description": "{source}: Stop attacking",
+        "help": "This action is actually stopping the entire attack procedure. It requires a passive react state to prevent a immediate AttackStart ai reaction",
+        "name_readable": "Stop attack",
+        "target_types": ["Creature"],
         "target_is_source": true
     },
     {
