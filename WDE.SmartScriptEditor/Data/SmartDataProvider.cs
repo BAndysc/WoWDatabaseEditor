@@ -58,7 +58,7 @@ namespace WDE.SmartScriptEditor.Data
 
         private bool IsSmartValidForCore(SmartGenericJsonData data)
         {
-            return data.Tags == null || data.Tags.Contains(coreVersion.Current.Tag);
+            return data.Tags == null || data.Tags.Contains(coreVersion.Current.Tag) || (coreVersion.Current.SmartScriptFeatures.ForceLoadTag != null && data.Tags.Contains(coreVersion.Current.SmartScriptFeatures.ForceLoadTag));
         }
         
         public IEnumerable<SmartGenericJsonData> GetActions() => actions;

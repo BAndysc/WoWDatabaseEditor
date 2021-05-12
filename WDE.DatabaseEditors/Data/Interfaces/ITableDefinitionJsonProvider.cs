@@ -7,5 +7,7 @@ namespace WDE.DatabaseEditors.Data.Interfaces
     public interface ITableDefinitionJsonProvider
     {
         IEnumerable<(string file, string content)> GetDefinitionSources();
+        
+        IEnumerable<(string file, string content)> GetDefinitionReferences();
     }
 }

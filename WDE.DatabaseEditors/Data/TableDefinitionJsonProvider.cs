@@ -13,5 +13,10 @@ namespace WDE.DatabaseEditors.Data
         {
             return Directory.GetFiles("DbDefinitions/", "*.json", SearchOption.AllDirectories).Select(f => (f, File.ReadAllText(f)));
         }
+        
+        public IEnumerable<(string file, string content)> GetDefinitionReferences()
+        {
+            return Directory.GetFiles("DbDefinitions/", "*.ref", SearchOption.AllDirectories).Select(f => (f, File.ReadAllText(f)));
+        }
     }
 }

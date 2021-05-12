@@ -22,5 +22,7 @@ namespace WDE.Common.CoreVersion
     public interface ISmartScriptFeatures
     {
         ISet<SmartScriptType> SupportedTypes { get; }
+
+        string? ForceLoadTag => null;
     }
 }
