@@ -15,7 +15,7 @@ namespace WDE.SmartScriptEditor.Models.Helpers
         public ObservableCollection<object> AllSmartObjectsFlat { get; } = new();
         public ObservableCollection<SmartAction> AllActions { get; } = new();
 
-        public event Action ScriptSelectedChanged;
+        public event Action? ScriptSelectedChanged;
         
         public SmartSelectionHelper(SmartScript script)
         {

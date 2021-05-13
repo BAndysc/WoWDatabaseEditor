@@ -36,7 +36,7 @@ namespace WDE.Updater.Data
             {
                 return new Uri(uri);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return fallback;
             }

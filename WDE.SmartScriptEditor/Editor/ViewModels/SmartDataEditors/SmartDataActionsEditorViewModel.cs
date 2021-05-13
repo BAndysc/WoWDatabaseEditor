@@ -87,8 +87,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         public int DesiredHeight { get; } = 666;
         public string Title { get; } = "Action Editor";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 
     class SmartDataActionsEditorData : INotifyPropertyChanged
@@ -110,7 +110,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
                 OnPropertyChanged();
             }
         }
-        public string ImplicitSource { get; set; }
+        public string? ImplicitSource { get; set; }
         public bool UsesTargetPosition { get; set; }
         public ObservableCollection<SmartParameterJsonData> Parameters { get; set; }
 
@@ -156,7 +156,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

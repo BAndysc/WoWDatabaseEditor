@@ -15,7 +15,7 @@ namespace WDE.RemoteSOAP.Providers
         public ConnectionSettingsProvider(IUserSettings userSettings)
         {
             this.userSettings = userSettings;
-            SoapAccess = userSettings.Get(new RemoteSoapAccess());
+            SoapAccess = userSettings.Get(new RemoteSoapAccess())!;
         }
 
         private RemoteSoapAccess SoapAccess { get; }

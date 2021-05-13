@@ -149,7 +149,7 @@ namespace WDE.Common.WPF.Attached
                 InsertPosition = dropInfo.InsertPosition.ToCommon();
             }
             
-            public object? Data { get; internal set; }
+            public object Data { get; internal set; }
             public object? TargetItem { get; internal set; }
             public int InsertIndex { get; internal set; }
             public CommonDrag.DropTargetAdorners DropTargetAdorner { get; set; }

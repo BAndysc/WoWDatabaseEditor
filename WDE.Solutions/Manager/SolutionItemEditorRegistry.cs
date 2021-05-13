@@ -33,7 +33,7 @@ namespace WDE.Solutions.Manager
         {
             if (!editorProviders.TryGetValue(item.GetType(), out var editor))
                 throw new SolutionItemEditorNotFoundException(item);
-            return (editor as ISolutionItemEditorProvider<T>).GetEditor(item);
+            return ((ISolutionItemEditorProvider<T>)editor).GetEditor(item);
         }
     }
 }

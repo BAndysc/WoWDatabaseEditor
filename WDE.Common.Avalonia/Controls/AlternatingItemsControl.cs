@@ -21,7 +21,7 @@ namespace WDE.Common.Avalonia.Controls
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
-            LogicalChildrenOnCollectionChanged(null, null);
+            LogicalChildrenOnCollectionChanged(null, null!);
         }
 
         private void LogicalChildrenOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

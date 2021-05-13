@@ -15,11 +15,8 @@ namespace WDE.Common.Utils
 
         private readonly AsyncCommand command;
 
-        public AsyncAutoCommand([NotNull]
-            Func<Task> execute,
-            [CanBeNull]
+        public AsyncAutoCommand(Func<Task> execute,
             Func<object?, bool>? canExecute = null,
-            [CanBeNull]
             Action<Exception>? onException = null,
             bool continueOnCapturedContext = false)
         {
@@ -78,9 +75,7 @@ namespace WDE.Common.Utils
 
         public AsyncAutoCommand([NotNull]
             Func<T, Task> execute,
-            [CanBeNull]
             Func<object?, bool>? canExecute = null,
-            [CanBeNull]
             Action<Exception>? onException = null,
             bool continueOnCapturedContext = false)
         {

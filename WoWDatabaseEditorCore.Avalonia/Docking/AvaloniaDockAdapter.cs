@@ -18,8 +18,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
         private Dictionary<IDocument, AvaloniaDocumentDockWrapper> documents = new();
         private Dictionary<ITool, AvaloniaToolDockWrapper> tools = new();
         private DockFactory factory;
-        private IDock currentLayout;
-        private IRootDock rootLayout;
+        private IDock? currentLayout;
+        private IRootDock? rootLayout;
         private DockSerializer dockSerializer;
 
         private void ActivateDocument(IDocument document)
@@ -36,7 +36,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             dockSerializer = new DockSerializer(factory, this);
         }
         
-        public AvaloniaToolDockWrapper ResolveTool(string id)
+        public AvaloniaToolDockWrapper? ResolveTool(string id)
         {
             var tool = layoutViewModelResolver.ResolveViewModel(id);
             if (tool == null)
@@ -48,17 +48,19 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             return toolDockWrapper;
         }
         
-        public SerializedDock SerializeDock()
+        public SerializedDock? SerializeDock()
         {
+            if (rootLayout == null)
+                return null;
             return dockSerializer.Serialize(rootLayout);
         }
         
-        public IRootDock Initialize(SerializedDock serializedDock)
+        public IRootDock? Initialize(SerializedDock? serializedDock)
         {
             if (serializedDock != null)
             {
                 rootLayout = dockSerializer.Deserialize(serializedDock);
-                if ((rootLayout.VisibleDockables?.Count ?? 0) == 0)
+                if ((rootLayout?.VisibleDockables?.Count ?? 0) == 0)
                     rootLayout = null;
             }
 
@@ -70,7 +72,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             
             factory.InitLayout(rootLayout);
 
-            currentLayout = rootLayout.VisibleDockables[0] as IDock;
+            currentLayout = rootLayout!.VisibleDockables![0] as IDock;
+
+            if (currentLayout == null)
+                return null;
             
             documentManager.ToObservable(d => d.ActiveDocument).SubscribeAction(active =>
             {
@@ -85,7 +90,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     var dockable = new AvaloniaDocumentDockWrapper(documentManager, e.Item);
                     documents.Add(e.Item, dockable);
                     factory.InitLayout(dockable);
-                    factory.AddDocument(currentLayout, dockable);
+                    factory.AddDocument(currentLayout!, dockable);
                 }
                 else if (e.Type == CollectionEventType.Remove)
                 {
@@ -105,7 +110,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     {
                         var dockable = new AvaloniaToolDockWrapper(tool);
                         tools[tool] = dockable;
-                        factory.AddTool(currentLayout, dockable);
+                        factory.AddTool(currentLayout!, dockable);
                     }
                     else if (!isVisible)
                     {

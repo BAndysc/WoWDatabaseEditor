@@ -15,10 +15,10 @@ namespace WDE.Common.Managers
         ICommand Cut { get; }
         ICommand Paste { get; }
         ICommand Save { get; }
-        IAsyncCommand CloseCommand { get; set; }
+        IAsyncCommand? CloseCommand { get; set; }
         bool CanClose { get; }
         bool IsModified { get; }
-        IHistoryManager History { get; }
+        IHistoryManager? History { get; }
     }
 
     public interface ISolutionItemDocument : IDocument

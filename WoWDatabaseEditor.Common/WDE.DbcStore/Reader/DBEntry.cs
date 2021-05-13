@@ -15,12 +15,10 @@ namespace WDBXEditor.Storage
     public class DBEntry : IDisposable
     {
         private int max = -1;
-
-
+        
         private int min = -1;
         private IEnumerable<int> primaryKeys;
-        private IEnumerable<int> unqiueRowIndices;
-
+        //private IEnumerable<int> unqiueRowIndices;
 
         public DBEntry(DBHeader header, string filepath)
         {

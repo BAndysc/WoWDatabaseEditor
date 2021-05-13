@@ -11,14 +11,24 @@ namespace WDE.Common.Tasks
             WPF,
             Avalonia
         }
-        
-        public static IMainThread MainThread { get; private set; }
+
+        public static IMainThread? mainThread;
+
+        public static IMainThread MainThread
+        {
+            get
+            {
+                if (mainThread == null)
+                    throw new Exception("Invalid use of MainThread before initialization, fatal error");
+                return mainThread;
+            }
+        }
         public static AppBackend Backend { get; private set; }
 
-        public static void InitializeApplication(IMainThread mainThread, AppBackend backend)
+        public static void InitializeApplication(IMainThread thread, AppBackend backend)
         {
-            Debug.Assert(MainThread == null);
-            MainThread = mainThread;
+            Debug.Assert(mainThread == null);
+            mainThread = thread;
             Backend = backend;
         }
     }

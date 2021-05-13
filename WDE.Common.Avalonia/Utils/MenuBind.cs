@@ -53,7 +53,7 @@ namespace WDE.Common.Avalonia.Utils
                     topLevelItem.Menu.Add(item);
                 }
                 
-                (targetLocation as NativeMenu).Add(topLevelItem);
+                ((NativeMenu)targetLocation).Add(topLevelItem);
             }
             return viewModel;
         }
@@ -122,7 +122,7 @@ namespace WDE.Common.Avalonia.Utils
             if (field == null)
                 return;
             
-            object undoHelper = field.GetValue(tb);
+            object? undoHelper = field.GetValue(tb);
             if (undoHelper == null)
                 return;
 
@@ -136,7 +136,7 @@ namespace WDE.Common.Avalonia.Utils
 
         private static ICommand OverrideCommand<T>(ICommand command, Key require, Key commandKey, IMenuCommandItem item, Action<T> func)
         {
-            if (require != commandKey || !item.Shortcut.Value.Control)
+            if (require != commandKey || !(item.Shortcut?.Control ?? false))
                 return command;
 
             return new DelegateCommand(() =>

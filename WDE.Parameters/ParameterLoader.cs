@@ -185,7 +185,7 @@ namespace WDE.Parameters
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IGameEvent item in database.GetGameEvents())
-                Items.Add(item.Entry, new SelectOption(item.Description));
+                Items.Add(item.Entry, new SelectOption(item.Description ?? "(null)"));
         }
     }
 

@@ -16,6 +16,6 @@ namespace WDE.TrinitySmartScriptEditor.Models
             constructorParam = editorConstructorParam;
         }
         
-        public IDocument EditorDocument() => (T)Activator.CreateInstance(typeof(T), constructorParam);
+        public IDocument EditorDocument() => (T)Activator.CreateInstance(typeof(T), constructorParam)!;
     }
 }

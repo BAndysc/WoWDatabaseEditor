@@ -75,8 +75,8 @@ namespace WDE.Conditions.ViewModels
         public int DesiredHeight { get; } = 666;
         public string Title { get; } = "Condition Editor";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 
     public class ConditionEditorData

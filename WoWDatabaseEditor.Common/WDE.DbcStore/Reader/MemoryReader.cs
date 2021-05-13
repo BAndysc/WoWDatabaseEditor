@@ -16,7 +16,7 @@ namespace WDBXEditor.Reader
             if ((proc?.Id ?? 0) == 0)
                 throw new Exception("Invalid process");
 
-            BaseAddress = (ulong) proc.MainModule.BaseAddress;
+            BaseAddress = (ulong) proc!.MainModule!.BaseAddress;
             ProcessHandle = OpenProcess(ProcessAccess.AllAccess, false, proc.Id);
 
             if (ProcessHandle == IntPtr.Zero)

@@ -32,7 +32,7 @@ namespace WDE.Conditions.ViewModels
             for (int i = 0; i < ParametersCount; ++i)
                 parameters[i] = new ParameterValueHolder<long>(Parameter.Instance, 0);
             ConditionTarget = new ParameterValueHolder<long>("Target", targets, 0);
-            ConditionTarget.IsUsed = targets.HasItems && targets.Items.Count > 1;
+            ConditionTarget.IsUsed = targets.HasItems && targets.Items!.Count > 1;
 
             Invert = new ParameterValueHolder<long>("Negated condition", BoolParameter.Instance, 0);
             
@@ -48,7 +48,7 @@ namespace WDE.Conditions.ViewModels
         public string Readable
         {
             get {
-                string readable = readableHint;
+                string? readable = readableHint;
                 if (readable == null)
                     return "";
                 return Smart.Format(readable, new

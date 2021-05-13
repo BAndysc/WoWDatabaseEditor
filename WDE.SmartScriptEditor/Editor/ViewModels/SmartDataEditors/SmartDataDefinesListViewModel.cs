@@ -105,7 +105,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         private async Task OpenEditor(SmartGenericJsonData item, bool isCreating)
         {
             var vm = GetEditorViewModel(in item, isCreating);
-            if (await windowManager.ShowDialog(vm as IDialog) && !vm.IsSourceEmpty())
+            if (vm is IDialog dialog && await windowManager.ShowDialog(dialog) && !vm.IsSourceEmpty())
             {
                 if (vm.InsertOnSave)
                     DefinesItems.Add(vm.GetSource());
@@ -148,7 +148,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
                                     .Build());
         }
 
-        private ISmartDataEditorModel GetEditorViewModel(in SmartGenericJsonData source, bool isCreating)
+        private ISmartDataEditorModel? GetEditorViewModel(in SmartGenericJsonData source, bool isCreating)
         {
             switch (dataSourceMode)
             {
@@ -169,7 +169,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
         public ICommand Save { get; private set; }
-        public AsyncAwaitBestPractices.MVVM.IAsyncCommand CloseCommand { get; set; } = null;
+        public AsyncAwaitBestPractices.MVVM.IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose => true;
         public IHistoryManager History { get; }
         private bool isModified = false;

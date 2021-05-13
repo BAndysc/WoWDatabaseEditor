@@ -30,7 +30,7 @@ namespace WDBXEditor.Storage
                 XmlSerializer deser = new(typeof(Definition));
                 using (FileStream fs = new FileStream(path, FileMode.Open))
                 {
-                    Definition def = (Definition) deser.Deserialize(fs);
+                    Definition def = (Definition)deser.Deserialize(fs);
                     var newtables = def.Tables.Where(x => Tables.Count(y => x.Build == y.Build && x.Name == y.Name) == 0).ToList();
                     newtables.ForEach(x => x.Load());
                     Tables.UnionWith(newtables.Where(x => x.Key != null));

@@ -19,11 +19,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             SmartBaseElement element,
             bool focusFirst,
-            IEnumerable<(ParameterValueHolder<long> parameter, string name)> parameters,
-            IEnumerable<(ParameterValueHolder<float> parameter, string name)> floatParameters = null,
-            IEnumerable<(ParameterValueHolder<string> parameter, string name)> stringParameters = null,
-            IEnumerable<EditableActionData> actionParameters = null,
-            System.Action saveAction = null)
+            IEnumerable<(ParameterValueHolder<long> parameter, string name)>? parameters,
+            IEnumerable<(ParameterValueHolder<float> parameter, string name)>? floatParameters = null,
+            IEnumerable<(ParameterValueHolder<string> parameter, string name)>? stringParameters = null,
+            IEnumerable<EditableActionData>? actionParameters = null,
+            System.Action? saveAction = null)
         {
             HashSet<IEditableParameterViewModel> visible = new();
             SourceList<IEditableParameterViewModel> visibleParameters = new();
@@ -86,7 +86,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         }
 
         public ReadOnlyObservableCollection<Grouping<string, IEditableParameterViewModel>> FilteredParameters { get; }
-        public string Readable { get; private set; }
+        public string Readable { get; private set; } = "";
         public bool ShowCloseButtons { get; set; } = true;
 
         public DelegateCommand Accept { get; }
@@ -97,9 +97,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public bool Resizeable => true;
         public bool FocusFirst { get; }
 
-        public event Action CloseCancel;
-        public event Action CloseOk;
-        public event Action BeforeAccept;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
+        public event Action? BeforeAccept;
     }
     
     public class Grouping<TKey, TVal> : ObservableCollectionExtended<TVal>, IGrouping<TKey, TVal>, IDisposable

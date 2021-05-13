@@ -16,13 +16,13 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
         }
 
         private bool alreadySerializedDocument;
-        public SerializedDock Serialize(IDock dock)
+        public SerializedDock? Serialize(IDock dock)
         {
             alreadySerializedDocument = false;
             return SerializeDockable(dock);
         }
 
-        public IRootDock Deserialize(SerializedDock serializedDock)
+        public IRootDock? Deserialize(SerializedDock serializedDock)
         {
             if (serializedDock.DockableType != SerializedDockableType.RootDock)
                 return null;
@@ -30,7 +30,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
             return DeserializeDockable(serializedDock) as IRootDock;
         }
         
-        public IDockable DeserializeDockable(SerializedDock serializedDock)
+        public IDockable? DeserializeDockable(SerializedDock serializedDock)
         {
             switch (serializedDock.DockableType)
             {
@@ -67,7 +67,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                     IRootDock rootDock = dockFactory.CreateRootDock();
                     rootDock.Proportion = serializedDock.Proportion;
                     DeserializeChildren(rootDock, serializedDock);
-                    if (rootDock.VisibleDockables.Count > 0)
+                    if (rootDock.VisibleDockables?.Count > 0)
                     {
                         rootDock.ActiveDockable = rootDock.VisibleDockables[0];
                         rootDock.DefaultDockable = rootDock.VisibleDockables[0];
@@ -93,7 +93,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
             }
         }
 
-        private SerializedDock SerializeDockable(IDockable dockable)
+        private SerializedDock? SerializeDockable(IDockable dockable)
         {
             SerializedDock serialized = new();
             if (dockable is IProportionalDock proportinal)
@@ -139,14 +139,17 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
 
             if (dockable is IDock dock && serialized.DockableType != SerializedDockableType.DocumentDock)
             {
-                foreach (var d in dock.VisibleDockables)
+                if (dock.VisibleDockables != null)
                 {
-                    if (d is not IDocument || d is ITool)
+                    foreach (var d in dock.VisibleDockables)
                     {
-                        var s = SerializeDockable(d);
-                        if (s != null)
-                            serialized.Children.Add(s);
-                    }
+                        if (d is not IDocument || d is ITool)
+                        {
+                            var s = SerializeDockable(d);
+                            if (s != null)
+                                serialized.Children.Add(s);
+                        }
+                    }   
                 }
             }
 

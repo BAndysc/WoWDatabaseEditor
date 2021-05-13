@@ -12,6 +12,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     [SingleInstance]
     public class MainWindowHolderHolder : IMainWindowHolder
     {
-        public Window Window { get; set;  }
+        public Window Window { get; set; } = null!;
     }
 }

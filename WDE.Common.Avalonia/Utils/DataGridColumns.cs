@@ -10,15 +10,18 @@ namespace WDE.Common.Avalonia.Utils
 {
     public class DataGridColumns
     {
-        public static readonly AvaloniaProperty ColumnsSourceProperty = AvaloniaProperty.RegisterAttached<DataGridColumns, DataGrid, IList<ColumnDescriptor>>("ColumnsSource",
+        public static readonly AvaloniaProperty ColumnsSourceProperty = AvaloniaProperty.RegisterAttached<DataGridColumns, DataGrid, IList<ColumnDescriptor>?>("ColumnsSource",
             null, coerce: ColumnsSourceChanged);
 
         public static List<ColumnDescriptor> GetColumnsSource(IControl obj) => (List<ColumnDescriptor>)obj.GetValue(ColumnsSourceProperty);
 
         public static void SetColumnsSource(IControl obj, List<ColumnDescriptor> value) => obj.SetValue(ColumnsSourceProperty, value);
 
-        private static IList<ColumnDescriptor> ColumnsSourceChanged(IAvaloniaObject o, IList<ColumnDescriptor> arg2)
+        private static IList<ColumnDescriptor>? ColumnsSourceChanged(IAvaloniaObject o, IList<ColumnDescriptor>? arg2)
         {
+            if (arg2 == null)
+                return arg2;
+            
             if (o is DataGrid dataGrid)
             {
                 dataGrid.Columns.Clear();

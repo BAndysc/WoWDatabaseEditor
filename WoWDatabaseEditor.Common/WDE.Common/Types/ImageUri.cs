@@ -5,7 +5,7 @@ namespace WDE.Common.Types
 {
     public readonly struct ImageUri
     {
-        public readonly Assembly Assembly;
+        public readonly Assembly? Assembly;
         public readonly string Uri;
         
         public ImageUri(Assembly assembly, string relativePath)
@@ -25,7 +25,7 @@ namespace WDE.Common.Types
             return Equals(Assembly, other.Assembly) && Uri == other.Uri;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is ImageUri other && Equals(other);
         }

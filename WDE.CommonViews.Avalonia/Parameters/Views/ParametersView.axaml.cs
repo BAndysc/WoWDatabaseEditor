@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WDE.Parameters.Views
+namespace WDE.CommonViews.Avalonia.Parameters.Views
 {
     /// <summary>
     ///     Interaction logic for ParametersView

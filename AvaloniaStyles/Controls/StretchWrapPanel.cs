@@ -91,7 +91,9 @@ namespace AvaloniaStyles.Controls
 
                 if (visual is ILayoutable layoutable)
                 {
-                    StyledElement styledElement = layoutable as StyledElement;
+                    StyledElement? styledElement = layoutable as StyledElement;
+                    if (styledElement == null)
+                        continue;
                     double width = layoutable.DesiredSize.Width;
                     if (width < optimumWidth)
                     {

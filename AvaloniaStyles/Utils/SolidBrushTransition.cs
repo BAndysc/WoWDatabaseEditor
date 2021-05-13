@@ -18,8 +18,8 @@ namespace AvaloniaStyles.Utils
             return progress
                 .Select(p =>
                 {
-                    SolidColorBrush old = oldValue as SolidColorBrush;
-                    SolidColorBrush nnew = newValue as SolidColorBrush;
+                    SolidColorBrush? old = oldValue as SolidColorBrush;
+                    SolidColorBrush? nnew = newValue as SolidColorBrush;
                     if (old == null || nnew == null)
                         return newValue;
                     var f = Easing.Ease(p);
@@ -36,7 +36,7 @@ namespace AvaloniaStyles.Utils
     // copy paste of Avalonia Transition class, because I do not know why original doesn't work here...
     public abstract class Transition<T> : AvaloniaObject, ITransition
     {
-        private AvaloniaProperty _prop;
+        private AvaloniaProperty? _prop;
 
         /// <summary>
         /// Gets or sets the duration of the transition.
@@ -54,11 +54,14 @@ namespace AvaloniaStyles.Utils
         public Easing Easing { get; set; } = new LinearEasing();
 
         /// <inheritdocs/>
-        public AvaloniaProperty Property
+        public AvaloniaProperty? Property
         {
             get { return _prop; }
             set
             {
+                if (value == null)
+                    return;
+                
                 if (!(value.PropertyType.IsAssignableFrom(typeof(T))))
                     throw new InvalidCastException
                         ($"Invalid property type \"{typeof(T).Name}\" for this transition: {GetType().Name}.");
@@ -76,17 +79,17 @@ namespace AvaloniaStyles.Utils
         public virtual IDisposable Apply(Animatable control, IClock clock, object oldValue, object newValue)
         {
             var transition = DoTransition(new TransitionInstance(clock, Delay, Duration), (T) oldValue, (T) newValue);
-            return control.Bind<T>((AvaloniaProperty<T>) Property, transition, Avalonia.Data.BindingPriority.Animation);
+            return control.Bind<T>((AvaloniaProperty<T>) Property!, transition, Avalonia.Data.BindingPriority.Animation);
         }
     }
     
     internal class TransitionInstance : SingleSubscriberObservableBase<double>
     {
-        private IDisposable _timerSubscription;
+        private IDisposable? _timerSubscription;
         private TimeSpan _delay;
         private TimeSpan _duration;
         private readonly IClock _baseClock;
-        private IClock _clock;
+        private IClock? _clock;
 
         public TransitionInstance(IClock clock, TimeSpan delay, TimeSpan duration)
         {
@@ -139,7 +142,8 @@ namespace AvaloniaStyles.Utils
         protected override void Unsubscribed()
         {
             _timerSubscription?.Dispose();
-            _clock.PlayState = PlayState.Stop;
+            if (_clock != null)
+                _clock.PlayState = PlayState.Stop;
         }
 
         protected override void Subscribed()

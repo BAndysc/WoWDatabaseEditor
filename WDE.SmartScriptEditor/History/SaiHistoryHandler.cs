@@ -33,17 +33,17 @@ namespace WDE.SmartScriptEditor.History
             script.BulkEditingFinished -= OnBulkEditingFinished;
         }
 
-        private void Events_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Events_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (object ev in e.NewItems)
-                    AddedEvent(ev as SmartEvent, e.NewStartingIndex);
+                foreach (SmartEvent ev in e.NewItems!)
+                    AddedEvent(ev, e.NewStartingIndex);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (object ev in e.OldItems)
-                    RemovedEvent(ev as SmartEvent, e.OldStartingIndex);
+                foreach (SmartEvent ev in e.OldItems!)
+                    RemovedEvent(ev, e.OldStartingIndex);
             }
         }
 
@@ -205,27 +205,27 @@ namespace WDE.SmartScriptEditor.History
 
         private void SmartEventOnOnIdChanged(SmartBaseElement element, int oldId, int newId)
         {
-            PushAction(new SmartIdChangedAction<SmartEvent>(element as SmartEvent, oldId, newId, (e, id) => smartFactory.UpdateEvent(e, id)));
+            PushAction(new SmartIdChangedAction<SmartEvent>((SmartEvent)element, oldId, newId, (e, id) => smartFactory.UpdateEvent(e, id)));
         }
 
         private void SmartActionOnOnIdChanged(SmartBaseElement action, int old, int @new)
         {
-            PushAction(new SmartIdChangedAction<SmartAction>(action as SmartAction, old, @new, (a, id) => smartFactory.UpdateAction(a, id)));
+            PushAction(new SmartIdChangedAction<SmartAction>((SmartAction)action, old, @new, (a, id) => smartFactory.UpdateAction(a, id)));
         }
         
         private void SmartConditionOnOnIdChanged(SmartBaseElement condition, int old, int @new)
         {
-            PushAction(new SmartIdChangedAction<SmartCondition>(condition as SmartCondition, old, @new, (a, id) => smartFactory.UpdateCondition(a, id)));
+            PushAction(new SmartIdChangedAction<SmartCondition>((SmartCondition)condition, old, @new, (a, id) => smartFactory.UpdateCondition(a, id)));
         }   
         
         private void SmartTargetOnOnIdChanged(SmartBaseElement target, int old, int @new)
         {
-            PushAction(new SmartIdChangedAction<SmartTarget>(target as SmartTarget, old, @new, (a, id) => smartFactory.UpdateTarget(a, id)));
+            PushAction(new SmartIdChangedAction<SmartTarget>((SmartTarget)target, old, @new, (a, id) => smartFactory.UpdateTarget(a, id)));
         }
         
         private void SmartSourceOnOnIdChanged(SmartBaseElement source, int old, int @new)
         {
-            PushAction(new SmartIdChangedAction<SmartSource>(source as SmartSource, old, @new, (a, id) => smartFactory.UpdateSource(a, id)));
+            PushAction(new SmartIdChangedAction<SmartSource>((SmartSource)source, old, @new, (a, id) => smartFactory.UpdateSource(a, id)));
         }
 
         private void OnBulkEditingFinished(string editName)
@@ -238,31 +238,35 @@ namespace WDE.SmartScriptEditor.History
             StartBulkEdit();
         }
 
-        private void Actions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Actions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (object ev in e.NewItems)
-                    AddedAction(ev as SmartAction, (ev as SmartAction).Parent, e.NewStartingIndex);
+                foreach (SmartAction ev in e.NewItems!)
+                    if (ev.Parent != null)
+                        AddedAction(ev, ev.Parent, e.NewStartingIndex);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (object ac in e.OldItems)
-                    RemovedAction(ac as SmartAction, (ac as SmartAction).Parent, e.OldStartingIndex);
+                foreach (SmartAction ac in e.OldItems!)
+                    if (ac.Parent != null)
+                        RemovedAction(ac, ac.Parent, e.OldStartingIndex);
             }
         }
 
-        private void Conditions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Conditions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (object ev in e.NewItems)
-                    AddedCondition(ev as SmartCondition, (ev as SmartCondition).Parent, e.NewStartingIndex);
+                foreach (SmartCondition ev in e.NewItems!)
+                    if (ev.Parent != null)
+                        AddedCondition(ev, ev.Parent, e.NewStartingIndex);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (object ac in e.OldItems)
-                    RemovedCondition(ac as SmartCondition, (ac as SmartCondition).Parent, e.OldStartingIndex);
+                foreach (SmartCondition ac in e.OldItems!)
+                    if (ac.Parent != null)
+                        RemovedCondition(ac, ac.Parent, e.OldStartingIndex);
             }
         }
 
@@ -341,7 +345,7 @@ namespace WDE.SmartScriptEditor.History
             }
         }
 
-        private class GenericParameterChangedAction<T> : IHistoryAction
+        private class GenericParameterChangedAction<T> : IHistoryAction where T : notnull
         {
             private readonly T @new;
             private readonly T old;

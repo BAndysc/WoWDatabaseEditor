@@ -7,9 +7,9 @@ namespace WDE.Common.Parameters
         bool HasItems { get; }
     }
     
-    public interface IParameter<T> : IParameter
+    public interface IParameter<T> : IParameter where T : notnull
     {
         string ToString(T value);
-        Dictionary<T, SelectOption> Items { get; }
+        Dictionary<T, SelectOption>? Items { get; }
     }
 }

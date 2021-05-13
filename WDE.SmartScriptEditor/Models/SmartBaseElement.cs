@@ -10,7 +10,7 @@ namespace WDE.SmartScriptEditor.Models
 {
     public abstract class SmartBaseElement : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         public event Action BulkEditingStarted = delegate { };
         public event Action<string> BulkEditingFinished = delegate { };
         public event EventHandler OnChanged = delegate { };
@@ -18,8 +18,8 @@ namespace WDE.SmartScriptEditor.Models
 
         private readonly ParameterValueHolder<long>[] @params;
 
-        private string readableHint;
-        public string ReadableHint
+        private string? readableHint;
+        public string? ReadableHint
         {
             get => readableHint;
             set
@@ -43,7 +43,7 @@ namespace WDE.SmartScriptEditor.Models
         }
         
         public IList<object> Context { get; }
-        public List<DescriptionRule> DescriptionRules { get; set; }
+        public List<DescriptionRule>? DescriptionRules { get; set; }
         public abstract string Readable { get; }
         public int ParametersCount { get; }
 
@@ -69,7 +69,7 @@ namespace WDE.SmartScriptEditor.Models
 
         protected void CallOnChanged()
         {
-            OnChanged(this, null);
+            OnChanged(this, null!);
         }
 
         public IDisposable BulkEdit(string name)
@@ -77,8 +77,8 @@ namespace WDE.SmartScriptEditor.Models
             return new BulkEditing(this, name);
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName]
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

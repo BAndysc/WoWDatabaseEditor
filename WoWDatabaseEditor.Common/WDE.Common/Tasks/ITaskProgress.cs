@@ -11,9 +11,9 @@ namespace WDE.Common.Tasks
         TaskState State { get; }
         int CurrentProgress { get; }
         int MaxProgress { get; }
-        string CurrentTask { get; }
+        string? CurrentTask { get; }
         
-        void Report(int currentProgress, int maxProgress, string currentTask);
+        void Report(int currentProgress, int maxProgress, string? currentTask);
         void ReportFinished();
         void ReportFail();
         event Action<ITaskProgress> Updated;

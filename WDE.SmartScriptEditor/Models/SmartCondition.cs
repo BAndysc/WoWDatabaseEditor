@@ -17,9 +17,9 @@ namespace WDE.SmartScriptEditor.Models
     {
         public static readonly int SmartConditionParametersCount = 3;
 
-        private string comment;
+        private string comment = "";
         private bool isSelected;
-        private SmartEvent parent;
+        private SmartEvent? parent;
         private ParameterValueHolder<long> inverted;
         private ParameterValueHolder<long> conditionTarget;
 
@@ -42,7 +42,7 @@ namespace WDE.SmartScriptEditor.Models
             Context.Add(conditionTarget);
         }
 
-        public SmartEvent Parent
+        public SmartEvent? Parent
         {
             get => parent;
             set
@@ -50,13 +50,14 @@ namespace WDE.SmartScriptEditor.Models
                 if (parent != null)
                     parent.PropertyChanged -= ParentPropertyChanged;
                 parent = value;
-                value.PropertyChanged += ParentPropertyChanged;
+                if (value != null)
+                    value.PropertyChanged += ParentPropertyChanged;
             }
         }
 
         public bool IsSelected
         {
-            get => isSelected || parent.IsSelected;
+            get => isSelected || (parent?.IsSelected ?? false);
             set
             {
                 if (value == isSelected)
@@ -85,7 +86,7 @@ namespace WDE.SmartScriptEditor.Models
         public override string Readable
         {
             get {
-                string readable = ReadableHint;
+                string? readable = ReadableHint;
                 if (readable == null)
                     return "";
                 return Smart.Format(readable, new

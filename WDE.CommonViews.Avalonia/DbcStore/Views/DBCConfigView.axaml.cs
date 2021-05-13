@@ -1,9 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
+﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WDE.DbcStore.Views
+namespace WDE.CommonViews.Avalonia.DbcStore.Views
 {
     /// <summary>
     ///     Interaction logic for DBCConfigView.xaml

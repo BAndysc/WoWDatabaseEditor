@@ -48,12 +48,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             set => SetProperty(ref areValuesVisible, value);
         }
 
-        private SmartDataParamterData selectedKey;
-        public SmartDataParamterData SelectedParameterKey { get => selectedKey;
+        private SmartDataParamterData? selectedKey;
+        public SmartDataParamterData? SelectedParameterKey { get => selectedKey;
             set
             {
                 selectedKey = value;
-                Source.Type = value.Key;
+                Source.Type = value!.Key;
                 AreValuesVisible = value.UseValues;
                 Source.Values.Clear();
             }
@@ -86,8 +86,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         public int DesiredHeight { get; } = 666;
         public string Title { get; } = "Parameter Editor";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 
     public class SmartDataParamterData: IComparable<SmartDataParamterData>
@@ -102,7 +102,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 
         public override string ToString() => Key;
 
-        public int CompareTo(SmartDataParamterData other)
+        public int CompareTo(SmartDataParamterData? other)
         {
             if (other == null)
                 return 1;

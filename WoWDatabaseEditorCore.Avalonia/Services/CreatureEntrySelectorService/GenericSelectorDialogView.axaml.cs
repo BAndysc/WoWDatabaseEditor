@@ -30,9 +30,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.CreatureEntrySelectorService
                 if (gridView == null)
                     return;
 
-                if (gridView.ListBoxImpl.SelectedItem == null)
-                    gridView.ListBoxImpl.SelectedIndex = 0;
-                gridView.ListBoxImpl.ItemContainerGenerator?.ContainerFromIndex(gridView.ListBoxImpl.SelectedIndex)?.Focus();
+                if (gridView.ListBoxImpl != null)
+                {
+                    if (gridView.ListBoxImpl.SelectedItem == null)
+                        gridView.ListBoxImpl.SelectedIndex = 0;
+                    gridView.ListBoxImpl.ItemContainerGenerator?.ContainerFromIndex(gridView.ListBoxImpl.SelectedIndex)?.Focus();   
+                }
             }
         }
     }

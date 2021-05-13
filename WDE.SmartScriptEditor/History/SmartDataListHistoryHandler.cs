@@ -21,7 +21,7 @@ namespace WDE.TrinitySmartScriptEditor.History
             smartDataList.CollectionChanged -= OnDataCollectionChanged;
         }
 
-        private void OnDataCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnDataCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -45,8 +45,8 @@ namespace WDE.TrinitySmartScriptEditor.History
                 {
                     for (int i = 0; i < e.NewItems.Count; ++i)
                     {
-                        SmartGenericJsonData oldItem = e.OldItems[i] is SmartGenericJsonData ? (SmartGenericJsonData) e.OldItems[i] : default;
-                        SmartGenericJsonData newItem = e.NewItems[i] is SmartGenericJsonData ? (SmartGenericJsonData) e.NewItems[i] : default;
+                        SmartGenericJsonData oldItem = e.OldItems[i] is SmartGenericJsonData ? (SmartGenericJsonData) e.OldItems[i]! : default;
+                        SmartGenericJsonData newItem = e.NewItems[i] is SmartGenericJsonData ? (SmartGenericJsonData) e.NewItems[i]! : default;
                         PushAction(new SmartDataListHistoryReplaceAction(in oldItem, in newItem, e.NewStartingIndex, smartDataList));
                     }
                 }

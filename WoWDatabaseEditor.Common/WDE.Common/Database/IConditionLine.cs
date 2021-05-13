@@ -16,7 +16,7 @@
 
         int NegativeCondition { get; set; }
 
-        string Comment { get; set; }
+        string? Comment { get; set; }
     }
 
     public interface IConditionLine : ICondition
@@ -28,22 +28,6 @@
         int SourceEntry { get; set; }
 
         int SourceId { get; set; }
-
-        int ElseGroup { get; set; }
-
-        int ConditionType { get; set; }
-
-        byte ConditionTarget { get; set; }
-
-        int ConditionValue1 { get; set; }
-
-        int ConditionValue2 { get; set; }
-
-        int ConditionValue3 { get; set; }
-
-        int NegativeCondition { get; set; }
-
-        string Comment { get; set; }
     }
     
     public class AbstractConditionLine : IConditionLine
@@ -104,7 +88,7 @@
 
         public int NegativeCondition { get; set; }
 
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
     }
     
     public class AbstractCondition : ICondition
@@ -137,6 +121,6 @@
 
         public int NegativeCondition { get; set; }
 
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
     }
 }

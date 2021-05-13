@@ -57,8 +57,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         public int DesiredHeight { get; } = 676;
         public string Title { get; } = "Condition Editor";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
         public bool InsertOnSave { get; }
         public SmartConditionalJsonData GetSource() => Source.ToSmartConditionalJsonData();
 

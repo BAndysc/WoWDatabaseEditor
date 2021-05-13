@@ -11,13 +11,13 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "entry")]
         public uint Entry { get; set; }
 
-        [Column(Name = "name")]
-        public string? Name { get; set; }
+        [Column(Name = "name")] 
+        public string Name { get; set; } = "";
 
         [Column(Name = "AIName")]
-        public string? AIName { get; set; }
+        public string AIName { get; set; } = "";
 
         [Column(Name = "ScriptName")]
-        public string? ScriptName { get; set; }
+        public string ScriptName { get; set; } = "";
     }
 }

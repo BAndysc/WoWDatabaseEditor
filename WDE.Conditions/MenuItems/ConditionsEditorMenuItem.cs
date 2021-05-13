@@ -16,6 +16,6 @@ namespace WDE.Conditions.MenuItems
             this.constructorParams = constructorParams;
         }
 
-        public IDocument EditorDocument() => (T)Activator.CreateInstance(typeof(T), constructorParams);
+        public IDocument EditorDocument() => (T)Activator.CreateInstance(typeof(T), constructorParams)!;
     }
 }

@@ -1,4 +1,4 @@
-﻿<components:ToolView x:Class="WDE.TrinityMySqlDatabase.Tools.DebugQueryToolView"
+﻿<components:ToolView x:Class="WDE.CommonViews.Avalonia.TrinityMySqlDatabase.Tools.DebugQueryToolView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"

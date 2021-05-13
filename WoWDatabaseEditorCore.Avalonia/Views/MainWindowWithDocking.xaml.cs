@@ -23,8 +23,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
 
         public MainWindowWithDocking()
         {
-            
+            fileSystem = null!;
+            avaloniaDockAdapter = null!;
         }
+        
         public MainWindowWithDocking(IMainWindowHolder mainWindowHolder, 
             IDocumentManager documentManager, 
             ILayoutViewModelResolver layoutViewModelResolver,
@@ -45,7 +47,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             
             DockControl dock = this.FindControl<DockControl>("DockControl");
 
-            SerializedDock serializedDock = null;
+            SerializedDock? serializedDock = null;
             if (fileSystem.Exists(DockSettingsFile))
             {
                 try

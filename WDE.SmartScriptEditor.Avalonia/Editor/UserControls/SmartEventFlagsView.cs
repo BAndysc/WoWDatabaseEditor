@@ -18,14 +18,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {
     public class SmartEventFlagsView : TemplatedControl
     {
-        private System.IDisposable? flagsDisposable;
+        private IDisposable? flagsDisposable;
         private AvaloniaList<IconViewModel> flags = new();
         public static readonly DirectProperty<SmartEventFlagsView, AvaloniaList<IconViewModel>> FlagsProperty = AvaloniaProperty.RegisterDirect<SmartEventFlagsView, AvaloniaList<IconViewModel>>("Flags", o => o.Flags, (o, v) => o.Flags = v);
 
         public AvaloniaList<IconViewModel> Flags
         {
-            get { return flags; }
-            set { SetAndRaise(FlagsProperty, ref flags, value); }
+            get => flags;
+            set => SetAndRaise(FlagsProperty, ref flags, value);
         }
 
         protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
@@ -43,7 +43,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
                     if (eventFlagsNum > 0 && se.Flags.Parameter.HasItems)
                     {
-                        foreach (var item in se.Flags.Parameter.Items)
+                        foreach (var item in se.Flags.Parameter.Items!)
                         {
                             if (item.Key == 0)
                                 continue;
@@ -55,10 +55,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     
                     if (eventPhasesNum > 0 && se.Phases.Parameter.HasItems)
                     {
-                        int totalPhases = se.Phases.Parameter.Items
+                        int totalPhases = se.Phases.Parameter.Items!
                             .Count(item => (eventPhasesNum & item.Key) > 0);
 
-                        var currentPhases = se.Phases.Parameter.Items
+                        var currentPhases = se.Phases.Parameter.Items!
                             .Where(item => item.Key != 0 && (eventPhasesNum & item.Key) > 0)
                             .Select(item => PhaseMaskToPhase((int) item.Key));
                         

@@ -227,7 +227,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         public bool IsChecked { get; set; }
         public T Entry { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

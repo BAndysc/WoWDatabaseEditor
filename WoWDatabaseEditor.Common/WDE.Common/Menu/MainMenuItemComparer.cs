@@ -5,7 +5,7 @@ namespace WDE.Common.Menu
 {
     public class MainMenuItemComparer: IComparer<IMainMenuItem>
     {
-        public int Compare(IMainMenuItem x, IMainMenuItem y)
+        public int Compare(IMainMenuItem? x, IMainMenuItem? y)
         {
             if (ReferenceEquals(x, y)) return 0;
             if (ReferenceEquals(null, y)) return 1;

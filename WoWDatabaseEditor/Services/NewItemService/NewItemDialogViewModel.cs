@@ -95,6 +95,5 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
         }
         
         public string GroupName { get; }
-        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

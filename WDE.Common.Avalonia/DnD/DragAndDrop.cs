@@ -167,8 +167,13 @@ namespace WDE.Common.Avalonia.DnD
 
         public class DropInfo : IDropInfo
         {
+            public DropInfo(object data)
+            {
+                Data = data;
+            }
+
             public object Data { get; set; }
-            public object TargetItem { get; set; }
+            public object? TargetItem { get; set; }
             public int InsertIndex { get; set; }
             public DropTargetAdorners DropTargetAdorner { get; set; }
             public Common.Utils.DragDrop.DragDropEffects Effects { get; set; }
@@ -207,12 +212,11 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = listBox.ItemCount;
 
-            var dropInfo = new DropInfo()
+            var dropInfo = new DropInfo(dragInfo.Value.draggedElement[0]!)
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
-                TargetItem = listBox.Items,
-                Data = dragInfo.Value.draggedElement[0]!
+                TargetItem = listBox.Items
             };
             dropHandler.DragOver(dropInfo);
 
@@ -258,9 +262,8 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = listBox.ItemCount;
             
-            dropHandler.Drop(new DropInfo()
+            dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
             {
-                Data = dragInfo.Value.draggedElement[0]!,
                 InsertIndex = indexOfDrop,
                 TargetItem = listBox.Items
             });
@@ -313,12 +316,11 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = treeView.ItemCount;
 
-            var dropInfo = new DropInfo()
+            var dropInfo = new DropInfo(dragInfo.Value.draggedElement[0]!)
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
-                TargetItem = treeView.Items,
-                Data = dragInfo.Value.draggedElement[0]!
+                TargetItem = treeView.Items
             };
             dropHandler.DragOver(dropInfo);
 
@@ -364,9 +366,8 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = listBox.ItemCount;
             
-            dropHandler.Drop(new DropInfo()
+            dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
             {
-                Data = dragInfo.Value.draggedElement[0]!,
                 InsertIndex = indexOfDrop,
                 TargetItem = listBox.Items
             });

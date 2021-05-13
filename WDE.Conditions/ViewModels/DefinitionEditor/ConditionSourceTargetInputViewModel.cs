@@ -23,8 +23,8 @@ namespace WDE.Conditions.ViewModels
         public int DesiredHeight { get; } = 300;
         public string Title { get; } = "Source Target Input";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 
     public class ConditionSourceTargetData

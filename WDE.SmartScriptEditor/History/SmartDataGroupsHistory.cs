@@ -44,15 +44,14 @@ namespace WDE.TrinitySmartScriptEditor.History
             PushAction(new SmartDataGroupNameHistoryModifedAction(data, oldName, newName));
         }
 
-        private void OnGroupMembersCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnGroupMembersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 if (e.NewItems != null)
                 {
-                    foreach (var item in e.NewItems)
+                    foreach (SmartDataGroupsEditorDataNode node in e.NewItems)
                     {
-                        var node = item as SmartDataGroupsEditorDataNode;
                         PushAction(new SmartDataGroupMemberHistoryAction(node, e.NewStartingIndex,
                             GroupHistoryActionMode.ActionAdd, node.Owner, node.Owner.Members));
                     }
@@ -62,9 +61,8 @@ namespace WDE.TrinitySmartScriptEditor.History
             {
                 if (e.OldItems != null)
                 {
-                    foreach (var item in e.OldItems)
+                    foreach (SmartDataGroupsEditorDataNode node in e.OldItems)
                     {
-                        var node = item as SmartDataGroupsEditorDataNode;
                         PushAction(new SmartDataGroupMemberHistoryAction(node, e.OldStartingIndex,
                             GroupHistoryActionMode.ActionRemove, node.Owner, node.Owner.Members));
                     }
@@ -196,7 +194,7 @@ namespace WDE.TrinitySmartScriptEditor.History
             if (remove)
             {
                 collection.Remove(element);
-                element.Owner = null;
+                element.Owner = null!;
             }
             else
             {

@@ -13,12 +13,12 @@ namespace WDE.Common.Managers
     {
         NotificationType Type { get; }
         string Message { get; }
-        ICommand ClickCommand { get; }
+        ICommand? ClickCommand { get; }
     }
 
     public struct PlainNotification : INotification
     {
-        public PlainNotification(NotificationType type, string message, ICommand clickCommand = null)
+        public PlainNotification(NotificationType type, string message, ICommand? clickCommand = null)
         {
             Type = type;
             Message = message;
@@ -27,7 +27,7 @@ namespace WDE.Common.Managers
 
         public NotificationType Type { get; }
         public string Message { get; }
-        public ICommand ClickCommand { get; }
+        public ICommand? ClickCommand { get; }
     }
 
     public enum NotificationType

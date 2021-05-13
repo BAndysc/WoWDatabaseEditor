@@ -16,16 +16,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
 {
     public partial class MainWindow : ExtendedWindow
     {
-        public static KeyGesture UndoGesture { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Undo.FirstOrDefault();
-
-        public static KeyGesture RedoGesture { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Redo.FirstOrDefault();
-
-        public static KeyGesture SaveGesture { get; } = new KeyGesture(Key.S, AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control);
-        
-        private ToolsTabControl tools;
+        private ToolsTabControl? tools;
 
         public MainWindow()
         {

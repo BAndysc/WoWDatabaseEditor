@@ -1,8 +1,7 @@
-﻿using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Markup.Xaml;
 using WDE.Common.Avalonia.Components;
 
-namespace WDE.HistoryWindow.Views
+namespace WDE.CommonViews.Avalonia.History.Views
 {
     /// <summary>
     ///     Interaction logic for HistoryView.xaml

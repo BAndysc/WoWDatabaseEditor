@@ -30,7 +30,7 @@ namespace WDE.Solutions.Manager
 
         private string GetName<T>(T item) where T : ISolutionItem
         {
-            var x = nameProviders[item.GetType()] as ISolutionNameProvider<T>;
+            var x = (ISolutionNameProvider<T>)nameProviders[item.GetType()];
             return x.GetName(item);
         }
     }

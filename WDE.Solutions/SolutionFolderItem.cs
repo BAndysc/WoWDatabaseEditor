@@ -17,7 +17,7 @@ namespace WDE.Solutions
 
         public ObservableCollection<ISolutionItem> Items { get; }
 
-        public string ExtraId => null;
+        public string? ExtraId => null;
 
         public bool IsExportable => true;
 

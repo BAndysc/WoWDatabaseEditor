@@ -22,7 +22,7 @@ namespace AvaloniaStyles.Controls
                 o => o.GroupName,
                 (o, v) => o.GroupName = v);
 
-        private string groupName;
+        private string groupName = "";
         
         [Content]
         public string GroupName
@@ -31,14 +31,14 @@ namespace AvaloniaStyles.Controls
             set => SetAndRaise(GroupNameProperty, ref groupName, value);
         }
         
-        public static readonly DirectProperty<GroupingHeader, IControl> CustomContentProperty =
-            AvaloniaProperty.RegisterDirect<GroupingHeader, IControl>(
+        public static readonly DirectProperty<GroupingHeader, IControl?> CustomContentProperty =
+            AvaloniaProperty.RegisterDirect<GroupingHeader, IControl?>(
                 nameof(CustomContent),
                 o => o.CustomContent,
                 (o, v) => o.CustomContent = v);
 
-        private IControl customContent;
-        public IControl CustomContent
+        private IControl? customContent;
+        public IControl? CustomContent
         {
             get => customContent;
             set => SetAndRaise(CustomContentProperty, ref customContent, value);
@@ -56,9 +56,9 @@ namespace AvaloniaStyles.Controls
                 (o, v) => o.SelectedItem = v,
                 defaultBindingMode: BindingMode.TwoWay);
 
-        private object _selectedItem;
+        private object? _selectedItem;
         
-        public object SelectedItem
+        public object? SelectedItem
         {
             get => _selectedItem;
             set => SetAndRaise(SelectedItemProperty, ref _selectedItem, value);
@@ -254,7 +254,7 @@ namespace AvaloniaStyles.Controls
                 },
                 defaultBindingMode: BindingMode.TwoWay);
 
-        public object CustomSelectedItem
+        public object? CustomSelectedItem
         {
             get => SelectedItem;
             set

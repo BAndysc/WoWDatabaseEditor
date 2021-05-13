@@ -31,7 +31,7 @@ namespace WDE.Solutions.Manager
                 return ((ISolutionItemRemoteCommandProvider<T>) provider).GenerateCommand(item);
             }
 
-            return null;
+            return Array.Empty<IRemoteCommand>();
         }
 
         public IRemoteCommand[] GenerateCommand(ISolutionItem item)

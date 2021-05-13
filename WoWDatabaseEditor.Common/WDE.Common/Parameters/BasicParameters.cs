@@ -7,8 +7,7 @@ namespace WDE.Common.Parameters
     {
         public override string ToString(long key)
         {
-            SelectOption option = null;
-            if (Items?.TryGetValue(key, out option) ?? false)
+            if (Items != null && Items.TryGetValue(key, out var option))
                 return option.Name + " (" + key + ")";
             return key.ToString();
         }
@@ -57,7 +56,7 @@ namespace WDE.Common.Parameters
 
         public override string ToString(string value)
         {
-            if (Items.TryGetValue(value, out var option))
+            if (Items != null && Items.TryGetValue(value, out var option))
                 return option.Name;
             return "unknown (" + value + ")";
         }
@@ -79,6 +78,8 @@ namespace WDE.Common.Parameters
     {
         public override string ToString(long value)
         {
+            if (Items == null)
+                return value.ToString();
             var flags = new List<string>();
             if (value == 0 && Items.TryGetValue(0, out var zero))
                 return zero.Name;

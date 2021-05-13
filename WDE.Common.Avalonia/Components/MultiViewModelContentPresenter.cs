@@ -24,20 +24,20 @@ namespace WDE.Common.Avalonia.Components
             set => SetAndRaise(ViewModelsProperty, ref _items, value);
         }
         
-        public static readonly DirectProperty<MultiViewModelContentPresenter, IControl> SelectedViewProperty =
-            AvaloniaProperty.RegisterDirect<MultiViewModelContentPresenter, IControl>(nameof(SelectedView), o => o.SelectedView);
-        private IControl selectedView;
-        public IControl SelectedView
+        public static readonly DirectProperty<MultiViewModelContentPresenter, IControl?> SelectedViewProperty =
+            AvaloniaProperty.RegisterDirect<MultiViewModelContentPresenter, IControl?>(nameof(SelectedView), o => o.SelectedView);
+        private IControl? selectedView;
+        public IControl? SelectedView
         {
             get => selectedView;
             private set => SetAndRaise(SelectedViewProperty, ref selectedView, value);
         }
         
-        public static readonly DirectProperty<MultiViewModelContentPresenter, object> SelectedViewModelProperty =
-            AvaloniaProperty.RegisterDirect<MultiViewModelContentPresenter, object>(nameof(SelectedViewModel), o => o.SelectedViewModel, (o, v) => o.SelectedViewModel = v);
+        public static readonly DirectProperty<MultiViewModelContentPresenter, object?> SelectedViewModelProperty =
+            AvaloniaProperty.RegisterDirect<MultiViewModelContentPresenter, object?>(nameof(SelectedViewModel), o => o.SelectedViewModel, (o, v) => o.SelectedViewModel = v);
 
-        private object selectedViewModel;
-        public object SelectedViewModel
+        private object? selectedViewModel;
+        public object? SelectedViewModel
         {
             get => selectedViewModel;
             set
@@ -82,7 +82,9 @@ namespace WDE.Common.Avalonia.Components
             {
                 if (ViewBind.TryResolve(newViewModel, out var view))
                 {
-                    viewModelsToViews[newViewModel] = view as IControl;
+                    if (view is not IControl controlView)
+                        continue;
+                    viewModelsToViews[newViewModel] = controlView;
                     if (selectedViewModel == newViewModel)
                         SelectedView = view as IControl;
                     if (view is ILogical logical)
@@ -95,11 +97,11 @@ namespace WDE.Common.Avalonia.Components
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                AddItems(e.NewItems);
+                AddItems(e.NewItems!);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (var oldViewModel in e.OldItems)
+                foreach (var oldViewModel in e.OldItems!)
                 {
                     if (viewModelsToViews.TryGetValue(oldViewModel, out var view) && view is ILogical logical)
                         LogicalChildren.Remove(logical);

@@ -1,16 +1,15 @@
 ﻿using System;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaEdit;
 using WDE.Common.Avalonia.Components;
 using WDE.MySqlDatabaseCommon.Tools;
 
-namespace WDE.TrinityMySqlDatabase.Tools
+namespace WDE.CommonViews.Avalonia.TrinityMySqlDatabase.Tools
 {
     public class DebugQueryToolView : ToolView
     {
-        private TextEditor MyAvalonEdit;
+        private TextEditor? MyAvalonEdit;
         
         public DebugQueryToolView()
         {

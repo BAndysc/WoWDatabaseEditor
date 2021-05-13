@@ -23,7 +23,7 @@ namespace WoWDatabaseEditorCore.Managers
             {
                 Process.Start(new ProcessStartInfo(url) {UseShellExecute = true});
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 
             }

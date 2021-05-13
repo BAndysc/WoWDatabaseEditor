@@ -27,7 +27,7 @@ namespace WDE.SmartScriptEditor.Data
             SmartSelectViewModel model = new(title, type, predicate, smartDataManager, conditionDataManager);
             
             if (await windowManager.ShowDialog(model))
-                return model.SelectedItem.Id;
+                return model.SelectedItem?.Id;
 
             return null;
         }

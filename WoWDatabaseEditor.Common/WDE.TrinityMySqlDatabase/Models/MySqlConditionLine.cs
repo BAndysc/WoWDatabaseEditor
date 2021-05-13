@@ -53,7 +53,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public int NegativeCondition { get; set; }
 
         [Column(Name = "Comment")]
-        public string Comment { get; set; } = "";
+        public string? Comment { get; set; } = "";
 
         public MySqlConditionLine() { }
 

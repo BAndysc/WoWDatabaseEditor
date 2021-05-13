@@ -28,7 +28,6 @@ namespace WoWDatabaseEditorCore.Providers
         {
             DocumentManager = documentManager;
             this.aboutViewModelCreator = aboutViewModelCreator;
-            string? nulll = null;
             SubItems = new List<IMenuItem>();
             SubItems.Add(new ModuleMenuItem("Report a bug", new DelegateCommand(reportBugService.ReportBug)));
             SubItems.Add(new ModuleMenuItem("Send feedback", new DelegateCommand(reportBugService.SendFeedback)));

@@ -21,7 +21,7 @@ namespace WDE.SmartScriptEditor.Models
             WarningType = warningType;
         }
 
-        protected ParameterConditional(ParameterValueHolder<int> compared, ParameterValueHolder<int> compareTo, WarningType warningType, string description = null)
+        protected ParameterConditional(ParameterValueHolder<int> compared, ParameterValueHolder<int> compareTo, WarningType warningType, string? description = null)
         {
             Compared = compared;
             CompareTo = compareTo;
@@ -29,10 +29,10 @@ namespace WDE.SmartScriptEditor.Models
             Description = description;
         }
 
-        public ParameterValueHolder<int> CompareTo { get; set; }
-        public ParameterValueHolder<int> Compared { get; set; }
+        public ParameterValueHolder<int>? CompareTo { get; set; }
+        public ParameterValueHolder<int>? Compared { get; set; }
         public WarningType WarningType { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
     }
 
@@ -43,7 +43,7 @@ namespace WDE.SmartScriptEditor.Models
         private readonly CompareType compareType;
         private long value;
 
-        public ParameterConditionalCompareAny(SmartConditionalJsonData data) : base(null, WarningType.NOT_SET)
+        public ParameterConditionalCompareAny(SmartConditionalJsonData data) : base(null!, WarningType.NOT_SET)
         {
             compareType = data.CompareType;
             value = data.CompareToValue;

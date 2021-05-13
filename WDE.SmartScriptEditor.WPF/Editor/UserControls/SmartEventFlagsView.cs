@@ -68,7 +68,7 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
 
                     if (eventFlagsNum > 0 && se.Flags.Parameter.HasItems)
                     {
-                        foreach (var item in se.Flags.Parameter.Items)
+                        foreach (var item in se.Flags.Parameter.Items!)
                         {
                             if (item.Key == 0)
                                 continue;
@@ -80,10 +80,10 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
                     
                     if (eventPhasesNum > 0 && se.Phases.Parameter.HasItems)
                     {
-                        int totalPhases = se.Phases.Parameter.Items
+                        int totalPhases = se.Phases.Parameter.Items!
                             .Count(item => (eventPhasesNum & item.Key) > 0);
 
-                        var currentPhases = se.Phases.Parameter.Items
+                        var currentPhases = se.Phases.Parameter.Items!
                             .Where(item => item.Key != 0 && (eventPhasesNum & item.Key) > 0)
                             .Select(item => PhaseMaskToPhase((int) item.Key));
                         

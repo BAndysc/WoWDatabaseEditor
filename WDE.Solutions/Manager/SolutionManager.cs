@@ -24,7 +24,7 @@ namespace WDE.Solutions.Manager
             Items.CollectionChanged += ItemsOnCollectionChanged;
         }
 
-        public event System.Action<ISolutionItem>? RefreshRequest;
+        public event System.Action<ISolutionItem?>? RefreshRequest;
         public ObservableCollection<ISolutionItem> Items { get; }
 
         public void RefreshAll()
@@ -52,17 +52,15 @@ namespace WDE.Solutions.Manager
             }
         }
 
-        private void ItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+        private void ItemsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
         {
             IList? newItems = notifyCollectionChangedEventArgs.NewItems;
             IList? oldItems = notifyCollectionChangedEventArgs.OldItems;
 
             if (newItems != null)
             {
-                foreach (object varitem in newItems)
+                foreach (ISolutionItem item in newItems)
                 {
-                    ISolutionItem item = varitem as ISolutionItem;
-
                     if (item.Items != null)
                         item.Items.CollectionChanged += ItemsOnCollectionChanged;
                 }
@@ -70,10 +68,8 @@ namespace WDE.Solutions.Manager
 
             if (oldItems != null)
             {
-                foreach (object varitem in oldItems)
+                foreach (ISolutionItem item in oldItems)
                 {
-                    ISolutionItem item = varitem as ISolutionItem;
-
                     if (item.Items != null)
                         item.Items.CollectionChanged -= ItemsOnCollectionChanged;
                 }

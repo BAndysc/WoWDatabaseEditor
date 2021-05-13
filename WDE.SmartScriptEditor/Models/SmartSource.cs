@@ -11,7 +11,7 @@ namespace WDE.SmartScriptEditor.Models
     {
         public static readonly int SmartSourceParametersCount = 3;
 
-        private SmartAction parent;
+        private SmartAction? parent;
         
         private ParameterValueHolder<long> condition;
 
@@ -20,7 +20,7 @@ namespace WDE.SmartScriptEditor.Models
             condition = new ParameterValueHolder<long>("Condition ID", Parameter.Instance, 0);
         }
 
-        public SmartAction Parent
+        public SmartAction? Parent
         {
             get => parent;
             set => parent = value;
@@ -80,7 +80,7 @@ namespace WDE.SmartScriptEditor.Models
 
                 return parentEventData.Invoker.Name;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return "Last action invoker";
             }

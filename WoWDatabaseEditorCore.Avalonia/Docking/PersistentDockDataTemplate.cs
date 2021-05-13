@@ -16,7 +16,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
 {
     public class PersistentDockDataTemplate : IRecyclingDataTemplate
     {
-        public static IDocumentManager DocumentManager;
+        public static IDocumentManager? DocumentManager;
         private bool bound = false;
         private Dictionary<IDocument, IControl> documents = new();
         private Dictionary<ITool, IControl> tools = new();
@@ -34,16 +34,17 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 if (documents.TryGetValue(documentDockWrapper.ViewModel, out var view))
                 {
                     var parent = view.VisualParent;
-                    ((AvaloniaList<IVisual>) parent?.VisualChildren)?.Remove(view);
+                    if (parent?.VisualChildren is AvaloniaList<IVisual> children)
+                        children.Remove(view);
                     return view;
                 }
                 
-                if (ViewBind.TryResolve(documentDockWrapper.ViewModel, out var documentView))
+                if (ViewBind.TryResolve(documentDockWrapper.ViewModel, out var documentView) && documentView is IControl control)
                 {
-                    documents[documentDockWrapper.ViewModel] = documentView as IControl;
+                    documents[documentDockWrapper.ViewModel] = control;
                     documents[documentDockWrapper.ViewModel].Classes.Add("documentView");
                     documents[documentDockWrapper.ViewModel].DataContext = documentDockWrapper.ViewModel;
-                    return documentView as IControl;
+                    return control;
                 }
             }
             else if (data is AvaloniaToolDockWrapper toolDockWrapper)
@@ -51,19 +52,20 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 if (tools.TryGetValue(toolDockWrapper.ViewModel, out var view))
                 {
                     var parent = view.VisualParent;
-                    ((AvaloniaList<IVisual>) parent?.VisualChildren)?.Remove(view);
+                    if (parent?.VisualChildren is AvaloniaList<IVisual> children)
+                        children.Remove(view);
                     return view;
                 }
                 
-                if (ViewBind.TryResolve(toolDockWrapper.ViewModel, out var documentView))
+                if (ViewBind.TryResolve(toolDockWrapper.ViewModel, out var documentView) && documentView is IControl control)
                 {
-                    tools[toolDockWrapper.ViewModel] = documentView as IControl;
+                    tools[toolDockWrapper.ViewModel] = control;
                     tools[toolDockWrapper.ViewModel].DataContext = toolDockWrapper.ViewModel;
-                    return documentView as IControl;
+                    return control;
                 }
             }
 
-            return null;
+            return new Panel();
         }
 
         public IControl Build(object data)

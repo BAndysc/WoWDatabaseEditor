@@ -115,7 +115,7 @@ namespace WDE.Conditions.ViewModels
         public ICommand Cut { get; }= AlwaysDisabledCommand.Command;
         public ICommand Paste { get; }= AlwaysDisabledCommand.Command;
         public ICommand Save { get; }
-        public IAsyncCommand CloseCommand { get; set; } = null;
+        public IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
         public bool IsModified

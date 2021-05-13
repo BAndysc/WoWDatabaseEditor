@@ -44,17 +44,16 @@ namespace WDE.Conditions.History
             PushAction(new ConditionGroupNameHistoryModifedAction(data, oldName, newName));
         }
 
-        private void OnGroupMembersCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnGroupMembersCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 if (e.NewItems != null)
                 {
-                    foreach (var item in e.NewItems)
+                    foreach (ConditionGroupsEditorDataNode node in e.NewItems)
                     {
-                        var node = item as ConditionGroupsEditorDataNode;
                         PushAction(new ConditionGroupMemberHistoryAction(node, e.NewStartingIndex,
-                            GroupHistoryActionMode.ActionAdd, node.Owner, node.Owner.Members));
+                            GroupHistoryActionMode.ActionAdd, node.Owner!, node.Owner!.Members));
                     }
                 }
             }
@@ -62,11 +61,10 @@ namespace WDE.Conditions.History
             {
                 if (e.OldItems != null)
                 {
-                    foreach (var item in e.OldItems)
+                    foreach (ConditionGroupsEditorDataNode node in e.OldItems)
                     {
-                        var node = item as ConditionGroupsEditorDataNode;
                         PushAction(new ConditionGroupMemberHistoryAction(node, e.OldStartingIndex,
-                            GroupHistoryActionMode.ActionRemove, node.Owner, node.Owner.Members));
+                            GroupHistoryActionMode.ActionRemove, node.Owner!, node.Owner!.Members));
                     }
                 }
             }

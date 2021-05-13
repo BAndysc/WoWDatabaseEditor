@@ -45,7 +45,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             if (!ViewModel.CanClose)
                 return false;
 
-            ViewModel.CloseCommand.Execute(null);
+            ViewModel.CloseCommand?.Execute(null);
             return false;
         }
 

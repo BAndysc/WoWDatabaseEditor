@@ -5,12 +5,12 @@ namespace WDE.Common.Services.MessageBox
 {
     public class MessageBoxFactory<T>
     {
-        private string windowTitle;
+        private string windowTitle = "";
         private MessageBoxIcon icon;
-        private string mainInstruction;
-        private string content;
-        private string expandedInformation;
-        private string footer;
+        private string mainInstruction = "";
+        private string content = "";
+        private string expandedInformation = "";
+        private string footer = "";
         private MessageBoxIcon footerIcon;
         private List<IMessageBoxButton<T>> buttons = new();
 
@@ -93,14 +93,14 @@ namespace WDE.Common.Services.MessageBox
 
         private class MessageBoxButton : IMessageBoxButton<T>
         {
-            public MessageBoxButton(string name, T returnValue)
+            public MessageBoxButton(string name, T? returnValue)
             {
                 Name = name;
                 ReturnValue = returnValue;
             }
 
             public string Name { get; }
-            public T ReturnValue { get; }
+            public T? ReturnValue { get; }
         }
         
         private class MessageBox : IMessageBox<T>
@@ -124,7 +124,7 @@ namespace WDE.Common.Services.MessageBox
                 if ((buttons?.Count ?? 0) == 0)
                     Buttons = new List<IMessageBoxButton<T>>() {new MessageBoxButton("Ok", default)};
                 else
-                    Buttons = buttons.ToList();
+                    Buttons = buttons!.ToList();
             }
 
             public string Title { get; }

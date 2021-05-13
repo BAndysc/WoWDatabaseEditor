@@ -10,17 +10,17 @@ namespace WDE.Common.Database
     {
         bool IsConnected { get; }
         
-        ICreatureTemplate GetCreatureTemplate(uint entry);
+        ICreatureTemplate? GetCreatureTemplate(uint entry);
         IEnumerable<ICreatureTemplate> GetCreatureTemplates();
 
-        IGameObjectTemplate GetGameObjectTemplate(uint entry);
+        IGameObjectTemplate? GetGameObjectTemplate(uint entry);
         IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
 
         IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates();
 
         IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
 
-        IQuestTemplate GetQuestTemplate(uint entry);
+        IQuestTemplate? GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
 
         IEnumerable<IGameEvent> GetGameEvents();

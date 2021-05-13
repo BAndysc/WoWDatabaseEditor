@@ -141,7 +141,7 @@ namespace WoWDatabaseEditorCore.Tasks
             
             public DateTime? StartTime { get; private set; }
 
-            public void Report(int currentProgress, int maxProgress, string currentTask)
+            public void Report(int currentProgress, int maxProgress, string? currentTask)
             {
                 StartTime ??= DateTime.Now;
                 

@@ -21,7 +21,7 @@ namespace WDE.Conditions.History
             sourcesList.CollectionChanged -= OnDataCollectionChanged;
         }
 
-        private void OnDataCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnDataCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -45,8 +45,8 @@ namespace WDE.Conditions.History
                 {
                     for (int i = 0; i < e.NewItems.Count; ++i)
                     {
-                        ConditionSourcesJsonData oldItem = e.OldItems[i] is ConditionSourcesJsonData ? (ConditionSourcesJsonData) e.OldItems[i] : default;
-                        ConditionSourcesJsonData newItem = e.NewItems[i] is ConditionSourcesJsonData ? (ConditionSourcesJsonData) e.NewItems[i] : default;
+                        ConditionSourcesJsonData oldItem = e.OldItems[i] is ConditionSourcesJsonData ? (ConditionSourcesJsonData) e.OldItems[i]! : default;
+                        ConditionSourcesJsonData newItem = e.NewItems[i] is ConditionSourcesJsonData ? (ConditionSourcesJsonData) e.NewItems[i]! : default;
                         PushAction(new ConditionSourcesListHistoryReplaceAction(in oldItem, in newItem, e.NewStartingIndex, sourcesList));
                     }
                 }

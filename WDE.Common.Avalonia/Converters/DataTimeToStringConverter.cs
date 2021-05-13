@@ -6,7 +6,7 @@ namespace WDE.Common.Avalonia.Converters
 {
     public class DataTimeToStringConverter : IValueConverter
     {
-        public string Format { get; set; }
+        public string Format { get; set; } = "MM/dd/yyyy HH:mm";
         
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

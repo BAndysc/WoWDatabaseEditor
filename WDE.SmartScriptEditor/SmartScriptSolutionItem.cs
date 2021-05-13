@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor
 
         public bool IsContainer => false;
 
-        public ObservableCollection<ISolutionItem> Items => null;
+        public ObservableCollection<ISolutionItem>? Items => null;
 
         public string ExtraId => Entry.ToString();
 

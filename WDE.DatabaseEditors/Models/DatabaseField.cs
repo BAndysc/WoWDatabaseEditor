@@ -49,7 +49,7 @@ namespace WDE.DatabaseEditors.Models
                         {
                             originalLong.Value = Convert.ToInt64(value);
                         }
-                        catch (Exception _)
+                        catch (Exception)
                         {
                             // cannot restore
                         }
@@ -60,7 +60,7 @@ namespace WDE.DatabaseEditors.Models
                         {
                             originalFloat.Value = (float)Convert.ToDouble(value);
                         }
-                        catch (Exception _)
+                        catch (Exception)
                         {
                             // cannot restore
                         }

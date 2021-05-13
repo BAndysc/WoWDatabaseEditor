@@ -112,7 +112,7 @@ namespace WDE.DatabaseEditors.Loaders
                         }
                     }
                 }
-                catch (IMySqlExecutor.CannotConnectToDatabaseException e)
+                catch (IMySqlExecutor.CannotConnectToDatabaseException)
                 {
                 }
                 catch (Exception e)

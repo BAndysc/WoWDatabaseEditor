@@ -25,7 +25,7 @@ namespace WDE.Solutions.Manager
 
         public Task<string> GenerateSql(ISolutionItem item)
         {
-            EventRequestGenerateSqlArgs generateSqlRequest = new() {Item = item};
+            EventRequestGenerateSqlArgs generateSqlRequest = new(item, "");
             eventAggregator.GetEvent<EventRequestGenerateSql>().Publish(generateSqlRequest);
             if (generateSqlRequest.Sql != null)
                 return Task.FromResult(generateSqlRequest.Sql);
@@ -42,8 +42,7 @@ namespace WDE.Solutions.Manager
         {
             if (sqlProviders.TryGetValue(item.GetType(), out var provider))
             {
-                var x = provider as ISolutionItemSqlProvider<T>;
-                return await x.GenerateSql(item);
+                return await ((ISolutionItemSqlProvider<T>)provider).GenerateSql(item);
             }
             else
             {

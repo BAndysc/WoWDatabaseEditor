@@ -17,13 +17,13 @@ namespace AvaloniaStyles.Controls
         public static readonly DirectProperty<GridView, IEnumerable> ItemsProperty =
             AvaloniaProperty.RegisterDirect<GridView, IEnumerable>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
         
-        private IEnumerable _items = new AvaloniaList<object>();
+        private IEnumerable items = new AvaloniaList<object>();
         
         [Content]
         public IEnumerable Items
         {
-            get => _items;
-            set => SetAndRaise(ItemsProperty, ref _items, value);
+            get => items;
+            set => SetAndRaise(ItemsProperty, ref items, value);
         }
 
         public static readonly DirectProperty<GridView, object?> SelectedItemProperty =
@@ -33,23 +33,22 @@ namespace AvaloniaStyles.Controls
                 (o, v) => o.SelectedItem = v,
                 defaultBindingMode: BindingMode.TwoWay);
 
-        private object _selectedItem;
-        
-        public object SelectedItem
+        private object? selectedItem;
+        public object? SelectedItem
         {
-            get => _selectedItem;
-            set => SetAndRaise(SelectedItemProperty, ref _selectedItem, value);
+            get => selectedItem;
+            set => SetAndRaise(SelectedItemProperty, ref selectedItem, value);
         }
         
         public static readonly DirectProperty<GridView, IEnumerable<GridColumnDefinition>> ColumnsProperty =
             AvaloniaProperty.RegisterDirect<GridView, IEnumerable<GridColumnDefinition>>(nameof(Columns), o => o.Columns, (o, v) => o.Columns = v);
         
-        private IEnumerable<GridColumnDefinition> _columns = new AvaloniaList<GridColumnDefinition>();
+        private IEnumerable<GridColumnDefinition> columns = new AvaloniaList<GridColumnDefinition>();
         
         public IEnumerable<GridColumnDefinition> Columns
         {
-            get => _columns;
-            set => SetAndRaise(ColumnsProperty, ref _columns, value);
+            get => columns;
+            set => SetAndRaise(ColumnsProperty, ref columns, value);
         }
         
         public static readonly StyledProperty<IDataTemplate> ItemTemplateProperty =
@@ -60,10 +59,10 @@ namespace AvaloniaStyles.Controls
             set => SetValue(ItemTemplateProperty, value);
         }
         
-        private Grid header;
-        private ListBox listBox;
+        private Grid? header;
+        private ListBox? listBox;
 
-        public ListBox ListBoxImpl => listBox;
+        public ListBox? ListBoxImpl => listBox;
         
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
@@ -102,12 +101,12 @@ namespace AvaloniaStyles.Controls
             return grid;
         }
 
-        private void SetupGridColumns(Grid grid, bool header)
+        private void SetupGridColumns(Grid grid, bool isHeader)
         {
             int i = 0;
             foreach (var column in Columns)
             {
-                var c = new ColumnDefinition(header ? new GridLength(column.PreferedWidth, GridUnitType.Pixel) : default)
+                var c = new ColumnDefinition(isHeader ? new GridLength(column.PreferedWidth, GridUnitType.Pixel) : default)
                 {
                     SharedSizeGroup = $"col{(i++)}",
                     MinWidth = 10,
@@ -128,7 +127,7 @@ namespace AvaloniaStyles.Controls
 
         public GridView()
         {
-            ItemTemplate = new FuncDataTemplate((o) => true, (o, scope) =>
+            ItemTemplate = new FuncDataTemplate(_ => true, (_, _) =>
             {
                 var parent = ConstructGrid();
                 int i = 0;
@@ -171,7 +170,7 @@ namespace AvaloniaStyles.Controls
                 o => o.ColumnName,
                 (o, v) => o.ColumnName = v);
         
-        private string _columnName;
+        private string columnName = "";
         
         /// <summary>
         /// Gets or sets the text.
@@ -179,8 +178,8 @@ namespace AvaloniaStyles.Controls
         [Content]
         public string ColumnName
         {
-            get { return _columnName; }
-            set { SetAndRaise(ColumnNameProperty, ref _columnName, value); }
+            get => columnName;
+            set => SetAndRaise(ColumnNameProperty, ref columnName, value);
         }
     }
 
@@ -191,8 +190,8 @@ namespace AvaloniaStyles.Controls
     
     public class GridColumnDefinition
     {
-        public string Name { get; set; }
-        public string Property { get; set; }
+        public string Name { get; set; } = "";
+        public string Property { get; set; } = "";
         public bool Checkable { get; set; }
         public bool IsReadOnly { get; set; }
         public int PreferedWidth { get; set; } = 70;

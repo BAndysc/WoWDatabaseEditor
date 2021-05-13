@@ -91,7 +91,7 @@ namespace AvaloniaStyles.Controls
 
             WindowStateProperty.Changed.AddClassHandler<ExtendedWindow>((window, state) =>
             {
-                window.PseudoClasses.Set(":maximized", (WindowState)state.NewValue == WindowState.Maximized);
+                window.PseudoClasses.Set(":maximized", (WindowState)state.NewValue! == WindowState.Maximized);
                 window.PseudoClasses.Set(":fullscreen", (WindowState)state.NewValue == WindowState.FullScreen);
             });
 

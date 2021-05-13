@@ -1,8 +1,7 @@
-﻿
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WDE.TrinityMySqlDatabase.Views
+namespace WDE.CommonViews.Avalonia.TrinityMySqlDatabase.Views
 {
     /// <summary>
     ///     Interaction logic for DatabaseConfigView

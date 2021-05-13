@@ -19,7 +19,7 @@ namespace WDE.SmartScriptEditor.Models
         
         public string GenerateCommand() => "reload creature_template " + string.Join(" ", entries);
 
-        public bool TryMerge(IRemoteCommand other, out IRemoteCommand mergedCommand)
+        public bool TryMerge(IRemoteCommand other, out IRemoteCommand? mergedCommand)
         {
             if (other is CreatureTemplateReloadRemoteCommand remoteCommand)
             {

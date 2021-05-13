@@ -1,11 +1,9 @@
-﻿
-using Avalonia.Controls;
-using Avalonia.Interactivity;
+﻿using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using WDE.Common.Avalonia.Components;
 using WDE.Solutions.Explorer.ViewModels;
 
-namespace WDE.Solutions.Explorer.Views
+namespace WDE.CommonViews.Avalonia.Solutions.Explorer.Views
 {
     /// <summary>
     ///     Interaction logic for SolutionExplorerView

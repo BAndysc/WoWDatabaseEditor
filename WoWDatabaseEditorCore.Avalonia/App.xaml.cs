@@ -80,7 +80,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             };
         }
         
-        protected override Window CreateShell()
+        protected override Window? CreateShell()
         {
             return null;//Container.Resolve<SplashScreenView>();
         }
@@ -227,7 +227,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
         }
 
-        public static Window MainApp;
+        public static Window? MainApp;
 
         public override void Initialize()
         {

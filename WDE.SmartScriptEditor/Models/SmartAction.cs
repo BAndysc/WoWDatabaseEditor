@@ -15,7 +15,7 @@ namespace WDE.SmartScriptEditor.Models
         
         private bool isSelected;
 
-        private SmartEvent parent;
+        private SmartEvent? parent;
 
         private SmartSource source;
 
@@ -45,7 +45,7 @@ namespace WDE.SmartScriptEditor.Models
             Context.Add(new MetaSmartSourceTargetEdit(this, false));
         }
 
-        public SmartEvent Parent
+        public SmartEvent? Parent
         {
             get => parent;
             set
@@ -53,7 +53,8 @@ namespace WDE.SmartScriptEditor.Models
                 if (parent != null)
                     parent.PropertyChanged -= ParentPropertyChanged;
                 parent = value;
-                value.PropertyChanged += ParentPropertyChanged;
+                if (value != null)
+                    value.PropertyChanged += ParentPropertyChanged;
             }
         }
 
@@ -61,7 +62,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public bool IsSelected
         {
-            get => isSelected || parent.IsSelected;
+            get => isSelected || (parent?.IsSelected ?? false);
             set
             {
                 if (value == isSelected)

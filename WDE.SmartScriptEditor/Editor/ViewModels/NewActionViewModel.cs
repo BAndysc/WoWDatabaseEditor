@@ -7,9 +7,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class NewActionViewModel : INotifyPropertyChanged
     {
-        private SmartEvent @event;
+        private SmartEvent? @event;
 
-        public SmartEvent Event
+        public SmartEvent? Event
         {
             get => @event;
             set
@@ -23,7 +23,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

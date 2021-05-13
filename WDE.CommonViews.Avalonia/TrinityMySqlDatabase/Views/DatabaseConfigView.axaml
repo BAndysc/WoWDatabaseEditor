@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WDE.TrinityMySqlDatabase.Views.DatabaseConfigView"
+﻿<UserControl x:Class="WDE.CommonViews.Avalonia.TrinityMySqlDatabase.Views.DatabaseConfigView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"

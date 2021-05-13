@@ -30,7 +30,7 @@ namespace WDBXEditor.Storage
                 DBEntry entry = reader.Read(file);
                 if (entry != null)
                 {
-                    DBEntry? current = Entries.FirstOrDefault(x => x.FileName == entry.FileName && x.Build == entry.Build);
+                    DBEntry current = Entries.FirstOrDefault(x => x.FileName == entry.FileName && x.Build == entry.Build);
                     if (current != null)
                         Entries.Remove(current);
 

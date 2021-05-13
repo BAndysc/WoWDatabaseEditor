@@ -17,7 +17,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             this.windowManager = windowManager;
         }
         
-        public async Task<long?> GetItemFromList(Dictionary<long, SelectOption> items, bool flags, long? current = null)
+        public async Task<long?> GetItemFromList(Dictionary<long, SelectOption>? items, bool flags, long? current = null)
         {
             using LongItemFromListProviderViewModel vm = new(items, flags, current);
             if (await windowManager.ShowDialog(vm))
@@ -25,7 +25,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             return null;
         }
         
-        public async Task<string?> GetItemFromList(Dictionary<string, SelectOption> items, bool multiSelect, string? current = null)
+        public async Task<string?> GetItemFromList(Dictionary<string, SelectOption>? items, bool multiSelect, string? current = null)
         {
             using StringItemFromListProviderViewModel vm = new(items, multiSelect, current);
             if (await windowManager.ShowDialog(vm))

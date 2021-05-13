@@ -53,7 +53,7 @@ namespace WDE.Conditions.ViewModels
 
         public ConditionViewModel CreateOr(int conditionSourceType)
         {
-            return Create(conditionSourceType, -1);
+            return Create(conditionSourceType, -1)!;
         }
 
         public ConditionViewModel? Create(int conditionSourceType, int type)

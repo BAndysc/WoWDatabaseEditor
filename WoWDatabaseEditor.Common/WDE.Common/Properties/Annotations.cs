@@ -229,7 +229,7 @@ namespace WDE.Common.Annotations
         }
 
         [CanBeNull]
-        public string ParameterName { get; }
+        public string? ParameterName { get; }
     }
 
   /// <summary>
@@ -508,7 +508,7 @@ namespace WDE.Common.Annotations
         }
 
         [CanBeNull]
-        public string Comment { get; }
+        public string? Comment { get; }
     }
 
     /// <summary>
@@ -556,7 +556,7 @@ namespace WDE.Common.Annotations
         }
 
         [CanBeNull]
-        public string Justification { get; }
+        public string? Justification { get; }
     }
 
     /// <summary>
@@ -600,7 +600,7 @@ namespace WDE.Common.Annotations
         }
 
         [CanBeNull]
-        public string BasePath { get; }
+        public string? BasePath { get; }
     }
 
     /// <summary>
@@ -667,7 +667,7 @@ namespace WDE.Common.Annotations
       ///     parameter when the template is expanded.
       /// </summary>
       [CanBeNull]
-        public string Expression { get; set; }
+        public string? Expression { get; set; }
 
       /// <summary>
       ///     Allows specifying which occurrence of the target parameter becomes editable when the template is deployed.
@@ -685,7 +685,7 @@ namespace WDE.Common.Annotations
       ///     <see cref="MacroAttribute" /> is applied on a template method.
       /// </summary>
       [CanBeNull]
-        public string Target { get; set; }
+        public string? Target { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
@@ -786,7 +786,7 @@ namespace WDE.Common.Annotations
         }
 
         [CanBeNull]
-        public string AnonymousProperty { get; }
+        public string? AnonymousProperty { get; }
     }
 
     /// <summary>
@@ -808,7 +808,7 @@ namespace WDE.Common.Annotations
         }
 
         [CanBeNull]
-        public string AnonymousProperty { get; }
+        public string? AnonymousProperty { get; }
     }
 
     /// <summary>
@@ -831,7 +831,7 @@ namespace WDE.Common.Annotations
         }
 
         [CanBeNull]
-        public string AnonymousProperty { get; }
+        public string? AnonymousProperty { get; }
     }
 
     /// <summary>
@@ -962,7 +962,7 @@ namespace WDE.Common.Annotations
         }
 
         [CanBeNull]
-        public string Name { get; }
+        public string? Name { get; }
     }
 
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property)]
@@ -1258,7 +1258,7 @@ namespace WDE.Common.Annotations
         public string BaseType { get; }
 
         [CanBeNull]
-        public string PageName { get; }
+        public string? PageName { get; }
     }
 
     [AttributeUsage(AttributeTargets.Method)]

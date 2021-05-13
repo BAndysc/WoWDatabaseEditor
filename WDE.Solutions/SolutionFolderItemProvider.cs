@@ -21,16 +21,16 @@ namespace WDE.Solutions
         
         public string GetGroupName() => "Other";
 
-        public Task<ISolutionItem> CreateSolutionItem()
+        public Task<ISolutionItem?> CreateSolutionItem()
         {
             throw new Exception("You are not supposed to call this!");
         }
 
-        public async Task<ISolutionItem> CreateSolutionItem(string name)
+        public Task<ISolutionItem?> CreateSolutionItem(string name)
         {
             if (!string.IsNullOrEmpty(name))
-                return new SolutionFolderItem(name);
-            return null;
+                return Task.FromResult<ISolutionItem?>(new SolutionFolderItem(name));
+            return Task.FromResult<ISolutionItem?>(null);
         }
     }
 }

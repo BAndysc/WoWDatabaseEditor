@@ -10,7 +10,7 @@ namespace WDE.Parameters.Models
     {
     }
 
-    public class ParameterValueHolder<T> : IParameterValueHolder, INotifyPropertyChanged
+    public sealed class ParameterValueHolder<T> : IParameterValueHolder, INotifyPropertyChanged where T : notnull
     {
         private T value;
         [NotNull]
@@ -106,7 +106,7 @@ namespace WDE.Parameters.Models
         public event System.Action<ParameterValueHolder<T>, T, T>? OnValueChanged;
         
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName]  string? propertyName = null)
+        private void OnPropertyChanged([CallerMemberName]  string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

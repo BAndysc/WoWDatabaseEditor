@@ -6,8 +6,8 @@ namespace AvaloniaStyles.Styles
 {
     public class StyleIncludeColorAware : StyleInclude
     {
-        private Uri lightSource;
-        public Uri LightSource
+        private Uri? lightSource;
+        public Uri? LightSource
         {
             get => lightSource;
             set
@@ -17,8 +17,8 @@ namespace AvaloniaStyles.Styles
             }
         }
         
-        private Uri darkSource;
-        public Uri DarkSource
+        private Uri? darkSource;
+        public Uri? DarkSource
         {
             get => darkSource;
             set

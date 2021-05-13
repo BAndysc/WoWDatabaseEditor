@@ -10,8 +10,8 @@ namespace WDE.Common.Solution
         }
         
         public bool IsContainer => false;
-        public ObservableCollection<ISolutionItem> Items => null;
-        public string ExtraId => null;
+        public ObservableCollection<ISolutionItem>? Items => null;
+        public string? ExtraId => null;
         public bool IsExportable => false;
         public ISolutionItem ItemToGenerate { get; }
     }

@@ -55,7 +55,7 @@ namespace WDE.Common.Utils.DragDrop
     public interface IDropInfo
     {
         object Data { get; }
-        object TargetItem { get; }
+        object? TargetItem { get; }
         int InsertIndex { get; }
         DropTargetAdorners DropTargetAdorner { get; set; }
         DragDropEffects Effects { get; set; }

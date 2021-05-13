@@ -4,6 +4,6 @@
     {
         public uint Id { get; }
         bool IsServerSide { get; }
-        string ScriptName { get; }
+        string? ScriptName { get; }
     }
 }

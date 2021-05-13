@@ -3,6 +3,6 @@
     public interface IGameEvent
     {
         ushort Entry { get; }
-        string Description { get; }
+        string? Description { get; }
     }
 }

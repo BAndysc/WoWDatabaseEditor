@@ -87,11 +87,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     return hostWindow;
                 }
             };
-
-            this.DockableLocator = new Dictionary<string, Func<IDockable>>
-            {
-            };
-
+            
             base.InitLayout(layout);
         }
     }

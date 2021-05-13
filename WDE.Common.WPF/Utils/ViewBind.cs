@@ -30,7 +30,7 @@ namespace WDE.Common.WPF.Utils
             if (args.OldValue == args.NewValue)
                 return;
             
-            if (AppViewLocator != null && AppViewLocator.TryResolve(args.NewValue?.GetType(), out var viewType))
+            if (AppViewLocator != null && AppViewLocator.TryResolve(args.NewValue?.GetType()!, out var viewType))
             {
                 object? view = Activator.CreateInstance(viewType);
                 SetContentProperty(targetLocation, view);

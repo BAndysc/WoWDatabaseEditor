@@ -5,8 +5,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class NewConditionViewModel : ObservableBase
     {
-        private SmartEvent @event;
-        public SmartEvent Event
+        private SmartEvent? @event;
+        public SmartEvent? Event
         {
             get => @event;
             set

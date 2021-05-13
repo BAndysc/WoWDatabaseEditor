@@ -14,11 +14,11 @@ namespace WDE.MySqlDatabaseCommon.Database
         }
 
         public bool IsConnected => impl.IsConnected;
-        public ICreatureTemplate GetCreatureTemplate(uint entry) => impl.GetCreatureTemplate(entry);
+        public ICreatureTemplate? GetCreatureTemplate(uint entry) => impl.GetCreatureTemplate(entry);
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates() => impl.GetCreatureTemplates();
-        public IGameObjectTemplate GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
+        public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => impl.GetGameObjectTemplates();
-        public IQuestTemplate GetQuestTemplate(uint entry) => impl.GetQuestTemplate(entry);
+        public IQuestTemplate? GetQuestTemplate(uint entry) => impl.GetQuestTemplate(entry);
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => impl.GetAreaTriggerTemplates();
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();

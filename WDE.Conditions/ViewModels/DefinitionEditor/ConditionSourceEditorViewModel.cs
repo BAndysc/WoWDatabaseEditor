@@ -108,8 +108,8 @@ namespace WDE.Conditions.ViewModels
         public int DesiredHeight { get; } = 666;
         public string Title { get; } = "Condition Source Editor";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 
     public enum ConditionSourceParamUpdate
@@ -187,11 +187,11 @@ namespace WDE.Conditions.ViewModels
 
         public bool IsEmpty() => string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Description);
         
-        public event PropertyChangedEventHandler PropertyChanged = delegate {};
+        public event PropertyChangedEventHandler? PropertyChanged = delegate {};
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

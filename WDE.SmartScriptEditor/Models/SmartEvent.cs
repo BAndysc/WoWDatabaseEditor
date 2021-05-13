@@ -26,7 +26,7 @@ namespace WDE.SmartScriptEditor.Models
         private ParameterValueHolder<long> flags;
         private ParameterValueHolder<long> phases;
 
-        public SmartScript Parent { get; set; }
+        public SmartScript? Parent { get; set; }
 
         public SmartEvent(int id) : base(SmartEventParamsCount, id)
         {
@@ -37,16 +37,16 @@ namespace WDE.SmartScriptEditor.Models
             {
                 if (args.Action == NotifyCollectionChangedAction.Add)
                 {
-                    foreach (object ob in args.NewItems)
-                        (ob as SmartAction).Parent = this;
+                    foreach (SmartAction ob in args.NewItems!)
+                        ob.Parent = this;
                 }
             };
             Conditions.CollectionChanged += (sender, args) =>
             {
                 if (args.Action == NotifyCollectionChangedAction.Add)
                 {
-                    foreach (object ob in args.NewItems)
-                        (ob as SmartCondition).Parent = this;
+                    foreach (SmartCondition ob in args.NewItems!)
+                        ob.Parent = this;
                 }
             };
 
@@ -81,7 +81,7 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        [CanBeNull] public string ChanceString => chance.Value == 100 ? null : $"{chance.Value}%";
+        public string? ChanceString => chance.Value == 100 ? null : $"{chance.Value}%";
 
         public ParameterValueHolder<long> CooldownMax => cooldownMax;
         public ParameterValueHolder<long> CooldownMin => cooldownMin;
@@ -96,7 +96,7 @@ namespace WDE.SmartScriptEditor.Models
         {
             get
             {
-                string readable = ReadableHint;
+                string? readable = ReadableHint;
                 if (DescriptionRules != null)
                 {
                     foreach (DescriptionRule rule in DescriptionRules)
@@ -221,7 +221,7 @@ namespace WDE.SmartScriptEditor.Models
 
     public class SmartEventFlagParameter : FlagParameter
     {
-        public static SmartEventFlagParameter Instance { get; } = new SmartEventFlagParameter();
+        public new static SmartEventFlagParameter Instance { get; } = new SmartEventFlagParameter();
 
         public SmartEventFlagParameter()
         {
@@ -233,7 +233,7 @@ namespace WDE.SmartScriptEditor.Models
 
     public static class EnumExtensions
     {
-        public static string GetDescription<T>(this T e) where T : IConvertible
+        public static string? GetDescription<T>(this T e) where T : IConvertible
         {
             if (e is Enum)
             {
@@ -244,7 +244,7 @@ namespace WDE.SmartScriptEditor.Models
                 {
                     if (val == e.ToInt32(CultureInfo.InvariantCulture))
                     {
-                        var memInfo = type.GetMember(type.GetEnumName(val));
+                        var memInfo = type.GetMember(type.GetEnumName(val)!);
                         var descriptionAttribute = memInfo[0]
                             .GetCustomAttributes(typeof(DescriptionAttribute), false)
                             .FirstOrDefault() as DescriptionAttribute;
@@ -262,7 +262,7 @@ namespace WDE.SmartScriptEditor.Models
 
     public class SmartEventPhaseParameter : FlagParameter
     {
-        public static SmartEventPhaseParameter Instance { get; } = new SmartEventPhaseParameter();
+        public new static SmartEventPhaseParameter Instance { get; } = new SmartEventPhaseParameter();
         public SmartEventPhaseParameter()
         {
             Items = Enum

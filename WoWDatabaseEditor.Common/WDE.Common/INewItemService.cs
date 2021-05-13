@@ -6,6 +6,6 @@ namespace WDE.Common
     [UniqueProvider]
     public interface INewItemService
     {
-        Task<ISolutionItem> GetNewSolutionItem();
+        Task<ISolutionItem?> GetNewSolutionItem();
     }
 }

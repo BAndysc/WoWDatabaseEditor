@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <PropertyGroup>
+        <NoWarn>CS0067,CS4014,CS3021,CS1998,CA1416</NoWarn>
+    </PropertyGroup>
+</Project>

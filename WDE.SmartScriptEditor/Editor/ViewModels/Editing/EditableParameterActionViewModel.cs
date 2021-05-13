@@ -23,7 +23,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public string Name { get; }
 
-        public string ActionName { get; private set; }
+        public string ActionName { get; private set; } = "";
         
         public string Group { get; }
 

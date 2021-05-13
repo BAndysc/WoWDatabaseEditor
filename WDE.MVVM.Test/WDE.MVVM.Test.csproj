@@ -5,6 +5,8 @@
         <IsPackable>false</IsPackable>
         <Configurations>Debug;Release;DebugAvalonia</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

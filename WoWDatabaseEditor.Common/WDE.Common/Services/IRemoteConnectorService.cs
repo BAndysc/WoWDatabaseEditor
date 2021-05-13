@@ -19,6 +19,6 @@ namespace WDE.Common.Services
     public interface IRemoteCommand
     {
         string GenerateCommand();
-        bool TryMerge(IRemoteCommand other, [CanBeNull] out IRemoteCommand mergedCommand);
+        bool TryMerge(IRemoteCommand other, out IRemoteCommand? mergedCommand);
     }
 }

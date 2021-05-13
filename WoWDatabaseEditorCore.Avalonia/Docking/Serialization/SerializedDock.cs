@@ -8,7 +8,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public SerializedDockableType DockableType { get; set; }
-        public string UniqueId { get; set; }
+        public string UniqueId { get; set; } = "";
         public bool Horizontal { get; set; }
         public double Proportion { get; set; }
         public bool IsCollapsable { get; set; }

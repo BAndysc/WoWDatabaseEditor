@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Solution;
@@ -16,12 +17,11 @@ namespace WDE.Solutions.Explorer.ViewModels
         private bool isSelected;
 
         public SolutionItemViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionItem item) : this(itemNameRegistry,
-            item,
-            null)
+            item, null)
         {
         }
 
-        public SolutionItemViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionItem item, SolutionItemViewModel parent)
+        public SolutionItemViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionItem item, SolutionItemViewModel? parent)
         {
             this.itemNameRegistry = itemNameRegistry;
             Item = item;
@@ -33,23 +33,23 @@ namespace WDE.Solutions.Explorer.ViewModels
             {
                 Children = new ObservableCollection<SolutionItemViewModel>();
 
-                foreach (object obj in item.Items)
-                    AddItem(obj as ISolutionItem);
+                foreach (ISolutionItem obj in item.Items)
+                    AddItem(obj);
 
                 item.Items.CollectionChanged += (sender, args) =>
                 {
                     if (args.NewItems != null)
                     {
                         var i = 0;
-                        foreach (object obj in args.NewItems)
-                            AddItem(obj as ISolutionItem, args.NewStartingIndex + i);
+                        foreach (ISolutionItem obj in args.NewItems)
+                            AddItem(obj, args.NewStartingIndex + i);
                     }
 
                     if (args.OldItems != null)
                     {
-                        foreach (object obj in args.OldItems)
+                        foreach (ISolutionItem obj in args.OldItems)
                         {
-                            ISolutionItem solutionItem = obj as ISolutionItem;
+                            ISolutionItem solutionItem = obj;
                             Children.Remove(itemToViewmodel[solutionItem]);
                             itemToViewmodel.Remove(solutionItem);
                         }
@@ -58,15 +58,15 @@ namespace WDE.Solutions.Explorer.ViewModels
             }
         }
 
-        public ObservableCollection<SolutionItemViewModel> Children { get; }
+        public ObservableCollection<SolutionItemViewModel>? Children { get; }
 
         public string Name => itemNameRegistry.GetName(Item);
-        public string ExtraId => Item.ExtraId;
+        public string? ExtraId => Item.ExtraId;
         public bool IsContainer => Item.IsContainer;
         public bool IsExportable => Item.IsExportable;
         public ISolutionItem Item { get; }
 
-        public SolutionItemViewModel Parent { get; set; }
+        public SolutionItemViewModel? Parent { get; set; }
 
         public bool IsSelected
         {
@@ -82,7 +82,8 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private void AddItem(ISolutionItem item, int index = -1)
         {
-            if (!itemToViewmodel.TryGetValue(item, out SolutionItemViewModel viewModel))
+            Debug.Assert(Children != null);
+            if (!itemToViewmodel.TryGetValue(item, out SolutionItemViewModel? viewModel))
             {
                 viewModel = new SolutionItemViewModel(itemNameRegistry, item, this);
                 itemToViewmodel[item] = viewModel;

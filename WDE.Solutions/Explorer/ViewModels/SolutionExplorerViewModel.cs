@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Events;
@@ -28,7 +29,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         private readonly ISolutionManager solutionManager;
         private readonly IStatusBar statusBar;
 
-        private SolutionItemViewModel selected;
+        private SolutionItemViewModel? selected;
         private bool visibility;
 
         public string UniqueId => "solution_explorer";
@@ -60,18 +61,18 @@ namespace WDE.Solutions.Explorer.ViewModels
                 if (args.NewItems != null)
                 {
                     var i = 0;
-                    foreach (object obj in args.NewItems)
+                    foreach (ISolutionItem obj in args.NewItems)
                     {
-                        AddItemToRoot(obj as ISolutionItem, args.NewStartingIndex + i);
+                        AddItemToRoot(obj, args.NewStartingIndex + i);
                         i++;
                     }
                 }
 
                 if (args.OldItems != null)
                 {
-                    foreach (object obj in args.OldItems)
+                    foreach (ISolutionItem obj in args.OldItems)
                     {
-                        ISolutionItem solutionItem = obj as ISolutionItem;
+                        ISolutionItem solutionItem = obj;
                         Root.Remove(itemToViewmodel[solutionItem]);
                         itemToViewmodel.Remove(solutionItem);
                     }
@@ -110,7 +111,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
             AddItem = new DelegateCommand(async () =>
             {
-                ISolutionItem item = await newItemService.GetNewSolutionItem();
+                ISolutionItem? item = await newItemService.GetNewSolutionItem();
                 if (item != null)
                     DoAddItem(item);
             });
@@ -122,7 +123,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                     if (selected.Parent == null)
                         this.solutionManager.Items.Remove(selected.Item);
                     else
-                        selected.Parent.Item.Items.Remove(selected.Item);
+                        selected.Parent.Item.Items?.Remove(selected.Item);
                 }
             });
 
@@ -178,8 +179,8 @@ namespace WDE.Solutions.Explorer.ViewModels
         
         public void DragOver(IDropInfo dropInfo)
         {
-            SolutionItemViewModel sourceItem = dropInfo.Data as SolutionItemViewModel;
-            SolutionItemViewModel targetItem = dropInfo.TargetItem as SolutionItemViewModel;
+            SolutionItemViewModel? sourceItem = dropInfo.Data as SolutionItemViewModel;
+            SolutionItemViewModel? targetItem = dropInfo.TargetItem as SolutionItemViewModel;
 
             if (sourceItem != null)
             {
@@ -193,17 +194,21 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         public void Drop(IDropInfo dropInfo)
         {
-            SolutionItemViewModel sourceItem = dropInfo.Data as SolutionItemViewModel;
-            SolutionItemViewModel targetItem = dropInfo.TargetItem as SolutionItemViewModel;
+            SolutionItemViewModel? sourceItem = dropInfo.Data as SolutionItemViewModel;
+            SolutionItemViewModel? targetItem = dropInfo.TargetItem as SolutionItemViewModel;
 
             if (sourceItem == null)
                 return;
 
             var prevPosition = 0;
             var sourceList = sourceItem.Parent == null ? solutionManager.Items : sourceItem.Parent.Item.Items;
-            SolutionItemViewModel destListOwner = dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight
+            if (sourceList == null)
+                return;
+            
+            SolutionItemViewModel? destListOwner = dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight
                 ? targetItem
                 : targetItem?.Parent;
+            
             var destList = destListOwner?.Item?.Items ?? solutionManager.Items;
 
             while (destListOwner != null)
@@ -219,6 +224,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
             if (dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight)
             {
+                Debug.Assert(targetItem != null && targetItem.Item.Items != null);
                 targetItem.AddViewModel(sourceItem);
                 targetItem.Item.Items.Add(sourceItem.Item);
             }
@@ -252,7 +258,7 @@ namespace WDE.Solutions.Explorer.ViewModels
             set => SetProperty(ref visibility, value);
         }
 
-        public SolutionItemViewModel SelectedItem
+        public SolutionItemViewModel? SelectedItem
         {
             get => selected;
             set => SetProperty(ref selected, value);
@@ -260,7 +266,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private void AddItemToRoot(ISolutionItem item, int index = -1)
         {
-            if (!itemToViewmodel.TryGetValue(item, out SolutionItemViewModel viewModel))
+            if (!itemToViewmodel.TryGetValue(item, out SolutionItemViewModel? viewModel))
             {
                 viewModel = new SolutionItemViewModel(itemNameRegistry, item);
                 itemToViewmodel[item] = viewModel;

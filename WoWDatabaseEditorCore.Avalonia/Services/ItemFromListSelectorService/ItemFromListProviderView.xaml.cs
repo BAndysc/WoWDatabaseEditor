@@ -27,8 +27,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
             // add missing functionality - space on the item (un)checks the checkbox
             if (e.Key == Key.Space && sender is GridView gridView)
             {
-                ListBox list = gridView.ListBoxImpl;
-                if (list.SelectedItem == null)
+                ListBox? list = gridView.ListBoxImpl;
+                if (list?.SelectedItem == null)
                     return;
 
                 var selected = list.ItemContainerGenerator.ContainerFromIndex(list.SelectedIndex);
@@ -49,7 +49,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
             if (e.Key == Key.Down)
             {
                 GridView gridView = this.FindControl<GridView>("GridView");
-                if (gridView == null)
+                if (gridView == null || gridView.ListBoxImpl == null)
                     return;
 
                 if (gridView.ListBoxImpl.SelectedItem == null)

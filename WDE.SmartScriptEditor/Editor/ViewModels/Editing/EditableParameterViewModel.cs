@@ -13,7 +13,7 @@ using WDE.SmartScriptEditor.Models;
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 {
     public abstract class EditableParameterViewModel : ObservableBase {}
-    public class EditableParameterViewModel<T> : EditableParameterViewModel, IEditableParameterViewModel, IDialog
+    public class EditableParameterViewModel<T> : EditableParameterViewModel, IEditableParameterViewModel, IDialog where T : notnull
     {
         private readonly IItemFromListProvider itemFromListProvider;
 
@@ -74,7 +74,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public int DesiredHeight { get; } = 50;
         public string Title { get; } = "Editing";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 }

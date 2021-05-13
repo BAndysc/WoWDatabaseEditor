@@ -55,16 +55,16 @@ namespace WoWDatabaseEditorCore.Providers
                         () => DocumentManager.ActiveDocument?.Save.Execute(null),
                 () => solutionTasksService.CanSaveToDatabase && (DocumentManager.ActiveDocument?.Save.CanExecute(null) ?? false))
                     .ObservesProperty(() => DocumentManager.ActiveDocument)
-                    .ObservesProperty(() => DocumentManager.ActiveDocument.IsModified), new("Control+S")));
+                    .ObservesProperty(() => DocumentManager.ActiveDocument!.IsModified), new("Control+S")));
             
             SubItems.Add(new ModuleMenuItem("_Generate query", 
                 new DelegateCommand(
-                        () => solutionSqlService.OpenDocumentWithSqlFor(DocumentManager.ActiveSolutionItemDocument?.SolutionItem),
+                        () => solutionSqlService.OpenDocumentWithSqlFor(DocumentManager.ActiveSolutionItemDocument!.SolutionItem),
                     () => DocumentManager.ActiveSolutionItemDocument != null)
                 .ObservesProperty(() => DocumentManager.ActiveSolutionItemDocument), new("F4")));
             
             SubItems.Add(new ModuleMenuItem("_Save to database and reload server", new DelegateCommand(
-                    () => solutionTasksService.SaveAndReloadSolutionTask(DocumentManager.ActiveSolutionItemDocument?.SolutionItem),
+                    () => solutionTasksService.SaveAndReloadSolutionTask(DocumentManager.ActiveSolutionItemDocument!.SolutionItem),
                     () => DocumentManager.ActiveSolutionItemDocument != null && solutionTasksService.CanSaveAndReloadRemotely)
                 .ObservesProperty(() => DocumentManager.ActiveSolutionItemDocument), new("F5")));
             
@@ -97,7 +97,7 @@ namespace WoWDatabaseEditorCore.Providers
                                 documents[item] = editor;
                                 documentToSolution[editor] = item;
                             }
-                            catch (SolutionItemEditorNotFoundException e)
+                            catch (SolutionItemEditorNotFoundException)
                             {
                                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Editor not found")
                                     .SetMainInstruction(

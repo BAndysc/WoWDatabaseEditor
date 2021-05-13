@@ -11,6 +11,6 @@ namespace WDE.Common
         void Refresh(ISolutionItem item);
         void RefreshAll();
 
-        event System.Action<ISolutionItem> RefreshRequest;
+        event System.Action<ISolutionItem?> RefreshRequest;
     }
 }

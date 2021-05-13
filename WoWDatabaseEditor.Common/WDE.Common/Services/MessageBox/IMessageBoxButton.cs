@@ -3,6 +3,6 @@
     public interface IMessageBoxButton<out T>
     {
         string Name { get; }
-        T ReturnValue { get; }
+        T? ReturnValue { get; }
     }
 }

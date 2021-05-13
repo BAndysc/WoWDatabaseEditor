@@ -1,8 +1,7 @@
-﻿<components:ToolView x:Class="WDE.Solutions.Explorer.Views.SolutionExplorerView"
+﻿<components:ToolView x:Class="WDE.CommonViews.Avalonia.Solutions.Explorer.Views.SolutionExplorerView"
              
           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
           xmlns:prism="http://prismlibrary.com/"
-          xmlns:views="clr-namespace:WDE.Solutions.Explorer.Views"
           xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
           xmlns:system="clr-namespace:System;assembly=System.Runtime"
           xmlns="https://github.com/avaloniaui"

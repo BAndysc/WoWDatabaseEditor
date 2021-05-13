@@ -23,11 +23,11 @@ namespace WoWDatabaseEditorCore.Providers
             SubItems = new List<IMenuItem>();
             SubItems.Add(new ModuleMenuItem("_Undo", new DelegateCommand(() => DocumentManager.ActiveDocument?.Undo.Execute(null),
                 () => DocumentManager.ActiveDocument?.Undo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument).
-                ObservesProperty(() => DocumentManager.ActiveDocument.IsModified), new("Control+Z")));
+                ObservesProperty(() => DocumentManager.ActiveDocument!.IsModified), new("Control+Z")));
             
             SubItems.Add(new ModuleMenuItem("_Redo", new DelegateCommand(() => DocumentManager.ActiveDocument?.Redo.Execute(null),
                 () => DocumentManager.ActiveDocument?.Redo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument).
-                ObservesProperty(() => DocumentManager.ActiveDocument.IsModified), new("Control+Y")));
+                ObservesProperty(() => DocumentManager.ActiveDocument!.IsModified), new("Control+Y")));
             
             SubItems.Add(new ModuleManuSeparatorItem());
             

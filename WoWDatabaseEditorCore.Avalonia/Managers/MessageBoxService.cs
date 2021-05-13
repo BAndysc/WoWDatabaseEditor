@@ -20,7 +20,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             this.mainWindowHolder = mainWindowHolder;
         }
         
-        public async Task<T> ShowDialog<T>(IMessageBox<T> messageBox)
+        public async Task<T?> ShowDialog<T>(IMessageBox<T> messageBox)
         {
             MessageBoxView view = new MessageBoxView();
             var viewModel = new MessageBoxViewModel<T>(messageBox);

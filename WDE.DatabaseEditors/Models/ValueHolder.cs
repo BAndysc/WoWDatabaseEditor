@@ -21,7 +21,7 @@ namespace WDE.DatabaseEditors.Models
         IParameter BaseParameter { get; }
     }
 
-    public class ParameterValue<T> : IParameterValue
+    public sealed class ParameterValue<T> : IParameterValue where T : notnull
     {
         private readonly ValueHolder<T> value;
         private readonly ValueHolder<T> originalValue;
@@ -61,7 +61,7 @@ namespace WDE.DatabaseEditors.Models
             this.originalValue = originalValue;
             this.parameter = parameter;
             OriginalString = originalValue.IsNull ? "(null)" : parameter.ToString(originalValue.Value!);
-            value.PropertyChanged += (sender, args) =>
+            value.PropertyChanged += (_, _) =>
             {
                 OnPropertyChanged(nameof(String));
                 OnPropertyChanged(nameof(Value));
@@ -88,13 +88,13 @@ namespace WDE.DatabaseEditors.Models
         
         public event PropertyChangedEventHandler? PropertyChanged;
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
-    public class ValueHolder<T> : INotifyPropertyChanged, IValueHolder
+    public sealed class ValueHolder<T> : INotifyPropertyChanged, IValueHolder
     {
         private T? value;
         public T? Value
@@ -126,7 +126,7 @@ namespace WDE.DatabaseEditors.Models
         }
 
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName]  string? propertyName = null)
+        private void OnPropertyChanged([CallerMemberName]  string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

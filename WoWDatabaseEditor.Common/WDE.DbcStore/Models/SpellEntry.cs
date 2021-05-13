@@ -17,12 +17,12 @@ namespace WDE.DbcStore.Models
         public uint AttributesEx8; // 9        m_attributesExH
         public uint AttributesEx9; // 10       m_attributesExI
         public uint CastingTimeIndex; // 12       m_castingTimeIndex
-        public string Description; // 23       m_description_lang not used
+        public string Description = ""; // 23       m_description_lang not used
         public uint DurationIndex; // 13       m_durationIndex
         public uint Id; // 0        m_ID
         public uint PowerType; // 14       m_powerType
         public uint RangeIndex; // 15       m_rangeIndex
-        public string Rank; // 22       m_nameSubtext_lang
+        public string Rank = ""; // 22       m_nameSubtext_lang
         public uint ResearchProject; // 47       ResearchProject.dbc //  not used
         public uint RuneCostId; // 26       m_runeCostID
         public uint SchoolMask; // 25       m_schoolMask
@@ -40,7 +40,7 @@ namespace WDE.DbcStore.Models
         public uint SpellInterruptsId; // 40       SpellInterrupts.dbc
         public uint SpellLevelsId; // 41       SpellLevels.dbc
         public uint SpellMissileId; // 27       m_spellMissileID //  not used
-        public string SpellName; // 21       m_name_lang
+        public string SpellName = ""; // 21       m_name_lang
         public uint SpellPowerId; // 42       SpellPower.dbc
         public uint SpellReagentsId; // 43       SpellReagents.dbc
         public uint SpellScalingId; // 31       SpellScaling.dbc
@@ -49,9 +49,9 @@ namespace WDE.DbcStore.Models
         public uint SpellTotemsId; // 46       SpellTotems.dbc
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
-        public uint[] SpellVisual; // 17-18    m_spellVisualID
+        public uint[] SpellVisual = new uint[0]; // 17-18    m_spellVisualID
 
-        public string ToolTip; // 24       m_auraDescription_lang not used
+        public string ToolTip = ""; // 24       m_auraDescription_lang not used
         public float Unknown3; // 30
         public uint Unknown4; // 38       all zeros... //  not used
     }

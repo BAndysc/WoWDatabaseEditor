@@ -288,9 +288,9 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return true;
         }
         
-        public async Task<bool> AddEntity(DatabaseEntity entity)
+        public Task<bool> AddEntity(DatabaseEntity entity)
         {
-            return ForceInsertEntity(entity, Entities.Count);
+            return Task.FromResult(ForceInsertEntity(entity, Entities.Count));
         }
 
         public override bool ForceInsertEntity(DatabaseEntity entity, int index)

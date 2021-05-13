@@ -22,9 +22,9 @@ namespace WoWDatabaseEditorCore.Managers
             staticBinding.Add(typeof(T), typeof(R));
         }
 
-        public bool TryResolve(Type viewModel, out Type? view)
+        public bool TryResolve(Type viewModel, out Type view)
         {
-            view = null;
+            view = null!;
 
             if (viewModel == null)
                 return false;
@@ -39,12 +39,12 @@ namespace WoWDatabaseEditorCore.Managers
                 return false;
 
             var viewString = viewModel.AssemblyQualifiedName!.Replace("ViewModel", "View");
-            view = Type.GetType(viewString);
+            view = Type.GetType(viewString)!;
 
             if (view == null) // try backend version
             {
                 var assemblyName = viewModel.Assembly.GetName().Name;
-                view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend));
+                view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend))!;
             }
 
             if (view != null)

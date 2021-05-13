@@ -11,7 +11,7 @@ namespace WoWDatabaseEditorCore.WPF.Managers
     [AutoRegister]
     public class MessageBoxService : IMessageBoxService
     {
-        public Task<T> ShowDialog<T>(IMessageBox<T> messageBox)
+        public Task<T?> ShowDialog<T>(IMessageBox<T> messageBox)
         {
             using (TaskDialog dialog = new TaskDialog())
             {
@@ -23,7 +23,7 @@ namespace WoWDatabaseEditorCore.WPF.Managers
                 dialog.FooterIcon = ToDialogIcon(messageBox.FooterIcon);
                 dialog.MainIcon = ToDialogIcon(messageBox.Icon);
 
-                Dictionary<TaskDialogButton, T> buttonToValue = new();
+                Dictionary<TaskDialogButton, T?> buttonToValue = new();
                 foreach (var buttonDefinition in messageBox.Buttons)
                 {
                     TaskDialogButton button = GenerateButton(buttonDefinition.Name);

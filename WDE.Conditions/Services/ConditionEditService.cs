@@ -22,7 +22,7 @@ namespace WDE.Conditions.Services
             this.containerProvider = containerProvider;
         }
     
-        public async Task<IEnumerable<ICondition>> EditConditions(int conditionSourceType, IEnumerable<ICondition>? conditions)
+        public async Task<IEnumerable<ICondition>?> EditConditions(int conditionSourceType, IEnumerable<ICondition>? conditions)
         {
             using var vm = containerProvider.Resolve<ConditionsEditorViewModel>(
                 (typeof(IEnumerable<ICondition>), conditions ?? Enumerable.Empty<ICondition>()),

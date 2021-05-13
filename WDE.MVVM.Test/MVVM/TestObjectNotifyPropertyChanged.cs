@@ -7,10 +7,10 @@ namespace WDE.MVVM.Test.MVVM
     [ExcludeFromCodeCoverage]
     internal sealed class TestObjectNotifyPropertyChanged : INotifyPropertyChanged
     {
-        public int Field;
+        public readonly int Field;
         private int number;
         private float floatNumber;
-        private string stringValue;
+        private string? stringValue;
 
         public int Number
         {
@@ -36,7 +36,7 @@ namespace WDE.MVVM.Test.MVVM
             }
         }
 
-        public string StringValue
+        public string? StringValue
         {
             get => stringValue;
             set
@@ -51,7 +51,7 @@ namespace WDE.MVVM.Test.MVVM
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

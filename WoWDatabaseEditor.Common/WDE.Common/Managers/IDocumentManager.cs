@@ -10,8 +10,8 @@ namespace WDE.Common.Managers
     [UniqueProvider]
     public interface IDocumentManager : INotifyPropertyChanged
     {
-        IDocument ActiveDocument { get; set; }
-        ISolutionItemDocument ActiveSolutionItemDocument { get; }
+        IDocument? ActiveDocument { get; set; }
+        ISolutionItemDocument? ActiveSolutionItemDocument { get; }
         IReadOnlyList<ITool> AllTools { get; }
         ObservableCollection<IDocument> OpenedDocuments { get; }
         ObservableCollection<ITool> OpenedTools { get; }

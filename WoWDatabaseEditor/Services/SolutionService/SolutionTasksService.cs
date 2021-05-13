@@ -110,14 +110,14 @@ namespace WoWDatabaseEditor.Services.SolutionService
                         {
                             await remoteConnectorService.ExecuteCommand(reduced[i]);
                         }
-                        catch (System.Net.Http.HttpRequestException e)
+                        catch (System.Net.Http.HttpRequestException)
                         {
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Error,
                                 "Unable to connect to server over SOAP. Check your settings or server settings."));
                             progress.ReportFail();
                             return;
                         }
-                        catch (System.Threading.Tasks.TaskCanceledException e)
+                        catch (System.Threading.Tasks.TaskCanceledException)
                         {
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Error,
                                 "Unable to connect to server over SOAP. Check your settings or server settings."));

@@ -28,16 +28,16 @@ namespace AvaloniaStyles.Controls
             control.SetValue(ToolTitleProperty, value);
         
         
-        public static readonly StyledProperty<IControl> ActiveViewProperty =
-            AvaloniaProperty.Register<ToolsTabControl, IControl>(nameof(ActiveView));
+        public static readonly StyledProperty<IControl?> ActiveViewProperty =
+            AvaloniaProperty.Register<ToolsTabControl, IControl?>(nameof(ActiveView));
 
-        public IControl ActiveView
+        public IControl? ActiveView
         {
             get => GetValue(ActiveViewProperty);
             internal set => SetValue(ActiveViewProperty, value);
         }
 
-        internal IContentPresenter ContentPart { get; private set; }
+        internal IContentPresenter? ContentPart { get; private set; }
         private static readonly FuncTemplate<IPanel> DefaultPanel =
             new FuncTemplate<IPanel>(() => new StackPanel(){Name = "ToolsList"});
         
@@ -76,7 +76,7 @@ namespace AvaloniaStyles.Controls
             foreach (var container in e.Containers)
             {
                 if (container.Item != null && itemsToViews.TryGetValue(container.Item, out var vieww))
-                    SetAttachedView(container.ContainerControl as TabItem, vieww as IControl);
+                    SetAttachedView((TabItem)container.ContainerControl, vieww as IControl);
             }
         }
 
@@ -85,7 +85,7 @@ namespace AvaloniaStyles.Controls
         protected override void ItemsChanged(AvaloniaPropertyChangedEventArgs e)
         {
             if (e.NewValue != null)
-                GenerateContent(e.NewValue as IList);
+                GenerateContent((IList)e.NewValue);
             base.ItemsChanged(e);
         }
 
@@ -94,11 +94,11 @@ namespace AvaloniaStyles.Controls
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    GenerateContent(e.NewItems);
+                    GenerateContent(e.NewItems!);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    FreeContent(e.OldItems);
+                    FreeContent(e.OldItems!);
                     break;
             }
 

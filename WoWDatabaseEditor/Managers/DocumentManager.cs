@@ -101,7 +101,7 @@ namespace WoWDatabaseEditorCore.Managers
                             disposable.Dispose();
                     }
                 },
-                (context) => origCommand?.CanExecute(null) ?? true);
+                _ => origCommand?.CanExecute(null) ?? true);
                 OpenedDocuments.Add(editor);
             }
 

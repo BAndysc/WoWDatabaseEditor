@@ -24,7 +24,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             this.windowManager = windowManager;
             InsertOnSave = insertOnSave;
             Source = new SmartDataEventsEditorData(in source);
-            MakeTypeItems();
+            var enumValues = System.Enum.GetValues<SmartScriptType>();
+            SmartScriptTypes = new List<SmartDataEventSmartTypeData>(capacity: enumValues.Length);
+            foreach (var enumVar in enumValues)
+            {
+                var isSelected = Source.ValidTypes.Contains(enumVar);
+                SmartScriptTypes.Add(new SmartDataEventSmartTypeData(enumVar, isSelected));
+            }
             SaveItem = new DelegateCommand(() =>
             {
                 Source.ValidTypes = SmartScriptTypes.Where(x => x.IsChecked).Select(x => x.Type).ToList();
@@ -168,23 +174,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             }
         }
         
-        private void MakeTypeItems()
-        {
-            var enumValues = System.Enum.GetValues<SmartScriptType>();
-            SmartScriptTypes = new List<SmartDataEventSmartTypeData>(capacity: enumValues.Length);
-            foreach (var enumVar in enumValues)
-            {
-                var isSelected = Source.ValidTypes.Contains(enumVar);
-                SmartScriptTypes.Add(new SmartDataEventSmartTypeData(enumVar, isSelected));
-            }
-        }
-
         public int DesiredWidth { get; } = 473;
         public int DesiredHeight { get; } = 676;
         public string Title { get; } = "Event Editor";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 
     public class SmartDataEventSmartTypeData

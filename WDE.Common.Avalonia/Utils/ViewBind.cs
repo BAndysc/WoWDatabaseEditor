@@ -18,7 +18,7 @@ namespace WDE.Common.Avalonia.Utils
         public static object GetModel(Control control) => control.GetValue(ModelProperty);
         public static void SetModel(Control control, object value) => control.SetValue(ModelProperty, value);
 
-        public static bool TryResolve(object viewModel, out object view)
+        public static bool TryResolve(object viewModel, out object? view)
         {
             view = null;
             if (AppViewLocator != null && AppViewLocator.TryResolve(viewModel.GetType(), out var viewType))

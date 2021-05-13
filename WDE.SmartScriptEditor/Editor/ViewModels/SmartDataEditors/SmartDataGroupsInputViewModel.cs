@@ -21,7 +21,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         public int DesiredHeight { get; } = 180;
         public string Title { get; } = "";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
 }

@@ -136,7 +136,7 @@ namespace WDE.DbcStore
             
             private void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary)
             {
-                progress.Report(now++, max, $"Loading {filename}");
+                progress?.Report(now++, max, $"Loading {filename}");
                 DBReader r = new();
                 var path = $"{dbcSettingsProvider.GetSettings().Path}/{filename}";
 
@@ -146,7 +146,7 @@ namespace WDE.DbcStore
                 DBEntry dbEntry = r.Read(path);
 
                 foreach (DataRow row in dbEntry.Data.Rows)
-                    dictionary.Add(Convert.ToInt32(row.ItemArray[id].ToString()), row.ItemArray[nameIndex].ToString());
+                    dictionary.Add(Convert.ToInt32(row.ItemArray[id]!.ToString()), row.ItemArray[nameIndex]!.ToString() ?? "");
             }
             
             public void FinishMainThread()
@@ -199,6 +199,7 @@ namespace WDE.DbcStore
             private int max = 0;
             private int now = 0;
             private ITaskProgress progress;
+            
             public void Run(ITaskProgress progress)
             {
                 this.progress = progress;

@@ -29,7 +29,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             MakeItems(type, predicate, smartDataManager, conditionDataManager);
             
             ReadOnlyObservableCollection<SmartItemsGroup> l;
-            var currentFilter = this.WhenValueChanged(t => t.SearchBox)
+            var currentFilter = this.WhenValueChanged(t => t.SearchBox)!
                 .Select<string, Func<SmartItem, bool>>(text =>
                 {
                     if (string.IsNullOrEmpty(text))
@@ -66,15 +66,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public ReadOnlyObservableCollection<SmartItemsGroup> FilteredItems { get; }
 
-        private string searchBox;
+        private string searchBox = "";
         public string SearchBox
         {
             get => searchBox;
             set => SetProperty(ref searchBox, value);
         }
 
-        private SmartItem selectedItem;
-        public SmartItem SelectedItem
+        private SmartItem? selectedItem;
+        public SmartItem? SelectedItem
         {
             get => selectedItem;
             set
@@ -152,19 +152,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public int DesiredHeight => 650;
         public string Title { get; }
         public bool Resizeable => true;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
     
     public class SmartItem
     {
         public SmartGenericJsonData Data;
         public ConditionJsonData ConditionData;
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public bool Deprecated { get; set; }
-        public string Help { get; set; }
+        public string Help { get; set; } = "";
         public int Id { get; set; }
-        public string Group { get; set; }
+        public string Group { get; set; } = "";
         public bool IsTimed { get; set; }
         public int Order { get; set; }
         public int GroupOrder { get; set; }
@@ -207,8 +207,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public int GroupOrder => Key.Item2;
         public (string, int) Key { get; private set; }
         
-        private SmartItem selectedItem;
-        public SmartItem SelectedItem
+        private SmartItem? selectedItem;
+        public SmartItem? SelectedItem
         {
             get => selectedItem;
             set

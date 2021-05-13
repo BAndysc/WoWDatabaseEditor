@@ -18,7 +18,7 @@ namespace WDE.Common
         
         bool IsCompatibleWithCore(ICoreVersion core);
 
-        Task<ISolutionItem> CreateSolutionItem();
+        Task<ISolutionItem?> CreateSolutionItem();
     }
     
     // Dynamic provider of ISolutionItemProvider
@@ -36,6 +36,6 @@ namespace WDE.Common
 
     public interface INamedSolutionItemProvider : ISolutionItemProvider
     {
-        Task<ISolutionItem> CreateSolutionItem(string name);
+        Task<ISolutionItem?> CreateSolutionItem(string name);
     }
 }

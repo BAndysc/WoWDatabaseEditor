@@ -113,7 +113,7 @@ namespace WDE.SmartScriptEditor.Models
                 : "position of " + output + (HasPosition() ? " moved by offset " + GetCoords() : "");
         }
 
-        public SmartTarget Copy()
+        public new SmartTarget Copy()
         {
             SmartTarget se = new(Id)
             {

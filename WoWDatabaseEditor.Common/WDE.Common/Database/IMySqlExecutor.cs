@@ -45,6 +45,6 @@ namespace WDE.Common.Database
         public bool PrimaryKey { get; set; }
         public string DatabaseType { get; set; }
         public Type? ManagedType { get; set; }
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
     }
 }

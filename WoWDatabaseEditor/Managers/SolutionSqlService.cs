@@ -20,7 +20,7 @@ namespace WoWDatabaseEditorCore.Managers
             this.eventAggregator = eventAggregator;
         }
         
-        public async void OpenDocumentWithSqlFor(ISolutionItem? solutionItem)
+        public void OpenDocumentWithSqlFor(ISolutionItem? solutionItem)
         {
             if (solutionItem == null)
                 return;

@@ -120,7 +120,9 @@ namespace WDE.Conditions.ViewModels
                     int indexOf = Conditions.Count;
                     if (SelectedCondition != null)
                         indexOf = Conditions.IndexOf(SelectedCondition) + 1;
-                    Conditions.Insert(indexOf, conditionsFactory.Create(conditionSourceType, clipboard));   
+                    var item = conditionsFactory.Create(conditionSourceType, clipboard);
+                    if (item != null)
+                        Conditions.Insert(indexOf, item);   
                 }
             }, () => Clipboard != null).ObservesProperty(() => Clipboard);
 
@@ -157,7 +159,6 @@ namespace WDE.Conditions.ViewModels
 
         public IHistoryManager HistoryManager { get; }
         
-        private ConditionJsonData? selectedConditionsType;
         public ConditionJsonData? SelectedConditionsType
         {
             get => SelectedCondition?.ConditionId == null
@@ -165,7 +166,7 @@ namespace WDE.Conditions.ViewModels
                 : conditionDataManager.GetConditionData(SelectedCondition!.ConditionId);
             set
             {
-                if (SelectedCondition == null)
+                if (SelectedCondition == null || value == null)
                     return;
                 
                 conditionsFactory.Update(value.Value.Id, SelectedCondition);

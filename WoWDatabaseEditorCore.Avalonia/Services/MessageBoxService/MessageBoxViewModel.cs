@@ -31,9 +31,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
             }
         }
 
-        public T SelectedOption { get; private set; }
+        public T? SelectedOption { get; private set; }
         public ObservableCollection<MessageBoxButtonViewModel> Buttons { get; } = new();
-        public event Action Close;
+        public event Action? Close;
     }
 
     internal class MessageBoxButtonViewModel : INotifyPropertyChanged

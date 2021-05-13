@@ -35,7 +35,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             }
         }
 
-        public Task<string> ShowFolderPickerDialog(string defaultDirectory)
+        public Task<string?> ShowFolderPickerDialog(string defaultDirectory)
         {
             return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(mainWindowHolder.Window);
         }

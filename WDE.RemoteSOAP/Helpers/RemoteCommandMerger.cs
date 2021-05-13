@@ -25,7 +25,7 @@ namespace WDE.RemoteSOAP.Helpers
                 {
                     if (list[^1].TryMerge(command, out var mergedCommand))
                     {
-                        list[^1] = mergedCommand;
+                        list[^1] = mergedCommand!;
                     }
                 }
             }

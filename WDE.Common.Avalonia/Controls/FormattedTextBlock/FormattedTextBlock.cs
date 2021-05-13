@@ -94,7 +94,6 @@ namespace WDE.Common.Avalonia.Controls
                 return;
             
             int partIndex = 0;
-            bool one = false;
             bool parameter = false;
             bool source = false;
             int contextId = -1;
@@ -102,7 +101,6 @@ namespace WDE.Common.Avalonia.Controls
             State state = State.Text;
 
             int startIndex = 0;
-            int endIndex = 0;
 
             for (var index = 0; index < text.Length; index++)
             {

@@ -80,7 +80,7 @@ namespace WDE.DatabaseEditors.Solution
         public async Task<ISolutionItem?> CreateSolutionItem()
         {
             var parameter = parameterFactory.Factory(definition.Picker);
-            var key = await itemFromListProvider.GetItemFromList(parameter.HasItems ? parameter.Items : new Dictionary<long, SelectOption>(), false);
+            var key = await itemFromListProvider.GetItemFromList(parameter.HasItems ? parameter.Items! : new Dictionary<long, SelectOption>(), false);
             if (key.HasValue)
             {
                 var data = await tableDataProvider.Load(definition.Id, (uint)key.Value);

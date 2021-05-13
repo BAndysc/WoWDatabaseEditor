@@ -31,7 +31,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
         public ImageUri Image { get; }
         public bool RequiresName { get; }
 
-        public Task<ISolutionItem> CreateSolutionItem(string name)
+        public Task<ISolutionItem?> CreateSolutionItem(string name)
         {
             if (provider is INamedSolutionItemProvider namedSolutionItemProvider)
                 return namedSolutionItemProvider.CreateSolutionItem(name);

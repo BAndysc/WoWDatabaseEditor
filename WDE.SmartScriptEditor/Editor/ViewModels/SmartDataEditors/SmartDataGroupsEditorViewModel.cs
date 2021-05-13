@@ -34,6 +34,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             this.messageBoxService = messageBoxService;
             this.windowManager = windowManager;
             this.dataSourceMode = dataSourceMode;
+            SourceItems = new ObservableCollection<SmartDataGroupsEditorData>();
             MakeItems();
             AddGroup = new AsyncAutoCommand(AddGroupToSource);
             Save = new DelegateCommand(() =>
@@ -80,7 +81,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             else if (obj is SmartDataGroupsEditorDataNode node)
             {
                 node.Owner.Members.Remove(node);
-                node.Owner = null;
+                node.Owner = null!;
             }
         }
 
@@ -146,7 +147,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
 
         private void MakeItems()
         {
-            SourceItems = new ObservableCollection<SmartDataGroupsEditorData>();
             List<SmartGroupsJsonData> source;
             switch (dataSourceMode)
             {
@@ -190,7 +190,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
         public ICommand Save { get; private set; }
-        public AsyncAwaitBestPractices.MVVM.IAsyncCommand CloseCommand { get; set; } = null;
+        public AsyncAwaitBestPractices.MVVM.IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose => true;
         public IHistoryManager History { get; }
         private bool isModified = false;
@@ -242,11 +242,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

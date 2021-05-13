@@ -114,7 +114,7 @@ namespace WDE.Common.Database
         public float TargetY { get; set; }
         public float TargetZ { get; set; }
         public float TargetO { get; set; }
-        public string Comment { get; set; }
+        public string Comment { get; set; } = "";
     }
 
     public static class SmartScriptLineExtensions

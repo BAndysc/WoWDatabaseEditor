@@ -34,7 +34,10 @@ namespace WDE.Conditions.ViewModels
             this.windowManager = windowManager;
             this.messageBoxService = messageBoxService;
 
-            MakeItems();
+            SourceItems = new ObservableCollection<ConditionGroupsEditorData>();
+
+            foreach (var item in conditionDataProvider.GetConditionGroups())
+                SourceItems.Add(new ConditionGroupsEditorData(in item));
             
             Save = new DelegateCommand(() =>
             {
@@ -45,7 +48,7 @@ namespace WDE.Conditions.ViewModels
             AddMember = new AsyncCommand<ConditionGroupsEditorData>(AddItemToGroup);
             EditItem = new AsyncCommand<ConditionGroupsEditorData>(EditSourceItem);
             // history setup
-            historyHandler = new ConditionGroupsEditorHistoryHandler(SourceItems);
+            historyHandler = new ConditionGroupsEditorHistoryHandler(SourceItems!);
             History = historyCreator();
             undoCommand = new DelegateCommand(History.Undo, () => History.CanUndo);
             redoCommand = new DelegateCommand(History.Redo, () => History.CanRedo);
@@ -79,7 +82,7 @@ namespace WDE.Conditions.ViewModels
                 SourceItems.Remove(source);
             else if (obj is ConditionGroupsEditorDataNode node)
             {
-                node.Owner.Members.Remove(node);
+                node.Owner!.Members.Remove(node);
                 node.Owner = null;
             }
         }
@@ -123,15 +126,6 @@ namespace WDE.Conditions.ViewModels
             History.MarkAsSaved();
         }
 
-        private void MakeItems()
-        {
-            SourceItems = new ObservableCollection<ConditionGroupsEditorData>();
-
-            foreach (var item in conditionDataProvider.GetConditionGroups())
-                SourceItems.Add(new ConditionGroupsEditorData(in item));
-        }
-        
-        
         public void Dispose()
         {
             historyHandler.Dispose();
@@ -144,7 +138,7 @@ namespace WDE.Conditions.ViewModels
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
         public ICommand Save { get; }
-        public IAsyncCommand CloseCommand { get; set; } = null;
+        public IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         private bool isModified;
 
@@ -196,11 +190,11 @@ namespace WDE.Conditions.ViewModels
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -218,7 +212,7 @@ namespace WDE.Conditions.ViewModels
     public class ConditionGroupsEditorDataNode
     {
         public string Name { get; set; }
-        public ConditionGroupsEditorData Owner;
+        public ConditionGroupsEditorData? Owner;
 
         public ConditionGroupsEditorDataNode(string name, ConditionGroupsEditorData owner)
         {

@@ -86,7 +86,7 @@ namespace Updater
                 using var f = File.OpenWrite(executable);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

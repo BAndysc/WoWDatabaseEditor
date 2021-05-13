@@ -53,18 +53,20 @@ namespace WDE.Conditions.ViewModels
             set => SetProperty(ref areValuesVisible, value);
         }
 
-        private ConditionParameterData selectedKey;
-        public ConditionParameterData SelectedParameterKey { get => selectedKey;
+        private ConditionParameterData? selectedKey;
+        public ConditionParameterData? SelectedParameterKey {
+            
+            get => selectedKey;
             set
             {
                 selectedKey = value;
-                Source.Type = value.Key;
+                Source.Type = value!.Key;
                 AreValuesVisible = value.UseValues;
                 Source.Values.Clear();
             }
         }
         
-        public List<ConditionParameterData> ParameterKeys { get; private set; }
+        public List<ConditionParameterData>? ParameterKeys { get; private set; }
         public BindableTuple<long, SelectOption>? SeletectedParamValue { get; set; }
 
         public DelegateCommand AddValue { get; }
@@ -73,7 +75,7 @@ namespace WDE.Conditions.ViewModels
 
         private void AssignCurrentParamKey()
         {
-            var index = ParameterKeys.FindIndex(x => x.Key == Source.Type);
+            var index = ParameterKeys!.FindIndex(x => x.Key == Source.Type);
             if (index != -1)
             {
                 selectedKey = ParameterKeys[index];
@@ -108,8 +110,8 @@ namespace WDE.Conditions.ViewModels
         public int DesiredHeight { get; } = 666;
         public string Title { get; } = "Parameter Editor";
         public bool Resizeable { get; } = false;
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
     }
     
     public class ConditionParameterData: IComparable<ConditionParameterData>
@@ -124,7 +126,7 @@ namespace WDE.Conditions.ViewModels
 
         public override string ToString() => Key;
 
-        public int CompareTo(ConditionParameterData other)
+        public int CompareTo(ConditionParameterData? other)
         {
             if (other == null)
                 return 1;
