@@ -60,6 +60,8 @@ namespace WDE.DbcStore
         public Dictionary<long, string> SpellFocusObjectStore { get; internal set; } = new();
         public Dictionary<long, string> QuestInfoStore { get; internal set; } = new();
         public Dictionary<long, string> CharTitleStore { get; internal set; } = new();
+        public Dictionary<long, string> CreatureModelDataStore {get; internal set; } = new();
+        public Dictionary<long, string> GameObjectDisplayInfoStore {get; internal set; } = new();
 
         public IEnumerable<uint> Spells
         {
@@ -119,6 +121,8 @@ namespace WDE.DbcStore
             public Dictionary<long, string> SpellFocusObjectStore { get; } = new();
             public Dictionary<long, string> QuestInfoStore { get; } = new();
             public Dictionary<long, string> CharTitleStore { get; } = new();
+            public Dictionary<long, string> CreatureModelDataStore { get; } = new();
+            public Dictionary<long, string> GameObjectDisplayInfoStore { get; } = new();
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -165,6 +169,8 @@ namespace WDE.DbcStore
                 store.SpellFocusObjectStore = SpellFocusObjectStore;
                 store.QuestInfoStore = QuestInfoStore;
                 store.CharTitleStore = CharTitleStore;
+                store.CreatureModelDataStore = CreatureModelDataStore;
+                store.GameObjectDisplayInfoStore = GameObjectDisplayInfoStore;
                 
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
                 parameterFactory.Register("FactionParameter", new DbcParameter(FactionStore));
@@ -184,6 +190,8 @@ namespace WDE.DbcStore
                 parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore));
                 parameterFactory.Register("QuestInfoParameter", new DbcParameter(QuestInfoStore));
                 parameterFactory.Register("CharTitleParameter", new DbcParameter(CharTitleStore));
+                parameterFactory.Register("CreatureModelDataParameter", new DbcFileParameter(CreatureModelDataStore));
+                parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
                 
                 store.solutionManager.RefreshAll();
             }
@@ -201,7 +209,7 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 15;
+                        max = 17;
                         Load("AreaTrigger.dbc", 0, 0, AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 3, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -217,11 +225,13 @@ namespace WDE.DbcStore
                         Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore);
                         Load("QuestInfo.dbc", 0, 1, QuestInfoStore);
                         Load("CharTitles.dbc", 0, 2, CharTitleStore);
+                        Load("CreatureModelData.dbc", 0, 2, CreatureModelDataStore);
+                        Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 17;
+                        max = 19;
                         Load("AreaTrigger.dbc", 0, 0,  AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -239,6 +249,8 @@ namespace WDE.DbcStore
                         Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore);
                         Load("QuestInfo.dbc", 0, 1, QuestInfoStore);
                         Load("CharTitles.dbc", 0, 2, CharTitleStore);
+                        Load("CreatureModelData.dbc", 0, 2, CreatureModelDataStore);
+                        Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
                         break;
                     }
                     case DBCVersions.LEGION_26972:
@@ -277,6 +289,22 @@ namespace WDE.DbcStore
         }
     }
     
+    public class DbcFileParameter : Parameter
+    {
+        public DbcFileParameter(Dictionary<long, string> storage)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (int key in storage.Keys)
+                Items.Add(key, new SelectOption(GetFileName(storage[key]), storage[key]));
+        }
+
+        private string GetFileName(string s)
+        {
+            int indexOf = s.LastIndexOf('\\');
+            return indexOf == -1 ? s : s.Substring(indexOf + 1);
+        }
+    }
+
     public class MultiSpellParameter : MultiSwitchStringParameter
     {
         public MultiSpellParameter(Dictionary<long, string> storage)
