@@ -16,7 +16,7 @@ namespace WDE.Trinity
         public IDatabaseFeatures DatabaseFeatures => this;
         public ISmartScriptFeatures SmartScriptFeatures => this;
         
-        public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate)};
+        public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ICreatureClassLevelStat)};
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {
             SmartScriptType.Creature,

@@ -24,6 +24,7 @@ namespace WDE.MySqlDatabaseCommon.Database
         private List<IConversationTemplate>? conversationTemplates;
         private List<IGossipMenu>? gossipMenusCache;
         private List<INpcText>? npcTextsCache;
+        private List<ICreatureClassLevelStat>? creatureClassLevelStatsCache;
         
         private IAsyncDatabaseProvider nonCachedDatabase;
         private readonly ITaskRunner taskRunner;
@@ -93,6 +94,9 @@ namespace WDE.MySqlDatabaseCommon.Database
             return nonCachedDatabase.GetQuestTemplates();
         }
 
+        public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() =>
+            creatureClassLevelStatsCache ?? nonCachedDatabase.GetCreatureClassLevelStats();
+
         public IEnumerable<IGameEvent> GetGameEvents() => gameEventsCache ?? nonCachedDatabase.GetGameEvents();
         
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => conversationTemplates ?? nonCachedDatabase.GetConversationTemplates();
@@ -151,7 +155,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             {
                 try
                 {
-                    int steps = 8;
+                    int steps = 9;
 
                     progress.Report(0, steps, "Loading creatures");
                     cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
@@ -177,6 +181,10 @@ namespace WDE.MySqlDatabaseCommon.Database
                     progress.Report(7, steps, "Loading quests");
                     cache.questTemplateCache = await cache.nonCachedDatabase.GetQuestTemplatesAsync();
 
+                    progress.Report(8, steps, "Loading creature class level stats");
+                    cache.creatureClassLevelStatsCache =
+                        await cache.nonCachedDatabase.GetCreatureClassLevelStatsAsync();
+                    
                     Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
                     Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
                     Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();

@@ -18,6 +18,8 @@ namespace WDE.Common.Database
 
         IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates();
 
+        IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
+
         IQuestTemplate GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
 

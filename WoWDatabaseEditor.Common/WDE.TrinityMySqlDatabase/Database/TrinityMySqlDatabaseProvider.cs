@@ -156,6 +156,24 @@ namespace WDE.TrinityMySqlDatabase.Database
             return task.Result;
         }
         
+        public async Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync()
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
+                return new List<ICreatureClassLevelStat>();
+
+            await using var model = new TrinityDatabase();
+            return await (from t in model.CreatureClassLevelStats select t).ToListAsync<ICreatureClassLevelStat>();
+        }
+        
+        public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats()
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
+                return Enumerable.Empty<ICreatureClassLevelStat>();
+
+            using var model = new TrinityDatabase();
+            return (from t in model.CreatureClassLevelStats select t).ToList<ICreatureClassLevelStat>();
+        }
+
         public async Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))

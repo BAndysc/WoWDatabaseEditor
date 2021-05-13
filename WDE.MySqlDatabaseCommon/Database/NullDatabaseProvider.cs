@@ -29,6 +29,8 @@ namespace WDE.MySqlDatabaseCommon.Database
         
         public IEnumerable<IGossipMenu> GetGossipMenus() => Enumerable.Empty<IGossipMenu>();
         
+        public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() => Enumerable.Empty<ICreatureClassLevelStat>();
+        
         public IEnumerable<INpcText> GetNpcTexts() => Enumerable.Empty<INpcText>();
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();

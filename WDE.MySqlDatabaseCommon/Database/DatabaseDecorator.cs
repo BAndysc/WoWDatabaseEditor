@@ -24,6 +24,7 @@ namespace WDE.MySqlDatabaseCommon.Database
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => impl.GetConversationTemplates();
         public IEnumerable<INpcText> GetNpcTexts() => impl.GetNpcTexts();
+        public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() => impl.GetCreatureClassLevelStats();
         public IEnumerable<IGossipMenu> GetGossipMenus() => impl.GetGossipMenus();
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) =>
             impl.GetScriptFor(entryOrGuid, type);
