@@ -47,7 +47,7 @@
         {
           "name": "Display",
           "db_column_name": "displayId",
-          "value_type": "uint"
+          "value_type": "GameObjectDisplayInfoParameter"
         },
         {
           "name": "Size",

@@ -279,24 +279,24 @@
       "group_name": "Visual",
       "fields": [
         {
-          "name": "Model Id 1",
+          "name": "Model 1",
           "db_column_name": "modelid1",
-          "value_type": "uint"
+          "value_type": "CreatureModelDataParameter"
         },
         {
-          "name": "Model Id 2",
+          "name": "Model 2",
           "db_column_name": "modelid2",
-          "value_type": "uint"
+          "value_type": "CreatureModelDataParameter"
         },
         {
-          "name": "Model Id 3",
+          "name": "Model 3",
           "db_column_name": "modelid3",
-          "value_type": "uint"
+          "value_type": "CreatureModelDataParameter"
         },
         {
-          "name": "Model Id 4",
+          "name": "Model 4",
           "db_column_name": "modelid4",
-          "value_type": "uint"
+          "value_type": "CreatureModelDataParameter"
         },
         {
           "name": "Model scale",
