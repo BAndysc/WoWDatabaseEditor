@@ -1,4 +1,6 @@
 ﻿using Prism.Ioc;
+using WoWDatabaseEditorCore.Services.ItemFromListSelectorService;
+using WoWDatabaseEditorCore.WPF.Services.ItemFromListSelectorService;
 using WDE.Common.Database;
 using WDE.Common.Windows;
 using WDE.Module;
@@ -18,6 +20,9 @@ namespace WoWDatabaseEditorCore.WPF
             viewLocator.Bind<GenericSelectorDialogViewModel<IGameObjectTemplate>, GenericSelectorDialogView>();
             viewLocator.Bind<GenericSelectorDialogViewModel<IQuestTemplate>, GenericSelectorDialogView>();
             viewLocator.Bind<GenericSelectorDialogViewModel<SpellMiniEntry>, GenericSelectorDialogView>();
+            
+            viewLocator.Bind<LongItemFromListProviderViewModel, ItemFromListProviderView>();
+            viewLocator.Bind<StringItemFromListProviderViewModel, ItemFromListProviderView>();
         }
     }
 }

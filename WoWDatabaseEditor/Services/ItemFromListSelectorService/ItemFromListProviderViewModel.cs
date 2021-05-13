@@ -21,24 +21,28 @@ using WoWDatabaseEditorCore.Extensions;
 
 namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 {
-    public class ItemFromListProviderViewModel : ObservableBase, IDialog
+    public abstract class ItemFromListProviderViewModel<T> : ObservableBase, IDialog where T : notnull
     {
-        private ReactiveProperty<Func<CheckableSelectOption, bool>> currentFilter;
-        private SourceList<CheckableSelectOption> items;
-        private readonly bool asFlags;
-        private string search = "";
+        protected ReactiveProperty<Func<CheckableSelectOption<T>, bool>> currentFilter;
+        protected SourceList<CheckableSelectOption<T>> items;
+        protected readonly bool asFlags;
+        protected string search = "";
         
-        public ItemFromListProviderViewModel(Dictionary<long, SelectOption>? items, bool asFlags, long? current = null)
+        public ItemFromListProviderViewModel(Dictionary<T, SelectOption>? items, 
+            IComparer<CheckableSelectOption<T>> comparer, 
+            Func<T, bool> shouldBeSelected,
+            bool asFlags, 
+            T? current = default)
         {
             this.asFlags = asFlags;
             
-            this.items = AutoDispose(new SourceList<CheckableSelectOption>());
-            ReadOnlyObservableCollection<CheckableSelectOption> outFilteredList;
-            currentFilter = AutoDispose(new ReactiveProperty<Func<CheckableSelectOption, bool>>(_ => true,
-                Compare.Create<Func<CheckableSelectOption, bool>>((_, _) => false, _ => 0)));
+            this.items = AutoDispose(new SourceList<CheckableSelectOption<T>>());
+            ReadOnlyObservableCollection<CheckableSelectOption<T>> outFilteredList;
+            currentFilter = AutoDispose(new ReactiveProperty<Func<CheckableSelectOption<T>, bool>>(_ => true,
+                Compare.Create<Func<CheckableSelectOption<T>, bool>>((_, _) => false, _ => 0)));
             AutoDispose(this.items.Connect()
                 .Filter(currentFilter)
-                .Sort(Comparer<CheckableSelectOption>.Create((x, y) => x.Entry.CompareTo(y.Entry)))
+                .Sort(comparer)
                 .Bind(out outFilteredList)
                 .Subscribe());
             FilteredItems = outFilteredList;
@@ -47,10 +51,10 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             {
                 this.items.Edit(list =>
                 {
-                    foreach (long key in items.Keys)
+                    foreach (T key in items.Keys)
                     {
-                        bool isSelected = current.HasValue && ((current == 0 && key == 0) || (key > 0) && (current & key) == key);
-                        var item = new CheckableSelectOption(key, items[key], isSelected);
+                        bool isSelected = shouldBeSelected(key);
+                        var item = new CheckableSelectOption<T>(key, items[key], isSelected);
                         if (isSelected)
                             SelectedItem = item;
                         list.Add(item);
@@ -61,15 +65,15 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             Columns = new ObservableCollection<ColumnDescriptor>
             {
                 new("Key", "Entry", 80),
-                new("Name", "Name", 270),
-                new("Description", "Description", 380)
+                new("Name", "Name", 220),
+                new("Description", "Description", 320)
             };
 
             if (asFlags)
                 Columns.Insert(0, new ColumnDescriptor("", "IsChecked", 35, true));
 
             if (items == null || items.Count == 0)
-                SearchText = current.HasValue ? current.Value.ToString() : "";
+                SearchText = current != null ? current.ToString() ?? "" : "";
 
             ShowItemsList = items?.Count > 0;
             DesiredHeight = ShowItemsList ? 670 : 130;
@@ -88,10 +92,10 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         }
 
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
-        public ReadOnlyObservableCollection<CheckableSelectOption> FilteredItems { get; }
+        public ReadOnlyObservableCollection<CheckableSelectOption<T>> FilteredItems { get; }
 
-        private CheckableSelectOption? selectedItem;
-        public CheckableSelectOption? SelectedItem
+        private CheckableSelectOption<T>? selectedItem;
+        public CheckableSelectOption<T>? SelectedItem
         {
             get => selectedItem;
             set => SetProperty(ref selectedItem, value);
@@ -106,10 +110,10 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 var lowerSearchText = SearchText.ToLower();
                 if (string.IsNullOrEmpty(SearchText))
                     currentFilter.Value = _ => true;
-                else if (long.TryParse(SearchText, out var searchNumber))
+                else if (typeof(T) == typeof(long) && long.TryParse(SearchText, out var searchNumber))
                     currentFilter.Value = model =>
                     {
-                        if (model.Entry.ToString().Contains(SearchText))
+                        if (model!.Entry!.ToString()!.Contains(SearchText))
                             return true;
                         return model.Name.ToLower().Contains(lowerSearchText);
                     };
@@ -117,8 +121,23 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                    currentFilter.Value = model => model.Name.ToLower().Contains(lowerSearchText);
             }
         }
-        
-        public long GetEntry()
+
+        public abstract T GetEntry();
+
+        public bool ShowItemsList { get; }
+        public DelegateCommand Accept { get; }
+        public ICommand Cancel { get; }
+        public int DesiredWidth { get; }
+        public int DesiredHeight { get; }
+        public string Title => "Picker";
+        public bool Resizeable => true;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
+    }
+
+    public class LongItemFromListProviderViewModel : ItemFromListProviderViewModel<long>
+    {
+        public override long GetEntry()
         {
             if (asFlags)
             {
@@ -147,20 +166,57 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             return 0;
         }
 
-        public bool ShowItemsList { get; }
-        public DelegateCommand Accept { get; }
-        public ICommand Cancel { get; }
-        public int DesiredWidth { get; }
-        public int DesiredHeight { get; }
-        public string Title => "Picker";
-        public bool Resizeable => true;
-        public event Action? CloseCancel;
-        public event Action? CloseOk;
+        public LongItemFromListProviderViewModel(Dictionary<long, SelectOption>? items, bool asFlags, long? current = default) 
+            : base(items, 
+                Comparer<CheckableSelectOption<long>>.Create((x, y) => x.Entry.CompareTo(y.Entry)), 
+                key => (current != null) && ((current == 0 && key == 0) || (key > 0) && (current & key) == key), 
+                asFlags, current ?? 0)
+        {
+        }
     }
-
-    public class CheckableSelectOption : INotifyPropertyChanged
+    
+    public class StringItemFromListProviderViewModel : ItemFromListProviderViewModel<string>
     {
-        public CheckableSelectOption(long entry, SelectOption selectOption, bool isChecked)
+        public override string GetEntry()
+        {
+            if (asFlags)
+                return string.Join(" ", items.Items.Where(i => i.IsChecked).Select(i => i.Entry));
+
+            if (SelectedItem != null)
+                return SelectedItem.Entry;
+
+            return SearchText;
+        }
+
+        public StringItemFromListProviderViewModel(Dictionary<string, SelectOption>? items, bool multiSelect,
+            string? current = default)
+            : base(items,
+                Comparer<CheckableSelectOption<string>>.Create((x, y) =>
+                {
+                    if (long.TryParse(x.Entry, out var e1) && long.TryParse(y.Entry, out var e2))
+                        return e1.CompareTo(e2);
+                    return x.Entry.CompareTo(y.Entry);
+                }),
+                GenerateSelector(multiSelect, current), 
+                multiSelect, current)
+        {
+        }
+
+        private static Func<string, bool> GenerateSelector(bool multiSelect, string? current)
+        {
+            if (multiSelect == false)
+                return key => key == current;
+            if (current == null)
+                return key => false;
+
+            var spells = current.Split(' ').Where(i => !string.IsNullOrEmpty(i)).ToHashSet();
+            return key => spells.Contains(key);
+        }
+    }
+    
+    public class CheckableSelectOption<T> : INotifyPropertyChanged
+    {
+        public CheckableSelectOption(T entry, SelectOption selectOption, bool isChecked)
         {
             Entry = entry;
             Name = selectOption.Name;
@@ -169,7 +225,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         }
 
         public bool IsChecked { get; set; }
-        public long Entry { get; set; }
+        public T Entry { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public event PropertyChangedEventHandler? PropertyChanged;
