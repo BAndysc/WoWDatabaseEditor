@@ -362,6 +362,42 @@
           "name": "Damage mod",
           "db_column_name": "DamageModifier",
           "value_type": "float"
+        },
+        {
+          "is_meta": true,
+          "name": "Effective health",
+          "expression": "str(ceil(GetHP(this.minlevel, this.unit_class, this.exp) * this.HealthModifier)) + ' - ' + str(ceil(GetHP(this.maxlevel, this.unit_class, this.exp) * this.HealthModifier))",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "Effective mana",
+          "expression": "str(ceil(GetMana(this.minlevel, this.unit_class) * this.ManaModifier)) + ' - ' + str(ceil(GetMana(this.maxlevel, this.unit_class) * this.ManaModifier))",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "Effective armor",
+          "expression": "str(ceil(GetArmor(this.minlevel, this.unit_class) * this.ArmorModifier)) + ' - ' + str(ceil(GetArmor(this.maxlevel, this.unit_class) * this.ArmorModifier))",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "Effective damage",
+          "expression": "str(GetDamage(this.minlevel, this.unit_class, this.exp) * this.DamageModifier) + ' - ' + str(GetDamage(this.maxlevel, this.unit_class, this.exp) * this.DamageModifier * 3 / 2)",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "AP bonus",
+          "expression": "str(GetAPBonus(this.minlevel, this.unit_class)) + ' - ' + str(GetAPBonus(this.maxlevel, this.unit_class))",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "Ranged AP bonus",
+          "expression": "str(GetRangeAPBonus(this.minlevel, this.unit_class)) + ' - ' + str(GetRangeAPBonus(this.maxlevel, this.unit_class))",
+          "read_only": true
         }
       ]
     },

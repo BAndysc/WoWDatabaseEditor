@@ -1,14 +1,13 @@
 version: 0.1.{build}
 image: Visual Studio 2019
 configuration: Release
-platform: Any CPU
 environment:
   DEPLOY_URL:
     secure: tI50+kR1mSDCXK8B4BPyT9ArtYD3D1NAvb5/06G8mFA=  
   DEPLOY_USER:
     secure: IZcgg6msojQGCM0rLsUNTA==
   DEPLOY_KEY:
-    secure: DoukQF6JSbhuFNX7qvxkkHVLccEINEcnBpvPGPDTVlQyaOO69y0729rh7VC2KNDdkSlPtuZKeZ+PXQ6ELaEn3A==    
+    secure: SXvCUsowLsFFH1P7e3IsqldBlcPD0gQ8qpsSM8s73VUImWk+NW0dbnLjbytCriqD6O3+FiBLKWkE/v0bNckEJkwFDU8y2ZuNjmB2NIyAQViPyi72/a3vRPM7ruJH+BY0
 install:
 - cmd: git submodule update --init --recursive
 build_script:

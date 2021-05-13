@@ -9,7 +9,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
     {
         public DatabaseRowViewModel Parent { get; }
         public DatabaseEntity ParentEntity { get; }
-        public IDatabaseField TableField { get; }
+        public IDatabaseField? TableField { get; }
         public IParameterValue ParameterValue { get; }
         public bool IsVisible { get; private set; } = true;
         public bool IsModified { get; private set; }
@@ -46,6 +46,22 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
                 RaisePropertyChanged(nameof(OriginalValueTooltip));
                 RaisePropertyChanged(nameof(AsBoolValue));
+            }));
+            inConstructor = false;
+        }
+
+        public DatabaseCellViewModel(DatabaseRowViewModel parent, 
+            DatabaseEntity parentEntity,
+            IParameterValue parameterValue)
+        {
+            ParentEntity = parentEntity;
+            Parent = parent;
+            ParameterValue = parameterValue;
+
+            AutoDispose(parameterValue.ToObservable().SubscribeAction(_ =>
+            {
+                if (!inConstructor)
+                    parent.AnyFieldModified();
             }));
             inConstructor = false;
         }

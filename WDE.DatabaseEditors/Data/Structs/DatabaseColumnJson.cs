@@ -34,6 +34,12 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "is_condition")]
         public bool IsConditionColumn { get; set; }
         
+        [JsonProperty(PropertyName = "is_meta")]
+        public bool IsMetaColumn { get; set; }
+        
+        [JsonProperty(PropertyName = "expression")]
+        public string? Expression { get; set; }
+
         [JsonProperty(PropertyName = "preferred_width")]
         public float? PreferredWidth { get; set; }
     }

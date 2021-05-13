@@ -40,7 +40,7 @@ namespace WDE.DatabaseEditors.Loaders
             var tablePrimaryKey = tableDefinitionJson.TablePrimaryKeyColumnName;
             var columns = tableDefinitionJson.Groups
                 .SelectMany(x => x.Fields)
-                .Where(x => !x.IsConditionColumn)
+                .Where(x => !x.IsConditionColumn && !x.IsMetaColumn)
                 .Select(x => $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`")
                 .Distinct();
             var names = string.Join(",", columns);

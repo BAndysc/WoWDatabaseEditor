@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Antlr4.Runtime;
 using DynamicData;
 using Prism.Commands;
 using Prism.Events;
@@ -17,6 +18,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Expressions;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
@@ -37,6 +39,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly IMySqlExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
         private readonly ITeachingTipService teachingTipService;
+        private readonly ICreatureStatCalculatorService creatureStatCalculatorService;
 
         private readonly IDatabaseTableDataProvider tableDataProvider;
         
@@ -62,7 +65,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
-            IQueryGenerator queryGenerator, ITeachingTipService teachingTipService) : base(history, solutionItem, solutionItemName, 
+            IQueryGenerator queryGenerator, ITeachingTipService teachingTipService,
+            ICreatureStatCalculatorService creatureStatCalculatorService) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory)
         {
@@ -73,6 +77,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             this.mySqlExecutor = mySqlExecutor;
             this.queryGenerator = queryGenerator;
             this.teachingTipService = teachingTipService;
+            this.creatureStatCalculatorService = creatureStatCalculatorService;
             tableDefinition = null!;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
@@ -155,7 +160,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private async Task Revert(DatabaseCellViewModel? view)
         {
-            if (view == null || view.Parent.IsReadOnly)
+            if (view == null || view.Parent.IsReadOnly || view.TableField == null)
                 return;
             
             view.ParameterValue.Revert();
@@ -199,7 +204,19 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             if (string.IsNullOrEmpty(text)) 
                 return _ => true;
             var lower = text.ToLower();
-            return item => item.Name.ToLower().Contains(lower);
+            if (lower.Contains("||"))
+            {
+                var parts = lower.Split("||").Select(a => a.Trim()).ToList();
+                return item =>
+                {
+                    foreach (var p in parts)
+                        if (item.Name.ToLower().Contains(p))
+                            return true;
+                    return false;
+                };
+            }
+            else
+                return item => item.Name.ToLower().Contains(lower);
         }
         
         private bool ContainsEntity(DatabaseEntity entity)
@@ -278,42 +295,56 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             foreach (var row in Rows.Items)
             {
                 var column = row.ColumnData;
+                DatabaseCellViewModel cellViewModel;
                 
-                var cell = entity.GetCell(column.DbColumnName);
-                if (cell == null)
-                    throw new Exception("this should never happen");
+                if (column.IsMetaColumn)
+                {
+                    var evaluator = new DatabaseExpressionEvaluator(creatureStatCalculatorService, column.Expression!);
+                    var parameterValue = new ParameterValue<string>(new ValueHolder<string>(evaluator.Evaluate(entity)!.ToString()),
+                        new ValueHolder<string>(""), StringParameter.Instance);
+                    entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
+                    cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, parameterValue));
+                }
+                else
+                {
+                    var cell = entity.GetCell(column.DbColumnName);
+                    if (cell == null)
+                        throw new Exception("this should never happen");
                             
-                IParameterValue parameterValue = null!;
-                if (cell is DatabaseField<long> longParam)
-                {
-                    parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
-                }
-                else if (cell is DatabaseField<string> stringParam)
-                {
-                    parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
-                }
-                else if (cell is DatabaseField<float> floatParameter)
-                {
-                    parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
-                }
-
-                IObservable<bool>? cellVisible = null!;
-                var group = row.GroupData;
-                if (group.ShowIf.HasValue)
-                {
-                    if (!groupVisibility.TryGetValue(group.Name, out cellVisible))
+                    IParameterValue parameterValue = null!;
+                    if (cell is DatabaseField<long> longParam)
                     {
-                        var compareCell = entity.GetCell(group.ShowIf.Value.ColumnName);
-                        if (compareCell != null && compareCell is DatabaseField<long> lField)
-                        {
-                            var comparedValue = group.ShowIf.Value.Value;
-                            cellVisible = Observable.Select(lField.Current.ToObservable(p => p.Value), val => val == comparedValue);
-                        }
-                        groupVisibility[group.Name] = cellVisible;
+                        parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
                     }
+                    else if (cell is DatabaseField<string> stringParam)
+                    {
+                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
+                    }
+                    else if (cell is DatabaseField<float> floatParameter)
+                    {
+                        parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
+                    }
+
+                    IObservable<bool>? cellVisible = null!;
+                    var group = row.GroupData;
+                    if (group.ShowIf.HasValue)
+                    {
+                        if (!groupVisibility.TryGetValue(group.Name, out cellVisible))
+                        {
+                            var compareCell = entity.GetCell(group.ShowIf.Value.ColumnName);
+                            if (compareCell != null && compareCell is DatabaseField<long> lField)
+                            {
+                                var comparedValue = group.ShowIf.Value.Value;
+                                cellVisible = Observable.Select(lField.Current.ToObservable(p => p.Value), val => val == comparedValue);
+                            }
+                            groupVisibility[group.Name] = cellVisible;
+                        }
+                    }
+
+                    cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, cell, parameterValue, cellVisible));
                 }
 
-                var cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, cell, parameterValue, cellVisible));
+                
                 row.Cells.Insert(index, cellViewModel);
             }
 
