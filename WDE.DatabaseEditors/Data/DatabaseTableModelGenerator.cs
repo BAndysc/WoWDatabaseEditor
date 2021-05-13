@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.Database;
+using WDE.Common.Parameters;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
@@ -17,12 +18,15 @@ namespace WDE.DatabaseEditors.Data
     public class DatabaseTableModelGenerator : IDatabaseTableModelGenerator
     {
         private readonly IMessageBoxService messageBoxService;
+        private readonly IParameterFactory parameterFactory;
         private readonly IDatabaseFieldFactory databaseFieldFactory;
 
         public DatabaseTableModelGenerator(IMessageBoxService messageBoxService,
+            IParameterFactory parameterFactory,
             IDatabaseFieldFactory databaseFieldFactory)
         {
             this.messageBoxService = messageBoxService;
+            this.parameterFactory = parameterFactory;
             this.databaseFieldFactory = databaseFieldFactory;
         }
         
@@ -37,12 +41,18 @@ namespace WDE.DatabaseEditors.Data
                         (a, b) => a!.DbColumnName.Equals(b!.DbColumnName))))
             {
                 IValueHolder valueHolder;
-                if (column.ValueType == "float")
+                var type = column.ValueType;
+
+                if (parameterFactory.IsRegisteredLong(type))
+                    type = "uint";
+                else if (parameterFactory.IsRegisteredString(type))
+                    type = "string";
+                
+                if (type == "float")
                 {
                     valueHolder = new ValueHolder<float>(column.Default is float f ? f : 0.0f);
                 }
-                else if (column.ValueType.EndsWith("Parameter") || column.ValueType == "int" ||
-                         column.ValueType == "uint")
+                else if (type == "int" || type == "uint")
                 {
                     if (column.DbColumnName == definition.TablePrimaryKeyColumnName)
                         valueHolder = new ValueHolder<long>(key);

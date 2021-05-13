@@ -229,18 +229,23 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private async Task EditParameter(DatabaseCellViewModel cell)
         {
-            var valueHolder = cell.ParameterValue as ParameterValue<long>;
+            if (!cell.ParameterValue.BaseParameter.HasItems)
+                return;
             
-            if (valueHolder == null)
-                return;
-
-            if (!valueHolder.Parameter.HasItems)
-                return;
-
-            var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
-                valueHolder.Parameter is FlagParameter, valueHolder.Value);
-            if (result.HasValue)
-                valueHolder.Value = result.Value; 
+            if (cell.ParameterValue is ParameterValue<long> valueHolder)
+            {
+                var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
+                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
+                if (result.HasValue)
+                    valueHolder.Value = result.Value;                 
+            }
+            else if (cell.ParameterValue is ParameterValue<string> stringValueHolder)
+            {
+                var result = await itemFromListProvider.GetItemFromList(stringValueHolder.Parameter.Items, 
+                    stringValueHolder.Parameter is MultiSwitchStringParameter, stringValueHolder.Value);
+                if (result != null)
+                    stringValueHolder.Value = result;                 
+            }
         }
 
         private List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
@@ -318,7 +323,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     }
                     else if (cell is DatabaseField<string> stringParam)
                     {
-                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
+                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
                     }
                     else if (cell is DatabaseField<float> floatParameter)
                     {

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using WDBXEditor.Reader;
 using WDBXEditor.Storage;
 using WDE.Common;
@@ -167,6 +169,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
                 parameterFactory.Register("FactionParameter", new DbcParameter(FactionStore));
                 parameterFactory.Register("SpellParameter", new DbcParameter(SpellStore));
+                parameterFactory.Register("MultiSpellParameter", new MultiSpellParameter(SpellStore));
                 parameterFactory.Register("SpellAreaSpellParameter", new SpellAreaSpellParameter(SpellStore));
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
@@ -271,6 +274,14 @@ namespace WDE.DbcStore
             Items = new Dictionary<long, SelectOption>();
             foreach (int key in storage.Keys)
                 Items.Add(key, new SelectOption(storage[key]));
+        }
+    }
+    
+    public class MultiSpellParameter : MultiSwitchStringParameter
+    {
+        public MultiSpellParameter(Dictionary<long, string> storage)
+         : base(storage.ToDictionary(t => t.Key.ToString(), t => new SelectOption(t.Value)))
+        {
         }
     }
 

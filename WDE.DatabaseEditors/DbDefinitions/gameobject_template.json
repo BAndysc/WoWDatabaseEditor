@@ -32,8 +32,7 @@
         {
           "name": "Name",
           "db_column_name": "name",
-          "value_type": "string",
-          "read_only": true
+          "value_type": "string"
         },
         {
           "name": "Type",
@@ -70,12 +69,12 @@
         {
           "name": "Icon name",
           "db_column_name": "IconName",
-          "value_type": "string"
+          "value_type": "GameObjectIconNameParameter"
         },
         {
           "name": "Cast bar caption",
           "db_column_name": "castBarCaption",
-          "value_type": "string"
+          "value_type": "GameObjectCastBarCaptionParameter"
         }
       ]
     },

@@ -76,7 +76,7 @@
         {
           "name": "Icon name",
           "db_column_name": "IconName",
-          "value_type": "string",
+          "value_type": "IconNameParameter",
           "can_be_null": true
         },
         {
@@ -235,7 +235,7 @@
           "name": "Auras",
           "db_column_name": "auras",
           "foreign_table": "creature_template_addon",
-          "value_type": "string",
+          "value_type": "MultiSpellParameter",
           "can_be_null": true
         }
       ]
