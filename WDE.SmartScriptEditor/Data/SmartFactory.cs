@@ -292,7 +292,7 @@ namespace WDE.SmartScriptEditor.Data
                 if (data.Parameters[i].Values != null)
                 {
                     key = $"{data.Name}_{i}";
-                    if (!parameterFactory.IsRegistered(key))
+                    if (!parameterFactory.IsRegisteredLong(key))
                         parameterFactory.Register(key, data.Parameters[i].Type == "FlagParameter" ? new FlagParameter(){Items = data.Parameters[i].Values} : new Parameter(){Items = data.Parameters[i].Values});
                 }
                 
@@ -322,7 +322,7 @@ namespace WDE.SmartScriptEditor.Data
                 if (data.Parameters[i].Values != null)
                 {
                     key = $"{data.Name}_{i}";
-                    if (!parameterFactory.IsRegistered(key))
+                    if (!parameterFactory.IsRegisteredLong(key))
                         parameterFactory.Register(key, new Parameter(){Items = data.Parameters[i].Values});
                 }
                 

@@ -66,7 +66,7 @@ namespace WDE.Conditions.Data
                         continue;
 
                     string key = $"condition_{cond.Name}_{index}";
-                    if (!parameterFactory.IsRegistered(key))
+                    if (!parameterFactory.IsRegisteredLong(key))
                         parameterFactory.Register(key,
                             param.Type == "FlagParameter"
                                 ? new FlagParameter() {Items = param.Values}

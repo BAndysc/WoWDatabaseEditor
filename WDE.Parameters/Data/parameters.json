@@ -2321,5 +2321,70 @@
 			"1": {"name": "autocast"},
 			"2": {"name": "autoremove"}
 		}
+	},
+	"IconNameParameter": {
+		"name": "Icon names",
+		"stringValues": {
+			"Directions": {"name": "Directions"},
+			"Buy": {"name": "Buy"},
+			"Taxi": {"name": "Taxi"},
+			"Trainer": {"name": "Trainer"},
+			"vehichleCursor": {"name": "vehichleCursor"},
+			"Attack": {"name": "Attack"},
+			"Interact": {"name": "Interact"},
+			"Speak": {"name": "Speak"},
+			"LootAll": {"name": "LootAll"},
+			"Gunner": {"name": "Gunner"},
+			"Pickup": {"name": "Pickup"},
+			"PVP": {"name": "PVP"},
+			"Point": {"name": "Point"},
+			"Quest": {"name": "Quest"},
+			"Repair": {"name": "Repair"},
+			"Driver": {"name": "Driver"}
+		}
+	},
+	"GameObjectIconNameParameter": {
+		"name": "GameObject icon names",
+		"stringValues": {
+			"": {"name": ""},
+			"Point": {"name": "Point"},
+			"Attack": {"name": "Attack"},
+			"PVP": {"name": "PVP"},
+			"Infused Moonstone": {"name": "Infused Moonstone"},
+			"Mine": {"name": "Mine"},
+			"Interact": {"name": "Interact"},
+			"LootAll": {"name": "LootAll"},
+			"Inspect": {"name": "Inspect"}
+		}
+	},
+	"GameObjectCastBarCaptionParameter": {
+		"name": "GameObject cast bar caption names",
+		"stringValues": {
+			"": {"name": ""},
+			"Reading": {"name": "Reading"},
+			"Burning": {"name": "Burning"},
+			"Retrieving": {"name": "Retrieving"},
+			"Collecting": {"name": "Collecting"},
+			"Examining": {"name": "Examining"},
+			"Searching": {"name": "Searching"},
+			"Stealing": {"name": "Stealing"},
+			"Using": {"name": "Using"},
+			"Opening": {"name": "Opening"},
+			"Breaking": {"name": "Breaking"},
+			"Extinguishing": {"name": "Extinguishing"},
+			"Drinking": {"name": "Drinking"},
+			"Summoning": {"name": "Summoning"},
+			"Gathering": {"name": "Gathering"},
+			"Destroying": {"name": "Destroying"},
+			"Unlocking": {"name": "Unlocking"},
+			"Ringing": {"name": "Ringing"},
+			"Removing": {"name": "Removing"},
+			"Acquiring": {"name": "Acquiring"},
+			"Activating": {"name": "Activating"},
+			"Lighting": {"name": "Lighting"},
+			"Taking Readings": {"name": "Taking Readings"},
+			"Disturbing": {"name": "Disturbing"},
+			"Activating Defenses": {"name": "Activating Defenses"}
+		}
 	}
 }

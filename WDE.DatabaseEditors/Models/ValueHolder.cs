@@ -18,6 +18,7 @@ namespace WDE.DatabaseEditors.Models
         string OriginalString { get; }
         void SetNull();
         void Revert();
+        IParameter BaseParameter { get; }
     }
 
     public class ParameterValue<T> : IParameterValue
@@ -36,6 +37,8 @@ namespace WDE.DatabaseEditors.Models
                 this.value.Value = value;
             }
         }
+
+        public IParameter BaseParameter => parameter;
         
         private IParameter<T> parameter;
         public IParameter<T> Parameter

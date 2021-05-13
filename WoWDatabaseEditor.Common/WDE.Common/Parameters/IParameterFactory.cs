@@ -8,8 +8,11 @@ namespace WDE.Common.Parameters
     public interface IParameterFactory
     {
         IParameter<long> Factory(string type);
-        bool IsRegistered(string type);
+        IParameter<string> FactoryString(string type);
+        bool IsRegisteredLong(string type);
+        bool IsRegisteredString(string type);
         void Register(string key, IParameter<long> parameter);
+        void Register(string key, IParameter<string> parameter);
         
         IEnumerable<string> GetKeys();
     }

@@ -24,9 +24,17 @@ namespace WDE.Parameters
         {
             foreach (var pair in parameterDefinitionProvider.Parameters)
             {
-                Parameter p = pair.Value.IsFlag ? new FlagParameter() : new Parameter();
-                p.Items = pair.Value.Values;
-                factory.Register(pair.Key, p);
+                if (pair.Value.StringValues != null)
+                {
+                    SwitchStringParameter stringParameter = new SwitchStringParameter(pair.Value.StringValues);
+                    factory.Register(pair.Key, stringParameter);
+                }
+                else if (pair.Value.Values != null)
+                {
+                    Parameter p = pair.Value.IsFlag ? new FlagParameter() : new Parameter();
+                    p.Items = pair.Value.Values;
+                    factory.Register(pair.Key, p);   
+                }
             }
             
             factory.Register("FloatParameter", new FloatIntParameter(1000));

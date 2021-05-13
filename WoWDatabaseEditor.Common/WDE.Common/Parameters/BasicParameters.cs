@@ -48,6 +48,33 @@ namespace WDE.Common.Parameters
         public override string ToString(string value) => value;
     }
 
+    public class SwitchStringParameter : GenericBaseParameter<string>
+    {
+        public SwitchStringParameter(Dictionary<string, SelectOption> options)
+        {
+            Items = options;
+        }
+
+        public override string ToString(string value)
+        {
+            if (Items.TryGetValue(value, out var option))
+                return option.Name;
+            return "unknown (" + value + ")";
+        }
+    }
+
+    public class MultiSwitchStringParameter : SwitchStringParameter
+    {
+        public MultiSwitchStringParameter(Dictionary<string, SelectOption> options) : base(options)
+        {
+        }
+
+        public override string ToString(string value)
+        {
+            return value;
+        }
+    }
+    
     public class FlagParameter : Parameter
     {
         public override string ToString(long value)

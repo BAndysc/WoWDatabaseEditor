@@ -2,10 +2,14 @@
 
 namespace WDE.Common.Parameters
 {
-    public interface IParameter<T>
+    public interface IParameter
+    {
+        bool HasItems { get; }
+    }
+    
+    public interface IParameter<T> : IParameter
     {
         string ToString(T value);
-        bool HasItems { get; }
         Dictionary<T, SelectOption> Items { get; }
     }
 }
