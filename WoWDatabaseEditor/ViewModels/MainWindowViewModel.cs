@@ -218,7 +218,8 @@ namespace WoWDatabaseEditorCore.ViewModels
                 }
             }
 
-            DocumentManager.OpenedDocuments.Clear();
+            while (DocumentManager.OpenedDocuments.Count > 0)
+                DocumentManager.OpenedDocuments.RemoveAt(DocumentManager.OpenedDocuments.Count - 1);
 
             return true;
         }

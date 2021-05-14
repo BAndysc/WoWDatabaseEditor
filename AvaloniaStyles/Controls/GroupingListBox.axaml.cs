@@ -11,6 +11,7 @@ using Avalonia.Interactivity;
 using Avalonia.Metadata;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using JetBrains.Annotations;
 
 namespace AvaloniaStyles.Controls
 {
@@ -49,6 +50,9 @@ namespace AvaloniaStyles.Controls
     // this is in order to make SelectionItem working
     public class GroupingListBox : TemplatedControl
     {
+        private ScrollViewer? scroll;
+        private ItemsControl? parentItems;
+
         public static readonly DirectProperty<GroupingListBox, object?> SelectedItemProperty =
             AvaloniaProperty.RegisterDirect<GroupingListBox, object?>(
                 nameof(SelectedItem),
@@ -105,10 +109,33 @@ namespace AvaloniaStyles.Controls
             get => GetValue(HeaderTemplateProperty);
             set => SetValue(HeaderTemplateProperty, value);
         }
-
+        
         public GroupingListBox()
         {
             this.AddHandler(InputElement.KeyDownEvent, OnPreviewKeyDown, RoutingStrategies.Tunnel);
+        }
+
+        public void ScrollToItem(object item)
+        {
+            if (Items is not IList collection)
+                return;
+
+            if (parentItems == null || scroll == null)
+                return;
+            
+            int index = collection.IndexOf(item);
+            if (index == -1)
+                return;
+
+            var container = parentItems.ItemContainerGenerator.ContainerFromIndex(index);
+            scroll.Offset = new Vector(0, container.Bounds.Y);
+        }
+
+        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+        {
+            base.OnApplyTemplate(e);
+            scroll = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer");
+            parentItems = e.NameScope.Find<ItemsControl>("PART_ParentItems");
         }
 
         #region KEYBOARD_NAVIGATION

@@ -73,12 +73,12 @@ namespace WDE.SmartScriptEditor.Models
 
             try
             {
-                var parentEventData = Parent.Parent.Parent.GetEventData(Parent.Parent);
+                var parentEventData = Parent.Parent.Parent.TryGetEventData(Parent.Parent);
 
-                if (parentEventData.Invoker == null)
+                if (parentEventData?.Invoker == null)
                     return "Last action invoker";
 
-                return parentEventData.Invoker.Name;
+                return parentEventData.Value.Invoker.Name;
             }
             catch (Exception)
             {

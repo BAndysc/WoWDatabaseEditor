@@ -118,6 +118,13 @@ namespace WoWDatabaseEditorCore.Managers
             OpenTool(typeof(T));
         }
 
+        public T GetTool<T>() where T : ITool
+        {
+            if (!typeToToolInstance.TryGetValue(typeof(T), out var tool))
+                throw new Exception("tool doesnt exist");
+            return (T)tool;
+        }
+        
         public void OpenTool(Type toolType)
         {
             if (!typeToToolInstance.TryGetValue(toolType, out var tool))

@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:managers="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.ProblemsTool.ProblemsView">
+    <UserControl.Resources>
+        <DrawingImage x:Key="IconError">
+          <DrawingGroup>
+              <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" /><GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M16,8C16,12.418 12.418,16 8,16 3.582,16 0,12.418 0,8 0,3.582 3.582,0 8,0 12.418,0 16,3.582 16,8" /><GeometryDrawing Brush="#FFE41400" Geometry="F1M12.4141,11L11.0001,12.414 8.0001,9.414 5.0001,12.414 3.5861,11 6.5861,8 3.5861,5 5.0001,3.586 8.0001,6.586 11.0001,3.586 12.4141,5 9.4141,8z M8.0001,1C4.1341,1 1.0001,4.135 1.0001,8 1.0001,11.865 4.1341,15 8.0001,15 11.8651,15 15.0001,11.865 15.0001,8 15.0001,4.135 11.8651,1 8.0001,1" /><GeometryDrawing Brush="#FFFFFFFF" Geometry="F1M9.4141,8L12.4141,11 11.0001,12.414 8.0001,9.414 5.0001,12.414 3.5861,11 6.5861,8 3.5861,5 5.0001,3.586 8.0001,6.586 11.0001,3.586 12.4141,5z" />
+            </DrawingGroup>
+        </DrawingImage>
+        <DrawingImage x:Key="IconOk">
+          <DrawingGroup>
+              <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" /><GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M8,16C3.589,16 0,12.411 0,8 0,3.589 3.589,0 8,0 12.411,0 16,3.589 16,8 16,12.411 12.411,16 8,16" /><GeometryDrawing Brush="#FF329932" Geometry="F1M6.2998,12.3887L3.0428,9.1317 4.4568,7.7177 6.2998,9.5607 11.5428,4.3177 12.9568,5.7317z M7.9998,0.999700000000001C4.1338,0.999700000000001 0.9998,4.1337 0.9998,7.9997 0.9998,11.8657 4.1338,14.9997 7.9998,14.9997 11.8658,14.9997 14.9998,11.8657 14.9998,7.9997 14.9998,4.1337 11.8658,0.999700000000001 7.9998,0.999700000000001" /><GeometryDrawing Brush="#FFFFFFFF" Geometry="F1M6.2998,12.3887L3.0428,9.1317 4.4568,7.7177 6.2998,9.5607 11.5428,4.3177 12.9568,5.7317z" />
+            </DrawingGroup>
+        </DrawingImage>
+        <DrawingImage x:Key="IconWarning">
+          <DrawingGroup>
+              <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" /><GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M7.0002,-0.000199999999999534L0.000200000000000422,13.9998 2.0002,15.9998 14.0002,15.9998 16.0002,13.9998 9.0002,-0.000199999999999534z" /><GeometryDrawing Brush="#FFFFCC00" Geometry="F1M9,10L7,10 7,5 9,5z M9,13L7,13 7,11 9,11z M8.382,1L7.618,1 1.217,13.803 2.5,15 13.5,15 14.783,13.803z" /><GeometryDrawing Brush="#FF000000" Geometry="F1M9,11L7,11 7,13 9,13z M9,10L7,10 7,5 9,5z" />
+            </DrawingGroup>
+        </DrawingImage>
+        <DrawingImage x:Key="IconInfo">
+            <DrawingGroup>
+                <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" /><GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M0,8.0005C0,3.5825 3.582,0.000499999999998835 8,0.000499999999998835 12.418,0.000499999999998835 16,3.5825 16,8.0005 16,12.4185 12.418,16.0005 8,16.0005 3.582,16.0005 0,12.4185 0,8.0005" /><GeometryDrawing Brush="#FF1AA1E2" Geometry="F1M9,5L7,5 7,3 9,3z M9,13L7,13 7,6 9,6z M8,1C4.135,1 1,4.135 1,8 1,11.865 4.135,15 8,15 11.865,15 15,11.865 15,8 15,4.135 11.865,1 8,1" /><GeometryDrawing Brush="#FFFFFFFF" Geometry="F1M7,5L9,5 9,3 7,3z M7,6L9,6 9,13 7,13z" />
+            </DrawingGroup>
+        </DrawingImage>
+    </UserControl.Resources>
+    <controls:GroupingListBox Items="{Binding Problems}" BorderThickness="0" Name="ListBox"> 
+        <controls:GroupingListBox.HeaderTemplate>
+            <DataTemplate>
+                <controls:GroupingHeader GroupName="{Binding Name}">
+                    <controls:GroupingHeader.CustomContent>
+                        <Border Padding="6,2,6,2" CornerRadius="3" Background="#30000000" Margin="0,0,3,0">
+                            <TextBlock  Text="{Binding Count}" />
+                        </Border>
+                    </controls:GroupingHeader.CustomContent>
+                </controls:GroupingHeader>
+            </DataTemplate>
+        </controls:GroupingListBox.HeaderTemplate>
+        <controls:GroupingListBox.ItemTemplate>
+            <DataTemplate>
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Image Height="16" Width="16" VerticalAlignment="Center" Margin="6,2,2,2">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{Binding Severity}" ComparisonCondition="Equal">
+                                <DataTriggerBehavior.Value>
+                                    <managers:DiagnosticSeverity>Error</managers:DiagnosticSeverity>
+                                </DataTriggerBehavior.Value>
+                                <ChangePropertyAction TargetObject="{Binding #Image}" 
+                                                      PropertyName="Source"
+                                                      Value="{StaticResource IconError}" />
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{Binding Severity}" ComparisonCondition="Equal">
+                                <DataTriggerBehavior.Value>
+                                    <managers:DiagnosticSeverity>Warning</managers:DiagnosticSeverity>
+                                </DataTriggerBehavior.Value>
+                                <ChangePropertyAction TargetObject="{Binding #Image}" 
+                                                      PropertyName="Source"
+                                                      Value="{StaticResource IconWarning}" />
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{Binding Severity}" ComparisonCondition="Equal">
+                                <DataTriggerBehavior.Value>
+                                    <managers:DiagnosticSeverity>Info</managers:DiagnosticSeverity>
+                                </DataTriggerBehavior.Value>
+                                <ChangePropertyAction TargetObject="{Binding #Image}" 
+                                                      PropertyName="Source"
+                                                      Value="{StaticResource IconInfo}" />
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Image>
+                    <TextBlock Grid.Column="1" TextTrimming="CharacterEllipsis" Text="{Binding Message}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Margin="10,0,0,0" Opacity="0.5" Text="{Binding Line}" VerticalAlignment="Center"/>
+                </Grid>
+            </DataTemplate>
+        </controls:GroupingListBox.ItemTemplate>
+    </controls:GroupingListBox>
+</UserControl>

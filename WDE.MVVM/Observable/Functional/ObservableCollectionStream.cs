@@ -72,7 +72,7 @@ namespace WDE.MVVM.Observable.Functional
                         
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        
+                        Console.WriteLine("ObservableCollection reset event is not supported in ToStream(), because it is not possible to do so.");
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

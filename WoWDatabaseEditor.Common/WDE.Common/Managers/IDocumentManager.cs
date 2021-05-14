@@ -17,6 +17,7 @@ namespace WDE.Common.Managers
         ObservableCollection<ITool> OpenedTools { get; }
         void OpenDocument(IDocument editor);
         void OpenTool<T>() where T : ITool;
+        T GetTool<T>() where T : ITool;
         void OpenTool(Type toolType);
     }
 }

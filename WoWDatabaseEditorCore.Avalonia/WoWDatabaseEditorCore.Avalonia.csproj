@@ -61,6 +61,10 @@
           <DependentUpon>TextDocumentView.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Services\ProblemsTool\ProblemsView.axaml.cs">
+          <DependentUpon>ProblemsView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="0.10.0" />

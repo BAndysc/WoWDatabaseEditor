@@ -34,7 +34,7 @@
                 <Border Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}">
-                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Name="PART_ScrollViewer">
                         <ItemsControl Items="{TemplateBinding Items}" Name="PART_ParentItems">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>

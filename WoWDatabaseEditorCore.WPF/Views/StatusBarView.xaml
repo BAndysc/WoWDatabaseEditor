@@ -11,6 +11,20 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <converters:NullConverter Inverted="True" x:Key="NullConverter" />
+            <DrawingImage x:Key="Problems">
+                <DrawingImage.Drawing>
+                    <DrawingGroup>
+                        <GeometryDrawing  Brush="White" Geometry="F1M235,-171L235,-128 277,-128 277,-171 235,-171z M235,-299L235,-213 277,-213 277,-299 235,-299z M256,-469L491,-64 21.0000038146973,-64 256,-469z"   />
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
+            <DrawingImage x:Key="NoProblems">
+                <DrawingImage.Drawing>
+                    <DrawingGroup>
+                        <GeometryDrawing  Brush="White" Geometry="F1M418,-393L448,-363 192,-107 73,-226 102,-256 192,-166 418,-393z"   />
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
             <Style TargetType="Button" x:Key="StatusBarButton">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="Template">
@@ -43,6 +57,7 @@
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                 </Grid>
@@ -82,7 +97,29 @@
                 </Button>
             </StackPanel>
         </StatusBarItem>
-        <StatusBarItem Grid.Column="1" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" Padding="0" Margin="0">
+        <StatusBarItem Grid.Column="1" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" Padding="0" Margin="0,0,8,0">
+            <Button Style="{StaticResource StatusBarButton}" Command="{Binding OpenProblemTool}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Height="13" Width="13" VerticalAlignment="Center" Margin="0,0,5,0">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Setter Property="Source" Value="{StaticResource Problems}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding TotalProblems}" Value="0">
+                                        <Setter Property="Source" Value="{StaticResource NoProblems}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                    <TextBlock IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" >
+                        <Run Text="{Binding TotalProblems, Mode=OneWay}"/>
+                        <Run Text=" problems found" />
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+        </StatusBarItem>
+        <StatusBarItem Grid.Column="2" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" Padding="0" Margin="0">
             <Button Style="{StaticResource StatusBarButton}" Command="{Binding TasksViewModel.TogglePanelVisibility}">
                 <TextBlock IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" >
                     <Run Text="{Binding TasksViewModel.PendingTasksCount, Mode=OneWay}"/>

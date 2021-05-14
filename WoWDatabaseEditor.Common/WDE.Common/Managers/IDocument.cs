@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using WDE.Common.Annotations;
 using WDE.Common.History;
 
 namespace WDE.Common.Managers
@@ -24,5 +26,24 @@ namespace WDE.Common.Managers
     public interface ISolutionItemDocument : IDocument
     {
         ISolutionItem SolutionItem { get; }
+    }
+
+    public interface IProblemSourceDocument : IDocument
+    {
+        IObservable<IReadOnlyList<IInspectionResult>> Problems { get; }
+    }
+
+    public interface IInspectionResult
+    {
+        public string Message { get; }
+        public DiagnosticSeverity Severity { get; }
+        public int Line { get; }
+    }
+    
+    public enum DiagnosticSeverity
+    {
+        Error,
+        Warning,
+        Info
     }
 }

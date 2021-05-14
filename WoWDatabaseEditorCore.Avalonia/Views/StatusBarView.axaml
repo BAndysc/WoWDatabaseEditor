@@ -1,9 +1,17 @@
 ﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Views.StatusBarView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
     <UserControl.Resources>
         <converters:NullConverter Inverted="True" x:Key="NullConverter" />
+        
+        <DrawingImage x:Key="Problems">
+            <GeometryDrawing  Brush="White" Geometry="F1M235,-171L235,-128 277,-128 277,-171 235,-171z M235,-299L235,-213 277,-213 277,-299 235,-299z M256,-469L491,-64 21.0000038146973,-64 256,-469z"   />
+        </DrawingImage>
+        <DrawingImage x:Key="NoProblems">
+            <GeometryDrawing  Brush="White" Geometry="F1M418,-393L448,-363 192,-107 73,-226 102,-256 192,-166 418,-393z"   />
+        </DrawingImage>
     </UserControl.Resources>
     <Grid VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
@@ -12,18 +20,41 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
         
         <Panel>
             <StackPanel Orientation="Horizontal">
                 <Button Opacity="1" Command="{Binding CurrentNotification.ClickCommand}" IsEnabled="{Binding CurrentNotification.ClickCommand, Converter={StaticResource NullConverter}}">
-                    <TextBlock HorizontalAlignment="Left"
+                    <TextBlock HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" 
                                VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}" />                    
                 </Button>
-
             </StackPanel>
         </Panel>
-        <Panel Grid.Column="1" VerticalAlignment="Stretch" Margin="0">
+        <Panel Grid.Column="1" VerticalAlignment="Stretch" Margin="0,0,10,0">
+            <Button Command="{Binding OpenProblemTool}">
+                <WrapPanel>
+                    <Image Width="13" Height="13" Margin="0,0,3,0" VerticalAlignment="Center">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{Binding TotalProblems}" ComparisonCondition="Equal" Value="0">
+                                <ChangePropertyAction TargetObject="{Binding #Image}" 
+                                                      PropertyName="Source"
+                                                      Value="{StaticResource NoProblems}" />
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{Binding TotalProblems}" ComparisonCondition="NotEqual" Value="0">
+                                <ChangePropertyAction TargetObject="{Binding #Image}" 
+                                                      PropertyName="Source"
+                                                      Value="{StaticResource Problems}" />
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </Image>
+                    <TextBlock Text="{Binding TotalProblems, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
+                    <TextBlock Text=" problems found"></TextBlock>
+                </WrapPanel>
+            </Button>
+        </Panel>
+        
+        <Panel Grid.Column="2" VerticalAlignment="Stretch" Margin="0">
             <Button Command="{Binding TasksViewModel.TogglePanelVisibility}">
                 <WrapPanel>
                     <TextBlock Text="{Binding TasksViewModel.PendingTasksCount, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
