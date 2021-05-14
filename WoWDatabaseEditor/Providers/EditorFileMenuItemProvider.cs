@@ -48,7 +48,7 @@ namespace WoWDatabaseEditorCore.Providers
             DocumentManager = documentManager;
             this.settings = settings;
             SubItems = new List<IMenuItem>();
-            SubItems.Add(new ModuleMenuItem("_New", new AsyncAutoCommand(OpenNewItemWindow), new("Control+N")));
+            SubItems.Add(new ModuleMenuItem("_New / Open", new AsyncAutoCommand(OpenNewItemWindow), new("Control+N")));
             
             SubItems.Add(new ModuleMenuItem("_Save to database", 
                 new DelegateCommand(
