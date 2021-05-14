@@ -124,6 +124,7 @@
                     <ItemsPanelTemplate>
                         <userControls:SmartScriptPanelLayout Background="Transparent"
                                                       DropItems="{Binding OnDropItems}"
+                                                      Problems="{Binding ProblematicLines}"
                                                       DropActions="{Binding OnDropActions}"
                                                       DropConditions="{Binding OnDropConditions}"
                                                       Script="{Binding Script}"

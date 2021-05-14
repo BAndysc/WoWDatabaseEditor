@@ -1330,27 +1330,28 @@
 		"name": "Spell school type",
 		"prefix": "SPELL_SCHOOL_",
 		"values": {
-			"0": {
-				"name": "NORMAL"
-			},
-			"1": {
-				"name": "HOLY"
-			},
-			"2": {
-				"name": "FIRE"
-			},
-			"3": {
-				"name": "NATURE"
-			},
-			"4": {
-				"name": "FROST"
-			},
-			"5": {
-				"name": "SHADOW"
-			},
-			"6": {
-				"name": "ARCANE"
-			}
+			"0": {"name": "NORMAL"},
+			"1": {"name": "HOLY"},
+			"2": {"name": "FIRE"},
+			"3": {"name": "NATURE"},
+			"4": {"name": "FROST"},
+			"5": {"name": "SHADOW"},
+			"6": {"name": "ARCANE"}
+		}
+	},
+	"SpellSchoolMaskParameter": {
+		"name": "Spell school mask type",
+		"prefix": "SPELL_SCHOOL_MASK_",
+		"isflag": true,
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "normal"},
+			"2": {"name": "holy"},
+			"4": {"name": "fire"},
+			"8": {"name": "nature"},
+			"16": {"name": "frost"},
+			"32": {"name": "shadow"},
+			"64": {"name": "arcane"}
 		}
 	},
 	"TypeMaskParameter": {
@@ -1854,37 +1855,6 @@
 			},
 			"1073741824": {
 				"name": "ENRAGED"
-			}
-		}
-	},
-	"SpellSchoolMaskParameter": {
-		"name": "Spell school masks",
-		"isflag": true,
-		"prefix": "SPELL_SCHOOL_MASK_",
-		"values": {
-			"0": {
-				"name": "NONE"
-			},
-			"1": {
-				"name": "NORMAL"
-			},
-			"2": {
-				"name": "HOLY"
-			},
-			"4": {
-				"name": "FIRE"
-			},
-			"8": {
-				"name": "NATURE"
-			},
-			"16": {
-				"name": "FROST"
-			},
-			"32": {
-				"name": "SHADOW"
-			},
-			"64": {
-				"name": "ARCANE"
 			}
 		}
 	},

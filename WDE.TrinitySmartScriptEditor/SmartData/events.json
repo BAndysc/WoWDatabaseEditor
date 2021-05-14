@@ -9,28 +9,28 @@
     "parameters": [
       {
         "type": "FloatParameter",
-        "name": "Initial Minimum",
-        "description": ""
+        "name": "Initial Minimum"
       },
       {
         "type": "FloatParameter",
-        "name": "Initial Maximum",
-        "description": ""
+        "name": "Initial Maximum"
       },
       {
         "type": "FloatParameter",
-        "name": "Repeat Minimum",
-        "description": ""
+        "name": "Repeat Minimum"
       },
       {
         "type": "FloatParameter",
-        "name": "Repeat Maximum",
-        "description": ""
+        "name": "Repeat Maximum"
       }
     ],
     "is_timed": true,
     "description": "When in combat and timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
     "name_readable": "Every X seconds (in combat)",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)"
+    ],
     "description_rules": [
       {
         "description": "After {pram1} seconds",
@@ -81,24 +81,24 @@
     "parameters": [
       {
         "type": "FloatParameter",
-        "name": "Initial Minimum",
-        "description": ""
+        "name": "Initial Minimum"
       },
       {
         "type": "FloatParameter",
-        "name": "Initial Maximum",
-        "description": ""
+        "name": "Initial Maximum"
       },
       {
         "type": "FloatParameter",
-        "name": "Repeat Minimum",
-        "description": ""
+        "name": "Repeat Minimum"
       },
       {
         "type": "FloatParameter",
-        "name": "Repeat Maximum",
-        "description": ""
+        "name": "Repeat Maximum"
       }
+    ],
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)"
     ],
     "description": "When out of combat and timer at the begining between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
     "name_readable": "Every X seconds (out of combat)",
@@ -150,13 +150,11 @@
     "parameters": [
       {
         "type": "PercentageParameter",
-        "name": "HP Minimum",
-        "description": ""
+        "name": "HP Minimum"
       },
       {
         "type": "PercentageParameter",
-        "name": "HP Maximum",
-        "description": ""
+        "name": "HP Maximum"
       },
       {
         "type": "Parameter",
@@ -169,8 +167,13 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When health between {pram1} and {pram2} (check every {pram3} - {pram4} ms)",
-    "name_readable": "When health between"
+    "description": "When health between {pram1}-{pram2}% {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "name_readable": "When health between",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ]
   },
   {
     "id": 3,
@@ -182,13 +185,11 @@
     "parameters": [
       {
         "type": "PercentageParameter",
-        "name": "Mana Minimum",
-        "description": ""
+        "name": "Mana Minimum"
       },
       {
         "type": "PercentageParameter",
-        "name": "Mana Maximum",
-        "description": ""
+        "name": "Mana Maximum"
       },
       {
         "type": "Parameter",
@@ -201,8 +202,13 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When mana between {pram1} and {pram2} (check every {pram3} - {pram4} ms)",
-    "name_readable": "When mana between"
+    "description": "When mana between {pram1}-{pram2}% {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "name_readable": "When mana between",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ]
   },
   {
     "id": 4,
@@ -250,6 +256,16 @@
     ],
     "description": "On kill {pram3value:choose(0):creature {pram4}|player} {pram1value:choose(0):|(wait {pram1} - {pram2} ms before next trigger of this event)}",
     "name_readable": "On kill",
+    "builtin_rules": [
+      "minmax(1, 2)"
+    ],
+    "rules": [
+      {
+        "rule": "event.param(3) == 0 || (event.param(3) == 1 && event.param(4) == 0)",
+        "level": "Info",
+        "description": "`Creature` parameter has no effect when `Player Only` is true"
+      }
+    ],
     "invoker": {
       "name": "Killed unit",
       "types": [
@@ -297,7 +313,7 @@
         "description": "If 0, any spell will trigger the event"
       },
       {
-        "type": "SpellSchoolParameter",
+        "type": "SpellSchoolMaskParameter",
         "name": "School",
         "description": "School of spell"
       },
@@ -311,6 +327,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)"
     ],
     "description": "On {pram1value:choose(0):any spell|spell {pram1}}{pram2value:choose(0):| of school {pram2}} hit {pram3value:choose(0):|(wait {pram3} - {pram4} ms before next trigger)}",
     "name_readable": "On spell hit",
@@ -329,6 +348,11 @@
     ],
     "is_timed": true,
     "name": "SMART_EVENT_RANGE",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
     "parameters": [
       {
         "type": "Parameter",
@@ -338,6 +362,7 @@
       {
         "type": "Parameter",
         "name": "Maximum Distance",
+        "required": true,
         "description": "Maximum distance between creature and its victim to trigger the event"
       },
       {
@@ -351,7 +376,7 @@
         "description": "Maximum timer value to check for event"
       }
     ],
-    "description": "When victim in range {pram1} - {pram2} yards (check every {pram3} - {pram4} ms)",
+    "description": "When victim in range {pram1} - {pram2} yards {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "Range"
   },
   {
@@ -368,8 +393,7 @@
       },
       {
         "type": "Parameter",
-        "name": "Max distance",
-        "description": ""
+        "name": "Max distance"
       },
       {
         "type": "Parameter",
@@ -381,6 +405,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)"
     ],
     "description": "When {pram1value:choose(0):|non }hostile unit in line of sight (out of combat)",
     "name_readable": "On move in line of sight (out of combat)"
@@ -436,13 +463,11 @@
     "parameters": [
       {
         "type": "PercentageParameter",
-        "name": "HP Minimum",
-        "description": ""
+        "name": "HP Minimum"
       },
       {
         "type": "PercentageParameter",
-        "name": "HP Maximum",
-        "description": ""
+        "name": "HP Maximum"
       },
       {
         "type": "Parameter",
@@ -455,7 +480,12 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When victim health between {pram1} - {pram2} (check every {pram3} - {pram4})",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When victim health between {pram1} - {pram2} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When victim's health between"
   },
   {
@@ -482,7 +512,11 @@
         "description": "If 0, any spell will trigger the event"
       }
     ],
-    "description": "When victim is casting {pram3value:choose(0):any|}spell{pram3value:choose(0):| {pram3}} (check every {pram3} - {pram4})",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "is_repeat(2)"
+    ],
+    "description": "When victim is casting {pram3value:choose(0):any|}spell{pram3value:choose(0):| {pram3}} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When victim is casting"
   },
   {
@@ -514,7 +548,11 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When friendly unit in range {pram2} yards has lost more than {pram1} hp (check every {pram3} - {pram4})",
+    "builtin_rules": [
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When friendly unit in range {pram2} yards has lost more than {pram1} hp {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When nerby unit health between",
     "invoker": {
       "name": "Friendly unit",
@@ -548,7 +586,11 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When friendly unit in range {pram1} yards is either: feared, charmed, stunned, frozen or confused (check every {pram3} - {pram4})",
+    "builtin_rules": [
+      "is_repeat(3)",
+      "minmax(2, 3)"
+    ],
+    "description": "When friendly unit in range {pram1} yards is either: feared, charmed, stunned, frozen or confused {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When nearby unit is CC",
     "invoker": {
       "name": "Friendly unit",
@@ -587,7 +629,11 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When friendly unit in range {pram2} yards has not got aura {pram1} (check every {pram3} - {pram4})",
+    "builtin_rules": [
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When friendly unit in range {pram2} yards has not got aura {pram1} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When nearby friendly missing buff",
     "invoker": {
       "name": "Friendly unit",
@@ -621,6 +667,9 @@
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
     ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
     "description": "On summoned {pram1value:choose(0):any|}unit {pram1value:choose(0):|{pram1}} {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next event trigger)}",
     "name_readable": "On creature summon",
     "invoker": {
@@ -640,13 +689,11 @@
     "parameters": [
       {
         "type": "PercentageParameter",
-        "name": "Minimum mana",
-        "description": ""
+        "name": "Minimum mana"
       },
       {
         "type": "PercentageParameter",
-        "name": "Maximum mana",
-        "description": ""
+        "name": "Maximum mana"
       },
       {
         "type": "Parameter",
@@ -659,7 +706,12 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When victim has mana between {pram1} - {pram2} (check every {pram3} - {pram4})",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When victim has mana between {pram1} - {pram2} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When victim mana between"
   },
   {
@@ -741,6 +793,9 @@
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
     ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
     "description": "On emote {pram1} received from player {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next event trigger)}",
     "name_readable": "On emote received",
     "invoker": {
@@ -760,8 +815,7 @@
     "parameters": [
       {
         "type": "SpellParameter",
-        "name": "Spell",
-        "description": ""
+        "name": "Spell"
       },
       {
         "type": "Parameter",
@@ -779,7 +833,11 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When creature has{pram2value:choose(0):| {pram2} stacks of} aura {pram1} (check every {pram3} - {pram4} ms)",
+    "builtin_rules": [
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When creature has{pram2value:choose(0):| {pram2} stacks of} aura {pram1} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When has aura"
   },
   {
@@ -793,14 +851,12 @@
       {
         "type": "SpellParameter",
         "name": "Spell",
-        "required": true,
-        "description": ""
+        "required": true
       },
       {
         "type": "Parameter",
         "name": "Minimum stack amount",
-        "required": true,
-        "description": ""
+        "required": true
       },
       {
         "type": "Parameter",
@@ -813,7 +869,11 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When victim has at least {pram2} stacks of aura {pram1} (check every {pram3} - {pram4})",
+    "builtin_rules": [
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When victim has at least {pram2} stacks of aura {pram1} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When target has aura"
   },
   {
@@ -839,8 +899,7 @@
       },
       {
         "type": "Parameter",
-        "name": "Maximum distance",
-        "description": ""
+        "name": "Maximum distance"
       },
       {
         "type": "Parameter",
@@ -852,6 +911,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)"
     ],
     "description": "When {pram1value:choose(0):|non }hostile unit in line of sight (in combat){pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On move in line of sight (in combat)"
@@ -873,6 +935,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(1, 2)"
     ],
     "description": "On passenger boarded (vehicle){pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
     "name_readable": "On passenger boarded",
@@ -901,6 +966,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(1, 2)"
     ],
     "description": "On passenger removed (vehicle){pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
     "name_readable": "On passenger removed",
@@ -939,11 +1007,10 @@
     "parameters": [
       {
         "type": "SpellParameter",
-        "name": "Spell",
-        "description": ""
+        "name": "Spell"
       },
       {
-        "type": "SpellSchoolParameter",
+        "type": "SpellSchoolMaskParameter",
         "name": "School",
         "description": "If 0, any spell school will trigger the event"
       },
@@ -957,6 +1024,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)"
     ],
     "description": "On spell {pram1} {pram2value:choose(0):|of school {pram2}} hit a target{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On spellhit target",
@@ -997,6 +1067,10 @@
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
     ],
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)"
+    ],
     "description": "On creature damaged by {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On damage take",
     "invoker": {
@@ -1035,6 +1109,10 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)"
     ],
     "description": "On creature dealt damage to victim between {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On damage deal",
@@ -1111,8 +1189,7 @@
           "17": {
             "name": "NULL_MOTION_TYPE"
           }
-        },
-        "description": ""
+        }
       },
       {
         "type": "Parameter",
@@ -1146,6 +1223,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
     ],
     "description": "On summoned creature {pram1value:choose(0):|{pram1} }despawn{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
     "name_readable": "On summon despawn",
@@ -1205,6 +1285,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)"
     ],
     "description": "On data {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On data set"
@@ -1322,6 +1405,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
     ],
     "description": "On player entered instance{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
     "name_readable": "On player enter instance"
@@ -1462,13 +1548,11 @@
     "parameters": [
       {
         "type": "Parameter",
-        "name": "Minimum heal",
-        "description": ""
+        "name": "Minimum heal"
       },
       {
         "type": "Parameter",
-        "name": "Maximum heal",
-        "description": ""
+        "name": "Maximum heal"
       },
       {
         "type": "Parameter",
@@ -1480,6 +1564,10 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)"
     ],
     "description": "On creature healed by {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On heal receive",
@@ -1620,28 +1708,28 @@
     "parameters": [
       {
         "type": "FloatParameter",
-        "name": "Initial Minimum",
-        "description": ""
+        "name": "Initial Minimum"
       },
       {
         "type": "FloatParameter",
-        "name": "Initial Maximum",
-        "description": ""
+        "name": "Initial Maximum"
       },
       {
         "type": "FloatParameter",
-        "name": "Repeat Minimum",
-        "description": ""
+        "name": "Repeat Minimum"
       },
       {
         "type": "FloatParameter",
-        "name": "Repeat Maximum",
-        "description": ""
+        "name": "Repeat Maximum"
       }
     ],
     "is_timed": true,
     "description": "Every {pram3} and {pram4} ms (for the first time, timer between {pram1} and {pram2} ms)",
     "name_readable": "Every X seconds",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)"
+    ],
     "description_rules": [
       {
         "description": "After {pram1} seconds",
@@ -1790,17 +1878,19 @@
     "name": "SMART_EVENT_IS_BEHIND_TARGET",
     "parameters": [
       {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+        "type": "FloatParameter",
+        "name": "Repeat Minimum"
       },
       {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+        "type": "FloatParameter",
+        "name": "Repeat Maximum"
       }
     ],
-    "description": "When victim is behind me{pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "is_repeat(2)"
+    ],
+    "description": "When victim is behind me {pram2value:choose(0):(check once)|(check every {pram1}-{pram2} seconds)}",
     "name_readable": "When is behind victim"
   },
   {
@@ -1936,8 +2026,7 @@
       },
       {
         "type": "PercentageParameter",
-        "name": "Maximum HP",
-        "description": ""
+        "name": "Maximum HP"
       },
       {
         "type": "Parameter",
@@ -1950,7 +2039,12 @@
         "description": "Core will check whether this event should fire every min - max milliseconds"
       }
     ],
-    "description": "When target has HP between {pram1} - {pram2} (check every {pram3} - {pram4} ms)",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When target has HP between {pram1} - {pram2} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "Targets health %",
     "invoker": {
       "name": "Friendly unit",
@@ -1970,26 +2064,27 @@
     "parameters": [
       {
         "type": "Parameter",
-        "name": "GUID",
-        "description": ""
+        "name": "GUID"
       },
       {
         "type": "CreatureParameter",
-        "name": "Creature",
-        "description": ""
+        "name": "Creature"
       },
       {
         "type": "Parameter",
         "name": "Distance",
-        "description": ""
+        "required": true
       },
       {
-        "type": "Parameter",
-        "name": "Repeat",
-        "description": "Core will check whether the event should fire every [parameter] milliseconds"
+        "type": "FloatParameter",
+        "name": "Check every",
+        "description": "Core will check whether the event should fire every [parameter] seconds"
       }
     ],
-    "description": "When creature {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3}",
+    "builtin_rules": [
+      "is_repeat(4)"
+    ],
+    "description": "When creature {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(check once)|(check every {pram4} seconds)}",
     "name_readable": "When creature in range",
     "invoker": {
       "name": "Found creature",
@@ -2008,26 +2103,27 @@
     "parameters": [
       {
         "type": "Parameter",
-        "name": "GUID",
-        "description": ""
+        "name": "GUID"
       },
       {
         "type": "GameobjectParameter",
-        "name": "Gameobject",
-        "description": ""
+        "name": "Gameobject"
       },
       {
         "type": "Parameter",
-        "name": "Distance",
-        "description": ""
+        "name": "Distance"
       },
       {
-        "type": "Parameter",
-        "name": "Repeat",
-        "description": "Core will check whether the event should fire every [parameter] milliseconds"
+        "type": "FloatParameter",
+        "name": "Check every",
+        "description": "Core will check whether the event should fire every [parameter] seconds"
       }
     ],
-    "description": "When gameobject {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3}",
+    "builtin_rules": [
+      "nonzero(3)",
+      "is_repeat(4)"
+    ],
+    "description": "When gameobject {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(check once)|(check every {pram4} seconds)}",
     "name_readable": "When gameobject in range",
     "invoker": {
       "name": "Found gameobject",
@@ -2046,13 +2142,11 @@
     "parameters": [
       {
         "type": "Parameter",
-        "name": "Counter ID",
-        "description": ""
+        "name": "Counter ID"
       },
       {
         "type": "Parameter",
-        "name": "Value",
-        "description": ""
+        "name": "Value"
       },
       {
         "type": "Parameter",
@@ -2064,6 +2158,9 @@
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
       }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)"
     ],
     "description": "On counter {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On counter set"
@@ -2098,7 +2195,7 @@
       "Gameobject"
     ],
     "is_timed": true,
-    "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby (check every {pram4} seconds)"
+    "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(check once)|(check every {pram4} seconds)}"
   },
   {
     "id": 102,
@@ -2130,6 +2227,6 @@
       "Gameobject"
     ],
     "is_timed": true,
-    "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby (check every {pram4} seconds)"
+    "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(check once)|(check every {pram4} seconds)}"
   }
 ]

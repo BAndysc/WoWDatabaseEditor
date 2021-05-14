@@ -517,7 +517,7 @@
 				"description": "Comparison type"
 			}
 		],
-		"description": "{target}'s level {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>}} {pram1}"
+		"description": "{target}'s level {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=|invalid value}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>|invalid value}} {pram1}"
 	},
 
 	{
@@ -721,7 +721,7 @@
 				}
 			}
 		],
-		"description": "{target} distance to {pram1} {negate:{pram3value:choose(0|1|2|3|4):=|>|<|>=|<=}|{pram3value:choose(0|1|2|3|4):!=|<=|>=|<|>}} {pram2} yards"
+		"description": "{target} distance to {pram1} {negate:{pram3value:choose(0|1|2|3|4):=|>|<|>=|<=|invalid value}|{pram3value:choose(0|1|2|3|4):!=|<=|>=|<|>|invalid value}} {pram2} yards"
 	},
 
 	{
@@ -754,7 +754,7 @@
 				}
 			}
 		],
-		"description": "{target}'s HP {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>}} {pram1}"
+		"description": "{target}'s HP {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=|invalid value}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>|invalid value}} {pram1}"
 	},
 
 	{
@@ -779,7 +779,7 @@
 				}
 			}
 		],
-		"description": "{target}'s HP {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>}} {pram1}%"
+		"description": "{target}'s HP {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=|invalid value}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>|invalid value}} {pram1}%"
 	},
 
 	{

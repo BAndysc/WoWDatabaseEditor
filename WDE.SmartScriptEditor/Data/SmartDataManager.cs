@@ -29,6 +29,8 @@ namespace WDE.SmartScriptEditor.Data
 
         IEnumerable<SmartGroupsJsonData> GetGroupsData(SmartType type);
 
+        IEnumerable<SmartGenericJsonData> GetAllData(SmartType type);
+        
         void Reload(SmartType smartType);
     }
 
@@ -94,6 +96,11 @@ namespace WDE.SmartScriptEditor.Data
                 default:
                     return new List<SmartGroupsJsonData>();
             }
+        }
+
+        public IEnumerable<SmartGenericJsonData> GetAllData(SmartType type)
+        {
+            return smartIdData[type].Values;
         }
 
         private void Load(SmartType type, IEnumerable<SmartGenericJsonData> data)

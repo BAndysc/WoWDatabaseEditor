@@ -168,7 +168,7 @@
     {
         "id": 9,
         "name": "SMART_ACTION_ACTIVATE_GOBJECT",
-        "description": "{source}: Activate (only gameobject)",
+        "description": "{source}: Activate gameobject",
         "name_readable": "Activate gobject",
         "target_types": ["GameObject"],
         "target_is_source": true
@@ -1823,7 +1823,6 @@
             {
                 "type": "SwitchParameter",
                 "name": "Type",
-                "required": true,
                 "values": {
                     "0": {
                         "name": "UNIT_BYTES_1_OFFSET_STAND_STATE"
@@ -1856,7 +1855,6 @@
             {
                 "type": "SwitchParameter",
                 "name": "Type",
-                "required": true,
                 "values": {
                     "0": {
                         "name": "UNIT_BYTES_1_OFFSET_STAND_STATE"
@@ -1909,7 +1907,7 @@
                 "name": "Animation id"
             }
         ],
-        "description": "{source}: Play custom animation (only gameobject)",
+        "description": "{source}: Play custom gameobject animation {pram1}",
         "name_readable": "Send gameobject custom animation",
         "target_types": ["GameObject"],
         "target_is_source": true
@@ -2105,7 +2103,7 @@
                 }
             }
         ],
-        "description": "{source}: Set loot state {pram1} (only gameobjects)",
+        "description": "{source}: Set gameobjects loot state {pram1}",
         "name_readable": "Set gameobject loot state",
         "target_types": ["GameObject"],
         "target_is_source": true

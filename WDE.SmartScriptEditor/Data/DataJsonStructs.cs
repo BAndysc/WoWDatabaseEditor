@@ -4,7 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using WDE.Common.Database;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
+using WDE.SmartScriptEditor.Inspections;
 
 namespace WDE.SmartScriptEditor.Data
 {
@@ -40,7 +42,7 @@ namespace WDE.SmartScriptEditor.Data
         public string Description { get; set; }
 
         [JsonProperty(PropertyName = "condition")]
-        public string Condition { get; set; }
+        public string? Condition { get; set; }
     }
     
     // Kind of hackfix due to lack of string enums in C# :<
@@ -139,6 +141,12 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "description_rules")]
         public IList<SmartDescriptionRulesJsonData>? DescriptionRules { get; set; }
 
+        [JsonProperty(PropertyName = "rules")]
+        public IList<SmartRule>? Rules { get; set; }
+        
+        [JsonProperty(PropertyName = "builtin_rules")]
+        public IList<string>? BuiltinRules { get; set; }
+        
         [JsonProperty(PropertyName = "tooltip")]
         public string Tooltip { get; set; }
 
@@ -146,6 +154,18 @@ namespace WDE.SmartScriptEditor.Data
         {
             return Parameters != null && Parameters.Count > 0;
         }
+    }
+
+    public struct SmartRule
+    {
+        [JsonProperty(PropertyName = "rule")]
+        public string Rule { get; set; }
+        
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
+        
+        [JsonProperty(PropertyName = "level", ItemConverterType = typeof(StringEnumConverter))]
+        public DiagnosticSeverity Level { get; set; }
     }
 
     public class DataJsonInvoker

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -10,6 +12,7 @@ using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.Database;
+using WDE.Common.Disposables;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -31,10 +34,11 @@ using WDE.SmartScriptEditor.Editor.ViewModels.Editing;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.History;
+using WDE.SmartScriptEditor.Inspections;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public class SmartScriptEditorViewModel : ObservableBase, ISolutionItemDocument, IDisposable
+    public class SmartScriptEditorViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument, IDisposable
     {
         private readonly IDatabaseProvider database;
         private readonly ISmartScriptDatabaseProvider smartScriptDatabase;
@@ -45,6 +49,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ISmartScriptExporter smartScriptExporter;
         private readonly IEditorFeatures editorFeatures;
         private readonly ITeachingTipService teachingTipService;
+        private readonly IMainThread mainThread;
+        private readonly ISmartScriptInspectorService inspectorService;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -90,7 +96,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IToolSmartEditorViewModel smartEditorViewModel,
             ISmartScriptExporter smartScriptExporter,
             IEditorFeatures editorFeatures,
-            ITeachingTipService teachingTipService)
+            ITeachingTipService teachingTipService,
+            IMainThread mainThread,
+            ISmartScriptInspectorService inspectorService)
         {
             History = history;
             this.database = databaseProvider;
@@ -108,6 +116,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.smartScriptExporter = smartScriptExporter;
             this.editorFeatures = editorFeatures;
             this.teachingTipService = teachingTipService;
+            this.mainThread = mainThread;
+            this.inspectorService = inspectorService;
             this.conditionDataManager = conditionDataManager;
             script = null!;
             this.item = null!;
@@ -286,6 +296,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 });*/
             SaveCommand = new DelegateCommand(() =>
             {
+                
                 taskRunner.ScheduleTask("Save script to database", SaveAllToDb);
             });
 
@@ -737,6 +748,21 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 RaisePropertyChanged(nameof(IsModified));
             };
 
+            AutoDispose(problems.Subscribe(problems =>
+            {
+                var lines = problematicLines ?? new();
+                lines.Clear();
+                foreach (var p in problems)
+                {
+                    lines[p.Line] = p.Severity;
+                }
+
+                ProblematicLines = null;
+                ProblematicLines = lines;
+            }));
+
+            AutoDispose(new ActionDisposable(() => disposed = true));
+            
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(args =>
                 {
@@ -837,6 +863,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Paste => PasteCommand;
         public ICommand Save => SaveCommand;
         public AsyncAwaitBestPractices.MVVM.IAsyncCommand? CloseCommand { get; set; }
+
+        private bool disposed = false;
         
         private void SetSolutionItem(ISmartScriptSolutionItem item)
         {
@@ -845,6 +873,29 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Title = itemNameRegistry.GetName(item);
             
             Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService);
+
+            bool updateInspections = false;
+            new Thread(() =>
+            {
+                Stopwatch sw = new();
+                while (!disposed)
+                {
+                    if (updateInspections)
+                    {
+                        mainThread.Dispatch(() =>
+                        {
+                            problems.Value = inspectorService.GenerateInspections(script);
+                        });
+                        updateInspections = false;
+                    }
+                    Thread.Sleep(1200);
+                }
+            }).Start();
+            script.EventChanged += (e, a, mask) =>
+            {
+                updateInspections = true;
+            };
+            
             TeachingTips = AutoDispose(new SmartTeachingTips(teachingTipService, Script));
             Script.ScriptSelectedChanged += EventChildrenSelectionChanged;
             
@@ -922,6 +973,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
             TeachingTips.Start();
+            problems.Value = inspectorService.GenerateInspections(script);
         }
         
         private async Task SaveAllToDb()
@@ -1365,5 +1417,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         }
 
         public ISolutionItem SolutionItem => item;
+        public IObservable<IReadOnlyList<IInspectionResult>> Problems => problems;
+        private ReactiveProperty<IReadOnlyList<IInspectionResult>> problems = new(new List<IInspectionResult>());
+
+        private Dictionary<int, DiagnosticSeverity>? problematicLines = new();
+        public Dictionary<int, DiagnosticSeverity>? ProblematicLines
+        {
+            get => problematicLines;
+            set => SetProperty(ref problematicLines, value);
+        }
     }
 }
