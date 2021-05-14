@@ -36,6 +36,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     var parent = view.VisualParent;
                     if (parent?.VisualChildren is AvaloniaList<IVisual> children)
                         children.Remove(view);
+                    ((ISetLogicalParent)(view)).SetParent(null);
                     return view;
                 }
                 
