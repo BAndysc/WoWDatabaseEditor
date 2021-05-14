@@ -11,6 +11,7 @@ using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
+using WDE.MVVM.Observable;
 
 namespace WoWDatabaseEditorCore.Managers
 {
@@ -39,6 +40,12 @@ namespace WoWDatabaseEditorCore.Managers
                 typeToToolInstance[tool.GetType()] = tool;
             }
             allTools.Sort((a, b) => -a.OpenOnStart.CompareTo(b.OpenOnStart));
+
+            OpenedDocuments.ToStream().SubscribeAction(e =>
+            {
+                if (e.Type == CollectionEventType.Remove && e.Item is IDisposable disposable)
+                    disposable.Dispose();
+            });
         }
 
         public IReadOnlyList<ITool> AllTools => allTools;
@@ -74,13 +81,13 @@ namespace WoWDatabaseEditorCore.Managers
                     {
                         MessageBoxButtonType result = await messageBoxService.ShowDialog(
                             new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Document is modified")
-                            .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
-                            .SetContent("Your changes will be lost if you don't save them.")
-                            .SetIcon(MessageBoxIcon.Warning)
-                            .WithYesButton(MessageBoxButtonType.Yes)
-                            .WithNoButton(MessageBoxButtonType.No)
-                            .WithCancelButton(MessageBoxButtonType.Cancel)
-                            .Build());
+                                .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
+                                .SetContent("Your changes will be lost if you don't save them.")
+                                .SetIcon(MessageBoxIcon.Warning)
+                                .WithYesButton(MessageBoxButtonType.Yes)
+                                .WithNoButton(MessageBoxButtonType.No)
+                                .WithCancelButton(MessageBoxButtonType.Cancel)
+                                .Build());
 
                         if (result == MessageBoxButtonType.Cancel)
                             close = false;
@@ -97,8 +104,6 @@ namespace WoWDatabaseEditorCore.Managers
                             ActiveDocument = OpenedDocuments.Count > 0 ? OpenedDocuments[0] : null;
                         eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
                         editor.CloseCommand = origCommand;
-                        if (editor is IDisposable disposable)
-                            disposable.Dispose();
                     }
                 },
                 _ => origCommand?.CanExecute(null) ?? true);
