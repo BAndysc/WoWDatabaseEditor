@@ -68,7 +68,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     {
                         linkTo = 0;
                         SmartAction waitAction = actualAction;
-                        actualAction = smartFactory.ActionFactory(SmartConstants.ActionTriggerTimed,
+                        actualAction = smartFactory.ActionFactory(SmartConstants.ActionCreateTimed,
                             smartFactory.SourceFactory(SmartConstants.SourceNone),
                             smartFactory.TargetFactory(SmartConstants.TargetNone));
                         actualAction.GetParameter(0).Value = nextTriggerId;

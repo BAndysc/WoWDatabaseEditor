@@ -99,7 +99,7 @@ namespace WDE.SmartScriptEditor.Models
                 string? readable = ReadableHint;
                 if (DescriptionRules != null)
                 {
-                    var context = new SmartValidationContext(Parent, this, null);
+                    var context = new SmartValidationContext(Parent!, this, null);
                     
                     foreach (DescriptionRule rule in DescriptionRules)
                     {
@@ -149,6 +149,26 @@ namespace WDE.SmartScriptEditor.Models
             Actions.Add(smartAction);
         }
 
+        public bool Equals(SmartEvent other)
+        {
+            if (Id != other.Id)
+                return false;
+            
+            for (int i = 0; i < SmartEventParamsCount; ++i)
+            {
+                if (GetParameter(i).Value != other.GetParameter(i).Value)
+                    return false;
+            }
+
+            if (Flags.Value != other.Flags.Value)
+                return false;
+
+            if (Phases.Value != other.Phases.Value)
+                return false;
+
+            return Chance.Value == other.Chance.Value;
+        }
+
         public SmartEvent ShallowCopy()
         {
             SmartEvent se = new(Id);
@@ -169,6 +189,16 @@ namespace WDE.SmartScriptEditor.Models
         }
     }
 
+    [Flags]
+    public enum EventChangedMask
+    {
+        EventValues = 1,
+        ActionsValues = 2,
+        Actions = 4,
+        Script = 8,
+        Event = EventValues | Actions
+    }
+    
     public enum SmartEventFlag
     {
         [Description(

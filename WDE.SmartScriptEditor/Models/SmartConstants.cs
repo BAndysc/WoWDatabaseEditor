@@ -11,7 +11,10 @@
         public const int ActionComment = 9998;
         public const int EventTriggerTimed = 59;
         public const int EventLink = 61;
-        public const int ActionTriggerTimed = 67;
+        public const int ActionCreateTimed = 67;
+        public const int ActionTriggerTimed = 73;
+        public const int ActionRemoveTimed = 74;
+        public const int ActionTriggerRandomTimed = 125;
         public const int ActionWait = 9999;
         public const string CommentWait = "-meta_wait";
         public const string CommentComment = "-meta_comment";

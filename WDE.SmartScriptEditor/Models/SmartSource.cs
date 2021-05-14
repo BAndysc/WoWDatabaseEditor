@@ -25,6 +25,12 @@ namespace WDE.SmartScriptEditor.Models
             get => parent;
             set => parent = value;
         }
+
+        public override int LineId
+        {
+            get => parent?.LineId ?? -1;
+            set { }
+        }
         
         public ParameterValueHolder<long> Condition => condition;
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 
@@ -9,13 +11,15 @@ namespace WDE.SmartScriptEditor.Models.Helpers
     public class SmartSelectionHelper : System.IDisposable
     {
         private IDisposable disposable;
-        private Dictionary<SmartEvent, (IDisposable, IDisposable, IDisposable)> eventToDisposables = new();
+        private Dictionary<SmartEvent, IDisposable> eventToDisposables = new();
         private Dictionary<SmartAction, IDisposable> actionToDisposables = new();
         private Dictionary<SmartCondition, IDisposable> conditionToDisposables = new();
         public ObservableCollection<object> AllSmartObjectsFlat { get; } = new();
         public ObservableCollection<SmartAction> AllActions { get; } = new();
 
         public event Action? ScriptSelectedChanged;
+
+        public event Action<SmartEvent?, SmartAction?, EventChangedMask>? EventChanged;
         
         public SmartSelectionHelper(SmartScript script)
         {
@@ -24,13 +28,21 @@ namespace WDE.SmartScriptEditor.Models.Helpers
 
         private void EventReceived(CollectionEvent<SmartEvent> collectionEvent)
         {
+            EventChanged?.Invoke(collectionEvent.Item, null, EventChangedMask.Event);
             if (collectionEvent.Type == CollectionEventType.Add)
             {
                 AllSmartObjectsFlat.Add(collectionEvent.Item);
-                var disposables = (
+                var disposables = new CompositeDisposable(
                     collectionEvent.Item.Actions.ToStream().Subscribe(ActionReceived),
                     collectionEvent.Item.Conditions.ToStream().Subscribe(ConditionReceived),
-                    collectionEvent.Item.ToObservable(e => e.IsSelected).Subscribe(SelectionChanged)
+                    collectionEvent.Item.ToObservable(e => e.IsSelected).Subscribe(SelectionChanged),
+                    Observable.FromEventPattern<EventHandler, EventArgs>(
+                        h => collectionEvent.Item.OnChanged += h,
+                        h => collectionEvent.Item.OnChanged -= h).Subscribe(handler =>
+                    {
+                        SmartEvent? e = (SmartEvent?) handler.Sender;
+                        EventChanged?.Invoke(e, null, EventChangedMask.EventValues);
+                    })
                 );
 
                 eventToDisposables.Add(collectionEvent.Item, disposables);
@@ -39,11 +51,8 @@ namespace WDE.SmartScriptEditor.Models.Helpers
             {
                 AllSmartObjectsFlat.Remove(collectionEvent.Item);
 
-                var disposables = eventToDisposables[collectionEvent.Item];
-                disposables.Item1.Dispose();
-                disposables.Item2.Dispose();
-                disposables.Item3.Dispose();
-
+                eventToDisposables[collectionEvent.Item].Dispose();
+                
                 foreach (var action in collectionEvent.Item.Actions)
                 {
                     AllSmartObjectsFlat.Remove(action);
@@ -63,12 +72,22 @@ namespace WDE.SmartScriptEditor.Models.Helpers
 
         private void ActionReceived(CollectionEvent<SmartAction> collectionEvent)
         {
+            EventChanged?.Invoke(collectionEvent.Item.Parent, null, EventChangedMask.Actions);
             if (collectionEvent.Type == CollectionEventType.Add)
             {
                 AllActions.Add(collectionEvent.Item);
                 AllSmartObjectsFlat.Add(collectionEvent.Item);
                 actionToDisposables.Add(collectionEvent.Item,
-                    collectionEvent.Item.ToObservable(e => e.IsSelected).Subscribe(SelectionChanged));
+                    new CompositeDisposable(
+                    collectionEvent.Item.ToObservable(e => e.IsSelected).Subscribe(SelectionChanged),
+                    Observable.FromEventPattern<EventHandler, EventArgs>(
+                        h => collectionEvent.Item.OnChanged += h,
+                        h => collectionEvent.Item.OnChanged -= h).Subscribe(handler =>
+                    {
+                        SmartAction? e = (SmartAction?) handler.Sender;
+                        EventChanged?.Invoke(e?.Parent, e, EventChangedMask.ActionsValues);
+                    })
+                ));
             }
             else if (collectionEvent.Type == CollectionEventType.Remove)
             {
@@ -105,11 +124,7 @@ namespace WDE.SmartScriptEditor.Models.Helpers
             disposable.Dispose();
             
             foreach (var disposables in eventToDisposables.Values)
-            {
-                disposables.Item1.Dispose();
-                disposables.Item2.Dispose();
-                disposables.Item3.Dispose();
-            }
+                disposables.Dispose();
             
             foreach (var d in actionToDisposables.Values)
                 d.Dispose();

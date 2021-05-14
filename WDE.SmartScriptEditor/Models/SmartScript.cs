@@ -26,6 +26,7 @@ namespace WDE.SmartScriptEditor.Models
         private readonly SmartSelectionHelper selectionHelper;
 
         public event Action? ScriptSelectedChanged;
+        public event Action<SmartEvent?, SmartAction?, EventChangedMask>? EventChanged;
         
         public ObservableCollection<object> AllSmartObjectsFlat { get; } 
         
@@ -55,6 +56,11 @@ namespace WDE.SmartScriptEditor.Models
             Events = new ObservableCollection<SmartEvent>();
             selectionHelper = new SmartSelectionHelper(this);
             selectionHelper.ScriptSelectedChanged += CallScriptSelectedChanged;
+            selectionHelper.EventChanged += (e, a, mask) =>
+            {
+                RenumerateEvents();
+                EventChanged?.Invoke(e, a, mask);
+            };
             AllSmartObjectsFlat = selectionHelper.AllSmartObjectsFlat;
             AllActions = selectionHelper.AllActions;
             
@@ -64,6 +70,27 @@ namespace WDE.SmartScriptEditor.Models
                     if (e.Type == CollectionEventType.Add)
                         e.Item.Parent = this;
                 });
+        }
+
+        private void RenumerateEvents()
+        {
+            int index = 1;
+            foreach (var e in Events)
+            {
+                e.LineId = index;
+                if (e.Actions.Count == 0)
+                {
+                    index++;
+                }
+                else
+                {
+                    foreach (var a in e.Actions)
+                    {
+                        a.LineId = index;
+                        index++;
+                    }   
+                }
+            }
         }
 
         private void CallScriptSelectedChanged()
@@ -134,7 +161,8 @@ namespace WDE.SmartScriptEditor.Models
                             foreach (var c in conditionList)
                                 currentEvent.Conditions.Add(c);
                         }
-                        
+
+                        currentEvent.Parent = this;
                         Events.Add(currentEvent);
                     }
                     else
@@ -155,7 +183,7 @@ namespace WDE.SmartScriptEditor.Models
                     var raw = smartDataManager.GetRawData(SmartType.SmartAction, line.ActionType);
                     if (raw.TargetIsSource)
                     {
-                        smartFactory.UpdateSource(action.Source, action.Target.Id);
+                        SafeUpdateSource(action.Source, action.Target.Id);
                         for (int i = 0; i < action.Source.ParametersCount; ++i)
                             action.Source.GetParameter(i).Copy(action.Target.GetParameter(i));
                         smartFactory.UpdateTarget(action.Target, 0);
@@ -163,7 +191,7 @@ namespace WDE.SmartScriptEditor.Models
                     
                     if (comment != SmartConstants.CommentWait)
                         action.Comment = comment;
-                    if (action.Id == SmartConstants.ActionTriggerTimed && comment == SmartConstants.CommentWait)
+                    if (action.Id == SmartConstants.ActionCreateTimed && comment == SmartConstants.CommentWait)
                         triggerIdToActionParent[action.GetParameter(0).Value] = currentEvent;
                     currentEvent.AddAction(action);
                 }
@@ -174,7 +202,7 @@ namespace WDE.SmartScriptEditor.Models
                 }
                 else if (line.Link != 0)
                 {
-                    var actionCallLinkedAsTrigger = smartFactory.ActionFactory(SmartConstants.ActionTriggerTimed,
+                    var actionCallLinkedAsTrigger = smartFactory.ActionFactory(SmartConstants.ActionCreateTimed,
                         smartFactory.SourceFactory(SmartConstants.ActionNone),
                         smartFactory.TargetFactory(SmartConstants.TargetNone));
                     actionCallLinkedAsTrigger.GetParameter(0).Value = linkToTriggerTimedEventId![line.Link];
@@ -194,7 +222,7 @@ namespace WDE.SmartScriptEditor.Models
 
                 SmartAction lastAction = caller.Actions[caller.Actions.Count - 1];
 
-                if (lastAction.Id != SmartConstants.ActionTriggerTimed ||
+                if (lastAction.Id != SmartConstants.ActionCreateTimed ||
                     lastAction.GetParameter(1).Value != lastAction.GetParameter(2).Value)
                     continue;
 
@@ -240,6 +268,7 @@ namespace WDE.SmartScriptEditor.Models
                     if (currentEvent == null)
                         continue;
                     
+                    currentEvent.Parent = this;
                     Events.Insert(index++, currentEvent);
                     newEvents.Add(currentEvent);
                     if (conds.TryGetValue(prevIndex, out var conditionList))
@@ -293,6 +322,22 @@ namespace WDE.SmartScriptEditor.Models
             return conds;
         }
 
+        private void SafeUpdateSource(SmartSource source, int targetId)
+        {
+            try
+            {
+                smartFactory.UpdateSource(source, targetId);
+            }
+            catch (Exception)
+            {
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetIcon(MessageBoxIcon.Error)
+                    .SetTitle("Unknown source")
+                    .SetMainInstruction($"Source {targetId} unknown, this may lead to invalid script opened!!")
+                    .Build());
+            }
+        }
+        
         public SmartAction? SafeActionFactory(ISmartScriptLine line)
         {
             try

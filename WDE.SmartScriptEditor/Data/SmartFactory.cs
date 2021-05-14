@@ -279,9 +279,12 @@ namespace WDE.SmartScriptEditor.Data
 
             element.Id = data.Id;
             element.ReadableHint = data.Description;
-            
+
             for (var i = 0; i < element.ParametersCount; ++i)
+            {
+                element.GetParameter(i).Name = "Parameter " + (i + 1) + " (unused)";
                 element.GetParameter(i).IsUsed = false;
+            }
             
             if (data.Parameters == null)
                 return;

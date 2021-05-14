@@ -6,7 +6,7 @@ namespace WDE.SmartScriptEditor.Models
 {
     public class DescriptionRule
     {
-        private SmartValidator validator;
+        private SmartValidator? validator;
 
         public DescriptionRule(SmartDescriptionRulesJsonData data)
         {

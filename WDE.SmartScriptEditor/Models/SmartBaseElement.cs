@@ -16,6 +16,7 @@ namespace WDE.SmartScriptEditor.Models
         public event EventHandler OnChanged = delegate { };
         public event Action<SmartBaseElement, int, int> OnIdChanged = delegate { };
 
+        public virtual int LineId { get; set; }
         private readonly ParameterValueHolder<long>[] @params;
 
         private string? readableHint;
