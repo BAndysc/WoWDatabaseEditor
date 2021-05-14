@@ -139,10 +139,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             }
             History.MarkAsSaved();
             messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Success!")
-                                    .SetMainInstruction($"Editor successfully saved definitions of {infoSourceName} Groups!")
-                                    .SetIcon(MessageBoxIcon.Information)
-                                    .WithOkButton(true)
-                                    .Build());
+                .SetMainInstruction($"Editor successfully saved definitions of {infoSourceName} Groups!")
+                .SetIcon(MessageBoxIcon.Information)
+                .WithOkButton(true)
+                .Build());
         }
 
         private void MakeItems()

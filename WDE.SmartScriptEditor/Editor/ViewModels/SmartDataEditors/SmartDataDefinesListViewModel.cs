@@ -142,10 +142,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
             }
             History.MarkAsSaved();
             messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Success!")
-                                    .SetMainInstruction($"Editor successfully saved definitions of Smart {infoSourceName}! Also remember to modify SmartData Group file via Editor if you modified list!")
-                                    .SetIcon(MessageBoxIcon.Information)
-                                    .WithOkButton(true)
-                                    .Build());
+                .SetMainInstruction($"Editor successfully saved definitions of Smart {infoSourceName}! Also remember to modify SmartData Group file via Editor if you modified list!")
+                .SetIcon(MessageBoxIcon.Information)
+                .WithOkButton(true)
+                .Build());
         }
 
         private ISmartDataEditorModel? GetEditorViewModel(in SmartGenericJsonData source, bool isCreating)

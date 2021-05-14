@@ -37,7 +37,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public string Name => Parameter.Name;
 
-        public bool IsHidden => !Parameter.IsUsed;
+        public bool IsHidden => !Parameter.IsUsed && (Parameter is not ParameterValueHolder<long> p || p.Value == 0);
         
         public bool HasItems => Parameter.Parameter.HasItems;
         

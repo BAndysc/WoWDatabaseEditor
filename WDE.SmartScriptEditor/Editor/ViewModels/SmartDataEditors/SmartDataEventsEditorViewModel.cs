@@ -58,9 +58,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors
         public DelegateCommand SaveItem { get; }
         public AsyncAutoCommand<SmartParameterJsonData?> EditParameter { get; }
         public AsyncAutoCommand AddParameter { get; }
-        public AsyncAutoCommand AddCondition { get; }
-        public AsyncAutoCommand<SmartDescriptionRulesJsonData?> EditDescriptionDefinition { get; }
-        public AsyncAutoCommand AddDescriptionDefinition { get; }
         public DelegateCommand DeleteActiveItem { get; }
 
         private async Task EditParam(SmartParameterJsonData? param)
