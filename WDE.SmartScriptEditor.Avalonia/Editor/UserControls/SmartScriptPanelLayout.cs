@@ -6,10 +6,12 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
+using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
@@ -44,12 +46,15 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         private (float y, float height, int conditionIndex, int eventIndex) overIndexCondition;
         private (float y, float height, int actionIndex, int eventIndex) overIndexAction;
 
-        private double EventWidth(double totalWidth) => Math.Min(Math.Max(totalWidth - 50, 0), 250);
+        private static double PaddingLeft = 20;
         
-        private double ConditionWidth(double totalWidth) => Math.Max(EventWidth(totalWidth) - 22, 0);
+        private double EventWidth(double totalWidth) => Math.Min(Math.Max(totalWidth - 50, PaddingLeft + 10), 250);
+        
+        private double ConditionWidth(double totalWidth) => Math.Max(EventWidth(totalWidth) - 22 - PaddingLeft, 0);
 
         static SmartScriptPanelLayout()
         {
+            AffectsRender<SmartScriptPanelLayout>(ProblemsProperty);
             PointerPressedEvent.AddClassHandler<SmartScriptPanelLayout>(PointerPressedHandled, RoutingStrategies.Tunnel, true);
         }
 
@@ -177,7 +182,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             
             foreach (ContentPresenter eventPresenter in Events())
             {
-                eventPresenter.Measure(new Size(eventWidth, availableSize.Height));
+                eventPresenter.Measure(new Size(eventWidth - PaddingLeft, availableSize.Height));
 
                 float actionsHeight = 26;
                 float conditionsHeight = 26;
@@ -251,7 +256,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             InvalidateArrange();
             InvalidateVisual();
         }
-        
+
+        private static FormattedText? vvvvText;
+        private static FormattedTextNumberCache NumberCache = new();
         public override void Render(DrawingContext dc)
         {
             base.Render(dc);
@@ -266,6 +273,85 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 float x = 1;
                 float y = overIndexCondition.y - overIndexCondition.height / 2 - 1;
                 dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + ConditionWidth(Bounds.Width), y));         
+            }
+
+            if (vvvvText == null)
+            {
+                vvvvText = new FormattedText();
+                vvvvText.FontSize = 7;
+                vvvvText.Text = "vvvv";
+                vvvvText.Typeface = Typeface.Default;
+            }
+            
+            int index = 1;
+            double yPos = 0;
+            foreach (var e in Script.Events)
+            {
+                if (e.Actions.Count == 0)
+                {
+                    if (!eventToPresenter.TryGetValue(e, out var eventPresenter))
+                        continue;
+                    yPos = eventPresenter.Bounds.Y;
+
+                    var ft = NumberCache.Get(index);
+                    dc.DrawText(Brushes.DarkGray, new Point(0, yPos + 5), ft);
+                    DrawProblems(dc, index, yPos);
+                    index++;
+                }
+                else
+                {
+                    foreach (var a in e.Actions)
+                    {
+                        if (!actionToPresenter.TryGetValue(a, out var actionPresenter))
+                            continue;
+                        
+                        yPos = actionPresenter.Bounds.Y;
+
+                        var ft = NumberCache.Get(index);
+                        dc.DrawText(Brushes.DarkGray, new Point(0, yPos + 5), ft);
+                        DrawProblems(dc, index, yPos);
+                        index++;
+                    }
+                }
+            }
+        }
+
+        private void DrawProblems(DrawingContext dc, int index, double yPos)
+        {
+            if (Problems != null && Problems.TryGetValue(index, out var severity))
+            { 
+                dc.DrawText(severity == DiagnosticSeverity.Error ? Brushes.Red : Brushes.Orange, new Point(0, yPos + 5 + 10), vvvvText);   
+            }
+        }
+
+        public class FormattedTextNumberCache
+        {
+            private FormattedText[] cache = new FormattedText[0];
+
+            public FormattedTextNumberCache()
+            {
+                
+            }
+
+            public FormattedText Get(int index)
+            {
+                if (cache.Length <= index)
+                    EnsureCache(index + 1);
+                return cache[index];
+            }
+
+            private void EnsureCache(int size)
+            {
+                int old = cache.Length;
+                size = Math.Max(size, cache.Length * 2 + 1);
+                Array.Resize(ref cache, size);
+                for (int i = old; i < size; ++i)
+                {
+                    cache[i] = new FormattedText();
+                    cache[i].Text = $"{i}";
+                    cache[i].FontSize = 10;
+                    cache[i].Typeface = Typeface.Default;
+                }
             }
         }
 
@@ -431,10 +517,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 if (!draggingEvents || !GetSelected(eventPresenter.Child))
                 {
                     float actionHeight = ArrangeActions(eventIndex, 0, finalSize, eventPresenter, y, height);
-                    float conditionsHeight = ArrangeConditions(eventIndex, 0, finalSize, eventPresenter, y, height);
+                    float conditionsHeight = ArrangeConditions(eventIndex, (float)PaddingLeft, finalSize, eventPresenter, y, height);
                     float eventsConditionsHeight = height + conditionsHeight;
                     height = Math.Max(eventsConditionsHeight, actionHeight);
-                    eventPresenter.Arrange(new Rect(0, y, EventWidth(finalSize.Width), height));
+                    eventPresenter.Arrange(new Rect(PaddingLeft, y, EventWidth(finalSize.Width) - PaddingLeft, height));
 
                     if (mouseY > y && mouseY < y + height && !draggingActions && !draggingEvents)
                     {
@@ -452,7 +538,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                             Math.Max(finalSize.Width - EventWidth(finalSize.Width), 0),
                             24));
                             
-                        addConditionPresenter?.Arrange(new Rect(25,
+                        addConditionPresenter?.Arrange(new Rect(PaddingLeft + 25,
                             y + eventsConditionsHeight - 26,
                             ConditionWidth(finalSize.Width),
                             24));
@@ -477,15 +563,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 var height = (float) eventPresenter.DesiredSize.Height;
                 if (draggingEvents && GetSelected(eventPresenter.Child))
                 {
-                    float conditionsHeight = ArrangeConditions(eventIndex, 20, finalSize, eventPresenter, start, height);
+                    float conditionsHeight = ArrangeConditions(eventIndex, 20 + (float)PaddingLeft, finalSize, eventPresenter, start, height);
                     height = Math.Max(height + conditionsHeight, ArrangeActions(eventIndex, 20, finalSize, eventPresenter, start, height));
-                    eventPresenter.Arrange(new Rect(20, start, EventWidth(finalSize.Width), height));
+                    eventPresenter.Arrange(new Rect(20 + PaddingLeft, start, EventWidth(finalSize.Width) - PaddingLeft, height));
                     start += height + EventSpacing;
                 }
 
                 eventIndex++;
             }
-
             return finalSize;
         }
 
@@ -611,17 +696,23 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public static readonly AvaloniaProperty ScriptProperty =
             AvaloniaProperty.Register<SmartScriptPanelLayout, SmartScript?>(nameof(Script), null);
         
+        public Dictionary<int, DiagnosticSeverity>? Problems
+        {
+            get => (Dictionary<int, DiagnosticSeverity>?) GetValue(ProblemsProperty);
+            set => SetValue(ProblemsProperty, value);
+        }
+        public static readonly AvaloniaProperty ProblemsProperty =
+            AvaloniaProperty.Register<SmartScriptPanelLayout, Dictionary<int, DiagnosticSeverity>?>(nameof(Problems));
+
         public float EventSpacing => 10;
 
         public float ConditionSpacing => 2;
         public float ActionSpacing => 2;
 
-        
         public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<SmartScriptPanelLayout, IControl, bool>("Selected");
         public static bool GetSelected(IControl control) => (bool)control.GetValue(SelectedProperty);
         public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
 
-        
         public static readonly AvaloniaProperty DropItemsProperty = AvaloniaProperty.Register<SmartScriptPanelLayout, ICommand>(nameof(DropItems));
 
         public ICommand DropItems
@@ -630,8 +721,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetValue(DropItemsProperty, value);
         }
 
-        public static readonly AvaloniaProperty DropActionsProperty = AvaloniaProperty.Register<SmartScriptPanelLayout, ICommand>(nameof(DropActions)
-            );
+        public static readonly AvaloniaProperty DropActionsProperty = AvaloniaProperty.Register<SmartScriptPanelLayout, ICommand>(nameof(DropActions));
 
         public ICommand DropActions
         {
@@ -639,14 +729,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetValue(DropActionsProperty, value);
         }
 
-        public static readonly AvaloniaProperty DropConditionsProperty = AvaloniaProperty.Register<SmartScriptPanelLayout, ICommand>(nameof(DropConditions)
-            );
+        public static readonly AvaloniaProperty DropConditionsProperty = AvaloniaProperty.Register<SmartScriptPanelLayout, ICommand>(nameof(DropConditions));
 
         public ICommand DropConditions
         {
             get => (ICommand) GetValue(DropConditionsProperty);
             set => SetValue(DropConditionsProperty, value);
         }
-
     }
 }

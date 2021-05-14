@@ -90,6 +90,7 @@
                     <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
                         <Button Classes="FlatButton"
                                 Content="Add action"
+                                Opacity="0.5"
                                 Command="{Binding DataContext.AddAction, ElementName=Rooot}"
                                 CommandParameter="{Binding}">
                         </Button>
@@ -98,6 +99,7 @@
                     <DataTemplate DataType="{x:Type viewModels1:NewConditionViewModel}">
                         <Button Classes="FlatButton"
                             Content="Add condition"
+                            Opacity="0.5"
                             Command="{Binding DataContext.AddCondition, ElementName=Rooot}"
                             CommandParameter="{Binding}">
                         </Button>
@@ -108,6 +110,7 @@
                     <ItemsPanelTemplate>
                         <userControls:SmartScriptPanelLayout Background="Transparent"
                                                       Script="{Binding Script}" 
+                                                      Problems="{Binding ProblematicLines}" 
                                                       DropItems="{Binding OnDropItems}"
                                                       DropActions="{Binding OnDropActions}"
                                                       DropConditions="{Binding OnDropConditions}"

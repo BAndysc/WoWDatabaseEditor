@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
@@ -39,9 +41,10 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
         private (float y, float height, int conditionIndex, int eventIndex) overIndexCondition;
         private (float y, float height, int actionIndex, int eventIndex) overIndexAction;
 
-        private float EventWidth => Math.Min(Math.Max((float) ActualWidth - 50, 0), 250);
+        private static float PaddingLeft = 20;
+        private float EventWidth => Math.Min(Math.Max((float) ActualWidth - 50, PaddingLeft + 10), 250);
 
-        private float ConditionWidth => Math.Max(EventWidth - 22, 0);
+        private float ConditionWidth => Math.Max(EventWidth - 22 - PaddingLeft, 0);
 
         protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
         {
@@ -132,7 +135,7 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
             float totalDesiredHeight = EventSpacing;
             foreach (ContentPresenter eventPresenter in Events())
             {
-                eventPresenter.Measure(new Size(EventWidth, availableSize.Height));
+                eventPresenter.Measure(new Size(EventWidth - PaddingLeft, availableSize.Height));
 
                 float actionsHeight = 26;
                 float conditionsHeight = 26;
@@ -210,6 +213,23 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
             InvalidateVisual();
         }
 
+        private static FormattedText? vvvvError;
+        private static FormattedText? vvvvWarning;
+
+        private void DrawProblem(DrawingContext dc, int line, double yPos)
+        {
+            if (vvvvError == null)
+            {
+                vvvvError = new FormattedText("vvvv", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Calibri"), 7, Brushes.Red);
+                vvvvWarning = new FormattedText("vvvv", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Calibri"), 7, Brushes.Orange);
+            }
+
+            if (Problems != null && Problems.TryGetValue(line, out var severity))
+            {
+                dc.DrawText(severity == DiagnosticSeverity.Error ? vvvvError : vvvvWarning, new Point(0, yPos + 5 + 10));
+            }
+        }
+
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
@@ -225,7 +245,72 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
                 float y = overIndexCondition.y - overIndexCondition.height / 2 - 1;
                 dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + ConditionWidth, y));         
             }
+
+
+            int index = 1;
+            double yPos = 0;
+            foreach (var e in Script.Events)
+            {
+                if (e.Actions.Count == 0)
+                {
+                    if (!eventToPresenter.TryGetValue(e, out var eventPresenter))
+                        continue;
+                    yPos = eventPresenter.TransformToAncestor(this).Transform(new Point(0, 0)).Y;
+
+                    var ft = NumberCache.Get(index);
+                    dc.DrawText(ft, new Point(0, yPos + 5));
+                    DrawProblem(dc, index, yPos);
+                    index++;
+                }
+                else
+                {
+                    foreach (var a in e.Actions)
+                    {
+                        if (!actionToPresenter.TryGetValue(a, out var actionPresenter))
+                            continue;
+
+                        yPos = actionPresenter.TransformToAncestor(this).Transform(new Point(0, 0)).Y;
+
+                        var ft = NumberCache.Get(index);
+                        dc.DrawText(ft, new Point(0, yPos + 5));
+                        DrawProblem(dc, index, yPos);
+
+                        index++;
+                    }
+                }
+            }
         }
+
+
+        private static FormattedTextNumberCache NumberCache = new();
+        public class FormattedTextNumberCache
+        {
+            private FormattedText[] cache = new FormattedText[0];
+
+            public FormattedTextNumberCache()
+            {
+
+            }
+
+            public FormattedText Get(int index)
+            {
+                if (cache.Length <= index)
+                    EnsureCache(index + 1);
+                return cache[index];
+            }
+
+            private void EnsureCache(int size)
+            {
+                int old = cache.Length;
+                size = Math.Max(size, cache.Length * 2 + 1);
+                Array.Resize(ref cache, size);
+                for (int i = old; i < size; ++i)
+                {
+                    cache[i] = new FormattedText(i.ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Calibri"), 10, Brushes.DarkGray);
+                }
+            }
+        }
+
 
         private bool AnyActionSelected()
         {
@@ -376,10 +461,10 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
                 if (!draggingEvents || !GetSelected(eventPresenter))
                 {
                     float actionHeight = ArrangeActions(eventIndex, 0, finalSize, eventPresenter, y, height);
-                    float conditionsHeight = ArrangeConditions(eventIndex, 0, finalSize, eventPresenter, y, height);
+                    float conditionsHeight = ArrangeConditions(eventIndex, PaddingLeft, finalSize, eventPresenter, y, height);
                     float eventsConditionsHeight = height + conditionsHeight;
                     height = Math.Max(eventsConditionsHeight, actionHeight);
-                    eventPresenter.Arrange(new Rect(0, y, EventWidth, height));
+                    eventPresenter.Arrange(new Rect(PaddingLeft, y, EventWidth - PaddingLeft, height));
 
                     if (mouseY > y && mouseY < y + height && !draggingActions && !draggingEvents)
                     {
@@ -397,7 +482,7 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
                             Math.Max(finalSize.Width - EventWidth, 0),
                             24));
                             
-                        addConditionPresenter.Arrange(new Rect(25,
+                        addConditionPresenter.Arrange(new Rect(PaddingLeft + 25,
                             y + eventsConditionsHeight - 26,
                             ConditionWidth,
                             24));
@@ -422,9 +507,9 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
                 var height = (float) eventPresenter.DesiredSize.Height;
                 if (draggingEvents && GetSelected(eventPresenter))
                 {
-                    float conditionsHeight = ArrangeConditions(eventIndex, 20, finalSize, eventPresenter, start, height);
+                    float conditionsHeight = ArrangeConditions(eventIndex, 20 + PaddingLeft, finalSize, eventPresenter, start, height);
                     height = Math.Max(height + conditionsHeight, ArrangeActions(eventIndex, 20, finalSize, eventPresenter, start, height));
-                    eventPresenter.Arrange(new Rect(20, start, EventWidth, height));
+                    eventPresenter.Arrange(new Rect(20 + PaddingLeft, start, EventWidth - PaddingLeft, height));
                     start += height + EventSpacing;
                 }
 
@@ -592,7 +677,17 @@ namespace WDE.SmartScriptEditor.WPF.Editor.UserControls
             typeof(SmartScriptPanelLayout),
             new PropertyMetadata(null));
 
-        
+        public Dictionary<int, DiagnosticSeverity>? Problems
+        {
+            get => (Dictionary<int, DiagnosticSeverity>?)GetValue(ProblemsProperty);
+            set => SetValue(ProblemsProperty, value);
+        }
+
+        public static readonly DependencyProperty ProblemsProperty = DependencyProperty.Register(nameof(Problems),
+            typeof(Dictionary<int, DiagnosticSeverity>),
+            typeof(SmartScriptPanelLayout),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
         public float EventSpacing
         {
             get => (float) GetValue(EventSpacingProperty);
