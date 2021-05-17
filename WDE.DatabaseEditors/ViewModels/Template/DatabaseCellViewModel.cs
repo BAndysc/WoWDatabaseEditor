@@ -66,14 +66,17 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             inConstructor = false;
         }
 
-        public bool AsBoolValue
+        public bool? AsBoolValue
         {
-            get => ((ParameterValue as ParameterValue<long>)?.Value ?? 0) != 0;
+            get =>  ParameterValue.IsNull ? null : ((ParameterValue as ParameterValue<long>)?.Value ?? 0) != 0;
             set
             {
                 if (ParameterValue is ParameterValue<long> longParam)
                 {
-                    longParam.Value = value ? 1 : 0;
+                    if (value == null)
+                        longParam.SetNull();
+                    else
+                        longParam.Value = value.Value ? 1 : 0;
                 }
             }
         }

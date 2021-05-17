@@ -10,6 +10,7 @@
                 <ControlTemplate TargetType="{x:Type local:FastBoolCellView}">
                     <Grid Background="Transparent">
                         <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center"
+                          IsThreeState="{TemplateBinding CanBeNull}"
                           IsEnabled="{TemplateBinding IsReadOnly, Converter={StaticResource InvertedBoolConverter}}"
                           IsChecked="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                           HorizontalContentAlignment="Center">

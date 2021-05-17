@@ -16,6 +16,7 @@ namespace WDE.DatabaseEditors.Models
     {
         string String { get; }
         string OriginalString { get; }
+        bool IsNull { get; }
         void SetNull();
         void Revert();
         IParameter BaseParameter { get; }
@@ -29,13 +30,7 @@ namespace WDE.DatabaseEditors.Models
         public T? Value
         {
             get => value.Value;
-            set
-            {
-                if (Comparer<T>.Default.Compare(value, Value) == 0)
-                    return;
-                
-                this.value.Value = value;
-            }
+            set => this.value.Value = value;
         }
 
         public IParameter BaseParameter => parameter;
@@ -70,15 +65,19 @@ namespace WDE.DatabaseEditors.Models
 
         public string String => ToString();
         public string OriginalString { get; }
+        public bool IsNull => value.IsNull;
         
         public void SetNull()
         {
-            value.Value = default;
+            value.SetNull();
         }
 
         public void Revert()
         {
-            value.Value = originalValue.Value;
+            if (originalValue.IsNull)
+                value.SetNull();
+            else
+                value.Value = originalValue.Value;
         }
 
         public override string ToString()
@@ -96,29 +95,41 @@ namespace WDE.DatabaseEditors.Models
 
     public sealed class ValueHolder<T> : INotifyPropertyChanged, IValueHolder
     {
+        private bool isNull;
+        
         private T? value;
         public T? Value
         {
             get => value;
-            set
-            {
-                if (Comparer<T>.Default.Compare(value, Value) == 0)
-                    return;
-                
-                var old = this.value;
-                this.value = value;
-                OnPropertyChanged();
-                ValueChanged?.Invoke(old, value);
-            }
+            set => SetValue(value, value == null);
         }
 
-        public ValueHolder(T? initial)
+        public void SetNull()
+        {
+            SetValue(default, true);
+        }
+
+        private void SetValue(T? value, bool isNull)
+        {
+            if (this.isNull == isNull && Comparer<T>.Default.Compare(value, Value) == 0)
+                return;
+
+            var wasNull = this.isNull;
+            this.isNull = isNull;
+            var old = this.value;
+            this.value = value;
+            OnPropertyChanged(nameof(Value));
+            ValueChanged?.Invoke(old, value, wasNull, isNull);
+        }
+
+        public ValueHolder(T? initial, bool isNull)
         {
             value = initial;
+            this.isNull = isNull;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        public event Action<T?, T?>? ValueChanged;
+        public event Action<T?, T?, bool, bool>? ValueChanged;
 
         public override string ToString()
         {
@@ -131,11 +142,11 @@ namespace WDE.DatabaseEditors.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public bool IsNull => value == null;
+        public bool IsNull => isNull;
 
         public ValueHolder<T> Clone()
         {
-            return new ValueHolder<T>(Value);
+            return new ValueHolder<T>(Value, isNull);
         }
     }
 }

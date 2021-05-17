@@ -50,17 +50,17 @@ namespace WDE.DatabaseEditors.Data
                 
                 if (type == "float")
                 {
-                    valueHolder = new ValueHolder<float>(column.Default is float f ? f : 0.0f);
+                    valueHolder = new ValueHolder<float>(column.Default is float f ? f : 0.0f, column.CanBeNull && column.Default == null);
                 }
                 else if (type == "int" || type == "uint")
                 {
                     if (column.DbColumnName == definition.TablePrimaryKeyColumnName)
-                        valueHolder = new ValueHolder<long>(key);
+                        valueHolder = new ValueHolder<long>(key, false);
                     else
-                        valueHolder = new ValueHolder<long>(column.Default is long f ? f : 0);
+                        valueHolder = new ValueHolder<long>(column.Default is long f ? f : 0, column.CanBeNull && column.Default == null);
                 }
                 else
-                    valueHolder = new ValueHolder<string>(column.Default is string f ? f : "");
+                    valueHolder = new ValueHolder<string>(column.Default is string f ? f : "", column.CanBeNull && column.Default == null);
 
 
                 columns[column.DbColumnName] = databaseFieldFactory.CreateField(column.DbColumnName, valueHolder);
@@ -86,43 +86,43 @@ namespace WDE.DatabaseEditors.Data
                     IValueHolder valueHolder = null!;
                     if (column.Value.type == typeof(string))
                     {
-                        valueHolder = new ValueHolder<string>(column.Value.value as string ?? null);
+                        valueHolder = new ValueHolder<string>(column.Value.value as string ?? null, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(float))
                     {
-                        valueHolder = new ValueHolder<float>(column.Value.value as float? ?? 0);
+                        valueHolder = new ValueHolder<float>(column.Value.value as float? ?? 0, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(uint))
                     {
-                        valueHolder = new ValueHolder<long>(column.Value.value as uint? ?? 0);
+                        valueHolder = new ValueHolder<long>(column.Value.value as uint? ?? 0, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(int))
                     {
-                        valueHolder = new ValueHolder<long>(column.Value.value as int? ?? 0);
+                        valueHolder = new ValueHolder<long>(column.Value.value as int? ?? 0, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(long))
                     {
-                        valueHolder = new ValueHolder<long>(column.Value.value as long? ?? 0);
+                        valueHolder = new ValueHolder<long>(column.Value.value as long? ?? 0, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(byte))
                     {
-                        valueHolder = new ValueHolder<long>(column.Value.value as byte? ?? 0);
+                        valueHolder = new ValueHolder<long>(column.Value.value as byte? ?? 0, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(sbyte))
                     {
-                        valueHolder = new ValueHolder<long>(column.Value.value as sbyte? ?? 0);
+                        valueHolder = new ValueHolder<long>(column.Value.value as sbyte? ?? 0, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(ushort))
                     {
-                        valueHolder = new ValueHolder<long>(column.Value.value as ushort? ?? 0);
+                        valueHolder = new ValueHolder<long>(column.Value.value as ushort? ?? 0, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(short))
                     {
-                        valueHolder = new ValueHolder<long>(column.Value.value as short? ?? 0);
+                        valueHolder = new ValueHolder<long>(column.Value.value as short? ?? 0, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(bool))
                     {
-                        valueHolder = new ValueHolder<long>(column.Value.value is DBNull ? 0 : ((bool)column.Value.value ? 1 : 0));
+                        valueHolder = new ValueHolder<long>(column.Value.value is DBNull ? 0 : ((bool)column.Value.value ? 1 : 0), column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(IList<IConditionLine>))
                     {

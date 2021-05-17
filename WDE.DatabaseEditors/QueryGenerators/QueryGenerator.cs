@@ -169,7 +169,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         .ToDictionary(g => g.Key, g => g.ToList());
 
                     foreach (var foreign in tableData.TableDefinition.ForeignTable)
-                        fieldsByTable[foreign.TableName].Insert(0, new DatabaseField<long>(foreign.ForeignKey, new ValueHolder<long>(entity.Key)));
+                        fieldsByTable[foreign.TableName].Insert(0, new DatabaseField<long>(foreign.ForeignKey, new ValueHolder<long>(entity.Key, false)));
                 }
                 else
                 {

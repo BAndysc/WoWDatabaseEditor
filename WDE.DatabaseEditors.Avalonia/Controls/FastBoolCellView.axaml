@@ -15,6 +15,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <CheckBox HorizontalAlignment="Center" 
+                          IsThreeState="{TemplateBinding CanBeNull}"
                           IsEnabled="{TemplateBinding IsReadOnly, Converter={StaticResource InvertBoolConverter}}"
                           IsChecked="{TemplateBinding Value, Mode=TwoWay}"
                           HorizontalContentAlignment="Center">

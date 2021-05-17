@@ -17,13 +17,13 @@ namespace WDE.DatabaseEditors.Models
         {
             this.columnName = columnName;
             Current = current;
-            Original = new ValueHolder<T>(current.Value);
+            Original = new ValueHolder<T>(current.Value, current.IsNull);
             Current.ValueChanged += OnValueChanged;
         }
 
-        private void OnValueChanged(T? old, T? nnew)
+        private void OnValueChanged(T? old, T? nnew, bool wasNull, bool isNull)
         {
-            OnChanged?.Invoke(new DatabaseFieldHistoryAction<T>(this, columnName, old, nnew));
+            OnChanged?.Invoke(new DatabaseFieldHistoryAction<T>(this, columnName, old, nnew, wasNull, isNull));
             OnPropertyChanged(nameof(IsModified));
         }
 

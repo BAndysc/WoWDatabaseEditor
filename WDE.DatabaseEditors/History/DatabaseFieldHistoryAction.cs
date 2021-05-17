@@ -9,28 +9,38 @@ namespace WDE.DatabaseEditors.History
         private readonly string property;
         private readonly T? oldValue;
         private readonly T? newValue;
+        private bool wasNull;
+        private bool isNull;
 
-        public DatabaseFieldHistoryAction(DatabaseField<T> tableField, string property, T? oldValue, T? newValue)
+        public DatabaseFieldHistoryAction(DatabaseField<T> tableField, string property, T? oldValue, T? newValue, bool wasNull, bool isNull)
         {
             this.tableField = tableField;
             this.property = property;
             this.oldValue = oldValue;
             this.newValue = newValue;
+            this.wasNull = wasNull;
+            this.isNull = isNull;
         }
 
         public void Undo()
         {
-            tableField.Current.Value = oldValue;
+            if (wasNull)
+                tableField.Current.SetNull();
+            else
+                tableField.Current.Value = oldValue;
         }
 
         public void Redo()
         {
-            tableField.Current.Value = newValue;
+            if (isNull)
+                tableField.Current.SetNull();
+            else
+                tableField.Current.Value = newValue;
         }
 
         public string GetDescription()
         {
-            var value = newValue == null ? "(null)" : newValue.ToString();
+            var value = isNull || newValue == null ? "(null)" : newValue.ToString();
             return $"Changed value of {property} to {value}";
         }
     }
