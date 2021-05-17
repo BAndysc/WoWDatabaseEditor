@@ -12,7 +12,7 @@
       <OutputPath>..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <None Update="Data\parameters.json">
+    <None Update="Parameters\parameters.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

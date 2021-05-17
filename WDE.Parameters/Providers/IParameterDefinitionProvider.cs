@@ -14,14 +14,17 @@ namespace WDE.Parameters.Providers
 
         public ParameterDefinitionProvider()
         {
-            var source = "Data/parameters.json";
-            if (File.Exists(source))
+            var allParameters = new Dictionary<string, ParameterSpecModel>();
+
+            foreach (var source in Directory.GetFiles("Parameters/", "*.json", SearchOption.AllDirectories))
             {
                 string data = File.ReadAllText(source);
-                Parameters = JsonConvert.DeserializeObject<Dictionary<string, ParameterSpecModel>>(data);
+                var parameters = JsonConvert.DeserializeObject<Dictionary<string, ParameterSpecModel>>(data);
+                foreach (var keyPair in parameters)
+                    allParameters[keyPair.Key] = keyPair.Value;
             }
-            else
-                Parameters = new Dictionary<string, ParameterSpecModel>();
+
+            Parameters = allParameters;
         }
     }
 

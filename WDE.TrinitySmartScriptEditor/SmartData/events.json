@@ -711,7 +711,7 @@
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When victim has mana between {pram1} - {pram2} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When victim has mana between {pram1} - {pram2}% {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
     "name_readable": "When victim mana between"
   },
   {

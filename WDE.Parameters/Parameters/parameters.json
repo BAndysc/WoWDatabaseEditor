@@ -2356,5 +2356,13 @@
 			"Disturbing": {"name": "Disturbing"},
 			"Activating Defenses": {"name": "Activating Defenses"}
 		}
+	},
+	"ReactStateParameter": {
+		"name": "React state",
+		"values": {
+			"0": {"name": "Passive"},
+			"1": {"name": "Defensive"},
+			"2": {"name": "Aggressive"}
+		}
 	}
 }

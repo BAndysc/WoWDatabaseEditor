@@ -145,19 +145,8 @@
         "name": "SMART_ACTION_SET_REACT_STATE",
         "parameters": [
             {
-                "type": "SwitchParameter",
-                "name": "ReactState",
-                "values": {
-                    "0": {
-                        "name": "REACT_PASSIVE"
-                    },
-                    "1": {
-                        "name": "REACT_DEFENSIVE"
-                    },
-                    "2": {
-                        "name": "REACT_AGGRESSIVE"
-                    }
-                }
+                "type": "ReactStateParameter",
+                "name": "ReactState"
             }
         ],
         "description": "{source}: Set react state to {pram1}",
@@ -1070,19 +1059,8 @@
                 "description": "Despawn time after finishing the path"
             },
             {
-                "type": "SwitchParameter",
-                "name": "React State",
-                "values": {
-                    "0": {
-                        "name": "Passive"
-                    },
-                    "1": {
-                        "name": "Defensive"
-                    },
-                    "2": {
-                        "name": "Aggressive"
-                    }
-                }
+                "type": "ReactStateParameter",
+                "name": "React State"
             }
         ],
         "description": "{source}: Start path #{pram2}, {pram1value:choose(0):walk|run}, {pram3value:choose(0):do not repeat|repeat}, {pram6}",
