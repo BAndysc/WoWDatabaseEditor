@@ -211,7 +211,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     ConditionValue2 = (int)c.GetParameter(1).Value,
                     ConditionValue3 = (int)c.GetParameter(2).Value,
                     NegativeCondition = (int)c.Inverted.Value,
-                    Comment = c.Readable
+                    Comment = c.Readable.RemoveTags()
                 });
             }
             return lines.ToArray();
