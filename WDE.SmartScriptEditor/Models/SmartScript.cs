@@ -127,7 +127,8 @@ namespace WDE.SmartScriptEditor.Models
                 linkToTriggerTimedEventId = doubleLinks.Select(linkId => (linkId, nextFreeTriggerTimedEvent++))
                     .ToDictionary(pair => pair.linkId, pair => pair.Item2);
             }
-            
+
+            SmartEvent? lastEvent = null;
             foreach (ISmartScriptLine line in lines)
             {
                 SmartEvent? currentEvent = null;
@@ -142,10 +143,13 @@ namespace WDE.SmartScriptEditor.Models
                 else
                     Debug.Assert((int) source.Value == line.ScriptSourceType);
 
-                if (!linkToSmartEventParent.TryGetValue(line.Id, out currentEvent))
+                if (source == SmartScriptType.TimedActionList && lastEvent != null && 
+                    line.EventParam1 == 0 && line.EventParam2 == 0)
+                    currentEvent = lastEvent;
+                else if (!linkToSmartEventParent.TryGetValue(line.Id, out currentEvent))
                 {
-                    currentEvent = SafeEventFactory(line);
-                        
+                    lastEvent = currentEvent = SafeEventFactory(line);
+
                     if (currentEvent != null)
                     {
                         if (currentEvent.Id == SmartConstants.EventTriggerTimed)

@@ -10,6 +10,7 @@
         public const int ActionCallTimedActionList = 80;
         public const int ActionComment = 9998;
         public const int EventTriggerTimed = 59;
+        public const int EventUpdateInCombat = 0;
         public const int EventLink = 61;
         public const int ActionCreateTimed = 67;
         public const int ActionTriggerTimed = 73;

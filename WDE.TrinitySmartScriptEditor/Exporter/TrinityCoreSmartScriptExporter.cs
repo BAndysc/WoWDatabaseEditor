@@ -52,15 +52,24 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 {
                     SmartEvent actualEvent = e;
 
-                    if (previousWasWait)
+                    int linkTo = 0;
+                    if (script.SourceType == SmartScriptType.TimedActionList)
                     {
-                        actualEvent = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
-                        actualEvent.GetParameter(0).Value = nextTriggerId++;
+                        if (index > 0)
+                            actualEvent = smartFactory.EventFactory(SmartConstants.EventUpdateInCombat);
                     }
-                    else if (index > 0)
-                        actualEvent = smartFactory.EventFactory(SmartConstants.EventLink);
-
-                    int linkTo = e.Actions.Count - 1 == index ? 0 : eventId + 1;
+                    else
+                    {
+                        if (previousWasWait)
+                        {
+                            actualEvent = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
+                            actualEvent.GetParameter(0).Value = nextTriggerId++;
+                        }
+                        else if (index > 0)
+                            actualEvent = smartFactory.EventFactory(SmartConstants.EventLink);
+                     
+                        linkTo = e.Actions.Count - 1 == index ? 0 : eventId + 1;
+                    }
 
                     SmartAction actualAction = e.Actions[index].Copy();
 
