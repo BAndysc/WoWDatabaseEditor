@@ -213,7 +213,8 @@
             "SMART_ACTION_REMOVE_IMMUNITY_AC",
             "SMART_ACTION_NO_ENVIRONMENT_UPDATE_AC",
             "SMART_ACTION_RESPAWN_TARGET",
-            "SMART_ACTION_ENABLE_TEMP_GOBJ"
+            "SMART_ACTION_ENABLE_TEMP_GOBJ",
+            "SMART_ACTION_SET_HOME_POS"
         ]
     },
     {
