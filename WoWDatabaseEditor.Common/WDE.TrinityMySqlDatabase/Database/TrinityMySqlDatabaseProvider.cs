@@ -248,7 +248,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                     break;
                 case SmartScriptType.GameObject:
                     await model.GameObjectTemplate.Where(p => p.Entry == (uint)entryOrGuid)
-                        .Set(p => p.AIName, "SmartAI")
+                        .Set(p => p.AIName, "SmartGameObjectAI")
                         .Set(p => p.ScriptName, "")
                         .UpdateAsync();
                     break;

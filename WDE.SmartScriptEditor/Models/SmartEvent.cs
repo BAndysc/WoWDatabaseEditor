@@ -67,8 +67,6 @@ namespace WDE.SmartScriptEditor.Models
             cooldownMax.PropertyChanged += (_, _) => CallOnChanged();
         }
 
-        public int ActualId { get; set; }
-
         public bool IsSelected
         {
             get => isSelected;
@@ -147,6 +145,11 @@ namespace WDE.SmartScriptEditor.Models
         public void AddAction(SmartAction smartAction)
         {
             Actions.Add(smartAction);
+        }
+
+        public void InsertAction(SmartAction smartAction, int indexAt)
+        {
+            Actions.Insert(indexAt, smartAction);
         }
 
         public bool Equals(SmartEvent other)

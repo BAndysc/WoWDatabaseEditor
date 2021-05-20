@@ -307,6 +307,7 @@ namespace WDE.SmartScriptEditor.History
 
             public void Redo()
             {
+                smartEvent.IsSelected = false;
                 script.Events.Insert(index, smartEvent);
             }
 
@@ -341,6 +342,7 @@ namespace WDE.SmartScriptEditor.History
 
             public void Undo()
             {
+                smartEvent.IsSelected = false;
                 script.Events.Insert(index, smartEvent);
             }
         }
@@ -402,6 +404,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Redo()
         {
+            smartAction.IsSelected = false;
             parent.Actions.Insert(index, smartAction);
         }
 
@@ -437,6 +440,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Undo()
         {
+            smartAction.IsSelected = false;
             parent.Actions.Insert(index, smartAction);
         }
     }
@@ -466,6 +470,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Undo()
         {
+            smartCondition.IsSelected = false;
             parent.Conditions.Insert(index, smartCondition);
         }
     }
@@ -518,6 +523,7 @@ namespace WDE.SmartScriptEditor.History
 
         public void Redo()
         {
+            smartCondition.IsSelected = false;
             parent.Conditions.Insert(index, smartCondition);
         }
 

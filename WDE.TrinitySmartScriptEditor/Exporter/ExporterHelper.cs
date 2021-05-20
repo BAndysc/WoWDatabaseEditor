@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using SmartFormat;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Conditions.Exporter;
 using WDE.SmartScriptEditor.Editor.UserControls;
@@ -16,15 +17,18 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         private readonly SmartScript script;
         private readonly ISmartScriptExporter scriptExporter;
+        private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
         private readonly StringBuilder sql = new();
 
         public ExporterHelper(SmartScript script, 
             ISmartScriptExporter scriptExporter,
+            ICurrentCoreVersion currentCoreVersion,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.script = script;
             this.scriptExporter = scriptExporter;
+            this.currentCoreVersion = currentCoreVersion;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
 
@@ -126,10 +130,10 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             switch (script.SourceType)
             {
                 case SmartScriptType.Creature:
-                    sql.AppendLine("UPDATE creature_template SET AIName=\"SmartAI\" WHERE entry= @ENTRY;");
+                    sql.AppendLine("UPDATE creature_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName + "\" WHERE entry= @ENTRY;");
                     break;
                 case SmartScriptType.GameObject:
-                    sql.AppendLine("UPDATE gameobject_template SET AIName=\"SmartGameObjectAI\" WHERE entry=@ENTRY;");
+                    sql.AppendLine("UPDATE gameobject_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName + "\" WHERE entry=@ENTRY;");
                     break;
                 case SmartScriptType.Quest:
                     sql.AppendLine("INSERT IGNORE INTO quest_template_addon (ID) VALUES (@ENTRY);");

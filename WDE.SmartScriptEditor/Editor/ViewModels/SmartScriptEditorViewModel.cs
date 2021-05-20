@@ -504,7 +504,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         int? actionIndex = null;
                         using (script!.BulkEdit("Paste actions"))
                         {
-                            for (var i = 0; i < Events.Count - 1; ++i)
+                            for (var i = 0; i < Events.Count; ++i)
                             {
                                 if (Events[i].IsSelected)
                                     eventIndex = i;
@@ -515,9 +515,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                     {
                                         eventIndex = i;
                                         if (!actionIndex.HasValue)
-                                            actionIndex = j;
-                                        else
-                                            actionIndex--;
+                                            actionIndex = j + 1;
+                                        //else
+                                        //    actionIndex--;
                                         //Events[i].Actions.RemoveAt(j);
                                     }
                                 }
@@ -560,7 +560,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                 if (Events[i].IsSelected)
                                 {
                                     if (!index.HasValue)
-                                        index = i;
+                                        index = i + 1;
                                     //else
                                     //    index--;
                                     //Events.RemoveAt(i);

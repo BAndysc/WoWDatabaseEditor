@@ -216,7 +216,7 @@ namespace WDE.SmartScriptEditor.Models
 
             var sortedTriggers = triggerIdToEvent.Keys.ToList();
             sortedTriggers.Reverse();
-            foreach (int triggerId in sortedTriggers)
+            foreach (long triggerId in sortedTriggers)
             {
                 SmartEvent @event = triggerIdToEvent[triggerId];
                 if (!triggerIdToActionParent.ContainsKey(triggerId))
@@ -224,24 +224,36 @@ namespace WDE.SmartScriptEditor.Models
 
                 SmartEvent caller = triggerIdToActionParent[triggerId];
 
-                SmartAction lastAction = caller.Actions[caller.Actions.Count - 1];
+                int indexOfAction = -1;
+                for (int i = 0; i < caller.Actions.Count; ++i)
+                {
+                    if (caller.Actions[i].Id == SmartConstants.ActionCreateTimed &&
+                        caller.Actions[i].GetParameter(1).Value == caller.Actions[i].GetParameter(2).Value &&
+                        caller.Actions[i].GetParameter(0).Value == triggerId)
+                    {
+                        indexOfAction = i;
+                        break;
+                    }
+                }
 
-                if (lastAction.Id != SmartConstants.ActionCreateTimed ||
-                    lastAction.GetParameter(1).Value != lastAction.GetParameter(2).Value)
+                if (indexOfAction == -1)
                     continue;
 
-                long waitTime = lastAction.GetParameter(1).Value;
+                long waitTime = caller.Actions[indexOfAction].GetParameter(1).Value;
+                if (indexOfAction > 0 && caller.Actions[indexOfAction - 1].Id == SmartConstants.ActionCreateTimed)
+                    waitTime -= caller.Actions[indexOfAction - 1].GetParameter(1).Value;
                 SmartAction waitAction = smartFactory.ActionFactory(SmartConstants.ActionWait,
                     smartFactory.SourceFactory(SmartConstants.SourceNone),
                     smartFactory.TargetFactory(SmartConstants.TargetNone));
                 waitAction.GetParameter(0).Value = waitTime;
 
-                caller.Actions.RemoveAt(caller.Actions.Count - 1);
-                caller.AddAction(waitAction);
+                caller.Actions.RemoveAt(indexOfAction);
+                caller.InsertAction(waitAction, indexOfAction++);
                 Events.Remove(@event);
                 foreach (SmartAction a in @event.Actions)
-                    caller.AddAction(a);
+                    caller.InsertAction(a, indexOfAction++);
             }
+            
 
             if (doubleLinks.Count > 0)
             {

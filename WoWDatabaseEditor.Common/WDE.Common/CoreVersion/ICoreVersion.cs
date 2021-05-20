@@ -22,6 +22,8 @@ namespace WDE.Common.CoreVersion
     public interface ISmartScriptFeatures
     {
         ISet<SmartScriptType> SupportedTypes { get; }
+        string CreatureSmartAiName => "SmartAI";
+        string GameObjectSmartAiName => "SmartGameObjectAI";
 
         string? ForceLoadTag => null;
     }
