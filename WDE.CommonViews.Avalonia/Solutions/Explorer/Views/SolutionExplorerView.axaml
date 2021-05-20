@@ -7,6 +7,7 @@
           xmlns="https://github.com/avaloniaui"
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+          xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
           prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
     
     <components:ToolView.Icon>
@@ -54,7 +55,12 @@
         </DrawingImage>
     </components:ToolView.Resources>
     
-    <TreeView x:Name="tv" Margin="0" Items="{Binding Root}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" DoubleTapped="Tv_OnDoubleTapped">
+    <TreeView x:Name="tv" Margin="0" 
+              Items="{Binding Root}" 
+              SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
+              PointerReleased="Tv_OnPointerReleased"
+              dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{Binding }" dnD:DragAndDrop.IsDragSource="True"
+              DoubleTapped="Tv_OnDoubleTapped">
         <TreeView.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="Add"

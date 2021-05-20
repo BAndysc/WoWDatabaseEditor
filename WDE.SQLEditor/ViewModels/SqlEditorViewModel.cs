@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -30,8 +31,16 @@ namespace WDE.SQLEditor.ViewModels
                     async () =>
                     {
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
-                        await mySqlExecutor.ExecuteSql(Code.ToString());
-                        statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
+                        try
+                        {
+                            await mySqlExecutor.ExecuteSql(Code.ToString());
+                            statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
+                        }
+                        catch (Exception e)
+                        {
+                            statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failure during query execution"));
+                            Console.WriteLine(e);
+                        }
                     });
             }, () => databaseProvider.IsConnected);
             IsLoading = false;

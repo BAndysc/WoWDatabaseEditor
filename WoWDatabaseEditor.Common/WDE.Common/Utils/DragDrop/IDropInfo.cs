@@ -59,6 +59,6 @@ namespace WDE.Common.Utils.DragDrop
         int InsertIndex { get; }
         DropTargetAdorners DropTargetAdorner { get; set; }
         DragDropEffects Effects { get; set; }
-        RelativeInsertPosition InsertPosition { get; }
+        RelativeInsertPosition InsertPosition { get; set; }
     }
 }

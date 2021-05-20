@@ -154,7 +154,7 @@ namespace WDE.Common.WPF.Attached
             public int InsertIndex { get; internal set; }
             public CommonDrag.DropTargetAdorners DropTargetAdorner { get; set; }
             public CommonDrag.DragDropEffects Effects { get; set; }
-            public CommonDrag.RelativeInsertPosition InsertPosition { get; internal set; }
+            public CommonDrag.RelativeInsertPosition InsertPosition { get; set; }
         }
     }
 }

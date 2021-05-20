@@ -124,6 +124,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                         this.solutionManager.Items.Remove(selected.Item);
                     else
                         selected.Parent.Item.Items?.Remove(selected.Item);
+                    SelectedItem = null;
                 }
             });
 
@@ -158,10 +159,16 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private void DoAddItem(ISolutionItem item)
         {
-            if (selected == null || selected.Item.Items == null)
+            if (selected == null || selected.Parent == null)
                 solutionManager.Items.Add(item);
-            else
+            else if (selected.Item.Items != null)
                 selected.Item.Items.Add(item);
+            else
+            {
+                var indexOf = selected.Parent.Item.Items?.IndexOf(selected.Item) ?? -1;
+                if (indexOf != -1)
+                    selected.Parent.Item.Items!.Insert(indexOf + 1, item);
+            }
                     
             if (item is not SolutionFolderItem)
                 ea.GetEvent<EventRequestOpenItem>().Publish(item);
@@ -235,7 +242,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                 else
                     targetItem.Parent.AddViewModel(sourceItem);
 
-                int destPosition = dropInfo.InsertIndex;
+                int destPosition = dropInfo.InsertIndex + (dropInfo.InsertPosition == RelativeInsertPosition.AfterTargetItem ? 1 : 0);
                 if (destList == sourceList && dropInfo.InsertIndex >= prevPosition)
                     destPosition--;
 

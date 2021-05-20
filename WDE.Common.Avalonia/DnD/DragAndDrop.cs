@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Utils.DragDrop;
 using DragDropEffects = Avalonia.Input.DragDropEffects;
@@ -289,7 +291,8 @@ namespace WDE.Common.Avalonia.DnD
             if (dropHandler == null)
                 return;
 
-            var parent = FindVisualParent<TreeView, TreeViewItem>(dropElement);
+            var parent = dropElement == null ? treeView : FindVisualParent<TreeView, TreeViewItem>(dropElement);
+            
             ITreeItemContainerGenerator treeItemContainerGenerator;
             if (parent is TreeView tv)
                 treeItemContainerGenerator = tv.ItemContainerGenerator;
@@ -298,13 +301,16 @@ namespace WDE.Common.Avalonia.DnD
             else
                 return;
             
-            adorner.AddAdorner(parent);
+            adorner.AddAdorner(treeView); // parent
             var indexOfDrop = treeItemContainerGenerator.IndexFromContainer(dropElement);
             RelativeInsertPosition insertPosition = RelativeInsertPosition.None;
             
             if (dropElement != null)
             {
-                var rel = e.GetPosition(dropElement).Y / dropElement.Bounds.Height;
+                var header = dropElement.GetVisualChildren().FirstOrDefault().GetVisualChildren().FirstOrDefault();
+                var height = header?.Bounds.Height ?? dropElement.Bounds.Height;
+                
+                var rel = e.GetPosition(dropElement).Y / height;
                 if (rel < 0.5f)
                     insertPosition = RelativeInsertPosition.BeforeTargetItem;
                 else
@@ -316,11 +322,20 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = treeView.ItemCount;
 
-            var dropInfo = new DropInfo(dragInfo.Value.draggedElement[0]!)
+            if (insertPosition.HasFlag(RelativeInsertPosition.AfterTargetItem) &&
+                (dropElement?.IsExpanded ?? false) &&
+                dropElement.ItemCount > 0)
+            {
+                indexOfDrop = 0;
+                insertPosition = RelativeInsertPosition.BeforeTargetItem;
+                dropElement = (TreeViewItem) dropElement.ItemContainerGenerator.ContainerFromIndex(0);
+            }
+            
+            dropInfo = new DropInfo(dragInfo.Value.draggedElement[0]!)
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
-                TargetItem = treeView.Items
+                TargetItem = ((IControl?)dropElement)?.DataContext
             };
             dropHandler.DragOver(dropInfo);
 
@@ -336,41 +351,48 @@ namespace WDE.Common.Avalonia.DnD
                 }
             }*/
             
+            Console.WriteLine("Over " + dropElement + " (" + dropElement?.DataContext?.ToString() + ")");
+            Console.WriteLine("Best parent: " + parent + " (" + ((IControl?)parent)?.DataContext?.ToString() + ")");
+            Console.WriteLine("Index: " + indexOfDrop + " insert position " + insertPosition.ToString());
+
+            if (dropInfo.DropTargetAdorner == DropTargetAdorners.Insert)
+                dropInfo.InsertPosition =
+                    (RelativeInsertPosition) ((int) dropInfo.InsertPosition &
+                                              ~(int) RelativeInsertPosition.TargetItemCenter);
             adorner.Adorner?.Update(treeView, treeItemContainerGenerator, dropInfo);
         }
+
+        private static IDropInfo? dropInfo;
         
         private static void OnTreeViewDrop(object? sender, DragEventArgs e)
         {
-            var listBox = sender as ListBox;
-            var dropElement = FindVisualParent<ListBoxItem>(e.Source as IVisual);
+            var treeView = sender as TreeView;
+            var dropElement = FindVisualParent<TreeViewItem>(e.Source as IVisual);
             var dragInfo = e.Data.Get("") as DragInfo?;
             if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
                 return;
             
-            if (listBox == null)
+            if (treeView == null)
                 return;
             
-            var dropHandler = GetDropHandler(listBox);
+            var dropHandler = GetDropHandler(treeView);
             if (dropHandler == null)
                 return;
             
-            adorner.RemoveAdorner(listBox);
+            adorner.RemoveAdorner(treeView);
             
-            var indexOfDrop = listBox.ItemContainerGenerator.IndexFromContainer(dropElement);
-            if (dropElement != null)
-            {
-                var pos = e.GetPosition(dropElement);
-                if (pos.Y > dropElement.Bounds.Height / 2)
-                    indexOfDrop++;
-            }
-            else
-                indexOfDrop = listBox.ItemCount;
+            var scrollViewer = treeView.FindDescendantOfType<ScrollViewer>();
+            var previousOffset = scrollViewer?.Offset;
             
-            dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
+            if (dropInfo != null)
+                dropHandler.Drop(dropInfo);
+            dropInfo = null;
+            
+            Dispatcher.UIThread.Post(() =>
             {
-                InsertIndex = indexOfDrop,
-                TargetItem = listBox.Items
-            });
+                if (previousOffset.HasValue)
+                    scrollViewer!.Offset = previousOffset.Value;
+            }, DispatcherPriority.Render);
         }
 
 
@@ -477,15 +499,33 @@ namespace WDE.Common.Avalonia.DnD
             }
             else
             {
+                double y = 0;
+                IVisual parent = container.VisualParent;
+                while (parent != null && parent != treeView)
+                {
+                    y += parent.Bounds.Y;
+                    parent = parent.VisualParent;
+                }
+                
+                var header = container.GetVisualChildren().FirstOrDefault().GetVisualChildren().FirstOrDefault();
+                var height = header?.Bounds.Height ?? container.Bounds.Height;
+                
+                double top = container.TranslatePoint(new Point(0, 0), treeView)?.Y ?? 0;
+                double bottom = container.TranslatePoint(new Point(0, height), treeView)?.Y ?? 0;
+                
                 if (dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.TargetItemCenter)
                     && dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight)
-                    drawRect = new Rect(container.Bounds.X + 1, container.Bounds.Y, container.Bounds.Width - 2, container.Bounds.Height);
+                    drawRect = new Rect(container.Bounds.X + 1, top, container.Bounds.Width - 2, container.Bounds.Height);
                 else if (dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.BeforeTargetItem))
-                    drawRect = new Rect(container.Bounds.X, container.Bounds.Top, container.Bounds.Width, 1);
+                    drawRect = new Rect(container.Bounds.X, top, container.Bounds.Width, 1);
                 else
-                    drawRect = new Rect(container.Bounds.X, container.Bounds.Bottom, container.Bounds.Width, 1);
+                    drawRect = new Rect(container.Bounds.X, bottom, container.Bounds.Width, 1);
             }
 
+            /*var scroll = treeView.FindDescendantOfType<ScrollViewer>();
+            if (scroll != null)
+                drawRect = new Rect(drawRect.X, drawRect.Y - scroll.Offset.Y, drawRect.Width, drawRect.Height);
+*/
             InvalidateVisual();
         }
         
