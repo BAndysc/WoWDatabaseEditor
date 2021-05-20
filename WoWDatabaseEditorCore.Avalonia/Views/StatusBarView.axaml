@@ -2,7 +2,8 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:managers="clr-namespace:WDE.Common.Managers;assembly=WDE.Common">
     <UserControl.Resources>
         <converters:NullConverter Inverted="True" x:Key="NullConverter" />
         
@@ -26,8 +27,26 @@
         <Panel>
             <StackPanel Orientation="Horizontal">
                 <Button Opacity="1" Command="{Binding CurrentNotification.ClickCommand}" IsEnabled="{Binding CurrentNotification.ClickCommand, Converter={StaticResource NullConverter}}">
-                    <TextBlock HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" 
-                               VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}" />                    
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,3,5,3">
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{Binding CurrentNotification.Type}" ComparisonCondition="Equal" Value="{x:Static managers:NotificationType.Error}">
+                                    <ChangePropertyAction TargetObject="{Binding #Image}" PropertyName="Source" Value="{DynamicResource StatusBarIconError}"/>
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding CurrentNotification.Type}" ComparisonCondition="Equal" Value="{x:Static managers:NotificationType.Warning}">
+                                    <ChangePropertyAction TargetObject="{Binding #Image}" PropertyName="Source" Value="{DynamicResource StatusBarIconWarning}"/>
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding CurrentNotification.Type}" ComparisonCondition="Equal" Value="{x:Static managers:NotificationType.Info}">
+                                    <ChangePropertyAction TargetObject="{Binding #Image}" PropertyName="Source" Value="{DynamicResource StatusBarIconNotice}"/>
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding CurrentNotification.Type}" ComparisonCondition="Equal" Value="{x:Static managers:NotificationType.Success}">
+                                    <ChangePropertyAction TargetObject="{Binding #Image}" PropertyName="Source" Value="{DynamicResource StatusBarIconSuccess}"/>
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </Image>
+                        <TextBlock HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" 
+                                   VerticalAlignment="Center" Text="{Binding CurrentNotification.Message}" />  
+                    </StackPanel>
                 </Button>
             </StackPanel>
         </Panel>
