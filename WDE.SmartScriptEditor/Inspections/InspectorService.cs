@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Data;
@@ -26,7 +27,7 @@ namespace WDE.SmartScriptEditor.Inspections
         
         private readonly Dictionary<int, IList<ITargetInspection>> perSourceInspection = new();
 
-        public SmartScriptInspectorService(ISmartDataManager smartDataManager)
+        public SmartScriptInspectorService(ISmartDataManager smartDataManager, ICurrentCoreVersion currentCoreVersion)
         {
             foreach (var ev in smartDataManager.GetAllData(SmartType.SmartEvent))
             {
@@ -51,8 +52,11 @@ namespace WDE.SmartScriptEditor.Inspections
             
             eventInspections.Add(new ParameterRangeInspection());
             eventInspections.Add(new NoActionInspection());
+            eventInspections.Add(new NoActionInvokerAfterWaitInspection());
             
             actionInspections.Add(new ParameterRangeInspection());
+            if (!currentCoreVersion.Current.SmartScriptFeatures.SupportsCreatingTimedEventsInsideTimedEvents)
+                actionInspections.Add(new NoTimedCallsInTimedEventInspection());
             
             scriptInspections.Add(new TimedEventInspection());
             scriptInspections.Add(new DuplicateEventsInspection());

@@ -43,6 +43,12 @@ namespace WDE.SmartScriptEditor.Models
         public SmartGenericJsonData? TryGetEventData(SmartEvent e) =>
             smartDataManager.Contains(SmartType.SmartEvent, e.Id) ? smartDataManager.GetRawData(SmartType.SmartEvent, e.Id) : null;
         
+        public SmartGenericJsonData? TryGetSourceData(SmartSource s) =>
+            smartDataManager.Contains(SmartType.SmartSource, s.Id) ? smartDataManager.GetRawData(SmartType.SmartSource, s.Id) : null;
+        
+        public SmartGenericJsonData? TryGetTargetData(SmartTarget t) =>
+            smartDataManager.Contains(SmartType.SmartTarget, t.Id) ? smartDataManager.GetRawData(SmartType.SmartTarget, t.Id) : null;
+            
         public SmartScript(ISmartScriptSolutionItem item, 
             ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
