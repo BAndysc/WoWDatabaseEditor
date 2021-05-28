@@ -2364,5 +2364,31 @@
 			"1": {"name": "Defensive"},
 			"2": {"name": "Aggressive"}
 		}
+	},
+	"SpellclickCastFlagParameter": {
+		"name": "Spellclick cast flag",
+		"values": {
+			"0": {"name": "clickee casts on clickee"},
+			"1": {"name": "clicker casts on clickee"},
+			"2": {"name": "clickee casts on clicker"},
+			"3": {"name": "clicker casts on clicker"}
+		}
+	},
+	"SpellclickUserTypeParameter": {
+		"name": "Spellclick user type",
+		"values": {
+			"0": {"name": "any"},
+			"1": {"name": "friend"},
+			"2": {"name": "raid"},
+			"3": {"name": "party"}
+		}
+	},
+	"SpellLinkedSpellTypeParameter": {
+		"name": "Spell linked spell type",
+		"values": {
+			"0": {"name": "cast"},
+			"1": {"name": "hit"},
+			"2": {"name": "aura"}
+		}
 	}
 }

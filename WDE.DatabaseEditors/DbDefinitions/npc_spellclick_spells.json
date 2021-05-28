@@ -1,0 +1,67 @@
+{
+    "id": "npc_spellclick_spells",
+    "compatibility": [
+        "TrinityWrath"
+    ],
+    "name": "Npc Spellclick Spells",
+    "single_solution_name": "{name} npc_spellclick spells editor",
+    "multi_solution_name": "Multiple npc_spellclick spells editor",
+    "description": "Used to define what spell are casted when player click on the npc with flag SPELLCLICK",
+    "table_name": "npc_spellclick_spells",
+    "table_index_name": "npc_entry",
+    "multi_record": true,
+    "reload_command": "reload npc_spellclick_spells",
+    "picker": "CreatureParameter",
+    "primary_key": [
+      "npc_entry",
+      "spell_id"
+    ],
+    "conditions": {
+      "source_type": 18,
+      "source_group": "npc_entry",
+      "source_entry": "spell_id",
+      "targets": [
+        {
+          "id": 0,
+          "name": "Clicker"
+        },
+        {
+          "id": 1,
+          "name": "Spellclick target (clickee)"
+        }
+      ]
+    },
+    "groups": [
+      {
+        "group_name": "group",
+        "fields": [
+          {
+            "name": "Npc Entry",
+            "db_column_name": "npc_entry",
+            "value_type": "CreatureParameter",
+            "read_only": true
+          },
+          {
+            "name": "Spell Id",
+            "db_column_name": "spell_id",
+            "value_type": "SpellParameter"
+          },
+          {
+            "name": "Cast Flags",
+            "db_column_name": "cast_flags",
+            "value_type": "SpellclickCastFlagParameter"
+          },
+          {
+            "name": "User Type",
+            "db_column_name": "user_type",
+            "value_type": "SpellclickUserTypeParameter"
+          },
+          {
+            "is_condition": true,
+            "name": "Conditions",
+            "db_column_name": "conditions"
+          }
+        ]
+      }
+    ]
+  }

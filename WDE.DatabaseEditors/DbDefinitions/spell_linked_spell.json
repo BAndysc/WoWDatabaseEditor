@@ -1,0 +1,48 @@
+{
+    "id": "spell_linked_spell",
+    "compatibility": [
+      "TrinityWrath"
+    ],
+    "name": "Spell Linked Spell",
+    "single_solution_name": "{name} linked spell editor",
+    "multi_solution_name": "Multiple spell_linked_spell editor",
+    "description": "This table provides data for spell linking system, telling it which spells trigger what, and under which conditions.",
+    "table_name": "spell_linked_spell",
+    "table_index_name": "spell_trigger",
+    "multi_record": true,
+    "reload_command": "reload spell_linked_spell",
+    "picker": "SpellParameter",
+    "primary_key": [
+      "spell_trigger",
+      "spell_effect",
+      "type"
+    ],
+    "groups": [
+      {
+        "group_name": "group",
+        "fields": [
+          {
+            "name": "Spell Trigger",
+            "db_column_name": "spell_trigger",
+            "value_type": "SpellParameter",
+            "read_only": true
+          },
+          {
+            "name": "Spell Effect",
+            "db_column_name": "spell_effect",
+            "value_type": "SpellParameter"
+          },
+          {
+            "name": "Type",
+            "db_column_name": "type",
+            "value_type": "SpellLinkedSpellTypeParameter"
+          },
+          {
+            "name": "Comment",
+            "db_column_name": "comment",
+            "value_type": "string"
+          }
+        ]
+      }
+    ]
+  }

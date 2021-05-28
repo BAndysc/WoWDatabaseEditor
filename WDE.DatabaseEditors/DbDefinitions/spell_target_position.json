@@ -1,0 +1,68 @@
+{
+    "id": "spell_target_position",
+    "compatibility": [
+      "TrinityWrath"
+    ],
+    "name": "Spell Target Position",
+    "single_solution_name": "{name} target position editor",
+    "multi_solution_name": "Multiple spells target position editor",
+    "description": "Spell_target_position is used for defining fixed, absolute target position for spells",
+    "table_name": "spell_target_position",
+    "table_index_name": "ID",
+    "multi_record": true,
+    "reload_command": "reload spell_target_position",
+    "picker": "SpellParameter",
+    "primary_key": [
+      "ID",
+      "EffectIndex"
+    ],
+    "groups": [
+      {
+        "group_name": "group",
+        "fields": [
+          {
+            "name": "ID",
+            "db_column_name": "ID",
+            "value_type": "SpellParameter",
+            "read_only": true
+          },
+          {
+            "name": "Effect Index",
+            "db_column_name": "EffectIndex",
+            "value_type": "SpellEffectIndexParameter"
+          },
+          {
+            "name": "Map ID",
+            "db_column_name": "MapID",
+            "value_type": "MapParameter"
+          },
+          {
+            "name": "Position X",
+            "db_column_name": "PositionX",
+            "value_type": "float"
+          },
+          {
+            "name": "Position Y",
+            "db_column_name": "PositionY",
+            "value_type": "float"
+          },
+          {
+            "name": "Position Z",
+            "db_column_name": "PositionZ",
+            "value_type": "float"
+          },
+          {
+            "name": "Orientation",
+            "db_column_name": "Orientation",
+            "value_type": "float"
+          },
+          {
+            "name": "Verified Build",
+            "db_column_name": "VerifiedBuild",
+            "value_type": "int",
+            "can_be_null": true
+          }
+        ]
+      }
+    ]
+  }
