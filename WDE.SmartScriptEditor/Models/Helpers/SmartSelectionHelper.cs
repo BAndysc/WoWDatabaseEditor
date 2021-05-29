@@ -21,7 +21,7 @@ namespace WDE.SmartScriptEditor.Models.Helpers
 
         public event Action<SmartEvent?, SmartAction?, EventChangedMask>? EventChanged;
         
-        public SmartSelectionHelper(SmartScript script)
+        public SmartSelectionHelper(SmartScriptBase script)
         {
             disposable = script.Events.ToStream().Subscribe(EventReceived);
         }

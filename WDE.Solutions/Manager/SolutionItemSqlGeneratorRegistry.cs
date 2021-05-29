@@ -25,7 +25,7 @@ namespace WDE.Solutions.Manager
 
         public Task<string> GenerateSql(ISolutionItem item)
         {
-            EventRequestGenerateSqlArgs generateSqlRequest = new(item, "");
+            EventRequestGenerateSqlArgs generateSqlRequest = new(item, null);
             eventAggregator.GetEvent<EventRequestGenerateSql>().Publish(generateSqlRequest);
             if (generateSqlRequest.Sql != null)
                 return Task.FromResult(generateSqlRequest.Sql);

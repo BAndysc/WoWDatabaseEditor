@@ -11,8 +11,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     public interface IToolSmartEditorViewModel
     {
         bool IsOpened { get; }
-        void ShowEditor(SmartScript? script, ParametersEditViewModel? viewModel);
-        SmartScript? CurrentScript { get; }
+        void ShowEditor(SmartScriptBase? script, ParametersEditViewModel? viewModel);
+        SmartScriptBase? CurrentScript { get; }
     }
     
     public class ToolSmartEditorViewModel : ObservableBase, ITool, IToolSmartEditorViewModel
@@ -37,7 +37,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set => SetProperty(ref visibility, value);
         }
         
-        public SmartScript? CurrentScript { get; private set; }
+        public SmartScriptBase? CurrentScript { get; private set; }
 
         private ReactiveProperty<ParametersEditViewModel?> editorViewModel = new(null);
         public ParametersEditViewModel? EditorViewModel { get; private set; }
@@ -47,7 +47,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Link(editorViewModel, () => EditorViewModel);
         }
         
-        public void ShowEditor(SmartScript? script, ParametersEditViewModel? viewModel)
+        public void ShowEditor(SmartScriptBase? script, ParametersEditViewModel? viewModel)
         {
             CurrentScript = script;
             editorViewModel.Value = viewModel;

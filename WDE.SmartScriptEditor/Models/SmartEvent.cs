@@ -26,7 +26,7 @@ namespace WDE.SmartScriptEditor.Models
         private ParameterValueHolder<long> flags;
         private ParameterValueHolder<long> phases;
 
-        public SmartScript? Parent { get; set; }
+        public SmartScriptBase? Parent { get; set; }
 
         public SmartEvent(int id) : base(SmartEventParamsCount, id)
         {

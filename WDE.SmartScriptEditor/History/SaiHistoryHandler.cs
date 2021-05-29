@@ -11,10 +11,10 @@ namespace WDE.SmartScriptEditor.History
 {
     public class SaiHistoryHandler : HistoryHandler, IDisposable
     {
-        private readonly SmartScript script;
+        private readonly SmartScriptBase script;
         private readonly ISmartFactory smartFactory;
 
-        public SaiHistoryHandler(SmartScript script, ISmartFactory smartFactory)
+        public SaiHistoryHandler(SmartScriptBase script, ISmartFactory smartFactory)
         {
             this.script = script;
             this.smartFactory = smartFactory;
@@ -289,10 +289,10 @@ namespace WDE.SmartScriptEditor.History
         {
             private readonly int index;
             private readonly string readable;
-            private readonly SmartScript script;
+            private readonly SmartScriptBase script;
             private readonly SmartEvent smartEvent;
 
-            public EventAddedAction(SmartScript script, SmartEvent smartEvent, int index)
+            public EventAddedAction(SmartScriptBase script, SmartEvent smartEvent, int index)
             {
                 this.script = script;
                 this.smartEvent = smartEvent;
@@ -320,10 +320,10 @@ namespace WDE.SmartScriptEditor.History
         private class EventRemovedAction : IHistoryAction
         {
             private readonly int index;
-            private readonly SmartScript script;
+            private readonly SmartScriptBase script;
             private readonly SmartEvent smartEvent;
 
-            public EventRemovedAction(SmartScript script, SmartEvent smartEvent, int index)
+            public EventRemovedAction(SmartScriptBase script, SmartEvent smartEvent, int index)
             {
                 this.script = script;
                 this.smartEvent = smartEvent;

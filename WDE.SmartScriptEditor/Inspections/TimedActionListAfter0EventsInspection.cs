@@ -7,7 +7,7 @@ namespace WDE.SmartScriptEditor.Inspections
 {
     public class TimedActionListAfter0EventsInspection : IScriptInspection, IScriptInspectionFix
     {
-        private bool CanInspect(SmartScript script)
+        private bool CanInspect(SmartScriptBase script)
         {
             if (script.SourceType != SmartScriptType.TimedActionList)
                 return false;
@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Inspections
             return true;
         }
         
-        public IEnumerable<InspectionResult> Inspect(SmartScript script)
+        public IEnumerable<InspectionResult> Inspect(SmartScriptBase script)
         {
             if (!CanInspect(script))
                 yield break;
@@ -42,7 +42,7 @@ namespace WDE.SmartScriptEditor.Inspections
             }
         }
 
-        public void Fix(SmartScript script)
+        public void Fix(SmartScriptBase script)
         {
             if (!CanInspect(script))
                 return;

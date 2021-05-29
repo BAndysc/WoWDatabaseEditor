@@ -5,11 +5,11 @@ namespace WDE.SmartScriptEditor.Models
 {
     public class SmartValidationContext : ISmartValidationContext
     {
-        private readonly SmartScript script;
+        private readonly SmartScriptBase script;
         private readonly SmartEvent @event;
         private readonly SmartAction? action;
 
-        public SmartValidationContext(SmartScript script, SmartEvent @event, SmartAction? action)
+        public SmartValidationContext(SmartScriptBase script, SmartEvent @event, SmartAction? action)
         {
             this.script = script;
             this.@event = @event;

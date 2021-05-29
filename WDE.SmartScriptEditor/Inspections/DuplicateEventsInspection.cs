@@ -7,7 +7,7 @@ namespace WDE.SmartScriptEditor.Inspections
 {
     public class DuplicateEventsInspection : IScriptInspection
     {
-        public IEnumerable<InspectionResult> Inspect(SmartScript script)
+        public IEnumerable<InspectionResult> Inspect(SmartScriptBase script)
         {
             if (script.SourceType == SmartScriptType.TimedActionList)
                 yield break;

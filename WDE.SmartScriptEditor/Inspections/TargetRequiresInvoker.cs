@@ -9,7 +9,7 @@ namespace WDE.SmartScriptEditor.Inspections
         public InspectionResult? Inspect(SmartSource a)
         {
             SmartEvent? parent = a.Parent?.Parent;
-            SmartScript? script = parent?.Parent;
+            SmartScriptBase? script = parent?.Parent;
             if (parent == null || script == null)
                 return null;
 

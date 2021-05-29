@@ -5,11 +5,11 @@ namespace WDE.SmartScriptEditor.Inspections
 {
     public interface IScriptInspection
     {
-        IEnumerable<InspectionResult> Inspect(SmartScript script);
+        IEnumerable<InspectionResult> Inspect(SmartScriptBase script);
     }
 
     public interface IScriptInspectionFix
     {
-        void Fix(SmartScript script);
+        void Fix(SmartScriptBase script);
     }
 }

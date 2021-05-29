@@ -11,7 +11,7 @@ namespace WDE.SmartScriptEditor.Inspections
     [UniqueProvider]
     public interface ISmartScriptInspectorService
     {
-        IReadOnlyList<IInspectionResult> GenerateInspections(SmartScript script);
+        IReadOnlyList<IInspectionResult> GenerateInspections(SmartScriptBase script);
     }
     
     [AutoRegister]
@@ -66,7 +66,7 @@ namespace WDE.SmartScriptEditor.Inspections
             actionInspections.Add(new UnusedParameterInspection());
         }
         
-        public IReadOnlyList<IInspectionResult> GenerateInspections(SmartScript script)
+        public IReadOnlyList<IInspectionResult> GenerateInspections(SmartScriptBase script)
         {
             var list = new List<IInspectionResult>();
             
@@ -77,7 +77,7 @@ namespace WDE.SmartScriptEditor.Inspections
             return list;
         }
         
-        private IEnumerable<IInspectionResult> GenerateInspectionsForScript(SmartScript script)
+        private IEnumerable<IInspectionResult> GenerateInspectionsForScript(SmartScriptBase script)
         {
             foreach (var i in scriptInspections)
             {

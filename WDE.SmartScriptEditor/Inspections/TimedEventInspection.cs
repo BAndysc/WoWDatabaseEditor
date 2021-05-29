@@ -9,7 +9,7 @@ namespace WDE.SmartScriptEditor.Inspections
         private HashSet<int> handledEvents = new();
         private List<SmartEvent> timedEvents = new();
         private List<SmartAction> timedActions = new();
-        public IEnumerable<InspectionResult> Inspect(SmartScript script)
+        public IEnumerable<InspectionResult> Inspect(SmartScriptBase script)
         {
             handledEvents.Clear();
             timedEvents.Clear();
