@@ -1,5 +1,6 @@
 ﻿using WDE.Common.Services;
 using WDE.Common.Solution;
+using WDE.Conditions;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Models;
@@ -13,7 +14,8 @@ namespace WDE.TrinitySmartScriptEditor.Providers
             new IRemoteCommand[]
             {
                 new CreatureTemplateReloadRemoteCommand((uint) item.Entry), 
-                SmartScriptReloadRemoteCommand.Singleton
+                SmartScriptReloadRemoteCommand.Singleton,
+                ConditionsReloadRemoteCommand.Singleton
             };
     }
 }
