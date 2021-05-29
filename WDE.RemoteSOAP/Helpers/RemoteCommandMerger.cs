@@ -30,7 +30,7 @@ namespace WDE.RemoteSOAP.Helpers
                 }
             }
 
-            return commandsByType.Values.SelectMany(v => v).ToList();
+            return commandsByType.Values.SelectMany(v => v).OrderBy(o => (int)o.Priority).ToList();
         }
     }
 }

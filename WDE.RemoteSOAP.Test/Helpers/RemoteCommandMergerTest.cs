@@ -35,6 +35,8 @@ namespace WDE.RemoteSOAP.Test.Helpers
 
             public string GenerateCommand() => cmd;
 
+            public RemoteCommandPriority Priority => RemoteCommandPriority.VeryLast;
+
             public bool TryMerge(IRemoteCommand other, out IRemoteCommand mergedCommand)
             {
                 mergedCommand = null;

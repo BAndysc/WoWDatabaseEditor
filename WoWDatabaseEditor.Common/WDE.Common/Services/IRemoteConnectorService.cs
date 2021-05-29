@@ -18,7 +18,17 @@ namespace WDE.Common.Services
 
     public interface IRemoteCommand
     {
+        RemoteCommandPriority Priority { get; }
         string GenerateCommand();
         bool TryMerge(IRemoteCommand other, out IRemoteCommand? mergedCommand);
+    }
+
+    public enum RemoteCommandPriority
+    {
+        VeryFirst = 0,
+        First,
+        Middle,
+        Last,
+        VeryLast
     }
 }

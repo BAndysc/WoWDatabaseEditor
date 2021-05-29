@@ -16,6 +16,8 @@ namespace WDE.DatabaseEditors.Utils
             return remoteCommand;
         }
 
+        public RemoteCommandPriority Priority => RemoteCommandPriority.Middle;
+
         public bool TryMerge(IRemoteCommand other, out IRemoteCommand? mergedCommand)
         {
             mergedCommand = null;

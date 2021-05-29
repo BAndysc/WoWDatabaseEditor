@@ -9,6 +9,8 @@ namespace WDE.SmartScriptEditor.Models
         
         public string GenerateCommand() => "reload smart_scripts";
 
+        public RemoteCommandPriority Priority => RemoteCommandPriority.VeryFirst;
+
         public bool TryMerge(IRemoteCommand other, out IRemoteCommand mergedCommand)
         {
             mergedCommand = Singleton;

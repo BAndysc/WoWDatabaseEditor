@@ -17,6 +17,8 @@ namespace WDE.SmartScriptEditor.Models
             this.entries = entries;
         }
         
+        public RemoteCommandPriority Priority => RemoteCommandPriority.First;
+
         public string GenerateCommand() => "reload creature_template " + string.Join(" ", entries);
 
         public bool TryMerge(IRemoteCommand other, out IRemoteCommand? mergedCommand)
