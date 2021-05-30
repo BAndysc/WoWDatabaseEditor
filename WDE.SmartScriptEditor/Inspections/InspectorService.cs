@@ -53,6 +53,7 @@ namespace WDE.SmartScriptEditor.Inspections
             eventInspections.Add(new ParameterRangeInspection());
             eventInspections.Add(new NoActionInspection());
             eventInspections.Add(new NoActionInvokerAfterWaitInspection());
+            eventInspections.Add(new AwaitAfterAsyncInspection(smartDataManager));
             
             actionInspections.Add(new ParameterRangeInspection());
             if (!currentCoreVersion.Current.SmartScriptFeatures.SupportsCreatingTimedEventsInsideTimedEvents)

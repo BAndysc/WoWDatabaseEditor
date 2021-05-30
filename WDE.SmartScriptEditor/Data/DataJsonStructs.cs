@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.SmartScriptEditor.Inspections;
+using WDE.SmartScriptEditor.Utils;
 
 namespace WDE.SmartScriptEditor.Data
 {
@@ -30,9 +32,19 @@ namespace WDE.SmartScriptEditor.Data
 
         [JsonProperty(PropertyName = "enter_to_accept")]
         public bool EnterToAccept { get; set; }
-
+        
         [JsonProperty(PropertyName = "values")]
         public Dictionary<long, SelectOption> Values { get; set; }
+    }
+
+    [Flags]
+    [JsonConverter(typeof(FlagJsonConverter))]
+    public enum ActionFlags
+    {
+        None = 0,
+        Await = 1,
+        Async = 2,
+        BeginAwait = 4
     }
 
     [ExcludeFromCodeCoverage]
@@ -123,6 +135,9 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "is_invoker")]
         public bool IsInvoker { get; set; }
         
+        [JsonProperty(PropertyName = "flags")]
+        public ActionFlags Flags { get; set; }
+
         [JsonProperty(PropertyName = "comment_field")]
         public string? CommentField { get; set; }
         
