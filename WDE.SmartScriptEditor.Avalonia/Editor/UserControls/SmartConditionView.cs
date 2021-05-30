@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using WDE.Common.Avalonia.Controls;
 using AvaloniaProperty = Avalonia.AvaloniaProperty;
 
@@ -46,10 +47,24 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetValue(EditConditionCommandProperty, value);
         }
         
+        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        {
+            base.OnPointerReleased(e);
+            if (lastClickCount == 2 && (e.Timestamp - lastPressedTimestamp) <= 1000)
+            {
+                EditConditionCommand?.Execute(DataContext);
+                e.Handled = true;
+            }
+        }
+
+        private ulong lastPressedTimestamp = 0;
+        private int lastClickCount = 0;
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             base.OnPointerPressed(e);
-            
+
+            lastPressedTimestamp = e.Timestamp;
+            lastClickCount = e.ClickCount;
             if (e.ClickCount == 1)
             {
                 if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
@@ -66,11 +81,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                         DeselectAllRequest?.Execute(null);
                     IsSelected = true;
                 }
+                e.Handled = true;
             }
-            else if (e.ClickCount == 2)
-                EditConditionCommand?.Execute(DataContext);
-            
-            e.Handled = true;
         }
     }
 }

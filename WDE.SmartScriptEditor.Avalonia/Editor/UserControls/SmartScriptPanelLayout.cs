@@ -11,6 +11,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
+using SmartFormat.Utilities;
 using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Editor.ViewModels;
@@ -220,7 +221,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             base.OnPointerPressed(e);
 
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed &&
+                e.ClickCount == 1)
             {
                 foreach (ContentPresenter @event in Children)
                     if (@event.Child != null)

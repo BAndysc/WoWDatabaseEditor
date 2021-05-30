@@ -2,6 +2,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using WDE.Common.Avalonia.Controls;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
@@ -64,12 +65,24 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetAndRaise(DirectEditParameterProperty, ref directEditParameter, value);
         }
         
+        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        {
+            base.OnPointerReleased(e);
+            if (lastClickCount == 2 && (e.Timestamp - lastPressedTimestamp) <= 1000)
+            {
+                EditEventCommand?.Execute(DataContext);
+                e.Handled = true;
+            }
+        }
+        
+        private ulong lastPressedTimestamp = 0;
+        private int lastClickCount = 0;
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             base.OnPointerPressed(e);
-            if (e.Handled)
-                return;
-            
+
+            lastPressedTimestamp = e.Timestamp;
+            lastClickCount = e.ClickCount;
             if (e.ClickCount == 1)
             {
                 if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
@@ -86,13 +99,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                         DeselectAllRequest?.Execute(null);
                     SetSelected(this, true);
                 }
-            }
-            else if (e.ClickCount == 2)
-            {
-                EditEventCommand?.Execute(DataContext);
-            }
             
-            e.Handled = true;
+                e.Handled = true;
+            }
         }
 
         public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<SmartEventView, IControl, bool>("Selected");

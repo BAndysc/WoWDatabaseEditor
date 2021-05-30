@@ -109,6 +109,7 @@
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <userControls:SmartScriptPanelLayout Background="Transparent"
+                                                             Focusable="True"
                                                       Script="{Binding Script}" 
                                                       Problems="{Binding ProblematicLines}" 
                                                       DropItems="{Binding OnDropItems}"
