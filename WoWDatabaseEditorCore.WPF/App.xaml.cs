@@ -14,6 +14,7 @@ using Prism.Unity.Ioc;
 using Unity;
 using Unity.RegistrationByConvention;
 using WDE.Common.Events;
+using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
@@ -27,6 +28,9 @@ using WoWDatabaseEditorCore.ModulesManagement;
 using WoWDatabaseEditorCore.ViewModels;
 using WoWDatabaseEditorCore.WPF.Managers;
 using WoWDatabaseEditorCore.WPF.Views;
+using WoWDatabaseEditorCore.CoreVersion;
+using WoWDatabaseEditorCore.Services.FileSystemService;
+using WoWDatabaseEditorCore.Services.UserSettingsService;
 
 namespace WoWDatabaseEditorCore.WPF
 {
@@ -108,11 +112,20 @@ namespace WoWDatabaseEditorCore.WPF
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance(Container);
-            modulesManager = new ModulesManager();
+            var vfs = new VirtualFileSystem();
+            var fs = new FileSystem(vfs);
+            var userSettings = new UserSettings(fs, new DummyStatusBar());
+            var currentCoreSettings = new CurrentCoreSettings(userSettings);
+            modulesManager = new ModulesManager(currentCoreSettings);
             var mainThread = new MainThread();
             GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.WPF);
             containerRegistry.RegisterInstance<IMainThread>(mainThread);
             containerRegistry.RegisterInstance(modulesManager);
+        }
+
+        private class DummyStatusBar : IStatusBar
+        {
+            public void PublishNotification(INotification notification) { }
         }
 
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)

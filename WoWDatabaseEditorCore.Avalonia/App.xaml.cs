@@ -26,6 +26,9 @@ using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Managers;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService;
 using WoWDatabaseEditorCore.Avalonia.Views;
+using WoWDatabaseEditorCore.CoreVersion;
+using WoWDatabaseEditorCore.Services.FileSystemService;
+using WoWDatabaseEditorCore.Services.UserSettingsService;
 using WoWDatabaseEditorCore.ModulesManagement;
 using WoWDatabaseEditorCore.ViewModels;
 
@@ -97,11 +100,21 @@ namespace WoWDatabaseEditorCore.Avalonia
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance(Container);
-            modulesManager = new ModulesManager();
+            var vfs = new VirtualFileSystem();
+            var fs = new FileSystem(vfs);
+            var userSettings = new UserSettings(fs, new DummyStatusBar());
+            var currentCoreSettings = new CurrentCoreSettings(userSettings);
+            
+            modulesManager = new ModulesManager(currentCoreSettings);
             var mainThread = new MainThread();
             GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.Avalonia);
             containerRegistry.RegisterInstance<IMainThread>(mainThread);
             containerRegistry.RegisterInstance(modulesManager);
+        }
+
+        private class DummyStatusBar : IStatusBar
+        {
+            public void PublishNotification(INotification notification) { }
         }
 
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)

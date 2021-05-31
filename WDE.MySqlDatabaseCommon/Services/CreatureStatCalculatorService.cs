@@ -14,7 +14,7 @@ namespace WDE.MySqlDatabaseCommon.Services
             this.databaseProvider = databaseProvider;
         }
         
-        public int GetHealthFor(byte level, byte unitClass, byte expansion)
+        public uint GetHealthFor(byte level, byte unitClass, byte expansion)
         {
             EnsureBuildStats();
 

@@ -44,7 +44,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "damage_exp2")]
         public float DamageExp2 { get; set; }
 
-        public ushort BaseHp(byte expansion)
+        public uint BaseHp(byte expansion)
         {
             if (expansion == 0)
                 return BaseHp0;

@@ -5,7 +5,7 @@ namespace WDE.Common.Database
     [UniqueProvider]
     public interface ICreatureStatCalculatorService
     {
-        int GetHealthFor(byte level, byte unitClass, byte expansion);
+        uint GetHealthFor(byte level, byte unitClass, byte expansion);
         int GetManaFor(byte level, byte unitClass);
         int GetArmorFor(byte level, byte unitClass);
         int GetAttackPowerBonusFor(byte level, byte unitClass);

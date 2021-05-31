@@ -3,17 +3,21 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using WDE.Common.Services;
+using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.CoreVersion;
 
 namespace WoWDatabaseEditorCore.ModulesManagement
 {
     public class ModulesManager : IModulesManager
     {
+        private readonly ICurrentCoreSettings currentCoreSettings;
         private readonly List<ModuleData> modules = new();
         private ISet<string> ignoredModules = new HashSet<string>();
         public IEnumerable<ModuleData> Modules => modules;
 
-        public ModulesManager()
+        public ModulesManager(ICurrentCoreSettings currentCoreSettings)
         {
+            this.currentCoreSettings = currentCoreSettings;
             if (File.Exists("ignored_modules"))
                 ignoredModules = File.ReadAllLines("ignored_modules").Where(t=> !string.IsNullOrEmpty(t)).ToHashSet();
         }
@@ -32,6 +36,17 @@ namespace WoWDatabaseEditorCore.ModulesManagement
 
         public bool ShouldLoad(Assembly module)
         {
+            var requiredCore = module
+                .GetCustomAttributes(typeof(ModuleRequiresCoreAttribute), false)
+                .Cast<ModuleRequiresCoreAttribute>()
+                .FirstOrDefault();
+            if (requiredCore != null)
+            {
+                if (currentCoreSettings.CurrentCore == null)
+                    return false;
+                
+                return requiredCore.cores.Contains(currentCoreSettings.CurrentCore);
+            }
             return !ignoredModules.Contains(module.GetName().Name!);
         }
     }

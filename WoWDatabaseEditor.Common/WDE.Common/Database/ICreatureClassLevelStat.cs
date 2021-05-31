@@ -9,7 +9,7 @@ namespace WDE.Common.Database
         ushort AttackPower { get; }
         ushort RangedAttackPower { get; }
 
-        ushort BaseHp(byte expansion);
+        uint BaseHp(byte expansion);
         float Damage(byte expansion);
     }
 }
