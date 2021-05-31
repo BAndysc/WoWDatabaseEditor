@@ -10,11 +10,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     {
         private const string TipWaitAction = "SmartScriptEditor.WaitActionTipOpened";
         private const string TipMultipleActions = "SmartScriptEditor.MultipleActions";
+        private const string TipYouCanNameStoredTargets = "SmartScriptEditor.YouCanNameStoredTargets";
         private readonly ITeachingTipService teachingTipService;
         private readonly SmartScript script;
 
         public bool MultipleActionsTipOpened { get; set; }
         public bool WaitActionTipOpened { get; set; }
+        public bool YouCanNameStoredTargetsTipOpened { get; set; }
         
         public SmartTeachingTips(ITeachingTipService teachingTipService, SmartScript script)
         {
@@ -37,6 +39,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         {
                             WaitActionTipOpened = true;
                             RaisePropertyChanged(nameof(WaitActionTipOpened));
+                        }
+                    }
+                }
+                
+                // YouCanNameStoredTargetsTipOpened
+                {
+                    if (item.Source.Id == SmartConstants.SourceStoredObject || item.Target.Id == SmartConstants.SourceStoredObject)
+                    {
+                        if (teachingTipService.ShowTip(TipYouCanNameStoredTargets))
+                        {
+                            YouCanNameStoredTargetsTipOpened = true;
+                            RaisePropertyChanged(nameof(YouCanNameStoredTargetsTipOpened));
                         }
                     }
                 }
@@ -112,7 +126,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private bool AnyTipToShow()
         {
             return !teachingTipService.IsTipShown(TipMultipleActions) ||
-                   !teachingTipService.IsTipShown(TipWaitAction);
+                   !teachingTipService.IsTipShown(TipWaitAction) || 
+                   !teachingTipService.IsTipShown(TipYouCanNameStoredTargets);
         }
     }
 }

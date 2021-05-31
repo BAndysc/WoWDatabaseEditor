@@ -22,11 +22,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             string title,
             SmartType type,
             Func<SmartGenericJsonData, bool> predicate,
+            List<(int, string)>? customItems,
             ISmartDataManager smartDataManager,
             IConditionDataManager conditionDataManager)
         {
             Title = title;
-            MakeItems(type, predicate, smartDataManager, conditionDataManager);
+            MakeItems(type, predicate, customItems, smartDataManager, conditionDataManager);
             
             ReadOnlyObservableCollection<SmartItemsGroup> l;
             var currentFilter = this.WhenValueChanged(t => t.SearchBox)!
@@ -86,6 +87,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         private void MakeItems(SmartType type, 
             Func<SmartGenericJsonData, bool> predicate, 
+            List<(int, string)>? customItems,
             ISmartDataManager smartDataManager, 
             IConditionDataManager conditionDataManager)
         {
@@ -109,12 +111,28 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         i.Help = data.Help;
                         i.IsTimed = data.IsTimed;
                         i.Deprecated = data.Deprecated;
-                        i.Data = data;
                         i.Order = order++;
                         i.GroupOrder = groupOrder;
 
                         items.Add(i);
                     }
+                }
+            }
+
+            if (customItems != null)
+            {
+                foreach (var customItem in customItems)
+                {
+                    SmartItem i = new();   
+                    i.Group = "Custom";
+                    i.Name = customItem.Item2;
+                    i.CustomId = customItem.Item1;
+                    i.IsTimed = false;
+                    i.Deprecated = false;
+                    i.Order = order++;
+                    i.GroupOrder = groupOrder;
+
+                    items.Add(i);
                 }
             }
 
@@ -135,7 +153,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             i.Id = data.Id;
                             i.Help = data.Help;
                             i.Deprecated = false;
-                            i.ConditionData = data;
                             i.GroupOrder = groupOrder;
                             i.Order = order++;
 
@@ -158,12 +175,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     
     public class SmartItem
     {
-        public SmartGenericJsonData Data;
-        public ConditionJsonData ConditionData;
         public string Name { get; set; } = "";
         public bool Deprecated { get; set; }
         public string Help { get; set; } = "";
         public int Id { get; set; }
+        public int? CustomId { get; set; }
         public string Group { get; set; } = "";
         public bool IsTimed { get; set; }
         public int Order { get; set; }

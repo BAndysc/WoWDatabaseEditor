@@ -894,15 +894,15 @@
         "name": "SMART_ACTION_SET_DATA",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "DataVariableParameter",
                 "name": "Field"
             },
             {
                 "type": "Parameter",
-                "name": "Data"
+                "name": "Value"
             }
         ],
-        "description": "{source}: Set creature data #{pram1} to {pram2}",
+        "description": "{source}: Set {sourceid:choose(0|1):{pram1}|{pram1}|creature data #{pram1value}} to {pram2}",
         "name_readable": "Set data",
         "target_types": ["Creature", "GameObject"],
         "target_is_source": true
@@ -1304,11 +1304,11 @@
         "name": "SMART_ACTION_STORE_TARGET_LIST",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "StoredTargetParameter",
                 "name": "Variable ID"
             }
         ],
-        "description": "{source}: Target_{pram1} = {target}",
+        "description": "{source}: {pram1} = {target}",
         "name_readable": "Store target list",
         "target_types": ["Creature", "Player", "GameObject"],
         "target_is_source": false,
@@ -1359,7 +1359,7 @@
         "name": "SMART_ACTION_CREATE_TIMED_EVENT",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedEventParameter",
                 "name": "Timed event id",
                 "description": "This timed event will be triggered"
             },
@@ -1388,7 +1388,7 @@
                 "name": "Chance"
             }
         ],
-        "description": "Trigger timed event #{pram1} in {pram2} - {pram3} ms{pram4value:choose(0):| and then trigger every {pram4} - {pram5} ms}{pram6value:choose(0):| with {pram6} chance}",
+        "description": "Trigger timed event {pram1} in {pram2} - {pram3} ms{pram4value:choose(0):| and then trigger every {pram4} - {pram5} ms}{pram6value:choose(0):| with {pram6} chance}",
         "name_readable": "Create timed event",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE"
@@ -1514,7 +1514,7 @@
         "name": "SMART_ACTION_TRIGGER_TIMED_EVENT",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedEventParameter",
                 "name": "ID",
                 "description": "Must be greater or equal than 1"
             }
@@ -1529,7 +1529,7 @@
         "name": "SMART_ACTION_REMOVE_TIMED_EVENT",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedEventParameter",
                 "name": "ID",
                 "description": "Must be greater or equal than 1"
             }
@@ -2091,7 +2091,7 @@
         "name": "SMART_ACTION_SEND_TARGET_TO_TARGET",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "StoredTargetParameter",
                 "name": "Variable ID"
             }
         ],

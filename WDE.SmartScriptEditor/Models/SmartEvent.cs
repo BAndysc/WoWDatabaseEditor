@@ -114,14 +114,10 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(readable,
                         new
                         {
-                            pram1 = "[p=0]" + GetParameter(0) + "[/p]",
-                            pram2 = "[p=1]" + GetParameter(1) + "[/p]",
-                            pram3 = "[p=2]" + GetParameter(2) + "[/p]",
-                            pram4 = "[p=3]" + GetParameter(3) + "[/p]",
-                            datapram1 = GetParameter(0),
-                            timed1 = GetParameter(0),
-                            function1 = GetParameter(0),
-                            action1 = GetParameter(0),
+                            pram1 = "[p=0]" + GetParameter(0).ToString(Parent) + "[/p]",
+                            pram2 = "[p=1]" + GetParameter(1).ToString(Parent) + "[/p]",
+                            pram3 = "[p=2]" + GetParameter(2).ToString(Parent) + "[/p]",
+                            pram4 = "[p=3]" + GetParameter(3).ToString(Parent) + "[/p]",
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,
                             pram3value = GetParameter(2).Value,
@@ -189,6 +185,15 @@ namespace WDE.SmartScriptEditor.Models
             }
 
             return se;
+        }
+
+        public override void InvalidateReadable()
+        {
+            base.InvalidateReadable();
+            foreach (var a in Actions)
+                a.InvalidateReadable();
+            foreach (var c in Conditions)
+                c.InvalidateReadable();
         }
     }
 

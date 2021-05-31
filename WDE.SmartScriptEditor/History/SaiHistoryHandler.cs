@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using WDE.Common.History;
 using WDE.Common.Utils;
 using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
@@ -13,6 +14,7 @@ namespace WDE.SmartScriptEditor.History
     {
         private readonly SmartScriptBase script;
         private readonly ISmartFactory smartFactory;
+        private System.IDisposable variablesDisposable;
 
         public SaiHistoryHandler(SmartScriptBase script, ISmartFactory smartFactory)
         {
@@ -22,12 +24,68 @@ namespace WDE.SmartScriptEditor.History
             this.script.BulkEditingStarted += OnBulkEditingStarted;
             this.script.BulkEditingFinished += OnBulkEditingFinished;
 
+            variablesDisposable = this.script.GlobalVariables.ToStream().Subscribe(e =>
+            {
+                if (e.Type == CollectionEventType.Add)
+                {
+                    e.Item.CommentChanged += OnGlobalVariableCommentChanged;
+                    e.Item.VariableTypeChanged += OnGlobalVariableTypeChanged;
+                    e.Item.NameChanged += OnGlobalVariableNameChanged;
+                    e.Item.KeyChanged += OnGlobalVariableKeyChanged;
+                }
+                else
+                {
+                    e.Item.CommentChanged -= OnGlobalVariableCommentChanged;
+                    e.Item.VariableTypeChanged -= OnGlobalVariableTypeChanged;
+                    e.Item.NameChanged -= OnGlobalVariableNameChanged;
+                    e.Item.KeyChanged -= OnGlobalVariableKeyChanged;
+                }
+            });
+            
+            script.GlobalVariables.CollectionChanged += GlobalVariablesOnCollectionChanged;
+            
             foreach (SmartEvent ev in this.script.Events)
                 BindEvent(ev);
         }
 
+        private void GlobalVariablesOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (GlobalVariable gv in e.NewItems)
+                    PushAction(new GlobalVariableAddedAction(script, gv, e.NewStartingIndex));
+            }
+            if (e.OldItems != null)
+            {
+                foreach (GlobalVariable gv in e.OldItems)
+                    PushAction(new GlobalVariableRemovedAction(script, gv, e.OldStartingIndex));
+            }
+        }
+
+        private void OnGlobalVariableKeyChanged(GlobalVariable variable, long old, long newValue)
+        {
+            PushAction(new GlobalVariableKeyChangedAction(variable, old, newValue));
+        }
+
+        private void OnGlobalVariableTypeChanged(GlobalVariable variable, GlobalVariableType old, GlobalVariableType newValue)
+        {
+            PushAction(new GlobalVariableTypeChangedAction(variable, old, newValue));
+        }
+
+        private void OnGlobalVariableNameChanged(GlobalVariable variable, string old, string newValue)
+        {
+            PushAction(new GlobalVariableNameChangedAction(variable, old, newValue));
+        }
+
+        private void OnGlobalVariableCommentChanged(GlobalVariable variable, string? old, string? newValue)
+        {
+            PushAction(new GlobalVariableCommentChangedAction(variable, old, newValue));
+        }
+
         public void Dispose()
         {
+            variablesDisposable.Dispose();
+            script.GlobalVariables.CollectionChanged -= GlobalVariablesOnCollectionChanged;
             script.Events.CollectionChanged -= Events_CollectionChanged;
             script.BulkEditingStarted -= OnBulkEditingStarted;
             script.BulkEditingFinished -= OnBulkEditingFinished;
@@ -285,6 +343,70 @@ namespace WDE.SmartScriptEditor.History
             PushAction(new GenericParameterChangedAction<string>(sender, old, @new));
         }
         
+        private class GlobalVariableAddedAction : IHistoryAction
+        {
+            private readonly int index;
+            private readonly string readable;
+            private readonly SmartScriptBase script;
+            private readonly GlobalVariable variable;
+
+            public GlobalVariableAddedAction(SmartScriptBase script, GlobalVariable variable, int index)
+            {
+                this.script = script;
+                this.variable = variable;
+                this.index = index;
+                readable = variable.Readable;
+            }
+
+            public string GetDescription()
+            {
+                return "Added global variable " + readable.RemoveTags();
+            }
+
+            public void Redo()
+            {
+                variable.IsSelected = false;
+                script.GlobalVariables.Insert(index, variable);
+            }
+
+            public void Undo()
+            {
+                script.GlobalVariables.Remove(variable);
+            }
+        }
+
+        private class GlobalVariableRemovedAction : IHistoryAction
+        {
+            private readonly int index;
+            private readonly SmartScriptBase script;
+            private readonly GlobalVariable variable;
+            private readonly string readable;
+
+            public GlobalVariableRemovedAction(SmartScriptBase script, GlobalVariable variable, int index)
+            {
+                this.script = script;
+                this.variable = variable;
+                this.index = index;
+                readable = variable.Readable;
+            }
+
+            public string GetDescription()
+            {
+                return "Removed global variable " + readable.RemoveTags();
+            }
+
+            public void Redo()
+            {
+                script.GlobalVariables.Remove(variable);
+            }
+
+            public void Undo()
+            {
+                variable.IsSelected = false;
+                script.GlobalVariables.Insert(index, variable);
+            }
+        }
+        
         private class EventAddedAction : IHistoryAction
         {
             private readonly int index;
@@ -389,17 +511,19 @@ namespace WDE.SmartScriptEditor.History
         private readonly int index;
         private readonly SmartEvent parent;
         private readonly SmartAction smartAction;
+        private readonly string readable;
 
         public ActionAddedAction(SmartEvent parent, SmartAction smartAction, int index)
         {
             this.parent = parent;
             this.smartAction = smartAction;
             this.index = index;
+            this.readable = smartAction.Readable.RemoveTags();
         }
 
         public string GetDescription()
         {
-            return "Added action " + smartAction.Readable.RemoveTags();
+            return "Added action " + readable;
         }
 
         public void Redo()
@@ -530,6 +654,116 @@ namespace WDE.SmartScriptEditor.History
         public void Undo()
         {
             parent.Conditions.Remove(smartCondition);
+        }
+    }
+    
+    public class GlobalVariableNameChangedAction : IHistoryAction
+    {
+        private readonly string old;
+        private readonly string newName;
+        private readonly GlobalVariable variable;
+        private readonly long id;
+
+        public GlobalVariableNameChangedAction(GlobalVariable variable, string old, string newName)
+        {
+            this.variable = variable;
+            this.old = old;
+            this.newName = newName;
+            this.id = variable.Key;
+        }
+
+        public string GetDescription() => "Global variable " + id + " name changed";
+
+        public void Redo()
+        {
+            variable.Name = newName;
+        }
+
+        public void Undo()
+        {
+            variable.Name = old;
+        }
+    }
+    
+    public class GlobalVariableKeyChangedAction : IHistoryAction
+    {
+        private readonly long old;
+        private readonly long newName;
+        private readonly GlobalVariable variable;
+
+        public GlobalVariableKeyChangedAction(GlobalVariable variable, long old, long newName)
+        {
+            this.variable = variable;
+            this.old = old;
+            this.newName = newName;
+        }
+
+        public string GetDescription() => "Global variable id changed";
+
+        public void Redo()
+        {
+            variable.Key = newName;
+        }
+
+        public void Undo()
+        {
+            variable.Key = old;
+        }
+    }
+    
+    public class GlobalVariableTypeChangedAction : IHistoryAction
+    {
+        private readonly GlobalVariableType old;
+        private readonly GlobalVariableType newName;
+        private readonly GlobalVariable variable;
+        private readonly long id;
+
+        public GlobalVariableTypeChangedAction(GlobalVariable variable, GlobalVariableType old, GlobalVariableType newName)
+        {
+            this.variable = variable;
+            this.old = old;
+            this.newName = newName;
+            this.id = variable.Key;
+        }
+
+        public string GetDescription() => "Global variable " + id + " type changed";
+
+        public void Redo()
+        {
+            variable.VariableType = newName;
+        }
+
+        public void Undo()
+        {
+            variable.VariableType = old;
+        }
+    }
+    
+    public class GlobalVariableCommentChangedAction : IHistoryAction
+    {
+        private readonly string? old;
+        private readonly string? newName;
+        private readonly GlobalVariable variable;
+        private readonly long id;
+
+        public GlobalVariableCommentChangedAction(GlobalVariable variable, string? old, string? newName)
+        {
+            this.variable = variable;
+            this.old = old;
+            this.newName = newName;
+            this.id = variable.Key;
+        }
+
+        public string GetDescription() => "Global variable " + id + " comment changed";
+
+        public void Redo()
+        {
+            variable.Comment = newName;
+        }
+
+        public void Undo()
+        {
+            variable.Comment = old;
         }
     }
 }

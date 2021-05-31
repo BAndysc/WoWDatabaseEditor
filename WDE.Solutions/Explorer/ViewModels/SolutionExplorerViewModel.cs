@@ -159,7 +159,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private void DoAddItem(ISolutionItem item)
         {
-            if (selected == null || selected.Parent == null)
+            if (selected == null || selected.Parent == null || !selected.Item.IsContainer)
                 solutionManager.Items.Add(item);
             else if (selected.Item.Items != null)
                 selected.Item.Items.Add(item);

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
@@ -29,7 +31,9 @@ namespace WDE.SmartScriptEditor.Models
         
         public ObservableCollection<object> AllSmartObjectsFlat { get; } 
         
-        public ObservableCollection<SmartAction> AllActions { get; } 
+        public ObservableCollection<SmartAction> AllActions { get; }
+
+        public ObservableCollection<GlobalVariable> GlobalVariables { get; } = new();
         
         ~SmartScriptBase()
         {
@@ -72,6 +76,21 @@ namespace WDE.SmartScriptEditor.Models
                     if (e.Type == CollectionEventType.Add)
                         e.Item.Parent = this;
                 });
+
+            GlobalVariables.ToStream().Subscribe(e =>
+            {
+                GlobalVariableChanged(null, null);
+                if (e.Type == CollectionEventType.Add)
+                    e.Item.PropertyChanged += GlobalVariableChanged;
+                else
+                    e.Item.PropertyChanged -= GlobalVariableChanged;
+            });
+        }
+
+        private void GlobalVariableChanged(object? sender, PropertyChangedEventArgs? _)
+        {
+            foreach (var e in Events)
+                e.InvalidateReadable();
         }
 
         private void RenumerateEvents()
@@ -98,6 +117,36 @@ namespace WDE.SmartScriptEditor.Models
         private void CallScriptSelectedChanged()
         {
             ScriptSelectedChanged?.Invoke();
+        }
+
+        private bool TryParseGlobalVariable(ISmartScriptLine line)
+        {
+            if (line.EventType != SmartConstants.EventAiInitialize)
+                return false;
+            if (line.ActionType != SmartConstants.ActionNone)
+                return false;
+            if (!line.Comment.StartsWith("#define"))
+                return false;
+            
+            Match match = Regex.Match(line.Comment, @"#define ([A-Za-z]+) (\d+) (.*?)(?: -- (.*?))?$", RegexOptions.IgnoreCase);
+            if (!match.Success)
+                return false;
+
+            if (!Enum.TryParse(typeof(GlobalVariableType), match.Groups[1].Value, out var enm) || enm == null)
+                return false;
+
+            if (!long.TryParse(match.Groups[2].Value, out var key))
+                return false;
+
+            var variable = new GlobalVariable()
+            {
+                Name = match.Groups[3].Value,
+                Comment = match.Groups.Count == 5 ? match.Groups[4].Value : null,
+                Key = key,
+                VariableType = (GlobalVariableType)enm
+            };
+            GlobalVariables.Add(variable);
+            return true;
         }
 
         public void Load(IList<ISmartScriptLine> lines, IList<IConditionLine> conditions)
@@ -133,6 +182,9 @@ namespace WDE.SmartScriptEditor.Models
             SmartEvent? lastEvent = null;
             foreach (ISmartScriptLine line in lines)
             {
+                if (TryParseGlobalVariable(line))
+                    continue;
+                
                 SmartEvent? currentEvent = null;
                 
                 if (!entry.HasValue)

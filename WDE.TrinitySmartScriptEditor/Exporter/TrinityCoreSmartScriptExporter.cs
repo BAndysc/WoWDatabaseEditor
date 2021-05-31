@@ -45,7 +45,9 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 .DefaultIfEmpty(0)
                 .Max() + 1;
             
-            
+            foreach (var gv in script.GlobalVariables)
+                lines.Add(gv.ToMetaSmartScriptLine(script.EntryOrGuid, script.SourceType, eventId++));    
+
             if (script.SourceType == SmartScriptType.TimedActionList)
             {
                 foreach (SmartEvent e in script.Events)

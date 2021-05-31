@@ -11,7 +11,7 @@ namespace WDE.SmartScriptEditor.Models
     {
         public static readonly int SmartSourceParametersCount = 3;
 
-        private SmartAction? parent;
+        protected SmartAction? parent;
         
         private ParameterValueHolder<long> condition;
 
@@ -43,9 +43,9 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(ReadableHint,
                         new
                         {
-                            pram1 = GetParameter(0).ToString(),
-                            pram2 = GetParameter(1).ToString(),
-                            pram3 = GetParameter(2).ToString(),
+                            pram1 = GetParameter(0).ToString(parent?.Parent?.Parent),
+                            pram2 = GetParameter(1).ToString(parent?.Parent?.Parent),
+                            pram3 = GetParameter(2).ToString(parent?.Parent?.Parent),
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,
                             pram3value = GetParameter(2).Value,
@@ -53,9 +53,7 @@ namespace WDE.SmartScriptEditor.Models
                             y = 0.ToString(),
                             z = 0.ToString(),
                             o = 0.ToString(),
-                            invoker = GetInvokerNameWithContext(),
-                            stored = "Stored target #" + GetParameter(0).Value,
-                            storedPoint = "Stored point #" + GetParameter(0).Value
+                            invoker = GetInvokerNameWithContext()
                         });
                     return output;
                 }

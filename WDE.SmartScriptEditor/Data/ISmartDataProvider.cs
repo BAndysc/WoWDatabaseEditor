@@ -57,6 +57,6 @@ namespace WDE.SmartScriptEditor.Data
 
     public interface ISmartTypeListProvider
     {
-        Task<int?> Get(SmartType type, Func<SmartGenericJsonData, bool> predicate);
+        Task<(int, bool)?> Get(SmartType type, Func<SmartGenericJsonData, bool> predicate, List<(int, string)>? customItems = null);
     }
 }

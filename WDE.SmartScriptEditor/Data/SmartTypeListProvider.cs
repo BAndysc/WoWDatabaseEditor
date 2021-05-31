@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WDE.Common.Managers;
 using WDE.Conditions.Data;
 using WDE.Module.Attributes;
@@ -21,13 +22,17 @@ namespace WDE.SmartScriptEditor.Data
             this.conditionDataManager = conditionDataManager;
         }
 
-        public async System.Threading.Tasks.Task<int?> Get(SmartType type, Func<SmartGenericJsonData, bool> predicate)
+        public async System.Threading.Tasks.Task<(int, bool)?> Get(SmartType type, Func<SmartGenericJsonData, bool> predicate, List<(int, string)>? customItems)
         {
             var title = GetTitleForType(type);
-            SmartSelectViewModel model = new(title, type, predicate, smartDataManager, conditionDataManager);
-            
-            if (await windowManager.ShowDialog(model))
-                return model.SelectedItem?.Id;
+            SmartSelectViewModel model = new(title, type, predicate, customItems, smartDataManager, conditionDataManager);
+
+            if (await windowManager.ShowDialog(model) && model.SelectedItem != null)
+            {
+                if (model.SelectedItem.CustomId.HasValue)
+                    return (model.SelectedItem.CustomId.Value, true);
+                return (model.SelectedItem.Id, false);
+            }
 
             return null;
         }

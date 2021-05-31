@@ -78,6 +78,11 @@ namespace WDE.SmartScriptEditor.Models
             return new BulkEditing(this, name);
         }
 
+        public virtual void InvalidateReadable()
+        {
+            OnPropertyChanged(nameof(Readable));
+        }
+
         protected void OnPropertyChanged([CallerMemberName]
             string? propertyName = null)
         {

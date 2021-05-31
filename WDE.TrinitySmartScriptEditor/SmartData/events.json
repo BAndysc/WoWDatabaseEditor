@@ -1266,7 +1266,7 @@
     "name": "SMART_EVENT_DATA_SET",
     "parameters": [
       {
-        "type": "Parameter",
+        "type": "DataVariableParameter",
         "name": "Id",
         "description": "Variable id"
       },
@@ -1289,7 +1289,7 @@
     "builtin_rules": [
       "minmax(3, 4)"
     ],
-    "description": "On data {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+    "description": "On {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On data set"
   },
   {
@@ -1688,7 +1688,7 @@
     "name": "SMART_EVENT_TIMED_EVENT_TRIGGERED",
     "parameters": [
       {
-        "type": "Parameter",
+        "type": "TimedEventParameter",
         "name": "ID",
         "description": "Timed event ID, which triggers the event. Note: 0 does NOT mean any event"
       }
@@ -1989,11 +1989,11 @@
     "name": "SMART_EVENT_ACTION_DONE",
     "parameters": [
       {
-        "type": "Parameter",
+        "type": "DoActionParameter",
         "name": "Action ID"
       }
     ],
-    "description": "On DoAction {pram1}",
+    "description": "On {pram1}",
     "name_readable": "On action"
   },
   {
