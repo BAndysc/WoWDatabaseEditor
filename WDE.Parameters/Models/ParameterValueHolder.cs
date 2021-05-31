@@ -76,6 +76,13 @@ namespace WDE.Parameters.Models
         {
             return parameter.ToString(value);
         }
+        
+        public string ToString<R>(R context)
+        {
+            if (parameter is IContextualParameter<T, R> contextualParameter)
+                return contextualParameter.ToString(value, context);
+            return parameter.ToString(value);
+        }
 
         public ParameterValueHolder(IParameter<T> parameter, T value)
         {

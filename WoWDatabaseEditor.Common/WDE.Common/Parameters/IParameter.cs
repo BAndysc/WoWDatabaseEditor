@@ -12,4 +12,10 @@ namespace WDE.Common.Parameters
         string ToString(T value);
         Dictionary<T, SelectOption>? Items { get; }
     }
+
+    public interface IContextualParameter<T, R> : IParameter<T> where T : notnull
+    {
+        string ToString(T value, R context);
+        System.Type ContextType => typeof(R);
+    }
 }
