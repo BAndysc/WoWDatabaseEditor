@@ -9,6 +9,10 @@
 
     <Styles.Resources>
         <converters:NullConverter x:Key="NullToBoolConverter" Inverted="True" />
+        <converters:EmptyStringToBoolConverter x:Key="EmptyStringToBoolConverter" WhenNullOrEmpty="False" />
+        <DrawingImage x:Key="BoxIcons.RegularWorld">
+            <GeometryDrawing  Brush="#30000000" Geometry="F1M189.055999755859,-557.611022949219C177.322998046875,-523.179016113281,170.667007446289,-486.356994628906,170.667007446289,-448L170.666000366211,-448.001007080078C170.666000366211,-274.263000488281,301.269012451172,-130.731994628906,469.3330078125,-109.611999511719L469.3330078125,-192.001007080078 341.3330078125,-320.001007080078 341.3330078125,-405.334014892578 189.055999755859,-557.611022949219z M640,-764.202026367188L640,-746.666015625C640,-699.56201171875,601.77099609375,-661.3330078125,554.6669921875,-661.3330078125L512,-661.3330078125 512,-618.666015625C512,-571.56201171875,473.77099609375,-533.3330078125,426.6669921875,-533.3330078125L426.6669921875,-405.3330078125 597.333984375,-405.3330078125C644.43798828125,-405.3330078125,682.6669921875,-367.10400390625,682.6669921875,-320L682.6669921875,-277.3330078125C711.97900390625,-277.3330078125,754.218994140625,-262.528015136719,782.080017089844,-240.085006713867L782.080017089844,-240.083999633789C826.580993652344,-297.726989746094 853.3330078125,-369.705993652344 853.3330078125,-447.998992919922 853.3330078125,-590.932983398438 764.927978515625,-713.471008300781 640,-764.202026367188z M512,-874.6669921875C747.263977050781,-874.6669921875 938.6669921875,-683.263977050781 938.6669921875,-448 938.6669921875,-212.735992431641 747.263977050781,-21.3330001831055 512,-21.3329925537109 276.735992431641,-21.3330001831055 85.3330001831055,-212.735992431641 85.3330001831055,-448 85.3330001831055,-683.263977050781 276.735992431641,-874.6669921875 512,-874.6669921875z"   />
+        </DrawingImage>
     </Styles.Resources>
     
     <styles:StyleIncludeColorAware DarkSource="avares://WDE.SmartScriptEditor.Avalonia/Themes/ColorsDark.axaml"
@@ -173,6 +177,33 @@
     <Style Selector="controls|SmartEventView /template/ extendedTextBlock|FormattedTextBlock:overlink">
         <Setter Property="Cursor" Value="Hand" />
     </Style>
+    
+    
+    <Style Selector="controls|GlobalVariableView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="1" DockPanel.Dock="Top" Padding="5">
+                    <DockPanel LastChildFill="True">
+                        <Image MinWidth="15" Source="{StaticResource BoxIcons.RegularWorld}" Width="15" Height="15" Margin="0,0,5,0"/>
+                        <TextBlock TextWrapping="Wrap" IsVisible="{Binding Comment, Converter={StaticResource EmptyStringToBoolConverter}}" DockPanel.Dock="Right" Opacity="0.8" FontStyle="Italic" MaxWidth="300" MinWidth="60" Text="{Binding Comment, Mode=OneWay}" />
+                        <TextBlock TextWrapping="Wrap" MinWidth="60" Text="{Binding Readable, Mode=OneWay}" />
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|GlobalVariableView Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Border}" />
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Background}" />
+    </Style>
+    <Style Selector="controls|GlobalVariableView:selected /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Selected.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Selected.Border}" />
+    </Style>
+    <Style Selector="controls|GlobalVariableView:selected /template/ TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
+    </Style>
+    
     
     <Style Selector="editing|ParameterEditorView">
         <Setter Property="ClipToBounds" Value="False" />

@@ -65,6 +65,14 @@
                             DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
                             IsSelected="{Binding IsSelected, Mode=TwoWay}" />
                     </DataTemplate>
+                    <DataTemplate DataType="{x:Type models:GlobalVariable}">
+                        <userControls:GlobalVariableView
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            EditGlobalVariableCommand="{Binding DataContext.EditGlobalVariable, ElementName=Rooot}"
+                            DeselectAllButGlobalVariablesRequest="{Binding DataContext.DeselectAllButGlobalVariables, ElementName=Rooot}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                        />
+                    </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
                         <Button
                             BorderThickness="0" Background="#E9EFFB"
@@ -147,6 +155,12 @@
                 HorizontalContentAlignment="Left"
                 VerticalContentAlignment="Top"
                 Command="{Binding AddEvent}">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Define global variable" 
+                                  Command="{Binding DefineGlobalVariable}" />
+                    </ContextMenu>
+                </Button.ContextMenu>
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="OverridesDefaultStyle" Value="True" />

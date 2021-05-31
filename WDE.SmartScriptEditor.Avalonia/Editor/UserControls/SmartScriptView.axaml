@@ -87,6 +87,15 @@
                             IsSelected="{Binding IsSelected, Mode=TwoWay}"
                             />
                     </DataTemplate>
+                    <DataTemplate DataType="{x:Type models:GlobalVariable}">
+                        <userControls:GlobalVariableView
+                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                            EditGlobalVariableCommand="{Binding DataContext.EditGlobalVariable, ElementName=Rooot}"
+                            DeselectAllButGlobalVariablesRequest="{Binding DataContext.DeselectAllButGlobalVariables, ElementName=Rooot}"
+                            userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
+                            IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                        />
+                    </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
                         <Button Classes="FlatButton"
                                 Content="Add action"
@@ -124,6 +133,12 @@
                 Classes="FlatButton"
                 Content="Add event"
                 Command="{Binding AddEvent}">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Define global variable" 
+                                  Command="{Binding DefineGlobalVariable}" />
+                        </ContextMenu>
+                </Button.ContextMenu>
             </Button>
         </Grid>
     </ScrollViewer>

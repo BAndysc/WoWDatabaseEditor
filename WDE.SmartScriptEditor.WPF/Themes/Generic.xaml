@@ -155,7 +155,38 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+
+    <Style TargetType="userControls:GlobalVariableView">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="userControls:GlobalVariableView">
+                    <Border BorderThickness="1">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Background}" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Border}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                                        <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Selected.Background}" />
+                                        <Setter Property="BorderBrush"
+                                                Value="{DynamicResource SmartScripts.Comment.Selected.Border}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <TextBlock Padding="2" 
+                                   TextWrapping="WrapWithOverflow" 
+                                   Text="{Binding Readable}">
+                        </TextBlock>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="userControls:MiniEventIcon">
         <Setter Property="Template">
             <Setter.Value>

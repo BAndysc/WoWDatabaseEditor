@@ -50,19 +50,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetValue(DirectEditParameterProperty, value);
         }
 
-        private ulong lastPressedTimestamp = 0;
-        private int lastClickCount = 0;
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             base.OnPointerPressed(e);
 
-            lastPressedTimestamp = e.Timestamp;
-            lastClickCount = e.ClickCount;
             if (e.ClickCount == 1)
             {
                 if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
                 {
-                    DirectEditParameter?.Execute(tb.OverContext);
                     return;
                 }
 
@@ -78,14 +73,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             }
         }
 
-        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        protected override void OnDirectEdit(object context)
         {
-            base.OnPointerReleased(e);
-            if (lastClickCount == 2 && (e.Timestamp - lastPressedTimestamp) <= 1000)
-            {
-                EditActionCommand?.Execute(DataContext);
-                e.Handled = true;
-            }
+            DirectEditParameter?.Execute(context);
+        }
+
+        protected override void OnEdit()
+        {
+            EditActionCommand?.Execute(DataContext);
         }
 
         protected override void OnDataContextEndUpdate()

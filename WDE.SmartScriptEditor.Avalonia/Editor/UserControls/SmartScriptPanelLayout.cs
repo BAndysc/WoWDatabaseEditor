@@ -31,6 +31,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         private readonly Dictionary<ContentPresenter, SmartCondition> presenterToCondition = new();
         private readonly Dictionary<ContentPresenter, SmartAction> presenterToAction = new();
         private readonly Dictionary<ContentPresenter, SmartEvent> presenterToEvent = new();
+        private readonly Dictionary<GlobalVariable, ContentPresenter> variableToPresenter = new();
+        private readonly Dictionary<ContentPresenter, GlobalVariable> presenterToVariable = new();
 
         private ContentPresenter? addActionPresenter;
         private NewActionViewModel? addActionViewModel;
@@ -113,6 +115,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     presenterToCondition.Remove(visualRemovedPresenter);
                     conditionToPresenter.Remove(condition);
                 }
+                else if (visualRemovedPresenter.Content is GlobalVariable globalVariable)
+                {
+                    presenterToVariable.Remove(visualRemovedPresenter);
+                    variableToPresenter.Remove(globalVariable);
+                }
                 else if (visualRemovedPresenter.Content is NewActionViewModel)
                 {
                     addActionPresenter = null;
@@ -150,6 +157,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 presenterToCondition[visualAddedPresenter] = condition;
                 conditionToPresenter[condition] = visualAddedPresenter;
             }
+            else if (visualAddedPresenter.Content is GlobalVariable globalVariable)
+            {
+                presenterToVariable[visualAddedPresenter] = globalVariable;
+                variableToPresenter[globalVariable] = visualAddedPresenter;
+            }
             else if (visualAddedPresenter.Content is NewActionViewModel vm)
             {
                 addActionPresenter = visualAddedPresenter;
@@ -173,13 +185,36 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     yield return child;
             }
         }
+        
+        private IEnumerable<ContentPresenter> GlobalVariables()
+        {
+            foreach (ContentPresenter child in Children)
+            {
+                if (child.Content is GlobalVariable)
+                    yield return child;
+            }
+        }
 
+        private Size MeasureGlobalVariables(Size availableSize)
+        {
+            double totalDesiredSize = EventSpacing;
+            foreach (ContentPresenter globalVariablePresenter in GlobalVariables())
+            {
+                globalVariablePresenter.Measure(new Size(availableSize.Width - PaddingLeft, availableSize.Height));
+                totalDesiredSize += globalVariablePresenter.DesiredSize.Height + 2;
+            }
+
+            return new Size(availableSize.Width, totalDesiredSize);
+        }
+        
         protected override Size MeasureOverride(Size availableSize)
         {
-            float totalDesiredHeight = EventSpacing;
+            float totalDesiredHeight = 0;
             double eventWidth = EventWidth((float) availableSize.Width);
             double actionWidth = availableSize.Width - eventWidth;
             double conditionWidth = ConditionWidth((float) availableSize.Width);
+
+            totalDesiredHeight += (float)MeasureGlobalVariables(availableSize).Height;
             
             foreach (ContentPresenter eventPresenter in Events())
             {
@@ -238,7 +273,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         private void StopDragging()
         {
-//            ReleaseMouseCapture();
             if (draggingEvents)
                 DropItems?.Execute(OverIndexEvent);
             else if (draggingActions)
@@ -466,12 +500,29 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             mouseStartPositionValid = false;
         }
 
+        private Size ArrangeGlobalVariables(Size finalSize)
+        {
+            double totalHeight = EventSpacing;
+            foreach (GlobalVariable gv in Script.GlobalVariables)
+            {
+                if (!variableToPresenter.TryGetValue(gv, out var variablePresenter))
+                    continue;
+                
+                variablePresenter.Arrange(new Rect(PaddingLeft, totalHeight, finalSize.Width - PaddingLeft, variablePresenter.DesiredSize.Height));
+
+                totalHeight += variablePresenter.DesiredSize.Height + 2;
+            }
+
+            return new Size(finalSize.Width, totalHeight);
+        }
+        
         protected override Size ArrangeOverride(Size finalSize)
         {
             eventHeights.Clear();
             actionHeights.Clear();
             conditionHeights.Clear();
-            float y = EventSpacing;
+            Size globalVariablesArrangement = ArrangeGlobalVariables(finalSize);
+            float y = (float)globalVariablesArrangement.Height;
 
             if (draggingActions || draggingConditions || draggingEvents)
             {
@@ -496,7 +547,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
             eventHeights.Add(y);
 
-            y = EventSpacing;
+            y = (float)globalVariablesArrangement.Height;
             float start = 0;
             if (OverIndexEvent == 0)
             {

@@ -1,0 +1,52 @@
+<controls:DialogViewBase xmlns="https://github.com/avaloniaui"
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                         xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+                         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                         x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.GlobalVariableEditDialogView">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+        
+            <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Variable type:</TextBlock>
+            <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Items="{Binding VariableTypes, Mode=OneTime}" SelectedItem="{Binding VariableType, Mode=TwoWay}">
+            </ComboBox>
+        
+            <TextBlock VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">Number:</TextBlock>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Key, Mode=TwoWay}"></TextBox>
+            
+            <TextBlock VerticalAlignment="Center" Grid.Row="4" Grid.Column="0">Name:</TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Name, Mode=TwoWay}"></TextBox>
+            
+            <TextBlock VerticalAlignment="Center" Grid.Row="6" Grid.Column="0" TextWrapping="WrapWithOverflow">Comment (optional):</TextBlock>
+            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Comment, Mode=TwoWay}"></TextBox>
+        </Grid>
+    
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" Command="{Binding Cancel}"  />
+            <Button Command="{Binding Accept}" Grid.Column="2" Content="Accept" />
+        </Grid>
+    </Grid>
+</controls:DialogViewBase>
