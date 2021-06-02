@@ -94,6 +94,14 @@ namespace WDE.SmartScriptEditor.Models
                         return $"Define objectData[{Key}] as {Name}";
                     case GlobalVariableType.TimedEvent:
                         return $"Define timedEvent[{Key}] as {Name}";
+                    case GlobalVariableType.Action:
+                        return $"Define doAction({Key}) as {Name}";
+                    case GlobalVariableType.Function:
+                        return $"Define function({Key}) as {Name}";
+                    case GlobalVariableType.StoredPoint:
+                        return $"Define storedPoint[{Key}] as {Name}";
+                    case GlobalVariableType.DatabasePoint:
+                        return $"Define databasePoint[{Key}] as {Name}";
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

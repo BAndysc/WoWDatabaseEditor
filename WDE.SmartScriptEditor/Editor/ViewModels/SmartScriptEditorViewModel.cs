@@ -48,6 +48,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ITaskRunner taskRunner;
         private readonly IToolSmartEditorViewModel smartEditorViewModel;
         private readonly ISmartScriptExporter smartScriptExporter;
+        private readonly ISmartScriptImporter smartScriptImporter;
         private readonly IEditorFeatures editorFeatures;
         private readonly ITeachingTipService teachingTipService;
         private readonly IMainThread mainThread;
@@ -96,6 +97,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IClipboardService clipboard,
             IToolSmartEditorViewModel smartEditorViewModel,
             ISmartScriptExporter smartScriptExporter,
+            ISmartScriptImporter smartScriptImporter,
             IEditorFeatures editorFeatures,
             ITeachingTipService teachingTipService,
             IMainThread mainThread,
@@ -115,6 +117,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.taskRunner = taskRunner;
             this.smartEditorViewModel = smartEditorViewModel;
             this.smartScriptExporter = smartScriptExporter;
+            this.smartScriptImporter = smartScriptImporter;
             this.editorFeatures = editorFeatures;
             this.teachingTipService = teachingTipService;
             this.mainThread = mainThread;
@@ -1108,7 +1111,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             var lines = smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType).ToList();
             var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.SmartType).ToList();
-            script.Load(lines, conditions);
+            smartScriptImporter.Import(script, lines, conditions);
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
             TeachingTips.Start();

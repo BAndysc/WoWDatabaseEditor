@@ -135,7 +135,7 @@ namespace WDE.TrinitySmartScriptEditor
             uint? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Spell);
+            return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Aura);
         }
     }
 

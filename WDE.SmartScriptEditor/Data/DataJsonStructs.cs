@@ -102,9 +102,6 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "sources")]
         public IList<string>? Sources { get; set; }
 
-        [JsonProperty(PropertyName = "targets")]
-        public IList<string>? Targets { get; set; }
-
         [JsonProperty(PropertyName = "incompatible")]
         public IList<int>? Incompatible { get; set; }
 
