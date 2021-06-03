@@ -229,12 +229,12 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.ActionFactory(line);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown action")
-                    .SetMainInstruction($"Action {line.ActionType} unknown, skipping action")
+                    .SetMainInstruction("Skipping action: " + e.Message)
                     .Build());
             }
 

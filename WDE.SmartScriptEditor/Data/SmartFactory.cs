@@ -37,7 +37,7 @@ namespace WDE.SmartScriptEditor.Data
         public SmartEvent EventFactory(int id)
         {
             if (!smartDataManager.Contains(SmartType.SmartEvent, id))
-                throw new NullReferenceException("No data for event id " + id);
+                throw new InvalidSmartEventException(id);
 
             SmartEvent ev = new(id);
             ev.Chance.Value = 100;
@@ -109,7 +109,7 @@ namespace WDE.SmartScriptEditor.Data
         public SmartAction ActionFactory(int id, SmartSource source, SmartTarget target)
         {
             if (!smartDataManager.Contains(SmartType.SmartAction, id))
-                throw new NullReferenceException("No data for action id " + id);
+                throw new InvalidSmartActionException(id);
 
             SmartAction action = new(id, source, target);
             var raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
@@ -177,7 +177,7 @@ namespace WDE.SmartScriptEditor.Data
         public SmartTarget TargetFactory(int id)
         {
             if (!smartDataManager.Contains(SmartType.SmartTarget, id))
-                throw new NullReferenceException("No data for target id " + id);
+                throw new InvalidSmartTargetException(id);
 
             var data = smartDataManager.GetRawData(SmartType.SmartTarget, id);
             
@@ -216,7 +216,7 @@ namespace WDE.SmartScriptEditor.Data
         public SmartSource SourceFactory(int id)
         {
             if (!smartDataManager.Contains(SmartType.SmartSource, id))
-                throw new NullReferenceException("No data for source id " + id);
+                throw new InvalidSmartSourceException(id);
 
             var data = smartDataManager.GetRawData(SmartType.SmartSource, id);
 
