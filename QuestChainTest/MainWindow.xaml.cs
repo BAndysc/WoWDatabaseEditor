@@ -49,15 +49,20 @@ namespace QuestChainTest
                 q.RequiredQuests.CollectionChanged += (sender, e) => { Update(); };
         }
 
-        public class MockCoreVersion : ICurrentCoreVersion, ICoreVersion, IDatabaseFeatures,ISmartScriptFeatures
+        public class MockCoreVersion : ICurrentCoreVersion, ICoreVersion, IDatabaseFeatures,ISmartScriptFeatures, IConditionFeatures
         {
             public ICoreVersion Current => this;
             public string Tag => "mock";
             public string FriendlyName => "mock";
             public IDatabaseFeatures DatabaseFeatures => this;
             public ISmartScriptFeatures SmartScriptFeatures => this;
+            public IConditionFeatures ConditionFeatures => this;
             public ISet<Type> UnsupportedTables => new HashSet<Type>();
             public ISet<SmartScriptType> SupportedTypes => null;
+
+            public string ConditionsFile => "SmartData/conditions.json";
+            public string ConditionGroupsFile => "SmartData/conditions_groups.json";
+            public string ConditionSourcesFile => "SmartData/condition_sources.json";
         }
 
         private void Update()

@@ -8,14 +8,15 @@ namespace WDE.Trinity
 {
     [AutoRegister]
     [SingleInstance]
-    public class TrinityCataclysmVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures
+    public class TrinityCataclysmVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures
     {
         public string Tag => "TrinityCata";
         public string FriendlyName => "The Cataclysm Preservation Project";
 
         public IDatabaseFeatures DatabaseFeatures => this;
         public ISmartScriptFeatures SmartScriptFeatures => this;
-        
+        public IConditionFeatures ConditionFeatures => this;
+
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ICreatureClassLevelStat)};
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {
@@ -24,5 +25,9 @@ namespace WDE.Trinity
             SmartScriptType.AreaTrigger,
             SmartScriptType.TimedActionList,
         };
+
+        public string ConditionsFile => "SmartData/conditions.json";
+        public string ConditionGroupsFile => "SmartData/conditions_groups.json";
+        public string ConditionSourcesFile => "SmartData/condition_sources.json";
     }
 }

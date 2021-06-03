@@ -12,6 +12,14 @@ namespace WDE.Common.CoreVersion
         string FriendlyName { get; }
         IDatabaseFeatures DatabaseFeatures { get; }
         ISmartScriptFeatures SmartScriptFeatures { get; }
+        IConditionFeatures ConditionFeatures { get; }
+    }
+
+    public interface IConditionFeatures
+    {
+        string ConditionsFile { get; }
+        string ConditionGroupsFile { get; }
+        string ConditionSourcesFile { get; }
     }
 
     public interface IDatabaseFeatures

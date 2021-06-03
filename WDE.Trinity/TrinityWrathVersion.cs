@@ -8,11 +8,12 @@ namespace WDE.Trinity
 {
     [AutoRegister]
     [SingleInstance]
-    public class TrinityWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures
+    public class TrinityWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures
     {
         public string Tag => "TrinityWrath";
         public string FriendlyName => "TrinityCore Wrath of the Lich King";
         public ISmartScriptFeatures SmartScriptFeatures => this;
+        public IConditionFeatures ConditionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
         
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate)};
@@ -23,5 +24,9 @@ namespace WDE.Trinity
             SmartScriptType.AreaTrigger,
             SmartScriptType.TimedActionList,
         };
+
+        public string ConditionsFile => "SmartData/conditions.json";
+        public string ConditionGroupsFile => "SmartData/conditions_groups.json";
+        public string ConditionSourcesFile => "SmartData/condition_sources.json";
     }
 }
