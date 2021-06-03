@@ -93,7 +93,22 @@ namespace WDE.SmartScriptEditor.Models
             {
                 try
                 {
-                    string output = Smart.Format(ReadableHint,
+                    string? readable = ReadableHint;
+                    if (DescriptionRules != null)
+                    {
+                        var context = new SmartValidationContext(Parent!.Parent!, Parent!, this);
+                    
+                        foreach (DescriptionRule rule in DescriptionRules)
+                        {
+                            if (rule.Matches(context))
+                            {
+                                readable = rule.Description;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    string output = Smart.Format(readable,
                         new
                         {
                             target = "[s=7]" + Target.Readable + "[/s]",
