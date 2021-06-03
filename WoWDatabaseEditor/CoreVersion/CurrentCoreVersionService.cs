@@ -18,7 +18,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         {
             this.settings = settings;
             AllVersions = coreVersions.ToList();
-            Current = AllVersions.First();
+            Current = AllVersions.First(c => c.GetType() == typeof(UnspecifiedCoreVersion));
             
             var savedVersion = settings.CurrentCore;
             
@@ -34,7 +34,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
                     messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetIcon(MessageBoxIcon.Error)
                         .SetTitle("Error while loading core version")
                         .SetMainInstruction("Unknown core version")
-                        .SetContent($"You have set core version to {savedVersion} in settings, however such core is not found in modules. Switching back to default: {Current.FriendlyName}")
+                        .SetContent($"You have set core version to {savedVersion} in settings, however such core is not found in modules. Switching back to unspecified. Fix that in the settings.")
                         .WithOkButton(true)
                         .Build());
                     UpdateCurrentVersion(Current);
