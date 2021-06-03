@@ -81,6 +81,11 @@ namespace WDE.Parameters.Models
         {
             if (parameter is IContextualParameter<T, R> contextualParameter)
                 return contextualParameter.ToString(value, context);
+            if (value is long l)
+            {
+                if (l < 0)
+                    return $"objectData\\[{-l}\\]";
+            }
             return parameter.ToString(value);
         }
 
