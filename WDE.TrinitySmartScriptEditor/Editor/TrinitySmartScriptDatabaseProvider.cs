@@ -17,9 +17,9 @@ namespace WDE.TrinitySmartScriptEditor.Editor
             this.databaseProvider = databaseProvider;
         }
         
-        public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
+        public Task<IEnumerable<ISmartScriptLine>> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
-            return databaseProvider.GetScriptFor(entryOrGuid, type);
+            return Task.FromResult(databaseProvider.GetScriptFor(entryOrGuid, type));
         }
 
         public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)

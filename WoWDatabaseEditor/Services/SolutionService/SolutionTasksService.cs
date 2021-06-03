@@ -124,6 +124,13 @@ namespace WoWDatabaseEditor.Services.SolutionService
                             progress.ReportFail();
                             return;
                         }
+                        catch (Exception e)
+                        {
+                            statusBar.PublishNotification(new PlainNotification(NotificationType.Error,
+                                "Unable to connect to the server: " + e.Message));
+                            progress.ReportFail();
+                            return;
+                        }
                     }
                     
                     progress.ReportFinished();

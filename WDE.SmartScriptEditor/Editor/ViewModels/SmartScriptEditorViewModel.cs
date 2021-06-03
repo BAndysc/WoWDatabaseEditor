@@ -1109,7 +1109,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task AsyncLoad()
         {
-            var lines = smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType).ToList();
+            var lines = (await smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType)).ToList();
             var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.SmartType).ToList();
             smartScriptImporter.Import(script, lines, conditions);
             IsLoading = false;
