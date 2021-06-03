@@ -134,6 +134,13 @@ namespace WoWDatabaseEditorCore.Avalonia
                 .Select(AssemblyLoadContext.Default.LoadFromAssemblyPath)
                 .ToList();
             
+            allAssemblies.Sort(Comparer<Assembly>.Create((a, b) =>
+            {
+                var aRequires = a.GetCustomAttributes(typeof(ModuleRequiresCoreAttribute), false);
+                var bRequires = b.GetCustomAttributes(typeof(ModuleRequiresCoreAttribute), false);
+                return bRequires.Length.CompareTo(aRequires.Length);
+            }));
+            
             List<Assembly> loadAssemblies = allAssemblies
                 .Where(modulesManager!.ShouldLoad)
                 .ToList();

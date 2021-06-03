@@ -13,6 +13,7 @@ namespace WoWDatabaseEditorCore.ModulesManagement
         private readonly ICurrentCoreSettings currentCoreSettings;
         private readonly List<ModuleData> modules = new();
         private ISet<string> ignoredModules = new HashSet<string>();
+        private ISet<string> blockedModules = new HashSet<string>();
         public IEnumerable<ModuleData> Modules => modules;
 
         public ModulesManager(ICurrentCoreSettings currentCoreSettings)
@@ -44,10 +45,24 @@ namespace WoWDatabaseEditorCore.ModulesManagement
             {
                 if (currentCoreSettings.CurrentCore == null)
                     return false;
-                
-                return requiredCore.cores.Contains(currentCoreSettings.CurrentCore);
+
+                if (!requiredCore.cores.Contains(currentCoreSettings.CurrentCore))
+                    return false;
             }
-            return !ignoredModules.Contains(module.GetName().Name!);
+
+            var name = module.GetName().Name!;
+            if (ignoredModules.Contains(name))
+                return false;
+
+            if (blockedModules.Contains(name))
+                return false;
+            
+            foreach (var block in module
+                .GetCustomAttributes(typeof(ModuleBlocksOtherAttribute), false)
+                .Cast<ModuleBlocksOtherAttribute>())
+                blockedModules.Add(block.otherModule);
+
+            return true;
         }
     }
 }
