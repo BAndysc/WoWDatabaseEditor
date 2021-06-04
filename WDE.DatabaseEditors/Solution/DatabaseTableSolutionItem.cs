@@ -14,6 +14,16 @@ namespace WDE.DatabaseEditors.Solution
             DefinitionId = definitionId;
         }
 
+        public DatabaseTableSolutionItem(string definitionId)
+        {
+            DefinitionId = definitionId;
+        }
+
+        public DatabaseTableSolutionItem()
+        {
+            DefinitionId = null!;
+        }
+        
         public List<SolutionItemDatabaseEntity> Entries { get; set; } = new();
         
         public string DefinitionId { get; }

@@ -173,8 +173,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             var newConditions = await conditionEditService.EditConditions(tableDefinition.Condition!.SourceType, conditionList);
             if (newConditions == null)
                 return;
-            
+
             view.ParentEntity.Conditions = newConditions.ToList();
+            if (tableDefinition.Condition.SetColumn != null)
+            {
+                var hasColumn = view.ParentEntity.GetCell(tableDefinition.Condition.SetColumn);
+                if (hasColumn is DatabaseField<long> lf)
+                    lf.Current.Value = view.ParentEntity.Conditions.Count > 0 ? 1 : 0;
+            }
         }
         
         private async Task Revert(DatabaseCellViewModel? view)

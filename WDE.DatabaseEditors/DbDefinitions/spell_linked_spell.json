@@ -28,9 +28,10 @@
             "read_only": true
           },
           {
-            "name": "Spell Effect",
+            "name": "Linked spell",
             "db_column_name": "spell_effect",
-            "value_type": "SpellParameter"
+            "value_type": "SpellParameter",
+            "preferred_width": 200
           },
           {
             "name": "Type",

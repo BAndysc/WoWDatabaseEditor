@@ -104,6 +104,10 @@ namespace WDE.DatabaseEditors.Data
                     {
                         valueHolder = new ValueHolder<long>(column.Value.value as long? ?? 0, column.Value.value is DBNull);
                     }
+                    else if (column.Value.type == typeof(ulong))
+                    {
+                        valueHolder = new ValueHolder<long>((long)(column.Value.value as ulong? ?? 0), column.Value.value is DBNull);
+                    }
                     else if (column.Value.type == typeof(byte))
                     {
                         valueHolder = new ValueHolder<long>(column.Value.value as byte? ?? 0, column.Value.value is DBNull);
@@ -131,7 +135,7 @@ namespace WDE.DatabaseEditors.Data
                     }
                     else
                     {
-                        throw new NotImplementedException();
+                        throw new NotImplementedException("Unknown column type " + column.Value.type);
                     }
 
                     if (column.Key == tableDefinition.TablePrimaryKeyColumnName)

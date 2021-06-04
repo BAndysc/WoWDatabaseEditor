@@ -82,6 +82,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "source_id")]
         public string? SourceIdColumn { get; set; }
         
+        [JsonProperty(PropertyName = "set_column")]
+        public string? SetColumn { get; set; }
+        
         [JsonProperty(PropertyName = "targets")]
         public IList<DatabaseConditionTargetJson>? Targets { get; set; }
     }
