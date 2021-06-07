@@ -49,6 +49,15 @@ namespace WDE.Parameters
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
+            factory.Register("PercentageParameter", new PercentageParameter());
+        }
+    }
+
+    public class PercentageParameter : Parameter
+    {
+        public override string ToString(long key)
+        {
+            return key + "%";
         }
     }
 

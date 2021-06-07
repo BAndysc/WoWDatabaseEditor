@@ -47,6 +47,8 @@ namespace WDE.DatabaseEditors.Data
                     type = "uint";
                 else if (parameterFactory.IsRegisteredString(type))
                     type = "string";
+                else if (type.EndsWith("Parameter"))
+                    type = "uint";
                 
                 if (type == "float")
                 {
