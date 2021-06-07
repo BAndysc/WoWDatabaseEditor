@@ -24,6 +24,8 @@ namespace WDE.Common.Tasks
             }
         }
         public static AppBackend Backend { get; private set; }
+        
+        public static bool HighDpi { get; set; }
 
         public static void InitializeApplication(IMainThread thread, AppBackend backend)
         {
