@@ -26,7 +26,7 @@ namespace WDE.DatabaseEditors.Solution
         
         public List<SolutionItemDatabaseEntity> Entries { get; set; } = new();
         
-        public string DefinitionId { get; }
+        public string DefinitionId { get; set; }
 
         [JsonIgnore]
         public bool IsContainer => false;
