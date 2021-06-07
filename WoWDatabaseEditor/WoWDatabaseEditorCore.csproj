@@ -23,4 +23,9 @@
       <Version>2.5.3</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Icons\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
