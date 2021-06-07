@@ -40,6 +40,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "multi_record")]
         public bool IsMultiRecord { get; set; }
         
+        [JsonProperty(PropertyName = "only_conditions")]
+        public bool IsOnlyConditionsTable { get; set; }
+        
         [JsonProperty(PropertyName = "reload_command")]
         public string? ReloadCommand { get; set; }
         

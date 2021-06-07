@@ -18,12 +18,14 @@ namespace WDE.DatabaseEditors.Data
             ITableDefinitionJsonProvider jsonProvider,
             ICurrentCoreVersion currentCoreVersion)
         {
-            Dictionary<string, DatabaseTableReferenceJson> fileToExtraCompatibility = new();
+            Dictionary<string, List<DatabaseTableReferenceJson>> fileToExtraCompatibility = new();
             foreach (var source in jsonProvider.GetDefinitionReferences())
             {
                 var reference =
                     serializationProvider.DeserializeTableDefinition<DatabaseTableReferenceJson>(source.content);
-                fileToExtraCompatibility[reference.File] = reference;
+                if (!fileToExtraCompatibility.ContainsKey(reference.File))
+                    fileToExtraCompatibility[reference.File] = new List<DatabaseTableReferenceJson>();
+                fileToExtraCompatibility[reference.File].Add(reference);
             }
             
             foreach (var source in jsonProvider.GetDefinitionSources())
@@ -52,7 +54,8 @@ namespace WDE.DatabaseEditors.Data
                 }
 
                 if (definition.Compatibility.Contains(currentCoreVersion.Current.Tag) || 
-                    fileToExtraCompatibility.TryGetValue(source.file, out var reference) && reference.Compatibility == currentCoreVersion.Current.Tag)
+                    fileToExtraCompatibility.TryGetValue(source.file, out var reference) && 
+                    reference.Any(r => r.Compatibility == currentCoreVersion.Current.Tag))
                     definitions[definition.Id] = definition;
                 else
                     incompatibleDefinitions[definition.Id] = definition;

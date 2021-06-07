@@ -601,7 +601,7 @@
 				"name": "Guid from DB"
 			}
 		],
-		"description": "{target} {negate:is|is not} {pram1}{pram2value:choose(0):|, entry is {pram2}} and guid is {pram3}"
+		"description": "{target} {negate:is|is not} {pram1}{pram2value:choose(0):|, entry is {pram2}}{pram3value:choose(0):| and guid is {pram3}}"
 	},
 
 	{

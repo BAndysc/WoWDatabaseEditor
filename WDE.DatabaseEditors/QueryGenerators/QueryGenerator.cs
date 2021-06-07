@@ -26,6 +26,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
         
         public string GenerateQuery(ICollection<uint> keys, IDatabaseTableData tableData)
         {
+            if (tableData.TableDefinition.IsOnlyConditionsTable)
+                return BuildConditions(keys, tableData);
             if (tableData.TableDefinition.IsMultiRecord)
                 return GenerateInsertQuery(keys, tableData);
             return GenerateUpdateQuery(tableData);
@@ -84,41 +86,49 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     query.AppendLine(" -- " + line);
             }
 
-            if (tableData.TableDefinition.Condition != null)
+            query.AppendLine(BuildConditions(keys, tableData));
+
+            return query.ToString();
+        }
+
+        private string BuildConditions(ICollection<uint> keys, IDatabaseTableData tableData)
+        {
+            if (tableData.TableDefinition.Condition == null)
+                return "";
+            
+            StringBuilder query = new();
+            query.AppendLine(BuildConditionsDeleteQuery(keys, tableData));
+            List<IConditionLine> conditions = new();
+            int sourceType = tableData.TableDefinition.Condition.SourceType;
+
+            foreach (var entity in tableData.Entities)
             {
-                query.AppendLine(BuildConditionsDeleteQuery(keys, tableData));
-                List<IConditionLine> conditions = new();
-                int sourceType = tableData.TableDefinition.Condition.SourceType;
-                    
-                foreach (var entity in tableData.Entities)
-                {
-                    if (entity.Conditions == null)
-                        continue;
+                if (entity.Conditions == null)
+                    continue;
 
-                    int sourceGroup = 0;
-                    int sourceEntry = 0;
-                    int sourceId = 0;
+                int sourceGroup = 0;
+                int sourceEntry = 0;
+                int sourceId = 0;
 
-                    if (tableData.TableDefinition.Condition.SourceEntryColumn != null &&
-                        entity.GetCell(tableData.TableDefinition.Condition.SourceEntryColumn) is DatabaseField<long>
-                            entryCell)
-                        sourceEntry = (int)entryCell.Current.Value;
-                    
-                    if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
-                        entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn) is DatabaseField<long>
-                            groupCell)
-                        sourceGroup = (int)groupCell.Current.Value;
-                    
-                    if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
-                        entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn) is DatabaseField<long>
-                            idCell)
-                        sourceId = (int)idCell.Current.Value;
-                    
-                    foreach (var condition in entity.Conditions)
-                        conditions.Add(new AbstractConditionLine(sourceType, sourceGroup, sourceEntry, sourceId, condition));
-                }
-                query.AppendLine(conditionQueryGenerator.BuildInsertQuery(conditions));
+                if (tableData.TableDefinition.Condition.SourceEntryColumn != null &&
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceEntryColumn) is DatabaseField<long>
+                        entryCell)
+                    sourceEntry = (int) entryCell.Current.Value;
+
+                if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn) is DatabaseField<long>
+                        groupCell)
+                    sourceGroup = (int) groupCell.Current.Value;
+
+                if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn) is DatabaseField<long>
+                        idCell)
+                    sourceId = (int) idCell.Current.Value;
+
+                foreach (var condition in entity.Conditions)
+                    conditions.Add(new AbstractConditionLine(sourceType, sourceGroup, sourceEntry, sourceId, condition));
             }
+            query.AppendLine(conditionQueryGenerator.BuildInsertQuery(conditions));
 
             return query.ToString();
         }

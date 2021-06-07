@@ -1,0 +1,58 @@
+{
+  "id": "spell_implicit_target",
+  "compatibility": [
+    "TrinityWrath", "TrinityMaster", "Azeroth", "TrinityCata"
+  ],
+  "name": "Spell Implicit Target conditions",
+  "single_solution_name": "{name} implicit target",
+  "multi_solution_name": "Multiple spells implicit target",
+  "description": "Use to define what shall be spell implicit target",
+  "table_name": "spell_implicit_target",
+  "table_index_name": "spell_id",
+  "multi_record": true,
+  "icon_path": "Icons/document_spell_implicit_target.png",
+  "group_name": "Common scripting tables",
+  "picker": "SpellParameter",
+  "only_conditions": true,
+  "primary_key": [
+    "spell_id"
+  ],
+  "conditions": {
+    "source_type": 13,
+    "source_group": "spell_effect",
+    "source_entry": "spell_id",
+    "targets": [
+      {
+        "id": 0,
+        "name": "potential spell target"
+      },
+      {
+        "id": 1,
+        "name": "spell caster"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell Id",
+          "db_column_name": "spell_id",
+          "value_type": "SpellParameter",
+          "read_only": true
+        },
+        {
+          "name": "Spell effect",
+          "db_column_name": "spell_effect",
+          "value_type": "SpellEffectMaskParameter"
+        },
+        {
+          "is_condition": true,
+          "name": "Conditions",
+          "db_column_name": "conditions"
+        }
+      ]
+    }
+  ]
+}

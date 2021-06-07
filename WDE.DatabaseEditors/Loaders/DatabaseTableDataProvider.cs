@@ -76,55 +76,124 @@ namespace WDE.DatabaseEditors.Loaders
 
             if (keys.Length > 0)
             {
-                var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
-                try
+                if (definition.IsOnlyConditionsTable)
                 {
-                    result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
-
-                    if (definition.Condition != null)
+                    if (definition.Condition == null)
+                        throw new Exception("only_conditions + no conditions make no sense");
+                    
+                    result = new List<Dictionary<string, (Type, object)>>();
+                    
+                    foreach (var key in keys)
                     {
-                        foreach (var row in result)
+                        int? sourceGroup = null, sourceEntry = null, sourceId = null;
+                        if (definition.Condition.SourceGroupColumn != null &&
+                            definition.TablePrimaryKeyColumnName == definition.Condition.SourceGroupColumn)
                         {
-                            int? sourceGroup = null, sourceEntry = null, sourceId = null;
+                            keyMask = IDatabaseProvider.ConditionKeyMask.SourceGroup;
+                            sourceGroup = (int)key;
+                        }
 
-                            if (definition.Condition.SourceGroupColumn != null &&
-                                row.TryGetValue(definition.Condition.SourceGroupColumn, out var groupData) &&
-                                int.TryParse(groupData.Item2.ToString(), out var groupInt))
-                                sourceGroup = groupInt;
+                        if (definition.Condition.SourceEntryColumn != null &&
+                            definition.TablePrimaryKeyColumnName == definition.Condition.SourceEntryColumn)
+                        {
+                            keyMask = IDatabaseProvider.ConditionKeyMask.SourceEntry;
+                            sourceEntry = (int)key;
+                        }
 
-                            if (definition.Condition.SourceEntryColumn != null &&
-                                row.TryGetValue(definition.Condition.SourceEntryColumn, out var entryData) &&
-                                int.TryParse(entryData.Item2.ToString(), out var entryInt))
-                                sourceEntry = entryInt;
+                        if (definition.Condition.SourceIdColumn != null &&
+                            definition.TablePrimaryKeyColumnName == definition.Condition.SourceIdColumn)
+                        {
+                            keyMask = IDatabaseProvider.ConditionKeyMask.SourceId;
+                            sourceId = (int)key;
+                        }
+                        
+                        IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
+                            new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
+                                sourceEntry, sourceId));
+                        if (conditionList != null && conditionList.Count > 0)
+                        {
+                            foreach (var distinct in conditionList
+                                .Select(line => (line.SourceEntry, line.SourceGroup, line.SourceId)).Distinct())
+                            {
+                                var row = new Dictionary<string, (Type, object)>();
+                                var conditions = conditionList.Where(l =>
+                                    l.SourceEntry == distinct.SourceEntry && l.SourceId == distinct.SourceId &&
+                                                    l.SourceGroup == distinct.SourceGroup).ToList();
+                                
+                                foreach (var column in definition.TableColumns.Values)
+                                {
+                                    if (column.IsConditionColumn)
+                                        continue;
+                                    if (definition.Condition.SourceGroupColumn != null &&
+                                        column.DbColumnName == definition.Condition.SourceGroupColumn)
+                                        row.Add(column.DbColumnName, (typeof(int), distinct.SourceGroup));
 
-                            if (definition.Condition.SourceIdColumn != null &&
-                                row.TryGetValue(definition.Condition.SourceIdColumn, out var idData) &&
-                                int.TryParse(idData.Item2.ToString(), out var idInt))
-                                sourceId = idInt;
+                                    if (definition.Condition.SourceEntryColumn != null &&
+                                        column.DbColumnName == definition.Condition.SourceEntryColumn)
+                                        row.Add(column.DbColumnName, (typeof(int), distinct.SourceEntry));
 
-                            IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
-                                new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
-                                    sourceEntry, sourceId));
-                            if (conditionList == null || conditionList.Count == 0)
-                                conditionList = new List<IConditionLine>();
-                            row.Add("conditions", (typeof(IList<IConditionLine>), conditionList!));
+                                    if (definition.Condition.SourceIdColumn != null &&
+                                        column.DbColumnName == definition.Condition.SourceIdColumn)
+                                        row.Add(column.DbColumnName, (typeof(int), distinct.SourceId));
+                                }
+                                row.Add("conditions", (typeof(IList<IConditionLine>), conditions));
+                                result.Add(row);
+                            } 
                         }
                     }
                 }
-                catch (IMySqlExecutor.CannotConnectToDatabaseException)
+                else
                 {
-                }
-                catch (Exception e)
-                {
-                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                        .SetTitle("Database error")
-                        .SetMainInstruction(
-                            "Unable to execute SQL query. Most likely your database is incompatible with provided database schema, if you think this is a bug, report it via Help -> Report Bug")
-                        .SetContent(e.ToString())
-                        .SetIcon(MessageBoxIcon.Error)
-                        .WithOkButton(false)
-                        .Build());
-                    return null;
+                    var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
+                    try
+                    {
+                        result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+
+                        if (definition.Condition != null)
+                        {
+                            foreach (var row in result)
+                            {
+                                int? sourceGroup = null, sourceEntry = null, sourceId = null;
+
+                                if (definition.Condition.SourceGroupColumn != null &&
+                                    row.TryGetValue(definition.Condition.SourceGroupColumn, out var groupData) &&
+                                    int.TryParse(groupData.Item2.ToString(), out var groupInt))
+                                    sourceGroup = groupInt;
+
+                                if (definition.Condition.SourceEntryColumn != null &&
+                                    row.TryGetValue(definition.Condition.SourceEntryColumn, out var entryData) &&
+                                    int.TryParse(entryData.Item2.ToString(), out var entryInt))
+                                    sourceEntry = entryInt;
+
+                                if (definition.Condition.SourceIdColumn != null &&
+                                    row.TryGetValue(definition.Condition.SourceIdColumn, out var idData) &&
+                                    int.TryParse(idData.Item2.ToString(), out var idInt))
+                                    sourceId = idInt;
+
+                                IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
+                                    new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
+                                        sourceEntry, sourceId));
+                                if (conditionList == null || conditionList.Count == 0)
+                                    conditionList = new List<IConditionLine>();
+                                row.Add("conditions", (typeof(IList<IConditionLine>), conditionList!));
+                            }
+                        }
+                    }
+                    catch (IMySqlExecutor.CannotConnectToDatabaseException)
+                    {
+                    }
+                    catch (Exception e)
+                    {
+                        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Database error")
+                            .SetMainInstruction(
+                                "Unable to execute SQL query. Most likely your database is incompatible with provided database schema, if you think this is a bug, report it via Help -> Report Bug")
+                            .SetContent(e.ToString())
+                            .SetIcon(MessageBoxIcon.Error)
+                            .WithOkButton(false)
+                            .Build());
+                        return null;
+                    }   
                 }
             }
 
