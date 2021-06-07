@@ -24,14 +24,17 @@ namespace WDE.SmartScriptEditor.Data
             this.parameterFactory = parameterFactory;
             this.smartDataManager = smartDataManager;
             this.conditionDataManager = conditionDataManager;
-            
-            parameterFactory.Register("StoredTargetParameter", new VariableContextualParameter(GlobalVariableType.StoredTarget, "storedTarget"));
-            parameterFactory.Register("DataVariableParameter", new VariableContextualParameter(GlobalVariableType.DataVariable, "data"));
-            parameterFactory.Register("TimedEventParameter", new VariableContextualParameter(GlobalVariableType.TimedEvent, "timedEvent"));
-            parameterFactory.Register("DoActionParameter", new VariableContextualParameter(GlobalVariableType.Action, "action"));
-            parameterFactory.Register("DoFunctionParameter", new VariableContextualParameter(GlobalVariableType.Function, "function"));
-            parameterFactory.Register("StoredPointParameter", new VariableContextualParameter(GlobalVariableType.StoredPoint, "storedPoint"));
-            parameterFactory.Register("DatabasePointParameter", new VariableContextualParameter(GlobalVariableType.DatabasePoint, "databasePoint"));
+
+            if (!parameterFactory.IsRegisteredLong("StoredTargetParameter"))
+            {
+                parameterFactory.Register("StoredTargetParameter", new VariableContextualParameter(GlobalVariableType.StoredTarget, "storedTarget"));
+                parameterFactory.Register("DataVariableParameter", new VariableContextualParameter(GlobalVariableType.DataVariable, "data"));
+                parameterFactory.Register("TimedEventParameter", new VariableContextualParameter(GlobalVariableType.TimedEvent, "timedEvent"));
+                parameterFactory.Register("DoActionParameter", new VariableContextualParameter(GlobalVariableType.Action, "action"));
+                parameterFactory.Register("DoFunctionParameter", new VariableContextualParameter(GlobalVariableType.Function, "function"));
+                parameterFactory.Register("StoredPointParameter", new VariableContextualParameter(GlobalVariableType.StoredPoint, "storedPoint"));
+                parameterFactory.Register("DatabasePointParameter", new VariableContextualParameter(GlobalVariableType.DatabasePoint, "databasePoint"));   
+            }
         }
 
         public SmartEvent EventFactory(int id)

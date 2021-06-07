@@ -50,8 +50,12 @@ namespace WDE.DatabaseEditors.QueryGenerators
             if (tableData.Entities.Count == 0)
                 return query.ToString();
 
-            var columns = tableData.Entities[0].Fields.Select(f => $"`{f.FieldName}`");
-            var columnsString = string.Join(", ", columns);
+
+            var columns = tableData.TableDefinition.TableColumns
+                .Select(c => c.Value)
+                .Where(col => !col.IsMetaColumn && !col.IsConditionColumn)
+                .ToList();
+            var columnsString = string.Join(", ", columns.Select(f => $"`{f.DbColumnName}`"));
 
             query.AppendLine($"INSERT INTO {tableData.TableDefinition.TableName} ({columnsString}) VALUES");
 
@@ -61,7 +65,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             foreach (var entity in tableData.Entities)
             {
                 bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new EntityKey(entity, tableData.TableDefinition));
-                var cells = entity.Fields.Select(f => f.ToQueryString());
+                var cells = columns.Select(c => entity.GetCell(c.DbColumnName)!.ToQueryString());
                 var cellStrings = string.Join(", ", cells);
                 
                 if (duplicate)
@@ -162,19 +166,16 @@ namespace WDE.DatabaseEditors.QueryGenerators
             foreach (var entity in tableData.Entities)
             {
                 Dictionary<string, List<IDatabaseField>> fieldsByTable = null!;
+                fieldsByTable = entity.Fields
+                    .Select(ef => (ef, tableData.TableDefinition.TableColumns[ef.FieldName]))
+                    .Where(pair => !pair.Item2.IsMetaColumn && !pair.Item2.IsConditionColumn)
+                    .GroupBy(pair => pair.Item2.ForeignTable ?? tableData.TableDefinition.TableName)
+                    .ToDictionary(g => g.Key, g => g.Select(f => f.ef).ToList());
+
                 if (tableData.TableDefinition.ForeignTable != null)
                 {
-                    fieldsByTable = entity.Fields
-                        .GroupBy(f => tableData.TableDefinition.TableColumns[f.FieldName].ForeignTable ?? tableData.TableDefinition.TableName)
-                        .ToDictionary(g => g.Key, g => g.ToList());
-
                     foreach (var foreign in tableData.TableDefinition.ForeignTable)
                         fieldsByTable[foreign.TableName].Insert(0, new DatabaseField<long>(foreign.ForeignKey, new ValueHolder<long>(entity.Key, false)));
-                }
-                else
-                {
-                    fieldsByTable = new();
-                    fieldsByTable[tableData.TableDefinition.TableName] = entity.Fields.ToList();
                 }
                 
                 if (entity.ExistInDatabase)
@@ -214,7 +215,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         var columns = string.Join(", ", table.Value.Select(f => $"`{f.FieldName}`"));
                         query.AppendLine($"INSERT INTO {table.Key} ({columns}) VALUES");
                         var values = string.Join(", ", table.Value.Select(f => f.ToQueryString()));
-                        query.AppendLine($"({values});");   
+                        query.AppendLine($"({values});");
                     }
                 }
             }

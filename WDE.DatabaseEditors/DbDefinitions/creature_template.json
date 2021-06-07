@@ -132,7 +132,7 @@
         {
           "name": "Racial leader",
           "db_column_name": "RacialLeader",
-          "value_type": "bool"
+          "value_type": "BoolParameter"
         }
       ]
     },
@@ -320,7 +320,7 @@
         {
           "name": "Health regen",
           "db_column_name": "RegenHealth",
-          "value_type": "bool"
+          "value_type": "BoolParameter"
         },
         {
           "name": "Health mod",
