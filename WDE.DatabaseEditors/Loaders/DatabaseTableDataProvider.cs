@@ -102,13 +102,12 @@ namespace WDE.DatabaseEditors.Loaders
                                 int.TryParse(idData.Item2.ToString(), out var idInt))
                                 sourceId = idInt;
 
-                            var conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
+                            IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
                                 new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
                                     sourceEntry, sourceId));
-                            if (conditionList?.Count > 0)
-                            {
-                                row.Add("conditions", (typeof(IList<IConditionLine>), conditionList));
-                            }
+                            if (conditionList == null || conditionList.Count == 0)
+                                conditionList = new List<IConditionLine>();
+                            row.Add("conditions", (typeof(IList<IConditionLine>), conditionList!));
                         }
                     }
                 }
