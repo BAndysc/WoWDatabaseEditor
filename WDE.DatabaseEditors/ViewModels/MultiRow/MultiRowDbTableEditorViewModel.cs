@@ -68,9 +68,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
-            IConditionEditService conditionEditService) : base(history, solutionItem, solutionItemName, 
+            IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry) 
+            : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
-            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory)
+            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, iconRegistry)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;

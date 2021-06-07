@@ -64,12 +64,17 @@ namespace WDE.DatabaseEditors.Solution
             this.messageBoxService = messageBoxService;
             this.parameterFactory = parameterFactory;
             this.definition = definition;
-            this.itemIcon = new ImageUri($"Resources/SmartScriptGeneric.png");
+            this.itemIcon = new ImageUri($"Icons/document_big.png");
         }
 
         public string GetName() => definition.Name;
 
-        public ImageUri GetImage() => itemIcon;
+        public ImageUri GetImage()
+        {
+            var icon = definition.IconPath?.Replace(".png", "_big.png");
+            icon ??= "Icons/document_big.png";
+            return new ImageUri(icon);
+        }
 
         public string GetDescription() => definition.Description;
         

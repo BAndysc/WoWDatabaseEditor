@@ -9,6 +9,7 @@
   "table_index_name": "CreatureID",
   "single_solution_name": "{name}'s texts",
   "multi_solution_name": "Texts for multiple npcs",
+  "icon_path": "Icons/chat.png",
   "reload_command": "reload creature_text",
   "multi_record": true,
   "picker": "CreatureParameter",

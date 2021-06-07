@@ -66,9 +66,10 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, ITeachingTipService teachingTipService,
-            ICreatureStatCalculatorService creatureStatCalculatorService) : base(history, solutionItem, solutionItemName, 
+            ICreatureStatCalculatorService creatureStatCalculatorService,
+            ISolutionItemIconRegistry iconRegistry) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
-            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory)
+            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, iconRegistry)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;

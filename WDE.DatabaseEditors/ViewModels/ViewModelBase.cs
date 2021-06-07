@@ -16,6 +16,7 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Extensions;
@@ -48,7 +49,8 @@ namespace WDE.DatabaseEditors.ViewModels
             IDatabaseTableDataProvider databaseTableDataProvider,
             IMessageBoxService messageBoxService,
             ITaskRunner taskRunner,
-            IParameterFactory parameterFactory)
+            IParameterFactory parameterFactory,
+            ISolutionItemIconRegistry iconRegistry)
         {
             this.solutionItemName = solutionItemName;
             this.solutionManager = solutionManager;
@@ -65,6 +67,7 @@ namespace WDE.DatabaseEditors.ViewModels
             redoCommand = new DelegateCommand(History.Redo, CanRedo);
             Save = new DelegateCommand(SaveSolutionItem);
             title = solutionItemName.GetName(solutionItem);
+            Icon = iconRegistry.GetIcon(solutionItem);
             nameGeneratorParameter = parameterFactory.Factory("Parameter");
             
             History.PropertyChanged += (_, _) =>
@@ -157,6 +160,8 @@ namespace WDE.DatabaseEditors.ViewModels
             internal set => SetProperty(ref isLoading, value);
         }
 
+        public ImageUri? Icon { get; }
+        
         private string title;
         public string Title
         {

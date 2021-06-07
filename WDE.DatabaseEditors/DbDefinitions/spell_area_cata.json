@@ -10,6 +10,7 @@
   "single_solution_name": "spell_area in {name}",
   "multi_solution_name": "spell_area in many areas",
   "reload_command": "reload spell_area",
+  "icon_path": "Icons/document_spell_area.png",
   "multi_record": true,
   "picker": "ZoneAreaParameter",
   "group_name": "Common scripting tables",
