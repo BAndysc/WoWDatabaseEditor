@@ -114,7 +114,21 @@ namespace WDE.Parameters
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IGossipMenu item in database.GetGossipMenus())
-                Items.Add(item.MenuId, new SelectOption(item.Text.Select(t => t.Text0_0 ?? t.Text0_1 ?? "").FirstOrDefault() ?? ""));
+                Items.Add(item.MenuId, new SelectOption((item.Text
+                        .Select(t => t.Text0_0 ?? t.Text0_1 ?? "")
+                        .FirstOrDefault() ?? "")
+                        .Replace("\n", "")
+                        .Truncate(100)));
+        }
+    }
+
+    internal static class StringExtensions
+    {
+        public static string Truncate(this string str, int length)
+        {
+            if (str.Length >= length + 20)
+                return str.Substring(0, length) + "...";
+            return str;
         }
     }
 
