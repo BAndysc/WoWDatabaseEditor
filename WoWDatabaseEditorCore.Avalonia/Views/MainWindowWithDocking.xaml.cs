@@ -9,6 +9,7 @@ using Dock.Avalonia.Controls;
 using Newtonsoft.Json;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Types;
 using WoWDatabaseEditorCore.Avalonia.Docking;
 using WoWDatabaseEditorCore.Avalonia.Docking.Serialization;
 using WoWDatabaseEditorCore.ViewModels;
@@ -40,7 +41,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             mainWindowHolder.Window = this;
             PersistentDockDataTemplate.DocumentManager = documentManager;
         }
-        
+
+        public static ImageUri DocumentIcon => new ImageUri("Icons/document.png");
+
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);

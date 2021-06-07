@@ -5,12 +5,14 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.Annotations;
 using WDE.Common.History;
+using WDE.Common.Types;
 
 namespace WDE.Common.Managers
 {
     public interface IDocument : IDisposable, INotifyPropertyChanged
     {
         string Title { get; }
+        ImageUri? Icon => null;
         ICommand Undo { get; }
         ICommand Redo { get; }
         ICommand Copy { get; }

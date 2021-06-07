@@ -28,6 +28,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         private readonly Dictionary<ISolutionItem, SolutionItemViewModel> itemToViewmodel;
         private readonly ISolutionManager solutionManager;
         private readonly IStatusBar statusBar;
+        private readonly ISolutionItemIconRegistry solutionItemIconRegistry;
 
         private SolutionItemViewModel? selected;
         private bool visibility;
@@ -43,12 +44,14 @@ namespace WDE.Solutions.Explorer.ViewModels
             INewItemService newItemService,
             ISolutionTasksService solutionTasksService,
             IStatusBar statusBar,
+            ISolutionItemIconRegistry solutionItemIconRegistry,
             ISolutionItemProvideService provider)
         {
             this.itemNameRegistry = itemNameRegistry;
             this.solutionManager = solutionManager;
             this.ea = ea;
             this.statusBar = statusBar;
+            this.solutionItemIconRegistry = solutionItemIconRegistry;
 
             Root = new ObservableCollection<SolutionItemViewModel>();
             itemToViewmodel = new Dictionary<ISolutionItem, SolutionItemViewModel>();
@@ -275,7 +278,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         {
             if (!itemToViewmodel.TryGetValue(item, out SolutionItemViewModel? viewModel))
             {
-                viewModel = new SolutionItemViewModel(itemNameRegistry, item);
+                viewModel = new SolutionItemViewModel(solutionItemIconRegistry, itemNameRegistry, item);
                 itemToViewmodel[item] = viewModel;
             }
             else

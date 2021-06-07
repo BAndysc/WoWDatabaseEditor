@@ -22,32 +22,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\SmartScriptAuraIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SmartScriptIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SmartScriptCreatureIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SmartScriptGameobjectIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SmartScriptGeneric.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SmartScriptQuestIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SmartScriptSpellIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\SmartScriptTimedActionListIcon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="DynamicData">
       <Version>7.1.1</Version>
     </PackageReference>

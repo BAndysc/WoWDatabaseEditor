@@ -23,6 +23,7 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Conditions.Data;
 using WDE.Conditions.Exporter;
@@ -65,7 +66,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private SmartScript script;
 
         public SmartTeachingTips TeachingTips { get; private set; }
-        
+
+        public ImageUri? Icon { get; }
+
         private bool isLoading = true;
         public bool IsLoading
         {
@@ -101,6 +104,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IEditorFeatures editorFeatures,
             ITeachingTipService teachingTipService,
             IMainThread mainThread,
+            ISolutionItemIconRegistry iconRegistry,
             ISmartScriptInspectorService inspectorService)
         {
             History = history;
@@ -127,6 +131,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.item = null!;
             TeachingTips = null!;
             title = "";
+            Icon = iconRegistry.GetIcon(item);
             
             CloseCommand = new AsyncCommand(async () =>
             {

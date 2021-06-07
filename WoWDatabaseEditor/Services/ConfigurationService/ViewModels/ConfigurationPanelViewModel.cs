@@ -9,6 +9,7 @@ using WDE.Common;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WoWDatabaseEditorCore.Extensions;
 
@@ -84,6 +85,7 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
             }
         }
 
+        public ImageUri? Icon => new ImageUri("Icons/settings.png");
         public string Title => "Settings";
         public ICommand Save { get; }
         public ICommand Undo => AlwaysDisabledCommand.Command;

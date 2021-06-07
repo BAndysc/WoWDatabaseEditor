@@ -10,6 +10,7 @@ using WDE.Common.DBC;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.CoreVersion;
 
@@ -58,7 +59,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         public string CommitHash => applicationVersion.CommitHash;
         public bool VersionKnown => applicationVersion.VersionKnown;
         public string ReleaseData => $"WoWDatabaseEditor, branch: {Branch}, build: {BuildVersion}, commit: {CommitHash}";
-        
+
+        public ImageUri? Icon => new ImageUri("Icons/wde_icon.png");
         public string Title { get; } = "About";
         public ICommand Undo { get; } = new DisabledCommand();
         public ICommand Redo { get; } = new DisabledCommand();

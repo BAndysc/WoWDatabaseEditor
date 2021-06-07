@@ -4,11 +4,13 @@ using System.Diagnostics;
 using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Solution;
+using WDE.Common.Types;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {
     public class SolutionItemViewModel : BindableBase
     {
+        private readonly ISolutionItemIconRegistry iconRegistry;
         private readonly ISolutionItemNameRegistry itemNameRegistry;
 
         private readonly Dictionary<ISolutionItem, SolutionItemViewModel> itemToViewmodel;
@@ -16,16 +18,18 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         private bool isSelected;
 
-        public SolutionItemViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionItem item) : this(itemNameRegistry,
+        public SolutionItemViewModel(ISolutionItemIconRegistry iconRegistry, ISolutionItemNameRegistry itemNameRegistry, ISolutionItem item) : this(iconRegistry, itemNameRegistry,
             item, null)
         {
         }
 
-        public SolutionItemViewModel(ISolutionItemNameRegistry itemNameRegistry, ISolutionItem item, SolutionItemViewModel? parent)
+        public SolutionItemViewModel(ISolutionItemIconRegistry iconRegistry, ISolutionItemNameRegistry itemNameRegistry, ISolutionItem item, SolutionItemViewModel? parent)
         {
+            this.iconRegistry = iconRegistry;
             this.itemNameRegistry = itemNameRegistry;
             Item = item;
             Parent = parent;
+            Icon = iconRegistry.GetIcon(item);
 
             itemToViewmodel = new Dictionary<ISolutionItem, SolutionItemViewModel>();
 
@@ -60,6 +64,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
         public ObservableCollection<SolutionItemViewModel>? Children { get; }
 
+        public ImageUri Icon { get; set; }
         public string Name => itemNameRegistry.GetName(Item);
         public string? ExtraId => Item.ExtraId;
         public bool IsContainer => Item.IsContainer;
@@ -85,7 +90,7 @@ namespace WDE.Solutions.Explorer.ViewModels
             Debug.Assert(Children != null);
             if (!itemToViewmodel.TryGetValue(item, out SolutionItemViewModel? viewModel))
             {
-                viewModel = new SolutionItemViewModel(itemNameRegistry, item, this);
+                viewModel = new SolutionItemViewModel(iconRegistry, itemNameRegistry, item, this);
                 itemToViewmodel[item] = viewModel;
             }
             else

@@ -25,7 +25,7 @@ namespace WDE.TrinitySmartScriptEditor
             this.name = name;
             this.desc = desc;
             this.type = type;
-            this.icon = new ImageUri($"Resources/{icon}.png");
+            this.icon = new ImageUri($"Icons/{icon}.png");
         }
 
         public string GetName()
@@ -58,7 +58,7 @@ namespace WDE.TrinitySmartScriptEditor
 
         public SmartScriptCreatureProvider(Lazy<ICreatureEntryProviderService> creatureEntryProvider) : base("Creature Script",
             "Script any npc in game.",
-            "SmartScriptCreatureIcon",
+            "document_creature_big",
             SmartScriptType.Creature)
         {
             this.creatureEntryProvider = creatureEntryProvider;
@@ -80,7 +80,7 @@ namespace WDE.TrinitySmartScriptEditor
 
         public SmartScriptGameobjectProvider(Lazy<IGameobjectEntryProviderService> goProvider) : base("Gameobject Script",
             "Create script for object, including transports.",
-            "SmartScriptGameobjectIcon",
+            "document_gobject_big",
             SmartScriptType.GameObject)
         {
             this.goProvider = goProvider;
@@ -102,7 +102,7 @@ namespace WDE.TrinitySmartScriptEditor
 
         public SmartScriptQuestProvider(Lazy<IQuestEntryProviderService> service) : base("Quest Script",
             "Write a script for quest: on accept, on reward.",
-            "SmartScriptQuestIcon",
+            "document_quest_big",
             SmartScriptType.Quest)
         {
             this.service = service;
@@ -124,7 +124,7 @@ namespace WDE.TrinitySmartScriptEditor
 
         public SmartScriptAuraProvider(Lazy<ISpellEntryProviderService> service) : base("Aura Script",
             "Auras can have scripted several events: on apply, on remove, on periodic tick.",
-            "SmartScriptAuraIcon",
+            "document_aura_big",
             SmartScriptType.Aura)
         {
             this.service = service;
@@ -146,7 +146,7 @@ namespace WDE.TrinitySmartScriptEditor
 
         public SmartScriptSpellProvider(Lazy<ISpellEntryProviderService> service) : base("Spell Script",
             "Create a new script for spell: this includes script for any existing effect in spell.",
-            "SmartScriptSpellIcon",
+            "document_spell_big",
             SmartScriptType.Spell)
         {
             this.service = service;
@@ -169,7 +169,7 @@ namespace WDE.TrinitySmartScriptEditor
         public SmartScriptTimedActionListProvider(Lazy<ICreatureEntryProviderService> creatureEntryProvider) : base(
             "Timed action list",
             "Timed action list contains list of actions played in time, this can be used to create RP events, cameras, etc.",
-            "SmartScriptTimedActionListIcon",
+            "document_timedactionlist_big",
             SmartScriptType.TimedActionList)
         {
             this.creatureEntryProvider = creatureEntryProvider;
@@ -195,7 +195,7 @@ namespace WDE.TrinitySmartScriptEditor
             Lazy<IDbcStore> dbcStore
         ) : base("Client Area Trigger",
             "The script from AreaTrigger from client database (DBC)",
-            "SmartScriptGeneric",
+            "document_areatrigger_big",
             SmartScriptType.AreaTrigger)
         {
             this.itemFromListProvider = itemFromListProvider;
@@ -260,7 +260,7 @@ namespace WDE.TrinitySmartScriptEditor
             database,
             "Area Trigger Entity",
             "The script from AreaTrigger defined in areatrigger_template",
-            "SmartScriptGeneric",
+            "document_areatrigger_big",
             SmartScriptType.AreaTriggerEntity,
             false) {}
     }
@@ -276,7 +276,7 @@ namespace WDE.TrinitySmartScriptEditor
             database,
             "Area Trigger Server-side Entity",
             "The script from server side AreaTrigger defined in areatrigger_template",
-            "SmartScriptGeneric",
+            "document_areatrigger_big",
             SmartScriptType.AreaTriggerEntityServerSide,
             true) {}
     }

@@ -9,6 +9,8 @@
           xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
           xmlns:docking="clr-namespace:WoWDatabaseEditorCore.Avalonia.Docking"
           xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+          xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+          xmlns:types="clr-namespace:WDE.Common.Types;assembly=WDE.Common"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindowWithDocking"
@@ -68,11 +70,34 @@
                           IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
     </controls:ExtendedWindow.Overlay>
 
-    <idc:DockControl Name="DockControl" >
+    <idc:DockControl Name="DockControl">
         <idc:DockControl.DataTemplates>
             <docking:PersistentDockDataTemplate />
         </idc:DockControl.DataTemplates>
         <idc:DockControl.Styles>
+            <Style Selector="idc|DocumentControl">
+                <Setter Property="HeaderTemplate">
+                    <DataTemplate DataType="docking:AvaloniaDocumentDockWrapper">
+                        <StackPanel Orientation="Horizontal">
+                            <components:WdeImage Image="{Binding ViewModel.Icon, FallbackValue={x:Static views:MainWindowWithDocking.DocumentIcon}, TargetNullValue={x:Static views:MainWindowWithDocking.DocumentIcon}}" Width="16" Height="16"/>
+                            <TextBlock Text="{Binding Title}" Padding="2">
+                                <Interaction.Behaviors>
+                                    <DataTriggerBehavior Binding="{Binding ViewModel.IsModified}" ComparisonCondition="Equal" Value="False">
+                                        <ChangePropertyAction TargetObject="{Binding #TextBlock}" 
+                                                              PropertyName="FontWeight"
+                                                              Value="Normal" />
+                                    </DataTriggerBehavior>
+                                    <DataTriggerBehavior Binding="{Binding ViewModel.IsModified}" ComparisonCondition="Equal" Value="True">
+                                        <ChangePropertyAction TargetObject="{Binding #TextBlock}" 
+                                                              PropertyName="FontWeight"
+                                                              Value="Bold" />
+                                    </DataTriggerBehavior>
+                                </Interaction.Behaviors>
+                            </TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter>
+            </Style>
             <Style Selector="idc|DocumentControl ContentControl#PART_ContentPresenter > ContentPresenter ContentPresenter.documentView">
                 <Setter Property="IsVisible" Value="{Binding ViewModel.IsLoading, FallbackValue=true, Converter={StaticResource InverseBoolConverter}}" />
             </Style>

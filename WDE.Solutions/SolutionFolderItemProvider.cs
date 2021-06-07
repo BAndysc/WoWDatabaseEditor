@@ -15,7 +15,7 @@ namespace WDE.Solutions
 
         public string GetName() => "Folder";
 
-        public ImageUri GetImage() => new ("Resources/folder.png");
+        public ImageUri GetImage() => new ("Icons/folder_big.png");
 
         public string GetDescription() => "Container for solutions";
         
