@@ -351,10 +351,6 @@ namespace WDE.Common.Avalonia.DnD
                 }
             }*/
             
-            Console.WriteLine("Over " + dropElement + " (" + dropElement?.DataContext?.ToString() + ")");
-            Console.WriteLine("Best parent: " + parent + " (" + ((IControl?)parent)?.DataContext?.ToString() + ")");
-            Console.WriteLine("Index: " + indexOfDrop + " insert position " + insertPosition.ToString());
-
             if (dropInfo.DropTargetAdorner == DropTargetAdorners.Insert)
                 dropInfo.InsertPosition =
                     (RelativeInsertPosition) ((int) dropInfo.InsertPosition &
