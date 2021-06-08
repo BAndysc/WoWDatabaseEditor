@@ -17,7 +17,8 @@
         AreaTriggerEntityServerSide = 12,
         Aura = 13, // do not exists on TC
         Cinematic = 14, // do not exists on TC
+        END,
         
-        ActionList  // can be any id, do not delete
+        ActionList,  // can be any id, do not delete
     }
 }
