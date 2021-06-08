@@ -42,6 +42,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             Func<QuickStartViewModel> quickStartCreator,
             Func<TextDocumentViewModel> textDocumentCreator,
             ISolutionTasksService solutionTasksService,
+            IMostRecentlyUsedService mostRecentlyUsedService,
             IEventAggregator eventAggregator)
         {
             DocumentManager = documentManager;

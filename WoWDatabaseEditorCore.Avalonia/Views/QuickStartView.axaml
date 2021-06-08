@@ -55,14 +55,15 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Classes="LinkALike" 
-                                        Margin="0,0,0,5"
                                         Command="{Binding #Root.DataContext.LoadItemCommand}"
                                         CommandParameter="{Binding}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <components:WdeImage Image="{Binding Image}" Width="16" Height="16" Margin="0,0,3,0" />
-                                        <TextBlock Text="Load " VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
-                                    </StackPanel>
+                                    <Border Padding="0,3" Background="Transparent">
+                                        <StackPanel Orientation="Horizontal">
+                                            <components:WdeImage Image="{Binding Image}" Width="16" Height="16" Margin="0,0,3,0" />
+                                            <TextBlock Text="Load " VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
                                 </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -71,7 +72,28 @@
                 
                 <StackPanel Grid.Column="1" Margin="30,0,0,0">
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Recent</TextBlock>
-                    <TextBlock Opacity="0.5" Margin="20,0,0,50">Coming soon!</TextBlock>
+                    
+                    <ItemsControl Margin="20,0,0,0" Items="{Binding MostRecentlyUsedItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Classes="LinkALike" 
+                                        Command="{Binding #Root.DataContext.OpenMostRecentlyUsedCommand}"
+                                        CommandParameter="{Binding}">
+                                    <Border Padding="0,3" Background="Transparent">
+                                        <StackPanel Orientation="Horizontal">
+                                            <components:WdeImage Image="{Binding Icon}" Width="16" Height="16" Margin="0,0,3,0" />
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Border>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     
                     <StackPanel DataContext="{Binding AboutViewModel}" Margin="10,0,0,0" IsVisible="{Binding AllConfigured, Converter={StaticResource InversedBoolConverter}}">
                         <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,0">Settings overview</TextBlock>

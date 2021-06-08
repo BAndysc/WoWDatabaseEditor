@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Events;
@@ -8,6 +7,9 @@ using WDE.Common.CoreVersion;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Services;
+using WDE.Common.Solution;
+using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
@@ -17,16 +19,25 @@ namespace WoWDatabaseEditorCore.ViewModels
 {
     public class QuickStartViewModel : ObservableBase, IDocument
     {
-        private readonly IEventAggregator eventAggregator;
+        private readonly ISolutionItemIconRegistry iconRegistry;
+        private readonly ISolutionItemNameRegistry nameRegistry;
+        private readonly IMostRecentlyUsedService mostRecentlyUsedService;
         public AboutViewModel AboutViewModel { get; }
         public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
+        public ObservableCollection<MostRecentlyUsedViewModel> MostRecentlyUsedItems { get; } = new();
         
         public QuickStartViewModel(ISolutionItemProvideService solutionItemProvideService, 
             IEventAggregator eventAggregator,
+            ISolutionItemIconRegistry iconRegistry,
+            ISolutionItemNameRegistry nameRegistry,
             ICurrentCoreVersion currentCoreVersion,
+            IMainThread mainThread,
+            IMostRecentlyUsedService mostRecentlyUsedService,
             AboutViewModel aboutViewModel)
         {
-            this.eventAggregator = eventAggregator;
+            this.iconRegistry = iconRegistry;
+            this.nameRegistry = nameRegistry;
+            this.mostRecentlyUsedService = mostRecentlyUsedService;
             AboutViewModel = aboutViewModel;
             foreach (var item in solutionItemProvideService.AllCompatible)
             {
@@ -46,9 +57,32 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (item != null)
                     eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
             });
+
+            OpenMostRecentlyUsedCommand = new AsyncAutoCommand<MostRecentlyUsedViewModel>(async item =>
+            {
+                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item.Item);
+            });
+
+            AutoDispose(eventAggregator.GetEvent<EventRequestOpenItem>().Subscribe(item =>
+            {
+                mainThread.Dispatch(ReloadMruList);
+            }, true));
+
+            ReloadMruList();
         }
-        
+
+        private void ReloadMruList()
+        {
+            MostRecentlyUsedItems.Clear();
+            foreach (var mru in mostRecentlyUsedService.MostRecentlyUsed)
+            {
+                var vm = new MostRecentlyUsedViewModel(iconRegistry.GetIcon(mru), nameRegistry.GetName(mru), mru);
+                MostRecentlyUsedItems.Add(vm);
+            }
+        }
+
         public AsyncAutoCommand<NewItemPrototypeInfo> LoadItemCommand { get; }
+        public AsyncAutoCommand<MostRecentlyUsedViewModel> OpenMostRecentlyUsedCommand { get; }
         
         public ImageUri? Icon => new ImageUri("Icons/wde_icon.png");
         public string Title => "Quick start";
@@ -62,5 +96,19 @@ namespace WoWDatabaseEditorCore.ViewModels
         public bool CanClose => true;
         public bool IsModified => false;
         public IHistoryManager? History => null;
+    }
+
+    public class MostRecentlyUsedViewModel
+    {
+        public ImageUri Icon { get; }
+        public string Name { get; }
+        public ISolutionItem Item { get; }
+
+        public MostRecentlyUsedViewModel(ImageUri icon, string name, ISolutionItem item)
+        {
+            Icon = icon;
+            Name = name;
+            Item = item;
+        }
     }
 }
