@@ -11,6 +11,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
         ObservableCollection<NewItemPrototypeGroup> ItemPrototypes { get; }
         NewItemPrototypeInfo? SelectedPrototype { get; }
         Task<ISolutionItem?> CreateSolutionItem();
+        void AllowFolders(bool showFolders);
     }
 
     public class NewItemPrototypeInfo
@@ -23,6 +24,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
             Name = provider.GetName();
             Description = provider.GetDescription();
             Image = provider.GetImage();
+            IsContainer = provider.IsContainer;
             RequiresName = provider is INamedSolutionItemProvider;
         }
 
@@ -30,6 +32,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
         public string Description { get; }
         public ImageUri Image { get; }
         public bool RequiresName { get; }
+        public bool IsContainer { get; }
 
         public Task<ISolutionItem?> CreateSolutionItem(string name)
         {

@@ -11,6 +11,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
 using WDE.Common.Services;
+using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -25,6 +26,7 @@ namespace WoWDatabaseEditorCore.ViewModels
     {
         private readonly IMessageBoxService messageBoxService;
         private readonly Func<AboutViewModel> aboutViewModelCreator;
+        private readonly Func<QuickStartViewModel> quickStartCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
 
         private string title = "Visual Database Editor 2021";
@@ -37,6 +39,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             EditorMainMenuItemsProvider menuItemProvider,
             ISolutionSqlService solutionSqlService,
             Func<AboutViewModel> aboutViewModelCreator,
+            Func<QuickStartViewModel> quickStartCreator,
             Func<TextDocumentViewModel> textDocumentCreator,
             ISolutionTasksService solutionTasksService,
             IEventAggregator eventAggregator)
@@ -45,6 +48,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             StatusBar = statusBar;
             this.messageBoxService = messageBoxService;
             this.aboutViewModelCreator = aboutViewModelCreator;
+            this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
             ExecuteChangedCommand = new DelegateCommand(() =>
@@ -90,7 +94,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             foreach (var window in documentManager.AllTools)
                 toolById[window.UniqueId] = window;
 
-            ShowAbout();
+            if (GlobalApplication.Backend == GlobalApplication.AppBackend.Avalonia)
+                ShowStartPage();
+            else
+                ShowAbout();
             //LoadDefault();
 
             eventAggregator.GetEvent<AllModulesLoaded>()
@@ -138,6 +145,11 @@ namespace WoWDatabaseEditorCore.ViewModels
             DocumentManager.OpenDocument(aboutViewModelCreator());
         }
 
+        private void ShowStartPage()
+        {
+            DocumentManager.OpenDocument(quickStartCreator());
+        }
+        
         private void ShowDocument(IMenuDocumentItem documentItem)
         {
             DocumentManager.OpenDocument(documentItem.EditorDocument());

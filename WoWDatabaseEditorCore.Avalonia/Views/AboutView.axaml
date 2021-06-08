@@ -12,7 +12,7 @@
                 <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                         <Image Source="../Icon.png" Width="56" Height="56" />
-                        <TextBlock VerticalAlignment="Bottom" FontSize="34" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
+                        <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
                     </StackPanel>
                 </Border>
                 <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
@@ -28,26 +28,6 @@
                 <WrapPanel Orientation="Horizontal" Margin="0, 10, 0, 0">
                     <TextBlock  TextWrapping="WrapWithOverflow" Text="Database is not required, but in that case features are limited. It is database editor by design." />
                 </WrapPanel>
-                
-                <Border Margin="0,35,0,0" BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
-                    <TextBlock FontSize="26">Configuration check-up list</TextBlock>
-                </Border>
-                <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">In order to enable all features, you have to configure the editor first.</TextBlock>
-                <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow" IsVisible="{Binding AllConfigured}">Congratulations! You have everything configured properly!</TextBlock>
-                <ItemsControl Items="{Binding ConfigurationChecks}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <DockPanel LastChildFill="True" Margin="0,10,0,0">
-                                <CheckBox MinWidth="0" Margin="0,0,10,0" VerticalAlignment="Center" IsChecked="{Binding Fulfilled, Mode=OneWay}" IsHitTestVisible="False" />
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock FontWeight="Bold" Text="{Binding Title}"/>
-                                    <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Description}" />
-                                </StackPanel>
-                            </DockPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <Button Margin="0,10,0,0" IsVisible="{Binding AllConfigured, Converter={StaticResource InversedBoolConverter}}" Command="{Binding OpenSettingsCommand}">Open settings to configure</Button>
             </StackPanel>
         </DockPanel>
     </ScrollViewer>

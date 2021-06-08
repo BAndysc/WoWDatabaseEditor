@@ -21,6 +21,8 @@ namespace WDE.Solutions
         
         public string GetGroupName() => "Other";
 
+        public bool IsContainer => true;
+
         public Task<ISolutionItem?> CreateSolutionItem()
         {
             throw new Exception("You are not supposed to call this!");

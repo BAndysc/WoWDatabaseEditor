@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:mvvm="http://prismlibrary.com/"
+             mvvm:ViewModelLocator.AutoWireViewModel="False"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="Root"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Views.QuickStartView">
+    <UserControl.Resources>
+        <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Button.LinkALike">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Content="{TemplateBinding Content}" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.LinkALike TextBlock">
+            <Setter Property="Foreground" Value="#FF5FA2DA" />
+        </Style>
+        <Style Selector="Button.LinkALike:pointerover TextBlock">
+            <Setter Property="TextDecorations" Value="Underline" />
+        </Style>
+    </UserControl.Styles>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel>
+            <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <Image Source="../Icon.png" Width="56" Height="56" />
+                    <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
+                </StackPanel>
+            </Border>
+            
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Margin="30,0,0,0">
+                    <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Quick load</TextBlock>
+                    <ItemsControl Margin="20,0,0,0" Items="{Binding FlatItemPrototypes, Mode=OneTime}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Classes="LinkALike" 
+                                        Margin="0,0,0,5"
+                                        Command="{Binding #Root.DataContext.LoadItemCommand}"
+                                        CommandParameter="{Binding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <components:WdeImage Image="{Binding Image}" Width="16" Height="16" Margin="0,0,3,0" />
+                                        <TextBlock Text="Load " VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Margin="30,0,0,0">
+                    <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Recent</TextBlock>
+                    <TextBlock Opacity="0.5" Margin="20,0,0,50">Coming soon!</TextBlock>
+                    
+                    <StackPanel DataContext="{Binding AboutViewModel}" Margin="10,0,0,0" IsVisible="{Binding AllConfigured, Converter={StaticResource InversedBoolConverter}}">
+                        <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,0">Settings overview</TextBlock>
+                        <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">In order to enable all features, you have to configure the editor first.</TextBlock>
+                        <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow" IsVisible="{Binding AllConfigured}">Congratulations! You have everything configured properly!</TextBlock>
+                        <ItemsControl Items="{Binding ConfigurationChecks, Mode=OneTime}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel LastChildFill="True" Margin="0,10,0,0">
+                                        <CheckBox MinWidth="0" Margin="0,0,10,0" VerticalAlignment="Center" IsChecked="{Binding Fulfilled, Mode=OneWay}" IsHitTestVisible="False" />
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock FontWeight="Bold" Text="{Binding Title}"/>
+                                            <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Description}" />
+                                        </StackPanel>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Margin="0,10,0,0" IsVisible="{Binding AllConfigured, Converter={StaticResource InversedBoolConverter}}" Command="{Binding OpenSettingsCommand}">Open settings to configure</Button>
+                    </StackPanel>
+                    
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

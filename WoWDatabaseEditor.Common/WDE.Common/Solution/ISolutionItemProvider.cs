@@ -15,7 +15,9 @@ namespace WDE.Common
         ImageUri GetImage();
         string GetDescription();
         string GetGroupName();
-        
+
+        bool IsContainer => false;
+        bool ShowInQuickStart(ICoreVersion core) => true;
         bool IsCompatibleWithCore(ICoreVersion core);
 
         Task<ISolutionItem?> CreateSolutionItem();

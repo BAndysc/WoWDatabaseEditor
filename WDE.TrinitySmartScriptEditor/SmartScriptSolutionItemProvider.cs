@@ -44,6 +44,9 @@ namespace WDE.TrinitySmartScriptEditor
         }
         
         public string GetGroupName() => "Smart scripts";
+
+        public bool ShowInQuickStart(ICoreVersion core) => 
+            core.SmartScriptFeatures.ProposeSmartScriptOnMainPage;
         
         public bool IsCompatibleWithCore(ICoreVersion core) => 
             core.SmartScriptFeatures.SupportedTypes.Contains(type);

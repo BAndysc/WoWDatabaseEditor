@@ -18,9 +18,10 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
             this.windowManager = windowManager;
         }
 
-        public async Task<ISolutionItem?> GetNewSolutionItem()
+        public async Task<ISolutionItem?> GetNewSolutionItem(bool showFolders)
         {
             var vm = viewModel();
+            vm.AllowFolders(showFolders);
             if (await windowManager.ShowDialog(vm))
             {
                 return await vm.CreateSolutionItem();

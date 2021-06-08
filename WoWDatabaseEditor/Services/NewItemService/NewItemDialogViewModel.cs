@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using DynamicData;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
@@ -52,6 +53,20 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
                 SelectedPrototype = ItemPrototypes[0][0];
         }
 
+        public void AllowFolders(bool showFolders)
+        {
+            if (!showFolders)
+            {
+                FlatItemPrototypes.Remove(FlatItemPrototypes.Where(i => i.IsContainer).ToList());
+                foreach (var group in ItemPrototypes)
+                    group.Remove(group.Where(i => i.IsContainer).ToList());
+                ItemPrototypes.Remove(ItemPrototypes.Where(i => i.Count == 0).ToList());
+
+                if (ItemPrototypes.Count > 0 && ItemPrototypes[0].Count > 0)
+                    SelectedPrototype = ItemPrototypes[0][0];
+            }
+        }
+        
         public ObservableCollection<NewItemPrototypeGroup> ItemPrototypes { get; }
         
         // for WPF: can be removed when WPF is removed

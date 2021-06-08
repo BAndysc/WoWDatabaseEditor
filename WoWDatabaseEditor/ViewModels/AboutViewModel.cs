@@ -30,7 +30,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         {
             this.applicationVersion = applicationVersion;
             
-            ConfigurationChecks.Add(new ConfigurationCheckup(true, 
+            ConfigurationChecks.Add(new ConfigurationCheckup(coreVersion.Current is not UnspecifiedCoreVersion, 
                 "Core version compatibility mode", 
                 "WoW Database Editor supports multiple world of warcraft server cores. In order to achieve maximum compatibility, choose version that matches best.\nYou are using: " + coreVersion.Current.FriendlyName + " compatibility mode now."));
             

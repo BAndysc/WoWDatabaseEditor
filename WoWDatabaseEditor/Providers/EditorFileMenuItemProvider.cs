@@ -48,7 +48,8 @@ namespace WoWDatabaseEditorCore.Providers
             DocumentManager = documentManager;
             this.settings = settings;
             SubItems = new List<IMenuItem>();
-            SubItems.Add(new ModuleMenuItem("_New / Open", new AsyncAutoCommand(OpenNewItemWindow), new("Control+N")));
+            SubItems.Add(new ModuleMenuItem("_Add item to project", new AsyncAutoCommand(AddNewItemWindow), new("Control+N")));
+            SubItems.Add(new ModuleMenuItem("_New / Open (without project)", new AsyncAutoCommand(OpenNewItemWindow), new("Control+O")));
             
             SubItems.Add(new ModuleMenuItem("_Save to database", 
                 new DelegateCommand(
@@ -127,7 +128,7 @@ namespace WoWDatabaseEditorCore.Providers
                     true);
         }
 
-        private async Task OpenNewItemWindow()
+        private async Task AddNewItemWindow()
         {
             ISolutionItem? item = await newItemService.GetNewSolutionItem();
             if (item != null)
@@ -136,6 +137,13 @@ namespace WoWDatabaseEditorCore.Providers
                 if (item is not SolutionFolderItem)
                     eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
             }
+        }
+        
+        private async Task OpenNewItemWindow()
+        {
+            ISolutionItem? item = await newItemService.GetNewSolutionItem(false);
+            if (item != null)
+                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
         }
         private void OpenSettings() => settings.ShowSettings();
 
