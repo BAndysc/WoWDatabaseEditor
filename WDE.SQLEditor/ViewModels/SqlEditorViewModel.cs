@@ -17,6 +17,7 @@ namespace WDE.SQLEditor.ViewModels
     public class SqlEditorViewModel : BindableBase, IDocument
     {
         private INativeTextDocument code;
+        public ImageUri? Icon { get; } = new("Icons/document_sql.png");
 
         private SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
             IStatusBar statusBar, 
