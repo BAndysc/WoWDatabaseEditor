@@ -58,7 +58,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             return true;
         }
 
-        public void Import(SmartScript script, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions)
+        public void Import(SmartScript script, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine> targetConditions)
         {
             int? entry = null;
             SmartScriptType? source = null;

@@ -53,6 +53,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IEditorFeatures editorFeatures;
         private readonly ITeachingTipService teachingTipService;
         private readonly IMainThread mainThread;
+        private readonly IConditionEditService conditionEditService;
         private readonly ISmartScriptInspectorService inspectorService;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
@@ -105,6 +106,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ITeachingTipService teachingTipService,
             IMainThread mainThread,
             ISolutionItemIconRegistry iconRegistry,
+            IConditionEditService conditionEditService,
             ISmartScriptInspectorService inspectorService)
         {
             History = history;
@@ -125,6 +127,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.editorFeatures = editorFeatures;
             this.teachingTipService = teachingTipService;
             this.mainThread = mainThread;
+            this.conditionEditService = conditionEditService;
             this.inspectorService = inspectorService;
             this.conditionDataManager = conditionDataManager;
             script = null!;
@@ -1116,7 +1119,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             var lines = (await smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType)).ToList();
             var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.SmartType).ToList();
-            smartScriptImporter.Import(script, lines, conditions);
+            var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.SmartType).ToList();
+            smartScriptImporter.Import(script, lines, conditions, targetSourceConditions);
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
             TeachingTips.Start();
@@ -1404,7 +1408,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                     smartFactory.UpdateAction(obj, newActionIndex.Value);
                 }, obj.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id).NameReadable)));
-            
+                
                 actionList.Add(new EditableActionData("Type", "Target", async () =>
                 {
                     var newTargetIndex = await ShowTargetPicker(obj.Parent, smartDataManager.GetRawData(SmartType.SmartAction, obj.Id));
@@ -1418,7 +1422,26 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     smartFactory.UpdateTarget(obj.Target, newId);
                     if (newTargetIndex.Value.Item2)
                         obj.Source.GetParameter(0).Value = newTargetIndex.Value.Item1;
-                },  obj.Target.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartTarget, id).NameReadable), canPickTarget.Not()));   
+                },  obj.Target.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartTarget, id).NameReadable), canPickTarget.Not()));
+                
+                if (editorFeatures.SupportsTargetCondition)
+                {
+                    var sourceConditions = new ReactiveProperty<string>($"Conditions ({obj.Source.Conditions?.Count ?? 0})");
+                    actionList.Add(new EditableActionData("Conditions", "Source", async () =>
+                    {
+                        var newConditions = await conditionEditService.EditConditions(29, obj.Source.Conditions);
+                        obj.Source.Conditions = newConditions?.ToList();
+                        sourceConditions.Value = $"Conditions ({obj.Source.Conditions?.Count ?? 0})";
+                    }, sourceConditions));
+
+                    var targetConditions = new ReactiveProperty<string>($"Conditions ({obj.Target.Conditions?.Count ?? 0})");
+                    actionList.Add(new EditableActionData("Conditions", "Target", async () =>
+                    {
+                        var newConditions = await conditionEditService.EditConditions(29, obj.Target.Conditions);
+                        obj.Target.Conditions = newConditions?.ToList();
+                        targetConditions.Value = $"Conditions ({obj.Target.Conditions?.Count ?? 0})";
+                    }, targetConditions, canPickTarget.Not()));   
+                }
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
@@ -1458,6 +1481,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         for (var i = 0; i < originalAction.ParametersCount; ++i)
                             originalAction.GetParameter(i).Value = obj.GetParameter(i).Value;
+
+                        if (editorFeatures.SupportsTargetCondition)
+                        {
+                            originalAction.Source.Conditions = obj.Source.Conditions;
+                            originalAction.Target.Conditions = obj.Target.Conditions;
+                        }
 
                         originalAction.Comment = obj.Comment;
                     }

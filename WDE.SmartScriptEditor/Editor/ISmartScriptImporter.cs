@@ -6,6 +6,6 @@ namespace WDE.SmartScriptEditor.Editor
 {
     public interface ISmartScriptImporter
     {
-        void Import(SmartScript script, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions);
+        void Import(SmartScript script, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine> targetConditions);
     }
 }

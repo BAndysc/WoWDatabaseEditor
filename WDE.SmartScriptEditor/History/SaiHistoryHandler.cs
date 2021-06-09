@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Utils;
 using WDE.MVVM;
@@ -162,10 +164,15 @@ namespace WDE.SmartScriptEditor.History
             smartAction.OnIdChanged += SmartActionOnOnIdChanged;
             smartAction.Source.OnIdChanged += SmartSourceOnOnIdChanged;
             smartAction.Target.OnIdChanged += SmartTargetOnOnIdChanged;
+
+            smartAction.Source.OnConditionsChanged += SmartSourceOnConditionsChanged;
+            smartAction.Target.OnConditionsChanged += SmartSourceOnConditionsChanged;
         }
-        
+
         private void UnbindAction(SmartAction smartAction)
         {
+            smartAction.Source.OnConditionsChanged -= SmartSourceOnConditionsChanged;
+            smartAction.Target.OnConditionsChanged -= SmartSourceOnConditionsChanged;
             smartAction.Target.OnIdChanged -= SmartTargetOnOnIdChanged;
             smartAction.Source.OnIdChanged -= SmartSourceOnOnIdChanged;
             smartAction.OnIdChanged -= SmartActionOnOnIdChanged;
@@ -276,6 +283,11 @@ namespace WDE.SmartScriptEditor.History
             PushAction(new SmartIdChangedAction<SmartCondition>((SmartCondition)condition, old, @new, (a, id) => smartFactory.UpdateCondition(a, id)));
         }   
         
+        private void SmartSourceOnConditionsChanged(SmartSource source, IList<ICondition>? old, IList<ICondition>? nnew)
+        {
+            PushAction(new SourceTargetConditionsChanged(source, old, nnew));
+        }
+
         private void SmartTargetOnOnIdChanged(SmartBaseElement target, int old, int @new)
         {
             PushAction(new SmartIdChangedAction<SmartTarget>((SmartTarget)target, old, @new, (a, id) => smartFactory.UpdateTarget(a, id)));
@@ -506,6 +518,37 @@ namespace WDE.SmartScriptEditor.History
         }
     }
 
+    public class SourceTargetConditionsChanged : IHistoryAction
+    {
+        private readonly SmartSource source;
+        private readonly IList<ICondition>? old;
+        private readonly IList<ICondition>? newConds;
+        private readonly string readable;
+
+        public SourceTargetConditionsChanged(SmartSource source, IList<ICondition>? old, IList<ICondition>? newConds)
+        {
+            this.source = source;
+            this.old = old;
+            this.newConds = newConds;
+            this.readable = source.Readable.RemoveTags();
+        }
+
+        public string GetDescription()
+        {
+            return "Modified conditions of " + readable;
+        }
+
+        public void Redo()
+        {
+            source.Conditions = newConds;
+        }
+
+        public void Undo()
+        {
+            source.Conditions = old;
+        }
+    }
+    
     public class ActionAddedAction : IHistoryAction
     {
         private readonly int index;
@@ -537,8 +580,7 @@ namespace WDE.SmartScriptEditor.History
             parent.Actions.Remove(smartAction);
         }
     }
-
-
+    
     public class ActionRemovedAction : IHistoryAction
     {
         private readonly int index;

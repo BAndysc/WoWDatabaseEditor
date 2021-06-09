@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Module.Attributes;
@@ -38,5 +39,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
                 IDatabaseProvider.ConditionKeyMask.SourceEntry | IDatabaseProvider.ConditionKeyMask.SourceId,
                 new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript, null, entryOrGuid, (int)type));
         }
+        
+        public IEnumerable<IConditionLine> GetConditionsForSourceTarget(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<IConditionLine>();
     }
 }

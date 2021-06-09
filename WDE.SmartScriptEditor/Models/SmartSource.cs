@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 
@@ -11,6 +14,8 @@ namespace WDE.SmartScriptEditor.Models
     {
         public static readonly int SmartSourceParametersCount = 3;
 
+        public event Action<SmartSource, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
+        
         protected SmartAction? parent;
         
         private ParameterValueHolder<long> condition;
@@ -31,7 +36,20 @@ namespace WDE.SmartScriptEditor.Models
             get => parent?.LineId ?? -1;
             set { }
         }
-        
+
+        private IList<ICondition>? conditions;
+        public IList<ICondition>? Conditions
+        {
+            get => conditions;
+            set
+            {
+                var old = conditions;
+                conditions = value;
+                OnConditionsChanged?.Invoke(this, old, value);
+                parent?.InvalidateReadable();
+            }
+        }
+
         public ParameterValueHolder<long> Condition => condition;
 
         public override string Readable
@@ -55,7 +73,9 @@ namespace WDE.SmartScriptEditor.Models
                             o = 0.ToString(),
                             invoker = GetInvokerNameWithContext()
                         });
-                    return output;
+                    if ((Conditions?.Count ?? 0) == 0)
+                        return output;
+                    return $"{output} (+)";
                 }
                 catch (ParsingErrors e)
                 {
@@ -98,6 +118,8 @@ namespace WDE.SmartScriptEditor.Models
             {
                 se.GetParameter(i).Copy(GetParameter(i));
             }
+
+            se.Conditions = Conditions?.ToList();
             return se;
         }
     }

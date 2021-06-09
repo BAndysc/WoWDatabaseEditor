@@ -45,7 +45,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
             SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService());
             var lines = database.Value.GetScriptFor(item.Entry, item.SmartType).ToList();
             var conditions = database.Value.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, item.Entry, (int)item.SmartType).ToList();
-            importer.Value.Import(script, lines, conditions);
+            importer.Value.Import(script, lines, conditions, null);
             return exporter.Value.GenerateSql(script);
         }
 

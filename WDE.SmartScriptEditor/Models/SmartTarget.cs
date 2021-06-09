@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
@@ -72,7 +73,9 @@ namespace WDE.SmartScriptEditor.Models
                             o = O.ToString(CultureInfo.InvariantCulture),
                             invoker = GetInvokerNameWithContext()
                         });
-                    return output;
+                    if ((Conditions?.Count ?? 0) == 0)
+                        return output;
+                    return $"{output} (+)";
                 }
                 catch (ParsingErrors e)
                 {
@@ -125,6 +128,8 @@ namespace WDE.SmartScriptEditor.Models
             
             for (var i = 0; i < Position.Length; ++i)
                 se.Position[i].Copy(Position[i]);
+            
+            se.Conditions = Conditions?.ToList();
             
             return se;
         }
