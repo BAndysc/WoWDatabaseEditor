@@ -38,6 +38,8 @@ namespace WDE.Common.Database
         Task<IList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ConditionKey manualKey);
         
         IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId);
+
+        IBroadcastText? GetBroadcastTextByText(string text);
         
         [Flags]
         public enum ConditionKeyMask

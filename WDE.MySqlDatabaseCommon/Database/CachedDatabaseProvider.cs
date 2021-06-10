@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KTrie;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Tasks;
@@ -25,6 +26,8 @@ namespace WDE.MySqlDatabaseCommon.Database
         private List<IGossipMenu>? gossipMenusCache;
         private List<INpcText>? npcTextsCache;
         private List<ICreatureClassLevelStat>? creatureClassLevelStatsCache;
+
+        private StringTrie<IBroadcastText>? broadcastTextsCache;
         
         private IAsyncDatabaseProvider nonCachedDatabase;
         private readonly ITaskRunner taskRunner;
@@ -140,6 +143,15 @@ namespace WDE.MySqlDatabaseCommon.Database
             return nonCachedDatabase.GetSpellScriptNames(spellId);
         }
 
+        public IBroadcastText? GetBroadcastTextByText(string text)
+        {
+            if (broadcastTextsCache == null)
+                return nonCachedDatabase.GetBroadcastTextByText(text);
+            if (broadcastTextsCache.TryGetValue(text, out var val))
+                return val;
+            return null;
+        }
+
         private class DatabaseCacheTask : IAsyncTask
         {
             private readonly CachedDatabaseProvider cache;
@@ -155,7 +167,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             {
                 try
                 {
-                    int steps = 9;
+                    int steps = 10;
 
                     progress.Report(0, steps, "Loading creatures");
                     cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
@@ -184,6 +196,18 @@ namespace WDE.MySqlDatabaseCommon.Database
                     progress.Report(8, steps, "Loading creature class level stats");
                     cache.creatureClassLevelStatsCache =
                         await cache.nonCachedDatabase.GetCreatureClassLevelStatsAsync();
+                    
+                    progress.Report(9, steps, "Loading broadcast texts");
+                    var broadcastTexts = await cache.nonCachedDatabase.GetBroadcastTextsAsync();
+                    var cachedTrie = new StringTrie<IBroadcastText>();
+                    foreach (var text in broadcastTexts)
+                    {
+                        if (text.Text != null)
+                            cachedTrie[text.Text] = text;
+                        if (text.Text1 != null)
+                            cachedTrie[text.Text1] = text;
+                    }
+                    cache.broadcastTextsCache = cachedTrie;
                     
                     Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
                     Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();

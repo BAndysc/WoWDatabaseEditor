@@ -44,5 +44,7 @@ namespace WDE.MySqlDatabaseCommon.Database
         public Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey manualKey) => Task.FromResult<IList<IConditionLine>>(System.Array.Empty<IConditionLine>());
         
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => Enumerable.Empty<ISpellScriptName>();
+        
+        public IBroadcastText? GetBroadcastTextByText(string text) => null;
     }
 }

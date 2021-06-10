@@ -17,7 +17,7 @@ namespace WDE.Trinity
         public IConditionFeatures ConditionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
 
-        public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat)};
+        public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat), typeof(IBroadcastText)};
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {
             SmartScriptType.Creature,

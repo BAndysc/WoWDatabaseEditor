@@ -24,5 +24,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlGossipMenuLine> GossipMenus => GetTable<MySqlGossipMenuLine>();
         public ITable<MySqlNpcText> NpcTexts => GetTable<MySqlNpcText>();
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
+        public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
     }
 }

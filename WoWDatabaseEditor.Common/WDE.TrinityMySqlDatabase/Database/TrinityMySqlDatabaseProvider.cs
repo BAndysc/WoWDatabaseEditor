@@ -345,6 +345,24 @@ namespace WDE.TrinityMySqlDatabase.Database
             using var model = new TrinityDatabase();
             return model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToList();
         }
+        
+        public async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
+                return await Task.FromResult(new List<IBroadcastText>());
+            
+            await using var model = new TrinityDatabase();
+            return await (from t in model.BroadcastTexts select t).ToListAsync<IBroadcastText>();
+        }
+        
+        public IBroadcastText? GetBroadcastTextByText(string text)
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
+                return null;
+            
+            using var model = new TrinityDatabase();
+            return (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefault();
+        }
     }
 
     public class ConnectionStringSettings : IConnectionStringSettings
