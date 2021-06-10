@@ -18,6 +18,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Expressions;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
@@ -67,9 +68,11 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, ITeachingTipService teachingTipService,
             ICreatureStatCalculatorService creatureStatCalculatorService,
+            ITableDefinitionProvider tableDefinitionProvider,
             ISolutionItemIconRegistry iconRegistry) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
-            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, iconRegistry)
+            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, 
+            tableDefinitionProvider, iconRegistry)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;
@@ -79,7 +82,6 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             this.queryGenerator = queryGenerator;
             this.teachingTipService = teachingTipService;
             this.creatureStatCalculatorService = creatureStatCalculatorService;
-            tableDefinition = null!;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
 

@@ -68,10 +68,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
+            ITableDefinitionProvider tableDefinitionProvider,
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
-            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, iconRegistry)
+            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
+            tableDefinitionProvider, iconRegistry)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
@@ -89,21 +91,21 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             DuplicateCommand = new DelegateCommand<DatabaseCellViewModel?>(Duplicate, vm => vm != null);
             EditConditionsCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(EditConditions);
-            AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRow);
+            AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRowByGroup);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
             
             ScheduleLoading();
         }
 
-        private void AddRow(DatabaseEntitiesGroupViewModel group)
+        public DatabaseEntity AddRow(uint key)
         {
-            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, group.Key);
+            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
             if (autoIncrementColumn != null)
             {
                 long max = 0;
                 
-                if (byEntryGroups[group.Key].Count > 0)
-                    max = 1 + byEntryGroups[group.Key].Max(t =>
+                if (byEntryGroups[key].Count > 0)
+                    max = 1 + byEntryGroups[key].Max(t =>
                     {
                         if (t.Entity.GetCell(autoIncrementColumn.DbColumnName) is DatabaseField<long> lField)
                             return lField.Current.Value;
@@ -114,6 +116,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     lField.Current.Value = max;
             }
             ForceInsertEntity(freshEntity, Entities.Count);
+            return freshEntity;
+        }
+        
+        private void AddRowByGroup(DatabaseEntitiesGroupViewModel group)
+        {
+            AddRow(group.Key);
         }
 
         private async Task AddNewEntity()

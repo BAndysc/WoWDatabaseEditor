@@ -18,6 +18,7 @@ using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Loaders;
@@ -50,6 +51,7 @@ namespace WDE.DatabaseEditors.ViewModels
             IMessageBoxService messageBoxService,
             ITaskRunner taskRunner,
             IParameterFactory parameterFactory,
+            ITableDefinitionProvider tableDefinitionProvider,
             ISolutionItemIconRegistry iconRegistry)
         {
             this.solutionItemName = solutionItemName;
@@ -76,6 +78,9 @@ namespace WDE.DatabaseEditors.ViewModels
                 redoCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged(nameof(IsModified));
             };
+            
+            tableDefinition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId)!;
+            nameGeneratorParameter = parameterFactory.Factory(tableDefinition.Picker);
             
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(ExecuteSql));
@@ -131,8 +136,6 @@ namespace WDE.DatabaseEditors.ViewModels
             solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
             
             Entities.Clear();
-            tableDefinition = data.TableDefinition;
-            nameGeneratorParameter = parameterFactory.Factory(tableDefinition.Picker);
             await InternalLoadData(data);
             IsLoading = false;
         }

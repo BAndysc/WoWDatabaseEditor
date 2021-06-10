@@ -132,7 +132,7 @@
                             <StackPanel>
                                 <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}">
                                     <controls1:GroupingHeader.CustomContent>
-                                        <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRow, Mode=OneTime}" CommandParameter="{Binding ., Mode=OneTime}">+</Button>
+                                        <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{Binding ., Mode=OneTime}">+</Button>
                                     </controls1:GroupingHeader.CustomContent>
                                 </controls1:GroupingHeader>
                                 <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}" MinHeight="20" ItemTemplate="{StaticResource RowTemplate}" />
