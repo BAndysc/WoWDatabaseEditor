@@ -71,7 +71,7 @@ namespace WDE.Parameters
         }
     }
 
-    public abstract class LazyLoadParameter : Parameter
+    public abstract class LazyLoadParameter : ParameterNumbered
     {
         public override bool HasItems
         {

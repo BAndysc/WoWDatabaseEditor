@@ -280,7 +280,7 @@ namespace WDE.DbcStore
         }
     }
 
-    public class DbcParameter : Parameter
+    public class DbcParameter : ParameterNumbered
     {
         public DbcParameter(Dictionary<long, string> storage)
         {

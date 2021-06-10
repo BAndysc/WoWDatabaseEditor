@@ -8,11 +8,21 @@ namespace WDE.Common.Parameters
         public override string ToString(long key)
         {
             if (Items != null && Items.TryGetValue(key, out var option))
-                return option.Name + " (" + key + ")";
+                return option.Name;// + " (" + key + ")";
             return key.ToString();
         }
 
         public static Parameter Instance { get; } = new Parameter();
+    }
+    
+    public class ParameterNumbered : GenericBaseParameter<long>
+    {
+        public override string ToString(long key)
+        {
+            if (Items != null && Items.TryGetValue(key, out var option))
+                return option.Name + " (" + key + ")";
+            return key.ToString();
+        }
     }
     
     public class FloatIntParameter : Parameter
