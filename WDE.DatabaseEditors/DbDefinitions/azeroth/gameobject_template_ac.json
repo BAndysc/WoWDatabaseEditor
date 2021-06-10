@@ -9,6 +9,7 @@
   "single_solution_name": "Gameobject {name} template",
   "multi_solution_name": "Multiple gameobjects template",
   "picker": "GameobjectParameter",
+  "icon_path": "Icons/document_gameobject_template.png",
   "group_name": "Templates",
   "primary_key": [
     "entry"

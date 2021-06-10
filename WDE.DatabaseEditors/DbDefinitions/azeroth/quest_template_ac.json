@@ -9,6 +9,7 @@
   "single_solution_name": "Quest {name} template",
   "multi_solution_name": "Multiple quests template",
   "reload_command": "reload quest_template",
+  "icon_path": "Icons/document_quest_template.png",
   "picker": "QuestParameter",
   "group_name": "Templates",
   "primary_key": [

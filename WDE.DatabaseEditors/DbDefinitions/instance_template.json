@@ -8,6 +8,7 @@
   "table_name_source_field": "script",
   "single_solution_name": "Instance {name} template",
   "multi_solution_name": "Multiple instances template",
+  "icon_path": "Icons/document_instance_template.png",
   "picker": "MapParameter",
   "group_name": "Templates",
   "primary_key": [

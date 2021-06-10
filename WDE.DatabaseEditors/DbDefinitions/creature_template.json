@@ -9,6 +9,7 @@
   "single_solution_name": "Creature {name} template",
   "multi_solution_name": "Multiple creatures template",
   "reload_command": "reload creature_template",
+  "icon_path": "Icons/document_creature_template.png",
   "picker": "CreatureParameter",
   "group_name": "Templates",
   "primary_key": [
