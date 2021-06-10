@@ -116,6 +116,16 @@ namespace AvaloniaStyles.Controls
             }
         }
 
+        public void ScrollIntoView(object e)
+        {
+            listBox?.ScrollIntoView(e);
+        }
+
+        public void ScrollIntoView(int index)
+        {
+            listBox?.ScrollIntoView(index);
+        }
+
         static GridView()
         {
             ColumnsProperty.Changed.AddClassHandler<GridView>(OnColumnsModified);

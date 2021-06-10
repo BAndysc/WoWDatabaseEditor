@@ -18,11 +18,13 @@
                                 </Grid>
                             </controls:GridViewHeader>
                             
+                            <!-- AutoScrollToSelectedItem=false on purpose, because of some weird Avalonia bug -->
                             <ListBox Items="{TemplateBinding Items}" 
                                      SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}"
                                      ItemTemplate="{TemplateBinding ItemTemplate}"
                                      BorderThickness="0"
                                      Name="PART_listbox"
+                                     AutoScrollToSelectedItem="False"
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                             </ListBox>
