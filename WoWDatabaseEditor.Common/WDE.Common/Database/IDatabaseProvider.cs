@@ -39,6 +39,9 @@ namespace WDE.Common.Database
         
         IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId);
 
+        IEnumerable<ISmartScriptProjectItem> GetProjectItems();
+        IEnumerable<ISmartScriptProject> GetProjects();
+
         IBroadcastText? GetBroadcastTextByText(string text);
         
         [Flags]

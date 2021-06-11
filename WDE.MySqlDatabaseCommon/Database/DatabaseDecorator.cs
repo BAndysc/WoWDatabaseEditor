@@ -43,6 +43,10 @@ namespace WDE.MySqlDatabaseCommon.Database
             impl.GetConditionsForAsync(keyMask, key);
 
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => impl.GetSpellScriptNames(spellId);
+
+        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => impl.GetProjectItems();
+        
+        public IEnumerable<ISmartScriptProject> GetProjects() => impl.GetProjects();
         
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
     }

@@ -45,6 +45,10 @@ namespace WDE.MySqlDatabaseCommon.Database
         
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => Enumerable.Empty<ISpellScriptName>();
         
+        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
+        
+        public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
+        
         public IBroadcastText? GetBroadcastTextByText(string text) => null;
     }
 }

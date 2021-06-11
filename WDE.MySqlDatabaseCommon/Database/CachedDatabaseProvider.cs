@@ -143,6 +143,10 @@ namespace WDE.MySqlDatabaseCommon.Database
             return nonCachedDatabase.GetSpellScriptNames(spellId);
         }
 
+        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => nonCachedDatabase.GetProjectItems();
+        
+        public IEnumerable<ISmartScriptProject> GetProjects() => nonCachedDatabase.GetProjects();
+
         public IBroadcastText? GetBroadcastTextByText(string text)
         {
             if (broadcastTextsCache == null)
@@ -200,13 +204,16 @@ namespace WDE.MySqlDatabaseCommon.Database
                     progress.Report(9, steps, "Loading broadcast texts");
                     var broadcastTexts = await cache.nonCachedDatabase.GetBroadcastTextsAsync();
                     var cachedTrie = new StringTrie<IBroadcastText>();
-                    foreach (var text in broadcastTexts)
+                    await Task.Run(() =>
                     {
-                        if (text.Text != null)
-                            cachedTrie[text.Text] = text;
-                        if (text.Text1 != null)
-                            cachedTrie[text.Text1] = text;
-                    }
+                        foreach (var text in broadcastTexts)
+                        {
+                            if (text.Text != null)
+                                cachedTrie[text.Text] = text;
+                            if (text.Text1 != null)
+                                cachedTrie[text.Text1] = text;
+                        }
+                    }).ConfigureAwait(true);
                     cache.broadcastTextsCache = cachedTrie;
                     
                     Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
