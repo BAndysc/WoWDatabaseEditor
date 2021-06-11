@@ -1191,7 +1191,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
             ev.Parent = e;
-            if (await EditActionCommand(ev))
+            bool allNotUsed = !ev.GetParameter(0).IsUsed && 
+                              !source.GetParameter(0).IsUsed &&
+                              !target.GetParameter(0).IsUsed;
+            if (allNotUsed || await EditActionCommand(ev))
                 e.Actions.Add(ev);
         }
 
@@ -1337,7 +1340,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 SmartEvent ev = smartFactory.EventFactory(id.Value);
                 ev.Parent = script;
-                if (await EditEventCommand(ev))
+                if (!ev.GetParameter(0).IsUsed || await EditEventCommand(ev))
                     script.Events.Add(ev);
             }
         }

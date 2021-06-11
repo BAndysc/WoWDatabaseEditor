@@ -15,8 +15,4 @@
         <KeyBinding Gesture="Escape" Command="{Binding Cancel}" />
         <KeyBinding Gesture="Enter" Command="{Binding Accept}" />
     </controls:ExtendedWindow.KeyBindings>
-    <controls:ExtendedWindow.ToolBar>
-        <controls:ToolBar Content="{Binding #ThisWindow.Content.ToolBar, FallbackValue={x:Null}}" >
-        </controls:ToolBar>
-    </controls:ExtendedWindow.ToolBar>
 </controls:ExtendedWindow>

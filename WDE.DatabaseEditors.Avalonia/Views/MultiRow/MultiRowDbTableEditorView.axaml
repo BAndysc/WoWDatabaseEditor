@@ -122,7 +122,7 @@
                 Add new key
             </Button>
         </StackPanel>
-        <ScrollViewer>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto">
             <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
                 <Border Classes="header" DockPanel.Dock="Top">
                     <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{Binding Columns, Mode=OneTime}" />

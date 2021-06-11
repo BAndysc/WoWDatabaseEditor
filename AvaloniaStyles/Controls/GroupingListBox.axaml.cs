@@ -138,6 +138,25 @@ namespace AvaloniaStyles.Controls
             parentItems = e.NameScope.Find<ItemsControl>("PART_ParentItems");
         }
 
+        public void FocusElement(int parentIndex, int innerIndex)
+        {
+            if (parentItems == null)
+                return;
+
+            if (parentIndex < 0 || parentIndex >= parentItems.ItemCount)
+                return;
+
+            var listBox = GetListBoxFromItemsControl(parentItems, parentIndex);
+            if (listBox == null)
+                return;
+
+            if (innerIndex < 0 || innerIndex >= listBox.ItemCount)
+                return;
+            
+            listBox.SelectedIndex = innerIndex;
+            (listBox.ItemContainerGenerator.ContainerFromIndex(listBox.SelectedIndex)).Focus();
+        }
+
         #region KEYBOARD_NAVIGATION
         private void OnPreviewKeyDown(object? sender, KeyEventArgs e)
         {
@@ -173,7 +192,12 @@ namespace AvaloniaStyles.Controls
             var nextParentIndex = currentParentIndex + dir;
             if (nextParentIndex < 0 || nextParentIndex > parent.ItemCount - 1)
                 return null;
-            var x = parent.ItemContainerGenerator.ContainerFromIndex(nextParentIndex);
+            return GetListBoxFromItemsControl(parent, nextParentIndex);
+        }
+
+        private ListBox? GetListBoxFromItemsControl(ItemsControl parent, int index)
+        {
+            var x = parent.ItemContainerGenerator.ContainerFromIndex(index);
             if (x == null || x.LogicalChildren.Count == 0 || x.LogicalChildren[0].LogicalChildren.Count < 2)
                 return null;
             return (ListBox) x.LogicalChildren[0].LogicalChildren[1];

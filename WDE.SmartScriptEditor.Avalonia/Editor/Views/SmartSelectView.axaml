@@ -68,13 +68,15 @@
                                    AcceptsReturn="False"
                                    Watermark="Search"
                                    Text="{Binding SearchBox}"
+                                   KeyDown="InputElement_OnKeyDown"
                                    HorizontalAlignment="Right"
                                    VerticalContentAlignment="Center"
                                    utils:FocusUtils.FocusFirst="True" />
             <TextBlock Text="{Binding SelectedItem.Help}" TextWrapping="WrapWithOverflow" />
         </DockPanel>
         
-        <controls1:GroupingListBox Items="{Binding FilteredItems}"
+        <controls1:GroupingListBox Items="{Binding FilteredItems, Mode=OneTime}"
+                                   Name="GroupingListBox"
                                    Grid.Row="1" Grid.ColumnSpan="2"  
                                    SelectedItem="{Binding SelectedItem}"
                                    Margin="0,6,0,6">
@@ -88,14 +90,14 @@
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Image Margin="0,0,4,0" Width="16" Height="16" Stretch="Fill" Source="{StaticResource cogIcon}">
                             <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding IsTimed}" Value="True">
+                                <DataTriggerBehavior Binding="{Binding IsTimed, Mode=OneTime}" Value="True">
                                     <ChangePropertyAction PropertyName="Source" Value="{StaticResource timedIcon}"></ChangePropertyAction>
                                 </DataTriggerBehavior>
                             </Interaction.Behaviors>
                         </Image>
-                        <TextBlock Text="{Binding Name}" Width="140" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name, Mode=OneTime}" Width="140" VerticalAlignment="Center">
                             <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding Deprecated}" Value="True">
+                                <DataTriggerBehavior Binding="{Binding Deprecated, Mode=OneTime}" Value="True">
                                     <ChangePropertyAction PropertyName="Foreground" Value="Gray" />
                                 </DataTriggerBehavior>
                             </Interaction.Behaviors>
