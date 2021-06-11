@@ -35,6 +35,21 @@ namespace WDE.Common.Utils
             return "\"" +  str.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n") + "\"";
         }
 
+        public static string ToEnumName(this string str)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var c in str)
+            {
+                if (char.IsLetter(c) || char.IsDigit(c))
+                    sb.Append(char.ToUpperInvariant(c));
+                else if (c == ' ')
+                    sb.Append('_');
+            }
+
+            return sb.ToString();
+        }
+
         private enum State
         {
             Text,

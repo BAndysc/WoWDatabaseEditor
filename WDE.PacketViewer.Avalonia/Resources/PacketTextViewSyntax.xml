@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="Packet" extensions=".cs" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    <Color name="PacketName" foreground="SaddleBrown" exampleText="int Prop { get; set; }"/>
+    <Color name="Key" foreground="MidnightBlue" fontWeight="bold" exampleText="o.ToString();"/>
+    <Color name="Keyword" foreground="Blue" exampleText="string text = &quot;Hello, World!&quot;"/>
+
+    <!-- This is the main ruleset. -->
+    <RuleSet>
+        <Rule color="PacketName">
+            SMSG_[A-Z_]+
+        </Rule>
+
+        <Rule color="PacketName">
+            CMSG_[A-Z_]+
+        </Rule>
+        
+        <Rule color="Keyword">
+            ClientToServer
+        </Rule>
+        <Rule color="Keyword">
+            ServerToClient
+        </Rule>
+        
+        <Rule color="Key">
+            [a-zA-Z]+:
+        </Rule>
+        <Rule color="Key">
+            ^[^:]+:
+        </Rule>
+    </RuleSet>
+</SyntaxDefinition>

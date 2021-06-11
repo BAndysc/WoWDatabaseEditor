@@ -9,6 +9,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
     <StyleInclude Source="avares://AvaloniaStyles/Controls/GroupingListBox.axaml" />
     <StyleInclude Source="avares://AvaloniaStyles/Controls/WizardPanel.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/DropDownButton.axaml" />
     
     <Style Selector="TextBlock">
         <Setter Property="FontSize" Value="13" />
