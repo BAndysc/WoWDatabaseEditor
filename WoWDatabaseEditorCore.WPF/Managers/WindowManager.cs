@@ -38,5 +38,19 @@ namespace WoWDatabaseEditorCore.WPF.Managers
                 return Task.FromResult<string?>(dialog.SelectedPath);
             return Task.FromResult<string?>(null);
         }
+        
+        public Task<string?> ShowOpenFileDialog(string filter, string? defaultDirectory = null)
+        {
+            VistaOpenFileDialog dialog = new();
+            if (!string.IsNullOrEmpty(defaultDirectory))
+                dialog.InitialDirectory = defaultDirectory;
+            dialog.Multiselect = false;
+            dialog.Filter = filter;
+
+            bool? result = dialog.ShowDialog();
+            if (result.HasValue && result.Value)
+                return Task.FromResult<string?>(dialog.FileName);
+            return Task.FromResult<string?>(null);
+        }
     }
 }

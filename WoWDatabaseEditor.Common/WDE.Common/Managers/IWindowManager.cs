@@ -9,5 +9,7 @@ namespace WDE.Common.Managers
         Task<bool> ShowDialog(IDialog viewModel);
 
         Task<string?> ShowFolderPickerDialog(string defaultDirectory);
+        
+        Task<string?> ShowOpenFileDialog(string filter, string? defaultDirectory = null);
     }
 }
