@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using WDE.Common.Database;
+using WDE.Common.Parameters;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Expressions.Antlr
@@ -9,10 +11,16 @@ namespace WDE.DatabaseEditors.Expressions.Antlr
     {
         private DatabaseEntity? entity;
         private readonly ICreatureStatCalculatorService statCalculatorService;
+        private readonly IParameterFactory parameterFactory;
+        private readonly DatabaseTableDefinitionJson definition;
 
-        public ExpressionVisitor(ICreatureStatCalculatorService statCalculatorService)
+        public ExpressionVisitor(ICreatureStatCalculatorService statCalculatorService,
+            IParameterFactory parameterFactory,
+            DatabaseTableDefinitionJson definition)
         {
             this.statCalculatorService = statCalculatorService;
+            this.parameterFactory = parameterFactory;
+            this.definition = definition;
         }
 
         public void SetContext(DatabaseEntity entity)
@@ -104,6 +112,25 @@ namespace WDE.DatabaseEditors.Expressions.Antlr
             if (!long.TryParse(context.INT().GetText(), out var asLong))
                 throw new Exception();
             return asLong;
+        }
+
+        public override object VisitEFieldStringValue(DatabaseEditorExpressionParser.EFieldStringValueContext context)
+        {
+            var name = context.ID().GetText();
+            if (name == null || !definition.TableColumns.TryGetValue(name, out var column))
+                return "(unknown)";
+            
+            var cell = entity?.GetCell(name);
+            if (cell is DatabaseField<long> lField)
+                return parameterFactory.Factory(column.ValueType).ToString(lField.Current.Value, new ToStringOptions(){WithNumber = false});
+            
+            if (cell is DatabaseField<float> fField)
+                return fField.Current.ToString();
+
+            if (cell is DatabaseField<string> sField)
+                return parameterFactory.FactoryString(column.ValueType).ToString(sField.Current.Value ?? "", new ToStringOptions(){WithNumber = false});
+            
+            return "";
         }
 
         public override object VisitEFieldValue(DatabaseEditorExpressionParser.EFieldValueContext context)

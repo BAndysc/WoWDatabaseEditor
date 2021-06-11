@@ -17,6 +17,16 @@ namespace WDE.Common.Parameters
     
     public class ParameterNumbered : GenericBaseParameter<long>
     {
+        public override string ToString(long key, ToStringOptions options)
+        {
+            if (options.WithNumber)
+                return ToString(key);
+
+            if (Items != null && Items.TryGetValue(key, out var option))
+                return option.Name;
+            return key.ToString();
+        }
+        
         public override string ToString(long key)
         {
             if (Items != null && Items.TryGetValue(key, out var option))

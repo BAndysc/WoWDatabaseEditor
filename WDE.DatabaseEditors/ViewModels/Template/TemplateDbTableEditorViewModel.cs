@@ -307,7 +307,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 
                 if (column.IsMetaColumn)
                 {
-                    var evaluator = new DatabaseExpressionEvaluator(creatureStatCalculatorService, column.Expression!);
+                    var evaluator = new DatabaseExpressionEvaluator(creatureStatCalculatorService, parameterFactory, tableDefinition, column.Expression!);
                     var parameterValue = new ParameterValue<string>(new ValueHolder<string>(evaluator.Evaluate(entity)!.ToString(), false),
                         new ValueHolder<string>("", false), StringParameter.Instance);
                     entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();

@@ -88,7 +88,8 @@ namespace WDE.DatabaseEditors.Data
                     IValueHolder valueHolder = null!;
                     if (column.Value.type == typeof(string))
                     {
-                        valueHolder = new ValueHolder<string>(column.Value.value as string ?? null, column.Value.value is DBNull);
+                        string? val = column.Value.value as string ?? null;
+                        valueHolder = new ValueHolder<string>(val, column.Value.value is DBNull);
                     }
                     else if (column.Value.type == typeof(float))
                     {

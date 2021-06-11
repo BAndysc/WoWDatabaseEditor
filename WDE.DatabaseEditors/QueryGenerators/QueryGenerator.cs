@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using WDE.Common.Database;
+using WDE.Common.Parameters;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.Expressions;
+using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
@@ -16,11 +19,18 @@ namespace WDE.DatabaseEditors.QueryGenerators
     public class QueryGenerator : IQueryGenerator
     {       
         private readonly ITableDefinitionProvider tableDefinitionProvider;
+        private readonly ICreatureStatCalculatorService calculatorService;
+        private readonly IParameterFactory parameterFactory;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
-        public QueryGenerator(ITableDefinitionProvider tableDefinitionProvider, IConditionQueryGenerator conditionQueryGenerator)
+        public QueryGenerator(ITableDefinitionProvider tableDefinitionProvider, 
+            ICreatureStatCalculatorService calculatorService,
+            IParameterFactory parameterFactory,
+            IConditionQueryGenerator conditionQueryGenerator)
         {
             this.tableDefinitionProvider = tableDefinitionProvider;
+            this.calculatorService = calculatorService;
+            this.parameterFactory = parameterFactory;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
@@ -67,7 +77,18 @@ namespace WDE.DatabaseEditors.QueryGenerators
             foreach (var entity in tableData.Entities)
             {
                 bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new EntityKey(entity, tableData.TableDefinition));
-                var cells = columns.Select(c => entity.GetCell(c.DbColumnName)!.ToQueryString());
+                var cells = columns.Select(c =>
+                {
+                    var cell = entity.GetCell(c.DbColumnName)!;
+                    if (c.AutogenerateComment != null && cell is DatabaseField<string> sField)
+                    {
+                        var evaluator = new DatabaseExpressionEvaluator(calculatorService, parameterFactory, tableData.TableDefinition, c.AutogenerateComment!);
+                        var comment = evaluator.Evaluate(entity);
+                        if (comment is string s)
+                            return s.AddComment(sField.Current.Value).ToSqlEscapeString();
+                    }
+                    return cell.ToQueryString();
+                });
                 var cellStrings = string.Join(", ", cells);
                 
                 if (duplicate)

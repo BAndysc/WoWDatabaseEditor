@@ -41,7 +41,8 @@
           {
             "name": "Comment",
             "db_column_name": "comment",
-            "value_type": "string"
+            "value_type": "string",
+            "autogenerate_comment": "thisString.spell_trigger + ' - ' + thisString.spell_effect"
           }
         ]
       }

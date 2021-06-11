@@ -92,7 +92,8 @@
           "name": "Comment",
           "db_column_name": "comment",
           "can_be_null": true,
-          "value_type": "string"
+          "value_type": "string",
+          "autogenerate_comment": "thisString.CreatureID"
         }
       ]
     }

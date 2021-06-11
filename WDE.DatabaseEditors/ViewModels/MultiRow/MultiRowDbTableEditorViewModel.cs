@@ -18,6 +18,7 @@ using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
@@ -355,6 +356,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     }
                     else if (cell is DatabaseField<string> stringParam)
                     {
+                        if (column.AutogenerateComment != null)
+                        {
+                            stringParam.Current.Value = stringParam.Current.Value.GetComment(column.CanBeNull);
+                            stringParam.Original.Value = stringParam.Original.Value.GetComment(column.CanBeNull);
+                        }
                         parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
                     }
                     else if (cell is DatabaseField<float> floatParameter)

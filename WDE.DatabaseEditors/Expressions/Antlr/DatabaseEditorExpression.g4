@@ -10,6 +10,7 @@ options {
 expr
     : '!' expr                              # ENegate
     | 'this' '.' ID            # EFieldValue
+    | 'thisString' '.' ID            # EFieldStringValue
     | ID '(' (expr (',' expr)*)? ')' #EFuncAppl
     | expr '<' expr                   # ELessThan
     | expr '<=' expr                  # ELessEquals

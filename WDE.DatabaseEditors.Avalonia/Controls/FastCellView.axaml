@@ -6,13 +6,14 @@
     </Design.PreviewWith>
 
     <Style Selector="controls|FastCellView">
+        <Setter Property="Padding" Value="16,0,0,0" />
         <Setter Property="FontFamily" Value="Consolas,Menlo,Courier,Courier New" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel Background="Transparent" Name="PART_Panel">
                     <TextBlock Name="PART_text"
                                Background="Transparent" 
-                               Padding="16,0,0,0"
+                               Padding="{TemplateBinding Padding}"
                                Text="{TemplateBinding StringValue}" 
                                FontWeight="{TemplateBinding FontWeight}"
                                VerticalAlignment="Center" />

@@ -202,7 +202,8 @@ namespace WDE.MySqlDatabaseCommon.Database
                         await cache.nonCachedDatabase.GetCreatureClassLevelStatsAsync();
                     
                     progress.Report(9, steps, "Loading broadcast texts");
-                    var broadcastTexts = await cache.nonCachedDatabase.GetBroadcastTextsAsync();
+                    // todo: is there any benefit of caching this?
+                    /*var broadcastTexts = await cache.nonCachedDatabase.GetBroadcastTextsAsync();
                     var cachedTrie = new StringTrie<IBroadcastText>();
                     await Task.Run(() =>
                     {
@@ -214,7 +215,7 @@ namespace WDE.MySqlDatabaseCommon.Database
                                 cachedTrie[text.Text1] = text;
                         }
                     }).ConfigureAwait(true);
-                    cache.broadcastTextsCache = cachedTrie;
+                    cache.broadcastTextsCache = cachedTrie;*/
                     
                     Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
                     Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();

@@ -102,6 +102,7 @@
                         ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
                         IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
                         Value="{Binding ParameterValue.Value}"
+                        Padding="2,0,0,0"
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
                         SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
                         RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"

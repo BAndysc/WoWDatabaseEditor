@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.History;
+using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
@@ -82,7 +83,7 @@ namespace WDE.DatabaseEditors.Models
             if (typeof(T) == typeof(string))
             {
                 var value = Current.Value as string;
-                return "\"" +  value!.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+                return value!.ToSqlEscapeString();
             }
 
             throw new Exception("Unexpected value of type " + typeof(T));

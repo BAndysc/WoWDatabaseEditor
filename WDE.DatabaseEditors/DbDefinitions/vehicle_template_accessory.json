@@ -57,7 +57,8 @@
         {
           "name": "Comment",
           "db_column_name": "description",
-          "value_type": "string"
+          "value_type": "string",
+          "autogenerate_comment": "thisString.entry + ' seat ' + str(this.seat_id) + ': ' + thisString.accessory_entry"
         }
       ]
     }

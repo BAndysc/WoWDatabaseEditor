@@ -19,6 +19,7 @@ namespace WDE.Common.Parameters
     {
         public Dictionary<T, SelectOption>? Items { get; set; }
         public abstract string ToString(T value);
+        public virtual string ToString(T value, ToStringOptions options) => ToString(value);
         public virtual bool HasItems => Items != null && Items.Count > 0;
     }
 
