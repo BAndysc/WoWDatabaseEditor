@@ -7,22 +7,12 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
+    <Import Project="..\Avalonia.props" />
     <ItemGroup>
-        <Compile Update="**\*.xaml.cs">
-            <DependentUpon>%(Filename)</DependentUpon>
-        </Compile>
-        <AvaloniaResource Include="**\*.xaml">
-            <SubType>Designer</SubType>
-        </AvaloniaResource>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.0" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
-        <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-    </ItemGroup>
-    <ItemGroup>
+      <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />

@@ -12,68 +12,13 @@
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
     <ItemGroup>
-        <None Remove="Services\MessageBoxService\MessageBoxView.axaml.xml" />
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Update="**\*.xaml.cs">
-            <DependentUpon>%(Filename)</DependentUpon>
-        </Compile>
-        <AvaloniaResource Include="**\*.xaml">
-            <SubType>Designer</SubType>
-        </AvaloniaResource>
-        <Compile Update="ModulesManagement\Configuration\Views\ModulesConfigView.axaml.cs">
-            <DependentUpon>ModulesConfigView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="CoreVersion\Views\CoreVersionConfigView.axaml.cs">
-            <DependentUpon>CoreVersionConfigView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\DialogWindow.axaml.cs">
-            <DependentUpon>DialogWindow.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Services\ConfigurationService\Views\ConfigurationPanelView.axaml.cs">
-            <DependentUpon>ConfigurationPanelView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\StatusBarView.axaml.cs">
-            <DependentUpon>StatusBarView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\TasksPanel.axaml.cs">
-            <DependentUpon>TasksPanel.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Services\NewItemService\NewItemDialogView.axaml.cs">
-            <DependentUpon>NewItemDialogView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Services\CreatureEntrySelectorService\GenericSelectorDialogView.axaml.cs">
-            <DependentUpon>GenericSelectorDialogView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Services\MessageBoxService\MessageBoxView.axaml.cs">
-          <DependentUpon>MessageBoxView.axaml</DependentUpon>
-        </Compile>
-        <None Remove="Icon.png" />
         <AvaloniaResource Include="Icon.png" />
-        <None Remove="IconSmall.png" />
         <AvaloniaResource Include="IconSmall.png" />
-        <Compile Update="Services\AppearanceService\Views\ThemeConfigView.axaml.cs">
-          <DependentUpon>ThemeConfigView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\TextDocumentView.axaml.cs">
-          <DependentUpon>TextDocumentView.axaml</DependentUpon>
-          <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Services\ProblemsTool\ProblemsView.axaml.cs">
-          <DependentUpon>ProblemsView.axaml</DependentUpon>
-          <SubType>Code</SubType>
-        </Compile>
     </ItemGroup>
+    <Import Project="..\Avalonia.props" />
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
-        <PackageReference Include="Prism.Avalonia" Version="7.2.0.1430" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
         <PackageReference Include="Prism.Unity.Avalonia" Version="7.2.0.1430" />
         <PackageReference Include="SmartFormat.NET" Version="2.5.3" />
@@ -83,39 +28,9 @@
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Extensions" />
-    </ItemGroup> 
-    <ItemGroup>
         <ProjectReference Include="..\Dock\src\Dock.Model\Dock.Model.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <UpToDateCheckInput Remove="Styles\Button.xaml" />
-      <UpToDateCheckInput Remove="Styles\CheckBox.xaml" />
-      <UpToDateCheckInput Remove="Styles\ColorsDark.xaml" />
-      <UpToDateCheckInput Remove="Styles\ColorsLight.xaml" />
-      <UpToDateCheckInput Remove="Styles\ComboBox.xaml" />
-      <UpToDateCheckInput Remove="Styles\ComboBoxItem.xaml" />
-      <UpToDateCheckInput Remove="Styles\ContextMenu.xaml" />
-      <UpToDateCheckInput Remove="Styles\GridSplitter.xaml" />
-      <UpToDateCheckInput Remove="Styles\ListBox.xaml" />
-      <UpToDateCheckInput Remove="Styles\ListBoxItem.xaml" />
-      <UpToDateCheckInput Remove="Styles\MacOS.xaml" />
-      <UpToDateCheckInput Remove="Styles\MenuItem.xaml" />
-      <UpToDateCheckInput Remove="Styles\PopupRoot.xaml" />
-      <UpToDateCheckInput Remove="Styles\RadioButton.xaml" />
-      <UpToDateCheckInput Remove="Styles\SideBar.xaml" />
-      <UpToDateCheckInput Remove="Styles\StatusBar.xaml" />
-      <UpToDateCheckInput Remove="Styles\TabStrip.xaml" />
-      <UpToDateCheckInput Remove="Styles\TextBox.xaml" />
-      <UpToDateCheckInput Remove="Styles\ToggleButton.xaml" />
-      <UpToDateCheckInput Remove="Styles\ToolsTabControl.xaml" />
-      <UpToDateCheckInput Remove="Styles\TreeView.xaml" />
-      <UpToDateCheckInput Remove="Styles\TreeViewItem.xaml" />
-      <UpToDateCheckInput Remove="Styles\Window.xaml" />
     </ItemGroup>
     <ItemGroup>
       <Resource Include="Icon.ico" />

@@ -10,27 +10,12 @@
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
+    <Import Project="..\Avalonia.props" />
     <ItemGroup>
-        <Compile Update="**\*.xaml.cs">
-            <DependentUpon>%(Filename)</DependentUpon>
-        </Compile>
-        <AvaloniaResource Include="**\*.xaml">
-            <SubType>Designer</SubType>
-        </AvaloniaResource>
-        <Compile Update="TrinityMySqlDatabase\Tools\DebugQueryToolView.axaml.cs">
-          <DependentUpon>DebugQueryToolView.axaml</DependentUpon>
-        </Compile>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.0" />
-        <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Xaml.Interactions" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.0" />
-        <PackageReference Include="Prism.Avalonia" Version="7.2.0.1430" />
-    </ItemGroup>
-    <ItemGroup>
+        <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
         <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />

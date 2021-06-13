@@ -1,3 +1,6 @@
 [submodule "Dock"]
 	path = Dock
 	url = https://github.com/BAndysc/Dock.git
+[submodule "AvaloniaEdit"]
+	path = AvaloniaEdit
+	url = https://github.com/BAndysc/AvaloniaEdit

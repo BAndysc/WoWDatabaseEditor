@@ -11,16 +11,13 @@
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
+    
+    <Import Project="..\Avalonia.props" />
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
     </ItemGroup>
     <ItemGroup>
-      <AvaloniaResource Include="**\*.xaml" />
       <AvaloniaResource Include="Styles\Assets\Lato\*.ttf" />
     </ItemGroup>
     <ItemGroup>

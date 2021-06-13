@@ -12,11 +12,7 @@
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-        <PackageReference Include="Prism.Avalonia" Version="7.2.0.1430" />
-    </ItemGroup>
+    <Import Project="..\Avalonia.props" />
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
