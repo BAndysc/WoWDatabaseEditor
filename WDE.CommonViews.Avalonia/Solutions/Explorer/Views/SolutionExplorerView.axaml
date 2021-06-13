@@ -37,17 +37,17 @@
     
     <TreeView x:Name="tv" Margin="0" 
               Items="{Binding Root}" 
-              SelectedItem="{Binding SelectedItem, Mode=TwoWay}" 
+              SelectionMode="Multiple"
+              SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+              SelectedItems="{Binding SelectedItems, Mode=TwoWay}"
               PointerReleased="Tv_OnPointerReleased"
               dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{Binding }" dnD:DragAndDrop.IsDragSource="True"
               DoubleTapped="Tv_OnDoubleTapped">
         <TreeView.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="Add"
-                          IsEnabled="{Binding IsContainer}"
                           Command="{Binding #tv.DataContext.AddItem}" />
                 <MenuItem Header="Quick add"
-                          IsEnabled="{Binding IsContainer}"
                           Classes="Parent"
                           Items="{Binding #tv.DataContext.AddItems}">
                     <MenuItem.Styles>

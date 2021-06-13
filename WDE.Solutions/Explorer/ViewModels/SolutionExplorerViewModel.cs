@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Events;
@@ -117,19 +118,27 @@ namespace WDE.Solutions.Explorer.ViewModels
                 ISolutionItem? item = await newItemService.GetNewSolutionItem();
                 if (item != null)
                     DoAddItem(item);
-            });
+            }, () => (SelectedItem == null || SelectedItem.IsContainer) && SelectedItems.Count <= 1)
+                .ObservesProperty(() => SelectedItem)
+                .ObservesProperty(() => SelectedItems.Count);
 
             RemoveItem = new DelegateCommand(() =>
             {
-                if (selected != null)
+                if (SelectedItems.Count > 0)
                 {
-                    if (selected.Parent == null)
-                        this.solutionManager.Items.Remove(selected.Item);
-                    else
-                        selected.Parent.Item.Items?.Remove(selected.Item);
-                    SelectedItem = null;
+                    foreach (var item in SelectedItems.ToList())
+                    {
+                        DeleteSolutionItem(item);
+                    }
+                    SelectedItems.Clear();
                 }
-            });
+                else if (selected != null)
+                {
+                    DeleteSolutionItem(selected);
+                }
+            }, () => SelectedItem != null || SelectedItems.Count > 0)
+                .ObservesProperty(() => SelectedItem)
+                .ObservesProperty(() => SelectedItems.Count);
 
             SelectedItemChangedCommand = new DelegateCommand<SolutionItemViewModel>(ob => { selected = ob; });
 
@@ -160,13 +169,24 @@ namespace WDE.Solutions.Explorer.ViewModels
             }, () => solutionTasksService.CanSaveAndReloadRemotely);
         }
 
+        private void DeleteSolutionItem(SolutionItemViewModel item)
+        {
+            if (item.Parent == null)
+                this.solutionManager.Items.Remove(item.Item);
+            else
+                item.Parent.Item.Items?.Remove(item.Item);
+            
+            if (item == SelectedItem)
+                SelectedItem = null;
+        }
+
         private void DoAddItem(ISolutionItem item)
         {
-            if (selected == null || selected.Parent == null || !selected.Item.IsContainer)
+            if (selected == null)
                 solutionManager.Items.Add(item);
-            else if (selected.Item.Items != null)
+            else if (selected.Item.Items != null && selected.Item.IsContainer)
                 selected.Item.Items.Add(item);
-            else
+            else if (selected.Parent != null)
             {
                 var indexOf = selected.Parent.Item.Items?.IndexOf(selected.Item) ?? -1;
                 if (indexOf != -1)
@@ -274,6 +294,13 @@ namespace WDE.Solutions.Explorer.ViewModels
             set => SetProperty(ref selected, value);
         }
 
+        private ObservableCollection<SolutionItemViewModel> selectedItems = new();
+        public ObservableCollection<SolutionItemViewModel> SelectedItems
+        {
+            get => selectedItems;
+            set => SetProperty(ref selectedItems, value);
+        }
+        
         private void AddItemToRoot(ISolutionItem item, int index = -1)
         {
             if (!itemToViewmodel.TryGetValue(item, out SolutionItemViewModel? viewModel))

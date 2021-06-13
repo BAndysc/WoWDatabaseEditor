@@ -8,6 +8,7 @@
              xmlns:helpers="clr-namespace:WDE.Solutions.Explorer.Helpers"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:attached="clr-namespace:WDE.Common.WPF.Attached;assembly=WDE.Common.WPF"
+             xmlns:components="clr-namespace:WDE.Common.WPF.Components;assembly=WDE.Common.WPF"
              prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
     <UserControl.Resources>
 
@@ -163,8 +164,12 @@
         </Style>
 
     </UserControl.Resources>
-    <TreeView x:Name="tv" ItemsSource="{Binding Root}" dd:DragDrop.IsDragSource="True"
-              dd:DragDrop.IsDropTarget="True" attached:GongDragAndDrop.WdeDropHandler="{Binding}" >
+    <TreeView x:Name="tv"
+              ItemsSource="{Binding Root}"
+              dd:DragDrop.IsDragSource="True"
+              dd:DragDrop.IsDropTarget="True"
+              MouseUp="Tv_OnMouseUp"
+              attached:GongDragAndDrop.WdeDropHandler="{Binding}" >
 
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="SelectedItemChanged">
@@ -220,21 +225,7 @@
         <TreeView.ItemTemplate>
             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                 <StackPanel Orientation="Horizontal">
-                    <Image Width="14" Height="14" Margin="0,0,6,0">
-                        <Image.Style>
-                            <Style TargetType="Image">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsContainer}">
-                                        <DataTrigger.Value>
-                                            <system:Boolean>True</system:Boolean>
-                                        </DataTrigger.Value>
-                                        <Setter Property="Source" Value="{DynamicResource Folder}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                                <Setter Property="Source" Value="{DynamicResource File}" />
-                            </Style>
-                        </Image.Style>
-                    </Image>
+                    <components:WdeImage Width="14" Height="14" Margin="0,0,6,0" Image="{Binding Icon}" />
                     <TextBlock Padding="2" VerticalAlignment="Center" Text="{Binding ExtraId}"
                                FontFamily="Consolas" Background="{DynamicResource ContentSpecialBackground}"
                                Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
