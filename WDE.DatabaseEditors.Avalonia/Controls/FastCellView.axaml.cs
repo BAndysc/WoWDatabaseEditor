@@ -1,14 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
@@ -114,6 +120,28 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             adornerLayer = null;
             opened = false;
         }
+
+        private bool MoveLeft(Key key, KeyModifiers modifiers)
+        {
+            return (key == Key.Tab && (modifiers & KeyModifiers.Shift) != 0) ||
+                   (key == Key.Left && (modifiers & (KeyModifiers.Control | KeyModifiers.Meta)) != 0);
+        }
+
+        private bool MoveRight(Key key, KeyModifiers modifiers)
+        {
+            return (key == Key.Tab && (modifiers & KeyModifiers.Shift) == 0) ||
+                   (key == Key.Right && (modifiers & (KeyModifiers.Control | KeyModifiers.Meta)) != 0);
+        }
+
+        private bool MoveDown(Key key, KeyModifiers modifiers)
+        {
+            return key == Key.Down;
+        }
+        
+        private bool MoveUp(Key key, KeyModifiers modifiers)
+        {
+            return key == Key.Up;
+        }
         
         private void OpenForEditing()
         {
@@ -129,9 +157,67 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             textBox.Classes.Add("GridViewPlainTextBox");
             textBox.DataContext = this;
             textBox.Bind(TextBox.TextProperty, new Binding("Value", BindingMode.OneTime));
-            textBox.Margin = partText?.Margin ?? BorderThickness;
+            textBox.MinWidth = 0;
+            textBox.Margin = new Thickness(partText?.Margin.Left ?? 0,partText?.Margin.Top ?? 0, 0, 0);
+            textBox.Padding = new Thickness(partText?.Padding.Left ?? 0,partText?.Padding.Top ?? 0, 0, 0);
             var disposable1 = textBox.AddDisposableHandler(KeyDownEvent, (sender, args) =>
             {
+                if (MoveLeft(args.Key, args.KeyModifiers) || MoveRight(args.Key, args.KeyModifiers))
+                {
+                    var wrapper = this.GetVisualParent() as IControl;
+                    var itemsPresenter = wrapper?.VisualParent?.VisualParent as ItemsPresenter;
+                    if (wrapper == null || itemsPresenter == null)
+                        return;
+
+                    var index = itemsPresenter.ItemContainerGenerator.IndexFromContainer(wrapper);
+
+                    if (MoveLeft(args.Key, args.KeyModifiers))
+                        index--;
+                    else
+                        index++;
+                    
+                    var next = itemsPresenter.ItemContainerGenerator.ContainerFromIndex(index)?.VisualChildren[0] as FastCellView;
+
+                    if (next == null)
+                        return;
+                    
+                    EndEditing();
+                    next.OpenForEditing();
+                    args.Handled = true;
+                }
+
+                if (MoveUp(args.Key, args.KeyModifiers) || MoveDown(args.Key, args.KeyModifiers))
+                {
+                    var wrapper = this.GetVisualParent() as IControl;
+                    var itemsPresenter = wrapper?.VisualParent?.VisualParent as ItemsPresenter;
+                    var row = itemsPresenter?.GetVisualParent()?.VisualParent as IControl;
+                    var rows = row?.VisualParent?.VisualParent as ItemsPresenter;
+                    if (wrapper == null || itemsPresenter == null || row == null || rows == null)
+                        return;
+                    
+                    var innerIndex = itemsPresenter.ItemContainerGenerator.IndexFromContainer(wrapper);
+                    var rowIndex = rows.ItemContainerGenerator.IndexFromContainer(row);
+
+                    if (MoveDown(args.Key, args.KeyModifiers))
+                        rowIndex++;
+                    else
+                        rowIndex--;
+
+                    var newRow = rows.ItemContainerGenerator.ContainerFromIndex(rowIndex)
+                        ?.VisualChildren[0]?.VisualChildren[0] as ItemsPresenter;
+
+                    if (newRow == null)
+                        return;
+
+                    var newCell = newRow.ItemContainerGenerator.ContainerFromIndex(innerIndex)?.VisualChildren[0] as FastCellView;
+
+                    if (newCell == null)
+                        return;
+                    
+                    this.EndEditing();
+                    newCell.OpenForEditing();
+                    args.Handled = true;
+                }
                 if (args.Key is Key.Return or Key.Enter)
                 {
                     EndEditing();

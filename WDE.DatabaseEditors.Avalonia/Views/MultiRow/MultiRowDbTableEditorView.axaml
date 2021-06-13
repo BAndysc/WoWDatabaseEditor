@@ -81,7 +81,7 @@
             </helpers:FieldValueTemplateSelector.CommandTemplate>
             <helpers:FieldValueTemplateSelector.BoolTemplate>
                 <DataTemplate>
-                    <controls2:FastBoolCellView Height="24" Margin="0,0,10,0"
+                    <controls2:FastBoolCellView Height="24"
                         ToolTip.Tip="{Binding OriginalValueTooltip}"
                         Focusable="False"
                         IsActive="True"
@@ -95,7 +95,7 @@
             </helpers:FieldValueTemplateSelector.BoolTemplate>
             <helpers:FieldValueTemplateSelector.GenericTemplate>
                 <DataTemplate>
-                    <controls2:FastCellView Height="24" Margin="0,0,10,0"
+                    <controls2:FastCellView Height="24"
                         ToolTip.Tip="{Binding OriginalValueTooltip}"
                         Focusable="False"
                         IsActive="True"
