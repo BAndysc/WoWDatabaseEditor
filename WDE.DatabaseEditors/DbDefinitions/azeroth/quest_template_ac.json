@@ -170,7 +170,7 @@
         {
           "name": "Required npc or go 1",
           "db_column_name": "RequiredNpcOrGo1",
-          "value_type": "CreatureParameter"
+          "value_type": "CreatureGameobjectParameter"
         },
         {
           "name": "Required npc or go count 1",
@@ -180,7 +180,7 @@
         {
           "name": "Required npc or go 2",
           "db_column_name": "RequiredNpcOrGo2",
-          "value_type": "CreatureParameter"
+          "value_type": "CreatureGameobjectParameter"
         },
         {
           "name": "Required npc or go count 2",
@@ -190,7 +190,7 @@
         {
           "name": "Required npc or go 3",
           "db_column_name": "RequiredNpcOrGo3",
-          "value_type": "CreatureParameter"
+          "value_type": "CreatureGameobjectParameter"
         },
         {
           "name": "Required npc or go count 3",
@@ -200,7 +200,7 @@
         {
           "name": "Required npc or go 4",
           "db_column_name": "RequiredNpcOrGo4",
-          "value_type": "CreatureParameter"
+          "value_type": "CreatureGameobjectParameter"
         },
         {
           "name": "Required npc or go count 4",
