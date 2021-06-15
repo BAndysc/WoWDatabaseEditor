@@ -1191,10 +1191,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
             ev.Parent = e;
-            bool allNotUsed = !ev.GetParameter(0).IsUsed && 
-                              !source.GetParameter(0).IsUsed &&
-                              !target.GetParameter(0).IsUsed;
-            if (allNotUsed || await EditActionCommand(ev))
+            bool anyUsed = ev.GetParameter(0).IsUsed ||
+                              source.GetParameter(0).IsUsed ||
+                              target.GetParameter(0).IsUsed ||
+                              actionData.CommentField != null;
+            if (!anyUsed || await EditActionCommand(ev))
                 e.Actions.Add(ev);
         }
 
