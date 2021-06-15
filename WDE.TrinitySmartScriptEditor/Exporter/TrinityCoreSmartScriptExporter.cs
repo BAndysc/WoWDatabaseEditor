@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Solution;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.UserControls;
@@ -18,16 +19,19 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ISmartFactory smartFactory;
         private readonly ISmartDataManager smartDataManager;
         private readonly ICurrentCoreVersion currentCoreVersion;
+        private readonly ISolutionItemNameRegistry nameRegistry;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
         public TrinityCoreSmartScriptExporter(ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
             ICurrentCoreVersion currentCoreVersion,
+            ISolutionItemNameRegistry nameRegistry,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
             this.currentCoreVersion = currentCoreVersion;
+            this.nameRegistry = nameRegistry;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
@@ -175,9 +179,9 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
         }
 
-        public string GenerateSql(SmartScript script)
+        public string GenerateSql(ISmartScriptSolutionItem item, SmartScript script)
         {
-            return new ExporterHelper(script, this, currentCoreVersion, conditionQueryGenerator).GetSql();
+            return new ExporterHelper(script, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
         }
     }
 }

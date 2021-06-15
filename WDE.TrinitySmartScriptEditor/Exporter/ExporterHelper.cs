@@ -4,6 +4,7 @@ using System.Text;
 using SmartFormat;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Solution;
 using WDE.Conditions.Exporter;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;
@@ -16,20 +17,26 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
 
         private readonly SmartScript script;
+        private readonly ISmartScriptSolutionItem item;
         private readonly ISmartScriptExporter scriptExporter;
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
+        private readonly ISolutionItemNameRegistry nameProvider;
         private readonly StringBuilder sql = new();
 
         public ExporterHelper(SmartScript script, 
+            ISmartScriptSolutionItem item,
             ISmartScriptExporter scriptExporter,
             ICurrentCoreVersion currentCoreVersion,
+            ISolutionItemNameRegistry nameProvider,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.script = script;
+            this.item = item;
             this.scriptExporter = scriptExporter;
             this.currentCoreVersion = currentCoreVersion;
             this.conditionQueryGenerator = conditionQueryGenerator;
+            this.nameProvider = nameProvider;
         }
 
         public string GetSql()
@@ -40,6 +47,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         private void BuildHeader()
         {
+            sql.AppendLine($" -- {nameProvider.GetName(item)}");
             sql.AppendLine($"SET @ENTRY := {script.EntryOrGuid};");
             BuildDelete();
             BuildUpdate();
@@ -73,8 +81,6 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         private string GenerateSingleSai(ISmartScriptLine line)
         {
-            //if (action.Id == 188) // ACTION DEBUG MESSAGE
-            //    comment = action.Comment;
             object data = new
             {
                 entryorguid = "@ENTRY",
@@ -167,7 +173,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private void BuildDelete()
         {
             sql.AppendLine(
-                $"DELETE FROM smart_scripts WHERE entryOrGuid = {script.EntryOrGuid} AND source_type = {(int) script.SourceType};");
+                $"DELETE FROM smart_scripts WHERE entryOrGuid = @ENTRY AND source_type = {(int) script.SourceType};");
         }
     }
 }

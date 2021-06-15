@@ -903,7 +903,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (args.Item is ISmartScriptSolutionItem itemm)
                     {
                         if (itemm.Entry == item.Entry && itemm.SmartType == item.SmartType)
-                            args.Sql = smartScriptExporter.GenerateSql(script!);
+                            args.Sql = smartScriptExporter.GenerateSql(itemm, script!);
                     }
                 }));
 
@@ -1012,7 +1012,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             Debug.Assert(this.item == null);
             this.item = item;
-            Title = itemNameRegistry.GetName(item);
+            Title = item.SmartType == SmartScriptType.TimedActionList ?
+                itemNameRegistry.GetName(item) :
+                itemNameRegistry.GetName(item) + $" ({item.Entry})";
             
             Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService);
 

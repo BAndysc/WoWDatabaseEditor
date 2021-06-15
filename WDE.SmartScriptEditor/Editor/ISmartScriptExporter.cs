@@ -6,6 +6,6 @@ namespace WDE.SmartScriptEditor.Editor.UserControls
     public interface ISmartScriptExporter
     {
         (ISmartScriptLine[], IConditionLine[]) ToDatabaseCompatibleSmartScript(SmartScript script);
-        string GenerateSql(SmartScript script);
+        string GenerateSql(ISmartScriptSolutionItem item, SmartScript script);
     }
 }
