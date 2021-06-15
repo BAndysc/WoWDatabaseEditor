@@ -8,6 +8,9 @@
         <SolidColorBrush Color="#2D2D30" x:Key="SystemControlBackgroundAltHighBrush" />
         <SolidColorBrush Color="#3579C6" x:Key="AccentColorBackground" />
         
+        <SolidColorBrush Color="#2D2D30" x:Key="ThemeControlLowBrush" />
+        <SolidColorBrush Color="#999999" x:Key="ThemeBorderLowBrush" />
+        
         <SolidColorBrush Color="#3579C6" x:Key="StatusBarBackground" />
         
         <SolidColorBrush Color="#3F3F45" x:Key="ContentBorderBrush" />
