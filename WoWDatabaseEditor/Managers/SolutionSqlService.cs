@@ -20,9 +20,9 @@ namespace WoWDatabaseEditorCore.Managers
             this.eventAggregator = eventAggregator;
         }
         
-        public void OpenDocumentWithSqlFor(ISolutionItem? solutionItem)
+        public void OpenDocumentWithSqlFor(params ISolutionItem[] solutionItem)
         {
-            if (solutionItem == null)
+            if (solutionItem == null || solutionItem.Length == 0)
                 return;
             MetaSolutionSQL solution = new(solutionItem);
             eventAggregator.GetEvent<EventRequestOpenItem>().Publish(solution);

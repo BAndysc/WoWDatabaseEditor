@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
@@ -63,7 +64,11 @@ namespace WDE.SQLEditor.ViewModels
             taskRunner.ScheduleTask("Generating SQL",
                 async () =>
                 {
-                    string sql = await sqlGeneratorsRegistry.GenerateSql(item.ItemToGenerate);
+                    StringBuilder sb = new();
+                    foreach (var subitem in item.ItemsToGenerate)
+                        sb.AppendLine(await sqlGeneratorsRegistry.GenerateSql(subitem));
+                    string sql = sb.ToString();
+                    
                     Code.FromString(sql);
                     IsLoading = false;
                 });

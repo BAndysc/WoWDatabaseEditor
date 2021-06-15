@@ -5,6 +5,6 @@ namespace WDE.Common.Managers
     [UniqueProvider]
     public interface ISolutionSqlService
     {
-        void OpenDocumentWithSqlFor(ISolutionItem solutionItem);
+        void OpenDocumentWithSqlFor(params ISolutionItem[] solutionItem);
     }
 }

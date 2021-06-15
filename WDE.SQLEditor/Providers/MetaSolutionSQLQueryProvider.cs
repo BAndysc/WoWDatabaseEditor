@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
@@ -17,7 +18,11 @@ namespace WDE.SQLEditor.Providers
         
         public async Task<string> GenerateSql(MetaSolutionSQL item)
         {
-            return await sqlGeneratorRegistry.Value.GenerateSql(item.ItemToGenerate);
+            StringBuilder sb = new();
+            foreach (var subitem in item.ItemsToGenerate)
+                sb.AppendLine(await sqlGeneratorRegistry.Value.GenerateSql(subitem));
+            
+            return sb.ToString();
         }
     }
 }

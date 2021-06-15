@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Prism.Commands;
@@ -69,6 +70,11 @@ namespace WoWDatabaseEditorCore.Providers
                     () => DocumentManager.ActiveSolutionItemDocument != null && solutionTasksService.CanSaveAndReloadRemotely)
                 .ObservesProperty(() => DocumentManager.ActiveSolutionItemDocument), new("F5")));
             
+            SubItems.Add(new ModuleMenuItem("_Generate query for all opened", 
+                new DelegateCommand(
+                        () => solutionSqlService.OpenDocumentWithSqlFor(DocumentManager.OpenedDocuments.Select(d => (d as ISolutionItemDocument)?.SolutionItem!).Where(d => d != null).ToArray<ISolutionItem>()))
+                    , new("F3")));
+
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("_Settings", new DelegateCommand(OpenSettings)));
             SubItems.Add(new ModuleManuSeparatorItem());
