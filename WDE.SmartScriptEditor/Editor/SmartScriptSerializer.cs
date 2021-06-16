@@ -194,7 +194,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     TargetY = a.Target.Y,
                     TargetZ = a.Target.Z,
                     TargetO = a.Target.O,
-                    Comment = e.Readable.RemoveTags() + " - " + a.Readable.RemoveTags() +
+                    Comment = e.Readable.RemoveTags().Trim() + " - " + a.Readable.RemoveTags().Trim() +
                               (string.IsNullOrEmpty(a.Comment) ? "" : " // " + a.Comment)
                 };
                 if (autoLinks && index > 0)
