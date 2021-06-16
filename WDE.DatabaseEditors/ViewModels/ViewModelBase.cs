@@ -12,6 +12,7 @@ using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
@@ -39,6 +40,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly IMessageBoxService messageBoxService;
         private readonly ITaskRunner taskRunner;
         private readonly IParameterFactory parameterFactory;
+        private readonly IItemFromListProvider itemFromListProvider;
 
         protected ViewModelBase(IHistoryManager history,
             DatabaseTableSolutionItem solutionItem,
@@ -52,6 +54,7 @@ namespace WDE.DatabaseEditors.ViewModels
             ITaskRunner taskRunner,
             IParameterFactory parameterFactory,
             ITableDefinitionProvider tableDefinitionProvider,
+            IItemFromListProvider itemFromListProvider,
             ISolutionItemIconRegistry iconRegistry)
         {
             this.solutionItemName = solutionItemName;
@@ -62,6 +65,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.messageBoxService = messageBoxService;
             this.taskRunner = taskRunner;
             this.parameterFactory = parameterFactory;
+            this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
             History = history;
             
@@ -86,6 +90,27 @@ namespace WDE.DatabaseEditors.ViewModels
                 .Subscribe(ExecuteSql));
         }
         
+        protected async Task EditParameter(IParameterValue parameterValue)
+        {
+            if (!parameterValue.BaseParameter.HasItems)
+                return;
+            
+            if (parameterValue is ParameterValue<long> valueHolder)
+            {
+                var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
+                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
+                if (result.HasValue)
+                    valueHolder.Value = result.Value;                 
+            }
+            else if (parameterValue is ParameterValue<string> stringValueHolder)
+            {
+                var result = await itemFromListProvider.GetItemFromList(stringValueHolder.Parameter.Items, 
+                    stringValueHolder.Parameter is MultiSwitchStringParameter, stringValueHolder.Value);
+                if (result != null)
+                    stringValueHolder.Value = result;                 
+            }
+        }
+
         public abstract bool ForceRemoveEntity(DatabaseEntity entity);
         public abstract bool ForceInsertEntity(DatabaseEntity entity, int index);
 

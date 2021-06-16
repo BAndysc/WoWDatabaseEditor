@@ -72,7 +72,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             ISolutionItemIconRegistry iconRegistry) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, 
-            tableDefinitionProvider, iconRegistry)
+            tableDefinitionProvider, itemFromListProvider, iconRegistry)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;
@@ -230,26 +230,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return false;
         }
 
-        private async Task EditParameter(DatabaseCellViewModel cell)
-        {
-            if (!cell.ParameterValue.BaseParameter.HasItems)
-                return;
-            
-            if (cell.ParameterValue is ParameterValue<long> valueHolder)
-            {
-                var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
-                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
-                if (result.HasValue)
-                    valueHolder.Value = result.Value;                 
-            }
-            else if (cell.ParameterValue is ParameterValue<string> stringValueHolder)
-            {
-                var result = await itemFromListProvider.GetItemFromList(stringValueHolder.Parameter.Items, 
-                    stringValueHolder.Parameter is MultiSwitchStringParameter, stringValueHolder.Value);
-                if (result != null)
-                    stringValueHolder.Value = result;                 
-            }
-        }
+        private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue);
 
         private List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
         {

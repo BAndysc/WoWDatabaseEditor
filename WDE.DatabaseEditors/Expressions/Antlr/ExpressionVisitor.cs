@@ -141,6 +141,8 @@ namespace WDE.DatabaseEditors.Expressions.Antlr
                 return lField.Current.Value;
             if (cell is DatabaseField<float> fField)
                 return fField.Current.Value;
+            if (cell is DatabaseField<string> sField)
+                return sField.Current.Value ?? "";
             return 0L;
         }
 

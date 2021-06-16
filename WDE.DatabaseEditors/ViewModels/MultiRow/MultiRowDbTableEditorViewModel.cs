@@ -74,7 +74,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
-            tableDefinitionProvider, iconRegistry)
+            tableDefinitionProvider, itemFromListProvider, iconRegistry)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
@@ -208,21 +208,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
             RemoveEntity(view.ParentEntity);
         }
-        
-        private async Task EditParameter(DatabaseCellViewModel cell)
+
+        private Task EditParameter(DatabaseCellViewModel cell)
         {
-            var valueHolder = cell.ParameterValue as ParameterValue<long>;
-            
-            if (valueHolder == null)
-                return;
-
-            if (!valueHolder.Parameter.HasItems)
-                return;
-
-            var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
-                valueHolder.Parameter is FlagParameter, valueHolder.Value);
-            if (result.HasValue)
-                valueHolder.Value = result.Value; 
+            if (cell.ParameterValue != null)
+                return EditParameter(cell.ParameterValue);
+            return Task.CompletedTask;
         }
 
         protected override ICollection<uint> GenerateKeys() => keys;
@@ -361,7 +352,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                             stringParam.Current.Value = stringParam.Current.Value.GetComment(column.CanBeNull);
                             stringParam.Original.Value = stringParam.Original.Value.GetComment(column.CanBeNull);
                         }
-                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, StringParameter.Instance);
+                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
                     }
                     else if (cell is DatabaseField<float> floatParameter)
                     {
