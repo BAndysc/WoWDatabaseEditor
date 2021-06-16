@@ -1785,7 +1785,7 @@
                 "description": "If 0, creature will stay idle in place"
             }
         ],
-        "description": "{source}: {pram1value:choose(0):Stay in place|Move in radius {pram1} yards}",
+        "description": "{source}: {pram1value:choose(0):Stay in place|Move randomly in radius {pram1} yards}",
         "name_readable": "Random move",
         "target_types": ["Creature"],
         "target_is_source": true
