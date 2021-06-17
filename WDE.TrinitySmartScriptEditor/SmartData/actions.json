@@ -232,8 +232,52 @@
     },
     {
         "id": 12,
+        "name": "SMART_ACTION_SUMMON_CREATURE_TC_WRATH",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature",
+                "description": "Creature Entry to summon"
+            },
+            {
+                "type": "SummonTypeParameter",
+                "name": "Summon Type"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Duration",
+                "description": "In ms"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Attack Invoker"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "1": {"name": "Personal spawn"},
+                    "2": {"name": "Prefer unit"}
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Count",
+                "defaultVal": 1
+            }
+        ],
+        "description": "{source}: Summon {pram6value:choose(0|1):creature|creature|{pram6} creatures} {pram1} at {targetid:choose(8):{targetcoords}|{target}'s position, moved by offset {targetcoords}} as summon type {pram2}{pram2value:choose(8):| with duration {pram3} seconds}{pram4value:choose(0):| and attack action invoker}{pram5value:choose(0):| with flags {pram5}}",
+        "name_readable": "Summon creature",
+        "target_types": ["Creature", "Player", "GameObject", "Position"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 12,
         "name": "SMART_ACTION_SUMMON_CREATURE",
-        "tags": ["TrinityWrath", "Azeroth", "TrinityCata"],
+        "tags": ["Azeroth", "TrinityCata"],
         "parameters": [
             {
                 "type": "CreatureParameter",
