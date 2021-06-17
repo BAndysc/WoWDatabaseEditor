@@ -18,7 +18,7 @@ namespace AvaloniaStyles
     public class SystemTheme : StyleInclude
     {
         internal static SystemThemeOptions EffectiveTheme { get; private set; }
-        internal static bool EffectiveThemeIsDark { get; private set; }
+        public static bool EffectiveThemeIsDark { get; private set; }
         
         public SystemTheme(IServiceProvider serviceProvider) : base(serviceProvider)
         {

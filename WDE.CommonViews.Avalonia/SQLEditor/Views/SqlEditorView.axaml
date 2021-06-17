@@ -5,6 +5,7 @@
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:avalonia="clr-namespace:WDE.Common.Avalonia;assembly=WDE.Common.Avalonia"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              Name="SqlUserControl">
     <UserControl.KeyBindings>
         <KeyBinding Gesture="{x:Static TextBox.CopyGesture}" Command="{Binding ElementName=SqlUserControl, Path=Copy}" />
@@ -18,8 +19,8 @@
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <Button DockPanel.Dock="Top" Content="Execute SQL" Command="{Binding ExecuteSql}" />
-        <avaloniaEdit:TextEditor SyntaxHighlighting="TSQL" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
-                          ShowLineNumbers="True"
-                          FontFamily="Consolas,Menlo,Courier,Courier New" />
+        <avaloniaEdit:TextEditor controls:AvalonEditExtra.Syntax="Resources/SqlSyntax.xml" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
+                                 ShowLineNumbers="True"
+                                 FontFamily="Consolas,Menlo,Courier,Courier New" />
     </DockPanel>
 </UserControl>

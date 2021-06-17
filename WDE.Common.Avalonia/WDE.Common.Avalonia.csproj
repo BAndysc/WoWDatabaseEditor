@@ -19,5 +19,8 @@
     </ItemGroup>
     <ItemGroup>
       <None Remove="Assets\Fonts\FiraCode-Regular.ttf" />
+      <None Update="Resources\*.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 </Project>
