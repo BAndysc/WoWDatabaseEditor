@@ -43,6 +43,7 @@ namespace WDE.DbcStore
         
         public bool IsConfigured { get; private set; }
         public Dictionary<long, string> AreaTriggerStore { get; internal set; } = new();
+        public Dictionary<long, long> FactionTemplateStore { get; internal set; } = new();
         public Dictionary<long, string> FactionStore { get; internal set; } = new();
         public Dictionary<long, string> SpellStore { get; internal set; } = new();
         public Dictionary<long, string> SkillStore { get; internal set;} = new();
@@ -104,6 +105,7 @@ namespace WDE.DbcStore
             private readonly DbcStore store;
 
             private Dictionary<long, string> AreaTriggerStore { get; } = new();
+            private Dictionary<long, long> FactionTemplateStore { get; } = new();
             private Dictionary<long, string> FactionStore { get; } = new();
             private Dictionary<long, string> SpellStore { get; } = new();
             public Dictionary<long, string> SkillStore { get; } = new();
@@ -133,8 +135,8 @@ namespace WDE.DbcStore
                 this.store = store;
                 dbcSettingsProvider = settingsProvider;
             }
-            
-            private void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary)
+
+            private void Load(string filename, int id, int nameIndex, Action<DataRow> foreachRow)
             {
                 progress?.Report(now++, max, $"Loading {filename}");
                 DBReader r = new();
@@ -144,9 +146,20 @@ namespace WDE.DbcStore
                     return;
 
                 DBEntry dbEntry = r.Read(path);
-
                 foreach (DataRow row in dbEntry.Data.Rows)
-                    dictionary.Add(Convert.ToInt32(row.ItemArray[id]!.ToString()), row.ItemArray[nameIndex]!.ToString() ?? "");
+                    foreachRow(row);
+            }
+
+            private void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary)
+            {
+                Load(filename, id, nameIndex, row => 
+                    dictionary.Add(Convert.ToInt32(row.ItemArray[id]!.ToString()), row.ItemArray[nameIndex]!.ToString() ?? ""));
+            }
+            
+            private void Load(string filename, int id, int nameIndex, Dictionary<long, long> dictionary)
+            {
+                Load(filename, id, nameIndex, row => 
+                    dictionary.Add(Convert.ToInt32(row.ItemArray[id]!.ToString()), Convert.ToInt32(row.ItemArray[nameIndex]!.ToString())));
             }
             
             public void FinishMainThread()
@@ -173,7 +186,7 @@ namespace WDE.DbcStore
                 store.GameObjectDisplayInfoStore = GameObjectDisplayInfoStore;
                 
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
-                parameterFactory.Register("FactionParameter", new DbcParameter(FactionStore));
+                parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore));
                 parameterFactory.Register("SpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("MultiSpellParameter", new MultiSpellParameter(SpellStore));
                 parameterFactory.Register("SpellAreaSpellParameter", new SpellAreaSpellParameter(SpellStore));
@@ -210,10 +223,11 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 17;
+                        max = 18;
                         Load("AreaTrigger.dbc", 0, 0, AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 3, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
+                        Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
                         Load("Spell.dbc", 0, 134, SpellStore);
                         Load("Movie.dbc", 0, 1, MovieStore);
                         Load("Map.dbc", 0, 5, MapStore);
@@ -232,10 +246,11 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 19;
+                        max = 20;
                         Load("AreaTrigger.dbc", 0, 0,  AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
+                        Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
                         Load("Spell.dbc", 0, 21, SpellStore);
                         Load("Movie.dbc", 0, 1, MovieStore);
                         Load("Map.dbc", 0, 6, MapStore);
@@ -256,7 +271,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.LEGION_26972:
                     {
-                        max = 13;
+                        max = 15;
                         Load("AreaTrigger.db2", 16, 16, AreaTriggerStore);
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
@@ -266,6 +281,8 @@ namespace WDE.DbcStore
                         Load("Emotes.db2", 0, 2, EmoteStore);
                         Load("ItemSparse.db2", 0, 2, ItemStore);
                         Load("Languages.db2", 1, 0, LanguageStore);
+                        Load("Faction.db2", 6, 4, FactionStore);
+                        Load("FactionTemplate.db2", 0, 1, FactionTemplateStore);
                         // Load("Phase.db2", 1, 0, PhaseStore); // no names in legion :(
                         Load("SoundKitName.db2", 0, 1, SoundStore);
                         Load("SpellFocusObject.db2", 0, 1, SpellFocusObjectStore);
@@ -280,13 +297,28 @@ namespace WDE.DbcStore
         }
     }
 
+    internal class FactionParameter : ParameterNumbered
+    {
+        public FactionParameter(Dictionary<long, string> factionStore, Dictionary<long, long> factionTemplateStore)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (var factionTemplate in factionTemplateStore)
+            {
+                if (factionStore.TryGetValue(factionTemplate.Value, out var factionName))
+                    Items.Add(factionTemplate.Key, new SelectOption(factionName));
+                else
+                    Items.Add(factionTemplate.Key, new SelectOption("unknown name"));
+            }
+        }
+    }
+
     public class DbcParameter : ParameterNumbered
     {
         public DbcParameter(Dictionary<long, string> storage)
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (int key in storage.Keys)
-                Items.Add(key, new SelectOption(storage[key]));
+            foreach (var (key, value) in storage)
+                Items.Add(key, new SelectOption(value));
         }
     }
     
