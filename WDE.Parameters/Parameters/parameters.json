@@ -46,11 +46,13 @@
 			"512": {"name": "IGNORE_SET_FACING", "description": "Will not adjust facing to target (if any)"},
 			"1024": {"name": "IGNORE_SHAPESHIFT", "description": "Will ignore shapeshift checks"},
 			"2048": {"name": "IGNORE_CASTER_AURASTATE", "description": "Will ignore caster aura states including combat requirements and death state"},
+			"4096": {"name": "DISALLOW_PROC_EVENTS", "description": "Disallows proc events from triggered spell (default)"},
 			"8192": {"name": "IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE", "description": "Will ignore mounted/on vehicle restrictions"},
 			"65536": {"name": "IGNORE_CASTER_AURAS", "description": "Will ignore caster aura restrictions or requirements"},
-			"131072": {"name": "DISALLOW_PROC_EVENTS", "description": "Disallows proc events from triggered spell (default)"},
+			"131072": {"name": "DONT_RESET_PERIODIC_TIMER", "description": "Will allow periodic aura timers to keep ticking (instead of resetting)"},
 			"262144": {"name": "DONT_REPORT_CAST_ERROR", "description": "Will return SPELL_FAILED_DONT_REPORT in CheckCast functions"},
-			"524288": {"name": "IGNORE_EQUIPPED_ITEM_REQUIREMENT", "description": "Will ignore equipped item requirements"}
+			"524288": {"name": "TREAT_PROC_AS_NON_TRIGGERED", "description": "Will treat procs from this spell as if it wasn't triggered"},
+			"1048576": {"name": "IGNORE_EQUIPPED_ITEM_REQUIREMENT", "description": "Will ignore equipped item requirements"}
 		}
 	},
 	"QuestFlagParameter": {
