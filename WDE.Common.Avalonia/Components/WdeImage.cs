@@ -27,11 +27,25 @@ namespace WDE.Common.Avalonia.Components
             get => (ImageUri) GetValue(ImageProperty);
             set => SetValue(ImageProperty, value);
         }
-        
+
         public static readonly AvaloniaProperty ImageProperty =
             AvaloniaProperty.Register<WdeImage, ImageUri>(
                 nameof(Image),
                 coerce: OnSourceChanged);
+
+        public string? ImageUri
+        {
+            get => Image.Uri;
+            set
+            {
+                if (value != null)
+                    Image = new ImageUri(value);
+                var old = Image.Uri;
+                RaisePropertyChanged(ImageUriProperty, old, value);
+            }
+        }
+        public static readonly DirectProperty<WdeImage, string?> ImageUriProperty = 
+            AvaloniaProperty.RegisterDirect<WdeImage, string?>("ImageUri", o => o.ImageUri, (o, v) => o.ImageUri = v);
 
         private static ImageUri OnSourceChanged(IAvaloniaObject d, ImageUri img)
         {

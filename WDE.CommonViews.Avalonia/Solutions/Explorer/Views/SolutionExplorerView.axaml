@@ -35,18 +35,29 @@
         </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
+    <components:ToolView.Styles>
+        <Style Selector="Button.ReloadButton">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="DockPanel.TreeViewItemRow:pointerover Button.ReloadButton">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+    </components:ToolView.Styles>
+    
     <TreeView x:Name="tv" Margin="0" 
               Items="{Binding Root}" 
               SelectionMode="Multiple"
               SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
               SelectedItems="{Binding SelectedItems, Mode=TwoWay}"
+              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+              AutoScrollToSelectedItem="False"
               PointerReleased="Tv_OnPointerReleased"
               dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{Binding }" dnD:DragAndDrop.IsDragSource="True"
               DoubleTapped="Tv_OnDoubleTapped">
         <TreeView.ContextMenu>
             <ContextMenu>
                 <MenuItem Header="Add"
-                          Command="{Binding #tv.DataContext.AddItem}" />
+                          Command="{Binding #tv.DataContext.AddItem, Mode=OneTime}" />
                 <MenuItem Header="Quick add"
                           Classes="Parent"
                           Items="{Binding #tv.DataContext.AddItems}">
@@ -62,16 +73,16 @@
                     </MenuItem.Styles>
                 </MenuItem>
                 <MenuItem Header="Remove"
-                          Command="{Binding #tv.DataContext.RemoveItem}" />
+                          Command="{Binding #tv.DataContext.RemoveItem, Mode=OneTime}" />
                 <Separator />
                 <MenuItem Header="Generate query"
-                          Command="{Binding #tv.DataContext.GenerateSQL}"
+                          Command="{Binding #tv.DataContext.GenerateSQL, Mode=OneTime}"
                           IsEnabled="{Binding IsExportable}" />
                 <MenuItem Header="Save to database"
-                          Command="{Binding #tv.DataContext.UpdateDatabase}"
+                          Command="{Binding #tv.DataContext.UpdateDatabase, Mode=OneTime}"
                           IsEnabled="{Binding IsExportable}" />
                 <MenuItem Header="Save to database and reload server"
-                          Command="{Binding #tv.DataContext.ExportToServer}"
+                          Command="{Binding #tv.DataContext.ExportToServer, Mode=OneTime}"
                           IsEnabled="{Binding IsExportable}" />
             </ContextMenu>
         </TreeView.ContextMenu>
@@ -83,7 +94,7 @@
         </TreeView.Styles>
         <TreeView.DataTemplates>
             <TreeDataTemplate ItemsSource="{Binding Children}">
-                <StackPanel Orientation="Horizontal">
+                <DockPanel Classes="TreeViewItemRow" LastChildFill="True" Height="26" Background="Transparent">
                     <components:WdeImage Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Image="{Binding Icon}" />
                     <TextBlock Padding="2" VerticalAlignment="Center" Text="{Binding ExtraId}"
                                FontFamily="Consolas,Menlo,Courier,Courier New" Background="{DynamicResource ContentSpecialBackground}"
@@ -94,9 +105,17 @@
                             </DataTriggerBehavior>
                         </Interaction.Behaviors>
                     </TextBlock>
+                    <Button Classes="ReloadButton" DockPanel.Dock="Right" 
+                            Width="16" Height="16" 
+                            Background="Transparent" BorderThickness="0"
+                            Command="{Binding #tv.DataContext.ExportToServerItem, Mode=OneTime}"
+                            CommandParameter="{Binding .}"
+                            Margin="0,0,6,0">
+                        <components:WdeImage ImageUri="Resources/icon_reload.png" Width="16" Height="16" />
+                    </Button>
                     <TextBlock Margin="0,0,0,0" Padding="0,0,0,0" VerticalAlignment="Center"
-                               Text="{Binding Name}" />
-                </StackPanel>
+                               Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                </DockPanel>
             </TreeDataTemplate>
         </TreeView.DataTemplates>
     </TreeView>

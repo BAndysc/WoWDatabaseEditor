@@ -167,6 +167,12 @@ namespace WDE.Solutions.Explorer.ViewModels
                 if (selected != null)
                     solutionTasksService.SaveAndReloadSolutionTask(selected.Item);
             }, () => solutionTasksService.CanSaveAndReloadRemotely);
+
+            ExportToServerItem = new DelegateCommand<SolutionItemViewModel>(item =>
+            {
+                if (item != null)
+                    solutionTasksService.SaveAndReloadSolutionTask(item.Item);
+            }, item => solutionTasksService.CanSaveAndReloadRemotely);
         }
 
         private void DeleteSolutionItem(SolutionItemViewModel item)
@@ -205,6 +211,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         public DelegateCommand<SolutionItemViewModel> SelectedItemChangedCommand { get; }
         public DelegateCommand<SolutionItemViewModel> RequestOpenItem { get; }
         public DelegateCommand ExportToServer { get; }
+        public DelegateCommand<SolutionItemViewModel> ExportToServerItem { get; }
         public DelegateCommand UpdateDatabase { get; }
         
         public void DragOver(IDropInfo dropInfo)
