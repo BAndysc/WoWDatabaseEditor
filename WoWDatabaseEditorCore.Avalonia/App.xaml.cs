@@ -245,7 +245,8 @@ namespace WoWDatabaseEditorCore.Avalonia
             
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
-            GlobalApplication.HighDpi = MainApp.Screens.Primary.PixelDensity > 1.5f;
+            var primaryScreen = MainApp.Screens.Primary ?? MainApp.Screens.All.FirstOrDefault();
+            GlobalApplication.HighDpi = (primaryScreen?.PixelDensity ?? 1) > 1.5f;
         }
 
         public static Window? MainApp;
