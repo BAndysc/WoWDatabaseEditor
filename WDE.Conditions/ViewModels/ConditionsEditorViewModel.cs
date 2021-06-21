@@ -70,7 +70,7 @@ namespace WDE.Conditions.ViewModels
                 if (!prh.HasItems) 
                     return;
 
-                var newItem = await itemFromListProvider.GetItemFromList(prh.Parameter.Items, prh.Parameter is FlagParameter, prh.Value);
+                var newItem = await itemFromListProvider.GetItemFromList(prh.Items, prh.Parameter is FlagParameter, prh.Value);
                 if (newItem.HasValue)
                     prh.Value = newItem.Value;
             });

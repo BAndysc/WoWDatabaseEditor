@@ -592,7 +592,7 @@
 				}
 			},
 			{
-				"type": "Parameter",
+				"type": "ConditionObjectEntryParameter",
 				"name": "Entry",
 				"description": "Creature or gameobject entry"
 			},

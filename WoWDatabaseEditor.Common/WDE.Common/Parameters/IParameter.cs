@@ -25,5 +25,6 @@ namespace WDE.Common.Parameters
     {
         string ToString(T value, R context);
         System.Type ContextType => typeof(R);
+        Dictionary<T, SelectOption>? ItemsForContext(R context) => null;
     }
 }

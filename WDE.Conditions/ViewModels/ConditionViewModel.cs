@@ -10,7 +10,7 @@ using WDE.Parameters.Models;
 
 namespace WDE.Conditions.ViewModels
 {
-    internal class ConditionViewModel : BindableBase
+    public class ConditionViewModel : BindableBase
     {
         public static int ParametersCount => 3;
         private ParameterValueHolder<long>[] parameters = new ParameterValueHolder<long>[ParametersCount];
@@ -30,7 +30,7 @@ namespace WDE.Conditions.ViewModels
         public ConditionViewModel(IParameter<long> targets)
         {
             for (int i = 0; i < ParametersCount; ++i)
-                parameters[i] = new ParameterValueHolder<long>(Parameter.Instance, 0);
+                parameters[i] = new ConstContextParameterValueHolder<long, ConditionViewModel>(Parameter.Instance, 0, this);
             ConditionTarget = new ParameterValueHolder<long>("Target", targets, 0);
             ConditionTarget.IsUsed = targets.HasItems && targets.Items!.Count > 1;
 

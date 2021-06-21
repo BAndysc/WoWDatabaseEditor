@@ -10,7 +10,7 @@ namespace WDE.Parameters.Models
     {
     }
 
-    public sealed class ParameterValueHolder<T> : IParameterValueHolder, INotifyPropertyChanged where T : notnull
+    public class ParameterValueHolder<T> : IParameterValueHolder, INotifyPropertyChanged where T : notnull
     {
         private T value;
         [NotNull]
@@ -68,7 +68,9 @@ namespace WDE.Parameters.Models
             }
         }
 
-        public bool HasItems => Parameter.HasItems;
+        public virtual bool HasItems => Parameter.HasItems;
+        
+        public virtual Dictionary<T, SelectOption>? Items => Parameter.Items;
 
         public string String => ToString();
 
@@ -96,7 +98,7 @@ namespace WDE.Parameters.Models
             this.value = value;
             this.parameter = parameter;
         }
-
+        
         public ParameterValueHolder(string name, IParameter<T> parameter, T value)
         {
             this.name = name;
@@ -121,6 +123,49 @@ namespace WDE.Parameters.Models
         private void OnPropertyChanged([CallerMemberName]  string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class ConstContextParameterValueHolder<T, R> : ParameterValueHolder<T> where T : notnull
+    {
+        private R? constContext;
+        private bool inToString;
+
+        public override Dictionary<T, SelectOption>? Items
+        {
+            get
+            {
+                if (constContext != null && Parameter is IContextualParameter<T, R> contextual)
+                {
+                    return contextual.ItemsForContext(constContext);
+                }
+
+                return Parameter.Items;
+            }
+        }
+
+        public override string ToString()
+        {
+            if (inToString || constContext == null)
+                return base.ToString();
+            
+            inToString = true;
+            var ret = ToString(constContext);
+            inToString = false;
+            return ret;
+        }
+        
+        public ConstContextParameterValueHolder(IParameter<T> parameter, T value, R context) : base(parameter, value)
+        {
+            constContext = context;
+        }
+        
+        public ConstContextParameterValueHolder(IParameter<T> parameter, T value) : base(parameter, value)
+        {
+        }
+
+        public ConstContextParameterValueHolder(string name, IParameter<T> parameter, T value) : base(name, parameter, value)
+        {
         }
     }
 }
