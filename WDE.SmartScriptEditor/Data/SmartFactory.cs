@@ -168,6 +168,10 @@ namespace WDE.SmartScriptEditor.Data
                     source.GetParameter(0).Value = action.GetParameter(3).Value;
                     source.GetParameter(1).Value = action.GetParameter(4).Value;
                     source.GetParameter(2).Value = action.GetParameter(5).Value;
+                    action.GetParameter(2).Value = 0;
+                    action.GetParameter(3).Value = 0;
+                    action.GetParameter(4).Value = 0;
+                    action.GetParameter(5).Value = 0;
                 }
                 catch (Exception)
                 {

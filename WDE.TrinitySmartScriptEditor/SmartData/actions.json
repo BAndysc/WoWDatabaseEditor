@@ -625,6 +625,10 @@
                 "type": "Parameter",
                 "name": "Charges",
                 "description": "If 0 all charges are removed"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Only owned auras"
             }
         ],
         "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
@@ -1203,6 +1207,26 @@
             {
                 "type": "Parameter",
                 "name": "AITemplateID"
+            },
+            {
+                "type": "AI parameter 1",
+                "name": "Parameter"
+            },
+            {
+                "type": "AI parameter 2",
+                "name": "Parameter"
+            },
+            {
+                "type": "AI parameter 3",
+                "name": "Parameter"
+            },
+            {
+                "type": "AI parameter 4",
+                "name": "Parameter"
+            },
+            {
+                "type": "AI parameter 5",
+                "name": "Parameter"
             }
         ],
         "description": "{source}: Install AI Template {pram1}",
@@ -1656,6 +1680,10 @@
                     "1": {"name": "update in combat"},
                     "2": {"name": "update always"}
                 }
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Allow override"
             }
         ],
         "description": "{source}: Start timed action list id #{pram1} ({pram2})",
@@ -1812,6 +1840,10 @@
             {
                 "type": "Parameter",
                 "name": "Action List ID max"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Allow override"
             }
         ],
         "description": "{source}: Call random timed action list between range {pram1} and {pram2} {pram2value:choose(0|1):(update out of combat)|(update in combat)|(update always)}",
@@ -2187,37 +2219,8 @@
         "name": "SMART_ACTION_SET_GO_FLAG",
         "parameters": [
             {
-                "type": "FlagParameter",
-                "name": "Flags",
-                "values": {
-                    "0": {
-                        "name": "GO_FLAG_IN_USE"
-                    },
-                    "2": {
-                        "name": "GO_FLAG_LOCKED"
-                    },
-                    "4": {
-                        "name": "GO_FLAG_INTERACT_COND"
-                    },
-                    "8": {
-                        "name": "GO_FLAG_TRANSPORT"
-                    },
-                    "16": {
-                        "name": "GO_FLAG_NOT_SELECTABLE"
-                    },
-                    "32": {
-                        "name": "GO_FLAG_NODESPAWN"
-                    },
-                    "64": {
-                        "name": "GO_FLAG_TRIGGERED"
-                    },
-                    "512": {
-                        "name": "GO_FLAG_DAMAGED"
-                    },
-                    "1024": {
-                        "name": "GO_FLAG_DESTROYED"
-                    }
-                }
+                "type": "GameObjectFlagParameter",
+                "name": "Flags"
             }
         ],
         "description": "{source}: Set game object flags {pram1}",
@@ -2230,37 +2233,8 @@
         "name": "SMART_ACTION_ADD_GO_FLAG",
         "parameters": [
             {
-                "type": "FlagParameter",
-                "name": "Flags",
-                "values": {
-                    "0": {
-                        "name": "GO_FLAG_IN_USE"
-                    },
-                    "2": {
-                        "name": "GO_FLAG_LOCKED"
-                    },
-                    "4": {
-                        "name": "GO_FLAG_INTERACT_COND"
-                    },
-                    "8": {
-                        "name": "GO_FLAG_TRANSPORT"
-                    },
-                    "16": {
-                        "name": "GO_FLAG_NOT_SELECTABLE"
-                    },
-                    "32": {
-                        "name": "GO_FLAG_NODESPAWN"
-                    },
-                    "64": {
-                        "name": "GO_FLAG_TRIGGERED"
-                    },
-                    "512": {
-                        "name": "GO_FLAG_DAMAGED"
-                    },
-                    "1024": {
-                        "name": "GO_FLAG_DESTROYED"
-                    }
-                }
+                "type": "GameObjectFlagParameter",
+                "name": "Flags"
             }
         ],
         "description": "{source}: Add game object flag {pram1}",
@@ -2273,37 +2247,8 @@
         "name": "SMART_ACTION_REMOVE_GO_FLAG",
         "parameters": [
             {
-                "type": "FlagParameter",
-                "name": "Flags",
-                "values": {
-                    "0": {
-                        "name": "GO_FLAG_IN_USE"
-                    },
-                    "2": {
-                        "name": "GO_FLAG_LOCKED"
-                    },
-                    "4": {
-                        "name": "GO_FLAG_INTERACT_COND"
-                    },
-                    "8": {
-                        "name": "GO_FLAG_TRANSPORT"
-                    },
-                    "16": {
-                        "name": "GO_FLAG_NOT_SELECTABLE"
-                    },
-                    "32": {
-                        "name": "GO_FLAG_NODESPAWN"
-                    },
-                    "64": {
-                        "name": "GO_FLAG_TRIGGERED"
-                    },
-                    "512": {
-                        "name": "GO_FLAG_DAMAGED"
-                    },
-                    "1024": {
-                        "name": "GO_FLAG_DESTROYED"
-                    }
-                }
+                "type": "GameObjectFlagParameter",
+                "name": "Flags"
             }
         ],
         "description": "{source}: Remove game object flag {pram1}",
@@ -2321,7 +2266,7 @@
             },
             {
                 "type": "BoolParameter",
-                "name": "Attack me"
+                "name": "Attack invoker"
             }
         ],
         "description": "{source}: Summon creature group {pram1}",
@@ -2671,7 +2616,31 @@
     },
     {
         "id": 127,
+        "name": "SMART_ACTION_PAUSE_MOVEMENT",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Movement slot"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Pause time"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Force"
+            }
+        ],
+        "description": "{source}: Pause movement for {pram2}sec on movement slot {pram1}",
+        "name_readable": "Pause movement",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 127,
         "name": "SMART_ACTION_STOP_MOTION",
+        "tags": ["TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",

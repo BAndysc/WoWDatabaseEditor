@@ -5,7 +5,7 @@ namespace WDE.SmartScriptEditor.Inspections
 {
     public class UnusedParameterInspection : IActionInspection, IEventInspection, IEventInspectionFix, IActionInspectionFix
     {
-        public InspectionResult? Inspect(SmartBaseElement e)
+        public InspectionResult? Inspect(SmartBaseElement e, string ofWhat)
         {
             for (int i = 0; i < e.ParametersCount; ++i)
             {
@@ -16,7 +16,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     return new InspectionResult()
                     {
                         Severity = DiagnosticSeverity.Info,
-                        Message = $" {index}{nd} parameter is not used, but has non zero value.",
+                        Message = $" {index}{nd} parameter of {ofWhat} is not used, but has non zero value.",
                         Line = e.LineId
                     };
                 }
@@ -27,12 +27,12 @@ namespace WDE.SmartScriptEditor.Inspections
         
         public InspectionResult? Inspect(SmartAction a)
         {
-            return Inspect((SmartBaseElement)a);
+            return Inspect((SmartBaseElement)a, "action");
         }
 
         public InspectionResult? Inspect(SmartEvent e)
         {
-            return Inspect((SmartBaseElement)e);
+            return Inspect((SmartBaseElement)e, "event");
         }
 
         public void Fix(SmartBaseElement e)

@@ -6,17 +6,17 @@ namespace WDE.SmartScriptEditor.Inspections
 {
     public class ParameterRangeInspection : IActionInspection, IEventInspection
     {
-        private static bool ContainsAllFlags(FlagParameter fp, long val)
+        private static int ContainsAllFlags(FlagParameter fp, long val)
         {
             if (fp.Items == null)
-                return true;
+                return 0;
             
             for (int i = 0; i < 32; ++i)
             {
                 if (((1 << i) & val) > 0 && !fp.Items.ContainsKey(1 << i))
-                    return false;
+                    return (1 << i);
             }
-            return true;
+            return 0;
         }
         
         public InspectionResult? Inspect(SmartBaseElement e)
@@ -25,16 +25,31 @@ namespace WDE.SmartScriptEditor.Inspections
             {
                 if (e.GetParameter(i).IsUsed &&
                     e.GetParameter(i).Value != 0 && 
-                    e.GetParameter(i).HasItems && 
-                    !((e.GetParameter(i).Parameter.Items?.ContainsKey(e.GetParameter(i).Value) ?? false) ||
-                      (e.GetParameter(i).Parameter is FlagParameter fp && ContainsAllFlags(fp, e.GetParameter(i).Value))))
+                    e.GetParameter(i).HasItems)
                 {
-                    return new InspectionResult()
+                    if (e.GetParameter(i).Parameter is FlagParameter fp &&
+                        ContainsAllFlags(fp, e.GetParameter(i).Value) != 0)
                     {
-                        Severity = DiagnosticSeverity.Info,
-                        Message = $"Parameter `{e.GetParameter(i).Name}` value out of range ({e.GetParameter(i).Value})",
-                        Line = e.LineId
-                    };
+                        var unknownFlag = ContainsAllFlags(fp, e.GetParameter(i).Value);
+                        return new InspectionResult()
+                        {
+                            Severity = DiagnosticSeverity.Info,
+                            Message = $"Parameter `{e.GetParameter(i).Name}` uses non existing flag {unknownFlag}",
+                            Line = e.LineId
+                        }; 
+                    }
+                    
+                    if (e.GetParameter(i).Parameter is not FlagParameter &&
+                        e.GetParameter(i).Parameter.GetType().Name != "DbcParameter" &&
+                        !(e.GetParameter(i).Parameter.Items?.ContainsKey(e.GetParameter(i).Value) ?? false))
+                    {
+                        return new InspectionResult()
+                        {
+                            Severity = DiagnosticSeverity.Info,
+                            Message = $"Parameter `{e.GetParameter(i).Name}` value out of range ({e.GetParameter(i).Value})",
+                            Line = e.LineId
+                        };   
+                    }
                 }
             }
 

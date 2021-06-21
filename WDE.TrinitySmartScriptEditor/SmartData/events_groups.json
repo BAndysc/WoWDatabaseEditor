@@ -83,7 +83,8 @@
         "name": "Gossip",
         "group_members": [
             "SMART_EVENT_GOSSIP_SELECT",
-            "SMART_EVENT_GOSSIP_HELLO"
+            "SMART_EVENT_GOSSIP_HELLO",
+            "SMART_EVENT_GOSSIP_HELLO_TC_WRATH"
         ]
     },
     {

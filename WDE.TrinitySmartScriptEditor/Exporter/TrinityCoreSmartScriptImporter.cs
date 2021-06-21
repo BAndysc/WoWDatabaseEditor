@@ -152,7 +152,10 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     {
                         script.SafeUpdateSource(action.Source, action.Target.Id);
                         for (int i = 0; i < action.Source.ParametersCount; ++i)
+                        {
                             action.Source.GetParameter(i).Copy(action.Target.GetParameter(i));
+                            action.Target.GetParameter(i).Value = 0;
+                        }
                         smartFactory.UpdateTarget(action.Target, 0);
                     }
                     

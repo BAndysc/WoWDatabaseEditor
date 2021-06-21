@@ -900,7 +900,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(args =>
                 {
-                    if (args.Item is ISmartScriptSolutionItem itemm)
+                    if (args.Item is ISmartScriptSolutionItem itemm && args.Item.GetType() == item.GetType())
                     {
                         if (itemm.Entry == item.Entry && itemm.SmartType == item.SmartType)
                             args.Sql = smartScriptExporter.GenerateSql(itemm, script!);

@@ -84,6 +84,7 @@
             "SMART_ACTION_SET_CAN_FLY",
             "SMART_ACTION_FLEE",
             "SMART_ACTION_STOP_MOTION",
+            "SMART_ACTION_PAUSE_MOVEMENT",
             "SMART_ACTION_SET_MOVEMENT_SPEED",
             "SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS_AC"
         ]
