@@ -27,6 +27,38 @@
         <Style Selector="Button.LinkALike:pointerover TextBlock">
             <Setter Property="TextDecorations" Value="Underline" />
         </Style>
+        
+        <Style Selector="Button.FlattyButton">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Panel Background="Transparent">
+                        <Border CornerRadius="3" />
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                    </Panel>
+                </ControlTemplate>
+            </Setter>
+            <Setter Property="RenderTransform" Value="none" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.FlattyButton:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.9)" />    
+        </Style>
+        <Style Selector="Button.FlattyButton /template/ Border">
+            <Setter Property="Background" Value="Black" />
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:.125" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.FlattyButton:pointerover /template/ Border">
+            <Setter Property="Opacity" Value="0.2" />
+        </Style>
     </UserControl.Styles>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="20">
         <StackPanel>
@@ -49,19 +81,21 @@
                     <ItemsControl Margin="20,0,0,0" Items="{Binding FlatItemPrototypes, Mode=OneTime}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel></StackPanel>
+                                <WrapPanel></WrapPanel>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Classes="LinkALike" 
+                                <Button Classes="FlattyButton" 
+                                        Width="100"
+                                        Height="80"
+                                        Margin="0,0,8,8"
                                         Command="{Binding #Root.DataContext.LoadItemCommand}"
                                         CommandParameter="{Binding}">
-                                    <Border Padding="0,3" Background="Transparent">
-                                        <StackPanel Orientation="Horizontal">
-                                            <components:WdeImage Image="{Binding Image}" Width="16" Height="16" Margin="0,0,3,0" />
-                                            <TextBlock Text="Load " VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                                    <Border Padding="3,3" Background="Transparent">
+                                        <StackPanel Orientation="Vertical">
+                                            <components:WdeImage Image="{Binding Image}" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                            <TextBlock TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.8" TextAlignment="Center" />
                                         </StackPanel>
                                     </Border>
                                 </Button>
