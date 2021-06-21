@@ -5,11 +5,6 @@ namespace WDE.DatabaseEditors.Extensions
 {
     public static class StringExtensions
     {
-        public static string ToSqlEscapeString(this string str)
-        {
-            return "\"" +  str.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
-        }
-
         public static string AddComment(this string str, string? comment)
         {
             if (string.IsNullOrEmpty(comment))

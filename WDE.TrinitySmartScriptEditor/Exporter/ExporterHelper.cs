@@ -5,6 +5,7 @@ using SmartFormat;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Solution;
+using WDE.Common.Utils;
 using WDE.Conditions.Exporter;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;
@@ -14,7 +15,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
     public class ExporterHelper
     {
         private static readonly string SaiSql =
-            "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
+            "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, {comment})";
 
         private readonly SmartScript script;
         private readonly ISmartScriptSolutionItem item;
@@ -125,7 +126,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 z = line.TargetZ.ToString(CultureInfo.InvariantCulture),
                 o = line.TargetO.ToString(CultureInfo.InvariantCulture),
 
-                comment = line.Comment
+                comment = line.Comment.ToSqlEscapeString()
             };
 
             return Smart.Format(SaiSql, data);
