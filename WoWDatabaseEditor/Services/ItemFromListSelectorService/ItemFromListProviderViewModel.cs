@@ -23,8 +23,10 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 {
     public abstract class ItemFromListProviderViewModel<T> : ObservableBase, IDialog where T : notnull
     {
+        public Dictionary<T, SelectOption>? Items { get; }
         protected ReactiveProperty<Func<CheckableSelectOption<T>, bool>> currentFilter;
         protected SourceList<CheckableSelectOption<T>> items;
+        private CheckableSelectOption<T>? pseudoItem;
         protected readonly bool asFlags;
         protected string search = "";
         
@@ -34,6 +36,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             bool asFlags, 
             T? current = default)
         {
+            Items = items;
             this.asFlags = asFlags;
             
             this.items = AutoDispose(new SourceList<CheckableSelectOption<T>>());
@@ -107,6 +110,19 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             set
             {
                 SetProperty(ref search, value);
+
+                if (!asFlags)
+                {
+                    if (pseudoItem != null)
+                        items.Remove(pseudoItem);
+                    if (Items != null && StringToT(value, out var searchedKey) && !Items.ContainsKey(searchedKey))
+                    {
+                        pseudoItem = new CheckableSelectOption<T>(searchedKey, new SelectOption("Pick non existing"),
+                            false);
+                        items.Add(pseudoItem);
+                    }   
+                }
+
                 var lowerSearchText = SearchText.ToLower();
                 if (string.IsNullOrEmpty(SearchText))
                     currentFilter.Value = _ => true;
@@ -123,6 +139,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         }
 
         public abstract T GetEntry();
+
+        protected abstract bool StringToT(string str, out T result);
 
         public bool ShowItemsList { get; }
         public DelegateCommand Accept { get; }
@@ -166,6 +184,11 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             return 0;
         }
 
+        protected override bool StringToT(string str, out long result)
+        {
+            return long.TryParse(str, out result);
+        }
+
         public LongItemFromListProviderViewModel(Dictionary<long, SelectOption>? items, bool asFlags, long? current = default) 
             : base(items, 
                 Comparer<CheckableSelectOption<long>>.Create((x, y) => x.Entry.CompareTo(y.Entry)), 
@@ -186,6 +209,12 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 return SelectedItem.Entry;
 
             return SearchText;
+        }
+
+        protected override bool StringToT(string str, out string result)
+        {
+            result = str;
+            return true;
         }
 
         public StringItemFromListProviderViewModel(Dictionary<string, SelectOption>? items, bool multiSelect,
