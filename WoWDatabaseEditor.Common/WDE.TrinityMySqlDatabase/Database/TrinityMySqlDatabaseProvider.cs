@@ -340,6 +340,17 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToListAsync<IConditionLine>();
         }
 
+        public async Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
+        {
+            var type = (int)scriptType;
+            await using var model = new TrinityDatabase();
+            return await model.SmartScript
+                .Where(t => t.ScriptSourceType == type)
+                .GroupBy(t => t.EntryOrGuid, t => t.EntryOrGuid)
+                .Select(t => t.Key)
+                .ToListAsync();
+        }
+        
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
         {
             using var model = new TrinityDatabase();

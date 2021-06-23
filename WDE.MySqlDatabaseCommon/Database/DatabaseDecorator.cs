@@ -47,6 +47,9 @@ namespace WDE.MySqlDatabaseCommon.Database
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => impl.GetProjectItems();
         
         public IEnumerable<ISmartScriptProject> GetProjects() => impl.GetProjects();
+
+        public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
+            impl.GetSmartScriptEntriesByType(scriptType);
         
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
     }

@@ -167,20 +167,27 @@ namespace WDE.TrinitySmartScriptEditor
     [AutoRegisterToParentScopeAttribute]
     public class SmartScriptTimedActionListProvider : SmartScriptSolutionItemProvider
     {
-        private readonly Lazy<ICreatureEntryProviderService> creatureEntryProvider;
+        private readonly Lazy<IDatabaseProvider> databaseProvider;
+        private readonly Lazy<IItemFromListProvider> itemFromListProvider;
 
-        public SmartScriptTimedActionListProvider(Lazy<ICreatureEntryProviderService> creatureEntryProvider) : base(
+        public SmartScriptTimedActionListProvider(Lazy<IDatabaseProvider> databaseProvider,
+            Lazy<IItemFromListProvider> itemFromListProvider) : base(
             "Timed action list",
             "Timed action list contains list of actions played in time, this can be used to create RP events, cameras, etc.",
             "document_timedactionlist_big",
             SmartScriptType.TimedActionList)
         {
-            this.creatureEntryProvider = creatureEntryProvider;
+            this.databaseProvider = databaseProvider;
+            this.itemFromListProvider = itemFromListProvider;
         }
 
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = await creatureEntryProvider.Value.GetEntryFromService();
+            var list = await databaseProvider.Value.GetSmartScriptEntriesByType(SmartScriptType.TimedActionList);
+
+            var items = list.ToDictionary(l => (long)l, l => new SelectOption("Timed action list"));
+
+            long? entry = await itemFromListProvider.Value.GetItemFromList(items, false);
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.TimedActionList);

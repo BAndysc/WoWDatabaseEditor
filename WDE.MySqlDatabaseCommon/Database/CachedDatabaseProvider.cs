@@ -143,6 +143,9 @@ namespace WDE.MySqlDatabaseCommon.Database
             return nonCachedDatabase.GetSpellScriptNames(spellId);
         }
 
+        public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
+            nonCachedDatabase.GetSmartScriptEntriesByType(scriptType);
+        
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => nonCachedDatabase.GetProjectItems();
         
         public IEnumerable<ISmartScriptProject> GetProjects() => nonCachedDatabase.GetProjects();

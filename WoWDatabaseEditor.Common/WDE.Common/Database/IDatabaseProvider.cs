@@ -39,6 +39,8 @@ namespace WDE.Common.Database
         
         IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId);
 
+        Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
+
         IEnumerable<ISmartScriptProjectItem> GetProjectItems();
         IEnumerable<ISmartScriptProject> GetProjects();
 
