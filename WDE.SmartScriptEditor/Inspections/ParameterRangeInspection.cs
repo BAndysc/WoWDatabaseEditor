@@ -24,7 +24,6 @@ namespace WDE.SmartScriptEditor.Inspections
             for (int i = 0; i < e.ParametersCount; ++i)
             {
                 if (e.GetParameter(i).IsUsed &&
-                    e.GetParameter(i).Value != 0 && 
                     e.GetParameter(i).HasItems)
                 {
                     if (e.GetParameter(i).Parameter is FlagParameter fp &&
