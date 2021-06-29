@@ -1,0 +1,45 @@
+using WDE.Common.Managers;
+using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Models;
+
+namespace WDE.SmartScriptEditor.Inspections
+{
+    public class IndentationInspection : IEventInspection
+    {
+        public InspectionResult? Inspect(SmartEvent e)
+        {
+            int indentation = 0;
+            foreach (var action in e.Actions)
+            {
+                if (action.ActionFlags.HasFlag(ActionFlags.DecreaseIndent))
+                {
+                    if (indentation <= 0)
+                    {
+                        return new InspectionResult()
+                        {
+                            Severity = DiagnosticSeverity.Error,
+                            Line = action.LineId,
+                            Message = "[END] without matching begin block, script will not work at all"
+                        };
+                    }
+                    indentation--;
+                }
+
+                if (action.ActionFlags.HasFlag(ActionFlags.IncreaseIndent))
+                    indentation++;
+            }
+
+            if (indentation != 0)
+            {
+                return new InspectionResult()
+                {
+                    Severity = DiagnosticSeverity.Error,
+                    Line = e.Actions[^1].LineId,
+                    Message = "Missing [END] action, script will not work at all."
+                };
+            }
+
+            return null;
+        }
+    }
+}

@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -44,6 +48,19 @@ namespace WDE.SmartScriptEditor.Models
             Context.Add(new MetaSmartSourceTargetEdit(this, true));
             Context.Add(new MetaSmartSourceTargetEdit(this, false));
         }
+
+        private int indent;
+        public int Indent
+        {
+            get => indent;
+            set
+            {
+                indent = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ActionFlags ActionFlags { get; set; }
 
         public SmartEvent? Parent
         {
@@ -168,7 +185,9 @@ namespace WDE.SmartScriptEditor.Models
         {
             SmartAction se = new(Id, Source.Copy(), Target.Copy());
             se.ReadableHint = ReadableHint;
+            se.ActionFlags = ActionFlags;
             se.DescriptionRules = DescriptionRules;
+            se.LineId = LineId;
             for (var i = 0; i < SmartActionParametersCount; ++i)
                 se.GetParameter(i).Copy(GetParameter(i));
             se.comment.Copy(comment);

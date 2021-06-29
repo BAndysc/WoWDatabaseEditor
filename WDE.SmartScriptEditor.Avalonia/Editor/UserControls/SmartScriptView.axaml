@@ -69,6 +69,7 @@
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type models:SmartAction}">
                         <userControls:SmartActionView
+                            Indent="{Binding Indent}"
                             DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                             DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                             DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"

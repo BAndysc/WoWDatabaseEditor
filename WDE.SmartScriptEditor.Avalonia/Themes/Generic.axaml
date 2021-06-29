@@ -5,9 +5,11 @@
         xmlns:controls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
         xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
         xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
-        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
+        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+        xmlns:themes="clr-namespace:WDE.SmartScriptEditor.Avalonia.Themes">
 
     <Styles.Resources>
+        <themes:IndentToMarginConverter x:Key="IndentToMarginConverter" LeftMultiplier="24" />
         <converters:NullConverter x:Key="NullToBoolConverter" Inverted="True" />
         <converters:EmptyStringToBoolConverter x:Key="EmptyStringToBoolConverter" WhenNullOrEmpty="False" />
         <DrawingImage x:Key="BoxIcons.RegularWorld">
@@ -22,7 +24,9 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border BorderThickness="1" Classes="action">
+                <Border BorderThickness="1" Classes="action" 
+                        Background="Transparent"
+                        Padding="{Binding Indent, Converter={StaticResource IndentToMarginConverter}}">
                     <extendedTextBlock:FormattedTextBlock
                         ContextArray="{Binding Context}"
                         IsSelected="{Binding IsSelected}"
@@ -54,6 +58,8 @@
     </Style>
     <Style Selector="controls|SmartActionView:action /template/ extendedTextBlock|FormattedTextBlock">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
+    </Style>
+    <Style Selector="controls|SmartActionView:action /template/ Border">
     </Style>
     <Style Selector="controls|SmartActionView:action:selected /template/ Border">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
