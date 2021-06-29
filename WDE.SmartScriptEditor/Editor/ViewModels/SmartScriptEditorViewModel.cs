@@ -1372,9 +1372,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             for (var i = 0; i < 4; ++i)
                 floatParametersList.Add((obj.Target.Position[i], "Target"));
 
-            var canPickTarget = obj.ToObservable(e => e.Id)
-                .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id)).Select(actionData => !actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0);
+            var actionDataObservable = obj.ToObservable(e => e.Id)
+                .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id));
+            var canPickConditions =
+                actionDataObservable.Select(ad => !ad.Flags.HasFlag(ActionFlags.ConditionInParameter1));
+            var canPickTarget = actionDataObservable.Select(actionData => !actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0);
 
+            actionList.Add(new EditableActionData("Conditions", "Action", async () =>
+            {
+                var newConditions = await conditionEditService.EditConditions(45, obj.Conditions);
+                obj.Conditions = newConditions?.ToList();
+            }, new ReactiveProperty<string>("Edit conditions"), canPickConditions));
+            
             if (actionData.Id != SmartConstants.ActionComment)
             {
                 actionList.Add(new EditableActionData("Type", "Source", async () =>
@@ -1493,6 +1502,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             originalAction.Source.Conditions = obj.Source.Conditions;
                             originalAction.Target.Conditions = obj.Target.Conditions;
                         }
+                        
+                        if (actionData.Flags.HasFlag(ActionFlags.ConditionInParameter1))
+                            originalAction.Conditions = obj.Conditions;
 
                         originalAction.Comment = obj.Comment;
                     }

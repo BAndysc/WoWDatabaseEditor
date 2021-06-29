@@ -27,6 +27,8 @@ namespace WDE.SmartScriptEditor.Models
 
         private ParameterValueHolder<string> comment;
 
+        public event Action<SmartAction, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
+        
         public SmartAction(int id, SmartSource source, SmartTarget target) : base(SmartActionParametersCount, id)
         {
             if (source == null || target == null)
@@ -77,6 +79,29 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartSource Source => source;
 
+        private string conditionReadable = "true";
+
+        private IList<ICondition>? conditions;
+        public IList<ICondition>? Conditions
+        {
+            get => conditions;
+            set
+            {
+                var old = conditions;
+                conditions = value;
+                OnConditionsChanged?.Invoke(this, old, value);
+                if (value == null)
+                    conditionReadable = "true";
+                else
+                {
+                    conditionReadable = string.Join(" [p]OR[/p] ", value
+                        .GroupBy(i => i.ElseGroup)
+                        .Select(group => "(" + string.Join(" [p]AND[/p] ", group.Select(g => g.Comment)) + ")"));
+                }
+                InvalidateReadable();
+            }
+        }
+        
         public bool IsSelected
         {
             get => isSelected || (parent?.IsSelected ?? false);
@@ -135,6 +160,8 @@ namespace WDE.SmartScriptEditor.Models
                             targetid = Target.Id,
                             sourceid = Source.Id,
                             pram2_m1 = "[p=1]" + (GetParameter(1).Value - 1) + "[/p]",
+                            condition1 = conditionReadable,
+                            hascondition = (conditions?.Count ?? 0) > 0,
                             pram1 = "[p=0]" + GetParameter(0).ToString(parent?.Parent) + "[/p]",
                             pram2 = "[p=1]" + GetParameter(1).ToString(parent?.Parent) + "[/p]",
                             pram3 = "[p=2]" + GetParameter(2).ToString(parent?.Parent) + "[/p]",
@@ -187,6 +214,7 @@ namespace WDE.SmartScriptEditor.Models
             se.ReadableHint = ReadableHint;
             se.ActionFlags = ActionFlags;
             se.DescriptionRules = DescriptionRules;
+            se.Conditions = Conditions?.ToList();
             se.LineId = LineId;
             for (var i = 0; i < SmartActionParametersCount; ++i)
                 se.GetParameter(i).Copy(GetParameter(i));
