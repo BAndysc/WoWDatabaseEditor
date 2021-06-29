@@ -132,6 +132,12 @@ namespace WDE.TrinityMySqlDatabase.Models
         }
 
         // those are not used on TC
+        public int LineId
+        {
+            get => 0;
+            set { }
+        }
+        
         public int SourceType
         {
             get => 0;

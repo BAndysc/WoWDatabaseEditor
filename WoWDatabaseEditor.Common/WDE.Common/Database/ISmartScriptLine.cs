@@ -11,6 +11,8 @@ namespace WDE.Common.Database
         int Id { get; set; }
 
         int Link { get; set; }
+        
+        int LineId { get; set; }
 
         int EventType { get; set; }
 
@@ -83,6 +85,7 @@ namespace WDE.Common.Database
         public int ScriptSourceType { get; set; }
         public int Id { get; set; }
         public int Link { get; set; }
+        public int LineId { get; set; }
         public int EventType { get; set; }
         public int EventPhaseMask { get; set; }
         public int EventChance { get; set; }

@@ -116,6 +116,7 @@ namespace WDE.SmartScriptEditor.Data
 
             SmartAction action = new(id, source, target);
             var raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
+            action.ActionFlags = raw.Flags;
             action.CommentParameter.IsUsed = raw.CommentField != null;
             action.CommentParameter.Name = raw.CommentField ?? "Comment";
             SetParameterObjects(action, raw);
@@ -138,6 +139,7 @@ namespace WDE.SmartScriptEditor.Data
                 return;
             
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
+            smartAction.ActionFlags = raw.Flags;
             smartAction.CommentParameter.IsUsed = raw.CommentField != null;
             smartAction.CommentParameter.Name = raw.CommentField ?? "Comment";
             SetParameterObjects(smartAction, raw, true);

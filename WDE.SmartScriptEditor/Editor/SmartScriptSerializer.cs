@@ -126,6 +126,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 EntryOrGuid = scriptEntryOrGuid,
                 ScriptSourceType = (int) scriptSourceType,
                 Id = id,
+                LineId = -1,
                 EventType = SmartConstants.EventAiInitialize,
                 ActionType = SmartConstants.ActionNone,
                 Comment = string.IsNullOrEmpty(gv.Comment) ? $"#define {gv.VariableType} {gv.Key} {gv.Name}" : $"#define {gv.VariableType} {gv.Key} {gv.Name} -- {gv.Comment}"
@@ -163,6 +164,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     ScriptSourceType = (int) scriptSourceType,
                     Id = id + (autoLinks ? index : 0),
                     Link = linkTo ?? 0,
+                    LineId = a.LineId,
                     EventType = e.Id,
                     EventPhaseMask = (int) e.Phases.Value,
                     EventChance = (int) e.Chance.Value,
