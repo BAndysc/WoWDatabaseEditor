@@ -28,13 +28,8 @@
 				"description": "Aura from this spell id"
 			},
 			{
-				"type": "SwitchParameter",
+				"type": "SpellEffectIndexParameter",
 				"name": "Spell Effect Index",
-				"values": {
-					"0": {"name": "EFFECT_0"},
-					"1": {"name": "EFFECT_1"},
-					"2": {"name": "EFFECT_2"}
-				},
 				"description": "Each spell has 'effects', you can see them in Spell Work"
 			}
 		],
@@ -106,19 +101,8 @@
 				"description": "Faction ID to test"
 			},
 			{
-				"type": "SwitchParameter",
-				"name": "Minimum rank",
-				"values":
-				{
-					"0": {"name": "REP_HATED"},
-					"1": {"name": "REP_HOSTILE"},
-					"2": {"name": "REP_UNFRIENDLY"},
-					"3": {"name": "REP_NEUTRAL"},
-					"4": {"name": "REP_FRIENDLY"},
-					"5": {"name": "REP_HONORED"},
-					"6": {"name": "REP_REVERED"},
-					"7": {"name": "REP_EXALTED"}
-				}
+				"type": "ReputationRankParameter",
+				"name": "Minimum rank"
 			}
 		],
 		"description": "{target} {negate:has at least|has no more than} reputation {pram2} to faction {pram1}"
@@ -131,13 +115,9 @@
 		"help": "Condition met if target (only player) belongs to horde/alliance",
 		"parameters": [
 			{
-				"type": "SwitchParameter",
+				"type": "TeamAllianceParameter",
 				"name": "Team",
-				"description": "Team to test. Only applies to players",
-				"values": {
-					"67": {"name": "Horde"},
-					"469": {"name": "Alliance"}
-				}
+				"description": "Team to test. Only applies to players"
 			}
 		],
 		"description": "{target} {negate:belongs|doesn't belong to} to {pram1}"
@@ -199,14 +179,8 @@
 		"help": "Condition is met if target is drunk",
 		"parameters": [
 			{
-				"type": "SwitchParameter",
-				"name": "Drunken State",
-				"values": {
-					"0": {"name": "DRUNKEN_SOBER"},
-					"1": {"name": "DRUNKEN_TIPSY"},
-					"2": {"name": "DRUNKEN_DRUNK"},
-					"3": {"name": "DRUNKEN_SMASHED"}
-				}
+				"type": "DrunkStateParameter",
+				"name": "Drunk State"
 			}
 		],
 		"description": "{target} {negate:has|doesn't have} drunk state {pram1}"
@@ -367,13 +341,8 @@
 		"help": "Condition is met if target has gender",
 		"parameters": [
 			{
-				"type": "SwitchParameter",
-				"name": "Gender",
-				"values": {
-					"0": {"name": "GENDER_MALE"},
-					"1": {"name": "GENDER_FEMALE"},
-					"2": {"name": "GENDER_NONE"}
-				}
+				"type": "GenderParameter",
+				"name": "Gender"
 			}
 		],
 		"description": "{target} {negate:is|is not} {pram1}"
@@ -386,36 +355,8 @@
 		"help": "Condition is met if target has unit state",
 		"parameters": [
 			{
-				"type": "FlagParameter",
-				"name": "Unit State",
-				"values": {
-					"1": {"name": "UNIT_STATE_DIED", "description": "player has fake death aura"},
-					"2": {"name": "UNIT_STATE_MELEE_ATTACKING", "description": "player is melee attacking someone"},
-					"8": {"name": "UNIT_STATE_STUNNED"},
-					"16": {"name": "UNIT_STATE_ROAMING"},
-					"32": {"name": "UNIT_STATE_CHASE"},
-					"128": {"name": "UNIT_STATE_FLEEING"},
-					"256": {"name": "UNIT_STATE_IN_FLIGHT", "description": "player is in flight mode"},
-					"512": {"name": "UNIT_STATE_FOLLOW"},
-					"1024": {"name": "UNIT_STATE_ROOT"},
-					"2048": {"name": "UNIT_STATE_CONFUSED"},
-					"4096": {"name": "UNIT_STATE_DISTRACTED"},
-					"8192": {"name": "UNIT_STATE_ISOLATED", "description": "area auras do not affect other players"},
-					"16384": {"name": "UNIT_STATE_ATTACK_PLAYER"},
-					"32768": {"name": "UNIT_STATE_CASTING"},
-					"65536": {"name": "UNIT_STATE_POSSESSED"},
-					"131072": {"name": "UNIT_STATE_CHARGING"},
-					"262144": {"name": "UNIT_STATE_JUMPING"},
-					"1048576": {"name": "UNIT_STATE_MOVE"},
-					"2097152": {"name": "UNIT_STATE_ROTATING"},
-					"4194304": {"name": "UNIT_STATE_EVADE"},
-					"8388608": {"name": "UNIT_STATE_ROAMING_MOVE"},
-					"16777216": {"name": "UNIT_STATE_CONFUSED_MOVE"},
-					"33554432": {"name": "UNIT_STATE_FLEEING_MOVE"},
-					"67108864": {"name": "UNIT_STATE_CHASE_MOVE"},
-					"134217728": {"name": "UNIT_STATE_FOLLOW_MOVE"},
-					"268435456": {"name": "UNIT_STATE_IGNORE_PATHFINDING"}
-				}
+				"type": "UnitStateParameter",
+				"name": "Unit State"
 			}
 		],
 		"description": "{target} {negate:has|doesn't have} unit state {pram1}"
@@ -505,15 +446,8 @@
 				"description": "Level to compare"
 			},
 			{
-				"type": "SwitchParameter",
+				"type": "ConditionsComparisonTypeParameter",
 				"name": "Comparison",
-				"values": {
-					"0": {"name": "equals (=)"},
-					"1": {"name": "higher than (>)"},
-					"2": {"name": "lower than (<)"},
-					"3": {"name": "higher or equals (>=)"},
-					"4": {"name": "lower or equals (<=)"}
-				},
 				"description": "Comparison type"
 			}
 		],
@@ -577,19 +511,8 @@
 		"help": "Condition is met if target has given entry, given guid or is given type",
 		"parameters": [
 			{
-				"type": "SwitchParameter",
-				"name": "Type ID",
-				"values": {
-					"0": {"name": "TYPEID_OBJECT"},
-					"1": {"name": "TYPEID_ITEM"},
-					"2": {"name": "TYPEID_CONTAINER"},
-					"3": {"name": "TYPEID_UNIT"},
-					"4": {"name": "TYPEID_PLAYER"},
-					"5": {"name": "TYPEID_GAMEOBJECT"},
-					"6": {"name": "TYPEID_DYNAMICOBJECT"},
-					"7": {"name": "TYPEID_CORPSE"},
-					"8": {"name": "TYPEID_AREATRIGGER"}
-				}
+				"type": "TypeIdParameter",
+				"name": "Type ID"
 			},
 			{
 				"type": "ConditionObjectEntryParameter",
@@ -675,18 +598,8 @@
 				}
 			},
 			{
-				"type": "FlagParameter",
-				"name": "Rank",
-				"values": {
-					"1": {"name": "REP_HATED"},
-					"2": {"name": "REP_HOSTILE"},
-					"4": {"name": "REP_UNFRIENDLY"},
-					"8": {"name": "REP_NEUTRAL"},
-					"16": {"name": "REP_FRIENDLY"},
-					"32": {"name": "REP_HONORED"},
-					"64": {"name": "REP_REVERED"},
-					"128": {"name": "REP_EXALTED"}
-				}
+				"type": "ReputationRankMaskParameter",
+				"name": "Rank"
 			}
 		],
 		"description": "{target} reaction to {pram1} {negate:is|is not} {pram2}"
@@ -710,15 +623,8 @@
 				"name": "Distance"
 			},
 			{
-				"type": "SwitchParameter",
-				"name": "Comparison",
-				"values": {
-					"0": {"name": "equals (=)"},
-					"1": {"name": "higher than (>)"},
-					"2": {"name": "lower than (<)"},
-					"3": {"name": "higher or equals (>=)"},
-					"4": {"name": "lower or equals (<=)"}
-				}
+				"type": "ConditionsComparisonTypeParameter",
+				"name": "Comparison"
 			}
 		],
 		"description": "{target} distance to {pram1} {negate:{pram3value:choose(0|1|2|3|4):=|>|<|>=|<=|invalid value}|{pram3value:choose(0|1|2|3|4):!=|<=|>=|<|>|invalid value}} {pram2} yards"
@@ -743,15 +649,8 @@
 				"name": "HP"
 			},
 			{
-				"type": "SwitchParameter",
-				"name": "Comparison",
-				"values": {
-					"0": {"name": "equals (=)"},
-					"1": {"name": "higher than (>)"},
-					"2": {"name": "lower than (<)"},
-					"3": {"name": "higher or equals (>=)"},
-					"4": {"name": "lower or equals (<=)"}
-				}
+				"type": "ConditionsComparisonTypeParameter",
+				"name": "Comparison"
 			}
 		],
 		"description": "{target}'s HP {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=|invalid value}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>|invalid value}} {pram1}"
@@ -768,15 +667,8 @@
 				"name": "HP %"
 			},
 			{
-				"type": "SwitchParameter",
-				"name": "Comparison",
-				"values": {
-					"0": {"name": "equals (=)"},
-					"1": {"name": "higher than (>)"},
-					"2": {"name": "lower than (<)"},
-					"3": {"name": "higher or equals (>=)"},
-					"4": {"name": "lower or equals (<=)"}
-				}
+				"type": "ConditionsComparisonTypeParameter",
+				"name": "Comparison"
 			}
 		],
 		"description": "{target}'s HP {negate:{pram2value:choose(0|1|2|3|4):=|>|<|>=|<=|invalid value}|{pram2value:choose(0|1|2|3|4):!=|<=|>=|<|>|invalid value}} {pram1}%"
@@ -795,6 +687,228 @@
 			}
 		],
 		"description": "{target} {negate:in|is not in} terrain swap {pram1}"
+	},
+
+	{
+		"id": 42,
+		"name": "CONDITION_STAND_STATE",
+		"name_readable": "Has stand state",
+		"help": "Condition is met if target has specific stand state",
+		"parameters": [
+			{
+				"type": "BoolParameter",
+				"name": "Has not specific stand state"
+			},
+			{
+				"type": "StandStateParameter",
+				"name": "Stand state"
+			}
+		],
+		"description": "{target} {pram1value:choose(0):{negate:has|doesn't have} stand state {pram2}|{pram2value:choose(0|1):{negate:stands|doesn't stand}|{negate:sits|doesn't sit}|(never, invalid combination of parameters)}"
+	},
+
+	{
+		"id": 43,
+		"name": "CONDITION_DAILY_QUEST_DONE",
+		"name_readable": "Daily quest done",
+		"help": "Condition is met if target has quest done on that day",
+		"parameters": [
+			{
+				"type": "QuestParameter",
+				"name": "Quest"
+			}
+		],
+		"description": "{target} {negate:has completed|hasn't completed} daily quest {pram1} today"
+	},
+
+	{
+		"id": 44,
+		"name": "CONDITION_CHARMED",
+		"name_readable": "Is charmed",
+		"help": "Condition is met if target is charmed",
+		"description": "{target} {negate:is|is not} charmed"
+	},
+
+	{
+		"id": 45,
+		"name": "CONDITION_PET_TYPE",
+		"name_readable": "Has pet of type",
+		"parameters": [
+			{
+				"type": "PetTypeMaskParameter",
+				"name": "Quest"
+			}
+		],
+		"help": "Condition is met if target player has a pet of given type(s)",
+		"description": "{target} {negate:has|doesn't have} pet of type {pram1}"
+	},
+
+	{
+		"id": 46,
+		"name": "CONDITION_TAXI",
+		"name_readable": "Is using taxi",
+		"help": "Condition is met if target player is taking a taxi",
+		"description": "{target} {negate:is on taxi|is not on taxi}"
+	},
+
+	{
+		"id": 47,
+		"name": "CONDITION_QUESTSTATE",
+		"name_readable": "Has quest in state",
+		"parameters": [
+			{
+				"type": "QuestParameter",
+				"name": "Quest"
+			},
+			{
+				"type": "QuestStatusParameter",
+				"name": "State"
+			}
+		],
+		"help": "Condition is met if target player is in any of the provided quest states for the quest",
+		"description": "{target} {negate:has|doesn't have} {pram1} in state {pram2}"
+	},
+
+	{
+		"id": 48,
+		"name": "CONDITION_QUEST_OBJECTIVE_PROGRESS",
+		"name_readable": "Has quest objective progress",
+		"parameters": [
+			{
+				"type": "QuestParameter",
+				"name": "Quest"
+			},
+			{
+				"type": "Parameter",
+				"name": "Objective index"
+			},
+			{
+				"type": "Parameter",
+				"name": "Objective count"
+			}
+		],
+		"help": "Condition is met if target player has reached the specified objectiveCount quest progress for the objectiveIndex for the specified quest",
+		"description": "{target} {pram2} quest {pram1} objective {negate:==|!=} {pram3}"
+	},
+
+	{
+		"id": 49,
+		"name": "CONDITION_DIFFICULTY_ID",
+		"name_readable": "Is map difficulty",
+		"parameters": [
+			{
+				"type": "MapDifficultyParameter",
+				"name": "Map difficulty"
+			}
+		],
+		"help": "Condition is met if target map has difficulty id",
+		"description": "{target}'s map difficulty {negate:is|isn't} {pram1}"
+	},
+
+	{
+		"id": 50,
+		"name": "CONDITION_GAMEMASTER",
+		"name_readable": "Is gamemaster",
+		"parameters": [
+			{
+				"type": "SwitchParameter",
+				"name": "Check mode",
+				"values": {
+					"0": {"name": "is gamemaster"},
+					"1": {"name": "can be gamemaster"}
+				}
+			}
+		],
+		"help": "Condition is met if target player is (or can be) gamemaster",
+		"description": "{target} {pram1value:choose(1):{negate:can be gamemaster|can't be gamemaster}|{negate:is gamemaster|isn't gamemaster}}"
+	},
+
+	{
+		"id": 51,
+		"name": "CONDITION_OBJECT_ENTRY_GUID_MASTER",
+		"name_readable": "[TC 9.x] Is entry/guid/type",
+		"help": "[TC 9.x] Condition is met if target has given entry, given guid or is given type",
+		"parameters": [
+			{
+				"type": "SwitchParameter",
+				"name": "Type ID",
+				"values": {
+					"0": {"name": "TYPEID_OBJECT"},
+					"1": {"name": "TYPEID_ITEM"},
+					"2": {"name": "TYPEID_CONTAINER"},
+					"3": {"name": "TYPEID_UNIT"},
+					"4": {"name": "TYPEID_PLAYER"},
+					"5": {"name": "TYPEID_GAMEOBJECT"},
+					"6": {"name": "TYPEID_DYNAMICOBJECT"},
+					"7": {"name": "TYPEID_CORPSE"},
+					"8": {"name": "TYPEID_AREATRIGGER"}
+				}
+			},
+			{
+				"type": "ConditionObjectEntryParameter",
+				"name": "Entry",
+				"description": "Creature or gameobject entry"
+			},
+			{
+				"type": "Parameter",
+				"name": "Guid from DB"
+			}
+		],
+		"description": "{target} {negate:is|is not} {pram1}{pram2value:choose(0):|, entry is {pram2}}{pram3value:choose(0):| and guid is {pram3}}"
+	},
+
+	{
+		"id": 52,
+		"name": "CONDITION_TYPE_MASK_MASTER",
+		"name_readable": "[TC 9.x] Has typemask",
+		"help": "[TC 9.x] Condition is met if target is in given typemask",
+		"parameters": [
+			{
+				"type": "FlagParameter",
+				"name": "Type Mask",
+				"values": {
+					"1": {"name": "TYPEMASK_OBJECT"},
+					"2": {"name": "TYPEMASK_ITEM"},
+					"6": {"name": "TYPEMASK_CONTAINER", "description": "TYPEMASK_ITEM | 0x0004"},
+					"8": {"name": "TYPEMASK_UNIT"},
+					"16": {"name": "TYPEMASK_PLAYER"},
+					"32": {"name": "TYPEMASK_GAMEOBJECT"},
+					"64": {"name": "TYPEMASK_DYNAMICOBJECT"},
+					"128": {"name": "TYPEMASK_CORPSE"},
+					"256": {"name": "TYPEMASK_AREATRIGGER"},
+					"88": {"name": "TYPEMASK_SEER", "description": "TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT"}
+				}
+			}
+		],
+		"description": "{target} {negate:is|is not} of type {pram1}"
+	},
+
+	{
+		"id": 53,
+		"name": "CONDITION_CREATURE_FAMILY",
+		"name_readable": "Is of family",
+		"help": "Condition is met if target is creature of family",
+		"parameters": [
+			{
+				"type": "Parameter",
+				"name": "Family"
+			}
+		],
+		"description": "{target} {negate:is|is not} of family {pram1}"
+	},
+
+	{
+		"id": 54,
+		"name": "CONDITION_CREATURE_SUBFAMILY",
+		"name_readable": "Is of subfamily",
+		"help": "Condition is met if target is creature of subfamily",
+		"parameters": [
+			{
+				"type": "Parameter",
+				"name": "Subfamily"
+			}
+		],
+		"description": "{target} {negate:is|is not} of subfamily {pram1}"
 	}
 
 ]

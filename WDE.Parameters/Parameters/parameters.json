@@ -1356,6 +1356,21 @@
 			"64": {"name": "arcane"}
 		}
 	},
+	"TypeIdParameter": {	
+		"name": "Type id",	
+		"prefix": "TYPE_",	
+		"values": {	
+			"0": {"name": "object"},	
+			"1": {"name": "item"},	
+			"2": {"name": "container"},	
+			"3": {"name": "creature"},	
+			"4": {"name": "player"},	
+			"5": {"name": "gameobject"},	
+			"6": {"name": "dynamic object"},	
+			"7": {"name": "corpse"},	
+			"8": {"name": "areatrigger"}	
+		}	
+	},
 	"TypeMaskParameter": {
 		"name": "Type mask",
 		"inmenu": true,
@@ -2392,5 +2407,125 @@
 			"1": {"name": "hit"},
 			"2": {"name": "aura"}
 		}
-	}
+	},
+	"PetTypeParameter": {	
+		"name": "Pet type",	
+		"values": {	
+			"0": {"name": "summoned pet"},	
+			"1": {"name": "hunter pet"}	
+		}	
+	},	
+	"PetTypeMaskParameter": {	
+		"name": "Pet type mask",	
+		"isflag": true,	
+		"values": {	
+			"1": {"name": "summoned"},	
+			"2": {"name": "hunter"}	
+		}	
+	},	
+	"MapDifficultyParameter": {	
+	  "name": "Map difficulty",	
+	  "values": {	
+		"0": {"name": "regular / normal dung / 10man norm"},	
+		"1": {"name": "heroic dung/25 norm raid"},	
+		"2": {"name": "epic dung/10 heroic raid"},	
+		"3": {"name": "25 heroic raid"}	
+	  }	
+	},	
+	"MapDifficultyMaskParameter": {	
+	  "name": "Map difficulty Mask",	
+	  "isflag": true,	
+	  "values": {	
+		"0": {"name": "any"},	
+		"1": {"name": "regular"},	
+		"2": {"name": "heroic dung/25 norm raid"},	
+		"4": {"name": "epic dung/10 heroic raid"},	
+		"8": {"name": "25 heroic raid"}	
+	  }	
+	},	
+	"ConditionsComparisonTypeParameter": {	
+		"name": "Conditions comparison type",	
+		"values": {	
+			"0": {"name": "equals (=)"},	
+			"1": {"name": "higher than (>)"},	
+			"2": {"name": "lower than (<)"},	
+			"3": {"name": "higher or equals (>=)"},	
+			"4": {"name": "lower or equals (<=)"}	
+		}	
+	},	
+	"ReputationRankParameter": {	
+		"name": "Reputation rank",	
+		"values": {	
+			"0": {"name": "REP_HATED"},	
+			"1": {"name": "REP_HOSTILE"},	
+			"2": {"name": "REP_UNFRIENDLY"},	
+			"3": {"name": "REP_NEUTRAL"},	
+			"4": {"name": "REP_FRIENDLY"},	
+			"5": {"name": "REP_HONORED"},	
+			"6": {"name": "REP_REVERED"},	
+			"7": {"name": "REP_EXALTED"}	
+		}	
+	},	
+	"ReputationRankMaskParameter": {	
+		"name": "Reputation rank",	
+		"isflag": true,	
+		"values": {	
+			"1": {"name": "REP_HATED"},	
+			"2": {"name": "REP_HOSTILE"},	
+			"4": {"name": "REP_UNFRIENDLY"},	
+			"8": {"name": "REP_NEUTRAL"},	
+			"16": {"name": "REP_FRIENDLY"},	
+			"32": {"name": "REP_HONORED"},	
+			"64": {"name": "REP_REVERED"},	
+			"128": {"name": "REP_EXALTED"}	
+		}	
+	},	
+	"TeamAllianceParameter": {	
+		"name": "Team",	
+		"values": {	
+			"67": {"name": "Horde"},	
+			"469": {"name": "Alliance"}	
+		}	
+	},	
+	"DrunkStateParameter": {	
+		"name": "Drunken state",	
+		"values": {	
+			"0": {"name": "sober"},	
+			"1": {"name": "tipsy"},	
+			"2": {"name": "drunk"},	
+			"3": {"name": "smashed"}	
+		}	
+	},	
+	"UnitStateParameter": {	
+		"name": "Unit state",	
+		"isflag": true,	
+		"values": {	
+			"1": {"name": "UNIT_STATE_DIED", "description": "player has fake death aura"},	
+			"2": {"name": "UNIT_STATE_MELEE_ATTACKING", "description": "player is melee attacking someone"},	
+			"8": {"name": "UNIT_STATE_STUNNED"},	
+			"16": {"name": "UNIT_STATE_ROAMING"},	
+			"32": {"name": "UNIT_STATE_CHASE"},	
+			"128": {"name": "UNIT_STATE_FLEEING"},	
+			"256": {"name": "UNIT_STATE_IN_FLIGHT", "description": "player is in flight mode"},	
+			"512": {"name": "UNIT_STATE_FOLLOW"},	
+			"1024": {"name": "UNIT_STATE_ROOT"},	
+			"2048": {"name": "UNIT_STATE_CONFUSED"},	
+			"4096": {"name": "UNIT_STATE_DISTRACTED"},	
+			"8192": {"name": "UNIT_STATE_ISOLATED", "description": "area auras do not affect other players"},	
+			"16384": {"name": "UNIT_STATE_ATTACK_PLAYER"},	
+			"32768": {"name": "UNIT_STATE_CASTING"},	
+			"65536": {"name": "UNIT_STATE_POSSESSED"},	
+			"131072": {"name": "UNIT_STATE_CHARGING"},	
+			"262144": {"name": "UNIT_STATE_JUMPING"},	
+			"1048576": {"name": "UNIT_STATE_MOVE"},	
+			"2097152": {"name": "UNIT_STATE_ROTATING"},	
+			"4194304": {"name": "UNIT_STATE_EVADE"},	
+			"8388608": {"name": "UNIT_STATE_ROAMING_MOVE"},	
+			"16777216": {"name": "UNIT_STATE_CONFUSED_MOVE"},	
+			"33554432": {"name": "UNIT_STATE_FLEEING_MOVE"},	
+			"67108864": {"name": "UNIT_STATE_CHASE_MOVE"},	
+			"134217728": {"name": "UNIT_STATE_FOLLOW_MOVE"},	
+			"268435456": {"name": "UNIT_STATE_IGNORE_PATHFINDING"}	
+		}	
+	}	
 }

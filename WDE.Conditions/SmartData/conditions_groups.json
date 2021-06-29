@@ -12,7 +12,10 @@
             "CONDITION_QUESTREWARDED",
             "CONDITION_QUESTTAKEN",
             "CONDITION_QUEST_COMPLETE",
-            "CONDITION_QUEST_NONE"
+            "CONDITION_QUEST_NONE",
+            "CONDITION_DAILY_QUEST_DONE",
+            "CONDITION_QUESTSTATE",
+            "CONDITION_QUEST_OBJECTIVE_PROGRESS"
         ]
     },
     {
@@ -21,7 +24,8 @@
             "CONDITION_MAPID",
             "CONDITION_AREAID",
             "CONDITION_ZONEID",
-            "CONDITION_TERRAIN_SWAP"
+            "CONDITION_TERRAIN_SWAP",
+            "CONDITION_DIFFICULTY_ID"
         ]
     },
     {
@@ -33,7 +37,13 @@
             "CONDITION_UNIT_STATE",
             "CONDITION_TYPE_MASK",
             "CONDITION_OBJECT_ENTRY_GUID",
-            "CONDITION_CREATURE_TYPE"
+            "CONDITION_OBJECT_ENTRY_GUID_MASTER",
+            "CONDITION_TYPE_MASK_MASTER",
+            "CONDITION_CREATURE_FAMILY",
+            "CONDITION_CREATURE_SUBFAMILY",
+            "CONDITION_CREATURE_TYPE",
+            "CONDITION_STAND_STATE",
+            "CONDITION_CHARMED"
         ]
     },
     {
@@ -62,7 +72,10 @@
             "CONDITION_GENDER",
             "CONDITION_SKILL",
             "CONDITION_DRUNKENSTATE",
-            "CONDITION_SPELL"
+            "CONDITION_SPELL",
+            "CONDITION_PET_TYPE",
+            "CONDITION_TAXI",
+            "CONDITION_GAMEMASTER"
         ]
     },
     {
