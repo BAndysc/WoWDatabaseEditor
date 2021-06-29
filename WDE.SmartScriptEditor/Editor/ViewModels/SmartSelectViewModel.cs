@@ -59,10 +59,30 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Accept = new DelegateCommand(() =>
             {
                 if (selectedItem == null)
-                    SelectedItem = FilteredItems[0][0];
+                    SelectedItem = FindExactMatching() ?? FilteredItems[0][0];
 
                 CloseOk?.Invoke();
-            }, () => selectedItem != null || (FilteredItems.Count == 1 && FilteredItems[0].Count == 1));
+            }, () => selectedItem != null || (FilteredItems.Count == 1 && FilteredItems[0].Count == 1 || FindExactMatching() != null))
+                .ObservesProperty(() => SearchBox);
+        }
+
+        private SmartItem? FindExactMatching()
+        {
+            if (string.IsNullOrEmpty(SearchBox.Trim()))
+                return null;
+            
+            var searchLowerCase = SearchBox.Trim().ToLower();
+            
+            foreach (var group in FilteredItems)
+            {
+                foreach (var item in group)
+                {
+                    if (item.Name.ToLower() == searchLowerCase)
+                        return item;
+                }
+            }
+
+            return null;
         }
 
         public ReadOnlyObservableCollection<SmartItemsGroup> FilteredItems { get; }
