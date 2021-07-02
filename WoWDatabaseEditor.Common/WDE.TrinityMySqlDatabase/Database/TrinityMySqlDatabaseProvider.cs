@@ -241,17 +241,39 @@ namespace WDE.TrinityMySqlDatabase.Database
             switch (type)
             {
                 case SmartScriptType.Creature:
-                    await model.CreatureTemplate.Where(p => p.Entry == (uint) entryOrGuid)
-                        .Set(p => p.AIName, "SmartAI")
+                {
+                    uint entry = 0;
+                    if (entryOrGuid < 0)
+                    {
+                        var template = await model.Creature.Where(p => p.Guid == (uint)-entryOrGuid).FirstOrDefaultAsync();
+                        if (template == null)
+                            throw new Exception(
+                                $"Trying to install creature script for guid {-entryOrGuid}, but this guid doesn't exist in creature table, so entry cannot be determined.");
+                        entry = template.Entry;
+                    }
+                    await model.CreatureTemplate.Where(p => p.Entry == entry)
+                        .Set(p => p.AIName, currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName)
                         .Set(p => p.ScriptName, "")
                         .UpdateAsync();
                     break;
+                }
                 case SmartScriptType.GameObject:
-                    await model.GameObjectTemplate.Where(p => p.Entry == (uint)entryOrGuid)
-                        .Set(p => p.AIName, "SmartGameObjectAI")
+                {
+                    uint entry = 0;
+                    if (entryOrGuid < 0)
+                    {
+                        var template = await model.GameObject.Where(p => p.Guid == (uint)-entryOrGuid).FirstOrDefaultAsync();
+                        if (template == null)
+                            throw new Exception(
+                                $"Trying to install gameobject script for guid {-entryOrGuid}, but this guid doesn't exist in gameobject table, so entry cannot be determined.");
+                        entry = template.Entry;
+                    }
+                    await model.GameObjectTemplate.Where(p => p.Entry == entry)
+                        .Set(p => p.AIName, currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName)
                         .Set(p => p.ScriptName, "")
                         .UpdateAsync();
                     break;
+                }
                 case SmartScriptType.Quest:
                     var addonExists = await model.QuestTemplateAddon.Where(p => p.Entry == (uint)entryOrGuid).AnyAsync();
                     if (!addonExists)

@@ -20,18 +20,21 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ISmartDataManager smartDataManager;
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ISolutionItemNameRegistry nameRegistry;
+        private readonly IDatabaseProvider databaseProvider;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
         public TrinityCoreSmartScriptExporter(ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
             ICurrentCoreVersion currentCoreVersion,
             ISolutionItemNameRegistry nameRegistry,
+            IDatabaseProvider databaseProvider,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
             this.currentCoreVersion = currentCoreVersion;
             this.nameRegistry = nameRegistry;
+            this.databaseProvider = databaseProvider;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
@@ -181,7 +184,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         public string GenerateSql(ISmartScriptSolutionItem item, SmartScript script)
         {
-            return new ExporterHelper(script, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
+            return new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
         }
     }
 }

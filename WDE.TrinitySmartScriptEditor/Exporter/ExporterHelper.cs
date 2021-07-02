@@ -18,6 +18,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, {comment})";
 
         private readonly SmartScript script;
+        private readonly IDatabaseProvider databaseProvider;
         private readonly ISmartScriptSolutionItem item;
         private readonly ISmartScriptExporter scriptExporter;
         private readonly ICurrentCoreVersion currentCoreVersion;
@@ -26,6 +27,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly StringBuilder sql = new();
 
         public ExporterHelper(SmartScript script, 
+            IDatabaseProvider databaseProvider,
             ISmartScriptSolutionItem item,
             ISmartScriptExporter scriptExporter,
             ICurrentCoreVersion currentCoreVersion,
@@ -33,6 +35,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.script = script;
+            this.databaseProvider = databaseProvider;
             this.item = item;
             this.scriptExporter = scriptExporter;
             this.currentCoreVersion = currentCoreVersion;
@@ -137,11 +140,44 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             switch (script.SourceType)
             {
                 case SmartScriptType.Creature:
-                    sql.AppendLine("UPDATE creature_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName + "\" WHERE entry= @ENTRY;");
+                {
+                    uint? entry = null;
+                    if (script.EntryOrGuid >= 0)
+                        entry = (uint)script.EntryOrGuid;
+                    else
+                        entry = databaseProvider.GetCreatureByGuid((uint)-script.EntryOrGuid)?.Entry;
+
+                    if (entry.HasValue)
+                    {
+                        var entryString = "@ENTRY";
+                        if (script.EntryOrGuid != entry.Value)
+                            entryString = entry.Value.ToString();
+                        sql.AppendLine("UPDATE creature_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName + $"\" WHERE entry={entryString};");
+                    }
+                    else
+                        sql.AppendLine("-- [WARNING] cannot set creature AI to SmartAI, because guid not found in `creature` table!");
+
                     break;
+                }
                 case SmartScriptType.GameObject:
-                    sql.AppendLine("UPDATE gameobject_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName + "\" WHERE entry=@ENTRY;");
+                {
+                    uint? entry = null;
+                    if (script.EntryOrGuid >= 0)
+                        entry = (uint)script.EntryOrGuid;
+                    else
+                        entry = databaseProvider.GetCreatureByGuid((uint)-script.EntryOrGuid)?.Entry;
+
+                    if (entry.HasValue)
+                    {
+                        var entryString = "@ENTRY";
+                        if (script.EntryOrGuid != entry.Value)
+                            entryString = entry.Value.ToString();
+                        sql.AppendLine("UPDATE gameobject_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName + $"\" WHERE entry={entryString};");
+                    }
+                    else
+                        sql.AppendLine("-- [WARNING] cannot set gameobject AI to SmartGameObjectAI, because guid not found in `gameobject` table!");
                     break;
+                }
                 case SmartScriptType.Quest:
                     sql.AppendLine("INSERT IGNORE INTO quest_template_addon (ID) VALUES (@ENTRY);");
                     sql.AppendLine("UPDATE quest_template_addon SET ScriptName=\"SmartQuest\" WHERE ID=@ENTRY;");

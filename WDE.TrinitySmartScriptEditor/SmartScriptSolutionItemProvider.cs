@@ -57,9 +57,9 @@ namespace WDE.TrinitySmartScriptEditor
     [AutoRegisterToParentScopeAttribute]
     public class SmartScriptCreatureProvider : SmartScriptSolutionItemProvider
     {
-        private readonly Lazy<ICreatureEntryProviderService> creatureEntryProvider;
+        private readonly Lazy<ICreatureEntryOrGuidProviderService> creatureEntryProvider;
 
-        public SmartScriptCreatureProvider(Lazy<ICreatureEntryProviderService> creatureEntryProvider) : base("Creature Script",
+        public SmartScriptCreatureProvider(Lazy<ICreatureEntryOrGuidProviderService> creatureEntryProvider) : base("Creature Script",
             "Script any npc in game.",
             "document_creature_big",
             SmartScriptType.Creature)
@@ -69,19 +69,19 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = await creatureEntryProvider.Value.GetEntryFromService();
+            int? entry = await creatureEntryProvider.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Creature);
+            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.Creature);
         }
     }
 
     [AutoRegisterToParentScopeAttribute]
     public class SmartScriptGameobjectProvider : SmartScriptSolutionItemProvider
     {
-        private readonly Lazy<IGameobjectEntryProviderService> goProvider;
+        private readonly Lazy<IGameobjectEntryOrGuidProviderService> goProvider;
 
-        public SmartScriptGameobjectProvider(Lazy<IGameobjectEntryProviderService> goProvider) : base("Gameobject Script",
+        public SmartScriptGameobjectProvider(Lazy<IGameobjectEntryOrGuidProviderService> goProvider) : base("Gameobject Script",
             "Create script for object, including transports.",
             "document_gobject_big",
             SmartScriptType.GameObject)
@@ -91,10 +91,10 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = await goProvider.Value.GetEntryFromService();
+            int? entry = await goProvider.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.GameObject);
+            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.GameObject);
         }
     }
 
@@ -113,10 +113,10 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = await service.Value.GetEntryFromService();
+            int? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Quest);
+            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.Quest);
         }
     }
 
@@ -135,10 +135,10 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = await service.Value.GetEntryFromService();
+            int? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Aura);
+            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.Aura);
         }
     }
 
@@ -157,10 +157,10 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            uint? entry = await service.Value.GetEntryFromService();
+            int? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem((int) entry.Value, SmartScriptType.Spell);
+            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.Spell);
         }
     }
 

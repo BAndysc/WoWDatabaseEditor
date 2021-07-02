@@ -4,26 +4,26 @@ using WDE.Module.Attributes;
 namespace WDE.Common
 {
     [UniqueProvider]
-    public interface ICreatureEntryProviderService
+    public interface ICreatureEntryOrGuidProviderService
     {
-        Task<uint?> GetEntryFromService();
+        Task<int?> GetEntryFromService();
     }
 
     [UniqueProvider]
-    public interface IGameobjectEntryProviderService
+    public interface IGameobjectEntryOrGuidProviderService
     {
-        Task<uint?> GetEntryFromService();
+        Task<int?> GetEntryFromService();
     }
 
     [UniqueProvider]
     public interface IQuestEntryProviderService
     {
-        Task<uint?> GetEntryFromService();
+        Task<int?> GetEntryFromService();
     }
 
     [UniqueProvider]
     public interface ISpellEntryProviderService
     {
-        Task<uint?> GetEntryFromService();
+        Task<int?> GetEntryFromService();
     }
 }

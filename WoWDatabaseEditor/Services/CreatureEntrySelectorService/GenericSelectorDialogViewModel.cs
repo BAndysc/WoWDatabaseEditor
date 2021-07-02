@@ -17,14 +17,14 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 {
     public class GenericSelectorDialogViewModel<T> : BindableBase, IDialog
     {
-        private readonly Func<T, uint> entryGetter;
+        private readonly Func<T, int> entryGetter;
         private readonly Func<T, string> index;
         private SourceList<T> items;
         private string search = "";
 
         public GenericSelectorDialogViewModel(IEnumerable<ColumnDescriptor> columns,
             IEnumerable<T> collection,
-            Func<T, uint> entryGetter,
+            Func<T, int> entryGetter,
             Func<T, string> index)
         {
             this.entryGetter = entryGetter;
@@ -82,13 +82,13 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
             set => SetProperty(ref search, value);
         }
         
-        public uint GetEntry()
+        public int GetEntry()
         {
             if (SelectedItem != null)
                 return entryGetter(SelectedItem);
 
-            uint res;
-            uint.TryParse(SearchText, out res);
+            int res;
+            int.TryParse(SearchText, out res);
             return res;
         }
 

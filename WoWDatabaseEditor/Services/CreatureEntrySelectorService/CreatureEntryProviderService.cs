@@ -15,11 +15,11 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
     [AutoRegister]
     public abstract class GenericDatabaseProviderService<T>
     {
-        private readonly Func<T, uint> entryGetter;
+        private readonly Func<T, int> entryGetter;
         private readonly Func<T, string> index;
         private readonly IWindowManager windowManager;
 
-        protected GenericDatabaseProviderService(IWindowManager windowManager, Func<T, uint> entryGetter, Func<T, string> index)
+        protected GenericDatabaseProviderService(IWindowManager windowManager, Func<T, int> entryGetter, Func<T, string> index)
         {
             this.entryGetter = entryGetter;
             this.index = index;
@@ -28,7 +28,7 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 
         protected abstract IEnumerable<T> GetList();
 
-        public async Task<uint?> GetEntryFromService()
+        public async Task<int?> GetEntryFromService()
         {
             List<ColumnDescriptor> columns = new()
             {
@@ -46,11 +46,11 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
         }
     }
 
-    public class CreatureEntryProviderService : GenericDatabaseProviderService<ICreatureTemplate>, ICreatureEntryProviderService
+    public class CreatureEntryOrGuidProviderService : GenericDatabaseProviderService<ICreatureTemplate>, ICreatureEntryOrGuidProviderService
     {
         private readonly IDatabaseProvider database;
 
-        public CreatureEntryProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager, t => t.Entry, t => t.Name + " " + t.Entry)
+        public CreatureEntryOrGuidProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager, t => (int)t.Entry, t => t.Name + " " + t.Entry)
         {
             this.database = database;
         }
@@ -61,11 +61,11 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
         }
     }
 
-    public class GameobjectEntryProviderService : GenericDatabaseProviderService<IGameObjectTemplate>, IGameobjectEntryProviderService
+    public class GameobjectEntryOrGuidProviderService : GenericDatabaseProviderService<IGameObjectTemplate>, IGameobjectEntryOrGuidProviderService
     {
         private readonly IDatabaseProvider database;
 
-        public GameobjectEntryProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager,t => t.Entry, t => t.Name + " " + t.Entry)
+        public GameobjectEntryOrGuidProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager,t => (int)t.Entry, t => t.Name + " " + t.Entry)
         {
             this.database = database;
         }
@@ -80,7 +80,7 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
     {
         private readonly IDatabaseProvider database;
 
-        public QuestEntryProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager, t => t.Entry, t => t.Name + " " + t.Entry)
+        public QuestEntryProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager, t => (int)t.Entry, t => t.Name + " " + t.Entry)
         {
             this.database = database;
         }
@@ -107,7 +107,7 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
     {
         private readonly ISpellStore spellStore;
 
-        public SpellEntryProviderService(IWindowManager windowManager, ISpellStore spellStore) : base(windowManager, t => t.Entry, t => t.Name + " " + t.Entry)
+        public SpellEntryProviderService(IWindowManager windowManager, ISpellStore spellStore) : base(windowManager, t => (int)t.Entry, t => t.Name + " " + t.Entry)
         {
             this.spellStore = spellStore;
         }
