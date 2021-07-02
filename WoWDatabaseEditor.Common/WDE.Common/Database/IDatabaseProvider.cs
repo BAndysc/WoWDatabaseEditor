@@ -45,6 +45,9 @@ namespace WDE.Common.Database
         IEnumerable<ISmartScriptProject> GetProjects();
 
         IBroadcastText? GetBroadcastTextByText(string text);
+
+        ICreature? GetCreatureByGuid(uint guid);
+        IGameObject? GetGameObjectByGuid(uint guid);
         
         [Flags]
         public enum ConditionKeyMask

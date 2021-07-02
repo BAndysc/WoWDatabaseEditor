@@ -53,5 +53,9 @@ namespace WDE.MySqlDatabaseCommon.Database
             Task.FromResult<IList<int>>(new List<int>());
         
         public IBroadcastText? GetBroadcastTextByText(string text) => null;
+        
+        public ICreature? GetCreatureByGuid(uint guid) => null;
+
+        public IGameObject? GetGameObjectByGuid(uint guid) => null;
     }
 }

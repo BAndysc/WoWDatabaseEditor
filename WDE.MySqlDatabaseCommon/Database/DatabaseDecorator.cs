@@ -52,5 +52,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             impl.GetSmartScriptEntriesByType(scriptType);
         
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
+        public ICreature? GetCreatureByGuid(uint guid) => impl.GetCreatureByGuid(guid);
+        public IGameObject? GetGameObjectByGuid(uint guid) => impl.GetGameObjectByGuid(guid);
     }
 }

@@ -374,7 +374,19 @@ namespace WDE.TrinityMySqlDatabase.Database
             using var model = new TrinityDatabase();
             return (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefault();
         }
-        
+
+        public ICreature? GetCreatureByGuid(uint guid)
+        {
+            using var model = new TrinityDatabase();
+            return model.Creature.FirstOrDefault(c => c.Guid == guid);
+        }
+
+        public IGameObject? GetGameObjectByGuid(uint guid)
+        {
+            using var model = new TrinityDatabase();
+            return model.GameObject.FirstOrDefault(g => g.Guid == guid);
+        }
+
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
         public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
     }

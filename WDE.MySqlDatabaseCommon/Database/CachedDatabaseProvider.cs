@@ -159,6 +159,10 @@ namespace WDE.MySqlDatabaseCommon.Database
             return null;
         }
 
+        public ICreature? GetCreatureByGuid(uint guid) => nonCachedDatabase.GetCreatureByGuid(guid);
+
+        public IGameObject? GetGameObjectByGuid(uint guid) => nonCachedDatabase.GetGameObjectByGuid(guid);
+
         private class DatabaseCacheTask : IAsyncTask
         {
             private readonly CachedDatabaseProvider cache;
