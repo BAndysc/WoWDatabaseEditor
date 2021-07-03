@@ -4,6 +4,7 @@ using WDE.Common.Windows;
 using WDE.Module;
 using WDE.Module.Attributes;
 using WDE.MySqlDatabaseCommon.Database;
+using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.MySqlDatabaseCommon.Tools;
 using WDE.TrinityMySqlDatabase.Database;
@@ -18,7 +19,7 @@ namespace WDE.TrinityMySqlDatabase
         {
             base.RegisterTypes(containerRegistry);
             containerRegistry.RegisterSingleton<CachedDatabaseProvider>();
-            containerRegistry.RegisterSingleton<NullDatabaseProvider>();
+            containerRegistry.RegisterSingleton<NullWorldDatabaseProvider>();
             containerRegistry.RegisterSingleton<TrinityMySqlDatabaseProvider>();
             containerRegistry.RegisterSingleton<IMySqlExecutor, MySqlExecutor>();
             containerRegistry.RegisterSingleton<ICreatureStatCalculatorService, CreatureStatCalculatorService>();

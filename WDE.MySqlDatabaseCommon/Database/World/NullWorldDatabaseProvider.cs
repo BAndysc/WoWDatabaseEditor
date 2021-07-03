@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 
-namespace WDE.MySqlDatabaseCommon.Database
+namespace WDE.MySqlDatabaseCommon.Database.World
 {
-    public class NullDatabaseProvider : IDatabaseProvider
+    public class NullWorldDatabaseProvider : IDatabaseProvider
     {
         public bool IsConnected => false;
         

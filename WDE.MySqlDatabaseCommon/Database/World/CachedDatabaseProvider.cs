@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using KTrie;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Tasks;
 
-namespace WDE.MySqlDatabaseCommon.Database
+namespace WDE.MySqlDatabaseCommon.Database.World
 {
     public class CachedDatabaseProvider : IDatabaseProvider
     {

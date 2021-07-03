@@ -9,6 +9,7 @@ using LinqToDB.Data;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.MySqlDatabaseCommon.Database;
+using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.TrinityMySqlDatabase.Data;
