@@ -29,6 +29,7 @@ namespace WDE.CommonViews.Avalonia
         {
             // database
             viewLocator.Bind<DatabaseConfigViewModel, DatabaseConfigView>();
+            viewLocator.Bind<WDE.SkyFireMySqlDatabase.ViewModels.DatabaseConfigViewModel, DatabaseConfigView>();
             viewLocator.Bind<DebugQueryToolViewModel, DebugQueryToolView>();
             // solutions
             viewLocator.Bind<SolutionExplorerViewModel, SolutionExplorerView>();
