@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using WDE.Common.Services;
 using WDE.MySqlDatabaseCommon.Providers;
 
 namespace WDE.TrinityMySqlDatabase.Data
 {
-    public struct DbAccess : ISettings, IDbAccess
+    public struct AuthDbAccess : ISettings, IDbAccess
     {
-        public static DbAccess Default => new() {Host = "localhost", Port = 3306};
+        public static AuthDbAccess Default => new() {Host = "localhost", Port = 3306};
         
         public string? Host { get; set; }
         public string? Password { get; set; }

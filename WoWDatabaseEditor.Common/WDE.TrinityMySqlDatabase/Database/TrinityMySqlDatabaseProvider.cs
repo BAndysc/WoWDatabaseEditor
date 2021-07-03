@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
-using LinqToDB.Configuration;
 using LinqToDB.Data;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
@@ -12,28 +11,28 @@ using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
-using WDE.TrinityMySqlDatabase.Data;
 using WDE.TrinityMySqlDatabase.Models;
 using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase.Database
 {
-    public class TrinityMySqlDatabaseProvider : IAsyncDatabaseProvider
+    public class TrinityMySqlDatabaseProvider : IAsyncDatabaseProvider, IAuthDatabaseProvider
     {
         public bool IsConnected => true;
-        
+
         private readonly ICurrentCoreVersion currentCoreVersion;
 
-        public TrinityMySqlDatabaseProvider(IDatabaseSettingsProvider settings,
+        public TrinityMySqlDatabaseProvider(IWorldDatabaseSettingsProvider settings,
+            IAuthDatabaseSettingsProvider authSettings,
             DatabaseLogger databaseLogger,
             ICurrentCoreVersion currentCoreVersion)
         {
             this.currentCoreVersion = currentCoreVersion;
             DataConnection.TurnTraceSwitchOn();
             DataConnection.WriteTraceLine = databaseLogger.Log;
-            DataConnection.DefaultSettings = new MySqlSettings(settings.Settings);
+            DataConnection.DefaultSettings = new MySqlSettings(settings.Settings, authSettings.Settings);
         }
-
+        
         public ICreatureTemplate? GetCreatureTemplate(uint entry)
         {
             using var model = new TrinityDatabase();
@@ -412,45 +411,28 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
         public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
-    }
-
-    public class ConnectionStringSettings : IConnectionStringSettings
-    {
-        public string ConnectionString { get; set; } = "";
-        public string Name { get; set; } = "";
-        public string ProviderName { get; set; } = "";
-        public bool IsGlobal => false;
-    }
-
-    public class MySqlSettings : ILinqToDBSettings, IMySqlConnectionStringProvider
-    {
-        private readonly DbAccess access;
-
-        public MySqlSettings(DbAccess access)
+        
+        public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
-            this.access = access;
-            DatabaseName = access.Database ?? "";
-            ConnectionStrings = new[]
-            {
-                new ConnectionStringSettings
-                {
-                    Name = "Trinity",
-                    ProviderName = "MySqlConnector",
-                    ConnectionString = ConnectionString
-                }
-            };
+            if (!Supports<IAuthRbacPermission>())
+                return new List<IAuthRbacPermission>();
+            
+            await using var model = new TrinityAuthDatabase();
+            return await model.RbacPermissions.ToListAsync<IAuthRbacPermission>();
         }
 
-        public IEnumerable<IDataProviderSettings> DataProviders => Enumerable.Empty<IDataProviderSettings>();
+        public async Task<IList<IAuthRbacLinkedPermission>> GetLinkedPermissionsAsync()
+        {
+            if (!Supports<IAuthRbacLinkedPermission>())
+                return new List<IAuthRbacLinkedPermission>();
+            
+            await using var model = new TrinityAuthDatabase();
+            return await model.RbacLinkedPermissions.ToListAsync<IAuthRbacLinkedPermission>();
+        }
 
-        public string DefaultConfiguration => "MySqlConnector";
-        public string DefaultDataProvider => "MySqlConnector";
-
-        public IEnumerable<IConnectionStringSettings> ConnectionStrings { get; }
-
-        public string ConnectionString =>
-            $"Server={access.Host};Port={access.Port ?? 3306};Database={access.Database};Uid={access.User};Pwd={access.Password};AllowUserVariables=True";
-
-        public string DatabaseName { get; }
+        private bool Supports<T>()
+        {
+            return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(T));
+        }
     }
 }

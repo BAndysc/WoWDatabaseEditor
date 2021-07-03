@@ -16,7 +16,12 @@ namespace WDE.AzerothCore
         public IConditionFeatures ConditionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
 
-        public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate)};
+        public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
+            typeof(IConversationTemplate),
+            typeof(IAuthRbacPermission),
+            typeof(IAuthRbacLinkedPermission)
+        };
+        
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {
             SmartScriptType.Creature,

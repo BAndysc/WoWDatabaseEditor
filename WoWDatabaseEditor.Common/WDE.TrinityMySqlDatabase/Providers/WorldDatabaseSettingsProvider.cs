@@ -7,11 +7,11 @@ namespace WDE.TrinityMySqlDatabase.Providers
 {
     [AutoRegister]
     [SingleInstance]
-    public class DatabaseSettingsProvider : IDatabaseSettingsProvider, IMySqlConnectionStringProvider
+    public class WorldDatabaseSettingsProvider : IWorldDatabaseSettingsProvider, IMySqlConnectionStringProvider
     {
         private readonly IUserSettings userSettings;
 
-        public DatabaseSettingsProvider(IUserSettings userSettings)
+        public WorldDatabaseSettingsProvider(IUserSettings userSettings)
         {
             this.userSettings = userSettings;
         }
@@ -19,10 +19,17 @@ namespace WDE.TrinityMySqlDatabase.Providers
         public string ConnectionString => $"Server={Settings.Host};Port={Settings.Port ?? 3306};Database={Settings.Database};Uid={Settings.User};Pwd={Settings.Password};AllowUserVariables=True";
         public string DatabaseName => Settings.Database ?? "";
 
-        public DbAccess Settings
+        public IDbAccess Settings
         {
             get => userSettings.Get<DbAccess>(DbAccess.Default);
-            set => userSettings.Update(value);
+            set => userSettings.Update(new DbAccess()
+            {
+                Host = value.Host,
+                Port = value.Port,
+                User = value.User,
+                Password = value.Password,
+                Database = value.Database,
+            });
         }
     }
 }

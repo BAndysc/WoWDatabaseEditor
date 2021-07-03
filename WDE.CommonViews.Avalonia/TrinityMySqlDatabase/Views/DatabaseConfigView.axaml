@@ -4,28 +4,56 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="False">
     <ScrollViewer>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <TextBlock Text="Host" VerticalAlignment="Center" />
-            <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
-            <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
-            <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
-            <TextBlock Text="Database" Grid.Row="4" VerticalAlignment="Center" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host, Mode=TwoWay}" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding User, Mode=TwoWay}" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Password, Mode=TwoWay}" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="4" Text="{Binding Database, Mode=TwoWay}" />
-        </Grid>
+        <StackPanel>
+            <TextBlock FontWeight="Bold" FontSize="20">World database:</TextBlock>
+            <Grid DataContext="{Binding WorldDatabase}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Host" VerticalAlignment="Center" />
+                <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
+                <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
+                <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
+                <TextBlock Text="Database" Grid.Row="4" VerticalAlignment="Center" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host, Mode=TwoWay}" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding User, Mode=TwoWay}" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Password, Mode=TwoWay}" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="4" Text="{Binding Database, Mode=TwoWay}" />
+            </Grid>
+            
+            <TextBlock FontWeight="Bold" FontSize="20">Auth database:</TextBlock>
+            <Grid DataContext="{Binding AuthDatabase}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Host" VerticalAlignment="Center" />
+                <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
+                <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
+                <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
+                <TextBlock Text="Database" Grid.Row="4" VerticalAlignment="Center" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host, Mode=TwoWay}" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding User, Mode=TwoWay}" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Password, Mode=TwoWay}" />
+                <TextBox Margin="5" Grid.Column="1" Grid.Row="4" Text="{Binding Database, Mode=TwoWay}" />
+            </Grid>
+        </StackPanel>
     </ScrollViewer>
 </UserControl>

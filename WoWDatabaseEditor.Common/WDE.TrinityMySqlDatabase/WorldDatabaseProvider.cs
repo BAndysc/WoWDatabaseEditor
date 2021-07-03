@@ -8,6 +8,7 @@ using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Database.World;
+using WDE.MySqlDatabaseCommon.Providers;
 using WDE.TrinityMySqlDatabase.Database;
 using WDE.TrinityMySqlDatabase.Models;
 using WDE.TrinityMySqlDatabase.Providers;
@@ -18,16 +19,13 @@ namespace WDE.TrinityMySqlDatabase
     [SingleInstance]
     public class WorldDatabaseProvider : WorldDatabaseDecorator
     {
-        private readonly IStatusBar statusBar;
-
         public WorldDatabaseProvider(TrinityMySqlDatabaseProvider trinityDatabase,
             NullWorldDatabaseProvider nullWorldDatabaseProvider,
-            IDatabaseSettingsProvider settingsProvider,
+            IWorldDatabaseSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
             IStatusBar statusBar,
             ITaskRunner taskRunner) : base(nullWorldDatabaseProvider)
         {
-            this.statusBar = statusBar;
             if (settingsProvider.Settings.IsEmpty)
                 return;
 
