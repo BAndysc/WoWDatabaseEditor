@@ -133,5 +133,10 @@
         <SolidColorBrush x:Key="ToolBarButton.Background.PointerOver" Color="#20000000" />
         <SolidColorBrush x:Key="ToolBarButton.Background.Pressed" Color="#30000000" />
         <SolidColorBrush x:Key="ToolBarButton.Foreground" Color="#717171" />
+        
+        <!-- wizard -->
+        <SolidColorBrush x:Key="NumberIndicatorBackground" Color="#bdc3c7" />
+        <SolidColorBrush x:Key="NumberIndicatorBackgroundActive" Color="#27ae60" />
+        <SolidColorBrush x:Key="NumberIndicatorForeground" Color="white" />
     </Style.Resources>
 </Style>

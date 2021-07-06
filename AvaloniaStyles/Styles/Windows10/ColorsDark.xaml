@@ -63,6 +63,11 @@
         <!-- dock fix -->
         <SolidColorBrush x:Key="DockThemeBackgroundBrush" Color="#252525" />
         <SolidColorBrush x:Key="DockThemeBorderLowBrush" Color="#3F3F46" />
+        
+        <!-- wizard -->
+        <SolidColorBrush x:Key="NumberIndicatorBackground" Color="#34495e" />
+        <SolidColorBrush x:Key="NumberIndicatorBackgroundActive" Color="#17632E" />
+        <SolidColorBrush x:Key="NumberIndicatorForeground" Color="#bdc3c7" />
     </Styles.Resources>
     
     <Style Selector="GridSplitter">

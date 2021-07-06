@@ -1,0 +1,55 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:AvaloniaStyles.Controls"
+        xmlns:converters="clr-namespace:AvaloniaStyles.Converters">
+    <Design.PreviewWith>
+        <controls:WizardPanel />
+    </Design.PreviewWith>
+    <Styles.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </Styles.Resources>
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/NumberIndicatorControl/NumberIndicator.axaml"></StyleInclude>
+
+    <Style Selector="controls|WizardPanel">
+        <Setter Property="TitleTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding WizardStepName}" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <ContentPresenter ContentTemplate="{TemplateBinding TitleTemplate}" 
+                                      Content="{Binding}"
+                                      DockPanel.Dock="Top"
+                                      Padding="10"
+                                      TextBlock.FontSize="28"
+                                      TextBlock.FontWeight="Light"
+                                      />
+                    <Border></Border>
+                    <DockPanel Margin="10" DockPanel.Dock="Bottom" LastChildFill="True">
+                        <Button Command="{TemplateBinding NextStepCommand}" DockPanel.Dock="Right">Next &gt;</Button>
+                        <Button Command="{TemplateBinding PreviousStepCommand}" DockPanel.Dock="Right" Margin="0,0,10,0">&lt; Back</Button>
+                        <controls:NumberIndicator StepsCount="{TemplateBinding StepsCount}" CurrentStep="{TemplateBinding CurrentStepIndex}" />
+                    </DockPanel>
+                    
+                    <Panel>
+                        <Panel x:Name="PART_PanelContainer" IsVisible="{TemplateBinding IsLoading, Converter={StaticResource InverseBoolConverter}}">
+                        
+                        </Panel>
+                        <Panel IsVisible="{TemplateBinding IsLoading}">
+                            <TextBlock TextAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="50"
+                                       FontWeight="Light"
+                            >Loading...</TextBlock>
+                        </Panel>
+                    </Panel>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

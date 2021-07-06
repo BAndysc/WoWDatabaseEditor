@@ -1,0 +1,35 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:AvaloniaStyles.Controls"
+        xmlns:converters="clr-namespace:AvaloniaStyles.Converters">
+    <Design.PreviewWith>
+        <controls:NumberIndicatorItem />
+    </Design.PreviewWith>
+    
+    <Styles.Resources>
+        <converters:ToStringConverter x:Key="ToStringConverter"/> 
+    </Styles.Resources>
+
+    <Style Selector="controls|NumberIndicatorItem">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border CornerRadius="30">
+                    <TextBlock Text="{TemplateBinding Number, Converter={StaticResource ToStringConverter}}"
+                               Foreground="{DynamicResource NumberIndicatorForeground}"
+                               FontWeight="Bold"
+                               FontSize="20"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|NumberIndicatorItem /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource NumberIndicatorBackground}" />
+    </Style>
+    <Style Selector="controls|NumberIndicatorItem:active /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource NumberIndicatorBackgroundActive}" />
+    </Style>
+</Styles>

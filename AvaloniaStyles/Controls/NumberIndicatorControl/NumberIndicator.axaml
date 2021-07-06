@@ -1,0 +1,33 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:AvaloniaStyles.Controls">
+    <Design.PreviewWith>
+        <controls:NumberIndicator />
+    </Design.PreviewWith>
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/NumberIndicatorControl/NumberIndicatorItem.axaml" />
+
+    <Style Selector="controls|NumberIndicator">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ItemsControl Items="{TemplateBinding Items}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <controls:NumberIndicatorItem 
+                                    Margin="0,0,18,0"
+                                    Number="{Binding Number}"
+                                    IsActive="{Binding IsActive}"
+                                    Width="{Binding Height, RelativeSource={RelativeSource AncestorType=controls:NumberIndicator, Mode=FindAncestor}}" 
+                                    Height="{Binding Height, RelativeSource={RelativeSource AncestorType=controls:NumberIndicator, Mode=FindAncestor}}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                       </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

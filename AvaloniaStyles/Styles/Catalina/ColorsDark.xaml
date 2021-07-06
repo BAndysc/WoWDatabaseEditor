@@ -128,5 +128,10 @@
         <!-- datagrid -->
         <SolidColorBrush x:Key="DataGrid.Header.Background" Color="#404040" />
         <SolidColorBrush x:Key="DataGrid.Header.Background.Pressed" Color="#202020" />
+        
+        <!-- wizard -->
+        <SolidColorBrush x:Key="NumberIndicatorBackground" Color="#34495e" />
+        <SolidColorBrush x:Key="NumberIndicatorBackgroundActive" Color="#17632E" />
+        <SolidColorBrush x:Key="NumberIndicatorForeground" Color="#bdc3c7" />
     </Style.Resources>
 </Style>
