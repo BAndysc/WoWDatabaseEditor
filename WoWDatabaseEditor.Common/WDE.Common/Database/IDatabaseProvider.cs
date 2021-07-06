@@ -48,7 +48,9 @@ namespace WDE.Common.Database
 
         ICreature? GetCreatureByGuid(uint guid);
         IGameObject? GetGameObjectByGuid(uint guid);
-        
+
+        IEnumerable<ICoreCommandHelp> GetCommands();
+
         [Flags]
         public enum ConditionKeyMask
         {

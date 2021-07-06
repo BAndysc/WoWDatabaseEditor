@@ -57,5 +57,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public ICreature? GetCreatureByGuid(uint guid) => null;
 
         public IGameObject? GetGameObjectByGuid(uint guid) => null;
+
+        public IEnumerable<ICoreCommandHelp> GetCommands() => Enumerable.Empty<ICoreCommandHelp>();
     }
 }

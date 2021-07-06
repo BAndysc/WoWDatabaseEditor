@@ -409,6 +409,12 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.GameObject.FirstOrDefault(g => g.Guid == guid);
         }
 
+        public IEnumerable<ICoreCommandHelp> GetCommands()
+        {
+            using var model = new TrinityDatabase();
+            return model.Commands.ToList();
+        }
+
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
         public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
         

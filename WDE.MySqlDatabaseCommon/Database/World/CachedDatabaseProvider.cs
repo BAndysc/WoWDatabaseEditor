@@ -161,6 +161,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public ICreature? GetCreatureByGuid(uint guid) => nonCachedDatabase.GetCreatureByGuid(guid);
 
         public IGameObject? GetGameObjectByGuid(uint guid) => nonCachedDatabase.GetGameObjectByGuid(guid);
+        
+        public IEnumerable<ICoreCommandHelp> GetCommands() => nonCachedDatabase.GetCommands();
 
         private class DatabaseCacheTask : IAsyncTask
         {

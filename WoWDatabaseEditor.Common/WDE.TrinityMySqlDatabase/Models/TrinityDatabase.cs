@@ -1,5 +1,6 @@
 ﻿using LinqToDB;
 using LinqToDB.Data;
+using WDE.MySqlDatabaseCommon.CommonModels;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
@@ -27,5 +28,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlNpcText> NpcTexts => GetTable<MySqlNpcText>();
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
         public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
+        public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
     }
 }

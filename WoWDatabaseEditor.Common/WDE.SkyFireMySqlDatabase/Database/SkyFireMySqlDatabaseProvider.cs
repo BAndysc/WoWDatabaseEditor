@@ -415,6 +415,12 @@ namespace WDE.SkyFireMySqlDatabase.Database
             return await model.RbacLinkedPermissions.ToListAsync<IAuthRbacLinkedPermission>();
         }
 
+        public IEnumerable<ICoreCommandHelp> GetCommands()
+        {
+            using var model = new SkyFireDatabase();
+            return model.Commands.ToList();
+        }
+        
         private bool Supports<T>()
         {
             return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(T));

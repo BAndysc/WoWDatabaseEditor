@@ -1,5 +1,6 @@
 ﻿using LinqToDB;
 using LinqToDB.Data;
+using WDE.MySqlDatabaseCommon.CommonModels;
 
 namespace WDE.SkyFireMySqlDatabase.Models
 {
@@ -25,5 +26,6 @@ namespace WDE.SkyFireMySqlDatabase.Models
         public ITable<MySqlNpcText> NpcTexts => GetTable<MySqlNpcText>();
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
         public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
+        public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
     }
 }
