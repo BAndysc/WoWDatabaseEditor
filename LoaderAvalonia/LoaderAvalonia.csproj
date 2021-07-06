@@ -21,6 +21,7 @@
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WDE.ProjectSkyFire\WDE.ProjectSkyFire.csproj" />
+      <ProjectReference Include="..\WDE.SourceCodeIntegrationEditor\WDE.SourceCodeIntegrationEditor.csproj" />
       <ProjectReference Include="..\WDE.SmartScriptEditor.Avalonia\WDE.SmartScriptEditor.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />

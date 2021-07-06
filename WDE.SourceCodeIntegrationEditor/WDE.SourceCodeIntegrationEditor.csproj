@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+        <FileVersion>0.0.0.0</FileVersion>
+        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+        <RootNamespace>WDE.SourceCodeIntegrationEditor</RootNamespace>
+    </PropertyGroup>
+    <Import Project="..\Avalonia.props" />
+    <ItemGroup>
+        <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+        <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+    </ItemGroup>
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+
+</Project>

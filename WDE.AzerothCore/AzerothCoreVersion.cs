@@ -15,6 +15,7 @@ namespace WDE.AzerothCore
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
+        public bool SupportsRbac => false;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
             typeof(IConversationTemplate),

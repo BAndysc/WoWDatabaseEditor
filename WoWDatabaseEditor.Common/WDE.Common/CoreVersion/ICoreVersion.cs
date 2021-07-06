@@ -13,6 +13,7 @@ namespace WDE.Common.CoreVersion
         IDatabaseFeatures DatabaseFeatures { get; }
         ISmartScriptFeatures SmartScriptFeatures { get; }
         IConditionFeatures ConditionFeatures { get; }
+        bool SupportsRbac => true;
     }
 
     public interface IConditionFeatures
