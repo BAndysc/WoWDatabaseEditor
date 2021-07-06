@@ -5,6 +5,7 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
@@ -29,11 +30,19 @@
         </Style>
         
         <Style Selector="Button.FlattyButton">
+            <Setter Property="Width" Value="100" />
+            <Setter Property="Height" Value="80" />
+            <Setter Property="Margin" Value="0,0,8,8" />
             <Setter Property="Template">
                 <ControlTemplate>
                     <Panel Background="Transparent">
-                        <Border CornerRadius="3" />
-                        <ContentPresenter Content="{TemplateBinding Content}" />
+                        <Border Name="Bg" CornerRadius="3" />
+                        <Border Padding="3,3" Background="Transparent">
+                            <StackPanel Orientation="Vertical">
+                                <components:WdeImage Image="{Binding Image}" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                <TextBlock TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.8" TextAlignment="Center" />
+                            </StackPanel>
+                        </Border>
                     </Panel>
                 </ControlTemplate>
             </Setter>
@@ -47,7 +56,7 @@
         <Style Selector="Button.FlattyButton:pressed">
             <Setter Property="RenderTransform" Value="scale(0.9)" />    
         </Style>
-        <Style Selector="Button.FlattyButton /template/ Border">
+        <Style Selector="Button.FlattyButton /template/ Border#Bg">
             <Setter Property="Background" Value="Black" />
             <Setter Property="Opacity" Value="0" />
             <Setter Property="Transitions">
@@ -56,7 +65,7 @@
                 </Transitions>
             </Setter>
         </Style>
-        <Style Selector="Button.FlattyButton:pointerover /template/ Border">
+        <Style Selector="Button.FlattyButton:pointerover /template/ Border#Bg">
             <Setter Property="Opacity" Value="0.2" />
         </Style>
     </UserControl.Styles>
@@ -73,7 +82,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" MaxWidth="420" MinWidth="100" />
                 </Grid.ColumnDefinitions>
                 
                 <StackPanel Margin="30,0,0,0">
@@ -92,12 +101,23 @@
                                         Margin="0,0,8,8"
                                         Command="{Binding #Root.DataContext.LoadItemCommand}"
                                         CommandParameter="{Binding}">
-                                    <Border Padding="3,3" Background="Transparent">
-                                        <StackPanel Orientation="Vertical">
-                                            <components:WdeImage Image="{Binding Image}" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Top" />
-                                            <TextBlock TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.8" TextAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    
+                    <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10" IsVisible="{Binding HasWizards}">Quick wizards</TextBlock>
+                    <ItemsControl Margin="20,0,0,0" Items="{Binding Wizards, Mode=OneTime}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel></WrapPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Classes="FlattyButton"
+                                        Command="{Binding #Root.DataContext.LoadWizard}"
+                                        CommandParameter="{Binding}">
                                 </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

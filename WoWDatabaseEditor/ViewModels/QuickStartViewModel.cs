@@ -1,9 +1,12 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.CoreVersion;
+using WDE.Common.Documents;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -13,6 +16,7 @@ using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
+using WoWDatabaseEditorCore.Extensions;
 using WoWDatabaseEditorCore.Services.NewItemService;
 
 namespace WoWDatabaseEditorCore.ViewModels
@@ -25,19 +29,25 @@ namespace WoWDatabaseEditorCore.ViewModels
         public AboutViewModel AboutViewModel { get; }
         public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
         public ObservableCollection<MostRecentlyUsedViewModel> MostRecentlyUsedItems { get; } = new();
+        public ObservableCollection<IWizardProvider> Wizards { get; } = new();
+        public bool HasWizards { get; }
         
         public QuickStartViewModel(ISolutionItemProvideService solutionItemProvideService, 
+            IEnumerable<IWizardProvider> wizards,
             IEventAggregator eventAggregator,
             ISolutionItemIconRegistry iconRegistry,
             ISolutionItemNameRegistry nameRegistry,
             ICurrentCoreVersion currentCoreVersion,
             IMainThread mainThread,
             IMostRecentlyUsedService mostRecentlyUsedService,
+            IDocumentManager documentManager,
             AboutViewModel aboutViewModel)
         {
             this.iconRegistry = iconRegistry;
             this.nameRegistry = nameRegistry;
             this.mostRecentlyUsedService = mostRecentlyUsedService;
+            Wizards.AddRange(wizards.Where(w => w.IsCompatibleWithCore(currentCoreVersion.Current)));
+            HasWizards = Wizards.Count > 0;
             AboutViewModel = aboutViewModel;
             foreach (var item in solutionItemProvideService.AllCompatible)
             {
@@ -63,6 +73,12 @@ namespace WoWDatabaseEditorCore.ViewModels
                 eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item.Item);
             });
 
+            LoadWizard = new AsyncAutoCommand<IWizardProvider>(async item =>
+            {
+                var wizard = await item.Create();
+                documentManager.OpenDocument(wizard);
+            });
+            
             AutoDispose(eventAggregator.GetEvent<EventRequestOpenItem>().Subscribe(item =>
             {
                 mainThread.Dispatch(ReloadMruList);
@@ -82,6 +98,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         }
 
         public AsyncAutoCommand<NewItemPrototypeInfo> LoadItemCommand { get; }
+        public AsyncAutoCommand<IWizardProvider> LoadWizard { get; }
         public AsyncAutoCommand<MostRecentlyUsedViewModel> OpenMostRecentlyUsedCommand { get; }
         
         public ImageUri? Icon => new ImageUri("Icons/wde_icon.png");
