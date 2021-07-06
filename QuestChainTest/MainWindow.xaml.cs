@@ -21,13 +21,13 @@ namespace QuestChainTest
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly QuestList quests;
+        //private readonly QuestList quests;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            quests = new QuestList();
+            /*quests = new QuestList();
 
             new TrinityMySqlDatabaseModule().OnInitialized(null);
 
@@ -46,10 +46,10 @@ namespace QuestChainTest
             Update();
 
             foreach (Quest q in quests)
-                q.RequiredQuests.CollectionChanged += (sender, e) => { Update(); };
+                q.RequiredQuests.CollectionChanged += (sender, e) => { Update(); };*/
         }
 
-        public class MockCoreVersion : ICurrentCoreVersion, ICoreVersion, IDatabaseFeatures,ISmartScriptFeatures, IConditionFeatures
+        /*public class MockCoreVersion : ICurrentCoreVersion, ICoreVersion, IDatabaseFeatures,ISmartScriptFeatures, IConditionFeatures
         {
             public ICoreVersion Current => this;
             public string Tag => "mock";
@@ -87,6 +87,6 @@ namespace QuestChainTest
             public void ScheduleTask(string name, Func<Task> task)
             {
             }
-        }
+        }*/
     }
 }

@@ -34,11 +34,13 @@
         {
           "name": "Quest start",
           "db_column_name": "quest_start",
-          "value_type": "QuestParameter"
+          "value_type": "QuestParameter",
+          "help": "The spell will be casted/allowed in this area ONLY if 'quest start' is in 'quest start status'"
         },
         {
           "name": "Quest start required status",
           "db_column_name": "quest_start_status",
+          "help": "The spell will be casted/allowed in this area ONLY if 'quest start' is in this state",
           "default": 64,
           "value_type": "QuestStatusParameter",
           "preferred_width": 150
@@ -46,13 +48,15 @@
         {
           "name": "Quest end",
           "db_column_name": "quest_end",
-          "value_type": "QuestParameter"
+          "value_type": "QuestParameter",
+          "help": "The spell will be casted/allowed in this area ONLY if 'quest end' is in 'quest end status'"
         },
         {
           "name": "Quest end required status",
           "db_column_name": "quest_end_status",
           "default": 11,
           "value_type": "QuestStatusParameter",
+          "help": "The spell will be casted/allowed in this area ONLY if 'quest end' is in this state",
           "preferred_width": 150
         },
         {
