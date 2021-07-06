@@ -6,12 +6,12 @@ using WDE.TrinityMySqlDatabase.Data;
 
 namespace WDE.TrinityMySqlDatabase.Database
 {
-    public class MySqlSettings : ILinqToDBSettings, IMySqlConnectionStringProvider
+    public class MySqlWorldSettings : ILinqToDBSettings, IMySqlWorldConnectionStringProvider
     {
         private readonly IDbAccess worldAccess;
         private readonly IDbAccess authAccess;
 
-        public MySqlSettings(IDbAccess worldAccess, IDbAccess authAccess)
+        public MySqlWorldSettings(IDbAccess worldAccess, IDbAccess authAccess)
         {
             this.worldAccess = worldAccess;
             this.authAccess = authAccess;

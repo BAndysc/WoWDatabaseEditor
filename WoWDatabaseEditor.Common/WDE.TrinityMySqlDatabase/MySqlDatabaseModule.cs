@@ -24,6 +24,7 @@ namespace WDE.TrinityMySqlDatabase
             containerRegistry.RegisterSingleton<NullAuthDatabaseProvider>();
             containerRegistry.RegisterSingleton<TrinityMySqlDatabaseProvider>();
             containerRegistry.RegisterSingleton<IMySqlExecutor, MySqlExecutor>();
+            containerRegistry.RegisterSingleton<IAuthMySqlExecutor, AuthMySqlExecutor>();
             containerRegistry.RegisterSingleton<ICreatureStatCalculatorService, CreatureStatCalculatorService>();
             containerRegistry.RegisterSingleton<ICodeEditorViewModel, DebugQueryToolViewModel>();
         }

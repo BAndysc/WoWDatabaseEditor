@@ -7,7 +7,7 @@ namespace WDE.TrinityMySqlDatabase.Providers
 {
     [AutoRegister]
     [SingleInstance]
-    public class AuthDatabaseSettingsProvider : IAuthDatabaseSettingsProvider, IMySqlConnectionStringProvider
+    public class AuthDatabaseSettingsProvider : IAuthDatabaseSettingsProvider, IMySqlAuthConnectionStringProvider
     {
         private readonly IUserSettings userSettings;
 

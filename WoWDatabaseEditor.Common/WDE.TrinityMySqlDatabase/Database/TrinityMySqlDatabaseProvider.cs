@@ -30,7 +30,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             this.currentCoreVersion = currentCoreVersion;
             DataConnection.TurnTraceSwitchOn();
             DataConnection.WriteTraceLine = databaseLogger.Log;
-            DataConnection.DefaultSettings = new MySqlSettings(settings.Settings, authSettings.Settings);
+            DataConnection.DefaultSettings = new MySqlWorldSettings(settings.Settings, authSettings.Settings);
         }
         
         public ICreatureTemplate? GetCreatureTemplate(uint entry)

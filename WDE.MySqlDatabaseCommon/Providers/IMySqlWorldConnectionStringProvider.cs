@@ -1,6 +1,6 @@
 namespace WDE.MySqlDatabaseCommon.Providers
 {
-    public interface IMySqlConnectionStringProvider
+    public interface IMySqlWorldConnectionStringProvider
     {
         public string ConnectionString { get; }
         public string DatabaseName { get; }

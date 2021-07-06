@@ -7,7 +7,7 @@ namespace WDE.TrinityMySqlDatabase.Providers
 {
     [AutoRegister]
     [SingleInstance]
-    public class WorldDatabaseSettingsProvider : IWorldDatabaseSettingsProvider, IMySqlConnectionStringProvider
+    public class WorldDatabaseSettingsProvider : IWorldDatabaseSettingsProvider, IMySqlWorldConnectionStringProvider
     {
         private readonly IUserSettings userSettings;
 

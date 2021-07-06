@@ -12,17 +12,17 @@ namespace WDE.MySqlDatabaseCommon.Database
 {
     public class MySqlExecutor : IMySqlExecutor
     {
-        private readonly IMySqlConnectionStringProvider connectionString;
+        private readonly IMySqlWorldConnectionStringProvider worldConnectionString;
         private readonly IDatabaseProvider databaseProvider;
         private readonly DatabaseLogger databaseLogger;
         
         public bool IsConnected => databaseProvider.IsConnected;
 
-        public MySqlExecutor(IMySqlConnectionStringProvider connectionString,
+        public MySqlExecutor(IMySqlWorldConnectionStringProvider worldConnectionString,
             IDatabaseProvider databaseProvider,
             DatabaseLogger databaseLogger)
         {
-            this.connectionString = connectionString;
+            this.worldConnectionString = worldConnectionString;
             this.databaseProvider = databaseProvider;
             this.databaseLogger = databaseLogger;
         }
@@ -36,7 +36,7 @@ namespace WDE.MySqlDatabaseCommon.Database
 
         public async Task<IList<MySqlDatabaseColumn>> GetTableColumns(string table)
         {
-            string databaseName = connectionString.DatabaseName;
+            string databaseName = worldConnectionString.DatabaseName;
             var columns = await ExecuteSelectSql($"SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, COLUMN_TYPE, COLUMN_KEY FROM information_schema.columns WHERE table_name = '{table}' AND table_schema = '{databaseName}' ORDER BY ordinal_position;");
 
             var list = new List<MySqlDatabaseColumn>();
@@ -143,7 +143,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             
             using var writeLock = await DatabaseLock.WriteLock();
             
-            MySqlConnection conn = new(connectionString.ConnectionString);
+            MySqlConnection conn = new(worldConnectionString.ConnectionString);
             MySqlTransaction transaction;
             try
             {
@@ -178,7 +178,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             databaseLogger.Log(query, null, TraceLevel.Info);
             using var writeLock = await DatabaseLock.WriteLock();
             
-            MySqlConnection conn = new(connectionString.ConnectionString);
+            MySqlConnection conn = new(worldConnectionString.ConnectionString);
             try
             {
                 conn.Open();
