@@ -421,6 +421,12 @@ namespace WDE.SkyFireMySqlDatabase.Database
             return model.Commands.ToList();
         }
         
+        public async Task<IList<ITrinityString>> GetStringsAsync()
+        {
+            await using var model = new SkyFireDatabase();
+            return await model.TrinityStrings.ToListAsync<ITrinityString>();
+        }
+        
         private bool Supports<T>()
         {
             return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(T));

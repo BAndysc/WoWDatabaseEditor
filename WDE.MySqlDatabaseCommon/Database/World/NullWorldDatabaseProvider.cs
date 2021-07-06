@@ -59,5 +59,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IGameObject? GetGameObjectByGuid(uint guid) => null;
 
         public IEnumerable<ICoreCommandHelp> GetCommands() => Enumerable.Empty<ICoreCommandHelp>();
+
+        public Task<IList<ITrinityString>> GetStringsAsync() => Task.FromResult<IList<ITrinityString>>(new List<ITrinityString>());
     }
 }

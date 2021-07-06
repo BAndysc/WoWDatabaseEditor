@@ -415,6 +415,15 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.Commands.ToList();
         }
 
+        public async Task<IList<ITrinityString>> GetStringsAsync()
+        {
+            await using var model = new TrinityDatabase();
+            if (currentCoreVersion.Current.DatabaseFeatures.AlternativeTrinityStrings)
+                return await model.AcoreStrings.ToListAsync<ITrinityString>();
+            
+            return await model.TrinityStrings.ToListAsync<ITrinityString>();
+        }
+        
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
         public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
         

@@ -29,5 +29,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
         public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
+        public ITable<ACoreString> TrinityStrings => GetTable<ACoreString>();
+        public ITable<ACoreString> AcoreStrings => GetTable<ACoreString>();
     }
 }

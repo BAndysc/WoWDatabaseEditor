@@ -26,6 +26,7 @@ namespace WDE.Common.CoreVersion
     public interface IDatabaseFeatures
     {
         ISet<Type> UnsupportedTables { get; }
+        bool AlternativeTrinityStrings => false;
     }
 
     public interface ISmartScriptFeatures

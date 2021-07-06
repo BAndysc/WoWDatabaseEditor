@@ -164,6 +164,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public IEnumerable<ICoreCommandHelp> GetCommands() => nonCachedDatabase.GetCommands();
 
+        public Task<IList<ITrinityString>> GetStringsAsync() => nonCachedDatabase.GetStringsAsync();
+        
         private class DatabaseCacheTask : IAsyncTask
         {
             private readonly CachedDatabaseProvider cache;

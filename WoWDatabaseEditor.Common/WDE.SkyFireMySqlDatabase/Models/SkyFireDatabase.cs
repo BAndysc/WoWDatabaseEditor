@@ -27,5 +27,6 @@ namespace WDE.SkyFireMySqlDatabase.Models
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
         public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
+        public ITable<SkyfireString> TrinityStrings => GetTable<SkyfireString>();
     }
 }

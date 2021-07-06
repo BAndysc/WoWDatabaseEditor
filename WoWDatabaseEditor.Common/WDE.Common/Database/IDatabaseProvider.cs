@@ -50,6 +50,7 @@ namespace WDE.Common.Database
         IGameObject? GetGameObjectByGuid(uint guid);
 
         IEnumerable<ICoreCommandHelp> GetCommands();
+        Task<IList<ITrinityString>> GetStringsAsync();
 
         [Flags]
         public enum ConditionKeyMask
