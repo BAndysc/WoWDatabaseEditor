@@ -30,14 +30,7 @@
                 </DataTemplate>
             </controls:WizardPanel.TitleTemplate>
             
-            <Border Margin="20" Padding="10" controls:WizardPanel.StepTitle="Pick core source folder">
-                <StackPanel>
-                    <TextBlock FontWeight="Light" FontSize="20" Margin="0,0,0,10">WoW Core sources</TextBlock>
-                    <TextBlock Margin="0,0,0,10">Select wow core source directory (containing src/, sql/ subfolders) to generate missing commands for</TextBlock>
-                    <TextBox Margin="0,0,0,10" Watermark="Core sources path" UseFloatingWatermark="True" IsReadOnly="True" Text="{Binding CoreSourceFolder}"></TextBox>
-                    <Button HorizontalAlignment="Left" Command="{Binding PickCoreSourceFolder}">Pick</Button>
-                </StackPanel>
-            </Border>
+            <views:SourceCodeWizardPage />
             
             <ScrollViewer controls:WizardPanel.StepTitle="Choose commands to generate sql for">
                 <StackPanel>
@@ -48,14 +41,12 @@
                 </StackPanel>
                 <ScrollViewer.DataTemplates>
                     <DataTemplate DataType="{x:Type viewModels:CommandViewModel}">
-                        <DockPanel>
-                            <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected, Mode=TwoWay}">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding NameWithDot}" FontWeight="Bold" DockPanel.Dock="Top"/>
-                                    <TextBlock Text="{Binding PermissionText}" DockPanel.Dock="Top"/>
-                                </StackPanel>
-                            </CheckBox>
-                        </DockPanel>
+                        <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected, Mode=TwoWay}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding NameWithDot}" FontWeight="Bold" DockPanel.Dock="Top"/>
+                                <TextBlock Text="{Binding PermissionText}" DockPanel.Dock="Top"/>
+                            </StackPanel>
+                        </CheckBox>
                     </DataTemplate>
                 </ScrollViewer.DataTemplates>
             </ScrollViewer>

@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Margin="20"
+             Padding="10" 
+             controls:WizardPanel.StepTitle="Pick core source folder"
+             x:Class="WDE.SourceCodeIntegrationEditor.Views.SourceCodeWizardPage">
+    <StackPanel>
+        <TextBlock FontWeight="Light" FontSize="20" Margin="0,0,0,10">WoW Core sources</TextBlock>
+        <TextBlock Margin="0,0,0,10">Select wow core source directory (containing src/, sql/ subfolders) to generate missing commands for</TextBlock>
+        <TextBox Margin="0,0,0,10" Watermark="Core sources path" UseFloatingWatermark="True" IsReadOnly="True" Text="{Binding CoreSourceFolder}"></TextBox>
+        <Button HorizontalAlignment="Left" Command="{Binding PickCoreSourceFolder}">Pick</Button>
+    </StackPanel>
+</UserControl>

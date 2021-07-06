@@ -1,0 +1,99 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:views="clr-namespace:WDE.SourceCodeIntegrationEditor.Views"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.SourceCodeIntegrationEditor.Views.TrinityStringsView">
+    <UserControl.Resources>
+        <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
+    </UserControl.Resources>
+    <controls:WizardPanel IsLoading="{Binding IsLoading}"
+                          CurrentStepIndex="{Binding WizardStep}" 
+                          NextStepCommand="{Binding CommandNextStep}" 
+                          PreviousStepCommand="{Binding CommandPreviousStep}">
+        <controls:WizardPanel.TitleTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <components:WdeImage ImageUri="icons/document_trinity_strings_big.png" Width="44" Height="44" Margin="0,0,10, 0" />
+                    <TextBlock VerticalAlignment="Bottom" Text="{Binding $parent[controls:WizardPanel].StepTitle}" />
+                </StackPanel>
+            </DataTemplate>
+        </controls:WizardPanel.TitleTemplate>
+        
+        <views:SourceCodeWizardPage />
+        
+        <ScrollViewer controls:WizardPanel.StepTitle="Choose strings to generate sql for">
+            <StackPanel>
+                <controls:GroupingHeader GroupName="Trinity strings not defined in database" />
+                <ItemsControl Padding="10,0" Items="{Binding TrinityStringsNoDatabase}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected, Mode=TwoWay}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Id}" Width="50" />
+                                    <TextBlock Text="{Binding EnumName}" FontFamily="Consolas,Menlo,Courier,Courier New" FontWeight="Bold" />
+                                </StackPanel>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <ScrollViewer controls:WizardPanel.StepTitle="Specify strings details">
+            <ItemsControl Items="{Binding ChosenStrings}">
+                <ItemsControl.Styles>
+                    <Style Selector="ItemsControl:empty">
+                        <Setter Property="Template">
+                            <ControlTemplate>
+                                <TextBlock Padding="10">You didn't select any strings to generate SQL.</TextBlock>
+                            </ControlTemplate>
+                        </Setter>
+                    </Style>
+                </ItemsControl.Styles>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid RowDefinitions="Auto,Auto" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" MinWidth="150" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" FontSize="13" TextAlignment="Right" Text="{Binding Id}" VerticalAlignment="Bottom" Margin="0,0,8,0" FontWeight="Bold" />
+                            <TextBlock Grid.Column="1" FontSize="16" Text="{Binding EnumName}" FontWeight="Bold" />
+
+                            <TextBlock Classes="Label"  Grid.Row="1">Content default:</TextBlock>
+                            <TextBox AcceptsReturn="True" Margin="0,2" Grid.Row="1" Grid.Column="1" Text="{Binding ContentDefault, Mode=TwoWay}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ScrollViewer.Styles>
+                <Style Selector="TextBlock.Label">
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="TextAlignment" Value="Right" />
+                    <Setter Property="Margin" Value="8,11" />
+                    <Setter Property="Opacity" Value="0.7" />
+                </Style>
+            </ScrollViewer.Styles>
+        </ScrollViewer>
+        
+        <DockPanel LastChildFill="True" controls:WizardPanel.StepTitle="Generated SQL">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10,0,0,0">
+                <Button Command="{Binding SaveSqlCommand}" Margin="0,0,10,0">Save to sql/updates/ folder</Button>
+                <Button Command="{Binding ExecuteSqlCommand}">Execute SQL</Button>
+            </StackPanel>
+            <avaloniaEdit:TextEditor  controls1:AvalonEditExtra.Syntax="Resources/SqlSyntax.xml" Document="{Binding ResultCode, Converter={StaticResource DocumentConverter}}" 
+                                      Padding="5" x:Name="MyAvalonEdit"
+                                      ShowLineNumbers="True"
+                                      IsReadOnly="True"
+                                      FontFamily="Consolas,Menlo,Courier,Courier New"/>
+        </DockPanel>
+    </controls:WizardPanel>
+</UserControl>

@@ -10,25 +10,22 @@ namespace WDE.SourceCodeIntegrationEditor.Wizard
 {
     [SingleInstance]
     [AutoRegister]
-    public class CommandsWizardProvider : IWizardProvider
+    public class TrinityStringsWizardProvider : IWizardProvider
     {
         private readonly IContainerProvider containerRegistry;
-        public string Name { get; } = "Commands wizard";
-        public ImageUri Image { get; } = new ImageUri("Icons/document_rbac_big.png");
-        
-        public CommandsWizardProvider(IContainerProvider containerRegistry)
+        public string Name { get; } = "Trinity strings wizard";
+        public ImageUri Image { get; } = new ImageUri("Icons/document_trinity_strings_big.png");
+
+        public TrinityStringsWizardProvider(IContainerProvider containerRegistry)
         {
             this.containerRegistry = containerRegistry;
         }
 
-        public bool IsCompatibleWithCore(ICoreVersion core)
-        {
-            return core.SupportsRbac;
-        }
+        public bool IsCompatibleWithCore(ICoreVersion core) => true;
 
         public Task<IWizard> Create()
         {
-            return Task.FromResult<IWizard>(containerRegistry.Resolve<CommandsDocumentViewModel>());
+            return Task.FromResult<IWizard>(containerRegistry.Resolve<TrinityStringsViewModel>());
         }
     }
 }
