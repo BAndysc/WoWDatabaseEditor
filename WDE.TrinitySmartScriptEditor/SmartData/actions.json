@@ -1499,7 +1499,7 @@
         ],
         "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target} with offset {targetcoords}{pram4value:choose(0):| in {pram4} yd distance}} (point id {pram1}){pram3value:choose(0):| without pathfinding}",
         "name_readable": "Move to position",
-        "target_types": ["GameObject", "Player", "Creature"],
+        "target_types": ["GameObject", "Player", "Creature", "Position"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
