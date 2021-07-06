@@ -13,8 +13,10 @@ using WDE.Module.Attributes;
 
 namespace WDE.Conditions.MenuItems
 {
+#if !DEBUGAVALONIA
     [AutoRegister]
-    public class ConditionModuleMenuItem: IMainMenuItem
+#endif
+    public class ConditionModuleMenuItem : IMainMenuItem
     {
         public string ItemName { get; } = "Editors";
         public List<IMenuItem> SubItems { get; }
