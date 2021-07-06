@@ -25,26 +25,26 @@ namespace WoWDatabaseEditorCore.Tasks
         public ObservableCollection<(ITask, ITaskProgress)> Tasks { get; } =
             new ObservableCollection<(ITask, ITaskProgress)>();
 
-        private List<(ITask, ITaskProgress)> pendingTasks = new List<(ITask, ITaskProgress)>();
+        private List<(TaskCompletionSource, ITask, ITaskProgress)> pendingTasks = new List<(TaskCompletionSource, ITask, ITaskProgress)>();
         private HashSet<ITask> activeTasks = new HashSet<ITask>();
 
         public event Action? ActivePendingTasksChanged;
         public int ActivePendingTasksCount => activeTasks.Count + pendingTasks.Count;
 
-        public void ScheduleTask(IThreadedTask threadedTask) => ScheduleTask(threadedTask, new TaskProgressSync(mainThread));
+        public Task ScheduleTask(IThreadedTask threadedTask) => ScheduleTask(threadedTask, new TaskProgressSync(mainThread));
 
-        public void ScheduleTask(IAsyncTask task) => ScheduleTask(task, new TaskProgressAsync());
+        public Task ScheduleTask(IAsyncTask task) => ScheduleTask(task, new TaskProgressAsync());
 
-        public void ScheduleTask(string name, Func<ITaskProgress, Task> task) => ScheduleTask(new AsyncTask(name, task));
+        public Task ScheduleTask(string name, Func<ITaskProgress, Task> task) => ScheduleTask(new AsyncTask(name, task));
 
-        public void ScheduleTask(string name, Func<Task> task) => ScheduleTask(new AsyncTask(name, async _ => await task()));
+        public Task ScheduleTask(string name, Func<Task> task) => ScheduleTask(new AsyncTask(name, async _ => await task()));
 
         private void AssertMainThread()
         {
             Debug.Assert(SynchronizationContext.Current != null);
         }
 
-        private void ScheduleNow(ITask task, ITaskProgress progress)
+        private void ScheduleNow(TaskCompletionSource taskCompletionSource, ITask task, ITaskProgress progress)
         {
             AssertMainThread();
             activeTasks.Add(task);
@@ -69,6 +69,10 @@ namespace WoWDatabaseEditorCore.Tasks
 
                             activeTasks.Remove(task);
                             Tasks.Remove((task, progress));
+                            if (t.Exception == null)
+                                taskCompletionSource.SetResult();
+                            else
+                                taskCompletionSource.SetException(t.Exception);
                             PeekNextTask();
                         });
                     });
@@ -84,6 +88,7 @@ namespace WoWDatabaseEditorCore.Tasks
                         await asyncTask.Run(progress);
                         AssertMainThread();
                         progress.ReportFinished();
+                        taskCompletionSource.SetResult();
                     }
                     catch (Exception e)
                     {
@@ -92,6 +97,7 @@ namespace WoWDatabaseEditorCore.Tasks
                         Console.WriteLine(e);
                         Console.WriteLine(e.StackTrace);
                         progress.ReportFail();
+                        taskCompletionSource.SetException(e);
                     }
                     finally
                     {
@@ -105,15 +111,17 @@ namespace WoWDatabaseEditorCore.Tasks
             }
         }
 
-        private void ScheduleTask(ITask task, ITaskProgress progress)
+        private Task ScheduleTask(ITask task, ITaskProgress progress)
         {
+            TaskCompletionSource completionSource = new TaskCompletionSource();
             AssertMainThread();
             Tasks.Add((task, progress));
             if (task.WaitForOtherTasks && activeTasks.Count > 0)
-                pendingTasks.Add((task, progress));
+                pendingTasks.Add((completionSource, task, progress));
             else
-                ScheduleNow(task, progress);
+                ScheduleNow(completionSource, task, progress);
             ActivePendingTasksChanged?.Invoke();
+            return completionSource.Task;
         }
 
         private void PeekNextTask()
@@ -121,11 +129,11 @@ namespace WoWDatabaseEditorCore.Tasks
             AssertMainThread();
             if (pendingTasks.Count > 0)
             {
-                var (task, progress) = pendingTasks[0];
+                var (completionSource, task, progress) = pendingTasks[0];
                 if (task.WaitForOtherTasks && activeTasks.Count == 0)
                 {
                     pendingTasks.RemoveAt(0);
-                    ScheduleNow(task, progress);
+                    ScheduleNow(completionSource, task, progress);
                 }
             }
 

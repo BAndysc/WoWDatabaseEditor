@@ -7,9 +7,9 @@ namespace WDE.Common.Tasks
     [UniqueProvider]
     public interface ITaskRunner
     {
-        void ScheduleTask(IThreadedTask threadedTask);
-        void ScheduleTask(IAsyncTask task);
-        void ScheduleTask(string name, Func<ITaskProgress, Task> task);
-        void ScheduleTask(string name, Func<Task> task);
+        Task ScheduleTask(IThreadedTask threadedTask);
+        Task ScheduleTask(IAsyncTask task);
+        Task ScheduleTask(string name, Func<ITaskProgress, Task> task);
+        Task ScheduleTask(string name, Func<Task> task);
     }
 }
