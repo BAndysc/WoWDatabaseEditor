@@ -32,7 +32,7 @@ namespace WDE.Common.Utils
 
         public static string ToSqlEscapeString(this string str)
         {
-            return "\"" +  str.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+            return "\"" +  str.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n") + "\"";
         }
 
         private enum State
