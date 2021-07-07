@@ -251,6 +251,8 @@ namespace WDE.TrinityMySqlDatabase.Database
                                 $"Trying to install creature script for guid {-entryOrGuid}, but this guid doesn't exist in creature table, so entry cannot be determined.");
                         entry = template.Entry;
                     }
+                    else
+                        entry = (uint)entryOrGuid;
                     await model.CreatureTemplate.Where(p => p.Entry == entry)
                         .Set(p => p.AIName, currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName)
                         .Set(p => p.ScriptName, "")
@@ -268,6 +270,8 @@ namespace WDE.TrinityMySqlDatabase.Database
                                 $"Trying to install gameobject script for guid {-entryOrGuid}, but this guid doesn't exist in gameobject table, so entry cannot be determined.");
                         entry = template.Entry;
                     }
+                    else
+                        entry = (uint)entryOrGuid;
                     await model.GameObjectTemplate.Where(p => p.Entry == entry)
                         .Set(p => p.AIName, currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName)
                         .Set(p => p.ScriptName, "")
