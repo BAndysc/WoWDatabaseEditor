@@ -91,8 +91,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public DelegateCommand Accept { get; }
         public DelegateCommand Cancel { get; }
-        public int DesiredWidth => 455;
-        public int DesiredHeight => 485;
+        public int DesiredWidth => 545;
+        public int DesiredHeight => 725;
         public string Title => "Edit";
         public bool Resizeable => true;
         public bool FocusFirst { get; }
