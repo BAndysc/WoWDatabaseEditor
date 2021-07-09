@@ -79,15 +79,10 @@ namespace WDE.Parameters.Models
             return parameter.ToString(value);
         }
         
-        public string ToString<R>(R context)
+        public virtual string ToString<R>(R context)
         {
             if (parameter is IContextualParameter<T, R> contextualParameter)
                 return contextualParameter.ToString(value, context);
-            if (value is long l)
-            {
-                if (l < 0)
-                    return $"objectData\\[{-l}\\]";
-            }
             return parameter.ToString(value);
         }
 

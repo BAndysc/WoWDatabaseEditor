@@ -19,6 +19,7 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartFactory(IParameterFactory parameterFactory, 
             ISmartDataManager smartDataManager, 
+            IDatabaseProvider databaseProvider,
             IConditionDataManager conditionDataManager)
         {
             this.parameterFactory = parameterFactory;
@@ -27,6 +28,8 @@ namespace WDE.SmartScriptEditor.Data
 
             if (!parameterFactory.IsRegisteredLong("StoredTargetParameter"))
             {
+                parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
+                parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("StoredTargetParameter", new VariableContextualParameter(GlobalVariableType.StoredTarget, "storedTarget"));
                 parameterFactory.Register("DataVariableParameter", new VariableContextualParameter(GlobalVariableType.DataVariable, "data"));
                 parameterFactory.Register("TimedEventParameter", new VariableContextualParameter(GlobalVariableType.TimedEvent, "timedEvent"));

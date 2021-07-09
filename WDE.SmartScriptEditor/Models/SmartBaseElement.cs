@@ -47,15 +47,15 @@ namespace WDE.SmartScriptEditor.Models
         public List<DescriptionRule>? DescriptionRules { get; set; }
         public abstract string Readable { get; }
         public int ParametersCount { get; }
-
-        protected SmartBaseElement(int parametersCount, int id)
+        
+        protected SmartBaseElement(int parametersCount, int id, Func<SmartBaseElement, ParameterValueHolder<long>> paramCreator)
         {
             Id = id;
             ParametersCount = parametersCount;
             @params = new ParameterValueHolder<long>[parametersCount];
             for (int i = 0; i < parametersCount; ++i)
             {
-                @params[i] = new ParameterValueHolder<long>(Parameter.Instance, 0);
+                @params[i] = paramCreator(this);
                 @params[i].PropertyChanged += (_, _) => CallOnChanged();
             }
 

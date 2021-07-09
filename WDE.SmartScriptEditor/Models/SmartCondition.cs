@@ -23,7 +23,7 @@ namespace WDE.SmartScriptEditor.Models
         private ParameterValueHolder<long> inverted;
         private ParameterValueHolder<long> conditionTarget;
 
-        public SmartCondition(int id) : base(SmartConditionParametersCount, id)
+        public SmartCondition(int id) : base(SmartConditionParametersCount, id, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
         {
             var invertedParam = new Parameter();
             invertedParam.Items = new Dictionary<long, SelectOption>() {[0] = new("False"), [1] = new("True")};
@@ -92,9 +92,9 @@ namespace WDE.SmartScriptEditor.Models
                 return Smart.Format(readable, new
                 {
                     target = "[p=3]" + conditionTarget + "[/p]",
-                    pram1 = "[p=0]" + GetParameter(0).ToString(parent?.Parent) + "[/p]",
-                    pram2 = "[p=1]" + GetParameter(1).ToString(parent?.Parent) + "[/p]",
-                    pram3 = "[p=2]" + GetParameter(2).ToString(parent?.Parent) + "[/p]",
+                    pram1 = "[p=0]" + GetParameter(0) + "[/p]",
+                    pram2 = "[p=1]" + GetParameter(1) + "[/p]",
+                    pram3 = "[p=2]" + GetParameter(2) + "[/p]",
                     pram1value = GetParameter(0).Value,
                     pram2value = GetParameter(1).Value,
                     pram3value = GetParameter(2).Value,

@@ -28,7 +28,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartScriptBase? Parent { get; set; }
 
-        public SmartEvent(int id) : base(SmartEventParamsCount, id)
+        public SmartEvent(int id) : base(SmartEventParamsCount, id, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
         {
             Actions = new ObservableCollection<SmartAction>();
             Conditions = new ObservableCollection<SmartCondition>();
@@ -114,10 +114,10 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(readable,
                         new
                         {
-                            pram1 = "[p=0]" + GetParameter(0).ToString(Parent) + "[/p]",
-                            pram2 = "[p=1]" + GetParameter(1).ToString(Parent) + "[/p]",
-                            pram3 = "[p=2]" + GetParameter(2).ToString(Parent) + "[/p]",
-                            pram4 = "[p=3]" + GetParameter(3).ToString(Parent) + "[/p]",
+                            pram1 = "[p=0]" + GetParameter(0) + "[/p]",
+                            pram2 = "[p=1]" + GetParameter(1) + "[/p]",
+                            pram3 = "[p=2]" + GetParameter(2) + "[/p]",
+                            pram4 = "[p=3]" + GetParameter(3) + "[/p]",
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,
                             pram3value = GetParameter(2).Value,

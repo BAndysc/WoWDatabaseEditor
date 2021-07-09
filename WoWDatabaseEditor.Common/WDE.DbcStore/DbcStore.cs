@@ -320,6 +320,8 @@ namespace WDE.DbcStore
             foreach (var (key, value) in storage)
                 Items.Add(key, new SelectOption(value));
         }
+
+        public bool AllowUnknownItems => true;
     }
     
     public class DbcFileParameter : Parameter

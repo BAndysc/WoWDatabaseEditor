@@ -39,8 +39,8 @@ namespace WDE.SmartScriptEditor.Inspections
                     }
                     
                     if (e.GetParameter(i).Parameter is not FlagParameter &&
-                        e.GetParameter(i).Parameter.GetType().Name != "DbcParameter" &&
-                        !(e.GetParameter(i).Parameter.Items?.ContainsKey(e.GetParameter(i).Value) ?? false))
+                        !e.GetParameter(i).Parameter.AllowUnknownItems &&
+                        !(e.GetParameter(i).Items?.ContainsKey(e.GetParameter(i).Value) ?? false))
                     {
                         return new InspectionResult()
                         {

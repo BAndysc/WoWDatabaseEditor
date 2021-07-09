@@ -5,6 +5,7 @@
         xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters">
     <Styles.Resources>
         <converters:LongToBoolConverter x:Key="LongToBoolConverter" />
+        <converters:StripTagConverter x:Key="StripTagConverter" />
     </Styles.Resources>
     <Style Selector="controls|ParameterValueHolderView">
         <Setter Property="Template">
@@ -38,7 +39,7 @@
                                                 </controls:ParameterTextBox.Styles>
                                                 <controls:ParameterTextBox.InnerLeftContent>
                                                     <Border Cursor="Ibeam">
-                                                        <TextBlock Text="{Binding String, Mode=OneWay}"
+                                                        <TextBlock Text="{Binding String, Mode=OneWay, Converter={StaticResource StripTagConverter}}"
                                                                    VerticalAlignment="Center"
                                                                    Margin="0,0,0,0" />
                                                     </Border>

@@ -59,11 +59,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         
         private async Task SelectItem()
         {
-            if (Parameter.Parameter.Items != null)
+            if (Parameter.HasItems)
             {
                 if (Parameter is ParameterValueHolder<long> p)
                 {
-                    long? val = await itemFromListProvider.GetItemFromList(p.Parameter.Items, Parameter.Parameter is FlagParameter, p.Value);
+                    long? val = await itemFromListProvider.GetItemFromList(p.Items, Parameter.Parameter is FlagParameter, p.Value);
                     if (val.HasValue)
                         p.Value = val.Value;   
                 }

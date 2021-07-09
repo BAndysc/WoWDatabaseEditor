@@ -20,7 +20,7 @@ namespace WDE.SmartScriptEditor.Models
         
         private ParameterValueHolder<long> condition;
 
-        public SmartSource(int id) : base(SmartSourceParametersCount, id)
+        public SmartSource(int id) : base(SmartSourceParametersCount, id, that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
         {
             condition = new ParameterValueHolder<long>("Condition ID", Parameter.Instance, 0);
         }

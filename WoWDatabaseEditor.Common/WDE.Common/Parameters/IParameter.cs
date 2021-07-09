@@ -5,6 +5,7 @@ namespace WDE.Common.Parameters
     public interface IParameter
     {
         bool HasItems { get; }
+        bool AllowUnknownItems => false;
     }
     
     public interface IParameter<T> : IParameter where T : notnull

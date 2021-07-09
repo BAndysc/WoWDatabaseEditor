@@ -29,7 +29,8 @@ namespace WDE.SmartScriptEditor.Models
 
         public event Action<SmartAction, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
         
-        public SmartAction(int id, SmartSource source, SmartTarget target) : base(SmartActionParametersCount, id)
+        public SmartAction(int id, SmartSource source, SmartTarget target) : 
+            base(SmartActionParametersCount, id, that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
         {
             if (source == null || target == null)
                 throw new ArgumentNullException("Source or target is null");
@@ -162,12 +163,12 @@ namespace WDE.SmartScriptEditor.Models
                             pram2_m1 = "[p=1]" + (GetParameter(1).Value - 1) + "[/p]",
                             condition1 = conditionReadable,
                             hascondition = (conditions?.Count ?? 0) > 0,
-                            pram1 = "[p=0]" + GetParameter(0).ToString(parent?.Parent) + "[/p]",
-                            pram2 = "[p=1]" + GetParameter(1).ToString(parent?.Parent) + "[/p]",
-                            pram3 = "[p=2]" + GetParameter(2).ToString(parent?.Parent) + "[/p]",
-                            pram4 = "[p=3]" + GetParameter(3).ToString(parent?.Parent) + "[/p]",
-                            pram5 = "[p=4]" + GetParameter(4).ToString(parent?.Parent) + "[/p]",
-                            pram6 = "[p=5]" + GetParameter(5).ToString(parent?.Parent) + "[/p]",
+                            pram1 = "[p=0]" + GetParameter(0) + "[/p]",
+                            pram2 = "[p=1]" + GetParameter(1) + "[/p]",
+                            pram3 = "[p=2]" + GetParameter(2) + "[/p]",
+                            pram4 = "[p=3]" + GetParameter(3) + "[/p]",
+                            pram5 = "[p=4]" + GetParameter(4) + "[/p]",
+                            pram6 = "[p=5]" + GetParameter(5) + "[/p]",
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,
                             pram3value = GetParameter(2).Value,
