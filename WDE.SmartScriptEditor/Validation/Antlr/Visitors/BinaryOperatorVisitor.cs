@@ -4,6 +4,21 @@ namespace WDE.SmartScriptEditor.Validation.Antlr.Visitors
 {
     class BinaryOperatorVisitor : SmartScriptValidationBaseVisitor<System.Func<long, long, long>>
     {
+        public override Func<long, long, long> VisitBitwiseAnd(SmartScriptValidationParser.BitwiseAndContext context)
+        {
+            return (a, b) => a & b;
+        }
+
+        public override Func<long, long, long> VisitBitwiseOr(SmartScriptValidationParser.BitwiseOrContext context)
+        {
+            return (a, b) => a | b;
+        }
+
+        public override Func<long, long, long> VisitBitwiseXor(SmartScriptValidationParser.BitwiseXorContext context)
+        {
+            return (a, b) => a ^ b;
+        }
+
         public override Func<long, long, long> VisitPlus(SmartScriptValidationParser.PlusContext context)
         {
             return (a, b) => a + b;

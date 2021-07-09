@@ -40,6 +40,9 @@ exprInt
 addOp
     : '+' # Plus
     | '-' # Minus
+    | '&' # BitwiseAnd
+    | '|' # BitwiseOr
+    | '^' # BitwiseXor
     ;
 
 mulOp
