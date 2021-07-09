@@ -61,9 +61,9 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(ReadableHint,
                         new
                         {
-                            pram1 = GetParameter(0).ToString(parent?.Parent?.Parent),
-                            pram2 = GetParameter(1).ToString(parent?.Parent?.Parent),
-                            pram3 = GetParameter(2).ToString(parent?.Parent?.Parent),
+                            pram1 = GetParameter(0),
+                            pram2 = GetParameter(1),
+                            pram3 = GetParameter(2),
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,
                             pram3value = GetParameter(2).Value,
