@@ -152,7 +152,10 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         var entryString = "@ENTRY";
                         if (script.EntryOrGuid != entry.Value)
                             entryString = entry.Value.ToString();
-                        sql.AppendLine("UPDATE creature_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName + $"\" WHERE entry={entryString};");
+                        
+                        string aientryupdate =
+                            currentCoreVersion.Current.DatabaseFeatures.HasAiEntry ? ", AIEntry=0" : "";
+                        sql.AppendLine("UPDATE creature_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName + $"\", ScriptName=\"\"{aientryupdate} WHERE entry={entryString};");
                     }
                     else
                         sql.AppendLine("-- [WARNING] cannot set creature AI to SmartAI, because guid not found in `creature` table!");

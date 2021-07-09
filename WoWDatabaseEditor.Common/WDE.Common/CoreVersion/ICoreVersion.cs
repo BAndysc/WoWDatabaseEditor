@@ -27,6 +27,7 @@ namespace WDE.Common.CoreVersion
     {
         ISet<Type> UnsupportedTables { get; }
         bool AlternativeTrinityStrings => false;
+        bool HasAiEntry => false;
     }
 
     public interface ISmartScriptFeatures
