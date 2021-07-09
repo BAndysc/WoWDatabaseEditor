@@ -27,6 +27,8 @@ namespace WDE.RemoteSOAP.Helpers
                     {
                         list[^1] = mergedCommand!;
                     }
+                    else
+                        list.Add(command);
                 }
             }
 
