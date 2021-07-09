@@ -162,6 +162,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IGameObject? GetGameObjectByGuid(uint guid) => nonCachedDatabase.GetGameObjectByGuid(guid);
         
+        public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => nonCachedDatabase.GetCreaturesByEntry(entry);
+
+        public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => nonCachedDatabase.GetGameObjectsByEntry(entry);
+
         public IEnumerable<ICoreCommandHelp> GetCommands() => nonCachedDatabase.GetCommands();
 
         public Task<IList<ITrinityString>> GetStringsAsync() => nonCachedDatabase.GetStringsAsync();

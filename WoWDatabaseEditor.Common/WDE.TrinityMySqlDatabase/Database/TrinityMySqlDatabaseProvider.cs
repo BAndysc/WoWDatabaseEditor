@@ -413,6 +413,18 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.GameObject.FirstOrDefault(g => g.Guid == guid);
         }
 
+        public IEnumerable<ICreature> GetCreaturesByEntry(uint entry)
+        {
+            using var model = new TrinityDatabase();
+            return model.Creature.Where(g => g.Entry == entry).ToList();
+        }
+
+        public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry)
+        {
+            using var model = new TrinityDatabase();
+            return model.GameObject.Where(g => g.Entry == entry).ToList();
+        }
+
         public IEnumerable<ICoreCommandHelp> GetCommands()
         {
             using var model = new TrinityDatabase();

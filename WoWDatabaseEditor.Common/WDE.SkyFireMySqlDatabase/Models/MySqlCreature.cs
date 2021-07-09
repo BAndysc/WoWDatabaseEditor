@@ -13,5 +13,7 @@ namespace WDE.SkyFireMySqlDatabase.Models
 
         [Column(Name = "id")]
         public uint Entry { get; set; }
+
+        public uint SpawnKey => 0;
     }
 }

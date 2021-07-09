@@ -54,6 +54,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
         public ICreature? GetCreatureByGuid(uint guid) => impl.GetCreatureByGuid(guid);
         public IGameObject? GetGameObjectByGuid(uint guid) => impl.GetGameObjectByGuid(guid);
+        public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => impl.GetCreaturesByEntry(entry);
+        public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => impl.GetGameObjectsByEntry(entry);
+
         public IEnumerable<ICoreCommandHelp> GetCommands() => impl.GetCommands();
         public Task<IList<ITrinityString>> GetStringsAsync() => impl.GetStringsAsync();
     }
