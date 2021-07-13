@@ -2,10 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls"
         xmlns:themes="clr-namespace:WDE.Common.Avalonia.Themes"
-        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters">
+        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters"
+        xmlns:components="clr-namespace:WDE.Common.Avalonia.Components">
     <Styles.Resources>
         <converters:LongToBoolConverter x:Key="LongToBoolConverter" />
         <converters:StripTagConverter x:Key="StripTagConverter" />
+        <converters:NullConverter Inverted="True" x:Key="NullConverter" />
     </Styles.Resources>
     <Style Selector="controls|ParameterValueHolderView">
         <Setter Property="Template">
@@ -24,16 +26,17 @@
                                                     Focusable="False"
                                                     IsVisible="{Binding HasItems}" />
                                             <controls:ParameterTextBox VerticalContentAlignment="Center"
+                                                                       Name="TextBox"
                                                                        Text="{Binding Value, Mode=TwoWay}"
                                                                        FontFamily="Consolas,Menlo,Courier,Courier New"
                                                                        Classes="InnerContentWithPadding">
                                                 <controls:ParameterTextBox.Styles>
                                                     <Style
-                                                        Selector="TextBox:not(:focus-within) /template/ TextPresenter#PART_TextPresenter">
+                                                        Selector="TextBox:not(:focus) /template/ TextPresenter#PART_TextPresenter">
                                                         <Setter Property="IsVisible" Value="False" />
                                                     </Style>
                                                     <Style
-                                                        Selector="TextBox:focus-within ContentPresenter Border">
+                                                        Selector="TextBox:focus ContentPresenter Border">
                                                         <Setter Property="IsVisible" Value="False" />
                                                     </Style>
                                                 </controls:ParameterTextBox.Styles>
@@ -44,6 +47,15 @@
                                                                    Margin="0,0,0,0" />
                                                     </Border>
                                                 </controls:ParameterTextBox.InnerLeftContent>
+                                                <controls:ParameterTextBox.InnerRightContent>
+                                                    <Button 
+                                                        IsVisible="{Binding SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}, Converter={StaticResource NullConverter}}"
+                                                        Background="Transparent"
+                                                        BorderBrush="Transparent"
+                                                        Command="{Binding PickSpecial, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}">
+                                                        <components:WdeImage ImageUri="icons/icon_picker.png" Width="16" Height="16" />
+                                                    </Button>
+                                                </controls:ParameterTextBox.InnerRightContent>
                                             </controls:ParameterTextBox>
                                         </DockPanel>
                                     </DataTemplate>

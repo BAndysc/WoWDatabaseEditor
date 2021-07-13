@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism.Commands;
+using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.MVVM;
 using WDE.Common.Parameters;
@@ -16,16 +17,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
     public class EditableParameterViewModel<T> : EditableParameterViewModel, IEditableParameterViewModel, IDialog where T : notnull
     {
         private readonly IItemFromListProvider itemFromListProvider;
+        private readonly ICurrentCoreVersion currentCoreVersion;
 
-        public EditableParameterViewModel(ParameterValueHolder<T> parameter, string group, IItemFromListProvider itemFromListProvider)
+        public EditableParameterViewModel(ParameterValueHolder<T> parameter, string group, IItemFromListProvider itemFromListProvider, ICurrentCoreVersion currentCoreVersion)
         {
             this.itemFromListProvider = itemFromListProvider;
+            this.currentCoreVersion = currentCoreVersion;
             Group = group;
             Parameter = parameter;
             SelectItemAction = new AsyncAutoCommand(SelectItem);
 
             Watch(parameter, p => p.IsUsed, nameof(IsHidden));
             Watch(parameter, p => p.Parameter, nameof(HasItems));
+            Watch(parameter, p => p.Parameter, nameof(SpecialCommand));
             Watch(parameter, p => p.Name, nameof(Name));
         }
 
@@ -37,6 +41,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public string Name => Parameter.Name;
 
+        public Func<Task<object?>>? SpecialCommand => currentCoreVersion.Current.SupportsSpecialCommands ? Parameter.Parameter.SpecialCommand : null;
+        
         public bool IsHidden => !Parameter.IsUsed && (Parameter is not ParameterValueHolder<long> p || p.Value == 0);
         
         public bool HasItems => Parameter.Parameter.HasItems;

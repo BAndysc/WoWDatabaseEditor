@@ -12,6 +12,7 @@ using Domemtech.Globbing;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Disposables;
 using WDE.Common.Events;
@@ -54,6 +55,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ITeachingTipService teachingTipService;
         private readonly IMainThread mainThread;
         private readonly IConditionEditService conditionEditService;
+        private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ISmartScriptInspectorService inspectorService;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
@@ -107,6 +109,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IMainThread mainThread,
             ISolutionItemIconRegistry iconRegistry,
             IConditionEditService conditionEditService,
+            ICurrentCoreVersion currentCoreVersion,
             ISmartScriptInspectorService inspectorService)
         {
             History = history;
@@ -128,6 +131,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.teachingTipService = teachingTipService;
             this.mainThread = mainThread;
             this.conditionEditService = conditionEditService;
+            this.currentCoreVersion = currentCoreVersion;
             this.inspectorService = inspectorService;
             this.conditionDataManager = conditionDataManager;
             script = null!;
@@ -1404,7 +1408,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             .SetTitle("Incorrect source for chosen action")
                             .SetMainInstruction($"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.NameReadable}");
                         if (string.IsNullOrEmpty(actionData.ImplicitSource))
-                            dialog.SetContent($"Selected source can be one of: {string.Join(", ", sourceData.Types!)}. However, current action requires one of: {string.Join(", ", actionData.TargetTypes!)}");
+                            dialog.SetContent($"Selected source can be one of: {string.Join(", ", sourceData.Types ?? Enumerable.Empty<string>())}. However, current action requires one of: {string.Join(", ", actionData.TargetTypes  ?? Enumerable.Empty<string>())}");
                         else
                             dialog.SetContent($"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}");
                         messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
@@ -1460,6 +1464,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
+                currentCoreVersion,
                 obj, 
                 !editOriginal,
                 parametersList, 
@@ -1547,6 +1552,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }, obj.ToObservable(e => e.Id).Select(id => conditionDataManager.GetConditionData(id).NameReadable)));
             
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
+                currentCoreVersion,
                 obj, 
                 !editOriginal,
                 parametersList, 
@@ -1616,6 +1622,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 parametersList.Add((ev.GetParameter(i), "Event specific"));
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
+                currentCoreVersion,
                 ev,
                 !editOriginal,
                 parametersList,

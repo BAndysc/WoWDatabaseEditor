@@ -5,6 +5,7 @@ using System.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using Prism.Commands;
+using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.MVVM.Observable;
 using WDE.MVVM;
@@ -17,6 +18,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
     public class ParametersEditViewModel : ObservableBase, IDialog
     {
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
+            ICurrentCoreVersion currentCoreVersion,
             SmartBaseElement element,
             bool focusFirst,
             IEnumerable<(ParameterValueHolder<long> parameter, string name)>? parameters,
@@ -38,15 +40,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
             if (parameters != null)
                 foreach (var parameter in parameters)
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider)));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion)));
 
             if (floatParameters != null)
                 foreach (var parameter in floatParameters)
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider)));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion)));
 
             if (stringParameters != null)
                 foreach (var parameter in stringParameters)
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider)));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion)));
 
             foreach (IEditableParameterViewModel parameter in allParameters)
             {
