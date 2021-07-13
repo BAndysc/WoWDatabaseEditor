@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AvaloniaStyles;
+using WDE.Common.Factories.Http;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
@@ -10,7 +11,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
 {
     [AutoRegister]
     [SingleInstance]
-    public class ThemeManager : IThemeManager
+    public class ThemeManager : IThemeManager, IUserAgentPart
     {
         private readonly Theme defaultTheme = new(SystemThemeOptions.Auto.ToString());
 
@@ -46,5 +47,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
         {
             return !string.IsNullOrEmpty(theme.Name) && themes.Select(t => t.Name).Contains(theme.Name);
         }
+
+        public string Part => $"Theme: {CurrentTheme.Name}";
     }
 }

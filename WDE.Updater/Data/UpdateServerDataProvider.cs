@@ -1,4 +1,5 @@
 using System;
+using WDE.Common.Factories.Http;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.Updater.Models;
@@ -7,7 +8,7 @@ namespace WDE.Updater.Data
 {
     [AutoRegister]
     [SingleInstance]
-    public class UpdateServerDataProvider : IUpdateServerDataProvider
+    public class UpdateServerDataProvider : IUpdateServerDataProvider, IUserAgentPart
     {
         public UpdateServerDataProvider(IApplicationReleaseConfiguration configuration)
         {
@@ -47,5 +48,6 @@ namespace WDE.Updater.Data
         public Platforms Platform { get; }
         public string? UpdateKey { get; }
         public bool HasUpdateServerData { get; }
+        public string Part => $"marketplace: {Marketplace}, platform: {Platform.ToString()}";
     }
 }

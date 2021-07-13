@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace WDE.Updater.Client
+namespace WDE.Common.Utils
 {
     public static class StreamExtensions
     {

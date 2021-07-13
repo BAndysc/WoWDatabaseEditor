@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.CoreVersion;
+using WDE.Common.Factories.Http;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 
@@ -8,7 +9,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
 {
     [SingleInstance]
     [AutoRegister]
-    public class CurrentCoreVersionService : ICurrentCoreVersion, ICoreVersionsProvider, ICoreVersionSettings
+    public class CurrentCoreVersionService : ICurrentCoreVersion, ICoreVersionsProvider, ICoreVersionSettings, IUserAgentPart
     {
         private readonly ICurrentCoreSettings settings;
 
@@ -52,5 +53,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         {
             settings.UpdateCore(version);
         }
+
+        public string Part => $"core: {Current.Tag}";
     }
 }

@@ -7,6 +7,7 @@ using Prism.Commands;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.Factories.Http;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Services;
@@ -17,9 +18,12 @@ using WoWDatabaseEditorCore.CoreVersion;
 namespace WoWDatabaseEditorCore.ViewModels
 {
     [AutoRegister]
-    public class AboutViewModel : IDocument
+    public class AboutViewModel : IDocument, IUserAgentPart
     {
         private readonly IApplicationVersion applicationVersion;
+        private readonly IDatabaseProvider databaseProvider;
+        private readonly IDbcStore dbcStore;
+        private readonly IRemoteConnectorService remoteConnectorService;
 
         public AboutViewModel(IApplicationVersion applicationVersion,
             IDatabaseProvider databaseProvider, 
@@ -29,7 +33,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             IRemoteConnectorService remoteConnectorService)
         {
             this.applicationVersion = applicationVersion;
-            
+            this.databaseProvider = databaseProvider;
+            this.dbcStore = dbcStore;
+            this.remoteConnectorService = remoteConnectorService;
+
             ConfigurationChecks.Add(new ConfigurationCheckup(coreVersion.Current is not UnspecifiedCoreVersion, 
                 "Core version compatibility mode", 
                 "WoW Database Editor supports multiple world of warcraft server cores. In order to achieve maximum compatibility, choose version that matches best.\nYou are using: " + coreVersion.Current.FriendlyName + " compatibility mode now."));
@@ -90,6 +97,13 @@ namespace WoWDatabaseEditorCore.ViewModels
                 Title = title;
                 Description = description;
             }
+        }
+
+        public string Part => $"(DBC: {BoolToString(dbcStore.IsConfigured)}, DB: {BoolToString(databaseProvider.IsConnected)}, SOAP: {BoolToString(remoteConnectorService.IsConnected)})";
+
+        private string BoolToString(bool b)
+        {
+            return b ? "Yes" : "No";
         }
     }
 
