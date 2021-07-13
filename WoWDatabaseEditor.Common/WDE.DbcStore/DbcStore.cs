@@ -63,7 +63,8 @@ namespace WDE.DbcStore
         public Dictionary<long, string> CharTitleStore { get; internal set; } = new();
         public Dictionary<long, string> CreatureModelDataStore {get; internal set; } = new();
         public Dictionary<long, string> GameObjectDisplayInfoStore {get; internal set; } = new();
-
+        public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
+        
         public IEnumerable<uint> Spells
         {
             get
@@ -125,6 +126,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> CharTitleStore { get; } = new();
             public Dictionary<long, string> CreatureModelDataStore { get; } = new();
             public Dictionary<long, string> GameObjectDisplayInfoStore { get; } = new();
+            public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -184,6 +186,7 @@ namespace WDE.DbcStore
                 store.CharTitleStore = CharTitleStore;
                 store.CreatureModelDataStore = CreatureModelDataStore;
                 store.GameObjectDisplayInfoStore = GameObjectDisplayInfoStore;
+                store.MapDirectoryStore = MapDirectoryStore;
                 
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
                 parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore));
@@ -223,7 +226,7 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 18;
+                        max = 19;
                         Load("AreaTrigger.dbc", 0, 0, AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 3, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -231,6 +234,7 @@ namespace WDE.DbcStore
                         Load("Spell.dbc", 0, 134, SpellStore);
                         Load("Movie.dbc", 0, 1, MovieStore);
                         Load("Map.dbc", 0, 5, MapStore);
+                        Load("Map.dbc", 0, 1, MapDirectoryStore);
                         Load("Achievement.dbc", 0, 4, AchievementStore);
                         Load("AreaTable.dbc", 0, 11, AreaStore);
                         Load("chrClasses.dbc", 0, 4, ClassStore);
@@ -246,7 +250,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 20;
+                        max = 21;
                         Load("AreaTrigger.dbc", 0, 0,  AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -254,6 +258,7 @@ namespace WDE.DbcStore
                         Load("Spell.dbc", 0, 21, SpellStore);
                         Load("Movie.dbc", 0, 1, MovieStore);
                         Load("Map.dbc", 0, 6, MapStore);
+                        Load("Map.dbc", 0, 1, MapDirectoryStore);
                         Load("Achievement.dbc", 0, 4, AchievementStore);
                         Load("AreaTable.dbc", 0, 11, AreaStore);
                         Load("chrClasses.dbc", 0, 3, ClassStore);
@@ -271,7 +276,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.LEGION_26972:
                     {
-                        max = 15;
+                        max = 16;
                         Load("AreaTrigger.db2", 16, 16, AreaTriggerStore);
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
@@ -281,6 +286,7 @@ namespace WDE.DbcStore
                         Load("Emotes.db2", 0, 2, EmoteStore);
                         Load("ItemSparse.db2", 0, 2, ItemStore);
                         Load("Languages.db2", 1, 0, LanguageStore);
+                        Load("Map.db2", 0, 1, MapDirectoryStore);
                         Load("Faction.db2", 6, 4, FactionStore);
                         Load("FactionTemplate.db2", 0, 1, FactionTemplateStore);
                         // Load("Phase.db2", 1, 0, PhaseStore); // no names in legion :(
