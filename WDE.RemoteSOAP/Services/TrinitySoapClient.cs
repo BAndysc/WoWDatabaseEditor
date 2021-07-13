@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using SoapHttpClient;
 using SoapHttpClient.Enums;
+using WDE.Common.Services;
 using WDE.RemoteSOAP.Services.Soap;
 
 namespace WDE.RemoteSOAP.Services
@@ -25,12 +27,19 @@ namespace WDE.RemoteSOAP.Services
         
         public async Task<SoapResponse> ExecuteCommand(string command)
         {
-            var result =
-                await soapClient.PostAsync(
+            HttpResponseMessage result;
+            try
+            {
+                result = await soapClient.PostAsync(
                     endpoint,
                     SoapVersion.Soap11,
                     soapParser.PrepareBody(command));
-            
+            }
+            catch (Exception e)
+            {
+                throw new CouldNotConnectToRemoteServer(e);
+            }
+
             var response = await result.Content.ReadAsStringAsync();
             return soapParser.ParseResponse(response);
         }

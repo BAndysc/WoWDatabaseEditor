@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.Annotations;
 using WDE.Module.Attributes;
@@ -16,6 +17,13 @@ namespace WDE.Common.Services
         IList<IRemoteCommand> Merge(IList<IRemoteCommand> commands);
     }
 
+    public class CouldNotConnectToRemoteServer : Exception
+    {
+        public CouldNotConnectToRemoteServer(Exception inner) : base("Couldn't connect to the remote server", inner)
+        {
+        }
+    }
+    
     public interface IRemoteCommand
     {
         RemoteCommandPriority Priority { get; }
