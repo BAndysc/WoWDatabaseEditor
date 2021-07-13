@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Newtonsoft.Json;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
+using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.Parameters.Models;
 using WDE.Parameters.Providers;
 
@@ -13,11 +19,18 @@ namespace WDE.Parameters
     {
         private readonly IDatabaseProvider database;
         private readonly IParameterDefinitionProvider parameterDefinitionProvider;
+        private readonly IServerIntegration serverIntegration;
+        private readonly IItemFromListProvider itemFromListProvider;
 
-        public ParameterLoader(IDatabaseProvider database, IParameterDefinitionProvider parameterDefinitionProvider)
+        public ParameterLoader(IDatabaseProvider database, 
+            IParameterDefinitionProvider parameterDefinitionProvider,
+            IServerIntegration serverIntegration,
+            IItemFromListProvider itemFromListProvider)
         {
             this.database = database;
             this.parameterDefinitionProvider = parameterDefinitionProvider;
+            this.serverIntegration = serverIntegration;
+            this.itemFromListProvider = itemFromListProvider;
         }
 
         public void Load(ParameterFactory factory)
@@ -40,11 +53,11 @@ namespace WDE.Parameters
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", new GameEventParameter(database));
-            factory.Register("CreatureParameter", new CreatureParameter(database));
+            factory.Register("CreatureParameter", new CreatureParameter(database, serverIntegration));
             factory.Register("CreatureGameobjectParameter", new CreatureGameobjectParameter(database));
             factory.Register("QuestParameter", new QuestParameter(database));
             factory.Register("PrevQuestParameter", new PrevQuestParameter(database));
-            factory.Register("GameobjectParameter", new GameobjectParameter(database));
+            factory.Register("GameobjectParameter", new GameobjectParameter(database, serverIntegration, itemFromListProvider));
             factory.Register("GossipMenuParameter", new GossipMenuParameter(database));
             factory.Register("NpcTextParameter", new NpcTextParameter(database));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
@@ -97,10 +110,19 @@ namespace WDE.Parameters
     public class CreatureParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;
+        
+        public override Func<Task<object?>>? SpecialCommand { get; }
 
-        public CreatureParameter(IDatabaseProvider database)
+        public CreatureParameter(IDatabaseProvider database, IServerIntegration serverIntegration)
         {
             this.database = database;
+            SpecialCommand = async () =>
+            {
+                var entry = await serverIntegration.GetSelectedEntry();
+                if (entry.HasValue)
+                    return entry;
+                return null;
+            };
         }
 
         protected override void LazyLoad()
@@ -235,10 +257,36 @@ namespace WDE.Parameters
     public class GameobjectParameter : LazyLoadParameter
     {
         private readonly IDatabaseProvider database;
+        
+        public override Func<Task<object?>>? SpecialCommand { get; }
 
-        public GameobjectParameter(IDatabaseProvider database)
+        public GameobjectParameter(IDatabaseProvider database,
+            IServerIntegration serverIntegration,
+            IItemFromListProvider itemFromListProvider)
         {
             this.database = database;
+            SpecialCommand = async () =>
+            {
+                var entry = await serverIntegration.GetNearestGameObjects();
+                if (entry == null || entry.Count == 0)
+                    return null;
+                
+                var options = entry.GroupBy(e => e.Entry)
+                    .OrderBy(group => group.Key)
+                    .ToDictionary(g => (long)g.Key,
+                        g => new SelectOption(database.GetGameObjectTemplate(g.Key)?.Name ?? "Unknown name",
+                            $"{g.First().Distance} yd away"));
+
+                if (options.Count == 1)
+                    return (uint)options.Keys.First();
+
+                var pick = await itemFromListProvider.GetItemFromList(options, false);
+
+                if (pick.HasValue)
+                    return (uint)pick.Value;
+                
+                return null;
+            };
         }
 
         protected override void LazyLoad()
