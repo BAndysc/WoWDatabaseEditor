@@ -1297,14 +1297,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             if (actionData.ImplicitSource != null)
             {
-                var actionImplicitSource = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource).Id;
+                var data = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource);
+                var actionImplicitSource = data.Id;
 
                 if (sourceId == actionImplicitSource)
                     return true;
 
                 // kinda hack to show actions with NONE source with user pick SELF source
                 // because it is natural for users to use SELF source for those actions
-                return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf;
+                return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf || data.Name == "Self";
             }
             else
             {
