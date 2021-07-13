@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using AvaloniaStyles;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using AvaloniaProperty = Avalonia.AvaloniaProperty;
@@ -14,7 +15,7 @@ namespace WDE.Common.Avalonia.Components
     public class WdeImage : Image
     {
         // we are never releasing those intentionally
-        private static Dictionary<ImageUri, Bitmap> cache = new();
+        private static Dictionary<ImageUri, Bitmap?> cache = new();
 
         static WdeImage()
         {
@@ -53,14 +54,23 @@ namespace WDE.Common.Avalonia.Components
             {
                 bitmap = cache[img] = LoadBitmap(img);
             }
-            d.SetValue(SourceProperty, bitmap);
+            if (bitmap != null)
+                d.SetValue(SourceProperty, bitmap);
 
             return img;
         }
 
-        private static Bitmap LoadBitmap(ImageUri img)
+        private static Bitmap? LoadBitmap(ImageUri img)
         {
             string uri = img.Uri;
+            if (SystemTheme.EffectiveThemeIsDark)
+            {
+                var extension = Path.GetExtension(uri);
+                var darkUri = Path.ChangeExtension(uri, null) + "_dark" + extension;
+                if (File.Exists(darkUri))
+                    uri = darkUri;
+            }
+            
             if (GlobalApplication.HighDpi)
             {
                 var extension = Path.GetExtension(uri);
@@ -68,8 +78,13 @@ namespace WDE.Common.Avalonia.Components
                 if (File.Exists(hdpiUri))
                     uri = hdpiUri;
             }
+
+            var path = Path.Combine(Environment.CurrentDirectory, uri);
+
+            if (!File.Exists(path))
+                return null;
             
-            return new Bitmap(System.IO.Path.Combine(Environment.CurrentDirectory, uri));
+            return new Bitmap(path);
         }
     }
 }
