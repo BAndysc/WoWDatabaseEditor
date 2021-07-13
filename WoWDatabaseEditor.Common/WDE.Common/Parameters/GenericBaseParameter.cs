@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WDE.Common.Parameters
 {
@@ -21,6 +22,7 @@ namespace WDE.Common.Parameters
         public abstract string ToString(T value);
         public virtual string ToString(T value, ToStringOptions options) => ToString(value);
         public virtual bool HasItems => Items != null && Items.Count > 0;
+        public virtual Func<Task<object?>>? SpecialCommand => null;
     }
 
     public class SelectOption

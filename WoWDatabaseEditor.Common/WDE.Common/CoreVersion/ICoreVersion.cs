@@ -14,6 +14,7 @@ namespace WDE.Common.CoreVersion
         ISmartScriptFeatures SmartScriptFeatures { get; }
         IConditionFeatures ConditionFeatures { get; }
         bool SupportsRbac => true;
+        bool SupportsSpecialCommands => false;
     }
 
     public interface IConditionFeatures

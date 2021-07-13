@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace WDE.Common.Parameters
 {
@@ -6,6 +9,7 @@ namespace WDE.Common.Parameters
     {
         bool HasItems { get; }
         bool AllowUnknownItems => false;
+        Func<Task<object?>>? SpecialCommand => null;
     }
     
     public interface IParameter<T> : IParameter where T : notnull
