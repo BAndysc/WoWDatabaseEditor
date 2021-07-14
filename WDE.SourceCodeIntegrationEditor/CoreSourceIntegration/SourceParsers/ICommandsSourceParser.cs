@@ -45,7 +45,7 @@ namespace WDE.SourceCodeIntegrationEditor.CoreSourceIntegration.SourceParsers
         // $2 - method
         // $3 - rbac
         private static readonly Regex ReLineNewStyleCommand =
-            new Regex(@"\{\s*""([^""]*)""\s*,\s*([a-zA-Z0-9_]+)\s*,\s*rbac::([A-Z_]+)\s*,\s*Console::Yes \}");
+            new Regex(@"\{\s*""([^""]*)""\s*,\s*([a-zA-Z0-9_]+)\s*,\s*rbac::([A-Z_]+)\s*,\s*Console::(?:Yes|No)\s*\}");
                 
         // old style command/group reference: \{\s*"([^"]*)"\s*,\s*rbac::([A-Z_]+)\s*,\s*(true|false),\s*(nullptr|&[a-zA-Z0-9_]+)\s*,\s*"[a-zA-Z ]*"\s*(?:,\s*([a-zA-Z0-9_]+))?\s*\}
         // $1 - name
