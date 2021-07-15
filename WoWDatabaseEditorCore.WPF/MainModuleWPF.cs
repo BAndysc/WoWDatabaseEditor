@@ -23,6 +23,7 @@ namespace WoWDatabaseEditorCore.WPF
             
             viewLocator.Bind<LongItemFromListProviderViewModel, ItemFromListProviderView>();
             viewLocator.Bind<StringItemFromListProviderViewModel, ItemFromListProviderView>();
+            viewLocator.Bind<FloatItemFromListProviderViewModel, ItemFromListProviderView>();
         }
     }
 }

@@ -32,5 +32,13 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 return vm.GetEntry();
             return null;
         }
+        
+        public async Task<float?> GetItemFromList(Dictionary<float, SelectOption>? items)
+        {
+            using FloatItemFromListProviderViewModel vm = new(items);
+            if (await windowManager.ShowDialog(vm))
+                return vm.GetEntry();
+            return null;
+        }
     }
 }

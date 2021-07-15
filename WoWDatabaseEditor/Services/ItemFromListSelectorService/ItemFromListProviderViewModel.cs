@@ -242,6 +242,29 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             return key => spells.Contains(key);
         }
     }
+
+    public class FloatItemFromListProviderViewModel : ItemFromListProviderViewModel<float>
+    {
+        public FloatItemFromListProviderViewModel(Dictionary<float, SelectOption>? items, float current = default) : 
+            base(items, Comparer<CheckableSelectOption<float>>.Create((x, y) => x.Entry.CompareTo(y.Entry))
+                , _ => false, false, current)
+        {
+        }
+
+        public override float GetEntry()
+        {
+            if (SelectedItem != null)
+                return SelectedItem.Entry;
+            if (float.TryParse(SearchText, out var ret))
+                return ret;
+            return 0;
+        }
+
+        protected override bool StringToT(string str, out float result)
+        {
+            return float.TryParse(str, out result);
+        }
+    }
     
     public class CheckableSelectOption<T> : INotifyPropertyChanged
     {
