@@ -124,6 +124,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> SpellFocusObjectStore { get; } = new();
             public Dictionary<long, string> QuestInfoStore { get; } = new();
             public Dictionary<long, string> CharTitleStore { get; } = new();
+            private Dictionary<long, long> CreatureDisplayInfoStore { get; } = new();
             public Dictionary<long, string> CreatureModelDataStore { get; } = new();
             public Dictionary<long, string> GameObjectDisplayInfoStore { get; } = new();
             public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
@@ -206,7 +207,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore));
                 parameterFactory.Register("QuestInfoParameter", new DbcParameter(QuestInfoStore));
                 parameterFactory.Register("CharTitleParameter", new DbcParameter(CharTitleStore));
-                parameterFactory.Register("CreatureModelDataParameter", new DbcFileParameter(CreatureModelDataStore));
+                parameterFactory.Register("CreatureModelDataParameter", new CreatureModelParameter(CreatureModelDataStore, CreatureDisplayInfoStore));
                 parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
                 
                 store.solutionManager.RefreshAll();
@@ -226,7 +227,7 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 19;
+                        max = 20;
                         Load("AreaTrigger.dbc", 0, 0, AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 3, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -245,12 +246,13 @@ namespace WDE.DbcStore
                         Load("QuestInfo.dbc", 0, 1, QuestInfoStore);
                         Load("CharTitles.dbc", 0, 2, CharTitleStore);
                         Load("CreatureModelData.dbc", 0, 2, CreatureModelDataStore);
+                        Load("CreatureDisplayInfo.dbc", 0, 1, CreatureDisplayInfoStore);
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 21;
+                        max = 22;
                         Load("AreaTrigger.dbc", 0, 0,  AreaTriggerStore);
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -271,12 +273,13 @@ namespace WDE.DbcStore
                         Load("QuestInfo.dbc", 0, 1, QuestInfoStore);
                         Load("CharTitles.dbc", 0, 2, CharTitleStore);
                         Load("CreatureModelData.dbc", 0, 2, CreatureModelDataStore);
+                        Load("CreatureDisplayInfo.dbc", 0, 1, CreatureDisplayInfoStore);
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
                         break;
                     }
                     case DBCVersions.LEGION_26972:
                     {
-                        max = 16;
+                        max = 17;
                         Load("AreaTrigger.db2", 16, 16, AreaTriggerStore);
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
@@ -294,6 +297,7 @@ namespace WDE.DbcStore
                         Load("SpellFocusObject.db2", 0, 1, SpellFocusObjectStore);
                         Load("QuestInfo.db2", 0, 1, QuestInfoStore);
                         Load("CharTitles.db2", 0, 1, CharTitleStore);
+                        Load("CreatureDisplayInfo.db2", 0, 2, CreatureDisplayInfoStore);
                         break;
                     }
                     default:
@@ -315,6 +319,27 @@ namespace WDE.DbcStore
                 else
                     Items.Add(factionTemplate.Key, new SelectOption("unknown name"));
             }
+        }
+    }
+
+    internal class CreatureModelParameter : ParameterNumbered
+    {
+        public CreatureModelParameter(Dictionary<long, string> creatureModelData, Dictionary<long, long> creatureDisplayInfo)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (var displayInfo in creatureDisplayInfo)
+            {
+                if (creatureModelData.TryGetValue(displayInfo.Value, out var modelPath))
+                    Items.Add(displayInfo.Key, new SelectOption(GetFileName(modelPath), modelPath));
+                else
+                    Items.Add(displayInfo.Key, new SelectOption("unknown model"));
+            }
+        }
+        
+        private string GetFileName(string s)
+        {
+            int indexOf = s.LastIndexOf('\\');
+            return indexOf == -1 ? s : s.Substring(indexOf + 1);
         }
     }
 
