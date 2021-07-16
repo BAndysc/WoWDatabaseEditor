@@ -2496,6 +2496,16 @@
 			"3": {"name": "smashed"}	
 		}	
 	},	
+	"AiReactionParameter": {
+		"name": "AI reaction",
+		"values": {
+			"0": {"name": "alert", "description": "pre-aggro (used in client packet handler)"},
+			"1": {"name": "friendly", "description": "(NOT used in client packet handler)"},
+			"2": {"name": "hostile", "description": "sent on every attack, triggers aggro sound (used in client packet handler)"},
+			"3": {"name": "afraid", "description": "seen for polymorph (when AI not in control of self?) (NOT used in client packet handler)"},
+			"4": {"name": "destroy", "description": "used on object destroy (NOT used in client packet handler)"}
+		}
+	},
 	"UnitStateParameter": {	
 		"name": "Unit state",	
 		"isflag": true,	
