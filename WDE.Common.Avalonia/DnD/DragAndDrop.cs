@@ -13,6 +13,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaStyles.Controls;
 using WDE.Common.Utils.DragDrop;
 using DragDropEffects = Avalonia.Input.DragDropEffects;
 
@@ -74,6 +75,12 @@ namespace WDE.Common.Avalonia.DnD
                     treeView.AddHandler(DragDrop.DropEvent, OnTreeViewDrop);
                     treeView.AddHandler(DragDrop.DragOverEvent, OnTreeViewDragOver);
                 }
+                else if (args.Sender is GridView gridView)
+                {
+                    args.Sender.SetValue(DragDrop.AllowDropProperty, true);
+                    gridView.AddHandler(DragDrop.DropEvent, OnGridViewDrop);
+                    gridView.AddHandler(DragDrop.DragOverEvent, OnGridViewDragOver);
+                }
             });
             IsDragSourceProperty.Changed.Subscribe(args =>
             {
@@ -86,6 +93,11 @@ namespace WDE.Common.Avalonia.DnD
                 {
                     treeView.AddHandler(InputElement.PointerMovedEvent, OnTreeViewPreviewMouseMove, RoutingStrategies.Tunnel);
                     treeView.AddHandler(InputElement.PointerPressedEvent, OnListPreviewMouseLeftButtonDown, RoutingStrategies.Tunnel);
+                }
+                else if (args.Sender is GridView gridView)
+                {
+                    gridView.AddHandler(InputElement.PointerMovedEvent, OnGridViewPreviewMouseMove, RoutingStrategies.Tunnel);
+                    gridView.AddHandler(InputElement.PointerPressedEvent, OnListPreviewMouseLeftButtonDown, RoutingStrategies.Tunnel);
                 }
             });
         }
@@ -125,6 +137,35 @@ namespace WDE.Common.Avalonia.DnD
             DoDrag(e, treeView, data);
         }
         
+        private static void OnGridViewPreviewMouseMove(object? sender, PointerEventArgs e)
+        {
+            GridView? listBox = sender as GridView;
+
+            if (listBox == null)
+                return;
+            
+            Point currentCursorPos = e.GetPosition(null);
+            Vector cursorVector = m_cursorStartPos - currentCursorPos;
+
+            if (!e.GetCurrentPoint(listBox).Properties.IsLeftButtonPressed ||
+                (!(Math.Abs(cursorVector.X) > 10) && !(Math.Abs(cursorVector.Y) > 10)) || dragging)
+                return;
+            
+            ListBoxItem? targetItem = FindVisualParent<ListBoxItem>((IVisual?)e.Source);
+            if (targetItem == null || targetItem.DataContext == null) 
+                return;
+            
+            dragging = true;
+            var data = new DataObject();
+            data.Set("", new DragInfo()
+            {
+                draggedElement = listBox.ListBoxImpl!.Selection.SelectedItems,
+                draggedIndex = listBox.ListBoxImpl!.Selection.SelectedIndexes
+            });
+                    
+            DoDrag(e, listBox.ListBoxImpl!, data);
+        }
+            
         private static void OnListPreviewMouseMove(object? sender, PointerEventArgs e)
         {
             ListBox? listBox = sender as ListBox;
@@ -263,6 +304,99 @@ namespace WDE.Common.Avalonia.DnD
             }
             else
                 indexOfDrop = listBox.ItemCount;
+            
+            dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
+            {
+                InsertIndex = indexOfDrop,
+                TargetItem = listBox.Items
+            });
+        }
+        
+        
+        
+        
+        // Grid View
+        private static void OnGridViewDragOver(object? sender, DragEventArgs e)
+        {
+            var listBox = sender as GridView;
+            var dropElement = FindVisualParent<ListBoxItem>(e.Source as IVisual);
+            var dragInfo = e.Data.Get("") as DragInfo?;
+            if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
+                return;
+            
+            if (listBox == null)
+                return;
+
+            var dropHandler = GetDropHandler(listBox);
+            if (dropHandler == null)
+                return;
+            
+            var indexOfDrop = listBox.ListBoxImpl!.ItemContainerGenerator.IndexFromContainer(dropElement);
+            RelativeInsertPosition insertPosition = RelativeInsertPosition.None;
+            
+            if (dropElement != null)
+            {
+                var rel = e.GetPosition(dropElement).Y / dropElement.Bounds.Height;
+                if (rel < 0.5f)
+                    insertPosition = RelativeInsertPosition.BeforeTargetItem;
+                else
+                    insertPosition = RelativeInsertPosition.AfterTargetItem;
+
+                if (rel >= 0.25f && rel <= 0.75f)
+                    insertPosition |= RelativeInsertPosition.TargetItemCenter;
+            }
+            else
+                indexOfDrop = listBox.ListBoxImpl!.ItemCount;
+
+            var dropInfo = new DropInfo(dragInfo.Value.draggedElement[0]!)
+            {
+                InsertIndex = indexOfDrop,
+                InsertPosition = insertPosition,
+                TargetItem = listBox.Items
+            };
+            dropHandler.DragOver(dropInfo);
+
+            {
+                double mousePosY = e.GetPosition(listBox).Y;
+                if (mousePosY < 10)
+                {
+                    listBox.ListBoxImpl!.Scroll.Offset = listBox.ListBoxImpl!.Scroll.Offset + new Vector(0, -1);
+                }
+                else if (mousePosY > listBox.Bounds.Height - 10)
+                {
+                    listBox.ListBoxImpl!.Scroll.Offset = listBox.ListBoxImpl!.Scroll.Offset + new Vector(0, +1);
+                }
+            }
+            
+            adorner.Adorner?.Update(listBox.ListBoxImpl!, dropInfo);
+        }
+        
+        private static void OnGridViewDrop(object? sender, DragEventArgs e)
+        {
+            var listBox = sender as GridView;
+            var dropElement = FindVisualParent<ListBoxItem>(e.Source as IVisual);
+            var dragInfo = e.Data.Get("") as DragInfo?;
+            if (dragInfo == null || dragInfo.Value.draggedElement.Count == 0)
+                return;
+            
+            if (listBox == null)
+                return;
+            
+            var dropHandler = GetDropHandler(listBox);
+            if (dropHandler == null)
+                return;
+            
+            adorner.RemoveAdorner(listBox.ListBoxImpl!);
+            
+            var indexOfDrop = listBox.ListBoxImpl!.ItemContainerGenerator.IndexFromContainer(dropElement);
+            if (dropElement != null)
+            {
+                var pos = e.GetPosition(dropElement);
+                if (pos.Y > dropElement.Bounds.Height / 2)
+                    indexOfDrop++;
+            }
+            else
+                indexOfDrop = listBox.ListBoxImpl!.ItemCount;
             
             dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
             {
