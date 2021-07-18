@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SmartFormat.Utilities;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Tasks
@@ -72,14 +73,17 @@ namespace WoWDatabaseEditorCore.Tasks
                             if (t.Exception == null)
                                 taskCompletionSource.SetResult();
                             else
+                            {
+                                Console.WriteLine(t.Exception);
                                 taskCompletionSource.SetException(t.Exception);
+                            }
                             PeekNextTask();
                         });
                     });
             }
             else if (task is IAsyncTask asyncTask)
             {
-                Action execute = async () =>
+                Func<Task> execute = async () =>
                 {
                     try
                     {

@@ -9,7 +9,9 @@ using WDBXEditor.Storage;
 using WDE.Common;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
+using WDE.DbcStore.FastReader;
 using WDE.DbcStore.Providers;
 using WDE.Module.Attributes;
 
@@ -27,15 +29,21 @@ namespace WDE.DbcStore
     public class DbcStore : IDbcStore, ISpellStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
+        private readonly IMessageBoxService messageBoxService;
         private readonly ISolutionManager solutionManager;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
 
-        public DbcStore(IParameterFactory parameterFactory, ITaskRunner taskRunner, IDbcSettingsProvider settingsProvider, ISolutionManager solutionManager)
+        public DbcStore(IParameterFactory parameterFactory, 
+            ITaskRunner taskRunner,
+            IDbcSettingsProvider settingsProvider,
+            IMessageBoxService messageBoxService,
+            ISolutionManager solutionManager)
         {
             this.parameterFactory = parameterFactory;
             this.taskRunner = taskRunner;
             dbcSettingsProvider = settingsProvider;
+            this.messageBoxService = messageBoxService;
             this.solutionManager = solutionManager;
 
             Load();
@@ -131,38 +139,36 @@ namespace WDE.DbcStore
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
+            private DatabaseClientFileOpener opener;
             
             public DbcLoadTask(IParameterFactory parameterFactory, IDbcSettingsProvider settingsProvider, DbcStore store)
             {
                 this.parameterFactory = parameterFactory;
                 this.store = store;
+                opener = new DatabaseClientFileOpener();
                 dbcSettingsProvider = settingsProvider;
             }
 
-            private void Load(string filename, int id, int nameIndex, Action<DataRow> foreachRow)
+            private void Load(string filename, Action<IDbcIterator> foreachRow)
             {
                 progress?.Report(now++, max, $"Loading {filename}");
-                DBReader r = new();
                 var path = $"{dbcSettingsProvider.GetSettings().Path}/{filename}";
 
                 if (!File.Exists(path))
                     return;
 
-                DBEntry dbEntry = r.Read(path);
-                foreach (DataRow row in dbEntry.Data.Rows)
-                    foreachRow(row);
+                foreach (var entry in opener.Open(path))
+                    foreachRow(entry);
             }
-
+            
             private void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary)
             {
-                Load(filename, id, nameIndex, row => 
-                    dictionary.Add(Convert.ToInt32(row.ItemArray[id]!.ToString()), row.ItemArray[nameIndex]!.ToString() ?? ""));
+                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetString(nameIndex)));
             }
             
             private void Load(string filename, int id, int nameIndex, Dictionary<long, long> dictionary)
             {
-                Load(filename, id, nameIndex, row => 
-                    dictionary.Add(Convert.ToInt32(row.ItemArray[id]!.ToString()), Convert.ToInt32(row.ItemArray[nameIndex]!.ToString())));
+                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetInt(nameIndex)));
             }
             
             public void FinishMainThread()
@@ -209,6 +215,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("CharTitleParameter", new DbcParameter(CharTitleStore));
                 parameterFactory.Register("CreatureModelDataParameter", new CreatureModelParameter(CreatureModelDataStore, CreatureDisplayInfoStore));
                 parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
+                parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore));
                 
                 store.solutionManager.RefreshAll();
             }
@@ -227,12 +234,12 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 20;
-                        Load("AreaTrigger.dbc", 0, 0, AreaTriggerStore);
+                        max = 21;
+                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 3, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
                         Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
-                        Load("Spell.dbc", 0, 134, SpellStore);
+                        Load("Spell.dbc", 0, 136, SpellStore);
                         Load("Movie.dbc", 0, 1, MovieStore);
                         Load("Map.dbc", 0, 5, MapStore);
                         Load("Map.dbc", 0, 1, MapDirectoryStore);
@@ -248,12 +255,13 @@ namespace WDE.DbcStore
                         Load("CreatureModelData.dbc", 0, 2, CreatureModelDataStore);
                         Load("CreatureDisplayInfo.dbc", 0, 1, CreatureDisplayInfoStore);
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
+                        Load("Languages.dbc", 0, 1, LanguageStore);
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 22;
-                        Load("AreaTrigger.dbc", 0, 0,  AreaTriggerStore);
+                        max = 23;
+                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
                         Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
@@ -275,12 +283,13 @@ namespace WDE.DbcStore
                         Load("CreatureModelData.dbc", 0, 2, CreatureModelDataStore);
                         Load("CreatureDisplayInfo.dbc", 0, 1, CreatureDisplayInfoStore);
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
+                        Load("Languages.dbc", 0, 1, LanguageStore);
                         break;
                     }
                     case DBCVersions.LEGION_26972:
                     {
                         max = 17;
-                        Load("AreaTrigger.db2", 16, 16, AreaTriggerStore);
+                        Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(16), $"Area trigger at {row.GetFloat(0)}, {row.GetFloat(1)}, {row.GetFloat(2)}"));
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
                         Load("AreaTable.db2", 0, 2, AreaStore);
@@ -303,6 +312,25 @@ namespace WDE.DbcStore
                     default:
                         return;
                 }
+                Validate(SpellStore, 1, "Word of Recall (OLD)");
+            }
+
+            private void Validate(Dictionary<long,string> dict, int id, string expectedName)
+            {
+                if (dict.TryGetValue(id, out var realName) && realName == expectedName)
+                    return;
+
+                var settings = dbcSettingsProvider.GetSettings();
+
+                store.messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetIcon(MessageBoxIcon.Error)
+                    .SetTitle("Invalid DBC")
+                    .SetMainInstruction("Invalid DBC path")
+                    .SetContent(
+                        $"In specified path, there is no DBC for version {settings.DBCVersion}. Ensure the path contains Spell.dbc or Spell.db2 file.\n\nPath: {settings.Path}")
+                    .WithOkButton(false)
+                    .Build());
+                throw new Exception("Invalid DBC!");
             }
         }
     }
@@ -354,7 +382,15 @@ namespace WDE.DbcStore
 
         public bool AllowUnknownItems => true;
     }
-    
+
+    public class LanguageParameter : DbcParameter
+    {
+        public LanguageParameter(Dictionary<long, string> storage) : base(storage)
+        {
+            Items.Add(0, new SelectOption("Universal"));
+        }
+    }
+
     public class DbcFileParameter : Parameter
     {
         public DbcFileParameter(Dictionary<long, string> storage)
