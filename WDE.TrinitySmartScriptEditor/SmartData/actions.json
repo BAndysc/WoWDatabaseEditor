@@ -2668,16 +2668,16 @@
                 "type": "SwitchParameter",
                 "name": "Flags",
                 "values": {
-                    "1": {
+                    "0": {
                         "name": "PlayOneShotAnimKitId"
                     },
-                    "2": {
+                    "1": {
                         "name": "SetAIAnimKitId"
                     },
-                    "3": {
+                    "2": {
                         "name": "SetMeleeAnimKitId"
                     },
-                    "4": {
+                    "3": {
                         "name": "SetMovementAnimKitId"
                     }
                 }
