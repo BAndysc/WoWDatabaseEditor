@@ -1,6 +1,8 @@
 ﻿using ICSharpCode.AvalonEdit.Document;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
+using WDE.MVVM;
+using System;
 
 namespace WDE.Common.WPF.Types
 {
@@ -10,6 +12,8 @@ namespace WDE.Common.WPF.Types
     {
         public TextDocument Native { get; }
 
+        public IObservable<int> Length => Native.ToObservable(n => n.TextLength);
+        
         public NativeTextDocument() : this(new TextDocument()) { }
 
         public NativeTextDocument(TextDocument document)

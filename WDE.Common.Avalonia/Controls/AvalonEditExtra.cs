@@ -22,8 +22,31 @@ namespace WDE.Common.Avalonia.Controls
         public static void SetSyntax(IAvaloniaObject obj, string value)
         {
             obj.SetValue(SyntaxProperty, value);
-            if (obj is TextEditor textEditor)
-                textEditor.SyntaxHighlighting = AvaloniaEditSyntaxManager.Instance.GetDefinition(value);
+        }
+        
+        
+        public static readonly AttachedProperty<string> SyntaxExtensionProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, string>("SyntaxExtension", typeof(AvalonEditExtra));
+
+        public static string GetSyntaxExtension(IAvaloniaObject obj)
+        {
+            return obj.GetValue(SyntaxExtensionProperty);
+        }
+
+        public static void SetSyntaxExtension(IAvaloniaObject obj, string value)
+        {
+            obj.SetValue(SyntaxExtensionProperty, value);
+        }
+
+        static AvalonEditExtra()
+        {
+            SyntaxExtensionProperty.Changed.AddClassHandler<TextEditor>((editor, args) =>
+            {
+                editor.SyntaxHighlighting = AvaloniaEditSyntaxManager.Instance.GetDefinitionForExtension((string)args.NewValue!);
+            });
+            SyntaxProperty.Changed.AddClassHandler<TextEditor>((editor, args) =>
+            {
+                editor.SyntaxHighlighting = AvaloniaEditSyntaxManager.Instance.GetDefinition((string)args.NewValue!);
+            });
         }
     }
 
@@ -32,6 +55,7 @@ namespace WDE.Common.Avalonia.Controls
         public static AvaloniaEditSyntaxManager Instance { get; } = new();
 
         private Dictionary<string, IHighlightingDefinition?> definitions = new();
+        private Dictionary<string, IHighlightingDefinition?> definitionsByExtension = new();
         
         public IHighlightingDefinition? GetDefinition(string path)
         {
@@ -42,8 +66,11 @@ namespace WDE.Common.Avalonia.Controls
             if (SystemTheme.EffectiveThemeIsDark)
             {
                 var darkDefinition = Path.ChangeExtension(path, null) + "Dark.xml";
+                var darkDefinition2 = Path.ChangeExtension(path, null) + ".dark.xml";
                 if (File.Exists(darkDefinition))
                     path = darkDefinition;
+                else if (File.Exists(darkDefinition2))
+                    path = darkDefinition2;
             }
 
             if (!File.Exists(path))
@@ -63,12 +90,25 @@ namespace WDE.Common.Avalonia.Controls
             {
                 Console.WriteLine(e);
             }
+            
 
             if (syntax == null)
                 Console.WriteLine("Invalid syntax in path " + path);
 
             definitions[originalPath] = syntax;
             return syntax;
+        }
+
+        public IHighlightingDefinition? GetDefinitionForExtension(string extension)
+        {
+            if (definitionsByExtension.TryGetValue(extension, out var definition))
+                return definition;
+
+            var originalExtension = extension;
+            var path = $"Resources/Syntax/{extension}.xml";
+            
+            definitionsByExtension[originalExtension] = GetDefinition(path);
+            return definitionsByExtension[originalExtension];
         }
     }
 }
