@@ -8,33 +8,34 @@
     <UserControl.Resources>
         <converters:NullConverter x:Key="IsNullConverter" Inverted="true" />
     </UserControl.Resources>
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid ColumnDefinitions="Auto,*">
-            <ListBox Items="{Binding ContainerTabItems}" 
-                SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" />
-                            <TextBlock Text="*" IsVisible="{Binding IsModified}" />
-                            <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding IsModified}" ComparisonCondition="Equal" Value="False">
-                                    <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Normal"/>
-                                </DataTriggerBehavior>
-                                <DataTriggerBehavior Binding="{Binding IsModified}" ComparisonCondition="Equal" Value="True">
-                                    <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Bold"/>
-                                </DataTriggerBehavior>
-                            </Interaction.Behaviors>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-            <DockPanel Grid.Column="1" LastChildFill="True" Margin="7,0">
+    <Grid ColumnDefinitions="Auto,*">
+        <ListBox Items="{Binding ContainerTabItems}"
+            BorderThickness="0"
+            SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text="*" IsVisible="{Binding IsModified}" />
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{Binding IsModified}" ComparisonCondition="Equal" Value="False">
+                                <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Normal"/>
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{Binding IsModified}" ComparisonCondition="Equal" Value="True">
+                                <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Bold"/>
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Border  Grid.Column="1" Background="{DynamicResource SlightlyHighlightedBackground}" Padding="15,7">
+            <DockPanel LastChildFill="True"> 
                 <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedTabItem.Name}" FontSize="32" FontWeight="Light" />
+                <Grid Margin="10" DockPanel.Dock="Bottom">
+                    <Button Margin="0,10,0,0" Content="Save" HorizontalAlignment="Left" Width="119"
+                            Command="{Binding Save}" />
+                </Grid>
                 <DockPanel LastChildFill="True">
                     <TextBlock DockPanel.Dock="Top" 
                                TextWrapping="WrapWithOverflow" 
@@ -47,8 +48,6 @@
                                     VerticalContentAlignment="Stretch" />
                 </DockPanel>
             </DockPanel>
-        </Grid>
-        <Button Margin="0,10,0,0" Content="Save" Grid.Row="1" HorizontalAlignment="Left" Width="119"
-                Command="{Binding Save}" />
+        </Border>
     </Grid>
 </UserControl>
