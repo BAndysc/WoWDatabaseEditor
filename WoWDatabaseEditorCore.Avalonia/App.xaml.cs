@@ -30,6 +30,7 @@ using WoWDatabaseEditorCore.CoreVersion;
 using WoWDatabaseEditorCore.Services.FileSystemService;
 using WoWDatabaseEditorCore.Services.UserSettingsService;
 using WoWDatabaseEditorCore.ModulesManagement;
+using WoWDatabaseEditorCore.Services.DebugConsole;
 using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Avalonia
@@ -226,6 +227,8 @@ namespace WoWDatabaseEditorCore.Avalonia
             var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>();
             foreach (var module in loadedModules)
                 module.FinalizeRegistration((IContainerRegistry)Container);
+
+            Container.Resolve<IDebugConsole>();
             
             var themeManager = Container.Resolve<IThemeManager>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
