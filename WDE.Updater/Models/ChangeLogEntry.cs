@@ -11,5 +11,7 @@ namespace WDE.Updater.Models
         public DateTime Date { get; set; }
         public string? UpdateTitle { get; set; }
         public string[]? Changes { get; set; }
+
+        public string Title => UpdateTitle == null ? (VersionName ?? "") : $"{UpdateTitle} ({VersionName})";
     }
 }
