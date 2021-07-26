@@ -14,15 +14,11 @@ build_script:
 - cmd: >-
     Rem Building WDE
     
-    dotnet publish -c Release --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/ LoaderWPF/LoaderWPF.csproj -r win7-x64
- 
     dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
 
     dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
 
     dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
-    
-    rename bin\wowdatabaseeditor\Updater.exe _Updater.exe
     
     rename bin\wowdatabaseeditor-avalonia-mac\Updater _Updater
     
@@ -30,11 +26,7 @@ build_script:
 
     rename bin\wowdatabaseeditor-avalonia-win\Updater.exe _Updater.exe
 
-    FOR %%A IN (bin\wowdatabaseeditor\app.ini,bin\wowdatabaseeditor-avalonia-win\app.ini,bin\wowdatabaseeditor-avalonia-mac\app.ini,bin\wowdatabaseeditor-avalonia-linux\app.ini) DO (echo COMMIT=%APPVEYOR_REPO_COMMIT% >> %%A & echo BRANCH=%APPVEYOR_REPO_BRANCH% >> %%A & echo VERSION=%APPVEYOR_BUILD_VERSION% >> %%A & echo BUILD_VERSION=%APPVEYOR_BUILD_NUMBER% >> %%A & echo UPDATE_SERVER=%DEPLOY_URL% >> %%A & echo MARKETPLACE=default >> %%A)
-
-    FOR %%A IN (bin\wowdatabaseeditor\,bin\wowdatabaseeditor-avalonia-win\,bin\wowdatabaseeditor-avalonia-mac\,bin\wowdatabaseeditor-avalonia-linux\) DO (mkdir %%A\Parsers & move %%A\WowPacketParserModule.* %%A\Parsers\)
-    
-    echo PLATFORM=WindowsWPF >> bin/wowdatabaseeditor/app.ini
+    FOR %%A IN (bin\wowdatabaseeditor-avalonia-win\app.ini,bin\wowdatabaseeditor-avalonia-mac\app.ini,bin\wowdatabaseeditor-avalonia-linux\app.ini) DO (echo COMMIT=%APPVEYOR_REPO_COMMIT% >> %%A & echo BRANCH=%APPVEYOR_REPO_BRANCH% >> %%A & echo VERSION=%APPVEYOR_BUILD_VERSION% >> %%A & echo BUILD_VERSION=%APPVEYOR_BUILD_NUMBER% >> %%A & echo UPDATE_SERVER=%DEPLOY_URL% >> %%A & echo MARKETPLACE=default >> %%A)
 
     echo PLATFORM=Windows >> bin/wowdatabaseeditor-avalonia-win/app.ini
 
@@ -60,8 +52,6 @@ build_script:
 
     for /d %%a in (bin\wowdatabaseeditor-avalonia-mac\*) do move "%%~fa" "WoW Database Editor.app\Contents\MacOS"
 
-    7z a WoWDatabaseEditorWindowsWPF.zip .\bin\wowdatabaseeditor\*
-    
     7z a WoWDatabaseEditorWindows.zip .\bin\wowdatabaseeditor-avalonia-win\*
     
     7z a WoWDatabaseEditorMacOs.zip "WoW Database Editor.app\"
@@ -77,8 +67,6 @@ test_script:
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
 artifacts:
-- path: WoWDatabaseEditorWindowsWPF.zip
-  name: WoWDatabaseEditorWindowsWPF.zip
 - path: WoWDatabaseEditorMacOs.zip
   name: WoWDatabaseEditorMacOs.zip
 - path: WoWDatabaseEditorWindows.zip
@@ -87,12 +75,10 @@ artifacts:
   name: WoWDatabaseEditorLinux.zip
 deploy_script:
 - cmd: >-
-    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windowswpf" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindowsWPF.zip;type=application/zip"
-    
     IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windows" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindows.zip;type=application/zip"
     
-    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=macos" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorMacOs.zip;type=application/zip" -F "make_exec=WoW Database Editor.app/Contents/MacOS/WoWDatabaseEditorCore.Avalonia" -F "make_exec=WoW Database Editor.app/Contents/MacOS/WowPacketParser"
+    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=macos" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorMacOs.zip;type=application/zip" -F "make_exec=WoW Database Editor.app/Contents/MacOS/WoWDatabaseEditorCore.Avalonia"
     
-    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=linux" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorLinux.zip;type=application/zip" -F "make_exec=WoWDatabaseEditorCore.Avalonia" -F "make_exec=_Updater" -F "make_exec=WowPacketParser"
+    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=linux" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorLinux.zip;type=application/zip" -F "make_exec=WoWDatabaseEditorCore.Avalonia" -F "make_exec=_Updater"
     
     IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Changelog/Add" -H  "accept: */*" -H  "Content-Type: application/json" -d "{\"version\":{\"branch\":\"%APPVEYOR_REPO_BRANCH%\",\"marketplace\":\"default\",\"version\":%APPVEYOR_BUILD_NUMBER%},\"user\":{\"user\":\"%DEPLOY_USER%\",\"key\":\"%DEPLOY_KEY%\"},\"entry\":\"%APPVEYOR_REPO_COMMIT_MESSAGE%%APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED%\"}"
