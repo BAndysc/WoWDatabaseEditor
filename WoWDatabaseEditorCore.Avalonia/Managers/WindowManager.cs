@@ -63,5 +63,37 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             
             return result[0];
         }
+
+        public async Task<string?> ShowSaveFileDialog(string filter, string? defaultDirectory = null)
+        {
+            var f = filter.Split("|");
+            
+            var result = await new SaveFileDialog()
+            {
+                Directory = defaultDirectory,
+                Filters = f.Zip(f.Skip(1))
+                    .Where((x, i) => i % 2 == 0)
+                    .Select(x => new FileDialogFilter()
+                    {
+                        Name = x.First,
+                        Extensions = x.Second.Split(",").ToList()
+                    }).ToList()
+            }.ShowAsync(mainWindowHolder.Window);
+            
+            if (string.IsNullOrEmpty(result))
+                return null;
+            
+            return result;
+        }
+        
+        public void OpenUrl(string url)
+        {
+            var psi = new System.Diagnostics.ProcessStartInfo
+            {
+                UseShellExecute = true,
+                FileName = url
+            };
+            System.Diagnostics.Process.Start(psi);
+        }
     }
 }

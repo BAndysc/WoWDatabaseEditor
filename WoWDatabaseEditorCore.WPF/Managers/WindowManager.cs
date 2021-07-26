@@ -52,5 +52,20 @@ namespace WoWDatabaseEditorCore.WPF.Managers
                 return Task.FromResult<string?>(dialog.FileName);
             return Task.FromResult<string?>(null);
         }
+
+        public Task<string?> ShowSaveFileDialog(string filter, string? defaultDirectory = null)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public void OpenUrl(string url)
+        {
+            var psi = new System.Diagnostics.ProcessStartInfo
+            {
+                UseShellExecute = true,
+                FileName = url
+            };
+            System.Diagnostics.Process.Start(psi);
+        }
     }
 }

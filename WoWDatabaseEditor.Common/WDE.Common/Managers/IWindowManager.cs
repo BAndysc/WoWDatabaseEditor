@@ -11,5 +11,9 @@ namespace WDE.Common.Managers
         Task<string?> ShowFolderPickerDialog(string defaultDirectory);
         
         Task<string?> ShowOpenFileDialog(string filter, string? defaultDirectory = null);
+        
+        Task<string?> ShowSaveFileDialog(string filter, string? defaultDirectory = null);
+
+        void OpenUrl(string url);
     }
 }
