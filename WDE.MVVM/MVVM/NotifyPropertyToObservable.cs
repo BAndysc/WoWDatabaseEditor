@@ -25,6 +25,21 @@ namespace WDE.MVVM
             propertyName = me.Member.Name;
         }
 
+        public NotifyPropertyToObservable(R property, Expression<Func<T>> getter)
+        {
+            this.property = property;
+            var compiled = getter.Compile();
+            this.getter = _ => compiled();
+
+            if (!(getter.Body is MemberExpression me))
+                throw new ArgumentException("Getter has to return property and nothing else");
+            
+            if ((me.Member.MemberType & MemberTypes.Property) == 0)
+                throw new ArgumentException("Getter has to return property, not a field");
+
+            propertyName = me.Member.Name;
+        }
+
         public IDisposable Subscribe(IObserver<T> observer)
         {
             return new Subscription(observer, getter, propertyName, property);
