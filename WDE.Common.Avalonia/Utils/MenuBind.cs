@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.LogicalTree;
 using AvaloniaEdit;
 using AvaloniaEdit.Editing;
 using Prism.Commands;
@@ -96,6 +97,8 @@ namespace WDE.Common.Avalonia.Utils
                     command = OverrideCommand<TextBox>(command, Key.Z, key, cmd, Undo);
                     command = OverrideCommand<TextBox>(command, Key.Y, key, cmd, Redo);
                     
+                    command = OverrideCommand<TextArea>(command, Key.Z, key, cmd, tb => GetTextEditor(tb)?.Undo());
+                    command = OverrideCommand<TextArea>(command, Key.Y, key, cmd, tb => GetTextEditor(tb)?.Redo());
                     command = OverrideCommand<TextArea>(command, Key.C, key, cmd, tb => ApplicationCommands.Copy.Execute(null, tb));
                     command = OverrideCommand<TextArea>(command, Key.X, key, cmd, tb => ApplicationCommands.Cut.Execute(null, tb));
                     command = OverrideCommand<TextArea>(command, Key.V, key, cmd, tb => ApplicationCommands.Paste.Execute(null, tb));
@@ -104,6 +107,11 @@ namespace WDE.Common.Avalonia.Utils
                 }
             }
             return viewModel;
+        }
+
+        private static TextEditor? GetTextEditor(TextArea area)
+        {
+            return area.FindLogicalAncestorOfType<TextEditor>();
         }
 
         private static void Redo(TextBox tb)
