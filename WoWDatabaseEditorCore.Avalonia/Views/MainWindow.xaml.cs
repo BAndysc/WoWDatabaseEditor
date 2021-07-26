@@ -9,6 +9,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using AvaloniaStyles.Controls;
+using WDE.Common.Tasks;
 using WDE.Common.Windows;
 using WoWDatabaseEditorCore.ViewModels;
 
@@ -25,6 +26,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         
         public MainWindow(IMainWindowHolder mainWindowHolder)
         {
+            // we have to do it before InitializeComponent!
+            var primaryScreen = Screens.Primary ?? Screens.All.FirstOrDefault();
+            GlobalApplication.HighDpi = (primaryScreen?.PixelDensity ?? 1) > 1.5f;
             InitializeComponent();
             mainWindowHolder.Window = this;
             this.AttachDevTools();

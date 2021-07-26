@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -9,6 +10,7 @@ using Dock.Avalonia.Controls;
 using Newtonsoft.Json;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WoWDatabaseEditorCore.Avalonia.Docking;
 using WoWDatabaseEditorCore.Avalonia.Docking.Serialization;
@@ -35,6 +37,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         {
             this.fileSystem = fileSystem;
             avaloniaDockAdapter = new AvaloniaDockAdapter(documentManager, layoutViewModelResolver);
+            
+            // we have to do it before InitializeComponent!
+            var primaryScreen = Screens.Primary ?? Screens.All.FirstOrDefault();
+            GlobalApplication.HighDpi = (primaryScreen?.PixelDensity ?? 1) > 1.5f;
             
             InitializeComponent();
             this.AttachDevTools();
