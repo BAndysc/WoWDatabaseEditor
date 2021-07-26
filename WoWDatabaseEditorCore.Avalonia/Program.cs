@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using AsyncAwaitBestPractices;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using WoWDatabaseEditorCore.Managers;
@@ -18,6 +19,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             if (ProgramBootstrap.TryLaunchUpdaterIfNeeded())
                 return;
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            SafeFireAndForgetExtensions.SetDefaultExceptionHandling(Console.WriteLine);
             var app = BuildAvaloniaApp();
             try
             {

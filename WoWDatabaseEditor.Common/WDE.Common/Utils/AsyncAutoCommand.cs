@@ -30,6 +30,7 @@ namespace WDE.Common.Utils
                 e =>
                 {
                     IsBusy = false;
+                    Console.WriteLine(e);
                     onException?.Invoke(e);
                 },
                 continueOnCapturedContext);

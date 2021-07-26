@@ -9,6 +9,7 @@ using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
