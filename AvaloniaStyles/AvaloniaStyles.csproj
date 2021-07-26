@@ -21,6 +21,7 @@
       <AvaloniaResource Include="Styles\Assets\Lato\*.ttf" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
       <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
     </ItemGroup>
 </Project>

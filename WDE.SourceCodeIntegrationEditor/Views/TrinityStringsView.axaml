@@ -90,7 +90,7 @@
                 <Button Command="{Binding ExecuteSqlCommand}">Execute SQL</Button>
             </StackPanel>
             <avaloniaEdit:TextEditor  controls1:AvalonEditExtra.Syntax="Resources/SqlSyntax.xml" Document="{Binding ResultCode, Converter={StaticResource DocumentConverter}}" 
-                                      Padding="5" x:Name="MyAvalonEdit"
+                                      BorderThickness="0" x:Name="MyAvalonEdit"
                                       ShowLineNumbers="True"
                                       IsReadOnly="True"
                                       FontFamily="Consolas,Menlo,Courier,Courier New"/>

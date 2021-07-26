@@ -34,24 +34,17 @@
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
             <controls:ToolBar.LeftContent>
-                <Button Command="{Binding ExecuteChangedCommand}">
-                    <Border Background="Transparent"
-                            Width="12"
-                            Height="12"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center">
-                        <Path Fill="{Binding $parent[Button].Foreground}"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Data="M 0 0 L 6 3.5 L 0 7 Z"/>
-                    </Border>
-                </Button>
+                <controls:ToolbarPanel>
+                    <components:ButtonImage Image="icons/icon_play.png" IsVisible="{Binding ShowPlayButtons}" Command="{Binding ExecuteChangedCommand}" />
+                    <components:ButtonImage Command="{Binding GenerateCurrentSqlCommand}"
+                                            IsVisible="{Binding ShowExportButtons}"
+                                            Text="To SQL" 
+                                            Image="icons/icon_to_sql.png" />
+                </controls:ToolbarPanel>
             </controls:ToolBar.LeftContent>
-            <controls:ToolBar.RightContent>
-                <StackPanel Orientation="Horizontal">
-                    <Button Command="{Binding GenerateCurrentSqlCommand}">SQL</Button>
-                </StackPanel>
-            </controls:ToolBar.RightContent>
+            <controls:ToolBar.MiddleContent>
+                <ContentPresenter DataContext="{Binding DocumentManager.ActiveDocument}" utils:ToolBarBind.Model="{Binding}" />
+            </controls:ToolBar.MiddleContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>
     

@@ -1,7 +1,8 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
-        xmlns:utils="clr-namespace:AvaloniaStyles.Utils">
+        xmlns:utils="clr-namespace:AvaloniaStyles.Utils"
+        xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit">
     <Style Selector="TextBox">
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
@@ -9,7 +10,6 @@
     <Style Selector="TextBox.InnerContentWithPadding /template/ ContentPresenter Border">
         <Setter Property="Padding" Value="{Binding $parent[TextBox].Padding}" />
     </Style>
-    
     
     <Style Selector="TextBox.GridViewPlainTextBox:disabled">
         <Setter Property="Opacity" Value="0.5" />
@@ -27,5 +27,15 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    
+    <!-- TextEditor -->
+    
+    <Style Selector="avaloniaEdit|TextEditor">
+        <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />    
+        <Setter Property="Padding" Value="{DynamicResource TextControlThemePadding}" />   
     </Style>
 </Styles>

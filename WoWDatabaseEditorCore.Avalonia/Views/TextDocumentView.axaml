@@ -2,11 +2,13 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
-             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia">
     <UserControl.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
     </UserControl.Resources>
     <avaloniaEdit:TextEditor Document="{Binding Document, Converter={StaticResource DocumentConverter}}" 
-                             Padding="5"
+                             BorderThickness="0"
+                             controls:AvalonEditExtra.SyntaxExtension="{Binding Extension}"
                              ShowLineNumbers="True" FontFamily="Consolas,Menlo,Courier,Courier New" />
 </UserControl>

@@ -16,6 +16,7 @@
         <SolidColorBrush Color="#74747F" x:Key="ContentBorderBrush" />
         <SolidColorBrush Color="White" x:Key="ContentBackground" />
         <SolidColorBrush Color="White" x:Key="ThemeBackgroundBrush" />
+        <SolidColorBrush Color="#F7F7F7" x:Key="SlightlyHighlightedBackground" />
         <SolidColorBrush Color="#DAD9D8" x:Key="ThemeBorderMidBrush" />
         <SolidColorBrush Color="Transparent" x:Key="SystemAltMediumLowColor" />
         

@@ -49,7 +49,7 @@
     </components:ToolView.Resources>
     <DockPanel LastChildFill="True">
         <Button Command="{Binding ClearConsole}" DockPanel.Dock="Top">Clear</Button>
-        <avaloniaEdit:TextEditor IsReadOnly="True" Document="{Binding Text, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
+        <avaloniaEdit:TextEditor IsReadOnly="True" Document="{Binding Text, Converter={StaticResource DocumentConverter}}" BorderThickness="0" x:Name="MyAvalonEdit"
                                FontFamily="Consolas,Menlo,Courier,Courier New"/>
         
     </DockPanel>
