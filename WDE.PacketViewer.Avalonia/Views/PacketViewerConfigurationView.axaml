@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:views="clr-namespace:WDE.PacketViewer.Avalonia.Views"
+             xmlns:viewmodels="clr-namespace:WDE.PacketViewer.ViewModels"
+             xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.PacketViewer.Avalonia.Views.PacketViewerConfigurationView">
+    <UserControl.Resources>
+        <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
+        <converters:NullConverter x:Key="NullConverter" Inverted="True" />
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="TextBlock.Label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+            <Setter Property="Width" Value="120" />
+        </Style>
+    </UserControl.Styles>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <DockPanel LastChildFill="True">
+                <TextBlock FontWeight="Bold" Name="Text">Defaults</TextBlock>
+                <Border Height="1" Background="{Binding #Text.Foreground}" Margin="10,0" Opacity="0.3" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+            </DockPanel>
+            <StackPanel Orientation="Vertical" Margin="15,0,0,0">
+                <CheckBox IsChecked="{Binding AlwaysSplitUpdates, Mode=TwoWay}">Always split UPDATE_OBJECT</CheckBox>
+                <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0">If you want to filter individual updates, you have to split UPDATE_OBJECT packets. This option can be also manually triggered for each sniff, however you may enable it globally be default. Note: it DOES increase memory usage.</TextBlock>
+                <CheckBox IsChecked="{Binding WrapLines, Mode=TwoWay}">Wrap lines</CheckBox>
+                <DockPanel LastChildFill="True">
+                    <TextBlock Classes="Label">Default filter</TextBlock>
+                    <views:FilterTextEditor Document="{Binding DefaultFilterText, Converter={StaticResource DocumentConverter}}" />
+                </DockPanel>
+                <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0">If you use some filter often, you may want to set it as a default filter.</TextBlock>
+            </StackPanel>
+            
+            
+            <DockPanel LastChildFill="True" Margin="0,15,0,0">
+                <TextBlock FontWeight="Bold">WoW Packet Parser settings</TextBlock>
+                <Border Height="1" Background="{Binding #Text.Foreground}" Margin="10,0" Opacity="0.3" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+            </DockPanel>
+            <ItemsControl Items="{Binding ParserSettings}" Margin="15,0,0,0">
+                <ItemsControl.DataTemplates>
+                    <DataTemplate DataType="viewModels:ParserBoolSettingViewModel">
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" Content="{Binding Name}" />
+                            <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0" Text="{Binding Help}" IsVisible="{Binding Help, Converter={StaticResource NullConverter}}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                    <DataTemplate DataType="viewModels:ParserStringSettingViewModel">
+                        <StackPanel Margin="0,0,0,12">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock Text="{Binding Name}"
+                                           Classes="Label" />
+                                <TextBox Text="{Binding Value, Mode=TwoWay}" />
+                            </DockPanel>
+                            <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0" Text="{Binding Help}" IsVisible="{Binding Help, Converter={StaticResource NullConverter}}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.DataTemplates>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

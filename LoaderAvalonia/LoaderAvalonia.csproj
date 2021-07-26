@@ -29,6 +29,8 @@
       <ProjectReference Include="..\WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj" />
       <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
       <ProjectReference Include="..\WDE.Updater\WDE.Updater.csproj" />
+      <ProjectReference Include="..\WDE.PacketViewer.Avalonia\WDE.PacketViewer.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.PacketViewer\WDE.PacketViewer.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />
@@ -36,6 +38,23 @@
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj" SkipGetTargetFrameworkProperties="true" />
       <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
+
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.BattleNet.V37165\WowPacketParserModule.BattleNet.V37165.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.Substructures\WowPacketParserModule.Substructures.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V1_13_2_31446\WowPacketParserModule.V1_13_2_31446.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V2_4_3_8606\WowPacketParserModule.V2_4_3_8606.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V4_3_4_15595\WowPacketParserModule.V4_3_4_15595.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V5_3_0_16981\WowPacketParserModule.V5_3_0_16981.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V5_4_0_17359\WowPacketParserModule.V5_4_0_17359.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V5_4_1_17538\WowPacketParserModule.V5_4_1_17538.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V5_4_2_17658\WowPacketParserModule.V5_4_2_17658.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V5_4_7_17898\WowPacketParserModule.V5_4_7_17898.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V5_4_8_18291\WowPacketParserModule.V5_4_8_18291.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V6_0_2_19033\WowPacketParserModule.V6_0_2_19033.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V7_0_3_22248\WowPacketParserModule.V7_0_3_22248.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V8_0_1_27101\WowPacketParserModule.V8_0_1_27101.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V9_0_1_36216\WowPacketParserModule.V9_0_1_36216.csproj" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParser\WowPacketParser.csproj" SkipGetTargetFrameworkProperties="true" />
     </ItemGroup>
 
 </Project>

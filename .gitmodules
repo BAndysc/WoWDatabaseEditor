@@ -4,3 +4,6 @@
 [submodule "AvaloniaEdit"]
 	path = AvaloniaEdit
 	url = https://github.com/BAndysc/AvaloniaEdit
+[submodule "WoWPacketParser"]
+	path = WoWPacketParser
+	url = https://github.com/BAndysc/WoWPacketParser

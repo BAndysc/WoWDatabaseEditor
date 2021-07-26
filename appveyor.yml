@@ -32,6 +32,8 @@ build_script:
 
     FOR %%A IN (bin\wowdatabaseeditor\app.ini,bin\wowdatabaseeditor-avalonia-win\app.ini,bin\wowdatabaseeditor-avalonia-mac\app.ini,bin\wowdatabaseeditor-avalonia-linux\app.ini) DO (echo COMMIT=%APPVEYOR_REPO_COMMIT% >> %%A & echo BRANCH=%APPVEYOR_REPO_BRANCH% >> %%A & echo VERSION=%APPVEYOR_BUILD_VERSION% >> %%A & echo BUILD_VERSION=%APPVEYOR_BUILD_NUMBER% >> %%A & echo UPDATE_SERVER=%DEPLOY_URL% >> %%A & echo MARKETPLACE=default >> %%A)
 
+    FOR %%A IN (bin\wowdatabaseeditor\,bin\wowdatabaseeditor-avalonia-win\,bin\wowdatabaseeditor-avalonia-mac\,bin\wowdatabaseeditor-avalonia-linux\) DO (mkdir %%A\Parsers & move %%A\WowPacketParserModule.* %%A\Parsers\)
+    
     echo PLATFORM=WindowsWPF >> bin/wowdatabaseeditor/app.ini
 
     echo PLATFORM=Windows >> bin/wowdatabaseeditor-avalonia-win/app.ini
@@ -89,8 +91,8 @@ deploy_script:
     
     IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windows" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindows.zip;type=application/zip"
     
-    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=macos" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorMacOs.zip;type=application/zip" -F "make_exec=WoW Database Editor.app/Contents/MacOS/WoWDatabaseEditorCore.Avalonia"
+    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=macos" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorMacOs.zip;type=application/zip" -F "make_exec=WoW Database Editor.app/Contents/MacOS/WoWDatabaseEditorCore.Avalonia" -F "make_exec=WoW Database Editor.app/Contents/MacOS/WowPacketParser"
     
-    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=linux" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorLinux.zip;type=application/zip" -F "make_exec=WoWDatabaseEditorCore.Avalonia" -F "make_exec=_Updater"
+    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=linux" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorLinux.zip;type=application/zip" -F "make_exec=WoWDatabaseEditorCore.Avalonia" -F "make_exec=_Updater" -F "make_exec=WowPacketParser"
     
     IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Changelog/Add" -H  "accept: */*" -H  "Content-Type: application/json" -d "{\"version\":{\"branch\":\"%APPVEYOR_REPO_BRANCH%\",\"marketplace\":\"default\",\"version\":%APPVEYOR_BUILD_NUMBER%},\"user\":{\"user\":\"%DEPLOY_USER%\",\"key\":\"%DEPLOY_KEY%\"},\"entry\":\"%APPVEYOR_REPO_COMMIT_MESSAGE%%APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED%\"}"

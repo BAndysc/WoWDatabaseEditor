@@ -1,0 +1,167 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:codeCompletion="clr-namespace:AvaloniaEdit.CodeCompletion;assembly=AvaloniaEdit"
+             xmlns:views="clr-namespace:WDE.PacketViewer.Avalonia.Views"
+             xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.PacketViewer.Avalonia.Views.PacketDocumentView">
+    <UserControl.Resources>
+        <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
+        <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
+        <converters:IntToBoolConverter x:Key="IntToBoolConverter" TrueValue="0" FalseValue="1"/>
+        <converters:BoolToScrollBarVisibilityConverter x:Key="BoolToScrollBarVisibilityConverter" WhenTrue="Disabled" WhenFalse="Auto"/>
+        <views:EntryToNiceBackgroundConverter x:Key="EntryToNiceBackgroundConverter" />
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="codeCompletion|CompletionList TextBlock">
+            <Setter Property="Foreground" Value="Black" />
+        </Style>
+        <Style Selector="ComboBox.ComboDropDown">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <DataValidationErrors>
+                        <Panel x:Name="DropDownOverlay" Background="Transparent">
+                            <Viewbox UseLayoutRounding="False"
+                                     MinHeight="{DynamicResource ComboBoxMinHeight}"
+                                     IsHitTestVisible="False"
+                                     Margin="0,0,10,0"
+                                     Height="12"
+                                     Width="12"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Center">
+                                <Panel>
+                                    <Panel Height="12"
+                                           Width="12" />
+                                    <Path x:Name="DropDownGlyph"
+                                          Stretch="Uniform"
+                                          VerticalAlignment="Center"
+                                          Data="M1939 486L2029 576L1024 1581L19 576L109 486L1024 1401L1939 486Z" />
+                                </Panel>
+                            </Viewbox>
+                            <Popup Name="PART_Popup"
+                                   WindowManagerAddShadowHint="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                                   MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                                   MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                   PlacementTarget="DropDownOverlay"
+                                   IsLightDismissEnabled="True">
+                                <Border x:Name="PopupBorder"
+                                        Background="{DynamicResource ComboBoxDropDownBackground}"
+                                        BorderBrush="{DynamicResource ComboBoxDropDownBorderBrush}"
+                                        BorderThickness="{DynamicResource ComboBoxDropdownBorderThickness}"
+                                        Margin="0,-1,0,-1"
+                                        Padding="{DynamicResource ComboBoxDropdownBorderPadding}"
+                                        HorizontalAlignment="Stretch"
+                                        CornerRadius="{DynamicResource OverlayCornerRadius}">
+                                    <ScrollViewer
+                                        HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                        VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                                        Items="{TemplateBinding Items}"
+                                                        Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+                                                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                        ItemTemplate="{TemplateBinding ItemTemplate}"
+                                                        VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Panel>
+                    </DataValidationErrors>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
+    
+    <DockPanel LastChildFill="True">
+        <!-- Toolbar -->
+        <Grid ColumnDefinitions="*,5,*"
+              IsEnabled="{Binding LoadingInProgress, Converter={StaticResource InversedBoolConverter}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" MinHeight="30" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <!-- Filter bar -->
+                <DockPanel LastChildFill="True" DockPanel.Dock="Top" Margin="0,5,0,0">
+                    <ComboBox Classes="ComboDropDown" Margin="0,0,5,0" VerticalAlignment="Stretch"
+                              Width="32"
+                              DockPanel.Dock="Left" Items="{Binding MostRecentlySearched}"
+                              SelectedItem="{Binding MostRecentlySearchedItem}" />
+                    <Panel>
+                        <views:FilterTextEditor Document="{Binding FilterText, Converter={StaticResource DocumentConverter}}"
+                                            BorderThickness="0"
+                                            Background="Transparent"
+                                            Padding="0"
+                                            Name="TextEditor" />
+                        <TextBlock FontFamily="Consolas,Menlo,Courier,Courier New" 
+                                   IsVisible="{Binding #TextEditor.Document.TextLength, Converter={StaticResource IntToBoolConverter}}"
+                                   Opacity="0.5"
+                                   IsHitTestVisible="False"
+                                   FontStyle="Italic">Filter packets... e.g. packet.opcode == SMSG.SPELL_START</TextBlock>
+                    </Panel>
+                </DockPanel>
+                <GridSplitter Grid.Row="1" />
+                
+                <!-- packets view -->
+                <DockPanel LastChildFill="True" Grid.Row="2">
+                    <ProgressBar Height="2"
+                                 Minimum="0"
+                                 Maximum="100"
+                                 IsIndeterminate="{Binding ProgressUnknown}"
+                                 DockPanel.Dock="Bottom"
+                                 Value="{Binding FilteringProgress, Mode=OneWay}"
+                                 IsVisible="{Binding FilteringInProgress}" />
+                    <controls:GridView Items="{Binding FilteredPackets}"
+                                       SelectedItem="{Binding SelectedPacket, Mode=TwoWay}"
+                                       IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch">
+                        <controls:GridView.Columns>
+                            <controls:GridColumnDefinition Name="Id"
+                                                           Property="Id"
+                                                           PreferedWidth="50" />
+                            <controls:GridColumnDefinition Name="Opcode"
+                                                           Property="Opcode"
+                                                           PreferedWidth="150" />
+                            <controls:GridColumnDefinition Name="Diff (ms)"
+                                                           Property="Diff"
+                                                           PreferedWidth="90" />
+                            <controls:GridColumnDefinition Name="Entry"
+                                                           Property="Entry"
+                                                           PreferedWidth="70" />
+                            <controls:GridColumnDefinition Name="Object name"
+                                                           Property="ObjectName"
+                                                           PreferedWidth="160" />
+                        </controls:GridView.Columns>
+                        <controls:GridView.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Background" Value="{Binding Entry, Converter={StaticResource EntryToNiceBackgroundConverter}}"></Setter>
+                            </Style>
+                        </controls:GridView.Styles>
+                    </controls:GridView>
+                </DockPanel>
+            </Grid>
+            <GridSplitter Grid.Column="1" />
+            
+            <!-- text view -->
+            <avaloniaEdit:TextEditor
+                Grid.Column="2"
+                BorderThickness="0"
+                Padding="2"
+                Document="{Binding SelectedPacketPreview, Converter={StaticResource DocumentConverter}}"
+                ShowLineNumbers="True"
+                HorizontalScrollBarVisibility="{Binding WrapLines, Converter={StaticResource BoolToScrollBarVisibilityConverter}}"
+                VerticalScrollBarVisibility="Auto"
+                controls1:AvalonEditExtra.Syntax="Resources/PacketTextViewSyntax.xml"
+                Name="PacketPreview"
+                FontFamily="Consolas,Menlo,Courier,Courier New" />
+        </Grid>
+    </DockPanel>
+</UserControl>
