@@ -28,6 +28,8 @@ build_script:
 
     FOR %%A IN (bin\wowdatabaseeditor-avalonia-win\app.ini,bin\wowdatabaseeditor-avalonia-mac\app.ini,bin\wowdatabaseeditor-avalonia-linux\app.ini) DO (echo COMMIT=%APPVEYOR_REPO_COMMIT% >> %%A & echo BRANCH=%APPVEYOR_REPO_BRANCH% >> %%A & echo VERSION=%APPVEYOR_BUILD_VERSION% >> %%A & echo BUILD_VERSION=%APPVEYOR_BUILD_NUMBER% >> %%A & echo UPDATE_SERVER=%DEPLOY_URL% >> %%A & echo MARKETPLACE=default >> %%A)
 
+    FOR %%A IN (bin\wowdatabaseeditor-avalonia-win,bin\wowdatabaseeditor-avalonia-mac,bin\wowdatabaseeditor-avalonia-linux) DO ( mkdir %%A\Parsers & cd %%A & FOR %%X in (WowPacketParserModule.*) DO (cd %%A & move %%X Parsers\%%X ) & cd .. )
+
     echo PLATFORM=Windows >> bin/wowdatabaseeditor-avalonia-win/app.ini
 
     echo PLATFORM=MacOs >> bin/wowdatabaseeditor-avalonia-mac/app.ini
