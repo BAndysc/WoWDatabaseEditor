@@ -28,6 +28,12 @@ namespace WDE.MVVM
             if (obj != null)
                 AutoDispose(obj.Subscribe(getter, _ => RaisePropertyChanged(property)));
         }
+        
+        protected void Watch<T>(string property, params Expression<Func<T>>[] getters)
+        {
+            foreach (var getter in getters)
+                AutoDispose(this.ToObservable(getter).SubscribeAction(_ => RaisePropertyChanged(property)));
+        }
 
         /// <summary>
         /// Subscribes into `obj` property extracted via `getter` (using INotifyPropertyChanged)
@@ -76,6 +82,16 @@ namespace WDE.MVVM
                     setter!.Invoke(this, new object?[] {next});
                     RaisePropertyChanged(propertyName);
                 }));
+        }
+
+        protected void On<T, R>(T obj, Expression<Func<T, R>> property, Action<R> action) where T : INotifyPropertyChanged
+        {
+            AutoDispose(obj.ToObservable(property).SubscribeAction(action));
+        }
+        
+        protected void On<T>(Expression<Func<T>> property, Action<T> action)
+        {
+            AutoDispose(this.ToObservable(property).SubscribeAction(action));
         }
         
         /// <summary>
