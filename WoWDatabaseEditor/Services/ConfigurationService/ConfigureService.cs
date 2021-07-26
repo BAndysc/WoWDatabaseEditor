@@ -4,6 +4,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels;
 
