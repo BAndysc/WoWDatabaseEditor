@@ -20,6 +20,8 @@ namespace WDE.SmartScriptEditor.Parameters
                 return action.Parent?.Parent;
             if (element is SmartEvent @event)
                 return @event.Parent;
+            if (element is SmartCondition @condition)
+                return @condition.Parent?.Parent;
             return null;
         }
         
