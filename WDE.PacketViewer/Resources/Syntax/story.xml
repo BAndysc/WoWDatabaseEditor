@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SyntaxDefinition name="Story teller" extensions=".story" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    <Color name="Punctuation" foreground="DarkGreen" />
+    <Color name="Header" foreground="#2980b9" fontWeight="bold" />
+    <Color name="Digits" foreground="#1e90ff" />
+    <Color name="Coords" foreground="#27ae60" />
+    <Color name="UpdateField" foreground="#8e44ad" fontWeight="bold"/>
+    <RuleSet ignoreCase="true">
+        <Rule color="UpdateField">
+            [A-Z_0-9]+(\s\+\s\d+)?\s=
+        </Rule>
+        <Rule color="Header">
+            After\s*(\d)+\s*ms
+        </Rule>
+        <Rule color="Coords">
+            \(\d+\.\d+,\s*\d+\.\d+,\s*\d+\.\d+\)
+        </Rule>
+        <Rule color="Punctuation">
+            [?,.;()\[\]{}+\-/%*&lt;&gt;^=~!&amp;]+
+        </Rule>
+        <Rule color="Digits">\b0[xX][0-9a-fA-F]+|(\b\d+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?</Rule>
+    </RuleSet>
+</SyntaxDefinition>

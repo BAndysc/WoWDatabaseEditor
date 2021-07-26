@@ -62,6 +62,14 @@ namespace WoWDatabaseEditorCore.Services.AppVersion
             return null;
         }
 
+        public bool? GetBool(string key)
+        {
+            var str = GetString(key);
+            if (str == null)
+                return null;
+            return str.Trim().ToLower() == "true" || str.Trim() == "1";
+        }
+
         public int? GetInt(string key)
         {
             if (config.TryGetValue(key, out var value) && int.TryParse(value, out var intValue))

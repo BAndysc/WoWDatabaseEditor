@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.PacketViewer.Avalonia.Views.PacketDocumentToolBar">
+    <UserControl.Resources>
+        <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
+    </UserControl.Resources>
+    <controls:ToolbarPanel DockPanel.Dock="Top"
+                           IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}">
+        <components:ButtonImage ToolTip.Tip="Saves to text file filtered packets" Command="{Binding SaveToFileCommand}" Image="icons/icon_save_to_txt.png" />
+        
+        <controls:DropDownButton>
+            <controls:DropDownButton.Button>
+                <StackPanel Orientation="Horizontal">
+                    <components:WdeImage ImageUri="icons/icon_cog_reload.png" />
+                    <TextBlock>Dump</TextBlock>
+                </StackPanel>
+            </controls:DropDownButton.Button>
+            <StackPanel Orientation="Vertical">
+                <ItemsPresenter Items="{Binding Processors}">
+                    <ItemsPresenter.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked}">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+                                    <TextBlock Text="{Binding Description}" />
+                                </StackPanel>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ItemsPresenter.ItemTemplate>
+                </ItemsPresenter>
+                <Button ClickMode="Press" Command="{Binding RunProcessors}" Content="Execute">
+                    <Interaction.Behaviors>
+                        <controls:DismissPopupBehaviour/>
+                    </Interaction.Behaviors>
+                </Button>
+            </StackPanel>
+        </controls:DropDownButton>
+        
+        <ToggleButton ToolTip.Tip="Wrap/don't wrap lines in the preview" IsChecked="{Binding WrapLines, Mode=TwoWay}">
+            <components:WdeImage ImageUri="icons/icon_word_wrap.png" />
+        </ToggleButton>
+        
+        <controls:ToolbarSpacer />
+
+        <CheckBox ToolTip.Tip="If enabled, UPDATE_OBJECT packets will be split for each update, what makes filtering way easier (because you can filter individual updates)." 
+                  IsChecked="{Binding SplitUpdate}">Split UPDATE_OBJECT</CheckBox>
+        
+        <components:ButtonImage ToolTip.Tip="Opens Packet Viewer help website" Command="{Binding OpenHelpCommand}" Image="icons/icon_help.png" />
+    </controls:ToolbarPanel>
+</UserControl>
