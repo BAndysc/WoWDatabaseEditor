@@ -1,0 +1,73 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    
+        <Style Selector="controls|ToolbarPanel">
+                <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+        </Style>
+        
+        <Style Selector="controls|ToolbarPanel > :is(Button)">
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > :is(Button) /template/ ContentPresenter">
+                <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > :is(Button) :is(Image)">
+                <Setter Property="Height" Value="24"/>
+                <Setter Property="Width" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > :is(Button) TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > :is(Button):disabled">
+                <Setter Property="Opacity" Value="0.2" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+        </Style>
+        
+        <!-- drop down -->
+        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton">
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton ContentPresenter">
+                <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton :is(Image)">
+                <Setter Property="Height" Value="24"/>
+                <Setter Property="Width" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton:disabled">
+                <Setter Property="Opacity" Value="0.2" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+        </Style>
+        
+        
+        
+        <Style Selector="controls|ToolbarPanel > CheckBox">
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > CheckBox /template/ Grid#RootGrid Grid">
+                <Setter Property="Margin" Value="0,-2,0,0" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > ComboBox">
+                <Setter Property="Padding" Value="12,0,5,0"/>
+                <Setter Property="Height" Value="24" />
+        </Style>
+</Styles>

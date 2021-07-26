@@ -26,7 +26,7 @@
                                          IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                                          SyntaxHighlighting="Json" 
                                          Document="{Binding Definition, Converter={StaticResource DocumentConverter}}" 
-                                         Padding="5"
+                                         BorderThickness="0"
                                          ShowLineNumbers="True"
                                          FontFamily="Consolas,Menlo,Courier,Courier New">
                 </avaloniaEdit:TextEditor>
@@ -54,7 +54,7 @@
                 <DockPanel Grid.Column="2">
                     <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">Raport:</TextBlock>
                     <avaloniaEdit:TextEditor Document="{Binding Raport, Converter={StaticResource DocumentConverter}}" 
-                                             Padding="5"
+                                             BorderThickness="0"
                                              ShowLineNumbers="True"
                                              FontFamily="Consolas,Menlo,Courier,Courier New">
                     </avaloniaEdit:TextEditor>

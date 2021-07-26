@@ -7,20 +7,11 @@
              xmlns:avalonia="clr-namespace:WDE.Common.Avalonia;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              Name="SqlUserControl">
-    <UserControl.KeyBindings>
-        <KeyBinding Gesture="{x:Static TextBox.CopyGesture}" Command="{Binding ElementName=SqlUserControl, Path=Copy}" />
-        <KeyBinding Gesture="{x:Static TextBox.PasteGesture}" Command="{Binding ElementName=SqlUserControl, Path=Paste}" />
-        <KeyBinding Gesture="{x:Static TextBox.CutGesture}" Command="{Binding ElementName=SqlUserControl, Path=Cut}" />
-        <KeyBinding Gesture="{x:Static avalonia:KeyGestures.Undo}" Command="{Binding ElementName=SqlUserControl, Path=Undo}" />
-        <KeyBinding Gesture="{x:Static avalonia:KeyGestures.Redo}" Command="{Binding ElementName=SqlUserControl, Path=Redo}" />
-    </UserControl.KeyBindings>
     <UserControl.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
     </UserControl.Resources>
-    <DockPanel LastChildFill="True">
-        <Button DockPanel.Dock="Top" Content="Execute SQL" Command="{Binding ExecuteSql}" />
-        <avaloniaEdit:TextEditor controls:AvalonEditExtra.Syntax="Resources/SqlSyntax.xml" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
-                                 ShowLineNumbers="True"
-                                 FontFamily="Consolas,Menlo,Courier,Courier New" />
-    </DockPanel>
+    <avaloniaEdit:TextEditor controls:AvalonEditExtra.Syntax="Resources/SqlSyntax.xml" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
+                             ShowLineNumbers="True"
+                             BorderThickness="0"
+                             FontFamily="Consolas,Menlo,Courier,Courier New" />
 </UserControl>

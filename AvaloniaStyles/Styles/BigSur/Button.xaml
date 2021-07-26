@@ -1,7 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
-    <Style Selector="Button">
+    <Style Selector="Button,ToggleButton">
         <Setter Property="ClipToBounds" Value="False" />
         <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
         <Setter Property="BorderThickness" Value="0.5" />
@@ -9,48 +9,67 @@
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
     </Style>
     
-    <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="BoxShadow" Value="{DynamicResource RaisedContent.Shadow}" />
     </Style>
     
-    <Style Selector="Button:pointerover /template/ ContentPresenter">
+    <Style Selector=":is(Button):pointerover /template/ ContentPresenter">
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}"/>
     </Style>
     
-    <Style Selector="Button TextBlock">
+    <Style Selector=":is(Button) TextBlock">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Margin" Value="0,2,0,0" />
         <Setter Property="Padding" Value="6,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     
-    <Style Selector="Button:pressed">
+    <Style Selector=":is(Button):pressed">
         <Setter Property="Foreground" Value="{DynamicResource RaisedContentForeground.Accent}" />
     </Style>
 
-    <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button):pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground.Accent}" />
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush.Accent}" />
         <Setter Property="BoxShadow" Value="{DynamicResource RaisedContentPressed.Shadow}" />
     </Style>
     
     <!-- titlebar button style -->
-    <Style Selector="controls1|ToolBar Button /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="controls1|ToolbarPanel > :is(Button) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="BoxShadow" Value="0 0 0 0 #00000000" />
     </Style>
-    <Style Selector="controls1|ToolBar Button">
+    <Style Selector="controls1|ToolbarPanel > :is(Button)">
         <Setter Property="Foreground" Value="{DynamicResource ToolBarButton.Foreground}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
-    <Style Selector="controls1|ToolBar Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="controls1|ToolbarPanel > :is(Button):pointerover /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ToolBarButton.Background.PointerOver}" />
     </Style>
-    <Style Selector="controls1|ToolBar Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="controls1|ToolbarPanel > :is(Button):pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ToolBarButton.Background.Pressed}" />
     </Style>
-    <Style Selector="controls1|ToolBar Button:pressed">
+    <Style Selector="controls1|ToolbarPanel > :is(Button):pressed">
+        <Setter Property="Foreground" Value="{DynamicResource ToolBarButton.Foreground}" />
+    </Style>
+    <!-- dropdown -->
+    
+    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BoxShadow" Value="0 0 0 0 #00000000" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton">
+        <Setter Property="Foreground" Value="{DynamicResource ToolBarButton.Foreground}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ToolBarButton.Background.PointerOver}" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ToolBarButton.Background.Pressed}" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton:pressed">
         <Setter Property="Foreground" Value="{DynamicResource ToolBarButton.Foreground}" />
     </Style>
 </Styles>

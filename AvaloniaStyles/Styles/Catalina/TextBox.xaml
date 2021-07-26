@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit">
     <Style Selector="TextBox">
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBoxForeground}" />
@@ -35,5 +36,14 @@
     <Style Selector="TextBox /template/ TextPresenter">
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Margin" Value="0,1,0,0" />
+    </Style>
+    
+    <!-- TextEditor -->
+    <Style Selector="avaloniaEdit|TextEditor">
+        <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBoxForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0.5" />    
+        <Setter Property="Padding" Value="4" />   
     </Style>
 </Styles>

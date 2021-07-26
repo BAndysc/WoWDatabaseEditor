@@ -14,6 +14,7 @@
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+      <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>

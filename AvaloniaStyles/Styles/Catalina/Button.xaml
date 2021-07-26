@@ -1,41 +1,58 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
-    <Style Selector="Button">
+    <Style Selector="Button,ToggleButton">
         <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
         <Setter Property="BorderThickness" Value="0.5" />
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
     </Style>
     
-    <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="CornerRadius" Value="4" />
     </Style>
     
-    <Style Selector="Button:pointerover /template/ ContentPresenter">
+    <Style Selector=":is(Button):pointerover /template/ ContentPresenter">
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}"/>
     </Style>
     
-    <Style Selector="Button TextBlock">
+    <Style Selector=":is(Button) TextBlock">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Margin" Value="0,2,0,0" />
         <Setter Property="Padding" Value="6,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     
-    <Style Selector="Button:pressed">
+    <Style Selector=":is(Button):pressed">
         <Setter Property="Foreground" Value="{DynamicResource RaisedContentForeground.Accent}" />
     </Style>
 
-    <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button):pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground.Accent}" />
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush.Accent}" />
     </Style>
     
     <!-- titlebar button style -->
-    <Style Selector="controls1|ToolBar Button:pressed">
+    <Style Selector="controls1|ToolbarPanel > :is(Button):pressed">
         <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
     </Style>
-    <Style Selector="controls1|ToolBar Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="controls1|ToolbarPanel > :is(Button) TextBlock">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > :is(Button):pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource RaisedContentBackgroundPressed}" />
+    </Style>
+    
+    <!-- dropdown button style -->
+    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton :is(Button):pressed">
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton TextBlock">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackgroundPressed}" />
     </Style>

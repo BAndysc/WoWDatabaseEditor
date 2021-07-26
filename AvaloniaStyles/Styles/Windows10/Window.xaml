@@ -12,9 +12,9 @@
         </Setter>
     </Style>
     
-    <Style Selector="controls1|ToolBar StackPanel">
+    <!--<Style Selector="controls1|ToolBar StackPanel">
         <Setter Property="Spacing" Value="10" />
-    </Style>
+    </Style>-->
 
     <Style Selector="controls1|ExtendedWindow">
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
@@ -42,11 +42,11 @@
                                             Foreground="{DynamicResource TitleBarForeground}"
                                             Text="{TemplateBinding Title}" />
                                     </DockPanel>
-                                    <DockPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="10,2,10,2">
-                                        <ContentPresenter Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                        <ContentPresenter Content="{Binding ToolBar.Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                        <ContentPresenter Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
-                                    </DockPanel>
+                                    <controls1:ToolbarPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="5,2,2,2">
+                                        <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                        <ContentPresenter HorizontalAlignment="Stretch" Content="{Binding ToolBar.MiddleContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                        <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />                                        
+                                    </controls1:ToolbarPanel>
                                 </StackPanel>
                             </Panel>
                             

@@ -53,15 +53,4 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
-    
-    <Style Selector="controls|ToolBar Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
-    </Style>
-    <Style Selector="controls|ToolBar Button:disabled">
-      <Setter Property="Opacity" Value="0.2" />
-    </Style>
-    <Style Selector="controls|ToolBar Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="Transparent" />
-    </Style>
 </Styles>

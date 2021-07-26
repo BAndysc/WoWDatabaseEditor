@@ -39,23 +39,28 @@
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
             <controls:ToolBar.LeftContent>
-                <Button Command="{Binding ExecuteChangedCommand}">
-                    <Border Background="Transparent"
-                            Width="12"
-                            Height="12"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center">
-                        <Path Fill="{Binding $parent[Button].Foreground}"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Data="M 0 0 L 6 3.5 L 0 7 Z"/>
-                    </Border>
-                </Button>
+                <controls:ToolbarPanel>
+                    <Button Command="{Binding ExecuteChangedCommand}" IsVisible="{Binding ShowPlayButtons}">
+                        <Border Background="Transparent"
+                                Width="12"
+                                Height="12"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Path Fill="{Binding $parent[Button].Foreground}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Data="M 0 0 L 6 3.5 L 0 7 Z"/>
+                        </Border>
+                    </Button>
+                </controls:ToolbarPanel>
             </controls:ToolBar.LeftContent>
+            <controls:ToolBar.MiddleContent>
+                <ContentPresenter DataContext="{Binding DocumentManager.ActiveDocument}" utils:ToolBarBind.Model="{Binding}" />
+            </controls:ToolBar.MiddleContent>
             <controls:ToolBar.RightContent>
-                <StackPanel Orientation="Horizontal">
-                    <Button Command="{Binding GenerateCurrentSqlCommand}">SQL</Button>
-                </StackPanel>
+                <controls:ToolbarPanel>
+                    <components:ButtonImage IsVisible="{Binding ShowExportButtons}" Command="{Binding GenerateCurrentSqlCommand}" Text="SQL" />
+                </controls:ToolbarPanel>
             </controls:ToolBar.RightContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>

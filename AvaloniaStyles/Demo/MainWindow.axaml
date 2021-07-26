@@ -44,9 +44,9 @@
                     <Button>SQL</Button>
                 </StackPanel>
             </controls:ToolBar.RightContent>
-            <controls:ToolBar.Content>
+            <controls:ToolBar.MiddleContent>
                 <Button>Search</Button>
-            </controls:ToolBar.Content>
+            </controls:ToolBar.MiddleContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>
     
