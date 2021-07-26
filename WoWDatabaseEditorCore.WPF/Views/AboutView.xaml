@@ -17,6 +17,13 @@
                         <TextBlock VerticalAlignment="Bottom" FontSize="34" FontFamily="Segoe UI Light" TextWrapping="WrapWithOverflow">World of Warcraft Database Editor</TextBlock>
                     </StackPanel>
                 </Border>
+                <Border BorderThickness="5" BorderBrush="Red" Padding="10" Margin="10">
+                    <TextBlock TextWrapping="WrapWithOverflow">
+                        <Run Text="This version of WoW Database Editor is now " />
+                        <Run FontWeight="Bold" Text="deprecated!" />
+                        <Run Text=" Please download latest version at https://github.com/BAndysc/WoWDatabaseEditor. Sorry it didn't auto update!" />
+                    </TextBlock>
+                </Border>
                 <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">
                     <Run FontWeight="Bold" Text="WoW Database Editor" /><Run Text=" " />
                     <Run Text="is an application used to create scripts (behaviours) in TrinityCore based servers." />
