@@ -7,7 +7,9 @@
              xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles">
     <Panel>
-        <userControls1:SmartScriptView Focusable="True"/>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <userControls1:SmartScriptView Focusable="True" Name="SmartScriptView"/>
+        </ScrollViewer>
         <controls:TeachingTip IsOpened="{Binding TeachingTips.WaitActionTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Have you checked WAIT action yet?">WoW Database Editor has special "wait" action that can be used instead of timed action lists. Check it out!</controls:TeachingTip>
         <controls:TeachingTip IsOpened="{Binding TeachingTips.MultipleActionsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Multiple actions in one event">In the WoW Database Editor you can have many actions in a single event. You do not have to copy-paste events.</controls:TeachingTip>
         <controls:TeachingTip IsOpened="{Binding TeachingTips.YouCanNameStoredTargetsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Stored object source/target name">You can name stored object variables to make writing script easier. To add named stored object, use right click on 'Add Event'.</controls:TeachingTip>

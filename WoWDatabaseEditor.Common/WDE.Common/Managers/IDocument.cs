@@ -28,6 +28,7 @@ namespace WDE.Common.Managers
     public interface ISolutionItemDocument : IDocument
     {
         ISolutionItem SolutionItem { get; }
+        bool ShowExportToolbarButtons => true;
     }
 
     public interface IProblemSourceDocument : IDocument

@@ -7,6 +7,7 @@ using Prism.Mvvm;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
+using WDE.Common.Utils;
 using WDE.Conditions.Data;
 
 namespace WDE.Conditions.ViewModels
