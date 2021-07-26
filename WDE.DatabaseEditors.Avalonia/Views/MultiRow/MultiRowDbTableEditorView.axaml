@@ -117,11 +117,6 @@
     </UserControl.DataTemplates>
     
     <DockPanel LastChildFill="True">
-        <StackPanel Margin="10" VerticalAlignment="Center" DockPanel.Dock="Top">
-            <Button Command="{Binding AddNewCommand, Mode=OneTime}" HorizontalAlignment="Left">
-                Add new key
-            </Button>
-        </StackPanel>
         <ScrollViewer HorizontalScrollBarVisibility="Auto">
             <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
                 <Border Classes="header" DockPanel.Dock="Top">

@@ -86,9 +86,6 @@
     <Panel>
         <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
             <DockPanel Margin="10" VerticalAlignment="Center" DockPanel.Dock="Top">
-                <Button DockPanel.Dock="Left" Command="{Binding AddNewCommand, Mode=OneTime}">
-                    Add new
-                </Button>
                 <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
                     <TextBlock VerticalAlignment="Center" Padding="0,0,15,0">Search: </TextBlock>
                     <TextBox Name="SearchTextBox" Width="300" HorizontalAlignment="Right" Text="{Binding SearchText, Mode=TwoWay}" />

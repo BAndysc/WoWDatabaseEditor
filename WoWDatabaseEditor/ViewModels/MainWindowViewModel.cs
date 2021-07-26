@@ -22,7 +22,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 {
     [SingleInstance]
     [AutoRegister]
-    public class MainWindowViewModel : BindableBase, ILayoutViewModelResolver, ICloseAwareViewModel
+    public class MainWindowViewModel : ObservableBase, ILayoutViewModelResolver, ICloseAwareViewModel
     {
         private readonly IMessageBoxService messageBoxService;
         private readonly Func<AboutViewModel> aboutViewModelCreator;
@@ -73,7 +73,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                         solutionTasksService.SaveSolutionToDatabaseTask(item);
                 }
             }, () => DocumentManager.ActiveSolutionItemDocument != null &&
-                     solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase);
+                     (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase));
 
             GenerateCurrentSqlCommand = new DelegateCommand(() =>
             {
@@ -100,7 +100,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             else
                 ShowAbout();
             //LoadDefault();
-
+            
+            Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowExportButtons));
+            Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowPlayButtons));
+            
             eventAggregator.GetEvent<AllModulesLoaded>()
                 .Subscribe(OpenFatalLogIfExists, ThreadOption.PublisherThread, true);
         }
@@ -136,6 +139,11 @@ namespace WoWDatabaseEditorCore.ViewModels
         }
 
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
+
+        // this fallback to QuickStartViewModel is a hack, otherwise Avalonia for some reason will never show this button if it is not visible in the beginning
+        public bool ShowPlayButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? (DocumentManager.ActiveDocument is QuickStartViewModel);
+        
+        public bool ShowExportButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? true;
         
         public DelegateCommand ExecuteChangedCommand { get; }
         
