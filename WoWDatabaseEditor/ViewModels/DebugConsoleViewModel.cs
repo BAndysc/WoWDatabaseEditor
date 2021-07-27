@@ -44,5 +44,6 @@ namespace WoWDatabaseEditorCore.ViewModels
         public bool CanClose => true;
         public bool IsModified => false;
         public IHistoryManager? History => null;
+        public ImageUri? Icon => new ImageUri("icons/document_console.png");
     }
 }
