@@ -5,12 +5,10 @@ using System.Text;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
-using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Expressions;
 using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Models;
-using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.QueryGenerators
@@ -18,18 +16,15 @@ namespace WDE.DatabaseEditors.QueryGenerators
     [SingleInstance]
     [AutoRegister]
     public class QueryGenerator : IQueryGenerator
-    {       
-        private readonly ITableDefinitionProvider tableDefinitionProvider;
+    {
         private readonly ICreatureStatCalculatorService calculatorService;
         private readonly IParameterFactory parameterFactory;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
-        public QueryGenerator(ITableDefinitionProvider tableDefinitionProvider, 
-            ICreatureStatCalculatorService calculatorService,
+        public QueryGenerator(ICreatureStatCalculatorService calculatorService,
             IParameterFactory parameterFactory,
             IConditionQueryGenerator conditionQueryGenerator)
         {
-            this.tableDefinitionProvider = tableDefinitionProvider;
             this.calculatorService = calculatorService;
             this.parameterFactory = parameterFactory;
             this.conditionQueryGenerator = conditionQueryGenerator;
@@ -48,7 +43,38 @@ namespace WDE.DatabaseEditors.QueryGenerators
         {
             return $"DELETE FROM `{table.TableName}` WHERE `{table.TablePrimaryKeyColumnName}` = {entity.Key};";
         }
- 
+
+        private class EntityComparer : IComparer<DatabaseEntity>
+        {
+            private readonly DatabaseTableDefinitionJson definition;
+
+            public EntityComparer(DatabaseTableDefinitionJson definition)
+            {
+                this.definition = definition;
+            }
+
+            public int Compare(DatabaseEntity? x, DatabaseEntity? y)
+            {
+                if (ReferenceEquals(x, y)) return 0;
+                if (ReferenceEquals(null, y)) return 1;
+                if (ReferenceEquals(null, x)) return -1;
+
+                if (definition.SortBy == null || definition.SortBy.Length == 0)
+                    return 0;
+
+                foreach (var sortBy in definition.SortBy)
+                {
+                    var comparisonResult = x.GetCell(sortBy)?.CompareTo(y.GetCell(sortBy)) ?? 0;
+                    if (comparisonResult != 0) 
+                        return comparisonResult;
+                }
+                
+                var existInDatabaseComparison = x.ExistInDatabase.CompareTo(y.ExistInDatabase);
+                if (existInDatabaseComparison != 0) return existInDatabaseComparison;
+                return x.Key.CompareTo(y.Key);
+            }
+        }
+
         private string GenerateInsertQuery(ICollection<uint> keys, IDatabaseTableData tableData)
         {
             if (keys.Count == 0)
@@ -75,7 +101,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
             HashSet<EntityKey> entityKeys = new();
             List<string> inserts = new List<string>(tableData.Entities.Count);
             List<string> duplicates = new List<string>();
-            foreach (var entity in tableData.Entities)
+            var comparer = new EntityComparer(tableData.TableDefinition);
+            foreach (var entity in tableData.Entities.OrderBy(t => t, comparer))
             {
                 bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new EntityKey(entity, tableData.TableDefinition));
                 var cells = columns.Select(c =>
@@ -197,8 +224,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             
             foreach (var entity in tableData.Entities)
             {
-                Dictionary<string, List<IDatabaseField>> fieldsByTable = null!;
-                fieldsByTable = entity.Fields
+                Dictionary<string, List<IDatabaseField>> fieldsByTable = entity.Fields
                     .Select(ef => (ef, tableData.TableDefinition.TableColumns[ef.FieldName]))
                     .Where(pair => !pair.Item2.IsMetaColumn && !pair.Item2.IsConditionColumn)
                     .GroupBy(pair => pair.Item2.ForeignTable ?? tableData.TableDefinition.TableName)
@@ -257,8 +283,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
         private class EntityKey
         {
-            private IList<IDatabaseField> fields;
-            private int hash;
+            private readonly IList<IDatabaseField> fields;
+            private readonly int hash;
             
             public EntityKey(DatabaseEntity entity, DatabaseTableDefinitionJson table)
             {
@@ -268,7 +294,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     hash = HashCode.Combine(hash, field.GetHashCode());
             }
 
-            protected bool Equals(EntityKey other)
+            private bool Equals(EntityKey other)
             {
                 if (other.fields.Count != fields.Count)
                     return false;

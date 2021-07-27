@@ -15,6 +15,7 @@
   "picker": "CreatureParameter",
   "group_name": "Common scripting tables",
   "primary_key": ["CreatureID", "GroupID", "ID"],
+  "sort_by": ["CreatureID", "GroupID", "ID"],
   "groups": [
     {
       "group_name": "only",

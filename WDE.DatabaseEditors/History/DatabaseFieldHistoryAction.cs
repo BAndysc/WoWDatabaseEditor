@@ -1,16 +1,17 @@
-﻿using WDE.Common.History;
+﻿using System;
+using WDE.Common.History;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.History
 {
-    public class DatabaseFieldHistoryAction<T> : IHistoryAction
+    public class DatabaseFieldHistoryAction<T> : IHistoryAction where T : IComparable<T>
     {
         private readonly DatabaseField<T> tableField;
         private readonly string property;
         private readonly T? oldValue;
         private readonly T? newValue;
-        private bool wasNull;
-        private bool isNull;
+        private readonly bool wasNull;
+        private readonly bool isNull;
 
         public DatabaseFieldHistoryAction(DatabaseField<T> tableField, string property, T? oldValue, T? newValue, bool wasNull, bool isNull)
         {

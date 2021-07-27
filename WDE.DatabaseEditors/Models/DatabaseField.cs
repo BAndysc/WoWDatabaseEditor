@@ -11,7 +11,7 @@ using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DatabaseField<T> : IDatabaseField
+    public class DatabaseField<T> : IDatabaseField where T : IComparable<T>
     {
         private readonly string columnName;
 
@@ -107,6 +107,17 @@ namespace WDE.DatabaseEditors.Models
         protected bool Equals(DatabaseField<T> other)
         {
             return columnName == other.columnName && (Current.Value == null && other.Current.Value == null || Current.Value!.Equals(other.Current.Value));
+        }
+
+        public int CompareTo(IDatabaseField? b)
+        {
+            if (b is not DatabaseField<T> other)
+                return 0;
+
+            if (Current.Value == null)
+                return -1;
+            
+            return Current.Value.CompareTo(other.Current.Value);
         }
 
         public override bool Equals(object? obj)

@@ -5,7 +5,7 @@ using WDE.Common.History;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public interface IDatabaseField : INotifyPropertyChanged
+    public interface IDatabaseField : INotifyPropertyChanged, IComparable<IDatabaseField>
     {
         string FieldName { get; }
         bool IsModified { get; }

@@ -18,6 +18,7 @@
     "MenuID",
     "OptionID"
   ],
+  "sort_by": ["MenuID", "OptionID"],
   "conditions": {
     "source_type": 15,
     "source_group": "MenuID",

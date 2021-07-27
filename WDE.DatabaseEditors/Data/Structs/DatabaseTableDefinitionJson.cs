@@ -46,6 +46,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "reload_command")]
         public string? ReloadCommand { get; set; }
         
+        [JsonProperty(PropertyName = "sort_by")]
+        public string[]? SortBy { get; set; }
+        
         [JsonProperty(PropertyName = "picker")]
         public string Picker { get; set; } = "";
 
