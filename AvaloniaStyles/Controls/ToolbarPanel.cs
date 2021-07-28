@@ -19,8 +19,14 @@ namespace AvaloniaStyles.Controls
             {
                 var child = children[i];
 
-                if (child == null || !child.IsVisible)
+                if (child == null)
                     continue;
+
+                if (!child.IsVisible)
+                {
+                    child.Measure(availableSize.WithWidth(double.PositiveInfinity));
+                    continue;
+                }
 
                 if (child is ToolbarSpacer)
                     continue;

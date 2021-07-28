@@ -141,7 +141,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
 
         // this fallback to QuickStartViewModel is a hack, otherwise Avalonia for some reason will never show this button if it is not visible in the beginning
-        public bool ShowPlayButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? (DocumentManager.ActiveDocument is QuickStartViewModel);
+        public bool ShowPlayButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? false;
         
         public bool ShowExportButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? true;
         
