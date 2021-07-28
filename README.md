@@ -31,6 +31,12 @@ Note: Legacy Windows version ("WPF") is already deprecated
 # I want to contribute!
 That's a fantastic news! There is still a lot to do in the IDE, if you do not know what you can do, check out [opened issues, especially those marked as "help wanted"](https://github.com/BAndysc/WoWDatabaseEditor/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
 
+# Sponsors
+
+WoW Database Editor is sponsored by [Atlantiss](https://atlantiss.org/) and [Tauri](https://tauriwow.com/).
+
+![Atlantiss & Tauri](https://i.imgur.com/gj0HPAk.png)
+
 # How to build
 
 WoW Database Editor is using [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), therefore after you clone, after you pull you have to download submodules:
