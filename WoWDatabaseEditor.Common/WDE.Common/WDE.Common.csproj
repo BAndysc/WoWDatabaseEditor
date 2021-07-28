@@ -36,4 +36,7 @@
       <Version>5.11.1</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\WDE.SqlQueryGenerator\WDE.SqlQueryGenerator.csproj" />
+  </ItemGroup>
 </Project>

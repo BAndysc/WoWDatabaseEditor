@@ -132,7 +132,7 @@ namespace WDE.DatabaseEditors.ViewModels
             if (!SolutionItem.Equals(dbEditItem)) 
                 return;
             
-            args.Sql = queryGenerator.GenerateQuery(GenerateKeys(), new DatabaseTableData(tableDefinition, Entities));
+            args.Sql = queryGenerator.GenerateQuery(GenerateKeys(), new DatabaseTableData(tableDefinition, Entities)).QueryString;
         }
 
         private void SaveSolutionItem()

@@ -1,22 +1,15 @@
-﻿using System.Globalization;
-using System.Linq;
-using System.Text;
-using SmartFormat;
+﻿using System.Linq;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Solution;
-using WDE.Common.Utils;
-using WDE.Conditions.Exporter;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.TrinitySmartScriptEditor.Exporter
 {
     public class ExporterHelper
     {
-        private static readonly string SaiSql =
-            "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, {comment})";
-
         private readonly SmartScript script;
         private readonly IDatabaseProvider databaseProvider;
         private readonly ISmartScriptSolutionItem item;
@@ -24,7 +17,6 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
         private readonly ISolutionItemNameRegistry nameProvider;
-        private readonly StringBuilder sql = new();
 
         public ExporterHelper(SmartScript script, 
             IDatabaseProvider databaseProvider,
@@ -43,105 +35,85 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             this.nameProvider = nameProvider;
         }
 
-        public string GetSql()
+        public IQuery GetSql()
         {
-            BuildHeader();
-            return sql.ToString();
+            var query = Queries.BeginTransaction();
+            query.Comment(nameProvider.GetName(item));
+            query.DefineVariable("ENTRY", script.EntryOrGuid);
+            BuildDelete(query);
+            BuildUpdate(query);
+            BuildInsert(query);
+            return query.Close();
         }
-
-        private void BuildHeader()
-        {
-            sql.AppendLine($" -- {nameProvider.GetName(item)}");
-            sql.AppendLine($"SET @ENTRY := {script.EntryOrGuid};");
-            BuildDelete();
-            BuildUpdate();
-            BuildInsert();
-        }
-
-        private void BuildInsert()
+        
+        private void BuildInsert(IMultiQuery query)
         {
             var (serializedScript, serializedConditions) = scriptExporter.ToDatabaseCompatibleSmartScript(script);
 
             if (serializedScript.Length == 0)
                 return;
 
-            sql.AppendLine(
-                "INSERT INTO `smart_scripts` (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES");
+            var lines = serializedScript.Select(s => GenerateSingleSai(query, s));
 
-            var lines = serializedScript.Select(GenerateSingleSai);
+            query.Table("smart_scripts").BulkInsert(lines);
 
-            sql.Append(string.Join(",\n", lines));
-            sql.AppendLine(";");
-            sql.AppendLine();
-            sql.AppendLine();
-
-            sql.AppendLine(conditionQueryGenerator.BuildDeleteQuery(new IDatabaseProvider.ConditionKey(
+            query.BlankLine();
+            
+            query.Add(conditionQueryGenerator.BuildDeleteQuery(new IDatabaseProvider.ConditionKey(
                 SmartConstants.ConditionSourceSmartScript,
                 null,
                 script.EntryOrGuid,
                 (int) script.SourceType)));
-            sql.AppendLine(conditionQueryGenerator.BuildInsertQuery(serializedConditions));
+            query.Add(conditionQueryGenerator.BuildInsertQuery(serializedConditions));
         }
 
-        private string GenerateSingleSai(ISmartScriptLine line)
+        private object GenerateSingleSai(IMultiQuery query, ISmartScriptLine line)
         {
-            object data = new
+            return new
             {
-                entryorguid = "@ENTRY",
-                source_type = ((int) script.SourceType).ToString(),
-                id = line.Id.ToString(),
-                linkto = line.Link.ToString(),
+                entryorguid = query.Variable("ENTRY"),
+                source_type = (int) script.SourceType,
+                id = line.Id,
+                link = line.Link,
 
-                event_id = line.EventType.ToString(),
-                phasemask = line.EventPhaseMask.ToString(),
-                chance = line.EventChance.ToString(),
-                flags = line.EventFlags.ToString(),
-                event_param1 = line.EventParam1.ToString(),
-                event_param2 = line.EventParam2.ToString(),
-                event_param3 = line.EventParam3.ToString(),
-                event_param4 = line.EventParam4.ToString(),
+                event_type = line.EventType,
+                event_phase_mask = line.EventPhaseMask,
+                event_chance = line.EventChance,
+                event_flags = line.EventFlags,
+                event_param1 = line.EventParam1,
+                event_param2 = line.EventParam2,
+                event_param3 = line.EventParam3,
+                event_param4 = line.EventParam4,
 
-                event_cooldown_min = line.EventCooldownMin.ToString(),
-                event_cooldown_max = line.EventCooldownMax.ToString(),
+                action_type = line.ActionType,
+                action_param1 = line.ActionParam1,
+                action_param2 = line.ActionParam2,
+                action_param3 = line.ActionParam3,
+                action_param4 = line.ActionParam4,
+                action_param5 = line.ActionParam5,
+                action_param6 = line.ActionParam6,
 
-                action_id = line.ActionType.ToString(),
-                action_param1 = line.ActionParam1.ToString(),
-                action_param2 = line.ActionParam2.ToString(),
-                action_param3 = line.ActionParam3.ToString(),
-                action_param4 = line.ActionParam4.ToString(),
-                action_param5 = line.ActionParam5.ToString(),
-                action_param6 = line.ActionParam6.ToString(),
+                target_type = line.TargetType,
+                target_param1 = line.TargetParam1,
+                target_param2 = line.TargetParam2,
+                target_param3 = line.TargetParam3,
 
-                action_source_id = line.SourceType.ToString(),
-                source_param1 = line.SourceParam1.ToString(),
-                source_param2 = line.SourceParam2.ToString(),
-                source_param3 = line.SourceParam3.ToString(),
-                source_condition_id = line.SourceConditionId.ToString(),
+                target_x = line.TargetX,
+                target_y = line.TargetY,
+                target_z = line.TargetZ,
+                target_o = line.TargetO,
 
-                target_id = line.TargetType.ToString(),
-                target_param1 = line.TargetParam1.ToString(),
-                target_param2 = line.TargetParam2.ToString(),
-                target_param3 = line.TargetParam3.ToString(),
-                target_condition_id = line.TargetConditionId.ToString(),
-
-                x = line.TargetX.ToString(CultureInfo.InvariantCulture),
-                y = line.TargetY.ToString(CultureInfo.InvariantCulture),
-                z = line.TargetZ.ToString(CultureInfo.InvariantCulture),
-                o = line.TargetO.ToString(CultureInfo.InvariantCulture),
-
-                comment = line.Comment.ToSqlEscapeString()
+                comment = line.Comment
             };
-
-            return Smart.Format(SaiSql, data);
         }
 
-        private void BuildUpdate()
+        private void BuildUpdate(IMultiQuery query)
         {
             switch (script.SourceType)
             {
                 case SmartScriptType.Creature:
                 {
-                    uint? entry = null;
+                    uint? entry;
                     if (script.EntryOrGuid >= 0)
                         entry = (uint)script.EntryOrGuid;
                     else
@@ -149,22 +121,30 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
                     if (entry.HasValue)
                     {
-                        var entryString = "@ENTRY";
-                        if (script.EntryOrGuid != entry.Value)
-                            entryString = entry.Value.ToString();
+                        var condition = query
+                            .Table("creature_template")
+                            .Where(t => t.Column<int>("entry") == t.Variable<int>("ENTRY"));
                         
-                        string aientryupdate =
-                            currentCoreVersion.Current.DatabaseFeatures.HasAiEntry ? ", AIEntry=0" : "";
-                        sql.AppendLine("UPDATE `creature_template` SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName + $"\", ScriptName=\"\"{aientryupdate} WHERE `entry`={entryString};");
+                        if (script.EntryOrGuid != entry.Value)
+                            condition = query
+                                .Table("creature_template")
+                                .Where(t => t.Column<uint>("entry") == entry.Value);
+                        
+                        var update = condition
+                            .Set("AIName", currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName)
+                            .Set("ScriptName", "");
+                        if (currentCoreVersion.Current.DatabaseFeatures.HasAiEntry)
+                            update = update.Set("AIEntry", 0);
+                        update.Update();
                     }
                     else
-                        sql.AppendLine("-- [WARNING] cannot set creature AI to SmartAI, because guid not found in `creature` table!");
+                        query.Comment("[WARNING] cannot set creature AI to SmartAI, because guid not found in `creature` table!");
 
                     break;
                 }
                 case SmartScriptType.GameObject:
                 {
-                    uint? entry = null;
+                    uint? entry;
                     if (script.EntryOrGuid >= 0)
                         entry = (uint)script.EntryOrGuid;
                     else
@@ -172,48 +152,73 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
                     if (entry.HasValue)
                     {
-                        var entryString = "@ENTRY";
+                        var condition = query
+                            .Table("gameobject_template")
+                            .Where(t => t.Column<int>("entry") == t.Variable<int>("ENTRY"));
+                        
                         if (script.EntryOrGuid != entry.Value)
-                            entryString = entry.Value.ToString();
-                        sql.AppendLine("UPDATE `gameobject_template` SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName + $"\" WHERE `entry`={entryString};");
+                            condition = query
+                                .Table("gameobject_template")
+                                .Where(t => t.Column<uint>("entry") == entry.Value);
+                        condition
+                            .Set("AIName", currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName)
+                            .Update();
                     }
                     else
-                        sql.AppendLine("-- [WARNING] cannot set gameobject AI to SmartGameObjectAI, because guid not found in `gameobject` table!");
+                        query.Comment("[WARNING] cannot set gameobject AI to SmartGameObjectAI, because guid not found in `gameobject` table!");
                     break;
                 }
                 case SmartScriptType.Quest:
-                    sql.AppendLine("INSERT IGNORE INTO `quest_template_addon` (ID) VALUES (@ENTRY);");
-                    sql.AppendLine("UPDATE `quest_template_addon` SET ScriptName=\"SmartQuest\" WHERE `ID`=@ENTRY;");
+                    query.Table("quest_template_addon")
+                        .InsertIgnore(new
+                        {
+                            ID = query.Variable("ENTRY")
+                        });
+                    query.Table("quest_template_addon")
+                        .Where(r => r.Column<int>("ID") == r.Variable<int>("ENTRY"))
+                        .Set("ScriptName", "SmartQuest")
+                        .Update();
                     break;
                 case SmartScriptType.Spell:
-                    sql.AppendLine("DELETE FROM `spell_script_names` WHERE `spell_id` = @ENTRY And ScriptName=\"SmartSpell\";");
-                    sql.AppendLine("INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartSpell\");");
+                    query.Comment("TrinityCore doesn't support Smart Spell Script");
                     break;
                 case SmartScriptType.Aura:
-                    sql.AppendLine("DELETE FROM `spell_script_names` WHERE `spell_id` = @ENTRY And ScriptName=\"SmartAura\";");
-                    sql.AppendLine("INSERT INTO `spell_script_names`(spell_id, ScriptName) VALUES(@ENTRY, \"SmartAura\");");
+                    query.Comment("TrinityCore doesn't support Smart Aura Script");
                     break;
                 case SmartScriptType.Cinematic:
-                    sql.AppendLine("DELETE FROM `cinematic_scripts` WHERE `cinematicId` = @ENTRY;");
-                    sql.AppendLine("INSERT INTO `cinematic_scripts`(cinematicId, ScriptName) VALUES(@ENTRY, \"SmartCinematic\");");
+                    query.Comment("TrinityCore doesn't support Smart Cinematic Script");
                     break;
                 case SmartScriptType.AreaTrigger:
-                    sql.AppendLine("DELETE FROM `areatrigger_scripts` WHERE entry = @ENTRY;");
-                    sql.AppendLine("INSERT INTO `areatrigger_scripts`(entry, ScriptName) VALUES(@ENTRY, \"SmartTrigger\");");
+                    query.Table("areatrigger_scripts")
+                        .Where(r => r.Column<int>("entry") == r.Variable<int>("ENTRY"))
+                        .Delete();
+                    query.Table("areatrigger_scripts")
+                        .Insert(new
+                        {
+                            entry = query.Variable("ENTRY"),
+                            ScriptName = "SmartTrigger"
+                        });
                     break;
                 case SmartScriptType.AreaTriggerEntityServerSide:
-                    sql.AppendLine("UPDATE `areatrigger_template` SET ScriptName = \"SmartAreaTriggerAI\" WHERE `Id` = @ENTRY AND IsServerSide = 1;");
+                    query.Table("areatrigger_template")
+                        .Where(r => r.Column<int>("Id") == r.Variable<int>("ENTRY") && r.Column<bool>("IsServerSide"))
+                        .Set("ScriptName", "SmartAreaTriggerAI")
+                        .Update();
                     break;
                 case SmartScriptType.AreaTriggerEntity:
-                    sql.AppendLine("UPDATE `areatrigger_template` SET ScriptName = \"SmartAreaTriggerAI\" WHERE `Id` = @ENTRY AND IsServerSide = 0;");
+                    query.Table("areatrigger_template")
+                        .Where(r => r.Column<int>("Id") == r.Variable<int>("ENTRY") && !r.Column<bool>("IsServerSide"))
+                        .Set("ScriptName", "SmartAreaTriggerAI")
+                        .Update();
                     break;
             }
         }
 
-        private void BuildDelete()
+        private void BuildDelete(IMultiQuery query)
         {
-            sql.AppendLine(
-                $"DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @ENTRY AND source_type = {(int) script.SourceType};");
+            query.Table("smart_scripts")
+                .Where(r => r.Column<int>("entryOrGuid") == r.Variable<int>("ENTRY") &&
+                            r.Column<int>("source_type") == (int)script.SourceType).Delete();
         }
     }
 }

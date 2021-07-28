@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
-using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Expressions;
 using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.QueryGenerators
 {
@@ -30,7 +29,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
-        public string GenerateQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        public IQuery GenerateQuery(ICollection<uint> keys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.IsOnlyConditionsTable)
                 return BuildConditions(keys, tableData);
@@ -39,9 +38,12 @@ namespace WDE.DatabaseEditors.QueryGenerators
             return GenerateUpdateQuery(tableData);
         }
 
-        public string GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity)
+        public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity)
         {
-            return $"DELETE FROM `{table.TableName}` WHERE `{table.TablePrimaryKeyColumnName}` = {entity.Key};";
+            return Queries
+                .Table(table.TableName)
+                .Where(r => r.Column<uint>(table.TablePrimaryKeyColumnName) == entity.Key)
+                .Delete();
         }
 
         private class EntityComparer : IComparer<DatabaseEntity>
@@ -75,37 +77,33 @@ namespace WDE.DatabaseEditors.QueryGenerators
             }
         }
 
-        private string GenerateInsertQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        private IQuery GenerateInsertQuery(ICollection<uint> keys, IDatabaseTableData tableData)
         {
             if (keys.Count == 0)
-                return "";
+                return Queries.Empty();
 
-            StringBuilder query = new();
-            var keysString = string.Join(", ",  keys.Distinct());
-
-            query.AppendLine(
-                $"DELETE FROM {tableData.TableDefinition.TableName} WHERE {tableData.TableDefinition.TablePrimaryKeyColumnName} IN ({keysString});");
+            IMultiQuery query = Queries.BeginTransaction();
+            query
+                .Table(tableData.TableDefinition.TableName)
+                .WhereIn(tableData.TableDefinition.TablePrimaryKeyColumnName, keys.Distinct())
+                .Delete();
 
             if (tableData.Entities.Count == 0)
-                return query.ToString();
-
-
+                return query.Close();
+            
             var columns = tableData.TableDefinition.TableColumns
                 .Select(c => c.Value)
                 .Where(col => !col.IsMetaColumn && !col.IsConditionColumn)
                 .ToList();
-            var columnsString = string.Join(", ", columns.Select(f => $"`{f.DbColumnName}`"));
-
-            query.AppendLine($"INSERT INTO `{tableData.TableDefinition.TableName}` ({columnsString}) VALUES");
 
             HashSet<EntityKey> entityKeys = new();
-            List<string> inserts = new List<string>(tableData.Entities.Count);
+            List<Dictionary<string, object?>> inserts = new(tableData.Entities.Count);
             List<string> duplicates = new List<string>();
             var comparer = new EntityComparer(tableData.TableDefinition);
             foreach (var entity in tableData.Entities.OrderBy(t => t, comparer))
             {
                 bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new EntityKey(entity, tableData.TableDefinition));
-                var cells = columns.Select(c =>
+                var cells = columns.ToDictionary(c => c.DbColumnName, c =>
                 {
                     var cell = entity.GetCell(c.DbColumnName)!;
                     if (c.AutogenerateComment != null && cell is DatabaseField<string> sField)
@@ -113,40 +111,39 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         var evaluator = new DatabaseExpressionEvaluator(calculatorService, parameterFactory, tableData.TableDefinition, c.AutogenerateComment!);
                         var comment = evaluator.Evaluate(entity);
                         if (comment is string s)
-                            return s.AddComment(sField.Current.Value).ToSqlEscapeString();
+                            return s.AddComment(sField.Current.Value);
                     }
-                    return cell.ToQueryString();
+                    return cell.Object;
                 });
-                var cellStrings = string.Join(", ", cells);
                 
                 if (duplicate)
-                    duplicates.Add($"({cellStrings})");
+                    duplicates.Add("(" + string.Join(", ", cells.Values) + ")");
                 else
-                    inserts.Add($"({cellStrings})");
+                    inserts.Add(cells);
             }
 
-            query.Append(string.Join(",\n", inserts));
-            query.AppendLine(";");
-
+            query.Table(tableData.TableDefinition.TableName)
+                .BulkInsert(inserts);
+            
             if (duplicates.Count > 0)
             {
-                query.AppendLine(" -- duplicates, cannot insert:");
+                query.Comment("duplicates, cannot insert:");
                 foreach (var line in duplicates)
-                    query.AppendLine(" -- " + line);
+                    query.Comment(line);
             }
 
-            query.AppendLine(BuildConditions(keys, tableData));
+            query.Add(BuildConditions(keys, tableData));
 
-            return query.ToString();
+            return query.Close();
         }
 
-        private string BuildConditions(ICollection<uint> keys, IDatabaseTableData tableData)
+        private IQuery BuildConditions(ICollection<uint> keys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.Condition == null)
-                return "";
+                return Queries.Empty();
             
-            StringBuilder query = new();
-            query.AppendLine(BuildConditionsDeleteQuery(keys, tableData));
+            IMultiQuery query = Queries.BeginTransaction();
+            query.Add(BuildConditionsDeleteQuery(keys, tableData));
             List<IConditionLine> conditions = new();
             int sourceType = tableData.TableDefinition.Condition.SourceType;
 
@@ -177,15 +174,15 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 foreach (var condition in entity.Conditions)
                     conditions.Add(new AbstractConditionLine(sourceType, sourceGroup, sourceEntry, sourceId, condition));
             }
-            query.AppendLine(conditionQueryGenerator.BuildInsertQuery(conditions));
+            query.Add(conditionQueryGenerator.BuildInsertQuery(conditions));
 
-            return query.ToString();
+            return query.Close();
         }
 
-        private string BuildConditionsDeleteQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        private IQuery BuildConditionsDeleteQuery(ICollection<uint> keys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.Condition == null)
-                return "";
+                return Queries.Empty();
 
             string? columnKey = null;
 
@@ -201,26 +198,31 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
             if (columnKey == null)
                 throw new Exception("No condition source group/entry/id is table primary key. Unable to generate SQL.");
-            
-            string c = string.Join(", ", keys.Distinct());
-            return $"DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = {tableData.TableDefinition.Condition.SourceType} AND `{columnKey}` IN ({c});";
+
+            return Queries.Table("conditions")
+                .Where(r => r.Column<int>("SourceTypeOrReferenceId") == tableData.TableDefinition.Condition.SourceType)
+                .WhereIn(columnKey, keys.Distinct())
+                .Delete();
         }
 
-        public string GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity,
+        public IQuery GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity,
             IDatabaseField field)
         {
             var column = table.TableColumns[field.FieldName];
             string primaryKeyColumn = table.TablePrimaryKeyColumnName;
             if (column.ForeignTable != null)
                 primaryKeyColumn = table.ForeignTableByName[column.ForeignTable].ForeignKey;
-            
-            return
-                $"UPDATE `{table.TableName}` SET `{field.FieldName}` = {field.ToQueryString()} WHERE `{primaryKeyColumn}` = {entity.Key};";
+
+            return Queries
+                .Table(table.TableName)
+                .Where(row => row.Column<uint>(primaryKeyColumn) == entity.Key)
+                .Set(field.FieldName, field.Object)
+                .Update();
         }
 
-        private string GenerateUpdateQuery(IDatabaseTableData tableData)
+        private IQuery GenerateUpdateQuery(IDatabaseTableData tableData)
         {
-            StringBuilder query = new();
+            IMultiQuery query = Queries.BeginTransaction();
             
             foreach (var entity in tableData.Entities)
             {
@@ -240,24 +242,28 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 {
                     foreach (var table in fieldsByTable)
                     {
-                        var updates = string.Join(", ",
-                            table.Value
-                                .Where(f => f.IsModified)
-                                .Select(f => $"`{f.FieldName}` = {f.ToQueryString()}"));
-                
-                        if (string.IsNullOrEmpty(updates))
+                        if (!table.Value.Any(f => f.IsModified))
                             continue;
 
+                        var updates = table.Value
+                            .Where(f => f.IsModified)
+                            .ToList();
+                        
                         string primaryKeyColumn = tableData.TableDefinition.TablePrimaryKeyColumnName;
                         if (table.Key != tableData.TableDefinition.TableName)
                         {
                             primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKey;
-                            query.AppendLine(
-                                $"INSERT IGNORE INTO `{table.Key}` (`{primaryKeyColumn}`) VALUES ({entity.Key});");
+                            query.Table(table.Key)
+                                .InsertIgnore(new Dictionary<string, object?>(){{primaryKeyColumn, entity.Key}});
                         }
-                        
-                        var updateQuery = $"UPDATE `{table.Key}` SET {updates} WHERE `{primaryKeyColumn}`= {entity.Key};";
-                        query.AppendLine(updateQuery);
+
+                        IUpdateQuery update = query.Table(table.Key)
+                            .Where(row => row.Column<uint>(primaryKeyColumn) == entity.Key)
+                            .Set(updates[0].FieldName, updates[0].Object);
+                        for (int i = 1; i < updates.Count; ++i)
+                            update = update.Set(updates[i].FieldName, updates[i].Object);
+
+                        update.Update();
                     }
                 }
                 else
@@ -267,18 +273,18 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         string primaryKeyColumn = tableData.TableDefinition.TablePrimaryKeyColumnName;
                         if (table.Key != tableData.TableDefinition.TableName)
                             primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKey;
-                        
-                        query.AppendLine(
-                            $"DELETE FROM `{table.Key}` WHERE `{primaryKeyColumn}` = {entity.Key};");
-                        var columns = string.Join(", ", table.Value.Select(f => $"`{f.FieldName}`"));
-                        query.AppendLine($"INSERT INTO `{table.Key}` ({columns}) VALUES");
-                        var values = string.Join(", ", table.Value.Select(f => f.ToQueryString()));
-                        query.AppendLine($"({values});");
+
+                        query.Table(table.Key)
+                            .Where(row => row.Column<uint>(primaryKeyColumn) == entity.Key)
+                            .Delete();
+
+                        query.Table(table.Key)
+                            .Insert(table.Value.ToDictionary(t => t.FieldName, t => t.Object));
                     }
                 }
             }
 
-            return query.ToString();
+            return query.Close();
         }
 
         private class EntityKey

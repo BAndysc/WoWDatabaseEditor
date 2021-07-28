@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using SmartFormat;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 
 namespace WDE.Conditions.Exporter
 {
@@ -10,26 +11,32 @@ namespace WDE.Conditions.Exporter
             @"\(\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*(-?\d+),\s*"".*?""\s*\)");
 
         private static readonly string ConditionSql =
-            @"({sourceType}, {sourceGroup}, {sourceEntry}, {sourceId}, {elseGroup}, {conditionType}, {conditionTarget}, {conditionValue1}, {conditionValue2}, {conditionValue3}, {negativeCondition}, ""{comment}"")";
+            @"({SourceTypeOrReferenceId}, {SourceGroup}, {SourceEntry}, {SourceId}, {ElseGroup}, {ConditionTypeOrReference}, {ConditionTarget}, {ConditionValue1}, {ConditionValue2}, {ConditionValue3}, {NegativeCondition}, {Comment})";
+        
+        public static object ToSqlObject(this IConditionLine line)
+        {
+            return new
+            {
+                SourceTypeOrReferenceId = line.SourceType,
+                SourceGroup = line.SourceGroup,
+                SourceEntry = line.SourceEntry,
+                SourceId = line.SourceId,
+                ElseGroup = line.ElseGroup,
+                ConditionTypeOrReference = line.ConditionType,
+                ConditionTarget = line.ConditionTarget,
+                ConditionValue1 = line.ConditionValue1,
+                ConditionValue2 = line.ConditionValue2,
+                ConditionValue3 = line.ConditionValue3,
+                NegativeCondition = line.NegativeCondition,
+                Comment = line.Comment,
+            };
+        }
         
         public static string ToSqlString(this IConditionLine line)
         {
-            object l = new
-            {
-                sourceType = line.SourceType,
-                sourceGroup = line.SourceGroup,
-                sourceEntry = line.SourceEntry,
-                sourceId = line.SourceId,
-                elseGroup = line.ElseGroup,
-                conditionType = line.ConditionType,
-                conditionTarget = line.ConditionTarget,
-                conditionValue1 = line.ConditionValue1,
-                conditionValue2 = line.ConditionValue2,
-                conditionValue3 = line.ConditionValue3,
-                negativeCondition = line.NegativeCondition,
-                comment = line.Comment,
-            };
-            return Smart.Format(ConditionSql, l);
+            var obj = line.ToSqlObject();
+            ((dynamic)obj).Comment = ((string)((dynamic)obj).Comment).ToSqlEscapeString();
+            return Smart.Format(ConditionSql, obj);
         }
         
         public static bool TryToConditionLine(this string str, out IConditionLine line)

@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.Common.Database
 {
     [UniqueProvider]
     public interface IConditionQueryGenerator
     {
-        string BuildDeleteQuery(IDatabaseProvider.ConditionKey conditionKey);
-        string BuildInsertQuery(IList<IConditionLine> conditions);
+        IQuery BuildDeleteQuery(IDatabaseProvider.ConditionKey conditionKey);
+        IQuery BuildInsertQuery(IList<IConditionLine> conditions);
     }
 }

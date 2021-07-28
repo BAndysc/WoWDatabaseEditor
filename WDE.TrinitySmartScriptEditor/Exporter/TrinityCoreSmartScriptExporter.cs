@@ -184,7 +184,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         public string GenerateSql(ISmartScriptSolutionItem item, SmartScript script)
         {
-            return new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
+            return new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql().QueryString;
         }
     }
 }

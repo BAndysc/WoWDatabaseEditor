@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.Annotations;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.Common.Database
 {
@@ -11,6 +12,7 @@ namespace WDE.Common.Database
     {
         bool IsConnected { get; }
         
+        Task ExecuteSql(IQuery query);
         Task ExecuteSql(string query);
         Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query);
         Task<IList<string>> GetTables();

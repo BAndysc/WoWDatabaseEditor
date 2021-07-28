@@ -7,6 +7,7 @@ using MySqlConnector;
 using WDE.Common.Database;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.MySqlDatabaseCommon.Database
 {
@@ -132,6 +133,11 @@ namespace WDE.MySqlDatabaseCommon.Database
                 list.Add(c);
             }
             return list;
+        }
+
+        public Task ExecuteSql(IQuery query)
+        {
+            return ExecuteSql(query.QueryString);
         }
         
         public async Task ExecuteSql(string query)

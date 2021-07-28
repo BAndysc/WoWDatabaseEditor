@@ -97,6 +97,8 @@ namespace WDE.DatabaseEditors.Models
             return copy;
         }
 
+        public object? Object => Current.IsNull ? null : Current.Value;
+
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         public override string? ToString()
