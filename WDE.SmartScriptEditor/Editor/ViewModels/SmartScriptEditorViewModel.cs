@@ -1272,7 +1272,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (data.IsOnlyTarget)
                         return false;
 
-                    if (actionData.HasValue && !IsSourceCompatibleWithAction(data.Id, actionData.Value))
+                    if (actionData.HasValue && !IsSourceCompatibleWithAction(data, actionData.Value))
                         return false;
 
                     if (data.UsableWithEventTypes != null && parentEvent != null && !data.UsableWithEventTypes.Contains(parentEvent.Id))
@@ -1293,24 +1293,22 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 .ToList();
         }
 
-        private bool IsSourceCompatibleWithAction(int sourceId, SmartGenericJsonData actionData)
+        private bool IsSourceCompatibleWithAction(SmartGenericJsonData sourceData, SmartGenericJsonData actionData)
         {
             if (actionData.ImplicitSource != null)
             {
                 var data = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource);
                 var actionImplicitSource = data.Id;
 
-                if (sourceId == actionImplicitSource)
+                if (sourceData.Id == actionImplicitSource)
                     return true;
 
                 // kinda hack to show actions with NONE source with user pick SELF source
                 // because it is natural for users to use SELF source for those actions
-                return actionImplicitSource == SmartConstants.SourceNone && sourceId == SmartConstants.SourceSelf || data.Name == "Self";
+                return actionImplicitSource == SmartConstants.SourceNone && (sourceData.Id == SmartConstants.SourceSelf || sourceData.NameReadable == "Self");
             }
             else
             {
-                var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, sourceId);
-
                 IList<string>? possibleSourcesOfAction = actionData.TargetIsSource ? actionData.TargetTypes : actionData.Sources;
                 var possibleSourcesOfSource = sourceData.Types;
 
@@ -1323,6 +1321,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         private async Task<int?> ShowActionPicker(SmartEvent? parentEvent, int sourceId, bool showCommentMetaAction = true)
         {
+            var sourceData = smartDataManager.GetRawData(SmartType.SmartTarget, sourceId);
             var result = await smartTypeListProvider.Get(SmartType.SmartAction,
                 data =>
                 {
@@ -1331,7 +1330,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     
                     return (data.UsableWithScriptTypes == null ||
                             data.UsableWithScriptTypes.Contains(script.SourceType)) &&
-                           IsSourceCompatibleWithAction(sourceId, data) &&
+                           IsSourceCompatibleWithAction(sourceData, data) &&
                            (showCommentMetaAction || data.Id != SmartConstants.ActionComment);
                 });
             if (result.HasValue)
@@ -1401,8 +1400,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         ? SmartConstants.SourceStoredObject
                         : newSourceIndex.Value.Item1;
                     
+                    var newSourceData = smartDataManager.GetRawData(SmartType.SmartTarget, newId);
                     var actionData = smartDataManager.GetRawData(SmartType.SmartAction, obj.Id);
-                    if (!IsSourceCompatibleWithAction(newId, actionData))
+                    if (!IsSourceCompatibleWithAction(newSourceData, actionData))
                     {
                         var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, newId);
                         var dialog = new MessageBoxFactory<bool>()
