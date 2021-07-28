@@ -151,9 +151,11 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
         {
-            var task = GetAreaTriggerTemplatesAsync();
-            task.Wait();
-            return task.Result;
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
+                return new List<IAreaTriggerTemplate>();
+
+            using var model = new TrinityDatabase();
+            return (from t in model.AreaTriggerTemplate orderby t.Id select t).ToList<IAreaTriggerTemplate>();
         }
         
         public async Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync()
