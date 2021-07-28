@@ -63,9 +63,13 @@ test_script:
 - cmd: >-
     dotnet test WDE.MVVM.Test/WDE.MVVM.Test.csproj
 
-    dotnet test WDE.RemoteSOAP/WDE.RemoteSOAP.csproj
+    dotnet test WDE.RemoteSOAP.Test/WDE.RemoteSOAP.Test.csproj
 
-    dotnet test WDE.Updater/WDE.Updater.csproj
+    dotnet test WDE.SmartScriptEditor.Test/WDE.SmartScriptEditor.Test.csproj
+
+    dotnet test WDE.Updater.Test/WDE.Updater.Test.csproj
+
+    dotnet test WDE.SqlQueryGenerator.Test/WDE.SqlQueryGenerator.Test.csproj
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
 artifacts:

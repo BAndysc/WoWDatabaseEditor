@@ -247,6 +247,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WowPacketParser.Proto", "Wo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SqlQueryGenerator", "WDE.SqlQueryGenerator\WDE.SqlQueryGenerator.csproj", "{C5F652DC-2998-4767-9E68-008BA51B097E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SqlQueryGenerator.Test", "WDE.SqlQueryGenerator.Test\WDE.SqlQueryGenerator.Test.csproj", "{5159E7FD-1525-41EF-8936-DA8919D69D0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -622,6 +624,12 @@ Global
 		{C5F652DC-2998-4767-9E68-008BA51B097E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C5F652DC-2998-4767-9E68-008BA51B097E}.DebugAvalonia|Any CPU.ActiveCfg = DebugAvalonia|Any CPU
 		{C5F652DC-2998-4767-9E68-008BA51B097E}.DebugAvalonia|Any CPU.Build.0 = DebugAvalonia|Any CPU
+		{5159E7FD-1525-41EF-8936-DA8919D69D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5159E7FD-1525-41EF-8936-DA8919D69D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5159E7FD-1525-41EF-8936-DA8919D69D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5159E7FD-1525-41EF-8936-DA8919D69D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5159E7FD-1525-41EF-8936-DA8919D69D0E}.DebugAvalonia|Any CPU.ActiveCfg = Debug|Any CPU
+		{5159E7FD-1525-41EF-8936-DA8919D69D0E}.DebugAvalonia|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -693,5 +701,6 @@ Global
 		{0A932EF2-830E-4409-AE4F-78A9C110E21F} = {5B4101BE-5A22-4B88-9E94-FFC484E04BDE}
 		{0643A92F-D13C-493C-AE87-37EE67B17EF6} = {5B4101BE-5A22-4B88-9E94-FFC484E04BDE}
 		{C5F652DC-2998-4767-9E68-008BA51B097E} = {8A37024A-7A68-4BCB-B800-766D92E041EF}
+		{5159E7FD-1525-41EF-8936-DA8919D69D0E} = {8A37024A-7A68-4BCB-B800-766D92E041EF}
 	EndGlobalSection
 EndGlobal
