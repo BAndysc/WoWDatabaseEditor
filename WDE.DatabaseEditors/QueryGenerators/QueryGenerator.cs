@@ -46,7 +46,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
         public string GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity)
         {
-            return $"DELETE FROM {table.TableName} WHERE {table.TablePrimaryKeyColumnName} = {entity.Key};";
+            return $"DELETE FROM `{table.TableName}` WHERE `{table.TablePrimaryKeyColumnName}` = {entity.Key};";
         }
  
         private string GenerateInsertQuery(ICollection<uint> keys, IDatabaseTableData tableData)
@@ -70,7 +70,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 .ToList();
             var columnsString = string.Join(", ", columns.Select(f => $"`{f.DbColumnName}`"));
 
-            query.AppendLine($"INSERT INTO {tableData.TableDefinition.TableName} ({columnsString}) VALUES");
+            query.AppendLine($"INSERT INTO `{tableData.TableDefinition.TableName}` ({columnsString}) VALUES");
 
             HashSet<EntityKey> entityKeys = new();
             List<string> inserts = new List<string>(tableData.Entities.Count);
@@ -188,7 +188,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 primaryKeyColumn = table.ForeignTableByName[column.ForeignTable].ForeignKey;
             
             return
-                $"UPDATE {table.TableName} SET `{field.FieldName}` = {field.ToQueryString()} WHERE `{primaryKeyColumn}` = {entity.Key};";
+                $"UPDATE `{table.TableName}` SET `{field.FieldName}` = {field.ToQueryString()} WHERE `{primaryKeyColumn}` = {entity.Key};";
         }
 
         private string GenerateUpdateQuery(IDatabaseTableData tableData)
@@ -227,7 +227,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         {
                             primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKey;
                             query.AppendLine(
-                                $"INSERT IGNORE INTO {table.Key} (`{primaryKeyColumn}`) VALUES ({entity.Key});");
+                                $"INSERT IGNORE INTO `{table.Key}` (`{primaryKeyColumn}`) VALUES ({entity.Key});");
                         }
                         
                         var updateQuery = $"UPDATE `{table.Key}` SET {updates} WHERE `{primaryKeyColumn}`= {entity.Key};";
@@ -243,9 +243,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKey;
                         
                         query.AppendLine(
-                            $"DELETE FROM {table.Key} WHERE `{primaryKeyColumn}` = {entity.Key};");
+                            $"DELETE FROM `{table.Key}` WHERE `{primaryKeyColumn}` = {entity.Key};");
                         var columns = string.Join(", ", table.Value.Select(f => $"`{f.FieldName}`"));
-                        query.AppendLine($"INSERT INTO {table.Key} ({columns}) VALUES");
+                        query.AppendLine($"INSERT INTO `{table.Key}` ({columns}) VALUES");
                         var values = string.Join(", ", table.Value.Select(f => f.ToQueryString()));
                         query.AppendLine($"({values});");
                     }

@@ -18,17 +18,17 @@ namespace WDE.QuestChainEditor.Exporter
                         foreach (Quest required in quest.RequiredQuests)
                         {
                             builder.AppendLine(
-                                $"UPDATE quest_template SET ExclusiveGroup = -{quest.RequiredQuests[0].Id} WHERE id = {required.Id}; // {required.Name}");
+                                $"UPDATE `quest_template` SET ExclusiveGroup = -{quest.RequiredQuests[0].Id} WHERE `id` = {required.Id}; // {required.Name}");
                         }
                     }
 
                     builder.AppendLine(
-                        $"UPDATE quest_template SET PrevQuestId={quest.RequiredQuests[0].Id}, NextQuestId=0 WHERE id = {quest.Id}; // {quest.Name}");
+                        $"UPDATE `quest_template` SET PrevQuestId={quest.RequiredQuests[0].Id}, NextQuestId=0 WHERE `id` = {quest.Id}; // {quest.Name}");
                 }
                 else if (quest.RequiredQuests.Count == 0)
                 {
                     builder.AppendLine(
-                        $"UPDATE quest_template SET PrevQuestId=0, NextQuestId=0  WHERE id = {quest.Id}; // {quest.Name}");
+                        $"UPDATE `quest_template` SET PrevQuestId=0, NextQuestId=0  WHERE `id` = {quest.Id}; // {quest.Name}");
                 }
             }
 

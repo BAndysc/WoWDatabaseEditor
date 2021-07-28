@@ -66,7 +66,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 return;
 
             sql.AppendLine(
-                "INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES");
+                "INSERT INTO `smart_scripts` (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES");
 
             var lines = serializedScript.Select(GenerateSingleSai);
 
@@ -155,7 +155,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         
                         string aientryupdate =
                             currentCoreVersion.Current.DatabaseFeatures.HasAiEntry ? ", AIEntry=0" : "";
-                        sql.AppendLine("UPDATE creature_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName + $"\", ScriptName=\"\"{aientryupdate} WHERE entry={entryString};");
+                        sql.AppendLine("UPDATE `creature_template` SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName + $"\", ScriptName=\"\"{aientryupdate} WHERE `entry`={entryString};");
                     }
                     else
                         sql.AppendLine("-- [WARNING] cannot set creature AI to SmartAI, because guid not found in `creature` table!");
@@ -175,37 +175,37 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         var entryString = "@ENTRY";
                         if (script.EntryOrGuid != entry.Value)
                             entryString = entry.Value.ToString();
-                        sql.AppendLine("UPDATE gameobject_template SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName + $"\" WHERE entry={entryString};");
+                        sql.AppendLine("UPDATE `gameobject_template` SET AIName=\"" + currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName + $"\" WHERE `entry`={entryString};");
                     }
                     else
                         sql.AppendLine("-- [WARNING] cannot set gameobject AI to SmartGameObjectAI, because guid not found in `gameobject` table!");
                     break;
                 }
                 case SmartScriptType.Quest:
-                    sql.AppendLine("INSERT IGNORE INTO quest_template_addon (ID) VALUES (@ENTRY);");
-                    sql.AppendLine("UPDATE quest_template_addon SET ScriptName=\"SmartQuest\" WHERE ID=@ENTRY;");
+                    sql.AppendLine("INSERT IGNORE INTO `quest_template_addon` (ID) VALUES (@ENTRY);");
+                    sql.AppendLine("UPDATE `quest_template_addon` SET ScriptName=\"SmartQuest\" WHERE `ID`=@ENTRY;");
                     break;
                 case SmartScriptType.Spell:
-                    sql.AppendLine("DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartSpell\";");
+                    sql.AppendLine("DELETE FROM `spell_script_names` WHERE `spell_id` = @ENTRY And ScriptName=\"SmartSpell\";");
                     sql.AppendLine("INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartSpell\");");
                     break;
                 case SmartScriptType.Aura:
-                    sql.AppendLine("DELETE FROM spell_script_names WHERE spell_id = @ENTRY And ScriptName=\"SmartAura\";");
-                    sql.AppendLine("INSERT INTO spell_script_names(spell_id, ScriptName) VALUES(@ENTRY, \"SmartAura\");");
+                    sql.AppendLine("DELETE FROM `spell_script_names` WHERE `spell_id` = @ENTRY And ScriptName=\"SmartAura\";");
+                    sql.AppendLine("INSERT INTO `spell_script_names`(spell_id, ScriptName) VALUES(@ENTRY, \"SmartAura\");");
                     break;
                 case SmartScriptType.Cinematic:
-                    sql.AppendLine("DELETE FROM cinematic_scripts WHERE cinematicId = @ENTRY;");
-                    sql.AppendLine("INSERT INTO cinematic_scripts(cinematicId, ScriptName) VALUES(@ENTRY, \"SmartCinematic\");");
+                    sql.AppendLine("DELETE FROM `cinematic_scripts` WHERE `cinematicId` = @ENTRY;");
+                    sql.AppendLine("INSERT INTO `cinematic_scripts`(cinematicId, ScriptName) VALUES(@ENTRY, \"SmartCinematic\");");
                     break;
                 case SmartScriptType.AreaTrigger:
-                    sql.AppendLine("DELETE FROM areatrigger_scripts WHERE entry = @ENTRY;");
-                    sql.AppendLine("INSERT INTO areatrigger_scripts(entry, ScriptName) VALUES(@ENTRY, \"SmartTrigger\");");
+                    sql.AppendLine("DELETE FROM `areatrigger_scripts` WHERE entry = @ENTRY;");
+                    sql.AppendLine("INSERT INTO `areatrigger_scripts`(entry, ScriptName) VALUES(@ENTRY, \"SmartTrigger\");");
                     break;
                 case SmartScriptType.AreaTriggerEntityServerSide:
-                    sql.AppendLine("UPDATE areatrigger_template SET ScriptName = \"SmartAreaTriggerAI\" WHERE Id = @ENTRY AND IsServerSide = 1;");
+                    sql.AppendLine("UPDATE `areatrigger_template` SET ScriptName = \"SmartAreaTriggerAI\" WHERE `Id` = @ENTRY AND IsServerSide = 1;");
                     break;
                 case SmartScriptType.AreaTriggerEntity:
-                    sql.AppendLine("UPDATE areatrigger_template SET ScriptName = \"SmartAreaTriggerAI\" WHERE Id = @ENTRY AND IsServerSide = 0;");
+                    sql.AppendLine("UPDATE `areatrigger_template` SET ScriptName = \"SmartAreaTriggerAI\" WHERE `Id` = @ENTRY AND IsServerSide = 0;");
                     break;
             }
         }
@@ -213,7 +213,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private void BuildDelete()
         {
             sql.AppendLine(
-                $"DELETE FROM smart_scripts WHERE entryOrGuid = @ENTRY AND source_type = {(int) script.SourceType};");
+                $"DELETE FROM `smart_scripts` WHERE `entryOrGuid` = @ENTRY AND source_type = {(int) script.SourceType};");
         }
     }
 }

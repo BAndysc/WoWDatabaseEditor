@@ -13,18 +13,18 @@ namespace WDE.Conditions.Exporter
         {
             StringBuilder sql = new();
             List<string> keySql = new List<string>();
-            keySql.Add($"SourceTypeOrReferenceId = {key.SourceType}");
+            keySql.Add($"`SourceTypeOrReferenceId` = {key.SourceType}");
             
             if (key.SourceGroup.HasValue)   
-                keySql.Add($"SourceGroup = {key.SourceGroup.Value}");
+                keySql.Add($"`SourceGroup` = {key.SourceGroup.Value}");
                 
             if (key.SourceEntry.HasValue)   
-                keySql.Add($"SourceEntry = {key.SourceEntry.Value}");
+                keySql.Add($"`SourceEntry` = {key.SourceEntry.Value}");
                 
             if (key.SourceId.HasValue)   
-                keySql.Add($"SourceId = {key.SourceId.Value}");
+                keySql.Add($"`SourceId` = {key.SourceId.Value}");
 
-            sql.Append("DELETE FROM conditions WHERE ");
+            sql.Append("DELETE FROM `conditions` WHERE ");
             sql.Append(string.Join(" AND ", keySql));
             sql.AppendLine(";");
             
@@ -38,7 +38,7 @@ namespace WDE.Conditions.Exporter
             
             StringBuilder sql = new();
             sql.AppendLine(
-                "INSERT INTO conditions (SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget, ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition, Comment) VALUES");
+                "INSERT INTO `conditions` (SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget, ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition, Comment) VALUES");
             sql.Append(string.Join(",\n", conditions.Select(c => c.ToSqlString())));
             sql.AppendLine(";");
 
