@@ -29,6 +29,12 @@ namespace WDE.PacketViewer.PacketParserIntegration
                     @"WowPacketParser.exe",
                     @"WowPacketParser",
                     @"WowPacketParser.dll",
+                    
+                    @"..\..\..\..\WowPacketParser\WowPacketParser\bin\Debug\WowPacketParser.exe",
+                    @"../../../../WowPacketParser/WowPacketParser/bin/Debug/WowPacketParser.dll",
+                    @"..\..\..\..\WowPacketParser\WowPacketParser\bin\Release\WowPacketParser.exe",
+                    @"../../../../WowPacketParser/WowPacketParser/bin/Release/WowPacketParser.dll",
+                    
                     @"..\..\..\WowPacketParser\WowPacketParser\bin\Debug\WowPacketParser.exe",
                     @"../../../WowPacketParser/WowPacketParser/bin/Debug/WowPacketParser.dll",
                     @"..\..\..\WowPacketParser\WowPacketParser\bin\Release\WowPacketParser.exe",
