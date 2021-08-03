@@ -44,7 +44,7 @@ namespace WDE.PacketViewer.Avalonia.Views
 
         private void Handler(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Return)
+            if (e.Key == Key.Return && _completionWindow == null)
             {
                 if (e.KeyModifiers == KeyModifiers.Shift)
                 {
@@ -76,7 +76,7 @@ namespace WDE.PacketViewer.Avalonia.Views
                     return;
                 
                 _completionWindow = new CompletionWindow(editor.TextArea);
-                _completionWindow.Closed += (o, args) => _completionWindow = null;
+                _completionWindow.Closed += CompletionWindowOnClosed;
 
                 var data = _completionWindow.CompletionList.CompletionData;
                 if (word == "packet")
@@ -99,6 +99,13 @@ namespace WDE.PacketViewer.Avalonia.Views
 
                 _completionWindow.Show();
             }
+        }
+
+        private void CompletionWindowOnClosed(object? sender, EventArgs e)
+        {
+            if (_completionWindow != null)
+                _completionWindow.Closed -= CompletionWindowOnClosed;
+            _completionWindow = null;
         }
 
         private string GetLastWord(int offset)
