@@ -91,7 +91,10 @@ namespace WoWDatabaseEditorCore.Avalonia
         
         protected override IContainerExtension CreateContainerExtension()
         {
-            var unity = new UnityContainer().AddExtension(new Diagnostic());
+            IUnityContainer unity = new UnityContainer();
+            #if DEBUG
+            unity = unity.AddExtension(new Diagnostic());
+            #endif
             var container = new UnityContainerExtension(unity);
             var mainScope = new ScopedContainer(container, unity);
             container.RegisterInstance<IScopedContainer>(mainScope);
@@ -150,8 +153,6 @@ namespace WoWDatabaseEditorCore.Avalonia
 
             foreach (var conflict in conflicts)
             {
-                //MessageBox.Show(
-                //    $"Module {conflict.ConflictingAssembly.GetName().Name} conflicts with module {conflict.FirstAssembly.GetName().Name}. They provide same functionality. This is not allowed. Disablig {conflict.ConflictingAssembly.GetName().Name}");
                 modulesManager!.AddConflicted(conflict.ConflictingAssembly, conflict.FirstAssembly);
                 allAssemblies.Remove(conflict.ConflictingAssembly);
             }
