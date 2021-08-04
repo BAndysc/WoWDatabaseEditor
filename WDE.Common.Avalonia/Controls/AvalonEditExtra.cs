@@ -79,11 +79,11 @@ namespace WDE.Common.Avalonia.Controls
                 throw new Exception("Cannot find syntax definition at path " + path);
             }
 
-            using FileStream file = File.Open(path, FileMode.Open);
-            using XmlTextReader reader = new XmlTextReader(file);
             IHighlightingDefinition? syntax = null;
             try
             {
+                using FileStream file = File.Open(path, FileMode.Open);
+                using XmlTextReader reader = new XmlTextReader(file);
                 syntax = HighlightingLoader.Load(reader, HighlightingManager.Instance);
             }
             catch (Exception e)
@@ -91,7 +91,6 @@ namespace WDE.Common.Avalonia.Controls
                 Console.WriteLine(e);
             }
             
-
             if (syntax == null)
                 Console.WriteLine("Invalid syntax in path " + path);
 
