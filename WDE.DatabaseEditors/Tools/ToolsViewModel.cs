@@ -8,7 +8,6 @@ using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Tools
 {
-#if DEBUGAVALONIA
     [AutoRegister]
     public class ToolsViewModel : BindableBase, IConfigurable
     {
@@ -38,5 +37,4 @@ namespace WDE.DatabaseEditors.Tools
             }
         }
     }
-#endif
 }

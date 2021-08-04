@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net5.0;net5.0-windows7.0</TargetFrameworks>
+        <TargetFramework>net5.0</TargetFramework>
         <OutputType>Exe</OutputType>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <Nullable>enable</Nullable>
-        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <TargetName>_Updater</TargetName>
     </PropertyGroup>

@@ -19,7 +19,6 @@ using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Tools
 {
-    #if DEBUGAVALONIA
     [AutoRegister]
     public class DefinitionGeneratorViewModel : BindableBase
     {
@@ -137,5 +136,4 @@ namespace WDE.DatabaseEditors.Tools
             return settings;
         }
     }
-    #endif
 }

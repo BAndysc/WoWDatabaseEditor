@@ -1,5 +1,8 @@
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Prism.Commands;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Types;
@@ -15,6 +18,8 @@ namespace WoWDatabaseEditorCore.ViewModels
     {
         private readonly IDebugConsole debugConsole;
         public INativeTextDocument ConsoleLog { get; }
+        public ICommand CrashCommand { get; }
+        public ICommand CrashAsyncCommand { get; }
 
         public DebugConsoleViewModel(IDebugConsole debugConsole, INativeTextDocument textDocument)
         {
@@ -25,6 +30,17 @@ namespace WoWDatabaseEditorCore.ViewModels
             CloseCommand = new AsyncCommand(async () =>
             {
                 debugConsole.WrittenText -= DebugConsoleOnWrittenText;
+            });
+            CrashCommand = new DelegateCommand(() =>
+            {
+                string x = null!;
+                x.Clone();
+            });
+            CrashAsyncCommand = new AsyncAutoCommand(async () =>
+            {
+                await Task.Run(() => Thread.Sleep(500));
+                string x = null!;
+                x.Clone();
             });
         }
 

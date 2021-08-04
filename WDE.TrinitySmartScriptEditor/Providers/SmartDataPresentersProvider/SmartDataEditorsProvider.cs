@@ -13,9 +13,6 @@ using WDE.TrinitySmartScriptEditor.Models;
 
 namespace WDE.TrinitySmartScriptEditor.Providers.SmartDataPresentersProvider
 {
-#if !DEBUGAVALONIA
-    [AutoRegisterToParentScope]
-#endif
     class SmartDataEditorsProvider : IMainMenuItem
     {
         public string ItemName { get; } = "Editors";

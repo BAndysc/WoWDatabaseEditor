@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0-windows7.0</TargetFramework>
         <UseWPF>true</UseWPF>
-        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
     </PropertyGroup>

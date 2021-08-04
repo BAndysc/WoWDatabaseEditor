@@ -13,7 +13,6 @@ using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Tools
 {
-#if DEBUGAVALONIA
     [AutoRegister]
     public class CompatibilityCheckerViewModel : BindableBase
     {
@@ -115,5 +114,4 @@ namespace WDE.DatabaseEditors.Tools
             Raport = document;
         }
     }
-#endif
 }

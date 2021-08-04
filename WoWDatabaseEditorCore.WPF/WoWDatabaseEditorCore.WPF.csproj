@@ -10,7 +10,7 @@
         <AssemblyName>WoWDatabaseEditorCore.WPF</AssemblyName>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
-        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 

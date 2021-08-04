@@ -26,8 +26,6 @@ WoW Database Editor is compatibile with both MacOS, Linux and Windows.
  * [WoWDatabaseEditor for Linux.zip](https://github.com/BAndysc/WoWDatabaseEditor/releases) (please use version from GitHub Releases and update via application)
  * [WoWDatabaseEditor for MacOS.zip](https://github.com/BAndysc/WoWDatabaseEditor/releases) (please use version from GitHub Releases and update via application)
 
-Note: Legacy Windows version ("WPF") is already deprecated
-
 # I want to contribute!
 That's a fantastic news! There is still a lot to do in the IDE, if you do not know what you can do, check out [opened issues, especially those marked as "help wanted"](https://github.com/BAndysc/WoWDatabaseEditor/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
 
@@ -45,22 +43,19 @@ WoW Database Editor is using [git submodules](https://git-scm.com/book/en/v2/Git
 git submodule update --init --recursive
 ```
 
-Now you can open solution in Visual Studio or other C#/.NET IDE and build. **Note:** WDE is distributed in two versions: WPF and Avalonia. You can switch between those in IDE by switching build type `DebugAvalonia`/`Debug` and build target: `WoWDatabaseCoreWPF`/`WoWDatabaseCoreAvalonia`.
+Now you can open solution in Visual Studio or other C#/.NET IDE and build. Start "WoWDatabaseCore.Avalonia" project
 
 **To build version to distribute:**
 
 ```
--- legacy WPF version
-dotnet publish -c Release --self-contained false -f net5.0-windows7.0 -o bin/wowdatabaseeditor/ LoaderWPF/LoaderWPF.csproj -r win7-x64
-
 -- Windows version
-dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
+dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
 
 -- MacOS version
-dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
+dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
 
 -- Linux version
-dotnet publish -c DebugAvalonia --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
+dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
 ```
 
 

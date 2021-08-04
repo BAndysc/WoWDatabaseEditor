@@ -33,10 +33,8 @@ namespace WoWDatabaseEditorCore.Providers
             SubItems = new List<IMenuItem>();
             SubItems.Add(new ModuleMenuItem("Report a bug", new DelegateCommand(reportBugService.ReportBug)));
             SubItems.Add(new ModuleMenuItem("Send feedback", new DelegateCommand(reportBugService.SendFeedback)));
-#if DEBUGAVALONIA
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("Open debug console", new DelegateCommand(OpenDebugConsole)));
-#endif
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("About", new DelegateCommand(OpenAbout)));
         }

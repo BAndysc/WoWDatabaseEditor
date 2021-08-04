@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net5.0;net5.0-windows7.0</TargetFrameworks>
+        <TargetFramework>net5.0</TargetFramework>
         <OutputType>Library</OutputType>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <Configurations>Debug;Release;DebugAvalonia</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
@@ -11,9 +11,6 @@
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)'=='DebugAvalonia'">
-        <DefineConstants>AVALONIA</DefineConstants>
     </PropertyGroup>
     
     <ItemGroup>

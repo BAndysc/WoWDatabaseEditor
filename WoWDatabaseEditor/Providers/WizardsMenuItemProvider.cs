@@ -10,7 +10,6 @@ using WoWDatabaseEditorCore.CoreVersion;
 
 namespace WoWDatabaseEditorCore.Providers
 {
-#if DEBUGAVALONIA
     [AutoRegister]
     public class WizardsMenuItemProvider : IMainMenuItem
     {
@@ -35,5 +34,4 @@ namespace WoWDatabaseEditorCore.Providers
         public List<IMenuItem> SubItems { get; } = new List<IMenuItem>();
         public MainMenuItemSortPriority SortPriority => MainMenuItemSortPriority.PriorityNormal;
     }
-#endif
 }
