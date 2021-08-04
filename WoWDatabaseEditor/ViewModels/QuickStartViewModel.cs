@@ -3,21 +3,27 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.CoreVersion;
+using WDE.Common.DBC;
 using WDE.Common.Documents;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Extensions;
+using WoWDatabaseEditorCore.Services.Http;
 using WoWDatabaseEditorCore.Services.NewItemService;
+using WoWDatabaseEditorCore.Services.Statistics;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
@@ -26,12 +32,22 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly ISolutionItemIconRegistry iconRegistry;
         private readonly ISolutionItemNameRegistry nameRegistry;
         private readonly IMostRecentlyUsedService mostRecentlyUsedService;
+        private bool showGiveStarBox;
         public AboutViewModel AboutViewModel { get; }
         public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
         public ObservableCollection<MostRecentlyUsedViewModel> MostRecentlyUsedItems { get; } = new();
         public ObservableCollection<IWizardProvider> Wizards { get; } = new();
         public bool HasWizards { get; }
+
+        public ICommand DismissCommand { get; set; }
+        public ICommand OpenGithubAndDismissCommand { get; set; }
         
+        public bool ShowGiveStarBox
+        {
+            get => showGiveStarBox;
+            set => SetProperty(ref showGiveStarBox, value);
+        }
+
         public QuickStartViewModel(ISolutionItemProvideService solutionItemProvideService, 
             IEnumerable<IWizardProvider> wizards,
             IEventAggregator eventAggregator,
@@ -41,6 +57,11 @@ namespace WoWDatabaseEditorCore.ViewModels
             IMainThread mainThread,
             IMostRecentlyUsedService mostRecentlyUsedService,
             IDocumentManager documentManager,
+            IParameterFactory parameterFactory,
+            IUserSettings userSettings,
+            IStatisticsService statisticsService,
+            IApplicationReleaseConfiguration applicationReleaseConfiguration,
+            IUrlOpenService urlOpenService,
             AboutViewModel aboutViewModel)
         {
             this.iconRegistry = iconRegistry;
@@ -78,11 +99,32 @@ namespace WoWDatabaseEditorCore.ViewModels
                 var wizard = await item.Create();
                 documentManager.OpenDocument(wizard);
             });
+
+            DismissCommand = new DelegateCommand(() =>
+            {
+                ShowGiveStarBox = false;
+                userSettings.Update(new QuickStartSettings(){DismissedLeaveStarBox = true});
+            });
+
+            OpenGithubAndDismissCommand = new DelegateCommand(() =>
+            {
+                urlOpenService.OpenUrl("https://github.com/BAndysc/WoWDatabaseEditor");
+                DismissCommand.Execute(null);
+            });
+            
+            parameterFactory.OnRegister().SubscribeAction(_ =>
+            {
+                ReloadMruList();
+            });
             
             AutoDispose(eventAggregator.GetEvent<EventRequestOpenItem>().Subscribe(item =>
             {
                 mainThread.Dispatch(ReloadMruList);
             }, true));
+
+            ShowGiveStarBox = statisticsService.RunCounter > 20 &&
+                              !applicationReleaseConfiguration.GetBool("SKIP_STAR_BOX").GetValueOrDefault() &&
+                              !userSettings.Get<QuickStartSettings>().DismissedLeaveStarBox;
 
             ReloadMruList();
         }
@@ -92,7 +134,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             MostRecentlyUsedItems.Clear();
             foreach (var mru in mostRecentlyUsedService.MostRecentlyUsed)
             {
-                var vm = new MostRecentlyUsedViewModel(iconRegistry.GetIcon(mru), nameRegistry.GetName(mru), mru);
+                var name = nameRegistry.GetName(mru);
+                if (!string.IsNullOrEmpty(mru.ExtraId))
+                    name += $" ({mru.ExtraId})";
+                var vm = new MostRecentlyUsedViewModel(iconRegistry.GetIcon(mru), name, mru);
                 MostRecentlyUsedItems.Add(vm);
             }
         }
@@ -113,6 +158,11 @@ namespace WoWDatabaseEditorCore.ViewModels
         public bool CanClose => true;
         public bool IsModified => false;
         public IHistoryManager? History => null;
+    }
+
+    public struct QuickStartSettings : ISettings
+    {
+        public bool DismissedLeaveStarBox { get; set; }
     }
 
     public class MostRecentlyUsedViewModel

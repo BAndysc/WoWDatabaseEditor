@@ -18,6 +18,8 @@ namespace WDE.Trinity
         public IDatabaseFeatures DatabaseFeatures => this;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat), typeof(IBroadcastText)};
+        public bool AlternativeTrinityDatabase => false;
+
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {
             SmartScriptType.Creature,

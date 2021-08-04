@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using KTrie;
+using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.Common.Tasks;
 
 namespace WDE.MySqlDatabaseCommon.Database.World
@@ -25,25 +29,33 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         private List<IGossipMenu>? gossipMenusCache;
         private List<INpcText>? npcTextsCache;
         private List<ICreatureClassLevelStat>? creatureClassLevelStatsCache;
+        private IList<IDatabaseSpellDbc>? databaseSpellDbcCache;
 
         private StringTrie<IBroadcastText>? broadcastTextsCache;
         
         private IAsyncDatabaseProvider nonCachedDatabase;
         private readonly ITaskRunner taskRunner;
         private readonly IStatusBar statusBar;
+        private readonly IEventAggregator eventAggregator;
+        private readonly ILoadingEventAggregator loadingEventAggregator;
+        private readonly IParameterFactory parameterFactory;
 
         public CachedDatabaseProvider(IAsyncDatabaseProvider nonCachedDatabase,
-            ITaskRunner taskRunner, IStatusBar statusBar)
+            ITaskRunner taskRunner, IStatusBar statusBar, IEventAggregator eventAggregator,
+            ILoadingEventAggregator loadingEventAggregator,
+            IParameterFactory parameterFactory)
         {
             this.nonCachedDatabase = nonCachedDatabase;
             this.taskRunner = taskRunner;
             this.statusBar = statusBar;
+            this.eventAggregator = eventAggregator;
+            this.loadingEventAggregator = loadingEventAggregator;
+            this.parameterFactory = parameterFactory;
         }
 
-        public void TryConnect()
+        public Task TryConnect()
         {
-            nonCachedDatabase.GetCreatureTemplate(0);
-            taskRunner.ScheduleTask(new DatabaseCacheTask(this));;
+            return taskRunner.ScheduleTask(new DatabaseCacheTask(this));;
         }
 
         public bool IsConnected => nonCachedDatabase.IsConnected;
@@ -53,7 +65,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (creatureTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return nonCachedDatabase.GetCreatureTemplate(entry);
+            return null;//nonCachedDatabase.GetCreatureTemplate(entry);
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
@@ -61,7 +73,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (gameObjectTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return nonCachedDatabase.GetGameObjectTemplate(entry);
+            return null;//nonCachedDatabase.GetGameObjectTemplate(entry);
         }
 
         public IQuestTemplate? GetQuestTemplate(uint entry)
@@ -69,7 +81,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (questTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return nonCachedDatabase.GetQuestTemplate(entry);
+            return null;//nonCachedDatabase.GetQuestTemplate(entry);
         }
 
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
@@ -158,6 +170,14 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return null;
         }
 
+        public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
+        {
+            if (databaseSpellDbcCache != null)
+                return Task.FromResult(databaseSpellDbcCache);
+
+            return nonCachedDatabase.GetSpellDbcAsync();
+        }
+        
         public ICreature? GetCreatureByGuid(uint guid) => nonCachedDatabase.GetCreatureByGuid(guid);
 
         public IGameObject? GetGameObjectByGuid(uint guid) => nonCachedDatabase.GetGameObjectByGuid(guid);
@@ -169,7 +189,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<ICoreCommandHelp> GetCommands() => nonCachedDatabase.GetCommands();
 
         public Task<IList<ITrinityString>> GetStringsAsync() => nonCachedDatabase.GetStringsAsync();
-        
+
         private class DatabaseCacheTask : IAsyncTask
         {
             private readonly CachedDatabaseProvider cache;
@@ -185,7 +205,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             {
                 try
                 {
-                    int steps = 10;
+                    int steps = 11;
 
                     progress.Report(0, steps, "Loading creatures");
                     cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
@@ -214,8 +234,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     progress.Report(8, steps, "Loading creature class level stats");
                     cache.creatureClassLevelStatsCache =
                         await cache.nonCachedDatabase.GetCreatureClassLevelStatsAsync();
+
+                    progress.Report(9, steps, "Loading database spell dbc");
+                    cache.databaseSpellDbcCache = await cache.nonCachedDatabase.GetSpellDbcAsync();
                     
-                    progress.Report(9, steps, "Loading broadcast texts");
+                    progress.Report(10, steps, "Loading broadcast texts");
                     // todo: is there any benefit of caching this?
                     /*var broadcastTexts = await cache.nonCachedDatabase.GetBroadcastTextsAsync();
                     var cachedTrie = new StringTrie<IBroadcastText>();
@@ -230,7 +253,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                         }
                     }).ConfigureAwait(true);
                     cache.broadcastTextsCache = cachedTrie;*/
-                    
+
                     Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
                     Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
                     Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
@@ -250,8 +273,14 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                 }
                 catch (Exception e)
                 {
-                    cache.statusBar.PublishNotification(new PlainNotification(NotificationType.Error, $"Error while connecting to the database. Make sure you have correct core version in the settings: {e.Message}"));
+                    cache.nonCachedDatabase = new NullWorldDatabaseProvider();
+                    cache.statusBar.PublishNotification(new PlainNotification(NotificationType.Error,
+                        $"Error while connecting to the database. Make sure you have correct core version in the settings: {e.Message}"));
                     throw;
+                }
+                finally
+                {
+                    cache.loadingEventAggregator.Publish<DatabaseLoadedEvent>();
                 }
             }
         }

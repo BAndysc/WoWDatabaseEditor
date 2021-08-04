@@ -38,7 +38,7 @@ namespace WDE.SourceCodeIntegrationEditor.Generators
             
             if (sqlCommands.Count > 0)
             {
-                var table = currentCoreVersion.Current.DatabaseFeatures.AlternativeTrinityStrings
+                var table = currentCoreVersion.Current.DatabaseFeatures.AlternativeTrinityDatabase
                     ? "acore_string"
                     : "trinity_string";
                 sb.AppendLine($"REPLACE INTO `{table}` (`entry`, `content_default`) VALUES ");

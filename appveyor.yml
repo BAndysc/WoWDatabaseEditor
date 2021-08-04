@@ -69,6 +69,8 @@ test_script:
 
     dotnet test WDE.Updater.Test/WDE.Updater.Test.csproj
 
+    dotnet test WDE.Parameters.Test/WDE.Parameters.Test.csproj
+
     dotnet test WDE.SqlQueryGenerator.Test/WDE.SqlQueryGenerator.Test.csproj
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj

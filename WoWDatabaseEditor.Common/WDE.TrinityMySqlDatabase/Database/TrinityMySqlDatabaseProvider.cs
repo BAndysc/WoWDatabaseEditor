@@ -32,40 +32,45 @@ namespace WDE.TrinityMySqlDatabase.Database
             DataConnection.WriteTraceLine = databaseLogger.Log;
             DataConnection.DefaultSettings = new MySqlWorldSettings(settings.Settings, authSettings.Settings);
         }
+
+        private TrinityDatabase Database()
+        {
+            return new TrinityDatabase(currentCoreVersion.Current.DatabaseFeatures.AlternativeTrinityDatabase);
+        }
         
         public ICreatureTemplate? GetCreatureTemplate(uint entry)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
         }
 
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates()
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.CreatureTemplate.OrderBy(t => t.Entry).ToList<ICreatureTemplate>();
         }
         
         public async Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync()
         {
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync<ICreatureTemplate>();
         }
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
         }
 
         public IEnumerable<IGameEvent> GetGameEvents()
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return (from t in model.GameEvents orderby t.Entry select t).ToList<IGameEvent>();
         }
         
         public async Task<List<IGameEvent>> GetGameEventsAsync()
         {
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await (from t in model.GameEvents orderby t.Entry select t).ToListAsync<IGameEvent>();
         }
         
@@ -74,7 +79,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
                 return new List<IConversationTemplate>();
             
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return (from t in model.ConversationTemplate orderby t.Id select t).ToList<IConversationTemplate>();
         }
         
@@ -83,13 +88,13 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
                 return new List<IConversationTemplate>();
             
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await (from t in model.ConversationTemplate orderby t.Id select t).ToListAsync<IConversationTemplate>();
         }
         
         public IEnumerable<IGossipMenu> GetGossipMenus()
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
 
             List<MySqlGossipMenuLine> gossips;
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
@@ -111,7 +116,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public async Task<List<IGossipMenu>> GetGossipMenusAsync()
         {
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
 
             List<MySqlGossipMenuLine> gossips;
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
@@ -136,7 +141,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
                 return new List<INpcText>();
             
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return (from t in model.NpcTexts orderby t.Id select t).ToList<INpcText>();
         }
 
@@ -145,7 +150,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
                 return new List<INpcText>();
             
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await (from t in model.NpcTexts orderby t.Id select t).ToListAsync<INpcText>();
         }
 
@@ -154,7 +159,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
                 return new List<IAreaTriggerTemplate>();
 
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return (from t in model.AreaTriggerTemplate orderby t.Id select t).ToList<IAreaTriggerTemplate>();
         }
         
@@ -163,7 +168,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
                 return new List<ICreatureClassLevelStat>();
 
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await (from t in model.CreatureClassLevelStats select t).ToListAsync<ICreatureClassLevelStat>();
         }
         
@@ -172,7 +177,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
                 return Enumerable.Empty<ICreatureClassLevelStat>();
 
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return (from t in model.CreatureClassLevelStats select t).ToList<ICreatureClassLevelStat>();
         }
 
@@ -181,19 +186,19 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
                 return new List<IAreaTriggerTemplate>();
 
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await (from t in model.AreaTriggerTemplate orderby t.Id select t).ToListAsync<IAreaTriggerTemplate>();
         }
         
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return (from t in model.GameObjectTemplate orderby t.Entry select t).ToList<IGameObjectTemplate>();
         }
         
         public async Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync()
         {
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await (from t in model.GameObjectTemplate orderby t.Entry select t).ToListAsync<IGameObjectTemplate>();
         }
         
@@ -208,26 +213,26 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public IEnumerable<IQuestTemplate> GetQuestTemplates()
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
 
             return GetQuestsQuery(model).ToList<IQuestTemplate>();
         }
 
         public async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
         {
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);
         }
 
         public IQuestTemplate? GetQuestTemplate(uint entry)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             MySqlQuestTemplateAddon? addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
         }
@@ -235,7 +240,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)
         {
             using var writeLock = await DatabaseLock.WriteLock();
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
 
             await model.BeginTransactionAsync(IsolationLevel.ReadCommitted);
             await model.SmartScript.Where(x => x.EntryOrGuid == entryOrGuid && x.ScriptSourceType == (int) type).DeleteAsync();
@@ -316,7 +321,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             IDatabaseProvider.ConditionKey? manualKey = null)
         {
             using var writeLock = await DatabaseLock.WriteLock();
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
 
             var conditions = conditionLines?.ToList() ?? new List<IConditionLine>();
             List<(int SourceType, int? SourceGroup, int? SourceEntry, int? SourceId)> keys = conditions.Select(c =>
@@ -350,7 +355,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
 
             return model.Conditions.Where(line =>
                     line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId)
@@ -359,7 +364,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
         {
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
 
             return await model.Conditions.Where(x => x.SourceType == key.SourceType &&
                                                      (!keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceGroup) || x.SourceGroup == (key.SourceGroup ?? 0)) &&
@@ -371,7 +376,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         public async Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
         {
             var type = (int)scriptType;
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await model.SmartScript
                 .Where(t => t.ScriptSourceType == type)
                 .GroupBy(t => t.EntryOrGuid, t => t.EntryOrGuid)
@@ -381,7 +386,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToList();
         }
         
@@ -390,7 +395,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
                 return await Task.FromResult(new List<IBroadcastText>());
             
-            await using var model = new TrinityDatabase();
+            await using var model = Database();
             return await (from t in model.BroadcastTexts select t).ToListAsync<IBroadcastText>();
         }
         
@@ -399,49 +404,52 @@ namespace WDE.TrinityMySqlDatabase.Database
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
                 return null;
             
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefault();
         }
 
         public ICreature? GetCreatureByGuid(uint guid)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.Creature.FirstOrDefault(c => c.Guid == guid);
         }
 
         public IGameObject? GetGameObjectByGuid(uint guid)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.GameObject.FirstOrDefault(g => g.Guid == guid);
         }
 
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.Creature.Where(g => g.Entry == entry).ToList();
         }
 
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry)
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.GameObject.Where(g => g.Entry == entry).ToList();
         }
 
         public IEnumerable<ICoreCommandHelp> GetCommands()
         {
-            using var model = new TrinityDatabase();
+            using var model = Database();
             return model.Commands.ToList();
         }
 
         public async Task<IList<ITrinityString>> GetStringsAsync()
         {
-            await using var model = new TrinityDatabase();
-            if (currentCoreVersion.Current.DatabaseFeatures.AlternativeTrinityStrings)
-                return await model.AcoreStrings.ToListAsync<ITrinityString>();
-            
-            return await model.TrinityStrings.ToListAsync<ITrinityString>();
+            await using var model = Database();
+            return await model.Strings.ToListAsync();
         }
-        
+
+        public async Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
+        {
+            await using var model = Database();
+            return await model.SpellDbc.ToListAsync();
+        }
+
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
         public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
         

@@ -5,11 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Newtonsoft.Json;
+using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
 using WDE.Parameters.Providers;
 
@@ -21,16 +23,23 @@ namespace WDE.Parameters
         private readonly IParameterDefinitionProvider parameterDefinitionProvider;
         private readonly IServerIntegration serverIntegration;
         private readonly IItemFromListProvider itemFromListProvider;
+        private readonly IEventAggregator eventAggregator;
+        private readonly ILoadingEventAggregator loadingEventAggregator;
 
+        private List<LateLoadParameter> databaseParameters = new();
         public ParameterLoader(IDatabaseProvider database, 
             IParameterDefinitionProvider parameterDefinitionProvider,
             IServerIntegration serverIntegration,
-            IItemFromListProvider itemFromListProvider)
+            IItemFromListProvider itemFromListProvider,
+            IEventAggregator eventAggregator,
+            ILoadingEventAggregator loadingEventAggregator)
         {
             this.database = database;
             this.parameterDefinitionProvider = parameterDefinitionProvider;
             this.serverIntegration = serverIntegration;
             this.itemFromListProvider = itemFromListProvider;
+            this.eventAggregator = eventAggregator;
+            this.loadingEventAggregator = loadingEventAggregator;
         }
 
         public void Load(ParameterFactory factory)
@@ -49,21 +58,36 @@ namespace WDE.Parameters
                     factory.Register(pair.Key, p);   
                 }
             }
-            
+
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
-            factory.Register("GameEventParameter", new GameEventParameter(database));
-            factory.Register("CreatureParameter", new CreatureParameter(database, serverIntegration));
-            factory.Register("CreatureGameobjectParameter", new CreatureGameobjectParameter(database));
-            factory.Register("QuestParameter", new QuestParameter(database));
-            factory.Register("PrevQuestParameter", new PrevQuestParameter(database));
-            factory.Register("GameobjectParameter", new GameobjectParameter(database, serverIntegration, itemFromListProvider));
-            factory.Register("GossipMenuParameter", new GossipMenuParameter(database));
-            factory.Register("NpcTextParameter", new NpcTextParameter(database));
+            factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)));
+            factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, serverIntegration)));
+            factory.Register("CreatureGameobjectParameter", AddDatabaseParameter(new CreatureGameobjectParameter(database)));
+            factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database)));
+            factory.Register("PrevQuestParameter", AddDatabaseParameter(new PrevQuestParameter(database)));
+            factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)));
+            factory.Register("GossipMenuParameter", AddDatabaseParameter(new GossipMenuParameter(database)));
+            factory.Register("NpcTextParameter", AddDatabaseParameter(new NpcTextParameter(database)));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
             factory.Register("PercentageParameter", new PercentageParameter());
+
+            loadingEventAggregator.OnEvent<DatabaseLoadedEvent>().SubscribeAction(_ =>
+            {
+                foreach (var p in databaseParameters)
+                {
+                    p.LateLoad();
+                    factory.Updated(p);
+                }
+            });
+        }
+    
+        private T AddDatabaseParameter<T>(T t) where T : LateLoadParameter
+        {
+            databaseParameters.Add(t);
+            return t;
         }
     }
 
@@ -83,6 +107,11 @@ namespace WDE.Parameters
         {
             Items = new Dictionary<long, SelectOption> {{0, new SelectOption("No")}, {1, new SelectOption("Yes")}};
         }
+    }
+
+    public abstract class LateLoadParameter : ParameterNumbered
+    {
+        public abstract void LateLoad();
     }
 
     public abstract class LazyLoadParameter : ParameterNumbered
@@ -107,7 +136,7 @@ namespace WDE.Parameters
         protected abstract void LazyLoad();
     }
 
-    public class CreatureParameter : LazyLoadParameter
+    public class CreatureParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
         
@@ -115,6 +144,7 @@ namespace WDE.Parameters
 
         public CreatureParameter(IDatabaseProvider database, IServerIntegration serverIntegration)
         {
+            Items = new Dictionary<long, SelectOption>();
             this.database = database;
             SpecialCommand = async () =>
             {
@@ -125,15 +155,14 @@ namespace WDE.Parameters
             };
         }
 
-        protected override void LazyLoad()
+        public override void LateLoad()
         {
-            Items = new Dictionary<long, SelectOption>();
             foreach (ICreatureTemplate item in database.GetCreatureTemplates())
-                Items.Add(item.Entry, new SelectOption(item.Name));
+                Items!.Add(item.Entry, new SelectOption(item.Name));
         }
     }
 
-    public class CreatureGameobjectParameter : LazyLoadParameter
+    public class CreatureGameobjectParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -142,7 +171,7 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        protected override void LazyLoad()
+        public override void LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (ICreatureTemplate item in database.GetCreatureTemplates())
@@ -152,7 +181,7 @@ namespace WDE.Parameters
         }
     }
     
-    public class GossipMenuParameter : LazyLoadParameter
+    public class GossipMenuParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -161,7 +190,7 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        protected override void LazyLoad()
+        public override void LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IGossipMenu item in database.GetGossipMenus())
@@ -183,7 +212,7 @@ namespace WDE.Parameters
         }
     }
 
-    public class NpcTextParameter : LazyLoadParameter
+    public class NpcTextParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -192,7 +221,7 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        protected override void LazyLoad()
+        public override void LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (INpcText item in database.GetNpcTexts())
@@ -200,7 +229,7 @@ namespace WDE.Parameters
         }
     }
     
-    public class QuestParameter : LazyLoadParameter
+    public class QuestParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -209,7 +238,7 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        protected override void LazyLoad()
+        public override void LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IQuestTemplate item in database.GetQuestTemplates())
@@ -217,7 +246,7 @@ namespace WDE.Parameters
         }
     }
     
-    public class PrevQuestParameter : LazyLoadParameter
+    public class PrevQuestParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -226,7 +255,7 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        protected override void LazyLoad()
+        public override void LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IQuestTemplate item in database.GetQuestTemplates())
@@ -237,7 +266,7 @@ namespace WDE.Parameters
         }
     }
 
-    public class GameEventParameter : LazyLoadParameter
+    public class GameEventParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -246,7 +275,7 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        protected override void LazyLoad()
+        public override void LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IGameEvent item in database.GetGameEvents())
@@ -254,7 +283,7 @@ namespace WDE.Parameters
         }
     }
 
-    public class GameobjectParameter : LazyLoadParameter
+    public class GameobjectParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
         
@@ -289,7 +318,7 @@ namespace WDE.Parameters
             };
         }
 
-        protected override void LazyLoad()
+        public override void LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())

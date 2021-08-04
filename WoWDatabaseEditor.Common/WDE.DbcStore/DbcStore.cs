@@ -4,6 +4,8 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using Prism.Events;
 using WDBXEditor.Reader;
 using WDBXEditor.Storage;
 using WDE.Common;
@@ -26,11 +28,11 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, ISpellStore
+    public class DbcStore : IDbcStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
-        private readonly ISolutionManager solutionManager;
+        private readonly IEventAggregator eventAggregator;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
 
@@ -38,13 +40,13 @@ namespace WDE.DbcStore
             ITaskRunner taskRunner,
             IDbcSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
-            ISolutionManager solutionManager)
+            IEventAggregator eventAggregator)
         {
             this.parameterFactory = parameterFactory;
             this.taskRunner = taskRunner;
             dbcSettingsProvider = settingsProvider;
             this.messageBoxService = messageBoxService;
-            this.solutionManager = solutionManager;
+            this.eventAggregator = eventAggregator;
 
             Load();
         }
@@ -73,28 +75,6 @@ namespace WDE.DbcStore
         public Dictionary<long, string> GameObjectDisplayInfoStore {get; internal set; } = new();
         public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
         
-        public IEnumerable<uint> Spells
-        {
-            get
-            {
-                foreach (int key in SpellStore.Keys)
-                    // @TODO: get rid of this ugly cast when redesign loading dbc
-                    yield return (uint) key;
-            }
-        }
-
-        public bool HasSpell(uint entry)
-        {
-            // @TODO: get rid of this ugly cast when redesign loading dbc
-            return SpellStore.ContainsKey((int) entry);
-        }
-
-        public string GetName(uint entry)
-        {
-            // @TODO: get rid of this ugly cast when redesign loading dbc
-            return SpellStore[(int) entry];
-        }
-
         internal void Load()
         {
             if (dbcSettingsProvider.GetSettings().SkipLoading)
@@ -197,9 +177,7 @@ namespace WDE.DbcStore
                 
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
                 parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore));
-                parameterFactory.Register("SpellParameter", new DbcParameter(SpellStore));
-                parameterFactory.Register("MultiSpellParameter", new MultiSpellParameter(SpellStore));
-                parameterFactory.Register("SpellAreaSpellParameter", new SpellAreaSpellParameter(SpellStore));
+                parameterFactory.Register("DbcSpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore));
@@ -217,7 +195,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
                 parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore));
                 
-                store.solutionManager.RefreshAll();
+                store.eventAggregator.GetEvent<DbcLoadedEvent>().Publish(store);
             }
 
             private int max = 0;
@@ -404,27 +382,6 @@ namespace WDE.DbcStore
         {
             int indexOf = s.LastIndexOf('\\');
             return indexOf == -1 ? s : s.Substring(indexOf + 1);
-        }
-    }
-
-    public class MultiSpellParameter : MultiSwitchStringParameter
-    {
-        public MultiSpellParameter(Dictionary<long, string> storage)
-         : base(storage.ToDictionary(t => t.Key.ToString(), t => new SelectOption(t.Value)))
-        {
-        }
-    }
-
-    public class SpellAreaSpellParameter : Parameter
-    {
-        public SpellAreaSpellParameter(Dictionary<long, string> storage)
-        {
-            Items = new Dictionary<long, SelectOption>();
-            foreach (int key in storage.Keys)
-            {
-                Items.Add(-key, new SelectOption(storage[key], "If the player HAS aura, then the spell will not be activated"));
-                Items.Add(key, new SelectOption(storage[key], "If the player has NO aura, then the spell will not be activated"));
-            }
         }
     }
     

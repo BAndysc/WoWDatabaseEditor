@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WDE.Common.DBC;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Database
@@ -53,6 +54,7 @@ namespace WDE.Common.Database
 
         IEnumerable<ICoreCommandHelp> GetCommands();
         Task<IList<ITrinityString>> GetStringsAsync();
+        Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync();
 
         [Flags]
         public enum ConditionKeyMask

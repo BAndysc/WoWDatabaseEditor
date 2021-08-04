@@ -40,7 +40,7 @@ namespace WDE.SmartScriptEditor
         [JsonIgnore] 
         public ObservableCollection<ISolutionItem> Items { get; set; } = new();
 
-        public string ExtraId => Entry.ToString();
+        public string? ExtraId => SmartType is SmartScriptType.AreaTrigger or SmartScriptType.TimedActionList ? null : Entry.ToString();
 
         [JsonIgnore]
         public bool IsExportable => true;

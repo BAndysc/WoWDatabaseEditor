@@ -442,7 +442,12 @@ namespace WDE.SkyFireMySqlDatabase.Database
             await using var model = new SkyFireDatabase();
             return await model.TrinityStrings.ToListAsync<ITrinityString>();
         }
-        
+
+        public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
+        {
+            return Task.FromResult<IList<IDatabaseSpellDbc>>(new List<IDatabaseSpellDbc>());
+        }
+
         private bool Supports<T>()
         {
             return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(T));

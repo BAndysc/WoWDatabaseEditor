@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Prism.Events;
+using Prism.Ioc;
 using WDE.Common.Database;
+using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
@@ -23,15 +27,19 @@ namespace WDE.TrinityMySqlDatabase
             NullWorldDatabaseProvider nullWorldDatabaseProvider,
             IWorldDatabaseSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
-            IStatusBar statusBar,
-            ITaskRunner taskRunner) : base(nullWorldDatabaseProvider)
+            ILoadingEventAggregator loadingEventAggregator,
+            IEventAggregator eventAggregator,
+            IContainerProvider containerProvider) : base(nullWorldDatabaseProvider)
         {
             if (settingsProvider.Settings.IsEmpty)
+            {
+                eventAggregator.GetEvent<AllModulesLoaded>().Subscribe(loadingEventAggregator.Publish<DatabaseLoadedEvent>, true);
                 return;
+            }
 
             try
             {
-                var cachedDatabase = new CachedDatabaseProvider(trinityDatabase, taskRunner, statusBar);
+                var cachedDatabase = containerProvider.Resolve<CachedDatabaseProvider>((typeof(IAsyncDatabaseProvider), trinityDatabase));
                 cachedDatabase.TryConnect();
                 impl = cachedDatabase;
             }

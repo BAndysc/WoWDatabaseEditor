@@ -17,6 +17,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         public IConditionFeatures ConditionFeatures => this;
         public ISet<Type> UnsupportedTables => new HashSet<Type>();
         public ISet<SmartScriptType> SupportedTypes => new HashSet<SmartScriptType>();
+        public bool AlternativeTrinityDatabase => false;
         
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";

@@ -6,13 +6,19 @@ using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.Statistics
 {
+    [UniqueProvider]
+    public interface IStatisticsService
+    {
+        public ulong RunCounter { get; }
+    }
+    
     [SingleInstance]
     [AutoRegister]
-    public class StatisticsService
+    public class StatisticsService : IStatisticsService
     {
         private readonly IUserSettings settings;
         public readonly DateTime? LastRun;
-        public readonly ulong RunCounter;
+        public ulong RunCounter { get; init; }
         
         public StatisticsService(IUserSettings settings)
         {

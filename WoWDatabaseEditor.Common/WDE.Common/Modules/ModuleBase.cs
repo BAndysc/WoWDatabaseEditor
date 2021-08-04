@@ -4,6 +4,9 @@ using System.Linq;
 using System.Reflection;
 using Prism.Ioc;
 using Prism.Modularity;
+using Unity;
+using Unity.Extension;
+using Unity.Lifetime;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
@@ -40,20 +43,27 @@ namespace WDE.Module
         
         protected void AutoRegisterByConvention(Assembly assembly, IContainerRegistry containerRegistry)
         {
+            IUnityContainer unityContainer = ((IContainerExtension<IUnityContainer>)containerRegistry).Instance;
             var defaultRegisters = assembly.GetTypes().Where(t => !t.IsAbstract && t.IsDefined(typeof(AutoRegisterAttribute), true));
 
             foreach (Type register in defaultRegisters)
             {
                 bool singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
 
-                foreach (Type @interface in register.GetInterfaces().Union(new[] {register}))
+                if (singleton)
+                    containerRegistry.RegisterSingleton(register);
+                    
+                foreach (Type @interface in register.GetInterfaces())
                 {
                     bool isUnique = !@interface.IsDefined(typeof(NonUniqueProviderAttribute), false);
 
                     string name = register + @interface.ToString();
 
                     if (singleton && isUnique)
+                    {
                         containerRegistry.RegisterSingleton(@interface, register);
+//                        unityContainer.RegisterFactory(@interface, c => unityContainer.Resolve(register), new ContainerControlledLifetimeManager());
+                    }
                     else
                         containerRegistry.Register(@interface, register, isUnique ? null : name);
                 }

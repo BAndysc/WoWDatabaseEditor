@@ -78,6 +78,22 @@
                 </StackPanel>
             </Border>
             
+            <Border Background="{DynamicResource SlightlyHighlightedBackground}" 
+                    CornerRadius="5" 
+                    Padding="10" 
+                    Margin="0,10" 
+                    BorderThickness="1" 
+                    IsVisible="{Binding ShowGiveStarBox}"
+                    BorderBrush="Gray">
+                <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
+                    <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">It looks like you are using Wow Database Editor for quite some time already.</TextBlock>
+                    <TextBlock TextWrapping="WrapWithOverflow">How about you leave a star on github for this project? It costs you nothing, but gives authors of this app power for further development 💪! To leave a star, you need an account on github, the 'star' button can be found in the top right corner.</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Command="{Binding OpenGithubAndDismissCommand}" Margin="0,0,5,0">Sure 👍! (this will open github website)</Button>
+                        <Button Command="{Binding DismissCommand}">Nah, I don't wanna 🖕</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
             
             <Grid>
                 <Grid.ColumnDefinitions>

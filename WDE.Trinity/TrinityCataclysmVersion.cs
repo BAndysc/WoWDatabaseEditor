@@ -18,6 +18,7 @@ namespace WDE.Trinity
         public IConditionFeatures ConditionFeatures => this;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ICreatureClassLevelStat)};
+        public bool AlternativeTrinityDatabase => false;
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {
             SmartScriptType.Creature,

@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Prism.Events;
+using Prism.Ioc;
 using WDE.Common.Database;
-using WDE.Common.Managers;
+using WDE.Common.Events;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
-using WDE.Common.Tasks;
 using WDE.Module.Attributes;
-using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.SkyFireMySqlDatabase.Database;
-using WDE.SkyFireMySqlDatabase.Models;
-using WDE.SkyFireMySqlDatabase.Providers;
 
 namespace WDE.SkyFireMySqlDatabase
 {
@@ -23,15 +20,19 @@ namespace WDE.SkyFireMySqlDatabase
             NullWorldDatabaseProvider nullWorldDatabaseProvider,
             IWorldDatabaseSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
-            IStatusBar statusBar,
-            ITaskRunner taskRunner) : base(nullWorldDatabaseProvider)
+            ILoadingEventAggregator loadingEventAggregator,
+            IEventAggregator eventAggregator,
+            IContainerProvider containerProvider) : base(nullWorldDatabaseProvider)
         {
             if (settingsProvider.Settings.IsEmpty)
+            {
+                eventAggregator.GetEvent<AllModulesLoaded>().Subscribe(loadingEventAggregator.Publish<DatabaseLoadedEvent>, true);
                 return;
+            }
 
             try
             {
-                var cachedDatabase = new CachedDatabaseProvider(skyfireDatabase, taskRunner, statusBar);
+                var cachedDatabase = containerProvider.Resolve<CachedDatabaseProvider>((typeof(IAsyncDatabaseProvider), skyfireDatabase));
                 cachedDatabase.TryConnect();
                 impl = cachedDatabase;
             }

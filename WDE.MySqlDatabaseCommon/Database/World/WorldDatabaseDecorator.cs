@@ -59,5 +59,6 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ICoreCommandHelp> GetCommands() => impl.GetCommands();
         public Task<IList<ITrinityString>> GetStringsAsync() => impl.GetStringsAsync();
+        public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync() => impl.GetSpellDbcAsync();
     }
 }

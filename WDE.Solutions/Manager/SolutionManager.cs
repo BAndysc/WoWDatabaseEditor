@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using WDE.Common;
+using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
+using WDE.MVVM.Observable;
 
 namespace WDE.Solutions.Manager
 {
@@ -14,7 +16,7 @@ namespace WDE.Solutions.Manager
     {
         private readonly IUserSettings userSettings;
 
-        public SolutionManager(IUserSettings userSettings)
+        public SolutionManager(IUserSettings userSettings, IParameterFactory parameterFactory)
         {
             this.userSettings = userSettings;
             Items = new ObservableCollection<ISolutionItem>();
@@ -22,6 +24,10 @@ namespace WDE.Solutions.Manager
             Initialize();
 
             Items.CollectionChanged += ItemsOnCollectionChanged;
+            parameterFactory.OnRegister().SubscribeAction(_ =>
+            {
+                RefreshAll();
+            });
         }
 
         public event System.Action<ISolutionItem?>? RefreshRequest;

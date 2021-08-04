@@ -27,7 +27,7 @@ namespace WDE.Common.CoreVersion
     public interface IDatabaseFeatures
     {
         ISet<Type> UnsupportedTables { get; }
-        bool AlternativeTrinityStrings => false;
+        bool AlternativeTrinityDatabase { get; }
         bool HasAiEntry => false;
     }
 

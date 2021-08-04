@@ -54,5 +54,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             extensions.RegisterInstance<IContainerRegistry>(scope);
             return scope;
         }
+
+        public IUnityContainer Instance => unity;
     }
 }

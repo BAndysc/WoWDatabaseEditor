@@ -21,6 +21,7 @@ namespace WDE.ProjectSkyFire
             typeof(IAuthRbacPermission),
             typeof(IAuthRbacLinkedPermission)
         };
+        public bool AlternativeTrinityDatabase => false;
         
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {

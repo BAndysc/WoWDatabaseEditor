@@ -116,8 +116,8 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
         {
             List<SpellMiniEntry> spells = new();
 
-            foreach (uint spellId in spellStore.Spells)
-                spells.Add(new SpellMiniEntry(spellId, spellStore.GetName(spellId)));
+            foreach (var pair in spellStore.SpellsWithName)
+                spells.Add(new SpellMiniEntry(pair.key, pair.name));
 
             return spells;
         }

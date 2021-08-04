@@ -17,13 +17,13 @@ namespace WDE.PacketViewer.Processing.Processors
         protected override IEnumerable<(string prefix, string name, uint entry)> Process(PacketBase basePacket, PacketSpellGo packet)
         {
             if (spellStore.HasSpell(packet.Data.Spell))
-                yield return ("Spell", spellStore.GetName(packet.Data.Spell), packet.Data.Spell);
+                yield return ("Spell", spellStore.GetName(packet.Data.Spell)!, packet.Data.Spell);
         }
 
         protected override IEnumerable<(string prefix, string name, uint entry)> Process(PacketBase basePacket, PacketSpellStart packet)
         {
             if (spellStore.HasSpell(packet.Data.Spell))
-                yield return ("Spell", spellStore.GetName(packet.Data.Spell), packet.Data.Spell);
+                yield return ("Spell", spellStore.GetName(packet.Data.Spell)!, packet.Data.Spell);
         }
 
         protected override IEnumerable<(string prefix, string name, uint entry)> Process(PacketBase basePacket, PacketAuraUpdate packet)
@@ -34,7 +34,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     continue;
                 
                 if (spellStore.HasSpell(update.Spell))
-                    yield return ("Spell", spellStore.GetName(update.Spell), update.Spell);
+                    yield return ("Spell", spellStore.GetName(update.Spell)!, update.Spell);
             }
         }
     }

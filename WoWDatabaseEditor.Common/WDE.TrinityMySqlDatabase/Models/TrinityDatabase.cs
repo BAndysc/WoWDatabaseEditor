@@ -1,13 +1,17 @@
 ﻿using LinqToDB;
 using LinqToDB.Data;
+using WDE.Common.Database;
 using WDE.MySqlDatabaseCommon.CommonModels;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
     public class TrinityDatabase : DataConnection
     {
-        public TrinityDatabase() : base("Trinity")
+        private readonly bool alternateNames;
+
+        public TrinityDatabase(bool alternateNames) : base("Trinity")
         {
+            this.alternateNames = alternateNames;
         }
 
         public ITable<MySqlAreaTriggerScript> AreaTriggerScript => GetTable<MySqlAreaTriggerScript>();
@@ -29,7 +33,16 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
         public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
-        public ITable<ACoreString> TrinityStrings => GetTable<ACoreString>();
-        public ITable<ACoreString> AcoreStrings => GetTable<ACoreString>();
+        public ITable<ITrinityString> Strings => GetTable<TrinityString, ACoreString, ITrinityString>();
+        public ITable<IDatabaseSpellDbc> SpellDbc => GetTable<TrinityMySqlSpellDbc, AzerothMySqlSpellDbc, IDatabaseSpellDbc>();
+
+        private ITable<T> GetTable<R, S, T>() where T : class 
+            where S : class, T
+            where R : class, T
+        {
+            if (alternateNames)
+                return GetTable<S>();
+            return GetTable<R>();
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace WDE.AzerothCore
             SmartScriptType.TimedActionList,
         };
 
-        public bool AlternativeTrinityStrings => true;
+        public bool AlternativeTrinityDatabase => true;
 
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";

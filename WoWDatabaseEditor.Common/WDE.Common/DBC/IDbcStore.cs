@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Prism.Events;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.DBC
@@ -24,5 +25,9 @@ namespace WDE.Common.DBC
         Dictionary<long, string> QuestInfoStore { get; }
         Dictionary<long, string> CharTitleStore { get; }
         Dictionary<long, string> MapDirectoryStore { get; }
+    }
+    
+    public class DbcLoadedEvent : PubSubEvent<IDbcStore>
+    {
     }
 }

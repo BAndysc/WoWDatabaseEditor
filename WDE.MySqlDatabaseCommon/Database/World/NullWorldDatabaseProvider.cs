@@ -5,7 +5,7 @@ using WDE.Common.Database;
 
 namespace WDE.MySqlDatabaseCommon.Database.World
 {
-    public class NullWorldDatabaseProvider : IDatabaseProvider
+    public class NullWorldDatabaseProvider : IAsyncDatabaseProvider
     {
         public bool IsConnected => false;
         
@@ -65,5 +65,28 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<ICoreCommandHelp> GetCommands() => Enumerable.Empty<ICoreCommandHelp>();
 
         public Task<IList<ITrinityString>> GetStringsAsync() => Task.FromResult<IList<ITrinityString>>(new List<ITrinityString>());
+        
+        public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync() => Task.FromResult<IList<IDatabaseSpellDbc>>(new List<IDatabaseSpellDbc>());
+        
+        public Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult(new List<ICreatureTemplate>());
+
+        public Task<List<IConversationTemplate>> GetConversationTemplatesAsync() => Task.FromResult(new List<IConversationTemplate>());
+        
+        public Task<List<IGameEvent>> GetGameEventsAsync() => Task.FromResult(new List<IGameEvent>());
+
+        public Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync() => Task.FromResult(new List<IAreaTriggerTemplate>());
+
+        public Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync() => Task.FromResult(new List<IGameObjectTemplate>());
+
+        public Task<List<IQuestTemplate>> GetQuestTemplatesAsync() => Task.FromResult(new List<IQuestTemplate>());
+
+        public Task<List<IGossipMenu>> GetGossipMenusAsync() => Task.FromResult(new List<IGossipMenu>());
+
+        public Task<List<INpcText>> GetNpcTextsAsync() => Task.FromResult(new List<INpcText>());
+
+        public Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync() => Task.FromResult(new List<ICreatureClassLevelStat>());
+
+        public Task<List<IBroadcastText>> GetBroadcastTextsAsync() => Task.FromResult(new List<IBroadcastText>());
+
     }
 }
