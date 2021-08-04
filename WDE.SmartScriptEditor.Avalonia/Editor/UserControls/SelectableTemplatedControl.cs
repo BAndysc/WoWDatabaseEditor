@@ -1,3 +1,5 @@
+using System;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -7,11 +9,19 @@ using WDE.Common.Avalonia.Controls;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {
-    public class SelectableTemplatedControl : TemplatedControl
+    public abstract class SelectableTemplatedControl : TemplatedControl
     {
         public static KeyModifiers MultiselectGesture { get; } = AvaloniaLocator.Current
             .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
         
+        public static readonly AvaloniaProperty DeselectAllRequestProperty =
+            AvaloniaProperty.Register<SelectableTemplatedControl, ICommand>(nameof(DeselectAllRequest));
+
+        public ICommand DeselectAllRequest
+        {
+            get => (ICommand) GetValue(DeselectAllRequestProperty);
+            set => SetValue(DeselectAllRequestProperty, value);
+        }
         public static readonly DirectProperty<SelectableTemplatedControl, bool> IsSelectedProperty =
             AvaloniaProperty.RegisterDirect<SelectableTemplatedControl, bool>(
                 nameof(IsSelected),
@@ -25,15 +35,42 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetAndRaise(IsSelectedProperty, ref isSelected, value);
         }
 
+        private bool IsMultiSelect(KeyModifiers modifiers)
+        {
+            return modifiers.HasFlag(MultiselectGesture);
+        }
+
         private ulong lastPressedTimestamp = 0;
         private int lastClickCount = 0;
+        private bool lastPressedWithControlOn = false;
+        private Point pressPosition;
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
             base.OnPointerPressed(e);
 
             lastPressedTimestamp = e.Timestamp;
             lastClickCount = e.ClickCount;
+            lastPressedWithControlOn = IsMultiSelect(e.KeyModifiers);
+            pressPosition = e.GetPosition(this);
+
+            if (e.ClickCount == 1)
+            {
+                if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
+                    return;
+
+                if (!IsSelected || !lastPressedWithControlOn)
+                    DeselectOthers();
+                
+                if (!lastPressedWithControlOn && !IsSelected)
+                {
+                    DeselectAllRequest?.Execute(null);
+                    IsSelected = true;
+                }
+                e.Handled = true;
+            }
         }
+
+        protected abstract void DeselectOthers();
 
         protected override void OnPointerReleased(PointerReleasedEventArgs e)
         {
@@ -44,6 +81,20 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 {
                     OnDirectEdit(tb.OverContext);
                     e.Handled = true;
+                }
+                else
+                {
+                    if (lastPressedWithControlOn)
+                    {
+                        var vector = pressPosition - e.GetPosition(this);
+                        var dist = Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y);
+                        if (dist < 5)
+                        {
+                            DeselectOthers();
+                            IsSelected = !IsSelected;
+                            e.Handled = true;   
+                        }
+                    }
                 }
             }
             if (lastClickCount == 2 && (e.Timestamp - lastPressedTimestamp) <= 1000)

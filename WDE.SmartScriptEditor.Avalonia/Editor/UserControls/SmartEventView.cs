@@ -17,12 +17,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 o => o.EditEventCommand,
                 (o, v) => o.EditEventCommand = v);
 
-        public static readonly DirectProperty<SmartEventView, ICommand?> DeselectAllRequestProperty =
-            AvaloniaProperty.RegisterDirect<SmartEventView, ICommand?>(
-                nameof(DeselectAllRequest),
-                o => o.DeselectAllRequest,
-                (o, v) => o.DeselectAllRequest = v);
-        
         public static readonly DirectProperty<SmartEventView, ICommand?> DeselectActionsOfDeselectedEventsRequestProperty =
             AvaloniaProperty.RegisterDirect<SmartEventView, ICommand?>(
                 nameof(DeselectActionsOfDeselectedEventsRequest),
@@ -42,14 +36,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             get => editEventCommand;
             set => SetAndRaise(EditEventCommandProperty, ref editEventCommand, value);
         }
-
-        private ICommand? deselectAllRequest;
-        public ICommand? DeselectAllRequest
-        {
-            get => deselectAllRequest;
-            set => SetAndRaise(DeselectAllRequestProperty, ref deselectAllRequest, value);
-        }
-
+        
         private ICommand? deselectActionsOfDeselectedEventsRequest;
         public ICommand? DeselectActionsOfDeselectedEventsRequest
         {
@@ -74,28 +61,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             DirectEditParameter?.Execute(context);
         }
         
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        protected override void DeselectOthers()
         {
-            base.OnPointerPressed(e);
-
-            if (e.ClickCount == 1)
-            {
-                if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
-                {
-                    return;
-                }
-
-                DeselectActionsOfDeselectedEventsRequest?.Execute(null);
-
-                if (!GetSelected(this))
-                {
-                    if (!e.KeyModifiers.HasFlag(MultiselectGesture))
-                        DeselectAllRequest?.Execute(null);
-                    SetSelected(this, true);
-                }
-            
-                e.Handled = true;
-            }
+            DeselectActionsOfDeselectedEventsRequest?.Execute(null);
         }
 
         public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<SmartEventView, IControl, bool>("Selected");

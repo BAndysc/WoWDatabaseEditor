@@ -13,7 +13,7 @@ namespace WDE.Conditions.Exporter
         private static readonly string ConditionSql =
             @"({SourceTypeOrReferenceId}, {SourceGroup}, {SourceEntry}, {SourceId}, {ElseGroup}, {ConditionTypeOrReference}, {ConditionTarget}, {ConditionValue1}, {ConditionValue2}, {ConditionValue3}, {NegativeCondition}, {Comment})";
         
-        public static object ToSqlObject(this IConditionLine line)
+        public static object ToSqlObject(this IConditionLine line, bool escapeComment = false)
         {
             return new
             {
@@ -28,15 +28,13 @@ namespace WDE.Conditions.Exporter
                 ConditionValue2 = line.ConditionValue2,
                 ConditionValue3 = line.ConditionValue3,
                 NegativeCondition = line.NegativeCondition,
-                Comment = line.Comment,
+                Comment = escapeComment ? line.Comment?.ToSqlEscapeString() : line.Comment,
             };
         }
         
         public static string ToSqlString(this IConditionLine line)
         {
-            var obj = line.ToSqlObject();
-            ((dynamic)obj).Comment = ((string)((dynamic)obj).Comment).ToSqlEscapeString();
-            return Smart.Format(ConditionSql, obj);
+            return Smart.Format(ConditionSql, line.ToSqlObject(true));
         }
         
         public static bool TryToConditionLine(this string str, out IConditionLine line)

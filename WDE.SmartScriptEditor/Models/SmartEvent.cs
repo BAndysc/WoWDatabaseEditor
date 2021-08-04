@@ -165,6 +165,19 @@ namespace WDE.SmartScriptEditor.Models
             return Chance.Value == other.Chance.Value;
         }
 
+        public SmartEvent DeepCopy()
+        {
+            var shallow = ShallowCopy();
+
+            foreach (var action in Actions)
+                shallow.AddAction(action.Copy());
+            
+            foreach (var condition in Conditions)
+                shallow.Conditions.Add(condition.Copy());
+            
+            return shallow;
+        }
+
         public SmartEvent ShallowCopy()
         {
             SmartEvent se = new(Id);

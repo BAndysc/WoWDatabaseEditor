@@ -9,21 +9,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
     /// </summary>
     public class GlobalVariableView : SelectableTemplatedControl
     {
-        public static AvaloniaProperty DeselectAllRequestProperty =
-            AvaloniaProperty.Register<GlobalVariableView, ICommand>(nameof(DeselectAllRequest));
-
         public static AvaloniaProperty DeselectAllButGlobalVariablesRequestProperty =
             AvaloniaProperty.Register<GlobalVariableView, ICommand>(nameof(DeselectAllButGlobalVariablesRequest));
 
         public static AvaloniaProperty EditGlobalVariableCommandProperty =
             AvaloniaProperty.Register<GlobalVariableView, ICommand>(nameof(EditGlobalVariableCommand));
         
-        public ICommand DeselectAllRequest
-        {
-            get => (ICommand) GetValue(DeselectAllRequestProperty);
-            set => SetValue(DeselectAllRequestProperty, value);
-        }
-
         public ICommand DeselectAllButGlobalVariablesRequest
         {
             get => (ICommand) GetValue(DeselectAllButGlobalVariablesRequestProperty);
@@ -36,22 +27,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetValue(EditGlobalVariableCommandProperty, value);
         }
 
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        protected override void DeselectOthers()
         {
-            base.OnPointerPressed(e);
-
-            if (e.ClickCount == 1)
-            {
-                DeselectAllButGlobalVariablesRequest?.Execute(null);
-               
-                if (!IsSelected)
-                {
-                    if (!e.KeyModifiers.HasFlag(MultiselectGesture))
-                        DeselectAllRequest?.Execute(null);
-                    IsSelected = true;
-                }
-                e.Handled = true;
-            }
+            DeselectAllButGlobalVariablesRequest?.Execute(null);
         }
 
         protected override void OnEdit()

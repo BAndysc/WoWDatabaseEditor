@@ -10,24 +10,37 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private const string TipWaitAction = "SmartScriptEditor.WaitActionTipOpened";
         private const string TipMultipleActions = "SmartScriptEditor.MultipleActions";
         private const string TipYouCanNameStoredTargets = "SmartScriptEditor.YouCanNameStoredTargets";
+        private const string TipControlToCopy = "SmartScriptEditor.ControlToCopy";
         private readonly ITeachingTipService teachingTipService;
+        private readonly SmartScriptEditorViewModel vm;
         private readonly SmartScript script;
 
         public bool MultipleActionsTipOpened { get; set; }
         public bool WaitActionTipOpened { get; set; }
         public bool YouCanNameStoredTargetsTipOpened { get; set; }
+        public bool ControlToCopyOpened { get; set; }
         
-        public SmartTeachingTips(ITeachingTipService teachingTipService, SmartScript script)
+        public SmartTeachingTips(ITeachingTipService teachingTipService, SmartScriptEditorViewModel vm, SmartScript script)
         {
             this.teachingTipService = teachingTipService;
+            this.vm = vm;
             this.script = script;
+        }
+
+        private void OnPaste()
+        {
+            if (teachingTipService.ShowTip(TipControlToCopy))
+            {
+                ControlToCopyOpened = true;
+                RaisePropertyChanged(nameof(ControlToCopyOpened));
+            }
         }
 
         private void AllActionsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems == null)
                 return;
-            
+
             foreach (SmartAction item in e.NewItems)
             {
                 // WaitActionTipOpened
@@ -112,6 +125,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public void Dispose()
         {
+            vm.OnPaste -= OnPaste;
             script.AllActions.CollectionChanged -= AllActionsOnCollectionChanged;
         }
 
@@ -119,14 +133,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             // subscribe only if tips not shown yet
             if (AnyTipToShow())
+            {
+                vm.OnPaste += OnPaste;
                 script.AllActions.CollectionChanged += AllActionsOnCollectionChanged;
+            }
         }
 
         private bool AnyTipToShow()
         {
             return !teachingTipService.IsTipShown(TipMultipleActions) ||
                    !teachingTipService.IsTipShown(TipWaitAction) || 
-                   !teachingTipService.IsTipShown(TipYouCanNameStoredTargets);
+                   !teachingTipService.IsTipShown(TipYouCanNameStoredTargets) ||
+                   !teachingTipService.IsTipShown(TipControlToCopy);
         }
     }
 }

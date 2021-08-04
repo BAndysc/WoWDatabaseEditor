@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using WDE.Common.Managers;
@@ -20,8 +21,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
     {
         private readonly List<(float y, float height, int actionIndex, int eventIndex)> actionHeights = new();
         private readonly List<(float y, float height, int conditionIndex, int eventIndex)> conditionHeights = new();
-
-        private readonly List<float> eventHeights = new();
+        private readonly List<(float y, float height, int eventIndex)> eventHeights = new();
+        
         private readonly Dictionary<SmartAction, ContentPresenter> actionToPresenter = new();
         private readonly Dictionary<SmartEvent, ContentPresenter> eventToPresenter = new();
         private readonly Dictionary<SmartCondition, ContentPresenter> conditionToPresenter = new();
@@ -39,10 +40,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         private bool draggingActions;
         private bool draggingEvents;
         private bool draggingConditions;
+        private bool isCopying;
 
         private Point mouseStartPosition;
         private float mouseY;
 
+        public (float y, float height, int eventIndex) OverIndexEvent { get; set; }
         private (float y, float height, int conditionIndex, int eventIndex) overIndexCondition;
         private (float y, float height, int actionIndex, int eventIndex) overIndexAction;
 
@@ -253,6 +256,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             base.OnPointerPressed(e);
 
+            UpdateIsCopying(e.KeyModifiers);
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed &&
                 e.ClickCount == 1)
             {
@@ -262,25 +266,59 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             }            
         }
 
+        private void UpdateIsCopying(KeyModifiers key)
+        {
+            var systemWideControlModifier = AvaloniaLocator.Current
+                .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
+            isCopying = key.HasFlag(systemWideControlModifier);
+        }
+
         protected override void OnPointerReleased(PointerReleasedEventArgs e)
         {
+            var systemWideControlModifier = AvaloniaLocator.Current
+                .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
+            
             base.OnPointerReleased(e);
+            UpdateIsCopying(e.KeyModifiers);
             StopDragging();
         }
 
+        private bool AnythingSelected()
+        {
+            foreach (var e in Script.Events)
+            {
+                if (e.IsSelected)
+                    return true;
+            }
+            foreach (var e in Script.Events)
+            {
+               foreach (var a in e.Actions)
+                   if (a.IsSelected)
+                       return true;
+               foreach (var a in e.Conditions)
+                   if (a.IsSelected)
+                       return true;
+            }
+
+            return false;
+        }
+        
         private void StopDragging()
         {
-            if (draggingEvents)
-                DropItems?.Execute(OverIndexEvent);
-            else if (draggingActions)
+            if (AnythingSelected())
             {
-                DropActions?.Execute(new DropActionsConditionsArgs
-                    {EventIndex = overIndexAction.eventIndex, ActionIndex = overIndexAction.actionIndex});
-            }
-            else if (draggingConditions)
-            {
-                DropConditions?.Execute(new DropActionsConditionsArgs
-                    {EventIndex = overIndexCondition.eventIndex, ActionIndex = overIndexCondition.conditionIndex});
+                if (draggingEvents)
+                    DropItems?.Execute(new DropActionsConditionsArgs{EventIndex = OverIndexEvent.eventIndex, ActionIndex = 0, Copy = isCopying});
+                else if (draggingActions)
+                {
+                    DropActions?.Execute(new DropActionsConditionsArgs
+                        {EventIndex = overIndexAction.eventIndex, ActionIndex = overIndexAction.actionIndex, Copy = isCopying});
+                }
+                else if (draggingConditions)
+                {
+                    DropConditions?.Execute(new DropActionsConditionsArgs
+                        {EventIndex = overIndexCondition.eventIndex, ActionIndex = overIndexCondition.conditionIndex, Copy = isCopying});
+                }
             }
 
             draggingEvents = false;
@@ -295,17 +333,29 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public override void Render(DrawingContext dc)
         {
             base.Render(dc);
-            if (draggingActions)
+            if (AnythingSelected())
             {
-                double x = EventWidth(Bounds.Width);
-                float y = overIndexAction.y - overIndexAction.height / 2 - 1;
-                dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + 200, y));
-            }
-            else if (draggingConditions)
-            {
-                float x = 1;
-                float y = overIndexCondition.y - overIndexCondition.height / 2 - 1;
-                dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + ConditionWidth(Bounds.Width), y));         
+                if (draggingActions)
+                {
+                    double x = EventWidth(Bounds.Width);
+                    float y = overIndexAction.y - overIndexAction.height / 2 - 1;
+                    dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + 200, y));
+                }
+                else if (draggingConditions)
+                {
+                    float x = 1;
+                    float y = overIndexCondition.y - overIndexCondition.height / 2 - 1;
+                    dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + ConditionWidth(Bounds.Width), y));         
+                }
+                else if (draggingEvents)
+                {
+                    if (isCopying)
+                    {
+                        float x = 1;
+                        float y = OverIndexEvent.y - OverIndexEvent.height / 2 - 1;
+                        dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + EventWidth(Bounds.Width), y));   
+                    }
+                }
             }
 
             if (vvvvText == null)
@@ -404,9 +454,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             base.OnPointerMoved(e);
 
+            UpdateIsCopying(e.KeyModifiers);
             var state = e.GetCurrentPoint(this);
-            
-            
+
             mouseY = (float) e.GetPosition(this).Y;
             if (!state.Properties.IsLeftButtonPressed)
             {
@@ -444,11 +494,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             {
                 var eventIndex = 0;
                 var found = false;
-                foreach (float f in eventHeights)
+                foreach (var tuple in eventHeights)
                 {
-                    if (f > mouseY)
+                    if (tuple.y > mouseY)
                     {
-                        OverIndexEvent = eventIndex;
+                        OverIndexEvent = tuple;
                         found = true;
                         break;
                     }
@@ -456,11 +506,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     eventIndex++;
                 }
             
-                if (!found)
+                if (!found && eventHeights.Count >= 1)
                 {
-                    OverIndexEvent = eventHeights.Count > 0 && mouseY > eventHeights[^1]
-                        ? eventHeights.Count - 1
-                        : 0;
+                    OverIndexEvent = eventHeights[^1];//eventHeights.Count > 0 && mouseY > eventHeights[^1].y
+                        //? eventHeights[^1]
+                        //: eventHeights[0];
                 }
             }
             else if (draggingActions)
@@ -527,32 +577,35 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 addConditionPresenter?.Arrange(new Rect(-5, -5, 1, 1));
             }
             
+            float lastHeight = 0;
             float selectedHeight = 0;
+            int eventIndex = 0;
             foreach (SmartEvent ev in Script.Events)
             {
+                eventIndex++;
                 if (!eventToPresenter.TryGetValue(ev, out var eventPresenter))
                     continue;
                 
-                float height = Math.Max(MeasureActions(eventPresenter), (float) eventPresenter.DesiredSize.Height + MeasureConditions(eventPresenter));
-                eventHeights.Add(y + (height + EventSpacing) / 2);
-                y += height + EventSpacing;
+                lastHeight = Math.Max(MeasureActions(eventPresenter), (float) eventPresenter.DesiredSize.Height + MeasureConditions(eventPresenter));
+                eventHeights.Add((y + (lastHeight + EventSpacing) / 2, lastHeight + EventSpacing, eventIndex - 1));
+                y += lastHeight + EventSpacing;
 
-                if (!draggingEvents || !GetSelected(eventPresenter.Child))
+                if (!draggingEvents || isCopying || !GetSelected(eventPresenter.Child))
                     continue;
-                selectedHeight += height + EventSpacing;
+                selectedHeight += lastHeight + EventSpacing;
             }
 
-            eventHeights.Add(y);
+            eventHeights.Add((y, 0, eventIndex));
 
             y = (float)globalVariablesArrangement.Height;
             float start = 0;
-            if (OverIndexEvent == 0)
+            if (OverIndexEvent.eventIndex == 0)
             {
                 start = y;
                 y += selectedHeight;
             }
 
-            var eventIndex = 0;
+            eventIndex = 0;
             if (addActionViewModel != null)
                 addActionViewModel.Event = null;
             if (addConditionViewModel != null)
@@ -564,7 +617,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     continue;
 
                 var height = (float)eventPresenter.DesiredSize.Height;
-                if (!draggingEvents || !GetSelected(eventPresenter.Child))
+                if (!draggingEvents || isCopying || !GetSelected(eventPresenter.Child))
                 {
                     float actionHeight = ArrangeActions(eventIndex, 0, finalSize, eventPresenter, y, height);
                     float conditionsHeight = ArrangeConditions(eventIndex, (float)PaddingLeft, finalSize, eventPresenter, y, height);
@@ -598,7 +651,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 }
 
                 eventIndex++;
-                if (eventIndex == OverIndexEvent)
+                if (eventIndex == OverIndexEvent.eventIndex)
                 {
                     start = y;
                     y += selectedHeight;
@@ -611,7 +664,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 if (!eventToPresenter.TryGetValue(ev, out var eventPresenter))
                     continue;
                 var height = (float) eventPresenter.DesiredSize.Height;
-                if (draggingEvents && GetSelected(eventPresenter.Child))
+                if (draggingEvents && !isCopying && GetSelected(eventPresenter.Child))
                 {
                     float conditionsHeight = ArrangeConditions(eventIndex, 20 + (float)PaddingLeft, finalSize, eventPresenter, start, height);
                     height = Math.Max(height + conditionsHeight, ArrangeActions(eventIndex, 20, finalSize, eventPresenter, start, height));
@@ -734,8 +787,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         //     InvalidateArrange();
         // }
         //
-
-        public int OverIndexEvent { get; set; }
 
         public SmartScript Script
         {

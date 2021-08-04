@@ -10,9 +10,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
     /// </summary>
     public class SmartConditionView : SelectableTemplatedControl
     {
-        public static readonly AvaloniaProperty DeselectAllRequestProperty =
-            AvaloniaProperty.Register<SmartActionView, ICommand>(nameof(DeselectAllRequest));
-
         public static readonly AvaloniaProperty DeselectAllButConditionsRequestProperty =
             AvaloniaProperty.Register<SmartActionView, ICommand>(nameof(DeselectAllButConditionsRequest));
 
@@ -22,11 +19,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public static readonly AvaloniaProperty DirectEditParameterProperty =
             AvaloniaProperty.Register<SmartActionView, ICommand>(nameof(DirectEditParameter));
         
-        public ICommand DeselectAllRequest
-        {
-            get => (ICommand) GetValue(DeselectAllRequestProperty);
-            set => SetValue(DeselectAllRequestProperty, value);
-        }
 
         public ICommand DirectEditParameter
         {
@@ -56,27 +48,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             DirectEditParameter?.Execute(context);
         }
 
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        protected override void DeselectOthers()
         {
-            base.OnPointerPressed(e);
-            
-            if (e.ClickCount == 1)
-            {
-                if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
-                {
-                    return;
-                }
-
-                DeselectAllButConditionsRequest?.Execute(null);
-               
-                if (!IsSelected)
-                {
-                    if (!e.KeyModifiers.HasFlag(MultiselectGesture))
-                        DeselectAllRequest?.Execute(null);
-                    IsSelected = true;
-                }
-                e.Handled = true;
-            }
+            DeselectAllButConditionsRequest?.Execute(null);
         }
     }
 }

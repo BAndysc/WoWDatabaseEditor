@@ -60,7 +60,7 @@
                         Selected="{Binding IsSelected, Mode=TwoWay}"
                         userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
                         DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
-                        DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectActions, ElementName=Rooot}"
+                        DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectAllButEvents, ElementName=Rooot}"
                         DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                         IsSelected="{Binding IsSelected, Mode=TwoWay}"
                         EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}"
@@ -70,7 +70,7 @@
                     <userControls:SmartActionView
                         Indent="{Binding Indent}"
                         DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
-                        DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                        userControls:SelectableTemplatedControl.DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                         DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
                         EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
                         IsSelected="{Binding IsSelected, Mode=TwoWay}"

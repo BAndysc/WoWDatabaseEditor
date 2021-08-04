@@ -144,8 +144,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     smartEditorViewModel.ShowEditor(null, null);
             });
             EditEvent = new DelegateCommand(EditEventCommand);
-            DeselectActions = new DelegateCommand(() =>
+            DeselectAllButEvents = new DelegateCommand(() =>
             {
+                foreach (var gv in script.GlobalVariables)
+                    gv.IsSelected = false;
                 foreach (SmartEvent e in Events)
                 {
                     if (!e.IsSelected)
@@ -207,23 +209,29 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     e.IsSelected = false;
                 }
             });
-            OnDropItems = new DelegateCommand<int?>(destIndex =>
+            OnDropItems = new DelegateCommand<DropActionsConditionsArgs>(args =>
             {
-                if (!destIndex.HasValue)
+                if (args == null)
                     return;
+
+                var destIndex = args.EventIndex;
                 
-                using (script!.BulkEdit("Reorder events"))
+                using (script!.BulkEdit(args.Move ? "Reorder events" : "Copy events"))
                 {
                     var selected = new List<SmartEvent>();
-                    int d = destIndex.Value;
+                    int d = destIndex;
                     for (int i = Events.Count - 1; i >= 0; --i)
                     {
                         if (Events[i].IsSelected)
                         {
-                            if (i <= destIndex)
-                                d--;
                             selected.Add(Events[i]);
-                            script.Events.RemoveAt(i);
+                            Events[i].IsSelected = false;
+                            if (args.Move)
+                            {
+                                if (i <= destIndex)
+                                    d--;
+                                script.Events.RemoveAt(i);
+                            }
                         }
                     }
 
@@ -231,59 +239,89 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         d = 0;
                     selected.Reverse();
                     foreach (SmartEvent s in selected)
-                        script.Events.Insert(d++, s);
+                    {
+                        var newEvent = args.Copy ? s.DeepCopy() : s;
+                        newEvent.IsSelected = true;
+                        script.Events.Insert(d++, newEvent);
+                    }
                 }
             });
             OnDropActions = new DelegateCommand<DropActionsConditionsArgs>(data =>
             {
-                using (script!.BulkEdit("Reorder actions"))
+                using (script!.BulkEdit(data.Move ? "Reorder actions" : "Copy actions"))
                 {
+                    if (data.EventIndex < 0 || data.EventIndex >= Events.Count)
+                    {
+                        Console.WriteLine("Fatal error! event index out of range");
+                        return;
+                    }
                     var selected = new List<SmartAction>();
                     int d = data.ActionIndex;
-                    for (var eventIndex = 0; eventIndex < Events.Count; eventIndex++)
+                    for (var eventIndex = Events.Count - 1; eventIndex >= 0; eventIndex--)
                     {
                         SmartEvent e = Events[eventIndex];
                         for (int i = e.Actions.Count - 1; i >= 0; --i)
                         {
                             if (e.Actions[i].IsSelected)
                             {
-                                if (eventIndex == data.EventIndex && i < data.ActionIndex)
-                                    d--;
                                 selected.Add(e.Actions[i]);
-                                e.Actions.RemoveAt(i);
+                                e.Actions[i].IsSelected = false;
+                                if (data.Move)
+                                {
+                                    if (eventIndex == data.EventIndex && i < data.ActionIndex)
+                                        d--;
+                                    e.Actions.RemoveAt(i);
+                                }
                             }
                         }
                     }
 
                     selected.Reverse();
                     foreach (SmartAction s in selected)
-                        Events[data.EventIndex].Actions.Insert(d++, s);
+                    {
+                        SmartAction newAction = data.Copy ? s.Copy() : s;
+                        newAction.IsSelected = true;
+                        Events[data.EventIndex].Actions.Insert(d++, newAction);
+                    }
                 }
             });
             OnDropConditions = new DelegateCommand<DropActionsConditionsArgs>(data =>
             {
-                using (script!.BulkEdit("Reorder conditions"))
+                using (script!.BulkEdit(data.Move ? "Reorder conditions" : "Copy conditions"))
                 {
+                    if (data.EventIndex < 0 || data.EventIndex >= Events.Count)
+                    {
+                        Console.WriteLine("Fatal error! event index out of range");
+                        return;
+                    }
                     var selected = new List<SmartCondition>();
                     int d = data.ActionIndex;
-                    for (var eventIndex = 0; eventIndex < Events.Count; eventIndex++)
+                    for (var eventIndex = Events.Count - 1; eventIndex >= 0; eventIndex--)
                     {
                         SmartEvent e = Events[eventIndex];
                         for (int i = e.Conditions.Count - 1; i >= 0; --i)
                         {
                             if (e.Conditions[i].IsSelected)
                             {
-                                if (eventIndex == data.EventIndex && i < data.ActionIndex)
-                                    d--;
                                 selected.Add(e.Conditions[i]);
-                                e.Conditions.RemoveAt(i);
+                                e.Conditions[i].IsSelected = false;
+                                if (data.Move)
+                                {
+                                    if (eventIndex == data.EventIndex && i < data.ActionIndex)
+                                        d--;
+                                    e.Conditions.RemoveAt(i);   
+                                }
                             }
                         }
                     }
 
                     selected.Reverse();
                     foreach (SmartCondition s in selected)
-                        Events[data.EventIndex].Conditions.Insert(d++, s);
+                    {
+                        var newCondition = data.Copy ? s.Copy() : s;
+                        newCondition.IsSelected = true;
+                        Events[data.EventIndex].Conditions.Insert(d++, newCondition);
+                    }
                 }
             });
 
@@ -500,7 +538,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     EditConditionCommand(Events[FirstSelectedConditionIndex.eventIndex].Conditions[FirstSelectedConditionIndex.conditionIndex]);
             });
 
-            CopyCommand = new DelegateCommand(() =>
+            CopyCommand = new AsyncCommand(async () =>
             {
                 var selectedEvents = Events.Where(e => e.IsSelected).ToList();
                 if (selectedEvents.Count > 0)
@@ -546,12 +584,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     }
                 }
             });
-            CutCommand = new DelegateCommand(() =>
+            CutCommand = new AsyncCommand(async () =>
             {
-                CopyCommand.Execute();
+                await CopyCommand.ExecuteAsync();
                 DeleteSelected.Execute();
             });
-            PasteCommand = new DelegateCommand(async () =>
+            PasteCommand = new AsyncCommand(async () =>
             {
                 if (string.IsNullOrEmpty(await clipboard.GetText()))
                     return;
@@ -743,6 +781,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }
                     }
                 }
+                OnPaste?.Invoke();
             });
 
             Action<bool, int> selectionUpDown = (addToSelection, diff) =>
@@ -926,13 +965,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand DeselectAllButGlobalVariables { get; set; }
         public DelegateCommand DeselectAllButConditions { get; set; }
         public DelegateCommand DeselectAllButActions { get; set; }
-        public DelegateCommand DeselectActions { get; set; }
+        public DelegateCommand DeselectAllButEvents { get; set; }
 
         public AsyncAutoCommand<GlobalVariable> EditGlobalVariable { get; }
         public DelegateCommand<object> DirectEditParameter { get; }
         public DelegateCommand<DropActionsConditionsArgs> OnDropConditions { get; set; }
         public DelegateCommand<DropActionsConditionsArgs> OnDropActions { get; set; }
-        public DelegateCommand<int?> OnDropItems { get; set; }
+        public DelegateCommand<DropActionsConditionsArgs> OnDropItems { get; set; }
 
         public AsyncAutoCommand<NewActionViewModel> AddAction { get; set; }
         public AsyncAutoCommand<NewConditionViewModel> AddCondition { get; set; }
@@ -948,9 +987,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand UndoCommand { get; set; }
         public DelegateCommand RedoCommand { get; set; }
 
-        public DelegateCommand CopyCommand { get; set; }
-        public DelegateCommand CutCommand { get; set; }
-        public DelegateCommand PasteCommand { get; set; }
+        public AsyncCommand CopyCommand { get; set; }
+        public AsyncCommand CutCommand { get; set; }
+        public AsyncCommand PasteCommand { get; set; }
+        public event Action? OnPaste;
         public DelegateCommand SaveCommand { get; set; }
         public DelegateCommand DeleteSelected { get; set; }
         public DelegateCommand EditSelected { get; set; }
@@ -1042,7 +1082,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 updateInspections = true;
             };
             
-            TeachingTips = AutoDispose(new SmartTeachingTips(teachingTipService, Script));
+            TeachingTips = AutoDispose(new SmartTeachingTips(teachingTipService, this, Script));
             Script.ScriptSelectedChanged += EventChildrenSelectionChanged;
             
             Together.Add(new NewActionViewModel());

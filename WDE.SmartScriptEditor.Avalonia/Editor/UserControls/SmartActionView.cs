@@ -12,9 +12,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
     /// </summary>
     public class SmartActionView : SelectableTemplatedControl
     {
-        public static AvaloniaProperty DeselectAllRequestProperty =
-            AvaloniaProperty.Register<SmartActionView, ICommand>(nameof(DeselectAllRequest));
-
         public static AvaloniaProperty DeselectAllButActionsRequestProperty =
             AvaloniaProperty.Register<SmartActionView, ICommand>(nameof(DeselectAllButActionsRequest));
 
@@ -27,12 +24,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         private int indent;
         public static readonly DirectProperty<SmartActionView, int> IndentProperty 
             = AvaloniaProperty.RegisterDirect<SmartActionView, int>("Indent", o => o.Indent, (o, v) => o.Indent = v);
-
-        public ICommand DeselectAllRequest
-        {
-            get => (ICommand) GetValue(DeselectAllRequestProperty);
-            set => SetValue(DeselectAllRequestProperty, value);
-        }
 
         public ICommand DeselectAllButActionsRequest
         {
@@ -57,28 +48,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             get { return indent; }
             set { SetAndRaise(IndentProperty, ref indent, value); }
         }
-
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        
+        protected override void DeselectOthers()
         {
-            base.OnPointerPressed(e);
-
-            if (e.ClickCount == 1)
-            {
-                if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
-                {
-                    return;
-                }
-
-                DeselectAllButActionsRequest?.Execute(null);
-               
-                if (!IsSelected)
-                {
-                    if (!e.KeyModifiers.HasFlag(MultiselectGesture))
-                        DeselectAllRequest?.Execute(null);
-                    IsSelected = true;
-                }
-                e.Handled = true;
-            }
+            DeselectAllButActionsRequest?.Execute(null);
         }
 
         protected override void OnDirectEdit(object context)

@@ -4,5 +4,7 @@
     {
         public int ActionIndex;
         public int EventIndex;
+        public bool Copy;
+        public bool Move => !Copy;
     }
 }
