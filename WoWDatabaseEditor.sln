@@ -151,7 +151,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{8A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Updater", "Updater", "{2616E90A-DE5D-41B4-A95F-352A62521D86}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services & Systems", "Services & Systems", "{4C553308-1140-42F2-B99C-90402248A983}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services and Systems", "Services and Systems", "{4C553308-1140-42F2-B99C-90402248A983}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaEdit", "AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj", "{728293D2-ADB0-49DF-90ED-194D810363B8}"
 EndProject
