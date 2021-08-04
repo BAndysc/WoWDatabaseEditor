@@ -40,6 +40,7 @@ namespace WoWDatabaseEditorCore.ModulesManagement.Configuration.ViewModels
         public ICommand Save { get; }
         public bool IsModified => false;
         public bool IsRestartRequired => false;
+        public ConfigurableGroup Group => ConfigurableGroup.Advanced;
     }
 
     internal class ModuleConfigModel

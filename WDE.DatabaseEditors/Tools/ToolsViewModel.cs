@@ -16,6 +16,7 @@ namespace WDE.DatabaseEditors.Tools
         public string ShortDescription => "This is not really settings, it is a tool to generate table definitions for new tables in your database";
         public bool IsModified => false;
         public bool IsRestartRequired => false;
+        public ConfigurableGroup Group => ConfigurableGroup.Advanced;
         private bool opened;
 
         public DefinitionGeneratorViewModel Definitions { get; }

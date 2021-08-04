@@ -54,8 +54,8 @@ namespace WDE.MySqlDatabaseCommon.ViewModels
         public SettingsViewModel WorldDatabase { get; } = new SettingsViewModel();
         public SettingsViewModel AuthDatabase { get; } = new SettingsViewModel();
         public bool IsModified => WorldDatabase.IsModified || AuthDatabase.IsModified;
-
         public bool IsRestartRequired => true;
+        public ConfigurableGroup Group => ConfigurableGroup.Basic;
     }
     
     public class SettingsViewModel : BindableBase, IDbAccess

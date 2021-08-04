@@ -12,7 +12,14 @@ namespace WDE.Common
         string? ShortDescription { get; }
         bool IsModified { get; }
         bool IsRestartRequired { get; }
+        ConfigurableGroup Group { get; }
         
         void ConfigurableOpened() { }
+    }
+
+    public enum ConfigurableGroup
+    {
+        Basic,
+        Advanced
     }
 }

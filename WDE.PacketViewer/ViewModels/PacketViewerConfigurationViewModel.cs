@@ -100,6 +100,7 @@ namespace WDE.PacketViewer.ViewModels
         public string? ShortDescription =>
             "WoW Database Editor has builtin integration with TrinityCore's Packet Parser.";
         public bool IsRestartRequired => false;
+        public ConfigurableGroup Group => ConfigurableGroup.Advanced;
     }
     
     public abstract class ParserSettingViewModel : BindableBase

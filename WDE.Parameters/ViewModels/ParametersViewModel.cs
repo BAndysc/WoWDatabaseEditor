@@ -46,5 +46,6 @@ namespace WDE.Parameters.ViewModels
         public bool IsModified => false;
 
         public bool IsRestartRequired => false;
+        public ConfigurableGroup Group => ConfigurableGroup.Advanced;
     }
 }

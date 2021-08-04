@@ -66,5 +66,6 @@ namespace WDE.Updater.ViewModels
             "WoW Database Editor can automatically check for updates. No personal data is sent during checking. You can change the behaviour or check for updates manually here."; 
         public bool IsModified => disableAutoUpdates != settings.Settings.DisableAutoUpdates || enableSilentUpdates != settings.Settings.EnableSilentUpdates;
         public bool IsRestartRequired => false;
+        public ConfigurableGroup Group => ConfigurableGroup.Basic;
     }
 }

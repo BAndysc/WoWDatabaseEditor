@@ -54,5 +54,6 @@ namespace WoWDatabaseEditorCore.CoreVersion.ViewModels
             "Choose which core version will you be working with. Particular modules (like SmartScripts module) can respect that.";
         public string Name => "Core version";
         public bool IsRestartRequired => true;
+        public ConfigurableGroup Group => ConfigurableGroup.Basic;
     }
 }

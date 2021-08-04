@@ -4,15 +4,16 @@
                    xmlns:prism="http://prismlibrary.com/"
                    xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
                    xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+                   xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
                    prism:ViewModelLocator.AutoWireViewModel="False">
     <UserControl.Resources>
         <converters:NullConverter x:Key="IsNullConverter" Inverted="true" />
     </UserControl.Resources>
     <Grid ColumnDefinitions="Auto,*">
-        <ListBox Items="{Binding ContainerTabItems}"
-            BorderThickness="0"
-            SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
-            <ListBox.ItemTemplate>
+        <controls:GroupingListBox Items="{Binding Groups}"
+                                  BorderThickness="0"
+                                  SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
+            <controls:GroupingListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Name}" />
@@ -27,8 +28,8 @@
                         </Interaction.Behaviors>
                     </StackPanel>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </controls:GroupingListBox.ItemTemplate>
+        </controls:GroupingListBox>
         <Border  Grid.Column="1" Background="{DynamicResource SlightlyHighlightedBackground}" Padding="15,7">
             <DockPanel LastChildFill="True"> 
                 <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedTabItem.Name}" FontSize="32" FontWeight="Light" />

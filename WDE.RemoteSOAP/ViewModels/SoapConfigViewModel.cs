@@ -130,5 +130,6 @@ namespace WDE.RemoteSOAP.ViewModels
         }
 
         public bool IsRestartRequired => true;
+        public ConfigurableGroup Group => ConfigurableGroup.Basic;
     }
 }

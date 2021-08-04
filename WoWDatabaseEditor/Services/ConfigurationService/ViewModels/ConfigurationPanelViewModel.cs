@@ -28,6 +28,8 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
 
             foreach (var tab in ContainerTabItems)
             {
+                GetGroup(tab.Group).Add(tab);
+                
                 tab.PropertyChanged += (sender, args) =>
                 {
                     if (args.PropertyName == nameof(tab.IsModified))
@@ -41,6 +43,17 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
             Save = new DelegateCommand(SaveAll);
         }
 
+        private ConfigurationGroupViewModel GetGroup(ConfigurableGroup group)
+        {
+            var firstOfDefault = Groups.FirstOrDefault(g => g.Group == group);
+            if (firstOfDefault != null)
+                return firstOfDefault;
+            var newGroup = new ConfigurationGroupViewModel(group);
+            Groups.Add(newGroup);
+            return newGroup;
+        }
+
+        public ObservableCollection<ConfigurationGroupViewModel> Groups { get; } = new();
         public ObservableCollection<IConfigurable> ContainerTabItems { get; set; }
         private IConfigurable? selectedTabItem;
         public IConfigurable? SelectedTabItem

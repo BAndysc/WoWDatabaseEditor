@@ -86,5 +86,6 @@ namespace WDE.DbcStore.ViewModels
         public ICommand PickFolder { get; }
 
         public bool IsRestartRequired => true;
+        public ConfigurableGroup Group => ConfigurableGroup.Basic;
     }
 }

@@ -51,6 +51,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
         public string Name => "Appearance";
         public string ShortDescription => "Wow Database Editor is supplied with few looks, check them out!";
         public bool IsRestartRequired => true;
+        public ConfigurableGroup Group => ConfigurableGroup.Basic;
 
         private bool isModified;
         public bool IsModified
