@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-
-namespace WDE.QuestChainEditor.Models
+﻿namespace WDE.QuestChainEditor.Models
 {
     public class QuestList : IEnumerable<Quest>
     {

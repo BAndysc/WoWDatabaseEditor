@@ -1,8 +1,5 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
 using WDE.Common.Factories;
-using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.Updater.Models;
 

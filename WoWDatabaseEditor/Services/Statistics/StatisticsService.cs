@@ -1,5 +1,4 @@
 using System;
-using Prism.Events;
 using WDE.Common.Factories.Http;
 using WDE.Common.Services;
 using WDE.Module.Attributes;

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using WDE.Blueprints.Data;
+﻿using WDE.Blueprints.Data;
 
 namespace WDE.Blueprints.Managers
 {

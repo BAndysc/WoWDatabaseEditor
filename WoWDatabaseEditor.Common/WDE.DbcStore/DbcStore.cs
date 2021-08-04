@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using Prism.Events;
-using WDBXEditor.Reader;
 using WDBXEditor.Storage;
-using WDE.Common;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Services.MessageBox;

@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-
-namespace WDE.Blueprints.Editor.Views
+﻿namespace WDE.Blueprints.Editor.Views
 {
     /// <summary>
     ///     Interaction logic for TriangleConnectorView.xaml

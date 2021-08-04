@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using WDE.Common.Database;
 using WDE.PacketViewer.ViewModels;
 
 namespace WDE.PacketViewer.Filtering.Antlr

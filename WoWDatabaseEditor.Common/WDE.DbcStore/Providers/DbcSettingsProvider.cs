@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Windows;
-using Newtonsoft.Json;
-using WDE.Common.Services;
+﻿using WDE.Common.Services;
 using WDE.DbcStore.Data;
 using WDE.Module.Attributes;
 

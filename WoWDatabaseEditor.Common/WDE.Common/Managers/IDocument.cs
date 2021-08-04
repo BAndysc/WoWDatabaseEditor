@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
-using WDE.Common.Annotations;
 using WDE.Common.History;
 using WDE.Common.Types;
 

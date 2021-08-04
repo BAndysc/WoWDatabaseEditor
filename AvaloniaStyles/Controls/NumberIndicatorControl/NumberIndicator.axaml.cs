@@ -1,10 +1,7 @@
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia;
-using Avalonia.Collections;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using JetBrains.Annotations;
 
@@ -36,7 +33,7 @@ namespace AvaloniaStyles.Controls
                             o.items[(int)nnew].IsActive = true; 
                 });
             
-            StepsCountProperty.Changed.AddClassHandler<NumberIndicator>((o, e) =>
+            StepsCountProperty.Changed.AddClassHandler<NumberIndicator>((o, _) =>
             {
                 while (o.items.Count > o.stepsCount)
                     o.items.RemoveAt(o.items.Count - 1);

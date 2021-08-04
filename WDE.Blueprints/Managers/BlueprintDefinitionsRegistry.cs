@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using WDE.Blueprints.Data;
+﻿using WDE.Blueprints.Data;
 using WDE.Module.Attributes;
 
 namespace WDE.Blueprints.Managers

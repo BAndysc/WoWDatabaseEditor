@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WDE.Common.DBC;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Database

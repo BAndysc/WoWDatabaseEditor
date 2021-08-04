@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using WDE.Blueprints.Enums;
+﻿using WDE.Blueprints.Enums;
 
 namespace WDE.Blueprints.Data
 {

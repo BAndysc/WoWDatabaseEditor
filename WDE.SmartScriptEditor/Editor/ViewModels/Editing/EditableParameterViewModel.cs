@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Prism.Commands;
 using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.MVVM;
@@ -9,7 +8,6 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Utils;
 using WDE.Parameters.Models;
-using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 {

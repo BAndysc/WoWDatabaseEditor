@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows.Input;

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using WDE.QuestChainEditor.Models;
+﻿using WDE.QuestChainEditor.Models;
 
 namespace WDE.QuestChainEditor.Providers
 {

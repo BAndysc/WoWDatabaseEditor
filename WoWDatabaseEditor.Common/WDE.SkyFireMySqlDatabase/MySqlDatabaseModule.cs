@@ -1,6 +1,5 @@
 ﻿using Prism.Ioc;
 using WDE.Common.Database;
-using WDE.Common.Windows;
 using WDE.Module;
 using WDE.Module.Attributes;
 using WDE.MySqlDatabaseCommon.Database;

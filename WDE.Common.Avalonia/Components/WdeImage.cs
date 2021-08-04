@@ -4,7 +4,6 @@ using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using AvaloniaStyles;
 using WDE.Common.Tasks;
 using WDE.Common.Types;

@@ -3,21 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using Prism.Commands;
-using Prism.Mvvm;
-using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
-using WoWDatabaseEditorCore.Extensions;
 
 namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 {

@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Reactive.Linq;
-using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Avalonia.Styling;
 using Avalonia.VisualTree;
-using Microsoft.CSharp.RuntimeBinder;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 using WDE.Common.Windows;

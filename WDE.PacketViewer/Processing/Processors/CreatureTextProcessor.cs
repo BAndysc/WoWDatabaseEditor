@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using WDE.Common.Database;
 using WoWPacketParser.Proto;

@@ -1,7 +1,5 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using AvaloniaStyles;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {

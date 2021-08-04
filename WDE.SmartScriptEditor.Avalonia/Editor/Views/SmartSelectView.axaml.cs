@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
 using WDE.Common.Avalonia.Controls;
 

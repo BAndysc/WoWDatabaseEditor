@@ -1,5 +1,3 @@
-using WDE.Common.Annotations;
-
 namespace WDE.Common.Database
 {
     public interface INpcText

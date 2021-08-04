@@ -1,5 +1,4 @@
-﻿using Dock.Model.Controls;
-using Dock.Model.ReactiveUI.Controls;
+﻿using Dock.Model.ReactiveUI.Controls;
 using ITool = WDE.Common.Windows.ITool;
 
 namespace WoWDatabaseEditorCore.Avalonia.Docking

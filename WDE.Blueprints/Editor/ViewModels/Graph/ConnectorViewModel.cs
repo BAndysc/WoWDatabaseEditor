@@ -1,8 +1,4 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Media;
-using Prism.Mvvm;
-using WDE.Blueprints.Enums;
+﻿using WDE.Blueprints.Enums;
 
 namespace WDE.Blueprints.Editor.ViewModels
 {

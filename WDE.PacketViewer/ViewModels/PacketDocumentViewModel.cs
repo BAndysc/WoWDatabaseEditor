@@ -340,7 +340,7 @@ namespace WDE.PacketViewer.ViewModels
             }
             catch (Exception e)
             {
-                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Filtering error")
                     .SetMainInstruction("Filtering error")
                     .SetContent(e.Message)

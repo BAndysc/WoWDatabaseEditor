@@ -6,7 +6,6 @@ using WDE.Common.Menu;
 using WDE.Common.Parameters;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
-using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors;
 using WDE.TrinitySmartScriptEditor.Models;

@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using WDE.Common.Database;
 using WDE.Common.Documents;
 using WDE.Common.Managers;
@@ -53,7 +50,7 @@ namespace WDE.SourceCodeIntegrationEditor.ViewModels
         protected override void OnChangeStep(uint old, uint nnew)
         {
             if (old == StepTcPath && nnew == StepPickItems)
-                Load();
+                Load().ListenErrors();
             if (old == StepPickItems && nnew == StepDetails)
             {
                 ChosenCommands.Clear();

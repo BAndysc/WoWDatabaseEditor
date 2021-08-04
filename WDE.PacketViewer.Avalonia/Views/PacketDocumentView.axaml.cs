@@ -1,8 +1,5 @@
 using System;
-using System.IO;
 using System.Text;
-using System.Xml;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -12,9 +9,6 @@ using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
-using AvaloniaEdit.Highlighting;
-using AvaloniaEdit.Highlighting.Xshd;
-using AvaloniaStyles;
 using WDE.PacketViewer.Structures;
 using WDE.PacketViewer.ViewModels;
 

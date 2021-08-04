@@ -1,7 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Reflection;
 using WDE.MVVM.Observable;
 
 namespace WDE.MVVM

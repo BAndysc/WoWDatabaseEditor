@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Data;
-using WDE.QuestChainEditor.Models;
+﻿using WDE.QuestChainEditor.Models;
 
 namespace WDE.QuestChainEditor.Editor.DisignTimeViewModels
 {

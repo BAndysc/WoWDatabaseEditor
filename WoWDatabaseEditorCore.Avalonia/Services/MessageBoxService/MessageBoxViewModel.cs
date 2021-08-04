@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using Prism.Commands;
-using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.MVVM;
 

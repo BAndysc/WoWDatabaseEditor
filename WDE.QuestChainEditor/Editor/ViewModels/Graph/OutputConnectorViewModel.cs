@@ -1,7 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Media;
-
-namespace WDE.QuestChainEditor.Editor.ViewModels
+﻿namespace WDE.QuestChainEditor.Editor.ViewModels
 {
     public class OutputConnectorViewModel : ConnectorViewModel
     {

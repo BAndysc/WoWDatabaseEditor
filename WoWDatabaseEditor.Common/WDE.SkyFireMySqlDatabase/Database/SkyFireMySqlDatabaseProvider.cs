@@ -12,7 +12,6 @@ using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.SkyFireMySqlDatabase.Models;
-using WDE.SkyFireMySqlDatabase.Providers;
 
 namespace WDE.SkyFireMySqlDatabase.Database
 {

@@ -12,7 +12,6 @@ using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.TrinityMySqlDatabase.Models;
-using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase.Database
 {

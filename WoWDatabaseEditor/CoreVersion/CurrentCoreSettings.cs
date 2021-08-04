@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Newtonsoft.Json;
-using WDE.Common.CoreVersion;
+﻿using WDE.Common.CoreVersion;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 

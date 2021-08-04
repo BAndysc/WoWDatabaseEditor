@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Input.Platform;
+﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls

@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
-using WDE.Common.Tasks;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Loaders;
-using WDE.DatabaseEditors.ViewModels;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.DatabaseEditors.ViewModels.Template;
 using WDE.Module.Attributes;

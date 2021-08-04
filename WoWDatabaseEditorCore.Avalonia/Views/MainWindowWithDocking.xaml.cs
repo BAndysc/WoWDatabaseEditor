@@ -12,6 +12,7 @@ using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 using WoWDatabaseEditorCore.Avalonia.Docking;
 using WoWDatabaseEditorCore.Avalonia.Docking.Serialization;
 using WoWDatabaseEditorCore.ViewModels;
@@ -91,7 +92,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 JsonConvert.SerializeObject(avaloniaDockAdapter.SerializeDock(), Formatting.Indented));
             if (!realClosing && DataContext is MainWindowViewModel closeAwareViewModel)
             {
-                TryClose(closeAwareViewModel);
+                TryClose(closeAwareViewModel).ListenErrors();
                 e.Cancel = true;
             }
         }

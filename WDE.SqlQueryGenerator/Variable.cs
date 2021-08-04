@@ -1,5 +1,3 @@
-using System;
-
 namespace WDE.SqlQueryGenerator
 {
     internal class Variable : IVariable

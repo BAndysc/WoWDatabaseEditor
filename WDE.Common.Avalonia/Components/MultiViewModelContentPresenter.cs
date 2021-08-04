@@ -17,11 +17,11 @@ namespace WDE.Common.Avalonia.Components
         public static readonly DirectProperty<MultiViewModelContentPresenter, IEnumerable> ViewModelsProperty =
             AvaloniaProperty.RegisterDirect<MultiViewModelContentPresenter, IEnumerable>(nameof(ViewModels), o => o.ViewModels, (o, v) => o.ViewModels = v);
 
-        private IEnumerable _items = new AvaloniaList<object>();
+        private IEnumerable items = new AvaloniaList<object>();
         public IEnumerable ViewModels
         {
-            get => _items;
-            set => SetAndRaise(ViewModelsProperty, ref _items, value);
+            get => items;
+            set => SetAndRaise(ViewModelsProperty, ref items, value);
         }
         
         public static readonly DirectProperty<MultiViewModelContentPresenter, IControl?> SelectedViewProperty =

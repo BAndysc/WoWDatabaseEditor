@@ -1,5 +1,4 @@
-﻿using System;
-using Prism.Events;
+﻿using Prism.Events;
 using Prism.Ioc;
 using WDE.Common.Events;
 using WDE.Module;

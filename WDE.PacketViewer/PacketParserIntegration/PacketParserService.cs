@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
-using WoWPacketParser.Proto;
 
 namespace WDE.PacketViewer.PacketParserIntegration
 {

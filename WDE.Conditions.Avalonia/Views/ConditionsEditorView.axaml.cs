@@ -1,7 +1,4 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
 using WDE.Common.Avalonia.Controls;
 
 namespace WDE.Conditions.Avalonia.Views

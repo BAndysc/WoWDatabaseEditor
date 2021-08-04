@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using Newtonsoft.Json;
 using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
-using WDE.Common.Utils;
 using WDE.MVVM.Observable;
-using WDE.Parameters.Models;
 using WDE.Parameters.Providers;
 
 namespace WDE.Parameters

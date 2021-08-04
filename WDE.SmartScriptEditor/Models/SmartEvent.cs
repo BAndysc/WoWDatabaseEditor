@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -8,10 +7,8 @@ using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
-using WDE.Common.Annotations;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
-using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Models
 {

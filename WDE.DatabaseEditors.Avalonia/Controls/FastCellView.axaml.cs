@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Windows.Input;
 using Avalonia;
@@ -14,7 +10,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
-using Avalonia.Media;
 using Avalonia.VisualTree;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls

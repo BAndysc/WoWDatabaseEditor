@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using Prism.Mvvm;
-
-namespace WDE.Blueprints.Editor.ViewModels
+﻿namespace WDE.Blueprints.Editor.ViewModels
 {
     public class GraphViewModel : BindableBase
     {

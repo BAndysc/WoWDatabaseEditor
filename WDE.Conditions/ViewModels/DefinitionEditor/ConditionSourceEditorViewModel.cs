@@ -10,7 +10,6 @@ using Prism.Commands;
 using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
-using WDE.Common.Utils;
 using WDE.Conditions.Data;
 
 namespace WDE.Conditions.ViewModels

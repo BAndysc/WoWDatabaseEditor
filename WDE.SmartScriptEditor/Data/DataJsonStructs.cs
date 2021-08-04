@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
-using WDE.SmartScriptEditor.Inspections;
 using WDE.SmartScriptEditor.Utils;
 
 namespace WDE.SmartScriptEditor.Data

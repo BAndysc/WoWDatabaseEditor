@@ -8,10 +8,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
 using WDE.Common.Types;
-using WDE.Common.Utils;
 using WDE.MVVM.Observable;
-using WoWDatabaseEditorCore.Extensions;
-using WoWDatabaseEditorCore.Services.ItemFromListSelectorService;
 
 namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 {

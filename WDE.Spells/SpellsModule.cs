@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using AsyncAwaitBestPractices;
 using Prism.Events;
 using Prism.Ioc;
 using WDE.Common.Database;

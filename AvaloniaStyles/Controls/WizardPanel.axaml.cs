@@ -9,7 +9,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml.Templates;
 using Avalonia.Metadata;
-using Avalonia.VisualTree;
 using AvaloniaStyles.Utils;
 
 namespace AvaloniaStyles.Controls

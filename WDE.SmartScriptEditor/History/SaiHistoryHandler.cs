@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Utils;
-using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;

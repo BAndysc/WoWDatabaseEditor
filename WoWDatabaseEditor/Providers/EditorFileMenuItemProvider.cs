@@ -18,7 +18,6 @@ using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.Solutions;
 using WoWDatabaseEditorCore.Managers;
-using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Providers
 {

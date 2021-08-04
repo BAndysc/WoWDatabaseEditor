@@ -7,6 +7,7 @@ using DynamicData;
 using Prism.Mvvm;
 using WDE.Common.Database;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.Module.Attributes;
@@ -29,7 +30,7 @@ namespace WDE.DatabaseEditors.Tools
             {
                 SetProperty(ref selectedDefinition, value);
                 if (value != null)
-                    Evaluate(value);
+                    Evaluate(value).ListenErrors();
             }
         }
 

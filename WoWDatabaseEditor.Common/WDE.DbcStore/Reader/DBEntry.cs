@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Windows;
 using WDBXEditor.Reader;
 using WDBXEditor.Reader.FileTypes;
 using static WDBXEditor.Common.Constants;

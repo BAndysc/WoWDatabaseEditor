@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Media;
-using Prism.Mvvm;
-using WDE.Blueprints.Enums;
+﻿using WDE.Blueprints.Enums;
 
 namespace WDE.Blueprints.Editor.ViewModels
 {

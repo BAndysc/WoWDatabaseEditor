@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using WDE.Common.Database;
+﻿using WDE.Common.Database;
 using WDE.QuestChainEditor.Models;
 
 namespace WDE.QuestChainEditor.Providers

@@ -3,8 +3,6 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Platform;
@@ -23,8 +21,8 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<ToolBar> ToolBarProperty =
             AvaloniaProperty.Register<ExtendedWindow, ToolBar>(nameof(ToolBar));
 
-        public static readonly StyledProperty<IControl> SideBarProperty =
-            AvaloniaProperty.Register<ExtendedWindow, IControl>(nameof(SideBar));
+        public static readonly StyledProperty<IControl?> SideBarProperty =
+            AvaloniaProperty.Register<ExtendedWindow, IControl?>(nameof(SideBar));
         
         public static readonly StyledProperty<StatusBar> StatusBarProperty =
             AvaloniaProperty.Register<ExtendedWindow, StatusBar>(nameof(StatusBar));
@@ -53,7 +51,7 @@ namespace AvaloniaStyles.Controls
             set => SetValue(ToolBarProperty, value);
         }
         
-        public IControl SideBar
+        public IControl? SideBar
         {
             get => GetValue(SideBarProperty);
             set => SetValue(SideBarProperty, value);
@@ -81,7 +79,7 @@ namespace AvaloniaStyles.Controls
         
         static ExtendedWindow()
         {
-            IsActiveProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) =>
+            IsActiveProperty.Changed.AddClassHandler<ExtendedWindow>((x, _) =>
                 x.PseudoClasses.Set(":focused", x.IsActive));
             ToolBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-toolbar"));
             SideBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-sidebar"));

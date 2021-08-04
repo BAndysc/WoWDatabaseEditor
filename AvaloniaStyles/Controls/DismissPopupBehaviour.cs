@@ -3,7 +3,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using Avalonia.VisualTree;
 using Avalonia.Xaml.Interactivity;
 
 namespace AvaloniaStyles.Controls

@@ -1,5 +1,3 @@
-using System.IO;
-using System.Text;
 using NSubstitute;
 using NUnit.Framework;
 using WDE.Common.Services;

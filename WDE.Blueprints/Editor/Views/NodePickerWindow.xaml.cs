@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows;
-
-namespace WDE.Blueprints.Editor.Views
+﻿namespace WDE.Blueprints.Editor.Views
 {
     /// <summary>
     ///     Interaction logic for NodePickerWindow.xaml

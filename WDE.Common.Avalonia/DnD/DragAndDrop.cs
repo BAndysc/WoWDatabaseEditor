@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +13,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
+using WDE.Common.Utils;
 using WDE.Common.Utils.DragDrop;
 using DragDropEffects = Avalonia.Input.DragDropEffects;
 
@@ -134,7 +134,7 @@ namespace WDE.Common.Avalonia.DnD
                 draggedIndex = new List<int>(){0}
             });
 
-            DoDrag(e, treeView, data);
+            DoDrag(e, treeView, data).ListenErrors();
         }
         
         private static void OnGridViewPreviewMouseMove(object? sender, PointerEventArgs e)
@@ -163,7 +163,7 @@ namespace WDE.Common.Avalonia.DnD
                 draggedIndex = listBox.ListBoxImpl!.Selection.SelectedIndexes
             });
                     
-            DoDrag(e, listBox.ListBoxImpl!, data);
+            DoDrag(e, listBox.ListBoxImpl!, data).ListenErrors();
         }
             
         private static void OnListPreviewMouseMove(object? sender, PointerEventArgs e)
@@ -192,7 +192,7 @@ namespace WDE.Common.Avalonia.DnD
                 draggedIndex = listBox.Selection.SelectedIndexes
             });
                     
-            DoDrag(e, listBox, data);
+            DoDrag(e, listBox, data).ListenErrors();
         }
 
         private static async Task DoDrag(PointerEventArgs e, IVisual listBox, DataObject data)

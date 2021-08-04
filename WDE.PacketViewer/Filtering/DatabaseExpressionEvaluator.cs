@@ -1,5 +1,4 @@
 using Antlr4.Runtime;
-using WDE.Common.Database;
 using WDE.PacketViewer.Filtering.Antlr;
 using WDE.PacketViewer.ViewModels;
 using WoWPacketParser.Proto;

@@ -1,15 +1,9 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.Styling;
-using Avalonia.Styling;
-using Avalonia.Threading;
 using AvaloniaStyles.Controls;
-using DynamicData;
 
 namespace AvaloniaStyles.Demo
 {

@@ -5,8 +5,6 @@ using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
-using WDE.MVVM;
-using WDE.MVVM.Observable;
 using WDE.RemoteSOAP.Providers;
 using WDE.RemoteSOAP.Services;
 using WDE.RemoteSOAP.Services.Soap;

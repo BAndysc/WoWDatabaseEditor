@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace WDE.QuestChainEditor.Models
+﻿namespace WDE.QuestChainEditor.Models
 {
     public class Quest
     {

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Windows;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Windows

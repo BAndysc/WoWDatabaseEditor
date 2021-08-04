@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using WDE.Common.Database;
 using WDE.Common.Parameters;
 
 namespace WDE.Conditions.ViewModels

@@ -50,7 +50,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private HashSet<uint> keys = new();
 
         public AsyncAutoCommand AddNewCommand { get; }
-        public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
+        public AsyncAutoCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> EditConditionsCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
@@ -87,7 +87,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.conditionEditService = conditionEditService;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
-            RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
+            RemoveTemplateCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
             RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && (vm.TableField?.IsModified ?? false));
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             DuplicateCommand = new DelegateCommand<DatabaseCellViewModel?>(Duplicate, vm => vm != null);
@@ -201,12 +201,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             view.ParameterValue?.Revert();
         }
 
-        private void RemoveTemplate(DatabaseCellViewModel? view)
+        private async Task RemoveTemplate(DatabaseCellViewModel? view)
         {
             if (view == null)
                 return;
 
-            RemoveEntity(view.ParentEntity);
+            await RemoveEntity(view.ParentEntity);
         }
 
         private Task EditParameter(DatabaseCellViewModel cell)

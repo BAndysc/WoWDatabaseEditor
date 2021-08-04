@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Prism.Ioc;
 using Prism.Modularity;
 using Unity;
-using Unity.Extension;
-using Unity.Lifetime;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 

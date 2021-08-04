@@ -3,8 +3,6 @@ using Avalonia.Controls;
 using System;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Styling;
-using Avalonia.Threading;
 
 namespace WDE.Common.Avalonia.Utils
 {

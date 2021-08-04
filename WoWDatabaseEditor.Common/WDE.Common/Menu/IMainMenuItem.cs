@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using WDE.Common.Annotations;
+﻿using System.Collections.Generic;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Menu

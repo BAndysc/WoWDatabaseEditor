@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using WDE.Module.Attributes;
-using WoWPacketParser.Proto;
 
 namespace WDE.PacketViewer.PacketParserIntegration
 {

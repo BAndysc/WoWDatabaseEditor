@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Events;
-using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
-using WDE.Common.Windows;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService;
 using WoWDatabaseEditorCore.Avalonia.Views;
@@ -31,7 +30,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         private void OnLoaded()
         {
             loaded = true;
-            ExecutePending();
+            ExecutePending().ListenErrors();
         }
 
         private async Task ExecutePending()

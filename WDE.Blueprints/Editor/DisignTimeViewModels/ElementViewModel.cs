@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Media;
-using WDE.Blueprints.Enums;
+﻿using WDE.Blueprints.Enums;
 
 namespace WDE.Blueprints.Editor.DisignTimeViewModels
 {

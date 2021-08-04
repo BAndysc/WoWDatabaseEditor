@@ -2,13 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Windows;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
-using WDE.Conditions.Data;
 using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models.Helpers;

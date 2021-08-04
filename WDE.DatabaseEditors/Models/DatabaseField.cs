@@ -6,7 +6,6 @@ using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.History;
 using WDE.Common.Utils;
-using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models

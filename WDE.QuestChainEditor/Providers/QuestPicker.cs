@@ -1,5 +1,4 @@
-﻿using ExtensionMethods;
-using WDE.Module.Attributes;
+﻿using WDE.Module.Attributes;
 using WDE.QuestChainEditor.Editor.ViewModels;
 using WDE.QuestChainEditor.Editor.Views;
 using WDE.QuestChainEditor.Models;

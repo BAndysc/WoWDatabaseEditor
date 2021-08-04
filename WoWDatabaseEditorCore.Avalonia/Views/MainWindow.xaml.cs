@@ -4,12 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
-using Avalonia.Platform;
 using AvaloniaStyles.Controls;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WoWDatabaseEditorCore.ViewModels;
 
@@ -83,7 +81,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             base.OnClosing(e);
             if (!realClosing && DataContext is MainWindowViewModel closeAwareViewModel)
             {
-                TryClose(closeAwareViewModel);
+                TryClose(closeAwareViewModel).ListenErrors();
                 e.Cancel = true;
             }
         }

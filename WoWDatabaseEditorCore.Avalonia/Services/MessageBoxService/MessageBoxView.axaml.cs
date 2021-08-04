@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;

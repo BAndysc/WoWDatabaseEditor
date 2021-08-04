@@ -1,6 +1,5 @@
 ﻿using System.Windows.Input;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using WDE.Common.Avalonia.Controls;
 using AvaloniaProperty = Avalonia.AvaloniaProperty;
 

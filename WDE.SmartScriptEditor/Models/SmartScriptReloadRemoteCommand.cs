@@ -1,5 +1,4 @@
-﻿using System;
-using WDE.Common.Services;
+﻿using WDE.Common.Services;
 
 namespace WDE.SmartScriptEditor.Models
 {

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Database;
-using WDE.Common.Events;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;

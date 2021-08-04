@@ -2,10 +2,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Templates;
 using WDE.DatabaseEditors.Models;
-using WDE.DatabaseEditors.ViewModels;
 using WDE.DatabaseEditors.ViewModels.Template;
 using WDE.Parameters;
-using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.Avalonia.Helpers
 {

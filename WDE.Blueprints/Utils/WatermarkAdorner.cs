@@ -1,10 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Media;
-
-namespace WDE.Blueprints.Utils
+﻿namespace WDE.Blueprints.Utils
 {
     /// <summary>
     ///     Adorner for the watermark

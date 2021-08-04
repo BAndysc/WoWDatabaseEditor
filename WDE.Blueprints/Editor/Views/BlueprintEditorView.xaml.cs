@@ -1,7 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using WDE.Blueprints.Editor.ViewModels;
+﻿using WDE.Blueprints.Editor.ViewModels;
 
 namespace WDE.Blueprints.Editor.Views
 {

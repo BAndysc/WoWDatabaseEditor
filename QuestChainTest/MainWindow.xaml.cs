@@ -1,20 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows;
-using WDE.Common.CoreVersion;
-using WDE.Common.Database;
-using WDE.Common.Tasks;
-using WDE.MySqlDatabaseCommon.Services;
-using WDE.QuestChainEditor.Editor.ViewModels;
-using WDE.QuestChainEditor.Exporter;
-using WDE.QuestChainEditor.Models;
-using WDE.QuestChainEditor.Providers;
-using WDE.TrinityMySqlDatabase;
-using WDE.TrinityMySqlDatabase.Database;
-using WDE.TrinityMySqlDatabase.Providers;
-
-namespace QuestChainTest
+﻿namespace QuestChainTest
 {
     /// <summary>
     ///     Interaction logic for MainWindow.xaml

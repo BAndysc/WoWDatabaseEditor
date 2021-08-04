@@ -1,5 +1,4 @@
-﻿using System.IO;
-using WDE.Module.Attributes;
+﻿using WDE.Module.Attributes;
 
 namespace WDE.Blueprints.Managers
 {

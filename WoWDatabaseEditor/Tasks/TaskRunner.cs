@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using SmartFormat.Utilities;
 using WDE.Common.Tasks;
-using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Tasks

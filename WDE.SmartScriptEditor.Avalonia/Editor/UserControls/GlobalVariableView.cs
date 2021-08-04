@@ -1,11 +1,6 @@
 ﻿using System.Windows.Input;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
-using Avalonia.Threading;
-using WDE.Common.Avalonia.Controls;
-using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {

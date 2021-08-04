@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Mvvm;
 using Prism.Commands;
@@ -27,7 +28,7 @@ namespace WDE.Conditions.ViewModels
             Save = new DelegateCommand(() => CloseOk?.Invoke());
             DeleteParam = new DelegateCommand(DeleteItem);
             EditParam = new AsyncCommand<ConditionParameterJsonData?>(EditItem);
-            AddParam = new DelegateCommand(AddItem);
+            AddParam = new AsyncAutoCommand(async () => await OpenEditor(new ConditionParameterJsonData(), true));
         }
         
         public ConditionEditorData Source { get; }
@@ -36,17 +37,12 @@ namespace WDE.Conditions.ViewModels
         public DelegateCommand Save { get; }
         public DelegateCommand DeleteParam { get; }
         public AsyncCommand<ConditionParameterJsonData?> EditParam { get; }
-        public DelegateCommand AddParam { get; }
+        public ICommand AddParam { get; }
 
         private void DeleteItem()
         {
             if (SelectedParamIndex >= 0)
                 Source.Parameters.RemoveAt(SelectedParamIndex);
-        }
-        
-        private void AddItem()
-        {
-            OpenEditor(new ConditionParameterJsonData(), true);
         }
 
         private async Task EditItem(ConditionParameterJsonData? item)

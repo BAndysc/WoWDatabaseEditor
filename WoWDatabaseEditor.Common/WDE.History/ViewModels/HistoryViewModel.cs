@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Windows;
 using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common.Events;

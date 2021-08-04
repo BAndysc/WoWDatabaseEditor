@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Media;
-using WDE.Blueprints.Enums;
+﻿using WDE.Blueprints.Enums;
 
 namespace WDE.Blueprints.Editor.ViewModels
 {

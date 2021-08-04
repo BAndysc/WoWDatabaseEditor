@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.Updater.Data;

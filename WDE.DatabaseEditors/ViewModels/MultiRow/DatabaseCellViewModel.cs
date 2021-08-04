@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.MVVM;

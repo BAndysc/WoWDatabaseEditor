@@ -1,10 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Media;
-
-namespace WDE.QuestChainEditor.Utils
+﻿namespace WDE.QuestChainEditor.Utils
 {
     /// <summary>
     ///     Adorner for the watermark

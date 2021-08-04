@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using Prism.Mvvm;
-using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow

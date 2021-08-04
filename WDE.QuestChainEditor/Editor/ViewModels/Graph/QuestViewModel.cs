@@ -1,5 +1,4 @@
-﻿using System.Windows.Media;
-using WDE.QuestChainEditor.Models;
+﻿using WDE.QuestChainEditor.Models;
 
 namespace WDE.QuestChainEditor.Editor.ViewModels
 {

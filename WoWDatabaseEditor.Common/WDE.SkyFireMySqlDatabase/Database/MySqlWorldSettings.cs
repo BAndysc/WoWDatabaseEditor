@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using LinqToDB.Configuration;
 using WDE.MySqlDatabaseCommon.Providers;
-using WDE.SkyFireMySqlDatabase.Data;
 
 namespace WDE.SkyFireMySqlDatabase.Database
 {

@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Antlr4.Runtime;
 using DynamicData;
 using Prism.Commands;
 using Prism.Events;
@@ -49,7 +48,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
         public SourceList<DatabaseRowViewModel> Rows { get; } = new();
         
-        public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
+        public AsyncAutoCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
@@ -102,7 +101,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 }, b => throw b));
             FilteredRows = filteredFields;
 
-            RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
+            RemoveTemplateCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
             RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.IsModified);
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
@@ -189,12 +188,12 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             await mySqlExecutor.ExecuteSql(query);
         }
 
-        private void RemoveTemplate(DatabaseCellViewModel? view)
+        private async Task RemoveTemplate(DatabaseCellViewModel? view)
         {
             if (view == null)
                 return;
 
-            RemoveEntity(view.ParentEntity);
+            await RemoveEntity(view.ParentEntity);
         }
 
         private DatabaseRowsGroupViewModel GroupCreate(IGroup<DatabaseRowViewModel, (string CategoryName, int CategoryIndex)> @group)

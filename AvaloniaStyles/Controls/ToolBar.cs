@@ -1,8 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
-using Avalonia.Metadata;
 
 namespace AvaloniaStyles.Controls
 {

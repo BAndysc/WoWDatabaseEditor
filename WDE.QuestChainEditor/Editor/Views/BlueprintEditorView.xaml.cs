@@ -1,7 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using WDE.QuestChainEditor.Editor.ViewModels;
+﻿using WDE.QuestChainEditor.Editor.ViewModels;
 
 namespace WDE.QuestChainEditor.Editor.Views
 {

@@ -1,4 +1,3 @@
-using WDE.PacketViewer.Processing;
 using WoWPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 

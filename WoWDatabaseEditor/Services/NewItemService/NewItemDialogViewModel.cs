@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
-using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.NewItemService

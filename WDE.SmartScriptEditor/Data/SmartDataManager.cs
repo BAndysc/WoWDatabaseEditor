@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using WDE.Common.Database;
 using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor.Data

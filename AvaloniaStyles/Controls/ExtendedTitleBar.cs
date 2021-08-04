@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
-using Avalonia.Metadata;
 
 namespace AvaloniaStyles.Controls
 {

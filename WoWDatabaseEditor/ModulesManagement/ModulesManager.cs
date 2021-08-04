@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.CoreVersion;
 

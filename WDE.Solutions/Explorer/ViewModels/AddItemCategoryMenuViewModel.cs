@@ -3,11 +3,8 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
-using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common;
-using WDE.Common.Events;
-using WDE.Common.Utils;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {

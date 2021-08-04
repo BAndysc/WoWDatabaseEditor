@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using WDE.Common.Menu;
 using WDE.Common.Windows;
 
 namespace WDE.Common.Avalonia.Utils

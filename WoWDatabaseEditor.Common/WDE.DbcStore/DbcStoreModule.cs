@@ -1,6 +1,4 @@
-﻿using Prism.Events;
-using Prism.Ioc;
-using WDE.Common.Events;
+﻿using Prism.Ioc;
 using WDE.Module;
 using WDE.Module.Attributes;
 

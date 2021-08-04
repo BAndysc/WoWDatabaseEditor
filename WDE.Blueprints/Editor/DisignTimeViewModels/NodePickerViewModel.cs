@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Data;
-
-namespace WDE.Blueprints.Editor.DisignTimeViewModels
+﻿namespace WDE.Blueprints.Editor.DisignTimeViewModels
 {
     internal class NodePickerViewModel
     {

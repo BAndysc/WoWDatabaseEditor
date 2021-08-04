@@ -1,9 +1,4 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Media;
-using Prism.Mvvm;
-
-namespace WDE.QuestChainEditor.Editor.ViewModels
+﻿namespace WDE.QuestChainEditor.Editor.ViewModels
 {
     public abstract class ConnectorViewModel : BindableBase
     {

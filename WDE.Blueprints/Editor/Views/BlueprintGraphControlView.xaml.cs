@@ -1,7 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using GeminiGraphEditor;
+﻿using GeminiGraphEditor;
 using WDE.Blueprints.Editor.ViewModels;
 
 namespace WDE.Blueprints.Editor.Views

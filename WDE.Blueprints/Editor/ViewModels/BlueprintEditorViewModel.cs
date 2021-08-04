@@ -1,8 +1,4 @@
-﻿using System.Windows.Input;
-using AsyncAwaitBestPractices.MVVM;
-using ExtensionMethods;
-using Prism.Mvvm;
-using WDE.Blueprints.Data;
+﻿using WDE.Blueprints.Data;
 using WDE.Blueprints.Editor.Views;
 using WDE.Blueprints.Enums;
 using WDE.Common.History;

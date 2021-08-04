@@ -1,21 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Prism.Events;
 using Prism.Ioc;
 using WDE.Common.Database;
 using WDE.Common.Events;
-using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
-using WDE.Common.Tasks;
 using WDE.Module.Attributes;
-using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.TrinityMySqlDatabase.Database;
-using WDE.TrinityMySqlDatabase.Models;
-using WDE.TrinityMySqlDatabase.Providers;
 
 namespace WDE.TrinityMySqlDatabase
 {

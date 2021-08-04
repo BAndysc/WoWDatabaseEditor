@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Media;
-
-namespace WDE.QuestChainEditor.Editor.DisignTimeViewModels
+﻿namespace WDE.QuestChainEditor.Editor.DisignTimeViewModels
 {
     internal class ElementViewModel
     {

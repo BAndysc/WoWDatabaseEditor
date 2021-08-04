@@ -1,5 +1,4 @@
-﻿using System;
-using WDE.Module;
+﻿using WDE.Module;
 
 namespace WDE.SourceCodeIntegrationEditor
 {

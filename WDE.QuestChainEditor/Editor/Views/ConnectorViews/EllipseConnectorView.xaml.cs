@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-
-namespace WDE.QuestChainEditor.Editor.Views
+﻿namespace WDE.QuestChainEditor.Editor.Views
 {
     /// <summary>
     ///     Interaction logic for EllipseConnectorView.xaml

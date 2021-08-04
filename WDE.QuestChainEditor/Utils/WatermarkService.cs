@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
-
-namespace WDE.QuestChainEditor.Utils
+﻿namespace WDE.QuestChainEditor.Utils
 {
     /// <summary>
     ///     Class that provides the Watermark attached property

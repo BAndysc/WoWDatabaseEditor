@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Types;

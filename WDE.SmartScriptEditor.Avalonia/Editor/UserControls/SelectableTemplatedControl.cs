@@ -1,11 +1,9 @@
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using WDE.Common.Avalonia.Controls;
-using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {

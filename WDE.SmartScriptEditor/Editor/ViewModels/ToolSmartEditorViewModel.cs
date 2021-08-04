@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using WDE.Common.Windows;
-using WDE.Module.Attributes;
+﻿using WDE.Common.Windows;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Editor.ViewModels.Editing;

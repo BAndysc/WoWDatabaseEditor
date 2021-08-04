@@ -2,7 +2,6 @@
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Events;
-using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Tasks;

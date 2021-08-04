@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using WDE.Common.Menu;
-using WDE.Common.Annotations;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -9,7 +8,6 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Conditions.Data;
 using WDE.Conditions.ViewModels;
-using WDE.Module.Attributes;
 
 namespace WDE.Conditions.MenuItems
 {

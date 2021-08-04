@@ -1,5 +1,3 @@
-using WDE.Common.Annotations;
-
 namespace WDE.Common.Services
 {
     public interface IUserSettings

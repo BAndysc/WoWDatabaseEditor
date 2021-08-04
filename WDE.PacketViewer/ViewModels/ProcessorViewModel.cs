@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Prism.Mvvm;
 using WDE.PacketViewer.Processing;

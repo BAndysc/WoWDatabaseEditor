@@ -11,7 +11,6 @@ using Avalonia.Interactivity;
 using Avalonia.Metadata;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
-using JetBrains.Annotations;
 
 namespace AvaloniaStyles.Controls
 {
@@ -60,24 +59,24 @@ namespace AvaloniaStyles.Controls
                 (o, v) => o.SelectedItem = v,
                 defaultBindingMode: BindingMode.TwoWay);
 
-        private object? _selectedItem;
+        private object? selectedItem;
         
         public object? SelectedItem
         {
-            get => _selectedItem;
-            set => SetAndRaise(SelectedItemProperty, ref _selectedItem, value);
+            get => selectedItem;
+            set => SetAndRaise(SelectedItemProperty, ref selectedItem, value);
         }
         
         public static readonly DirectProperty<GroupingListBox, IEnumerable> ItemsProperty =
             AvaloniaProperty.RegisterDirect<GroupingListBox, IEnumerable>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
 
-        private IEnumerable _items = new AvaloniaList<object>();
+        private IEnumerable items = new AvaloniaList<object>();
 
         [Content]
         public IEnumerable Items
         {
-            get => _items;
-            set => SetAndRaise(ItemsProperty, ref _items, value);
+            get => items;
+            set => SetAndRaise(ItemsProperty, ref items, value);
         }
         
         private static readonly FuncTemplate<IPanel> DefaultPanel =
@@ -167,7 +166,7 @@ namespace AvaloniaStyles.Controls
             if (that == null)
                 return;
             
-            var parent = FindParent<ItemsControl>(that!);
+            var parent = FindParent<ItemsControl>(that);
 
             if (parent == null)
                 return;
@@ -308,11 +307,7 @@ namespace AvaloniaStyles.Controls
         public object? CustomSelectedItem
         {
             get => SelectedItem;
-            set
-            {
-                var old = SelectedItem;
-                SelectedItem = value;
-            }
+            set => SelectedItem = value;
         }
 
         private static bool inEvent;

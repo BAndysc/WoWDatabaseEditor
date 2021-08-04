@@ -1,10 +1,6 @@
-﻿using System;
-using Prism.Ioc;
-using WDE.Common.Database;
+﻿using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
-using WDE.Common.Tasks;
-using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.SQLEditor.ViewModels;
 

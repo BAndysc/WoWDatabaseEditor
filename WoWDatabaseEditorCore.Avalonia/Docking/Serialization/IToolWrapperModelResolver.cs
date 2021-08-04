@@ -1,6 +1,4 @@
-﻿using WDE.Common.Windows;
-
-namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
+﻿namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
 {
     public interface IToolWrapperModelResolver
     {

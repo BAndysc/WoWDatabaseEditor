@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,8 +6,9 @@ using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Settings;
 using WowPacketParser.PacketStructures;
-//using WowPacketParser.PacketStructures;
 using WoWPacketParser.Proto;
+
+//using WowPacketParser.PacketStructures;
 
 namespace WDE.PacketViewer.PacketParserIntegration
 {

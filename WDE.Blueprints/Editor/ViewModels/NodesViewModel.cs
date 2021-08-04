@@ -1,9 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows.Data;
-using Prism.Mvvm;
-using WDE.Blueprints.Data;
+﻿using WDE.Blueprints.Data;
 using WDE.Blueprints.Enums;
 using WDE.Blueprints.Managers;
 

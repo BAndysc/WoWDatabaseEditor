@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Windows;
-using Newtonsoft.Json;
-using WDE.Common.Services;
+﻿using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.RemoteSOAP.Providers

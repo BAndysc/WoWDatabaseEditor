@@ -2,12 +2,8 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
-using Prism.Commands;
-using WDE.Common.CoreVersion;
-using WDE.Common.Services;
 using WDE.Common.Utils;
 
 namespace WDE.Common.Avalonia.Controls

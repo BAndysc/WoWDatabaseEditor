@@ -1,7 +1,4 @@
-﻿using System.Windows.Controls;
-using System.Windows.Input;
-
-namespace WDE.QuestChainEditor.Editor.Views
+﻿namespace WDE.QuestChainEditor.Editor.Views
 {
     /// <summary>
     ///     Interaction logic for QuestPicker.xaml

@@ -7,7 +7,6 @@ using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.CoreVersion;
-using WDE.Common.DBC;
 using WDE.Common.Documents;
 using WDE.Common.Events;
 using WDE.Common.History;

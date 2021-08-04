@@ -1,8 +1,4 @@
-﻿using System;
-using System.Windows;
-using Prism.Mvvm;
-
-namespace WDE.Blueprints.Editor.ViewModels
+﻿namespace WDE.Blueprints.Editor.ViewModels
 {
     public class ConnectionViewModel : BindableBase
     {

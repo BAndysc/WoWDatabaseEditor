@@ -12,7 +12,6 @@ using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Solution;
-using WDE.Common.Utils;
 using WDE.Common.Utils.DragDrop;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;

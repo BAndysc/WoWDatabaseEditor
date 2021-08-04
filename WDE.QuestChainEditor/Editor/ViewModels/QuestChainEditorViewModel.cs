@@ -1,5 +1,4 @@
-﻿using Prism.Mvvm;
-using WDE.QuestChainEditor.Models;
+﻿using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.Providers;
 
 namespace WDE.QuestChainEditor.Editor.ViewModels

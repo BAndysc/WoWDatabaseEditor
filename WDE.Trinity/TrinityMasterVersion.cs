@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Module.Attributes;

@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using GeminiGraphEditor;
+﻿using GeminiGraphEditor;
 using WDE.QuestChainEditor.Editor.ViewModels;
 
 namespace WDE.QuestChainEditor.Editor.Views

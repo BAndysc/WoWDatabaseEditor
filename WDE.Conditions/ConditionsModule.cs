@@ -4,7 +4,6 @@ using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.Conditions.ViewModels;
 using WDE.Module;
-using WDE.Parameters;
 
 namespace WDE.Conditions
 {

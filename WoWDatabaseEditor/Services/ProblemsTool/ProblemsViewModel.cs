@@ -5,7 +5,6 @@ using System.Linq;
 using Prism.Events;
 using WDE.Common.Events;
 using WDE.Common.Managers;
-using WDE.Common.Solution;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.MVVM;

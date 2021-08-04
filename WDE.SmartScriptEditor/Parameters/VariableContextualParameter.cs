@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using WDE.Common.Parameters;
-using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters

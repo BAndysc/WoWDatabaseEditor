@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace QuestChainTest
+﻿namespace QuestChainTest
 {
     /// <summary>
     ///     Interaction logic for App.xaml

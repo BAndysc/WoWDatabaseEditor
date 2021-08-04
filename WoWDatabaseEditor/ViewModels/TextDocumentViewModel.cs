@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;

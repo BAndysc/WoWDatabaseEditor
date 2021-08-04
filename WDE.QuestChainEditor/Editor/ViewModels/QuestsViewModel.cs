@@ -1,8 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Windows.Data;
-using Prism.Mvvm;
-using WDE.QuestChainEditor.Models;
+﻿using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.Providers;
 
 namespace WDE.QuestChainEditor.Editor.ViewModels

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common.Managers;
-using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Data;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.SmartDataEditors

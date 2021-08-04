@@ -6,7 +6,6 @@ using WDE.Common.Documents;
 using WDE.Common.Managers;
 using WDE.Common.Menu;
 using WDE.Module.Attributes;
-using WoWDatabaseEditorCore.CoreVersion;
 
 namespace WoWDatabaseEditorCore.Providers
 {

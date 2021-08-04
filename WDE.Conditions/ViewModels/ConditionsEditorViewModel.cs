@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using Prism.Commands;
-using Prism.Mvvm;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;

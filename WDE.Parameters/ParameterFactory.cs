@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Prism.Events;
 using WDE.Common.Parameters;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
