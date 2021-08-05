@@ -38,7 +38,8 @@ namespace WDE.SmartScriptEditor.Inspections
                         }; 
                     }
                     
-                    if (e.GetParameter(i).Parameter is not FlagParameter &&
+                    if (e.GetParameter(i).Value != 0 &&
+                        e.GetParameter(i).Parameter is not FlagParameter &&
                         !e.GetParameter(i).Parameter.AllowUnknownItems &&
                         !(e.GetParameter(i).Items?.ContainsKey(e.GetParameter(i).Value) ?? false))
                     {

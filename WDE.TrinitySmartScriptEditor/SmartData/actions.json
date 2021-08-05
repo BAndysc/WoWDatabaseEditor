@@ -73,7 +73,8 @@
         "parameters": [
             {
                 "type": "SoundParameter",
-                "name": "Sound ID"
+                "name": "Sound ID",
+                "required": true
             },
             {
                 "type": "BoolParameter",
@@ -112,7 +113,8 @@
             {
                 "type": "QuestParameter",
                 "name": "Quest ID",
-                "description": "Quest ID to mark as failed. Only for players"
+                "description": "Quest ID to mark as failed. Only for players",
+                "required": true
             }
         ],
         "description": "{source}: Fail quest {pram1}",
@@ -127,7 +129,8 @@
             {
                 "type": "QuestParameter",
                 "name": "Quest ID",
-                "description": "Add quest, only for players"
+                "description": "Add quest, only for players",
+                "required": true
             },
             {
                 "type": "BoolParameter",
@@ -209,7 +212,8 @@
             {
                 "type": "SpellParameter",
                 "name": "Spell",
-                "description": "Spell id to cast"
+                "description": "Spell id to cast",
+                "required": true
             },
             {
                 "type": "SmartCastFlagsParameter",
@@ -238,11 +242,14 @@
             {
                 "type": "CreatureParameter",
                 "name": "Creature",
-                "description": "Creature Entry to summon"
+                "description": "Creature Entry to summon",
+                "required": true
             },
             {
                 "type": "SummonTypeParameter",
-                "name": "Summon Type"
+                "name": "Summon Type",
+                "required": true,
+                "defaultVal": 8
             },
             {
                 "type": "FloatParameter",
@@ -282,11 +289,14 @@
             {
                 "type": "CreatureParameter",
                 "name": "Creature",
-                "description": "Creature Entry to summon"
+                "description": "Creature Entry to summon",
+                "required": true
             },
             {
                 "type": "SummonTypeParameter",
-                "name": "Summon Type"
+                "name": "Summon Type",
+                "required": true,
+                "defaultVal": 8
             },
             {
                 "type": "FloatParameter",
@@ -313,11 +323,14 @@
             {
                 "type": "CreatureParameter",
                 "name": "Creature",
-                "description": "Creature Entry to summon"
+                "description": "Creature Entry to summon",
+                "required": true
             },
             {
                 "type": "SummonTypeParameter",
-                "name": "Summon Type"
+                "name": "Summon Type",
+                "required": true,
+                "defaultVal": 8
             },
             {
                 "type": "FloatParameter",
@@ -392,7 +405,8 @@
             {
                 "type": "QuestParameter",
                 "name": "Quest ID",
-                "description": "Trigger quest group event. Also complete the quest"
+                "description": "Trigger quest group event. Also complete the quest",
+                "required": true
             }
         ],
         "description": "{source}: Call quest {pram1} group event happened",
@@ -589,7 +603,8 @@
         "parameters": [
             {
                 "type": "QuestParameter",
-                "name": "Quest"
+                "name": "Quest",
+                "required": true
             }
         ],
         "description": "{source}: Call group event happened from quest {pram1} on owner",
@@ -747,10 +762,11 @@
         "parameters": [
             {
                 "type": "CreatureParameter",
-                "name": "Creature"
+                "name": "Creature",
+                "required": true
             }
         ],
-        "description": "{sourceid:choose(0|1):Loot recipient|Loot recipient|{source}}: Give kill credit {pram1}",
+        "description": "{sourceid:choose(0|1):[s]Loot recipient[/s]|[s]Loot recipient[/s]|{source}}: Give kill credit {pram1}",
         "name_readable": "Give killed monster credit",
         "target_types": ["Player", "Creature"],
         "target_is_source": true
@@ -925,7 +941,8 @@
         "parameters": [
             {
                 "type": "PhaseParameter",
-                "name": "Phase ID"
+                "name": "Phase ID",
+                "required": true
             },
             {
                 "type": "BoolParameter",
@@ -1170,7 +1187,8 @@
         "parameters": [
             {
                 "type": "ItemParameter",
-                "name": "Item"
+                "name": "Item",
+                "required": true
             },
             {
                 "type": "Parameter",
@@ -1188,7 +1206,8 @@
         "parameters": [
             {
                 "type": "ItemParameter",
-                "name": "Item"
+                "name": "Item",
+                "required": true
             },
             {
                 "type": "Parameter",
@@ -1335,7 +1354,7 @@
         "name": "SMART_ACTION_TELEPORT",
         "parameters": [
             {
-                "type": "ZoneAreaParameter",
+                "type": "MapParameter",
                 "name": "Map ID"
             }
         ],
@@ -1467,7 +1486,8 @@
         "parameters": [
             {
                 "type": "MovieParameter",
-                "name": "Entry"
+                "name": "Entry",
+                "required": true
             }
         ],
         "description": "{source}: Play movie {pram1}",
@@ -1540,7 +1560,7 @@
         "parameters": [
             {
                 "type": "Parameter",
-                "name": "Eqipment ID",
+                "name": "Equipment ID",
                 "description": "Entry from table creature_equip_template"
             },
             {
@@ -1613,7 +1633,8 @@
         "parameters": [
             {
                 "type": "SpellParameter",
-                "name": "Spell"
+                "name": "Spell",
+                "required": true
             }
         ],
         "description": "{source}: Add aura {pram1}",
@@ -1755,7 +1776,8 @@
             {
                 "type": "SpellParameter",
                 "name": "Spell",
-                "description": "Spell id to cast"
+                "description": "Spell id to cast",
+                "required": true
             },
             {
                 "type": "SmartCastFlagsParameter",
@@ -1770,7 +1792,7 @@
                 "name": "TargetsLimit"
             }
         ],
-        "description": "{pram4value:choose(0):| Random {pram4}} {source}: Cast spell {pram1} on self",
+        "description": "{pram4value:choose(0):|Random {pram4} }{source}: Cast spell {pram1} on self",
         "name_readable": "Invoker cast",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -1781,7 +1803,8 @@
         "parameters": [
             {
                 "type": "SpellParameter",
-                "name": "Spell"
+                "name": "Spell",
+                "required": true
             },
             {
                 "type": "SmartCastFlagsParameter",
@@ -1940,7 +1963,8 @@
             },
             {
                 "type": "SpellParameter",
-                "name": "Spell ID"
+                "name": "Spell ID",
+                "required": true
             },
             {
                 "type": "BoolParameter",
@@ -2334,7 +2358,8 @@
         "parameters": [
             {
                 "type": "GameEventParameter",
-                "name": "Event"
+                "name": "Event",
+                "required": true
             }
         ],
         "description": "Stop game event {pram1}",
@@ -2347,7 +2372,8 @@
         "parameters": [
             {
                 "type": "GameEventParameter",
-                "name": "Event"
+                "name": "Event",
+                "required": true
             }
         ],
         "description": "Start game event {pram1}",
@@ -2504,7 +2530,7 @@
                 "name": "CanFly"
             }
         ],
-        "description": "{source}: {pram1value:choose(0):Can not|Can} Fly}",
+        "description": "{source}: Set {pram1value:choose(0):can not|can} Fly",
         "name_readable": "Set can fly",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -2743,7 +2769,7 @@
                 }
             }
         ],
-        "description": "{source}: Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
+        "description": "{source}: Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
         "name_readable": "Spawn Spawngroup",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -2775,7 +2801,7 @@
                 }
             }
         ],
-        "description": "{source}: Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0): with flags {pram4}}",
+        "description": "{source}: Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
         "name_readable": "Despawn Spawngroup",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -2870,7 +2896,7 @@
                 "name": "Speed fraction"
             }
         ],
-        "description": "{source}: Set movement {pram1} speed to {pram2value}.{pram3.value}",
+        "description": "{source}: Set movement {pram1} speed to {pram2value}.{pram3value}",
         "name_readable": "Set Movement speed",
         "target_types": ["Creature"],
         "target_is_source": true
