@@ -31,16 +31,21 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             SourceList<IEditableParameterViewModel> visibleParameters = new();
             List<IEditableParameterViewModel> allParameters = new();
             Link(element, e => e.Readable, () => Readable);
-
-            FocusFirst = focusFirst;
             
             if (actionParameters != null)
                 foreach (EditableActionData act in actionParameters)
                     allParameters.Add(new EditableParameterActionViewModel(act));
 
             if (parameters != null)
+            {
+                bool first = focusFirst;
                 foreach (var parameter in parameters)
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion)));
+                {
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion){FocusFirst = first && parameter.parameter.IsUsed}));
+                    if (!allParameters[^1].IsHidden)
+                        first = false;
+                }
+            }
 
             if (floatParameters != null)
                 foreach (var parameter in floatParameters)
@@ -48,7 +53,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
             if (stringParameters != null)
                 foreach (var parameter in stringParameters)
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion)));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion){FocusFirst=focusFirst}));
 
             foreach (IEditableParameterViewModel parameter in allParameters)
             {
@@ -97,7 +102,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public int DesiredHeight => 725;
         public string Title => "Edit";
         public bool Resizeable => true;
-        public bool FocusFirst { get; }
 
         public event Action? CloseCancel;
         public event Action? CloseOk;

@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Utils;
 
@@ -29,6 +31,20 @@ namespace WDE.Common.Avalonia.Controls
         }
         
         public ICommand? PickSpecial { get; }
+
+        protected override void OnGotFocus(GotFocusEventArgs e)
+        {
+            base.OnGotFocus(e);
+            if (e.Source == this)
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ParameterTextBox tb = this.FindDescendantOfType<ParameterTextBox>();
+                    if (tb != null)
+                        FocusManager.Instance.Focus(tb, NavigationMethod.Tab);
+                });
+            }
+        }
 
         public ParameterValueHolderView()
         {

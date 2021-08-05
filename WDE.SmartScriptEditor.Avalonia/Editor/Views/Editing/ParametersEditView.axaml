@@ -4,6 +4,10 @@
              xmlns:mvvm="http://prismlibrary.com/"
              xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor"
+             d:DataContext="{d:DesignInstance viewModels:ParametersEditViewModel, IsDesignTimeCreatable=False}"
              mvvm:ViewModelLocator.AutoWireViewModel="False">
     
     <Grid Margin="6">
@@ -25,7 +29,8 @@
                             <ItemsPresenter Items="{Binding}" Margin="10,0,0,16">
                                 <ItemsPresenter.ItemTemplate>
                                     <DataTemplate>
-                                        <editing:ParameterEditorView Margin="0,0,0,5" />
+                                        <editing:ParameterEditorView utils:FocusUtils.FocusFirst="{Binding FocusFirst}"
+                                                                     Margin="0,0,0,5" />
                                     </DataTemplate>
                                 </ItemsPresenter.ItemTemplate>
                             </ItemsPresenter>

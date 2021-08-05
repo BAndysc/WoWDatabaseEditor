@@ -2,10 +2,11 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Styling;
+using WDE.Common.Avalonia.Controls;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
-    public class ParameterTextBox : TextBox, IStyleable
+    public class ParameterTextBox : FixedTextBox, IStyleable
     {
         private DateTime lastFocusTime;
         

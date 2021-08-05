@@ -7,5 +7,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         bool IsHidden { get; }
         string Group { get; }
         string Name { get; }
+        bool FocusFirst { get; }
     }
 }

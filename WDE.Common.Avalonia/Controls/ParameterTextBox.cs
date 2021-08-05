@@ -5,7 +5,7 @@ using Avalonia.Styling;
 
 namespace WDE.Common.Avalonia.Controls
 {
-    public class ParameterTextBox : TextBox, IStyleable
+    public class ParameterTextBox : FixedTextBox, IStyleable
     {
         private DateTime lastFocusTime;
         

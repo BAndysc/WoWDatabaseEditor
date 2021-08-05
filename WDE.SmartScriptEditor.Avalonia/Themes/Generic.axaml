@@ -6,7 +6,8 @@
         xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
         xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
         xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
-        xmlns:themes="clr-namespace:WDE.SmartScriptEditor.Avalonia.Themes">
+        xmlns:themes="clr-namespace:WDE.SmartScriptEditor.Avalonia.Themes"
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia">
 
     <Styles.Resources>
         <themes:IndentToMarginConverter x:Key="IndentToMarginConverter" LeftMultiplier="24" />
@@ -224,8 +225,8 @@
                                 <views:ParameterDataTemplateSelector>
                                     <views:ParameterDataTemplateSelector.Generic>
                                         <DataTemplate>
-                                            <extendedTextBlock:ParameterValueHolderView 
-                                                DataContext="{Binding Parameter}" 
+                                            <extendedTextBlock:ParameterValueHolderView
+                                                DataContext="{Binding Parameter}"
                                                 SpecialCommand="{Binding DataContext.SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}, FallbackValue=False}" 
                                                 PickCommand="{Binding DataContext.SelectItemAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}" />
                                         </DataTemplate>

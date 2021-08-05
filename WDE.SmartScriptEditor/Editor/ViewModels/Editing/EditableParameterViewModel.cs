@@ -38,6 +38,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ICommand SelectItemAction { get; set; }
 
         public string Name => Parameter.Name;
+        
+        public bool FocusFirst { get; set; }
 
         public Func<Task<object?>>? SpecialCommand => currentCoreVersion.Current.SupportsSpecialCommands ? Parameter.Parameter.SpecialCommand : null;
         

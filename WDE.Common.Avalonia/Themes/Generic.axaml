@@ -3,74 +3,75 @@
         xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls"
         xmlns:themes="clr-namespace:WDE.Common.Avalonia.Themes"
         xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters"
-        xmlns:components="clr-namespace:WDE.Common.Avalonia.Components">
+        xmlns:components="clr-namespace:WDE.Common.Avalonia.Components"
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils">
     <Styles.Resources>
         <converters:LongToBoolConverter x:Key="LongToBoolConverter" />
         <converters:StripTagConverter x:Key="StripTagConverter" />
         <converters:NullConverter Inverted="True" x:Key="NullConverter" />
     </Styles.Resources>
     <Style Selector="controls|ParameterValueHolderView">
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <ContentControl Content="{Binding ., Mode=OneWay}">
-                        <ContentControl.DataTemplates>
-                            <themes:ParameterDataTemplateSelector>
-                                <themes:ParameterDataTemplateSelector.Generic>
-                                    <DataTemplate>
-                                        <DockPanel LastChildFill="True">
-                                            <Button DockPanel.Dock="Right" Content="  ...  "
-                                                    Command="{Binding PickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
-                                                    CommandParameter="{Binding .}"
-                                                    Margin="3,0,0,0"
-                                                    Focusable="False"
-                                                    IsVisible="{Binding HasItems}" />
-                                            <controls:ParameterTextBox VerticalContentAlignment="Center"
-                                                                       Name="TextBox"
-                                                                       Text="{Binding Value, Mode=TwoWay}"
-                                                                       FontFamily="Consolas,Menlo,Courier,Courier New"
-                                                                       Classes="InnerContentWithPadding">
-                                                <controls:ParameterTextBox.Styles>
-                                                    <Style
-                                                        Selector="TextBox:not(:focus) /template/ TextPresenter#PART_TextPresenter">
-                                                        <Setter Property="IsVisible" Value="False" />
-                                                    </Style>
-                                                    <Style
-                                                        Selector="TextBox:focus ContentPresenter Border">
-                                                        <Setter Property="IsVisible" Value="False" />
-                                                    </Style>
-                                                </controls:ParameterTextBox.Styles>
-                                                <controls:ParameterTextBox.InnerLeftContent>
-                                                    <Border Cursor="Ibeam">
-                                                        <TextBlock Text="{Binding String, Mode=OneWay, Converter={StaticResource StripTagConverter}}"
-                                                                   VerticalAlignment="Center"
-                                                                   Margin="0,0,0,0" />
-                                                    </Border>
-                                                </controls:ParameterTextBox.InnerLeftContent>
-                                                <controls:ParameterTextBox.InnerRightContent>
-                                                    <Button 
-                                                        IsVisible="{Binding SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}, Converter={StaticResource NullConverter}}"
-                                                        Background="Transparent"
-                                                        BorderBrush="Transparent"
-                                                        Command="{Binding PickSpecial, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}">
-                                                        <components:WdeImage ImageUri="icons/icon_picker.png" Width="16" Height="16" />
-                                                    </Button>
-                                                </controls:ParameterTextBox.InnerRightContent>
-                                            </controls:ParameterTextBox>
-                                        </DockPanel>
-                                    </DataTemplate>
-                                </themes:ParameterDataTemplateSelector.Generic>
-                                <themes:ParameterDataTemplateSelector.BoolParameter>
-                                    <DataTemplate>
-                                        <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
-                                                  IsChecked="{Binding Value, Converter={StaticResource LongToBoolConverter}}" />
-                                    </DataTemplate>
-                                </themes:ParameterDataTemplateSelector.BoolParameter>
-                            </themes:ParameterDataTemplateSelector>
-                        </ContentControl.DataTemplates>
-                    </ContentControl>
-                </ControlTemplate>
-            </Setter.Value>
+            <ControlTemplate>
+                <ContentPresenter Content="{Binding .}">
+                    <ContentPresenter.DataTemplates>
+                        <themes:ParameterDataTemplateSelector>
+                            <themes:ParameterDataTemplateSelector.Generic>
+                                <DataTemplate>
+                                    <DockPanel LastChildFill="True">
+                                        <Button DockPanel.Dock="Right" Content="  ...  "
+                                                Command="{Binding PickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
+                                                CommandParameter="{Binding .}"
+                                                Margin="3,0,0,0"
+                                                Focusable="False"
+                                                IsVisible="{Binding HasItems}" />
+                                        <controls:ParameterTextBox VerticalContentAlignment="Center"
+                                                                   Focusable="True"
+                                                                   Name="TextBox"
+                                                                   Text="{Binding Value, Mode=TwoWay}"
+                                                                   FontFamily="Consolas,Menlo,Courier,Courier New"
+                                                                   Classes="InnerContentWithPadding">
+                                            <controls:ParameterTextBox.Styles>
+                                                <Style
+                                                    Selector="TextBox:not(:focus) /template/ TextPresenter#PART_TextPresenter">
+                                                    <Setter Property="IsVisible" Value="False" />
+                                                </Style>
+                                                <Style
+                                                    Selector="TextBox:focus ContentPresenter Border">
+                                                    <Setter Property="IsVisible" Value="False" />
+                                                </Style>
+                                            </controls:ParameterTextBox.Styles>
+                                            <controls:ParameterTextBox.InnerLeftContent>
+                                                <Border Cursor="Ibeam">
+                                                    <TextBlock Text="{Binding String, Mode=OneWay, Converter={StaticResource StripTagConverter}}"
+                                                               VerticalAlignment="Center"
+                                                               Margin="0,0,0,0" />
+                                                </Border>
+                                            </controls:ParameterTextBox.InnerLeftContent>
+                                            <controls:ParameterTextBox.InnerRightContent>
+                                                <Button 
+                                                    IsVisible="{Binding SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}, Converter={StaticResource NullConverter}}"
+                                                    Background="Transparent"
+                                                    BorderBrush="Transparent"
+                                                    Command="{Binding PickSpecial, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}">
+                                                    <components:WdeImage ImageUri="icons/icon_picker.png" Width="16" Height="16" />
+                                                </Button>
+                                            </controls:ParameterTextBox.InnerRightContent>
+                                        </controls:ParameterTextBox>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </themes:ParameterDataTemplateSelector.Generic>
+                            <themes:ParameterDataTemplateSelector.BoolParameter>
+                                <DataTemplate>
+                                    <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
+                                              IsChecked="{Binding Value, Converter={StaticResource LongToBoolConverter}}" />
+                                </DataTemplate>
+                            </themes:ParameterDataTemplateSelector.BoolParameter>
+                        </themes:ParameterDataTemplateSelector>
+                    </ContentPresenter.DataTemplates>
+                </ContentPresenter>
+            </ControlTemplate>
         </Setter>
     </Style>
 </Styles>

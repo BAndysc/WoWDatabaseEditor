@@ -26,6 +26,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public string ActionName { get; private set; } = "";
         
         public string Group { get; }
+        
+        public bool FocusFirst { get; set; }
 
         public bool IsHidden { get; private set; }
     }
