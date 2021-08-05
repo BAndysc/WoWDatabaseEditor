@@ -92,7 +92,7 @@ namespace WDE.SqlQueryGenerator.Test
         {
             bool? val = null;
             Test(null, r => !val.HasValue || r.Column<bool>("Id") == val.Value);
-            Test(null, r => r.Column<bool>("Id") == val.Value || !val.HasValue);
+            Test(null, r => r.Column<bool>("Id") == val!.Value || !val.HasValue);
             
             val = true;
             Test("`Id` = 1", r => !val.HasValue || r.Column<bool>("Id") == val.Value);

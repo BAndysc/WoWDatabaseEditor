@@ -140,7 +140,7 @@ namespace WDE.SqlQueryGenerator
             return new Query(query, $" -- {comment}");
         }
 
-        public static IQuery DefineVariable(this IMultiQuery query, string variableName, object value)
+        public static IQuery DefineVariable(this IMultiQuery query, string variableName, object? value)
         {
             return new Query(query, $"SET @{variableName} := {value.ToSql()};");
         }
