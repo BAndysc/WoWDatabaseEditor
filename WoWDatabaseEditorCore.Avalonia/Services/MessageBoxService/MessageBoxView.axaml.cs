@@ -1,8 +1,13 @@
 using System;
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
+using Avalonia.Input;
 using Avalonia.Layout;
+using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
 
@@ -65,7 +70,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
         protected override void OnClosing(CancelEventArgs e)
         {
             if (!realClosing)
+            {
+                if (DataContext is IMessageBoxViewModel dialogWindow)
+                    dialogWindow.CancelButtonCommand.Execute(null);
                 e.Cancel = true;
+            }
             base.OnClosing(e);
         }
 

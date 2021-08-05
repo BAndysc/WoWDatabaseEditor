@@ -13,5 +13,7 @@ namespace WDE.Common.Services.MessageBox
         string Footer { get; }
         MessageBoxIcon FooterIcon { get; }
         IList<IMessageBoxButton<T>> Buttons { get; }
+        IMessageBoxButton<T>? DefaultButton { get; }
+        IMessageBoxButton<T>? CancelButton { get; }
     }
 }

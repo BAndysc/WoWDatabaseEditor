@@ -8,6 +8,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:messageBoxService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              CanResize="False"
              WindowStartupLocation="CenterOwner"
              d:DataContext="{d:DesignInstance messageBoxService:MessageBoxViewModelDesignModel}"
@@ -15,10 +16,16 @@
     <controls:BaseMessageBoxWindow.Image>
         <Image Source="../../Icon.png"></Image>
     </controls:BaseMessageBoxWindow.Image>
-    <ItemsPresenter Items="{Binding Buttons}">
+    <controls:BaseMessageBoxWindow.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding CancelButtonCommand}" />
+    </controls:BaseMessageBoxWindow.KeyBindings>
+    <ItemsPresenter Items="{Binding Buttons}" Name="ButtonsList">
         <ItemsPresenter.ItemTemplate>
             <DataTemplate>
-                <Button Content="{Binding Name}" Command="{Binding Command}"></Button>
+                <Button Content="{Binding Name}" 
+                        utils:FocusUtils.FocusFirst="{Binding IsDefault}"
+                        IsDefault="{Binding IsDefault}" 
+                        Command="{Binding Command}" />
             </DataTemplate>
         </ItemsPresenter.ItemTemplate>
         <ItemsPresenter.ItemsPanel>

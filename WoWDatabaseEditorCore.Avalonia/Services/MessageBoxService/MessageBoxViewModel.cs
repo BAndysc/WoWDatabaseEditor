@@ -11,6 +11,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
     internal interface IMessageBoxViewModel
     {
         public event Action Close;
+        public ICommand CancelButtonCommand { get; }
     }
     
     internal class MessageBoxViewModel<T> : ObservableBase, IMessageBoxViewModel
@@ -20,16 +21,21 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
         public MessageBoxViewModel(IMessageBox<T> model)
         {
             Model = model;
+            CancelButtonCommand = new DelegateCommand(() => { });
             foreach (var btn in model.Buttons)
             {
-                Buttons.Add(new MessageBoxButtonViewModel(btn.Name, new DelegateCommand(() =>
+                var vm = new MessageBoxButtonViewModel(btn.Name, btn == model.DefaultButton, new DelegateCommand(() =>
                 {
                     SelectedOption = btn.ReturnValue;
                     Close?.Invoke();
-                })));
+                }));
+                Buttons.Add(vm);
+                if (btn == model.CancelButton)
+                    CancelButtonCommand = vm.Command;
             }
         }
 
+        public ICommand CancelButtonCommand { get; }
         public T? SelectedOption { get; private set; }
         public ObservableCollection<MessageBoxButtonViewModel> Buttons { get; } = new();
         public event Action? Close;
@@ -37,14 +43,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
 
     internal class MessageBoxButtonViewModel : INotifyPropertyChanged
     {
-        public MessageBoxButtonViewModel(string name, ICommand command)
+        public MessageBoxButtonViewModel(string name,  bool isDefault, ICommand command)
         {
             Name = name;
             Command = command;
+            IsDefault = isDefault;
         }
 
         public string Name { get; }
         public ICommand Command { get; }
+        public bool IsDefault { get; }
         
         public event PropertyChangedEventHandler? PropertyChanged;
     }

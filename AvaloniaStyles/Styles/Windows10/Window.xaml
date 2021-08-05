@@ -107,25 +107,27 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Background="{TemplateBinding Background}">
-                    <DockPanel LastChildFill="True">
-                        <ContentPresenter DockPanel.Dock="Bottom" 
-                                          Content="{TemplateBinding Content}"
-                                          Name="Buttons" 
-                                          HorizontalContentAlignment="Right" 
-                                          Background="{DynamicResource MessageBoxBottomPanelBackground}" 
-                                          BorderBrush="{DynamicResource MessageBoxBottomPanelBorder}"
-                                          BorderThickness="0,1,0,0"
-                                          Padding="10"/>
-                        <DockPanel LastChildFill="True" Margin="10">
-                            <ContentPresenter Content="{TemplateBinding Image}"
-                                              VerticalContentAlignment="Top"
-                                              VerticalAlignment="Top"
-                                              Width="32" Height="32"
-                                              Margin="0,0,15,0" />
-                            <TextBlock Text="{TemplateBinding Header}" Foreground="{DynamicResource MessageBoxTitleForeground}" TextWrapping="WrapWithOverflow" FontSize="16" DockPanel.Dock="Top" Margin="0,0,0,12" />
-                            <TextBlock Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" FontSize="12" />
+                    <VisualLayerManager>
+                        <DockPanel LastChildFill="True">
+                            <ContentPresenter DockPanel.Dock="Bottom" 
+                                              Content="{TemplateBinding Content}"
+                                              Name="Buttons" 
+                                              HorizontalContentAlignment="Right" 
+                                              Background="{DynamicResource MessageBoxBottomPanelBackground}" 
+                                              BorderBrush="{DynamicResource MessageBoxBottomPanelBorder}"
+                                              BorderThickness="0,1,0,0"
+                                              Padding="10"/>
+                            <DockPanel LastChildFill="True" Margin="10">
+                                <ContentPresenter Content="{TemplateBinding Image}"
+                                                  VerticalContentAlignment="Top"
+                                                  VerticalAlignment="Top"
+                                                  Width="32" Height="32"
+                                                  Margin="0,0,15,0" />
+                                <TextBlock Text="{TemplateBinding Header}" Foreground="{DynamicResource MessageBoxTitleForeground}" TextWrapping="WrapWithOverflow" FontSize="16" DockPanel.Dock="Top" Margin="0,0,0,12" />
+                                <TextBlock Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" FontSize="12" />
+                            </DockPanel>
                         </DockPanel>
-                    </DockPanel>
+                    </VisualLayerManager>
                 </Border>
             </ControlTemplate>
         </Setter>

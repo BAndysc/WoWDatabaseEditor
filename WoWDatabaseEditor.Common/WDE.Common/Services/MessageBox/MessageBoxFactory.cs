@@ -13,6 +13,8 @@ namespace WDE.Common.Services.MessageBox
         private string footer = "";
         private MessageBoxIcon footerIcon;
         private List<IMessageBoxButton<T>> buttons = new();
+        private IMessageBoxButton<T>? defaultButton = null;
+        private IMessageBoxButton<T>? cancelButton = null;
 
         public MessageBoxFactory<T> SetTitle(string title)
         {
@@ -58,37 +60,37 @@ namespace WDE.Common.Services.MessageBox
 
         public MessageBoxFactory<T> WithOkButton(T returnValue)
         {
-            buttons.Add(new MessageBoxButton("Ok", returnValue));
-            return this;
+            return WithButton("Ok", returnValue, true, true);
         }
         
         public MessageBoxFactory<T> WithYesButton(T returnValue)
         {
-            buttons.Add(new MessageBoxButton("Yes", returnValue));
-            return this;
+            return WithButton("Yes", returnValue, true, false);
         }
         
         public MessageBoxFactory<T> WithNoButton(T returnValue)
         {
-            buttons.Add(new MessageBoxButton("No", returnValue));
-            return this;
+            return WithButton("No", returnValue, false, false);
         }
         
         public MessageBoxFactory<T> WithCancelButton(T returnValue)
         {
-            buttons.Add(new MessageBoxButton("Cancel", returnValue));
-            return this;
+            return WithButton("Cancel", returnValue, false, true);
         }
         
-        public MessageBoxFactory<T> WithButton(string text, T returnValue)
+        public MessageBoxFactory<T> WithButton(string text, T returnValue, bool isDefault = false, bool isCancel = false)
         {
             buttons.Add(new MessageBoxButton(text, returnValue));
+            if (isDefault)
+                defaultButton = buttons[^1];
+            if (isCancel)
+                cancelButton = buttons[^1];
             return this;
         }
         
         public IMessageBox<T> Build()
         {
-            return new MessageBox(windowTitle, icon, mainInstruction, content, expandedInformation, footer, footerIcon, buttons);
+            return new MessageBox(windowTitle, icon, mainInstruction, content, expandedInformation, footer, footerIcon, buttons, defaultButton, cancelButton);
         }
 
         private class MessageBoxButton : IMessageBoxButton<T>
@@ -112,7 +114,9 @@ namespace WDE.Common.Services.MessageBox
                 string expandedInformation,
                 string footer,
                 MessageBoxIcon footerIcon,
-                IList<IMessageBoxButton<T>> buttons)
+                IList<IMessageBoxButton<T>> buttons,
+                IMessageBoxButton<T>? defaultButton,
+                IMessageBoxButton<T>? cancelButton)
             {
                 Title = title;
                 Icon = icon;
@@ -121,8 +125,14 @@ namespace WDE.Common.Services.MessageBox
                 ExpandedInformation = expandedInformation;
                 Footer = footer;
                 FooterIcon = footerIcon;
+                DefaultButton = defaultButton;
+                CancelButton = cancelButton;
                 if ((buttons?.Count ?? 0) == 0)
+                {
                     Buttons = new List<IMessageBoxButton<T>>() {new MessageBoxButton("Ok", default)};
+                    DefaultButton = Buttons[0];
+                    CancelButton = Buttons[0];
+                }
                 else
                     Buttons = buttons!.ToList();
             }
@@ -135,6 +145,8 @@ namespace WDE.Common.Services.MessageBox
             public string Footer { get; }
             public MessageBoxIcon FooterIcon { get; }
             public IList<IMessageBoxButton<T>> Buttons { get; }
+            public IMessageBoxButton<T>? DefaultButton { get; }
+            public IMessageBoxButton<T>? CancelButton { get; }
         }
     }
 }
