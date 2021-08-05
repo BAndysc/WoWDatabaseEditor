@@ -58,14 +58,13 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
                     return;
 
-                if (!IsSelected || !lastPressedWithControlOn)
-                    DeselectOthers();
+                if (!lastPressedWithControlOn)
+                    DeselectAllRequest?.Execute(null);
+                else if (!IsSelected)
+                    DeselectOthers();    
                 
                 if (!lastPressedWithControlOn && !IsSelected)
-                {
-                    DeselectAllRequest?.Execute(null);
                     IsSelected = true;
-                }
                 e.Handled = true;
             }
         }
