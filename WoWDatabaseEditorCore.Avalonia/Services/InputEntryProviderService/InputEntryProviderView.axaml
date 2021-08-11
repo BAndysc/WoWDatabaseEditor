@@ -2,14 +2,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.InputEntryProviderService.InputEntryProviderView">
-    <StackPanel>
-        <Label Content="Enter entry:" HorizontalAlignment="Center"
-               Margin="0, 10, 0, 10"/>
-        <TextBox Text="{Binding Entry}" />
-        <Button Content="Ok" Command="{Binding Save}"
-                HorizontalAlignment="Center"
-                Margin="0, 10, 0, 10"/>
-    </StackPanel>
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Escape" Command="{Binding Cancel}" />
+        <KeyBinding Gesture="Enter" Command="{Binding Save}" />
+    </UserControl.KeyBindings>
+    <DockPanel Margin="15" LastChildFill="False">
+        <Image DockPanel.Dock="Left" Width="64" Height="64" VerticalAlignment="Center" Margin="0,0,10,0">
+            <Image.Source>
+                <DrawingImage>
+                    <DrawingGroup>
+                        <GeometryDrawing Brush="#FF1AA1E2" Geometry="F1M9,5L8,5 8,4 9,4z M9,11L8,11 8,6 9,6z M8.5,3C6.015,3 4,5.015 4,7.5 4,9.985 6.015,12 8.5,12 10.985,12 13,9.985 13,7.5 13,5.015 10.985,3 8.5,3" /><GeometryDrawing Brush="#FFFFFFFF" Geometry="F1M8,5L9,5 9,4 8,4z M8,11L9,11 9,6.001 8,6.001z" />
+                    </DrawingGroup>
+                </DrawingImage>
+            </Image.Source>
+        </Image>
+        <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{Binding Title}" FontSize="16" FontWeight="Bold" TextWrapping="WrapWithOverflow" />
+        <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{Binding Description}" TextWrapping="WrapWithOverflow" />
+        <TextBox utils:FocusUtils.FocusFirst="True" Margin="0,0,0,10" Text="{Binding Entry}" HorizontalAlignment="Stretch" AcceptsReturn="False" DockPanel.Dock="Top" AcceptsTab="False" />
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Spacing="10" HorizontalAlignment="Right">
+            <Button IsDefault="True" Content="Ok" Command="{Binding Save}" MinWidth="80" />
+            <Button IsCancel="True" Content="Cancel" Command="{Binding Cancel}" MinWidth="80" />
+        </StackPanel>
+    </DockPanel>
 </UserControl>

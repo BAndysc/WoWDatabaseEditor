@@ -4,7 +4,9 @@ using WDE.Module;
 using WoWDatabaseEditorCore.Avalonia.Services.CreatureEntrySelectorService;
 using WoWDatabaseEditorCore.Services.CreatureEntrySelectorService;
 using WDE.Common.Windows;
+using WoWDatabaseEditorCore.Avalonia.Services.InputEntryProviderService;
 using WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService;
+using WoWDatabaseEditorCore.Services.InputEntryProviderService;
 using WoWDatabaseEditorCore.Services.ItemFromListSelectorService;
 
 namespace WoWDatabaseEditorCore.Avalonia
@@ -20,6 +22,9 @@ namespace WoWDatabaseEditorCore.Avalonia
             viewLocator.Bind<GenericSelectorDialogViewModel<IGameObjectTemplate>, GenericSelectorDialogView>();
             viewLocator.Bind<GenericSelectorDialogViewModel<IQuestTemplate>, GenericSelectorDialogView>();
             viewLocator.Bind<GenericSelectorDialogViewModel<SpellMiniEntry>, GenericSelectorDialogView>();
+
+            viewLocator.Bind<InputEntryProviderViewModel<uint>, InputEntryProviderView>();
+            viewLocator.Bind<InputEntryProviderViewModel<string>, InputEntryProviderView>();
             
             viewLocator.Bind<LongItemFromListProviderViewModel, ItemFromListProviderView>();
             viewLocator.Bind<StringItemFromListProviderViewModel, ItemFromListProviderView>();
