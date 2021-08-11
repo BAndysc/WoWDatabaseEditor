@@ -151,7 +151,7 @@ namespace WDE.Parameters
 
         public void Updated(IParameter parameter)
         {
-            registration.Publish(parameter);
+            registration.OnNext(parameter);
         }
     }
 }
