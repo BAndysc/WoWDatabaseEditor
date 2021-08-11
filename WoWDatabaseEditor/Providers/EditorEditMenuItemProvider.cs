@@ -10,24 +10,28 @@ using WDE.Module.Attributes;
 namespace WoWDatabaseEditorCore.Providers
 {
     [AutoRegister]
-    public class EditorEditMenuItemProvider: IMainMenuItem, INotifyPropertyChanged
+    public class EditorEditMenuItemProvider : IMainMenuItem, INotifyPropertyChanged
     {
-        public string ItemName { get; } = "_Edit";
+        public string ItemName => "_Edit";
         public List<IMenuItem> SubItems { get; }
-        public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityHigh;
+        public MainMenuItemSortPriority SortPriority => MainMenuItemSortPriority.PriorityHigh;
         public IDocumentManager DocumentManager { get; }
 
         public EditorEditMenuItemProvider(IDocumentManager documentManager)
         {
             DocumentManager = documentManager;
             SubItems = new List<IMenuItem>();
-            SubItems.Add(new ModuleMenuItem("_Undo", new DelegateCommand(() => DocumentManager.ActiveDocument?.Undo.Execute(null),
-                () => DocumentManager.ActiveDocument?.Undo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument).
-                ObservesProperty(() => DocumentManager.ActiveDocument!.IsModified), new("Control+Z")));
+            SubItems.Add(new ModuleMenuItem("_Undo", new DelegateCommand(() =>
+                {
+                    DocumentManager.ActiveUndoRedo?.Undo.Execute(null);
+                },
+                () => DocumentManager.ActiveUndoRedo?.Undo.CanExecute(null) ?? false)
+                .ObservesProperty(() => DocumentManager.ActiveUndoRedo)
+                .ObservesProperty(() => DocumentManager.ActiveUndoRedo!.IsModified), new("Control+Z")));
             
-            SubItems.Add(new ModuleMenuItem("_Redo", new DelegateCommand(() => DocumentManager.ActiveDocument?.Redo.Execute(null),
-                () => DocumentManager.ActiveDocument?.Redo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveDocument).
-                ObservesProperty(() => DocumentManager.ActiveDocument!.IsModified), new("Control+Y")));
+            SubItems.Add(new ModuleMenuItem("_Redo", new DelegateCommand(() => DocumentManager.ActiveUndoRedo?.Redo.Execute(null),
+                () => DocumentManager.ActiveUndoRedo?.Redo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveUndoRedo).
+                ObservesProperty(() => DocumentManager.ActiveUndoRedo!.IsModified), new("Control+Y")));
             
             SubItems.Add(new ModuleManuSeparatorItem());
             

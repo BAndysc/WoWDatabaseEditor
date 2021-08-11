@@ -1,0 +1,18 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WDE.Common.Avalonia.Controls">
+    <Design.PreviewWith>
+        <controls:SettingsHeader />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|SettingsHeader">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <TextBlock FontWeight="Bold" Name="Text" Text="{TemplateBinding Text}" />
+                    <Border Height="1" Background="{Binding #Text.Foreground}" Margin="10,0" Opacity="0.3" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

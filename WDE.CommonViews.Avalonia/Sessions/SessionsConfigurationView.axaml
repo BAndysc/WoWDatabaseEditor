@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sessions="clr-namespace:WDE.Solutions.Sessions;assembly=WDE.Solutions"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.CommonViews.Avalonia.Sessions.SessionsConfigurationView">
+    <Design.DataContext>
+        <sessions:SessionsConfigurationViewModel />
+    </Design.DataContext>
+    <ScrollViewer>
+        <StackPanel>
+            <controls:SettingsHeader Text="Configuration" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding DeleteOnSave}">After saving, always delete the session?</CheckBox>
+            <controls:SettingsHeader Text="Recently deleted sessions" />
+            <Button Command="{Binding RestoreSelectedSession}">Restore</Button>
+            <ListBox Items="{Binding DeletedSessions}" 
+                     SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid RowDefinitions="Auto,Auto">
+                            <TextBlock Text="{Binding Name, Mode=OneTime}" FontWeight="Bold" />
+                            <TextBlock Grid.Row="1" Text="{Binding LastModified, Mode=OneTime, StringFormat=Last modified: {0}}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

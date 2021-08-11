@@ -11,5 +11,7 @@ namespace WDE.Blueprints
         public string ExtraId => "";
 
         public bool IsExportable => false;
+
+        public ISolutionItem Clone() => null!;
     }
 }

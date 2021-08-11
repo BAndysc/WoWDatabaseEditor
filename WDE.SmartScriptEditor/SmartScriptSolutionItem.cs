@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using WDE.Common;
@@ -16,7 +17,8 @@ namespace WDE.SmartScriptEditor
         }
 
         public int Entry { get; }
-        public SmartScriptType SmartType { get; set; }
+        public SmartScriptType SmartType { get; }
+        
         public void UpdateDependants(HashSet<long> usedTimed)
         {
             for (int i = Items.Count - 1; i >= 0; --i)
@@ -44,5 +46,25 @@ namespace WDE.SmartScriptEditor
 
         [JsonIgnore]
         public bool IsExportable => true;
+
+        public ISolutionItem Clone() => new SmartScriptSolutionItem(Entry, SmartType);
+
+        protected bool Equals(SmartScriptSolutionItem other)
+        {
+            return Entry == other.Entry && SmartType == other.SmartType;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((SmartScriptSolutionItem)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Entry, (int)SmartType);
+        }
     }
 }

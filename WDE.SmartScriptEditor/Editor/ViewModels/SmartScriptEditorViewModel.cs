@@ -938,17 +938,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             AutoDispose(new ActionDisposable(() => disposed = true));
             
-            AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
-                .Subscribe(args =>
-                {
-                    if (args.Item is ISmartScriptSolutionItem itemm && args.Item.GetType() == item.GetType())
-                    {
-                        if (itemm.Entry == item.Entry && itemm.SmartType == item.SmartType)
-                            args.Sql = smartScriptExporter.GenerateSql(itemm, script!);
-                    }
-                }));
-
             SetSolutionItem(item);
+        }
+
+        public Task<string> GenerateQuery()
+        {
+            return Task.FromResult(smartScriptExporter.GenerateSql(item, script));
         }
 
         public string Name => itemNameRegistry.GetName(item);

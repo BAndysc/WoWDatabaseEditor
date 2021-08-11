@@ -74,10 +74,17 @@ namespace WoWDatabaseEditor.Services.SolutionService
                         return;
                     }
 
-                    for (int i = 0; i < reduced.Count; ++i)
+                    try
                     {
-                        progress.Report(i, reduced.Count, reduced[i].GenerateCommand());
-                        await remoteConnectorService.ExecuteCommand(reduced[i]);
+                        for (int i = 0; i < reduced.Count; ++i)
+                        {
+                            progress.Report(i, reduced.Count, reduced[i].GenerateCommand());
+                            await remoteConnectorService.ExecuteCommand(reduced[i]);
+                        }
+                    }
+                    catch (CouldNotConnectToRemoteServer)
+                    {
+                        // we are fine with that
                     }
                     
                     progress.ReportFinished();

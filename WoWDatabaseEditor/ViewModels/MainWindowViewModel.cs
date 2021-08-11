@@ -10,6 +10,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
 using WDE.Common.Services;
+using WDE.Common.Sessions;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -42,6 +43,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             Func<TextDocumentViewModel> textDocumentCreator,
             ISolutionTasksService solutionTasksService,
             IMostRecentlyUsedService mostRecentlyUsedService,
+            ISessionService sessionService,
+            ITaskRunner taskRunner,
             IEventAggregator eventAggregator)
         {
             DocumentManager = documentManager;
@@ -57,6 +60,8 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (item == null)
                     return;
 
+                taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(item));
+                
                 if (DocumentManager.ActiveSolutionItemDocument!.Save?.CanExecute(null) ?? false)
                 {
                     DocumentManager.ActiveSolutionItemDocument.Save.Execute(null);

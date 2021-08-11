@@ -14,6 +14,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
@@ -29,7 +30,7 @@ using WDE.MVVM;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument
+    public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator
     {
         private readonly ISolutionItemNameRegistry solutionItemName;
         private readonly ISolutionManager solutionManager;
@@ -40,6 +41,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly ITaskRunner taskRunner;
         private readonly IParameterFactory parameterFactory;
         private readonly IItemFromListProvider itemFromListProvider;
+        private readonly ISessionService sessionService;
 
         protected ViewModelBase(IHistoryManager history,
             DatabaseTableSolutionItem solutionItem,
@@ -54,7 +56,8 @@ namespace WDE.DatabaseEditors.ViewModels
             IParameterFactory parameterFactory,
             ITableDefinitionProvider tableDefinitionProvider,
             IItemFromListProvider itemFromListProvider,
-            ISolutionItemIconRegistry iconRegistry)
+            ISolutionItemIconRegistry iconRegistry,
+            ISessionService sessionService)
         {
             this.solutionItemName = solutionItemName;
             this.solutionManager = solutionManager;
@@ -65,6 +68,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.taskRunner = taskRunner;
             this.parameterFactory = parameterFactory;
             this.itemFromListProvider = itemFromListProvider;
+            this.sessionService = sessionService;
             this.solutionItem = solutionItem;
             History = history;
             
@@ -84,9 +88,6 @@ namespace WDE.DatabaseEditors.ViewModels
             
             tableDefinition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId)!;
             nameGeneratorParameter = parameterFactory.Factory(tableDefinition.Picker);
-            
-            AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
-                .Subscribe(ExecuteSql));
         }
         
         protected async Task EditParameter(IParameterValue parameterValue)
@@ -123,15 +124,29 @@ namespace WDE.DatabaseEditors.ViewModels
             taskRunner.ScheduleTask($"Loading {Title}..", LoadTableDefinition);
         }
 
-        private void ExecuteSql(EventRequestGenerateSqlArgs args)
+        public Task<string> GenerateQuery()
         {
-            if (args.Item is not DatabaseTableSolutionItem dbEditItem) 
-                return;
-            
-            if (!SolutionItem.Equals(dbEditItem)) 
-                return;
-            
-            args.Sql = queryGenerator.GenerateQuery(GenerateKeys(), new DatabaseTableData(tableDefinition, Entities)).QueryString;
+            return Task.FromResult(queryGenerator
+                .GenerateQuery(GenerateKeys(), new DatabaseTableData(tableDefinition, Entities)).QueryString);
+        }
+
+        protected virtual List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity) => null;
+
+        public Task<IList<(ISolutionItem, string)>> GenerateSplitQuery()
+        {
+            var keys = GenerateKeys();
+            IList<(ISolutionItem, string)> split = new List<(ISolutionItem, string)>();
+            foreach (var key in keys)
+            {
+                var entities = Entities.Where(e => e.Key == key).ToList();
+                var sql = queryGenerator
+                    .GenerateQuery(new List<uint>(){key}, new DatabaseTableData(tableDefinition, entities)).QueryString;
+                var splitItem = new DatabaseTableSolutionItem(tableDefinition.Id);
+                splitItem.Entries.Add(new SolutionItemDatabaseEntity(key, entities.Count > 0 ? entities[0].ExistInDatabase : false, entities.Count > 0 ? GetOriginalFields(entities[0]) : null));
+                split.Add((splitItem, sql));
+            }
+
+            return Task.FromResult(split);
         }
 
         private void SaveSolutionItem()

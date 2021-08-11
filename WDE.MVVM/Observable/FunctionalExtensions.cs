@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using WDE.MVVM.Observable.Functional;
 
 namespace WDE.MVVM.Observable
@@ -19,6 +21,11 @@ namespace WDE.MVVM.Observable
         public static IObservable<CollectionEvent<T>> ToStream<T>(this ObservableCollection<T> collection)
         {
             return new ObservableCollectionStream<T>(collection);
+        }
+
+        public static IObservable<CollectionEvent<T>> ToStream<T>(this INotifyCollectionChanged collection, IEnumerable<T> initial)
+        {
+            return new ObservableCollectionStream<T>(initial, collection);
         }
 
         public static void RemoveAll<T>(this ObservableCollection<T> collection)

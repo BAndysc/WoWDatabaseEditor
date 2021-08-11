@@ -42,7 +42,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             if (tool == null)
                 return null;
             
-            var toolDockWrapper = new AvaloniaToolDockWrapper(tool);
+            var toolDockWrapper = new AvaloniaToolDockWrapper(documentManager, tool);
             tools[tool] = toolDockWrapper;
             tool.Visibility = true;
             return toolDockWrapper;
@@ -108,7 +108,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 {
                     if (isVisible && !tools.ContainsKey(tool))
                     {
-                        var dockable = new AvaloniaToolDockWrapper(tool);
+                        var dockable = new AvaloniaToolDockWrapper(documentManager, tool);
                         tools[tool] = dockable;
                         factory.AddTool(currentLayout!, dockable);
                     }

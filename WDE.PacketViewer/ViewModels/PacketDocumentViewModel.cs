@@ -457,6 +457,8 @@ namespace WDE.PacketViewer.ViewModels
         public bool IsModified => false;
         public IHistoryManager? History => null;
         public ISolutionItem SolutionItem { get; }
+        public Task<string> GenerateQuery() => Task.FromResult("");
+
         public bool ShowExportToolbarButtons => false;
     }
 }

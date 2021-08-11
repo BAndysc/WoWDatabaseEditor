@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
@@ -6,36 +7,46 @@ namespace WDE.MVVM.Observable.Functional
 {
     public class ObservableCollectionStream<T> : IObservable<CollectionEvent<T>>
     {
-        private readonly ObservableCollection<T> collection;
+        private readonly IEnumerable<T> initial;
+        private readonly INotifyCollectionChanged notifyCollectionChanged;
 
-        public ObservableCollectionStream(ObservableCollection<T> collection)
+        public ObservableCollectionStream(IEnumerable<T> initial, INotifyCollectionChanged notifyCollectionChanged)
         {
-            this.collection = collection;
+            this.initial = initial;
+            this.notifyCollectionChanged = notifyCollectionChanged;
+        }
+
+        public ObservableCollectionStream(ObservableCollection<T> collection) : this(collection, collection)
+        {
         }
 
         public IDisposable Subscribe(IObserver<CollectionEvent<T>> observer)
         {
-            return new Subscription(collection, observer);
+            return new Subscription(initial, notifyCollectionChanged, observer);
         }
 
         private class Subscription : IDisposable
         {
-            private readonly ObservableCollection<T> collection;
+            private readonly INotifyCollectionChanged notifyCollectionChanged;
             private readonly IObserver<CollectionEvent<T>> observer;
-
-            public Subscription(ObservableCollection<T> collection, IObserver<CollectionEvent<T>> observer)
+            
+            public Subscription(IEnumerable<T> initial, INotifyCollectionChanged changed, IObserver<CollectionEvent<T>> observer)
             {
-                this.collection = collection;
+                notifyCollectionChanged = changed;
+                
                 this.observer = observer;
-                collection.CollectionChanged += CollectionOnCollectionChanged;
+                changed.CollectionChanged += CollectionOnCollectionChanged;
 
-                for (var index = 0; index < collection.Count; index++)
-                    observer.OnNext(new CollectionEvent<T>(CollectionEventType.Add, collection[index], index));
+                int index = 0;
+                foreach (var t in initial)
+                {
+                    observer.OnNext(new CollectionEvent<T>(CollectionEventType.Add, t, index++));   
+                }
             }
 
             public void Dispose()
             {
-                collection.CollectionChanged -= CollectionOnCollectionChanged;
+                notifyCollectionChanged.CollectionChanged -= CollectionOnCollectionChanged;
             }
             
             private void CollectionOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

@@ -35,4 +35,10 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Sessions\SessionToolView.axaml.cs">
+        <DependentUpon>SessionToolView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

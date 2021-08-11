@@ -13,5 +13,7 @@ namespace WDE.Common
 
         [JsonIgnore]
         bool IsExportable { get; }
+
+        ISolutionItem Clone();
     }
 }

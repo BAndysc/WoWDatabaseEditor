@@ -12,6 +12,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
     public class DockFactory : Factory
     {
         public override IDocumentDock CreateDocumentDock() => new FocusAwareDocumentDock();
+        public override IToolDock CreateToolDock() => new FocusAwareToolDock();
 
         public void AddDocument(IDock layout, AvaloniaDocumentDockWrapper document)
         {

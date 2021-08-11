@@ -14,15 +14,15 @@ namespace WDE.PacketViewer.Solutions
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 25,
-                Comment = item.File
+                StringValue = item.File
             };
         }
 
         public bool TryDeserialize(ISmartScriptProjectItem projectItem, out ISolutionItem? solutionItem)
         {
-            if (projectItem.Type == 25 && !string.IsNullOrEmpty(projectItem.Comment))
+            if (projectItem.Type == 25 && !string.IsNullOrEmpty(projectItem.StringValue))
             {
-                solutionItem = new PacketDocumentSolutionItem(projectItem.Comment);
+                solutionItem = new PacketDocumentSolutionItem(projectItem.StringValue);
                 return true;
             }
             solutionItem = null;

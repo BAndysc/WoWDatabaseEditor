@@ -16,4 +16,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             });
         }
     }
+    
+    public class FocusAwareToolDock : ToolDock
+    {
+        public FocusAwareToolDock()
+        {
+            this.ToObservable(t => t.IsActive).Where(w => w).SubscribeAction(_ =>
+            {
+                if (ActiveDockable is IDockableFocusable dockableFocusable)
+                    dockableFocusable.OnFocus();
+            });
+        }
+    }
 }

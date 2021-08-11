@@ -22,7 +22,7 @@ namespace WDE.HistoryWindow.ViewModels
     {
         private bool visibility;
 
-        private IDocument previousDocument;
+        private IUndoRedoWindow previousDocument;
 
         public string UniqueId => "history_view";
         public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Right;
@@ -30,12 +30,12 @@ namespace WDE.HistoryWindow.ViewModels
 
         public HistoryViewModel(IEventAggregator eventAggregator)
         {
-            eventAggregator.GetEvent<EventActiveDocumentChanged>()
+            eventAggregator.GetEvent<EventActiveUndoRedoDocumentChanged>()
                 .Subscribe(doc =>
                 {
                     Items.Clear();
 
-                    if (previousDocument != null)
+                    if (previousDocument != null && previousDocument.History != null)
                     {
                         previousDocument.History.Past.CollectionChanged -= HistoryCollectionChanged;
                         previousDocument.History.Future.CollectionChanged -= HistoryCollectionChanged;
@@ -74,6 +74,9 @@ namespace WDE.HistoryWindow.ViewModels
         private void HistoryCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             Items.Clear();
+            if (previousDocument.History == null)
+                return;
+            
             foreach (IHistoryAction past in previousDocument.History.Past)
                 Items.Add(new HistoryEvent {Name = past.GetDescription(), IsFromFuture = false});
 

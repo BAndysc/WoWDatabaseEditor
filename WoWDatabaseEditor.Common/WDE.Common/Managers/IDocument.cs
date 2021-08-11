@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.History;
@@ -8,26 +9,36 @@ using WDE.Common.Types;
 
 namespace WDE.Common.Managers
 {
-    public interface IDocument : IDisposable, INotifyPropertyChanged
+    public interface IUndoRedoWindow
+    {
+        ICommand Undo { get; }
+        ICommand Redo { get; }
+        IHistoryManager? History { get; }
+        bool IsModified { get; }
+    }
+    
+    public interface IDocument : IUndoRedoWindow, IDisposable, INotifyPropertyChanged
     {
         string Title { get; }
         ImageUri? Icon => null;
-        ICommand Undo { get; }
-        ICommand Redo { get; }
         ICommand Copy { get; }
         ICommand Cut { get; }
         ICommand Paste { get; }
         ICommand Save { get; }
         IAsyncCommand? CloseCommand { get; set; }
         bool CanClose { get; }
-        bool IsModified { get; }
-        IHistoryManager? History { get; }
     }
 
     public interface ISolutionItemDocument : IDocument
     {
         ISolutionItem SolutionItem { get; }
+        Task<string> GenerateQuery();
         bool ShowExportToolbarButtons => true;
+    }
+
+    public interface ISplitSolutionItemQueryGenerator
+    {
+        Task<IList<(ISolutionItem, string)>> GenerateSplitQuery();
     }
 
     public interface IProblemSourceDocument : IDocument

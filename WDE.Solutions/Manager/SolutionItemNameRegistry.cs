@@ -30,8 +30,16 @@ namespace WDE.Solutions.Manager
 
         private string GetName<T>(T item) where T : ISolutionItem
         {
-            var x = (ISolutionNameProvider<T>)nameProviders[item.GetType()];
-            return x.GetName(item);
+            if (nameProviders.TryGetValue(item.GetType(), out var nameProvider))
+            {
+                var x = (ISolutionNameProvider<T>)nameProvider;
+                return x.GetName(item);
+            }
+#if DEBUG
+            return item.GetType().Name + " (missing ISolutionNameProvider<T>)";
+#else
+            return item.GetType().Name;
+#endif
         }
     }
 }

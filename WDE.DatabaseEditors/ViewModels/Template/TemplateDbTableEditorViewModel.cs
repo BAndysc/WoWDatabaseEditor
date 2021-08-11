@@ -14,11 +14,13 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Expressions;
+using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
@@ -40,6 +42,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly IQueryGenerator queryGenerator;
         private readonly ITeachingTipService teachingTipService;
         private readonly ICreatureStatCalculatorService creatureStatCalculatorService;
+        private readonly ISessionService sessionService;
 
         private readonly IDatabaseTableDataProvider tableDataProvider;
         
@@ -68,10 +71,10 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             IQueryGenerator queryGenerator, ITeachingTipService teachingTipService,
             ICreatureStatCalculatorService creatureStatCalculatorService,
             ITableDefinitionProvider tableDefinitionProvider,
-            ISolutionItemIconRegistry iconRegistry) : base(history, solutionItem, solutionItemName, 
+            ISolutionItemIconRegistry iconRegistry, ISessionService sessionService) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, 
-            tableDefinitionProvider, itemFromListProvider, iconRegistry)
+            tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;
@@ -81,6 +84,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             this.queryGenerator = queryGenerator;
             this.teachingTipService = teachingTipService;
             this.creatureStatCalculatorService = creatureStatCalculatorService;
+            this.sessionService = sessionService;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
 
@@ -231,7 +235,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue);
 
-        private List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
+        protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
         {
             var modified = entity.Fields.Where(f => f.IsModified).ToList();
             if (modified.Count == 0)
@@ -279,6 +283,11 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public override bool ForceInsertEntity(DatabaseEntity entity, int index)
         {
             Dictionary<string, IObservable<bool>?> groupVisibility = new();
+
+            var pseudoItem = new DatabaseTableSolutionItem(entity.Key, entity.ExistInDatabase, tableDefinition.Id);
+            var savedItem = sessionService.Find(pseudoItem);
+            if (savedItem is DatabaseTableSolutionItem savedTableItem)
+                savedTableItem.UpdateEntitiesWithOriginalValues(new List<DatabaseEntity>(){entity});
             
             foreach (var row in Rows.Items)
             {

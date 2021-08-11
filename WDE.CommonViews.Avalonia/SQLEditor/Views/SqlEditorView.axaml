@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
     </UserControl.Resources>
-    <avaloniaEdit:TextEditor controls:AvalonEditExtra.Syntax="Resources/SqlSyntax.xml" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
+    <avaloniaEdit:TextEditor controls:AvalonEditExtra.SyntaxExtension="sql" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
                              ShowLineNumbers="True"
                              BorderThickness="0"
                              FontFamily="Consolas,Menlo,Courier,Courier New" />

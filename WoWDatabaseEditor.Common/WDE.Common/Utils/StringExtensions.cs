@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 
 namespace WDE.Common.Utils
 {
@@ -35,6 +36,15 @@ namespace WDE.Common.Utils
             return "\"" +  str.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n") + "\"";
         }
 
+        public static string ToAlphanumerical(this string str)
+        {
+            char[] arr = str.Where(c => (char.IsLetterOrDigit(c) || 
+                                         char.IsWhiteSpace(c) || 
+                                         c == '-')).ToArray(); 
+
+            return new string(arr);
+        }
+        
         public static string ToEnumName(this string str)
         {
             var sb = new StringBuilder();

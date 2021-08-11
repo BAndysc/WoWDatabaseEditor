@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Solution;
@@ -12,9 +15,9 @@ namespace WDE.DatabaseEditors.Solution
         public bool TryDeserialize(ISmartScriptProjectItem projectItem, out ISolutionItem? solutionItem)
         {
             solutionItem = null;
-            if (projectItem.Type == 32 && projectItem.Comment != null)
+            if (projectItem.Type == 32 && projectItem.StringValue != null)
             {
-                var split = projectItem.Comment.Split(':');
+                var split = projectItem.StringValue.Split(':');
                 if (split.Length != 2)
                     return false;
 
@@ -25,7 +28,15 @@ namespace WDE.DatabaseEditors.Solution
                     .Select(i => new SolutionItemDatabaseEntity(i, true));
 
                 var dbItem = new DatabaseTableSolutionItem(table);
-                dbItem.Entries.AddRange(items);
+                if (string.IsNullOrEmpty(projectItem.Comment))
+                {
+                    dbItem.Entries.AddRange(items);
+                }
+                else
+                {
+                    var entries = JsonConvert.DeserializeObject<List<SolutionItemDatabaseEntity>>(projectItem.Comment);
+                    dbItem.Entries.AddRange(entries);
+                }
                 solutionItem = dbItem;
                 return true;
             }
@@ -35,11 +46,13 @@ namespace WDE.DatabaseEditors.Solution
 
         public ISmartScriptProjectItem Serialize(DatabaseTableSolutionItem item)
         {
+            var entries = JsonConvert.SerializeObject(item.Entries);
             var items = string.Join(",", item.Entries.Select(e => e.Key));
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 32,
-                Comment = $"{item.DefinitionId}:{items}"
+                StringValue = $"{item.DefinitionId}:{items}",
+                Comment = entries
             };
         }
     }

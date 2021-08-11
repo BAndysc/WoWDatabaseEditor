@@ -10,6 +10,7 @@
         <converters:StripTagConverter x:Key="StripTagConverter" />
         <converters:NullConverter Inverted="True" x:Key="NullConverter" />
     </Styles.Resources>
+    <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/SettingsHeader.axaml"></StyleInclude>
     <Style Selector="controls|ParameterValueHolderView">
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">

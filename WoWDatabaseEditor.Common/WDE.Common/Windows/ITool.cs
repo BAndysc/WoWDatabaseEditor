@@ -14,6 +14,11 @@ namespace WDE.Common.Windows
         bool IsSelected { get; set; }
     }
 
+    public interface IFocusableTool : ITool
+    {
+        
+    }
+
     public enum ToolPreferedPosition
     {
         Left, Right, Bottom

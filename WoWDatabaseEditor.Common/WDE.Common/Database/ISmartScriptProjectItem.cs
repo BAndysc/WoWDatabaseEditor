@@ -7,6 +7,7 @@ namespace WDE.Common.Database
         byte Type { get; set; }
         int Value { get; set; }
         int? Value2 { get; set; }
+        string? StringValue { get; set; }
         string? Comment { get; set; }
     }
 
@@ -17,6 +18,7 @@ namespace WDE.Common.Database
         public byte Type { get; set; }
         public int Value { get; set; }
         public int? Value2 { get; set; }
+        public string? StringValue { get; set; }
         public string? Comment { get; set; }
     }
 }

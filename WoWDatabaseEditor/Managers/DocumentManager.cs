@@ -23,6 +23,8 @@ namespace WoWDatabaseEditorCore.Managers
         private readonly IMessageBoxService messageBoxService;
         private ISolutionItemDocument? activeSolutionItemDocument;
         private IDocument? activeDocument;
+        private IFocusableTool? activeTool;
+        private IUndoRedoWindow? activeUndoRedo;
         private Dictionary<Type, ITool> typeToToolInstance = new();
         private List<ITool> allTools = new ();
 
@@ -58,12 +60,47 @@ namespace WoWDatabaseEditorCore.Managers
             get => activeDocument;
             set
             {
-                if (value == null && activeDocument != null && OpenedDocuments.Contains(activeDocument))
+                if (value == null && activeDocument != null && OpenedDocuments.Contains(activeDocument) && activeTool == null)
                     return;
+                if (value != null)
+                {
+                    ActiveTool = null;
+                    if (value is IUndoRedoWindow undoRedoWindow)
+                        ActiveUndoRedo = undoRedoWindow;
+                } else if (ActiveUndoRedo == activeDocument && activeDocument != null)
+                    ActiveUndoRedo = null;
                 activeSolutionItemDocument = value as ISolutionItemDocument;
                 SetProperty(ref activeDocument, value);
                 RaisePropertyChanged(nameof(ActiveSolutionItemDocument));
                 eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
+            }
+        }
+        
+        public IFocusableTool? ActiveTool
+        {
+            get => activeTool;
+            set
+            {
+                var oldActiveTool = activeTool;
+                activeTool = value;
+                if (value != null)
+                {
+                    ActiveDocument = null;
+                    if (value is IUndoRedoWindow undoRedoWindow)
+                        ActiveUndoRedo = undoRedoWindow;
+                } else if (ActiveUndoRedo == oldActiveTool && oldActiveTool != null)
+                    ActiveUndoRedo = null;
+                RaisePropertyChanged(nameof(ActiveTool));
+            }
+        }
+
+        public IUndoRedoWindow? ActiveUndoRedo
+        {
+            get => activeUndoRedo;
+            private set
+            {
+                SetProperty(ref activeUndoRedo, value);
+                eventAggregator.GetEvent<EventActiveUndoRedoDocumentChanged>().Publish(value);
             }
         }
 

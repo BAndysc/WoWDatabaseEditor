@@ -36,7 +36,7 @@ namespace WoWDatabaseEditorCore.Services.MostRecentlyUsed
                 if (serialized == null)
                     return;
 
-                MruEntry entry = new MruEntry(serialized.Type, serialized.Value, serialized.Value2, serialized.Comment);
+                MruEntry entry = new MruEntry(serialized.Type, serialized.Value, serialized.Value2, serialized.StringValue);
                 mostRecentlyUsed.Remove(entry);
                 
                 if (mostRecentlyUsed.Count >= MaxMruEntries)
@@ -125,7 +125,7 @@ namespace WoWDatabaseEditorCore.Services.MostRecentlyUsed
                         Type = entry.Type,
                         Value = entry.Value,
                         Value2 = entry.Value2,
-                        Comment = entry.StringValue
+                        StringValue = entry.StringValue
                     };
                     
                     if (deserializer.TryDeserialize(projectItem, out var solutionItem))

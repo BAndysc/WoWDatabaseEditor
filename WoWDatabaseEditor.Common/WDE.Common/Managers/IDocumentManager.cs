@@ -11,6 +11,8 @@ namespace WDE.Common.Managers
     public interface IDocumentManager : INotifyPropertyChanged
     {
         IDocument? ActiveDocument { get; set; }
+        IFocusableTool? ActiveTool { get; set; }
+        IUndoRedoWindow? ActiveUndoRedo { get; }
         ISolutionItemDocument? ActiveSolutionItemDocument { get; }
         IReadOnlyList<ITool> AllTools { get; }
         ObservableCollection<IDocument> OpenedDocuments { get; }

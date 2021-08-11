@@ -13,6 +13,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
@@ -70,11 +71,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
             ITableDefinitionProvider tableDefinitionProvider,
-            IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry) 
+            IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
+            ISessionService sessionService) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
-            tableDefinitionProvider, itemFromListProvider, iconRegistry)
+            tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;

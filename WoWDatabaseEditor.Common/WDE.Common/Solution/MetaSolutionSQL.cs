@@ -14,5 +14,7 @@ namespace WDE.Common.Solution
         public string? ExtraId => null;
         public bool IsExportable => false;
         public ISolutionItem[] ItemsToGenerate { get; }
+        
+        public ISolutionItem Clone() => new MetaSolutionSQL(ItemsToGenerate);
     }
 }

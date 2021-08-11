@@ -4,6 +4,7 @@ using WDE.CommonViews.Avalonia.DbcStore.Views;
 using WDE.CommonViews.Avalonia.History.Views;
 using WDE.CommonViews.Avalonia.Parameters.Views;
 using WDE.CommonViews.Avalonia.RemoteSOAP.Views;
+using WDE.CommonViews.Avalonia.Sessions;
 using WDE.CommonViews.Avalonia.Solutions.Explorer.Views;
 using WDE.CommonViews.Avalonia.SQLEditor.Views;
 using WDE.CommonViews.Avalonia.TrinityMySqlDatabase.Tools;
@@ -17,6 +18,7 @@ using WDE.MySqlDatabaseCommon.Tools;
 using WDE.Parameters.ViewModels;
 using WDE.RemoteSOAP.ViewModels;
 using WDE.Solutions.Explorer.ViewModels;
+using WDE.Solutions.Sessions;
 using WDE.SQLEditor.ViewModels;
 using WDE.TrinityMySqlDatabase.ViewModels;
 using WDE.Updater.ViewModels;
@@ -33,6 +35,8 @@ namespace WDE.CommonViews.Avalonia
             viewLocator.Bind<DebugQueryToolViewModel, DebugQueryToolView>();
             // solutions
             viewLocator.Bind<SolutionExplorerViewModel, SolutionExplorerView>();
+            viewLocator.Bind<SessionToolViewModel, SessionToolView>();
+            viewLocator.Bind<SessionsConfigurationViewModel, SessionsConfigurationView>();
             // parameters
             viewLocator.Bind<ParametersViewModel, ParametersView>();
             // history

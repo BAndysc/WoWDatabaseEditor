@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:sessions="clr-namespace:WDE.Solutions.Sessions;assembly=WDE.Solutions"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.CommonViews.Avalonia.Sessions.SessionToolView">
+    <Design.DataContext>
+        <sessions:SessionToolViewModel />
+    </Design.DataContext>
+    <UserControl.Styles>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="7,2" />
+        </Style>
+    </UserControl.Styles>
+    <DockPanel>
+       <controls:ToolbarPanel DockPanel.Dock="Top">
+           <components:ButtonImage Command="{Binding NewSessionCommand, Mode=OneTime}" Image="icons/icon_new.png" ToolTip.Tip="New session" />
+           <components:ButtonImage Command="{Binding SaveCurrentCurrent, Mode=OneTime}" Image="icons/icon_save.png" ToolTip.Tip="Save session" />
+           <components:ButtonImage Command="{Binding PreviewCurrentCommand}" Image="icons/icon_to_sql.png" ToolTip.Tip="Preview current total SQL" />
+           <components:ButtonImage Command="{Binding ForgetCurrentCurrent}" Image="icons/icon_trash.png" ToolTip.Tip="Forget session" />
+           <controls:ToolbarSpacer />
+           <components:ButtonImage Command="{Binding DeleteSelectedItem}" Image="icons/icon_delete.png" ToolTip.Tip="Remove item" />
+           <components:ButtonImage ToolTip.Tip="Open sessions help website" Command="{Binding OpenHelpCommand}" Image="icons/icon_help.png" />
+       </controls:ToolbarPanel>
+       <ComboBox DockPanel.Dock="Top" HorizontalAlignment="Stretch" 
+                 IsVisible="{Binding HasAnySessions}"
+                 Items="{Binding Sessions}" SelectedItem="{Binding SelectedSession, Mode=TwoWay}">
+           <ComboBox.ItemTemplate>
+               <DataTemplate>
+                   <TextBlock Text="{Binding Name}" />
+               </DataTemplate>
+           </ComboBox.ItemTemplate>
+       </ComboBox>
+       <ListBox Items="{Binding CurrentSolutionItems}"
+                BorderThickness="0" 
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                DoubleTapped="Tv_OnDoubleTapped">
+           <ListBox.ItemTemplate>
+               <DataTemplate>
+                   <DockPanel LastChildFill="True" Height="26" Background="Transparent">
+                       <components:WdeImage Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Image="{Binding Icon}" />
+                       <TextBlock Padding="2" VerticalAlignment="Center" Text="{Binding ExtraId}"
+                                  FontFamily="Consolas,Menlo,Courier,Courier New" Background="{DynamicResource ContentSpecialBackground}"
+                                  Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
+                           <Interaction.Behaviors>
+                               <DataTriggerBehavior Binding="{Binding ExtraId}" ComparisonCondition="Equal" Value="{x:Null}">
+                                   <ChangePropertyAction TargetObject="TextBlock" PropertyName="IsVisible" Value="False"/>
+                               </DataTriggerBehavior>
+                           </Interaction.Behaviors>
+                       </TextBlock>
+                       <TextBlock Margin="0,0,0,0" Padding="0,0,0,0" VerticalAlignment="Center"
+                                  Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                   </DockPanel>
+               </DataTemplate>
+           </ListBox.ItemTemplate>
+       </ListBox>
+   </DockPanel>
+</UserControl>

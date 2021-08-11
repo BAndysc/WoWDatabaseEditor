@@ -24,5 +24,7 @@ namespace WDE.PacketViewer.Solutions
 
         [JsonIgnore] 
         public bool IsExportable => false;
+
+        public ISolutionItem Clone() => new PacketDocumentSolutionItem(File);
     }
 }
