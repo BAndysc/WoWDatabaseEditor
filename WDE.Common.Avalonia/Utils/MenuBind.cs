@@ -11,6 +11,8 @@ using AvaloniaEdit;
 using AvaloniaEdit.Editing;
 using Prism.Commands;
 using WDE.Common.Menu;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 
 namespace WDE.Common.Avalonia.Utils
 {
@@ -47,6 +49,12 @@ namespace WDE.Common.Avalonia.Utils
                                 var keyGesture = new KeyGesture(key, cmd.Shortcut.Value.Control ? systemWideControlModifier : KeyModifiers.None);
                                 nativeMenuItem.Gesture = keyGesture;
                             }
+                        }
+                        if (subItem is ICheckableMenuItem checkable)
+                        {
+                            nativeMenuItem.ToggleType = NativeMenuItemToggleType.CheckBox;
+                            checkable.ToObservable(o => o.IsChecked)
+                                .SubscribeAction(@is => nativeMenuItem.IsChecked = @is);
                         }
                         item = nativeMenuItem;
                     }

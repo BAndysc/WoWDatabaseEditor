@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Input;
 using WDE.Common.Managers;
 
@@ -23,6 +24,11 @@ namespace WDE.Common.Menu
     {
         ICommand ItemCommand { get; }
         MenuShortcut? Shortcut { get; }
+    }
+
+    public interface ICheckableMenuItem : IMenuItem, INotifyPropertyChanged
+    {
+        public bool IsChecked { get; }
     }
 
     public interface IMenuCategoryItem: IMenuItem

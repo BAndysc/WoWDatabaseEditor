@@ -1,6 +1,7 @@
 <Style xmlns="https://github.com/avaloniaui"
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
        xmlns:local="clr-namespace:Avalonia.Themes.Fluent"
+       xmlns:converters="clr-namespace:AvaloniaStyles.Converters"
        Selector="NativeMenuBar">
     <Setter Property="Template">
         <ControlTemplate>
@@ -8,6 +9,8 @@
                 Items="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
                 <Menu.Styles>
                     <Style Selector="MenuItem">
+                        <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>
+                        <Setter Property="(converters:NativeMenuItemHelper.ToggleType)" Value="{Binding ToggleType}"></Setter>
                         <Setter Property="Header" Value="{Binding Header}"/>
                         <Setter Property="InputGesture" Value="{Binding Gesture}"/>
                         <Setter Property="HotKey" Value="{Binding Gesture}" />
