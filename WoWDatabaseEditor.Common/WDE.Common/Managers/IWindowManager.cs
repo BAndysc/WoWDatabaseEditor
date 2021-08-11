@@ -12,7 +12,7 @@ namespace WDE.Common.Managers
         
         Task<string?> ShowOpenFileDialog(string filter, string? defaultDirectory = null);
         
-        Task<string?> ShowSaveFileDialog(string filter, string? defaultDirectory = null);
+        Task<string?> ShowSaveFileDialog(string filter, string? defaultDirectory = null, string? initialFileName = null);
 
         void OpenUrl(string url);
     }

@@ -64,13 +64,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             return result[0];
         }
 
-        public async Task<string?> ShowSaveFileDialog(string filter, string? defaultDirectory = null)
+        public async Task<string?> ShowSaveFileDialog(string filter, string? defaultDirectory = null, string? initialFileName = null)
         {
             var f = filter.Split("|");
             
             var result = await new SaveFileDialog()
             {
                 Directory = defaultDirectory,
+                InitialFileName = initialFileName ?? "",
                 Filters = f.Zip(f.Skip(1))
                     .Where((x, i) => i % 2 == 0)
                     .Select(x => new FileDialogFilter()
