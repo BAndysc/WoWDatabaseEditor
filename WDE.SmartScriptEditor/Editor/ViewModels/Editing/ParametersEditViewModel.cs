@@ -99,7 +99,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public DelegateCommand Accept { get; }
         public DelegateCommand Cancel { get; }
         public int DesiredWidth => 545;
-        public int DesiredHeight => 725;
+        public int DesiredHeight => 625;
         public string Title => "Edit";
         public bool Resizeable => true;
 

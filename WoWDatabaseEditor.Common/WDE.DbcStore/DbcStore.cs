@@ -60,6 +60,7 @@ namespace WDE.DbcStore
         public Dictionary<long, string> ClassStore { get; internal set;} = new();
         public Dictionary<long, string> RaceStore { get; internal set;} = new();
         public Dictionary<long, string> EmoteStore { get;internal set; } = new();
+        public Dictionary<long, string> TextEmoteStore { get;internal set; } = new();
         public Dictionary<long, string> AchievementStore { get; internal set;} = new();
         public Dictionary<long, string> ItemStore { get; internal set;} = new();
         public Dictionary<long, string> SpellFocusObjectStore { get; internal set; } = new();
@@ -101,6 +102,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> ClassStore { get; } = new();
             public Dictionary<long, string> RaceStore { get; } = new();
             public Dictionary<long, string> EmoteStore { get; } = new();
+            public Dictionary<long, string> TextEmoteStore { get; } = new();
             public Dictionary<long, string> AchievementStore { get; } = new();
             public Dictionary<long, string> ItemStore { get; } = new();
             public Dictionary<long, string> SpellFocusObjectStore { get; } = new();
@@ -160,6 +162,7 @@ namespace WDE.DbcStore
                 store.ClassStore = ClassStore;
                 store.RaceStore = RaceStore;
                 store.EmoteStore = EmoteStore;
+                store.TextEmoteStore = TextEmoteStore;
                 store.AchievementStore = AchievementStore;
                 store.ItemStore = ItemStore;
                 store.SpellFocusObjectStore = SpellFocusObjectStore;
@@ -174,6 +177,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
+                parameterFactory.Register("TextEmoteParameter", new DbcParameter(TextEmoteStore));
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore));
                 parameterFactory.Register("ClassMaskParameter", new DbcMaskParameter(ClassStore, -1));
                 parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
@@ -206,7 +210,7 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
-                        max = 21;
+                        max = 22;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 3, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -220,6 +224,7 @@ namespace WDE.DbcStore
                         Load("chrClasses.dbc", 0, 4, ClassStore);
                         Load("chrRaces.dbc", 0, 14, RaceStore);
                         Load("Emotes.dbc", 0, 1, EmoteStore);
+                        Load("EmotesText.dbc", 0, 1, TextEmoteStore);
                         Load("SoundEntries.dbc", 0, 2, SoundStore);
                         Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore);
                         Load("QuestInfo.dbc", 0, 1, QuestInfoStore);
@@ -232,7 +237,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.CATA_15595:
                     {
-                        max = 23;
+                        max = 24;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -246,6 +251,7 @@ namespace WDE.DbcStore
                         Load("chrClasses.dbc", 0, 3, ClassStore);
                         Load("chrRaces.dbc", 0, 14, RaceStore);
                         Load("Emotes.dbc", 0, 1, EmoteStore);
+                        Load("EmotesText.dbc", 0, 1, TextEmoteStore);
                         Load("item-sparse.db2", 0, 99, ItemStore);
                         Load("Phase.dbc", 0, 1, PhaseStore);
                         Load("SoundEntries.dbc", 0, 2, SoundStore);
@@ -268,6 +274,7 @@ namespace WDE.DbcStore
                         Load("chrClasses.db2", 19, 1, ClassStore);
                         Load("chrRaces.db2", 34, 2, RaceStore);
                         Load("Emotes.db2", 0, 2, EmoteStore);
+                        Load("EmotesText.db2", 0, 1, TextEmoteStore);
                         Load("ItemSparse.db2", 0, 2, ItemStore);
                         Load("Languages.db2", 1, 0, LanguageStore);
                         Load("Map.db2", 0, 1, MapDirectoryStore);

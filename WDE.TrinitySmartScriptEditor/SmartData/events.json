@@ -836,7 +836,7 @@
     "name": "SMART_EVENT_RECEIVE_EMOTE",
     "parameters": [
       {
-        "type": "EmoteParameter",
+        "type": "TextEmoteParameter",
         "name": "Emote",
         "required": true,
         "description": "Note: \"0\" does NOT mean any emote"
