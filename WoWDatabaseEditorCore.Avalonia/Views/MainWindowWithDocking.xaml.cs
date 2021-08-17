@@ -97,6 +97,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             }
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            GlobalApplication.IsRunning = false;
+        }
+        
         private async Task TryClose(MainWindowViewModel closeAwareViewModel)
         {
             if (await closeAwareViewModel.CanClose())

@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.ServerIntegration
@@ -13,14 +17,92 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
     {
         private readonly IRemoteConnectorService remoteConnectorService;
         private readonly IStatusBar statusBar;
+        private readonly Lazy<IWindowManager> windowManager;
+        private readonly IMainThread mainThread;
+
+        private List<ReverseRemoteCommandHolder> commands = new();
 
         public ServerIntegration(IRemoteConnectorService remoteConnectorService,
-            IStatusBar statusBar)
+            IStatusBar statusBar, Lazy<IWindowManager> windowManager,
+            IMainThread mainThread,
+            IEnumerable<IReverseRemoteCommand> reverseRemoteCommands)
         {
             this.remoteConnectorService = remoteConnectorService;
             this.statusBar = statusBar;
+            this.windowManager = windowManager;
+            this.mainThread = mainThread;
+
+            foreach (var command in reverseRemoteCommands)
+            {
+                var atr = command.GetType().GetCustomAttribute(typeof(ReverseRemoteCommandAttribute), true) as ReverseRemoteCommandAttribute;
+                if (atr == null)
+                    throw new Exception($"Found new ReverseRemoteCommand {command.GetType()}, but it doesn't have ReverseRemoteCommandAttribute, skipping");
+             
+                commands.Add(new(){Name = atr.Name, Command = command});
+            }
+            
+            new Thread(BeginFetchLoop).Start();
         }
 
+        private void BeginFetchLoop()
+        {
+            while (GlobalApplication.IsRunning)
+            {
+                var task = SilentInvoke(FetchEditorCommandsRemoteCommand.Instance);
+                task.Wait();
+                string? resp = task.Result;
+
+                if (!string.IsNullOrEmpty(resp))
+                {
+                    bool any = false;
+                    var split = resp.Split("\n");
+                    mainThread.Dispatch(() => windowManager.Value.Activate());
+                    foreach (var line in split)
+                    {
+                        bool anyCmd = false;
+                        foreach (var cmd in commands)
+                        {
+                            if (line.StartsWith(cmd.Name))
+                            {
+                                if (line.Length == cmd.Name.Length || line[cmd.Name.Length] == ' ')
+                                {
+                                    var args = line.Substring(cmd.Name.Length).Trim();
+                                    mainThread.Dispatch(() => cmd.Command.Invoke(new CommandArguments(args))).Wait();
+                                    any = true;
+                                    anyCmd = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!anyCmd)
+                            Console.WriteLine("Got command " + line + " but didn't found any command to process this");
+                    }
+                }
+
+                Thread.Sleep(50);
+            }
+        }
+
+        private async Task<string?> SilentInvoke(IRemoteCommand remoteCommand)
+        {
+            if (!remoteConnectorService.IsConnected)
+                return null;
+            
+            try
+            {
+                var response = (await remoteConnectorService.ExecuteCommand(remoteCommand)).Trim();
+
+                if (response.StartsWith("### USAGE:"))
+                    return null;
+                
+                return response;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        
         private async Task<string?> Invoke(IRemoteCommand remoteCommand)
         {
             if (!remoteConnectorService.IsConnected)
@@ -107,6 +189,16 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
             }
 
             return nearest;
+        }
+
+        private struct ReverseRemoteCommandHolder
+        {
+            public string Name { get; init; }
+            public IReverseRemoteCommand Command
+            {
+                get;
+                init;
+            }
         }
     }
 }

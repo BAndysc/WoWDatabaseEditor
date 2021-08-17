@@ -27,6 +27,8 @@ namespace WDE.Common.Tasks
         
         public static bool HighDpi { get; set; }
 
+        public static bool IsRunning { get; set; } = true;
+
         public static void InitializeApplication(IMainThread thread, AppBackend backend)
         {
             Debug.Assert(mainThread == null);

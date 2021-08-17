@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -20,6 +21,7 @@ using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module;
 using WDE.Module.Attributes;
@@ -281,6 +283,27 @@ namespace WoWDatabaseEditorCore.Avalonia
         public void Dispatch(Action action)
         {
             Dispatcher.UIThread.Post(action);
+        }
+
+        public Task Dispatch(Func<Task> action)
+        {
+            var tcs = new TaskCompletionSource();
+            Dispatcher.UIThread.Post(() => Do(action, tcs).ListenErrors());
+            return tcs.Task;
+        }
+
+        private async Task Do(Func<Task> action, TaskCompletionSource tcs)
+        {
+            try
+            {
+                await action();
+                tcs.SetResult();
+            }
+            catch (Exception)
+            {
+                tcs.SetResult();
+                throw;
+            }
         }
     }
 }

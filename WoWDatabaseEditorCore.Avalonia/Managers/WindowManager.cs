@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.Avalonia.Extensions;
 using WoWDatabaseEditorCore.Avalonia.Views;
 
 namespace WoWDatabaseEditorCore.Avalonia.Managers
@@ -95,6 +96,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 FileName = url
             };
             System.Diagnostics.Process.Start(psi);
+        }
+
+        public void Activate()
+        {
+            mainWindowHolder.Window?.ActivateWorkaround();
         }
     }
 }
