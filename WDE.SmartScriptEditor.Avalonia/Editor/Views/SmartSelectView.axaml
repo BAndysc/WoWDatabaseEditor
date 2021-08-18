@@ -1,31 +1,15 @@
 ﻿<controls:DialogViewBase x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartSelectView"
                 xmlns="https://github.com/avaloniaui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:system="clr-namespace:System;assembly=System.Runtime"
                 xmlns:mvvm="http://prismlibrary.com/"
                 xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
                 xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
-                xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
-                xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+                xmlns:editor="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor"
                 Name="Root"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+                d:DataContext="{d:DesignInstance viewModels:SmartSelectViewModel}"
                 mvvm:ViewModelLocator.AutoWireViewModel="False">
-    <UserControl.Styles>
-        <Style Selector="ListBox">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <ItemsPresenter Name="PART_ItemsPresenter"
-                                        Items="{TemplateBinding Items}"
-                                        ItemsPanel="{TemplateBinding ItemsPanel}"
-                                        ItemTemplate="{TemplateBinding ItemTemplate}"
-                                        Margin="{TemplateBinding Padding}"
-                                        VirtualizationMode="{TemplateBinding VirtualizationMode}"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Styles>
-    
     <UserControl.Resources>
         <DrawingImage x:Key="cogIcon">
             <DrawingImage.Drawing>
@@ -72,45 +56,64 @@
                                    HorizontalAlignment="Right"
                                    VerticalContentAlignment="Center"
                                    utils:FocusUtils.FocusFirst="True" />
-            <TextBlock Text="{Binding SelectedItem.Help}" TextWrapping="WrapWithOverflow" />
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{Binding SelectedItem.Help, FallbackValue='', TargetNullValue=''}" TextWrapping="WrapWithOverflow" />
+                <TextBlock Text="{Binding SelectedItem.EnumName, FallbackValue='', TargetNullValue=''}" TextWrapping="WrapWithOverflow" Opacity="0.5" />
+            </StackPanel>
         </DockPanel>
         
-        <controls1:GroupingListBox Items="{Binding FilteredItems, Mode=OneTime}"
-                                   Name="GroupingListBox"
-                                   Grid.Row="1" Grid.ColumnSpan="2"  
-                                   SelectedItem="{Binding SelectedItem}"
-                                   Margin="0,6,0,6">
-            <controls1:GroupingListBox.ItemsPanel>
+        <ListBox Items="{Binding Items}"
+                 Grid.Row="1" Grid.ColumnSpan="2"  
+                 SelectedItem="{Binding SelectedItem}"
+                 Name="ListBox"
+                 VirtualizationMode="Simple"
+                 Margin="0,6,0,6">
+            <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel />
+                    <editor:FastGroupingWrapPanel ItemWidth="160" ItemHeight="24">
+                    </editor:FastGroupingWrapPanel>
                 </ItemsPanelTemplate>
-            </controls1:GroupingListBox.ItemsPanel>
-            <controls1:GroupingListBox.ItemTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="(editor:FastGroupingWrapPanel.Group)" Value="{Binding Group}" />
+                    <Setter Property="IsVisible" Value="{Binding ShowItem}"></Setter>
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Image Margin="0,0,4,0" Width="16" Height="16" Stretch="Fill" Source="{StaticResource cogIcon}">
                             <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding IsTimed, Mode=OneTime}" Value="True">
-                                    <ChangePropertyAction PropertyName="Source" Value="{StaticResource timedIcon}"></ChangePropertyAction>
+                                <DataTriggerBehavior Binding="{Binding IsTimed}" Value="True">
+                                    <ChangePropertyAction PropertyName="Source" Value="{StaticResource timedIcon}" />
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding IsTimed}" Value="False">
+                                    <ChangePropertyAction PropertyName="Source" Value="{StaticResource cogIcon}" />
                                 </DataTriggerBehavior>
                             </Interaction.Behaviors>
                         </Image>
-                        <TextBlock Text="{Binding Name, Mode=OneTime}" Width="140" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Name}" Width="140" VerticalAlignment="Center">
                             <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding Deprecated, Mode=OneTime}" Value="True">
+                                <DataTriggerBehavior Binding="{Binding Deprecated}" Value="True">
                                     <ChangePropertyAction PropertyName="Foreground" Value="Gray" />
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{Binding Deprecated}" Value="False">
+                                    <ChangePropertyAction PropertyName="Foreground" Value="{Binding #Root.Foreground}" />
                                 </DataTriggerBehavior>
                             </Interaction.Behaviors>
                         </TextBlock>
+                        <TextBlock Text="{Binding Score}" VerticalAlignment="Center">
+                        </TextBlock>
                     </StackPanel>
                 </DataTemplate>
-            </controls1:GroupingListBox.ItemTemplate>
+            </ListBox.ItemTemplate>
             <Interaction.Behaviors>
                 <EventTriggerBehavior EventName="DoubleTapped">
                     <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
                 </EventTriggerBehavior>
             </Interaction.Behaviors>
-        </controls1:GroupingListBox>
+        </ListBox>
         
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

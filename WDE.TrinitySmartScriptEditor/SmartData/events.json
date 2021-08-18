@@ -6,6 +6,7 @@
       "TimedActionList"
     ],
     "name": "SMART_EVENT_UPDATE_IC",
+    "search_tags": "update ic",
     "parameters": [
       {
         "type": "FloatParameter",
@@ -78,6 +79,7 @@
     ],
     "is_timed": true,
     "name": "SMART_EVENT_UPDATE_OOC",
+    "search_tags": "update occ",
     "parameters": [
       {
         "type": "FloatParameter",
@@ -1774,6 +1776,7 @@
       "AreaTriggerEntityServerSide"
     ],
     "name": "SMART_EVENT_UPDATE",
+    "search_tags": "update",
     "parameters": [
       {
         "type": "FloatParameter",

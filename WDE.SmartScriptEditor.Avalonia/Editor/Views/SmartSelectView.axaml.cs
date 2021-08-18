@@ -1,8 +1,11 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
 using WDE.Common.Avalonia.Controls;
+using WDE.SmartScriptEditor.Editor.ViewModels;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
 {
@@ -25,9 +28,15 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
         {
             if (e.Key != Key.Down)
                 return;
-            
-            GroupingListBox groupingListBox = this.FindControl<GroupingListBox>("GroupingListBox");
-            groupingListBox?.FocusElement(0, 0);
+
+            if (DataContext is SmartSelectViewModel vm)
+            {
+                vm.SelectFirstVisible();
+                ListBox? listBox = this.FindControl<ListBox>("ListBox");
+                if (listBox != null)
+                    FocusManager.Instance.Focus(listBox.ItemContainerGenerator.ContainerFromIndex(listBox.SelectedIndex), NavigationMethod.Tab);
+                e.Handled = true;
+            }
         }
     }
 }

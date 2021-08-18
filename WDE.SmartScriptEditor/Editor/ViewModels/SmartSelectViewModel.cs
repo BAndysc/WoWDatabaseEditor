@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using DynamicData;
+using System.Threading;
+using System.Threading.Tasks;
 using DynamicData.Binding;
 using Prism.Commands;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 using WDE.Conditions.Data;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -16,7 +16,56 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartSelectViewModel : ObservableBase, IDialog
     {
-        private readonly SourceList<SmartItem> items = new();
+        private bool anyVisible => visibleCount > 0;
+        private int visibleCount = 0;
+        private CancellationTokenSource? currentToken;
+
+        private async Task FilterAndSort(string? text, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        {
+            while (currentToken != null)
+            {
+                await Task.Run(() => Thread.Sleep(50)).ConfigureAwait(true);
+                currentToken = tokenSource;
+            }
+            
+            var lower = text?.ToLower();
+            
+            // filtering on a separate thread, so that UI doesn't lag
+            await Task.Run(() =>
+            {
+                visibleCount = 0;
+                foreach (var item in Items)
+                {
+                    item.Score = string.IsNullOrEmpty(lower) ? 100 : (item.Name.ToLower() == lower ? 101 : FuzzySharp.Fuzz.WeightedRatio(item.SearchName, lower));
+                    if (item.ShowItem)
+                        visibleCount++;
+                    else if (item == SelectedItem)
+                        SelectedItem = null;
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        currentToken = null;
+                        return;
+                    }
+                }
+            }, cancellationToken).ConfigureAwait(true);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                currentToken = null;
+                return;
+            }
+            
+            // reordering items in ListBox is very expensive, therefore we are doing a trick
+            // instead of reordering them, I am only updating items on their indices
+            // that works!
+            var filtered = Items.OrderByDescending(f => string.IsNullOrEmpty(lower) ? -f.Order : f.Score).Select(f => new SmartItem().Update(f)).ToList();
+            for (int i = 0; i < filtered.Count; ++i)
+                Items[i].Update(filtered[i]);
+            
+            SelectedItem ??= Items.FirstOrDefault(f => f.ShowItem);
+
+            currentToken = null;
+        }
 
         public SmartSelectViewModel(
             string title,
@@ -28,42 +77,32 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             Title = title;
             MakeItems(type, predicate, customItems, smartDataManager, conditionDataManager);
-            
-            ReadOnlyObservableCollection<SmartItemsGroup> l;
-            var currentFilter = this.WhenValueChanged(t => t.SearchBox)!
-                .Select<string, Func<SmartItem, bool>>(text =>
+
+            AutoDispose(this.WhenValueChanged(t => t.SearchBox)!
+                .SubscribeAction(text =>
                 {
-                    if (string.IsNullOrEmpty(text))
-                        return _ => true;
-                    var lower = text.ToLower();
-                    return item => item.Name.ToLower().Contains(lower);
-                });
+                    if (currentToken != null)
+                    {
+                        Console.WriteLine("Searching in progress, canceling");
+                    }
+                    currentToken?.Cancel();
+                    var token = new CancellationTokenSource();
+                    FilterAndSort(text, token, token.Token).ListenErrors();
+                }));
 
-            AutoDispose(items.Connect()
-                .Filter(currentFilter)
-                .GroupOn(t => (t.Group, t.GroupOrder))
-                .Transform(group => new SmartItemsGroup(this, group))
-                .DisposeMany()
-                .Sort(Comparer<SmartItemsGroup>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder)))
-                .Bind(out l)
-                .Subscribe());
-            FilteredItems = l;
+            if (Items.Count > 0)
+                SelectedItem = Items[0];
 
-            if (items.Count > 0)
-                SelectedItem = items.Items.First();
-
-            Cancel = new DelegateCommand(() =>
-            {
-                CloseCancel?.Invoke();
-            });
+            Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
             Accept = new DelegateCommand(() =>
             {
                 if (selectedItem == null)
-                    SelectedItem = FindExactMatching() ?? FilteredItems[0][0];
+                    SelectedItem = FindExactMatching() ?? Items.FirstOrDefault(f => f.ShowItem);
 
                 CloseOk?.Invoke();
-            }, () => selectedItem != null || (FilteredItems.Count == 1 && FilteredItems[0].Count == 1 || FindExactMatching() != null))
-                .ObservesProperty(() => SearchBox);
+            }, () => selectedItem != null || (visibleCount == 1 || FindExactMatching() != null))
+                .ObservesProperty(() => SearchBox)
+                .ObservesProperty(() => SelectedItem);
         }
 
         private SmartItem? FindExactMatching()
@@ -73,20 +112,23 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             var searchLowerCase = SearchBox.Trim().ToLower();
             
-            foreach (var group in FilteredItems)
+            foreach (var item in Items)
             {
-                foreach (var item in group)
-                {
-                    if (item.Name.ToLower() == searchLowerCase)
-                        return item;
-                }
+                if (item.Name.ToLower() == searchLowerCase)
+                    return item;
             }
 
             return null;
         }
-
-        public ReadOnlyObservableCollection<SmartItemsGroup> FilteredItems { get; }
-
+        
+        public void SelectFirstVisible()
+        {
+            if (visibleCount > 0)
+                SelectedItem = Items.FirstOrDefault(f => f.ShowItem);
+        }
+        
+        public ObservableCollectionExtended<SmartItem> Items { get; } = new();
+        
         private string searchBox = "";
         public string SearchBox
         {
@@ -107,15 +149,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         private void MakeItems(SmartType type, 
             Func<SmartGenericJsonData, bool> predicate, 
-            List<(int, string)>? customItems,
+            List<(int id, string name)>? customItems,
             ISmartDataManager smartDataManager, 
             IConditionDataManager conditionDataManager)
         {
             int order = 0;
-            int groupOrder = 0;
             foreach (var smartDataGroup in smartDataManager.GetGroupsData(type))
             {
-                groupOrder++;
                 foreach (var member in smartDataGroup.Members)
                 {
                     if (smartDataManager.Contains(type, member))
@@ -127,14 +167,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         SmartItem i = new();   
                         i.Group = smartDataGroup.Name;
                         i.Name = data.NameReadable;
+                        i.SearchName = data.SearchTags == null ? data.NameReadable : $"{data.NameReadable} {data.SearchTags}";
                         i.Id = data.Id;
                         i.Help = data.Help;
                         i.IsTimed = data.IsTimed;
                         i.Deprecated = data.Deprecated;
                         i.Order = order++;
-                        i.GroupOrder = groupOrder;
+                        i.EnumName = data.Name;
 
-                        items.Add(i);
+                        Items.Add(i);
                     }
                 }
             }
@@ -145,14 +186,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 {
                     SmartItem i = new();   
                     i.Group = "Custom";
-                    i.Name = customItem.Item2;
-                    i.CustomId = customItem.Item1;
+                    i.Name = customItem.name;
+                    i.SearchName = customItem.name;
+                    i.CustomId = customItem.id;
                     i.IsTimed = false;
                     i.Deprecated = false;
                     i.Order = order++;
-                    i.GroupOrder = groupOrder;
 
-                    items.Add(i);
+                    Items.Add(i);
                 }
             }
 
@@ -160,7 +201,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 foreach (var conditionDataGroup in conditionDataManager.GetConditionGroups())
                 {
-                    groupOrder++;
                     foreach (var member in conditionDataGroup.Members)
                     {
                         if (conditionDataManager.HasConditionData(member))
@@ -169,14 +209,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                             SmartItem i = new();
                             i.Group = conditionDataGroup.Name;
+                            i.SearchName = data.NameReadable;
                             i.Name = data.NameReadable;
                             i.Id = data.Id;
                             i.Help = data.Help;
                             i.Deprecated = false;
-                            i.GroupOrder = groupOrder;
                             i.Order = order++;
+                            i.EnumName = data.Name;
 
-                            items.Add(i);
+                            Items.Add(i);
                         }
                     }
                 }   
@@ -191,74 +232,5 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public bool Resizeable => true;
         public event Action? CloseCancel;
         public event Action? CloseOk;
-    }
-    
-    public class SmartItem
-    {
-        public string Name { get; set; } = "";
-        public bool Deprecated { get; set; }
-        public string Help { get; set; } = "";
-        public int Id { get; set; }
-        public int? CustomId { get; set; }
-        public string Group { get; set; } = "";
-        public bool IsTimed { get; set; }
-        public int Order { get; set; }
-        public int GroupOrder { get; set; }
-    }
-    
-    public class SmartItemsGroup : ObservableCollectionExtended<SmartItem>, IGrouping<(string, int), SmartItem>, IDisposable
-    {
-        private readonly IDisposable disposable;
-        private readonly SmartSelectViewModel parent;
-        
-        public SmartItemsGroup(SmartSelectViewModel parent, IGroup<SmartItem, (string, int)> group) 
-        {
-            if (group == null)
-                throw new ArgumentNullException(nameof(group));
-
-            this.parent = parent;
-            Key = group.GroupKey;
-
-            parent.ToObservable(t => t.SelectedItem)
-                .Subscribe(item =>
-                {
-                    inEvent = true;
-                    if (item == null || Contains(item))
-                        SelectedItem = item;
-                    else
-                        SelectedItem = null;
-                    inEvent = false;
-                });
-            
-            disposable = group.List
-                .Connect()
-                .Sort(Comparer<SmartItem>.Create((x, y) => x.Order.CompareTo(y.Order)))
-                .Bind(this)
-                .Subscribe();
-        }
-
-        private bool inEvent = false;
-        public string Name => Key.Item1;
-        public string GroupName => Key.Item1;
-        public int GroupOrder => Key.Item2;
-        public (string, int) Key { get; private set; }
-        
-        private SmartItem? selectedItem;
-        public SmartItem? SelectedItem
-        {
-            get => selectedItem;
-            set
-            {
-                if (!inEvent)
-                    parent.SelectedItem = value;
-                else
-                {
-                    selectedItem = value;
-                    OnPropertyChanged(new PropertyChangedEventArgs(nameof(SelectedItem)));
-                }
-            }
-        }
-
-        public void Dispose() => disposable.Dispose();
     }
 }

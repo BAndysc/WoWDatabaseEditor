@@ -23,7 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DynamicData">
-      <Version>7.1.1</Version>
+      <Version>7.2.1</Version>
     </PackageReference>
     <PackageReference Include="SmartFormat.NET">
       <Version>2.5.3</Version>
