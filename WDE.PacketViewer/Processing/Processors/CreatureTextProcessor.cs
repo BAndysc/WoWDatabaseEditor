@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using WDE.Common.Database;
-using WoWPacketParser.Proto;
+using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DynamicData.Binding;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.ViewModels;
-using WoWPacketParser.Proto;
+using WowPacketParser.Proto;
 
 namespace WDE.PacketViewer.Filtering
 {

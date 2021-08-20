@@ -1,5 +1,5 @@
 using System;
-using WoWPacketParser.Proto;
+using WowPacketParser.Proto;
 
 namespace WDE.PacketViewer.ViewModels
 {

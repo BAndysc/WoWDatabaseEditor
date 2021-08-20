@@ -5,7 +5,7 @@ using System.Text;
 using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Module.Attributes;
-using WoWPacketParser.Proto;
+using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors

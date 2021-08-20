@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.Utils;
-using WoWPacketParser.Proto;
+using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors

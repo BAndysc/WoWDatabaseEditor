@@ -1639,8 +1639,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             };
             if (editorFeatures.SupportsEventCooldown)
             {
-                parametersList.Add((ev.CooldownMax, "General"));
                 parametersList.Add((ev.CooldownMin, "General"));
+                parametersList.Add((ev.CooldownMax, "General"));
             }
 
             actionList.Add(new EditableActionData("Event", "General", async () =>

@@ -1,7 +1,7 @@
 using Antlr4.Runtime;
 using WDE.PacketViewer.Filtering.Antlr;
 using WDE.PacketViewer.ViewModels;
-using WoWPacketParser.Proto;
+using WowPacketParser.Proto;
 
 namespace WDE.PacketViewer.Filtering
 {

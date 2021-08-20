@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using WDE.Common.Database;
 using WDE.PacketViewer.Processing.Processors;
-using WoWPacketParser.Proto;
+using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.ViewModels

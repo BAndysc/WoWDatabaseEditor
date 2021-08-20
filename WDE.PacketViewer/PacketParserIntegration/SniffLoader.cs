@@ -6,7 +6,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Settings;
 using WowPacketParser.PacketStructures;
-using WoWPacketParser.Proto;
+using WowPacketParser.Proto;
 
 //using WowPacketParser.PacketStructures;
 
