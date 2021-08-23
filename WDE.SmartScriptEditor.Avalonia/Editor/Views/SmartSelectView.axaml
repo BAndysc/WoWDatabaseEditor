@@ -66,6 +66,7 @@
                  Grid.Row="1" Grid.ColumnSpan="2"  
                  SelectedItem="{Binding SelectedItem}"
                  Name="ListBox"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  VirtualizationMode="Simple"
                  Margin="0,6,0,6">
             <ListBox.ItemsPanel>

@@ -145,8 +145,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
                 groupStartHeight[group.Key] = (height - 32, 0, height, 0);
                 height += itemHeight * Ceiling(group.Value.Count / itemsPerRow);
             }
-
-            return new Size(availableSize.Width, height);
+            
+            return new Size(Min(availableSize.Width, visualCount * itemWidth), height);
         }
 
         protected override Size ArrangeOverride(Size finalSize)
