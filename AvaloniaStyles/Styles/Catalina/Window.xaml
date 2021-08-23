@@ -121,17 +121,19 @@
         <Setter Property="WindowStartupLocation" Value="CenterOwner" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Background="{TemplateBinding Background}" Padding="15">
-                    <DockPanel LastChildFill="True">
-                        <ContentPresenter Content="{TemplateBinding Image}"
-                                          VerticalContentAlignment="Center"
-                                          Width="54" Height="54"
-                                          Margin="0,0,15,0" />
-                        <ContentPresenter DockPanel.Dock="Bottom" Content="{TemplateBinding Content}" Name="Buttons" HorizontalContentAlignment="Right"/>
-                        <TextBlock Text="{TemplateBinding Header}" TextWrapping="WrapWithOverflow" FontSize="16" DockPanel.Dock="Top" />
-                        <TextBlock Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" FontSize="13" />
-                    </DockPanel>
-                </Border>
+                <VisualLayerManager>
+                    <Border Background="{TemplateBinding Background}" Padding="15">
+                        <DockPanel LastChildFill="True">
+                            <ContentPresenter Content="{TemplateBinding Image}"
+                                              VerticalContentAlignment="Center"
+                                              Width="54" Height="54"
+                                              Margin="0,0,15,0" />
+                            <ContentPresenter DockPanel.Dock="Bottom" Content="{TemplateBinding Content}" Name="Buttons" HorizontalContentAlignment="Right"/>
+                            <TextBlock Text="{TemplateBinding Header}" TextWrapping="WrapWithOverflow" FontSize="16" DockPanel.Dock="Top" />
+                            <TextBlock Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" FontSize="13" />
+                        </DockPanel>
+                    </Border>
+                </VisualLayerManager>
             </ControlTemplate>
         </Setter>
     </Style>

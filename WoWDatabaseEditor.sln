@@ -159,6 +159,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SkyFireMySqlDatabase", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.ProjectSkyFire", "WDE.ProjectSkyFire\WDE.ProjectSkyFire.csproj", "{2B3DFEB9-808F-4EC4-B848-3C2533B40B39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prism.Avalonia", "Prism.Avalonia\src\Prism.Avalonia\Prism.Avalonia.csproj", "{B9498EA0-8186-4770-883A-B3CD9B1705BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prism.Unity.Avalonia", "Prism.Avalonia\src\Prism.Unity.Avalonia\Prism.Unity.Avalonia.csproj", "{10ACA1B2-02DE-4B04-A151-9087989B6ADE}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.SourceCodeIntegrationEditor", "WDE.SourceCodeIntegrationEditor\WDE.SourceCodeIntegrationEditor.csproj", "{B0F1E33D-8CD2-4839-8F87-E8835F5F8D0B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.PacketViewer", "WDE.PacketViewer\WDE.PacketViewer.csproj", "{B421A454-BCA5-4B10-B0BD-BBEB5AAD3294}"
@@ -477,6 +481,14 @@ Global
 		{8B25EEAE-2DDD-4D62-A426-619FE21D2711}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B25EEAE-2DDD-4D62-A426-619FE21D2711}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B25EEAE-2DDD-4D62-A426-619FE21D2711}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9498EA0-8186-4770-883A-B3CD9B1705BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9498EA0-8186-4770-883A-B3CD9B1705BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9498EA0-8186-4770-883A-B3CD9B1705BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9498EA0-8186-4770-883A-B3CD9B1705BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10ACA1B2-02DE-4B04-A151-9087989B6ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10ACA1B2-02DE-4B04-A151-9087989B6ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10ACA1B2-02DE-4B04-A151-9087989B6ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10ACA1B2-02DE-4B04-A151-9087989B6ADE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

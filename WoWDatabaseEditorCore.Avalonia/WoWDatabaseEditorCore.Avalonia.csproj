@@ -20,11 +20,11 @@
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
-        <PackageReference Include="Prism.Unity.Avalonia" Version="7.2.0.1430" />
         <PackageReference Include="SmartFormat.NET" Version="2.5.3" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+        <ProjectReference Include="..\Prism.Avalonia\src\Prism.Unity.Avalonia\Prism.Unity.Avalonia.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />

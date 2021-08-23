@@ -11,8 +11,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
 {
     public class DockFactory : Factory
     {
-        public override IDocumentDock CreateDocumentDock() => new FocusAwareDocumentDock();
-        public override IToolDock CreateToolDock() => new FocusAwareToolDock();
+        public override IDocumentDock CreateDocumentDock() => new FocusAwareDocumentDock() {CanFloat = false};
+        public override IToolDock CreateToolDock() => new FocusAwareToolDock() {CanFloat = false};
 
         public void AddDocument(IDock layout, AvaloniaDocumentDockWrapper document)
         {
@@ -36,6 +36,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     Id = "tool",
                     Title = "Tools",
                     Proportion = 0.2f,
+                    CanFloat = false
                 };
                 AddDockable(layout, CreateSplitterDockable());
                 AddDockable(layout, toolDock);
@@ -55,6 +56,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 Title = "MainLayout",
                 Proportion = 1,
                 IsCollapsable = false,
+                CanFloat = false,
                 Orientation = Orientation.Horizontal,
                 ActiveDockable = null,
                 VisibleDockables = CreateList<IDockable>

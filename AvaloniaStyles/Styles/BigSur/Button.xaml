@@ -9,8 +9,11 @@
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
     </Style>
     
-    <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button)">
         <Setter Property="CornerRadius" Value="6" />
+    </Style>
+
+    <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="BoxShadow" Value="{DynamicResource RaisedContent.Shadow}" />
     </Style>
     

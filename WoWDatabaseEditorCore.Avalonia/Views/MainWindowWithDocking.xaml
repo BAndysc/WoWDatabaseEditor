@@ -43,7 +43,7 @@
                 </controls:ToolbarPanel>
             </controls:ToolBar.LeftContent>
             <controls:ToolBar.MiddleContent>
-                <ContentPresenter DataContext="{Binding DocumentManager.ActiveDocument}" utils:ToolBarBind.Model="{Binding}" />
+                <ContentPresenter DataContext="{Binding DocumentManager.ActiveDocument}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
             </controls:ToolBar.MiddleContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>

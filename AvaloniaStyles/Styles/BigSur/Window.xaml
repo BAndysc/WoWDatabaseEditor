@@ -153,22 +153,24 @@
         <Setter Property="WindowStartupLocation" Value="CenterOwner" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Panel>
-                    <Border BorderThickness="0.5"
-                            BorderBrush="#80FFFFFF" 
-                            CornerRadius="10"
-                            IsHitTestVisible="False"
-                            Background="{TemplateBinding Background}" />
-                    <StackPanel Name="Main" Orientation="Vertical" Spacing="13" Margin="15" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                        <ContentPresenter IsHitTestVisible="False"
-                                          Content="{TemplateBinding Image}"
-                                          Width="54" Height="54"
-                                          Margin="0,12,0,12" />
-                        <TextBlock IsHitTestVisible="False" FontWeight="Black" Text="{TemplateBinding Header}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center"/>
-                        <TextBlock IsHitTestVisible="False" Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Stretch"/>
-                        <ContentPresenter Content="{TemplateBinding Content}" Name="Buttons" />
-                    </StackPanel>
-                </Panel>
+                <VisualLayerManager>
+                    <Panel>
+                        <Border BorderThickness="0.5"
+                                BorderBrush="#80FFFFFF" 
+                                CornerRadius="10"
+                                IsHitTestVisible="False"
+                                Background="{TemplateBinding Background}" />
+                        <StackPanel Name="Main" Orientation="Vertical" Spacing="13" Margin="15" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                            <ContentPresenter IsHitTestVisible="False"
+                                              Content="{TemplateBinding Image}"
+                                              Width="54" Height="54"
+                                              Margin="0,12,0,12" />
+                            <TextBlock IsHitTestVisible="False" FontWeight="Black" Text="{TemplateBinding Header}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Center"/>
+                            <TextBlock IsHitTestVisible="False" Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" HorizontalAlignment="Stretch"/>
+                            <ContentPresenter Content="{TemplateBinding Content}" Name="Buttons" />
+                        </StackPanel>
+                    </Panel>
+                </VisualLayerManager>
              </ControlTemplate>
         </Setter>
     </Style>

@@ -533,7 +533,7 @@ namespace WDE.Common.Avalonia.DnD
                 if (child == null) 
                     return default;
 
-                IVisual parentObject = child.VisualParent;
+                IVisual? parentObject = child.VisualParent;
                 if (parentObject == null) 
                     return default;
 
@@ -551,7 +551,7 @@ namespace WDE.Common.Avalonia.DnD
                 if (child == null) 
                     return default;
 
-                IVisual parentObject = child.VisualParent;
+                IVisual? parentObject = child.VisualParent;
                 if (parentObject == null) 
                     return default;
 
@@ -630,7 +630,7 @@ namespace WDE.Common.Avalonia.DnD
             else
             {
                 double y = 0;
-                IVisual parent = container.VisualParent;
+                IVisual? parent = container.VisualParent;
                 while (parent != null && parent != treeView)
                 {
                     y += parent.Bounds.Y;

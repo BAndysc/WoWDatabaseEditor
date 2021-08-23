@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using WDE.Common.Windows;
 
 namespace WDE.Common.Avalonia.Utils
@@ -43,52 +44,31 @@ namespace WDE.Common.Avalonia.Utils
             }
         }
     }
-    
-    public class ToolBarBind
+
+    public class ToolbarDataTemplate : IDataTemplate
     {
-        public static readonly AvaloniaProperty ModelProperty = AvaloniaProperty.RegisterAttached<Control, object>("Model",
-            typeof(ToolBarBind),coerce: OnModelChanged);
-        
-        public static object GetModel(Control control) => control.GetValue(ModelProperty);
-        public static void SetModel(Control control, object value) => control.SetValue(ModelProperty, value);
-        
-        public static bool TryResolveToolBar(object viewModel, out object? toolbar)
+        public static IDataTemplate Template { get; } = new ToolbarDataTemplate();
+        public IControl Build(object param)
         {
-            toolbar = null;
             if (ViewBind.AppViewLocator != null &&
-                ViewBind.AppViewLocator.TryResolveToolBar(viewModel.GetType(), out var toolbarType))
+                ViewBind.AppViewLocator.TryResolveToolBar(param.GetType(), out var toolbarType))
             {
                 try
                 {
-                    toolbar = Activator.CreateInstance(toolbarType);
+                    return (IControl)Activator.CreateInstance(toolbarType)!;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    toolbar = new TextBlock() { Text = e.ToString() };
+                    return new TextBlock() { Text = e.ToString() };
                 }
             }
-            
-            return toolbar != null;
+            return new Control();
         }
 
-        private static object OnModelChanged(IAvaloniaObject targetLocation, object viewModel)
+        public bool Match(object data)
         {
-            if (TryResolveToolBar(viewModel, out var view))
-                SetContentProperty(targetLocation, view);
-            else
-                SetContentProperty(targetLocation, new Panel());
-
-            return viewModel;
-        }
-
-        private static void SetContentProperty(IAvaloniaObject targetLocation, object? view)
-        {
-            if (view != null && targetLocation != null)
-            {
-                Type? type = targetLocation.GetType();
-                type.GetProperty("Content")?.SetValue(targetLocation, view);
-            }
+            return data is not IControl && data is not string;
         }
     }
 }

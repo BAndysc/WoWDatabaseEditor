@@ -7,7 +7,7 @@
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
     </Style>
     
-    <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button)">
         <Setter Property="CornerRadius" Value="4" />
     </Style>
     

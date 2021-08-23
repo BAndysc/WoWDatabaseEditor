@@ -113,8 +113,7 @@ namespace AvaloniaStyles.Controls
             }
             else
             {
-                ExtendClientAreaChromeHints &= ~ExtendClientAreaChromeHints.SystemChrome;
-                ExtendClientAreaChromeHints |= ExtendClientAreaChromeHints.NoChrome;
+                ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
             }
         }
 

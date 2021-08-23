@@ -270,9 +270,9 @@ namespace AvaloniaStyles.Controls
             (listbox.ItemContainerGenerator.ContainerFromIndex(listbox.SelectedIndex)).Focus();
         }
         
-        public static T? FindParent<T>(IVisual obj) where T : Control
+        public static T? FindParent<T>(IVisual? obj) where T : Control
         {
-            obj = obj.VisualParent;
+            obj = obj?.VisualParent;
             while (obj != null)
             {
                 if (obj is T parent)
