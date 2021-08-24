@@ -1,0 +1,58 @@
+{
+  "id": "gossip_menu",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Gossip Menu",
+  "single_solution_name": "{key} gossip menu",
+  "multi_solution_name": "Multiple gossip menus",
+  "description": "This table is used for displaying gossip when a player talks to an NPC",
+  "table_name": "gossip_menu",
+  "table_index_name": "MenuID",
+  "icon_path": "Icons/gossip.png",
+  "multi_record": true,
+  "reload_command": "reload gossip_menu",
+  "picker": "GossipMenuParameter",
+  "primary_key": [
+    "MenuID",
+    "TextID"
+  ],
+  "sort_by": ["MenuID", "TextID"],
+  "conditions": {
+    "source_type": 14,
+    "source_group": "MenuID",
+    "source_entry": "TextID",
+    "targets": [
+      {
+        "id": 0,
+        "name": "player"
+      },
+      {
+        "id": 1,
+        "name": "gossip sender"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Menu ID",
+          "db_column_name": "MenuID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Text ID",
+          "db_column_name": "TextID",
+          "value_type": "NpcTextParameter"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}
