@@ -9,6 +9,6 @@ namespace WDE.SqlQueryGenerator
         }
 
         public ITable Table { get; }
-        public string Condition { get; init; }
+        public string Condition { get; }
     }
 }

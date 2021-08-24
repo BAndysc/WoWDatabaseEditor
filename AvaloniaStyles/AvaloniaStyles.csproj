@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
@@ -16,6 +16,8 @@
     <ItemGroup>
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="HarfBuzzSharp" Version="2.8.2-preview.127" />
+        <PackageReference Include="SkiaSharp" Version="2.88.0-preview.127" />
     </ItemGroup>
     <ItemGroup>
       <AvaloniaResource Include="Styles\Assets\Lato\*.ttf" />
