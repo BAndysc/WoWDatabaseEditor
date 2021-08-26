@@ -83,7 +83,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     ActivateDocument(active);
             });
             
-            documentManager.OpenedDocuments.ToStream().SubscribeAction(e =>
+            documentManager.OpenedDocuments.ToStream(false).SubscribeAction(e =>
             {
                 if (e.Type == CollectionEventType.Add)
                 {

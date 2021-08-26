@@ -43,7 +43,7 @@ namespace WoWDatabaseEditorCore.Managers
             }
             allTools.Sort((a, b) => -a.OpenOnStart.CompareTo(b.OpenOnStart));
 
-            OpenedDocuments.ToStream().SubscribeAction(e =>
+            OpenedDocuments.ToStream(false).SubscribeAction(e =>
             {
                 if (e.Type == CollectionEventType.Remove && e.Item is IDisposable disposable)
                     disposable.Dispose();

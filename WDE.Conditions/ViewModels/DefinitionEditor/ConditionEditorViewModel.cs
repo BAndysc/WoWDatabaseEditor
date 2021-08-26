@@ -82,7 +82,7 @@ namespace WDE.Conditions.ViewModels
         public string Name { get; set; }
         public string NameReadable { get; set; }
         public string Description { get; set; }
-        public string Help { get; set; }
+        public string? Help { get; set; }
         public ObservableCollection<ConditionParameterJsonData> Parameters { get; set; }
 
         public ConditionEditorData(in ConditionJsonData source)

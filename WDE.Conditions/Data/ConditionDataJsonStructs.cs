@@ -70,25 +70,30 @@ namespace WDE.Conditions.Data
     }
 
     [ExcludeFromCodeCoverage]
-    public struct ConditionJsonData
+    public class ConditionJsonData
     {
         [JsonProperty(PropertyName = "id")]
         public int Id { get; set; }
 
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        [JsonProperty(PropertyName = "name")] 
+        public string Name { get; set; } = "";
 
         [JsonProperty(PropertyName = "parameters")]
-        public IList<ConditionParameterJsonData> Parameters { get; set; }
+        public IList<ConditionParameterJsonData>? Parameters { get; set; }
 
         [JsonProperty(PropertyName = "description")]
-        public string Description { get; set; }
+        public string Description { get; set; } = "Missing description";
         
         [JsonProperty(PropertyName = "help")]
-        public string Help { get; set; }
-        
+        public string? Help { get; set; }
+
         [JsonProperty(PropertyName = "name_readable")]
-        public string NameReadable { get; set; }
+        public string NameReadable { get; set; } = "Missing name";
+
+        public override string ToString()
+        {
+            return $"{NameReadable} {Id}";
+        }
     }
 
     [ExcludeFromCodeCoverage]

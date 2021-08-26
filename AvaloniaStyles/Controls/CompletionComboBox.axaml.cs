@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Controls.Utils;
@@ -18,7 +17,6 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Utils;
-using WDE.MVVM;
 using WDE.MVVM.Utils;
 
 namespace AvaloniaStyles.Controls
@@ -41,13 +39,13 @@ namespace AvaloniaStyles.Controls
         public Func<object?, object?>? SelectedItemExtractor { get; set; }
         private ISelectionAdapter? adapter;
         public event EventHandler<EnterPressedArgs>? OnEnterPressed;
-        private Func<string, CancellationToken, Task<IEnumerable<object>>>? asyncPopulator;
+        private Func<string, CancellationToken, Task<IEnumerable<object>>> asyncPopulator;
         private string searchText = string.Empty;
         private bool isDropDownOpen;
         private object? selectedItem;
         private IEnumerable<object>? items;
 
-        public Func<string, CancellationToken, Task<IEnumerable<object>>>? AsyncPopulator
+        public Func<string, CancellationToken, Task<IEnumerable<object>>> AsyncPopulator
         {
             get => asyncPopulator;
             set => SetAndRaise(AsyncPopulatorProperty, ref asyncPopulator, value);
@@ -106,8 +104,8 @@ namespace AvaloniaStyles.Controls
                 o => o.SearchText,
                 unsetValue: string.Empty);
         
-        public static readonly DirectProperty<CompletionComboBox, Func<string, CancellationToken, Task<IEnumerable<object>>>?> AsyncPopulatorProperty =
-            AvaloniaProperty.RegisterDirect<CompletionComboBox, Func<string, CancellationToken, Task<IEnumerable<object>>>?>(
+        public static readonly DirectProperty<CompletionComboBox, Func<string, CancellationToken, Task<IEnumerable<object>>>> AsyncPopulatorProperty =
+            AvaloniaProperty.RegisterDirect<CompletionComboBox, Func<string, CancellationToken, Task<IEnumerable<object>>>>(
                 nameof(AsyncPopulator),
                 o => o.AsyncPopulator,
                 (o, v) => o.AsyncPopulator = v);
@@ -128,7 +126,7 @@ namespace AvaloniaStyles.Controls
         public CompletionComboBox()
         {
             // Default async populator searches in Items (toString) using Fuzzy match or normal match depending on the collection size
-            AsyncPopulator = async (s, token) =>
+            asyncPopulator = async (s, token) =>
             {
                 if (items is not IList o)
                     return Enumerable.Empty<object>();
@@ -140,8 +138,8 @@ namespace AvaloniaStyles.Controls
                 {
                     if (o.Count < 250)
                     {
-                        return FuzzySharp.Process.ExtractSorted(s, items.Select(s => s.ToString()), cutoff: 51)
-                            .Select(s => o[s.Index]!);   
+                        return FuzzySharp.Process.ExtractSorted(s, items.Select(item => item.ToString()), cutoff: 51)
+                            .Select(item => o[item.Index]!);   
                     }
 
                     List<object> picked = new();
@@ -215,16 +213,16 @@ namespace AvaloniaStyles.Controls
             if (ListBox != null)
             {
                 // Check if it is already an IItemsSelector
-                var adapter = ListBox as ISelectionAdapter;
-                if (adapter == null)
+                if (ListBox is ISelectionAdapter selectionAdapter)
+                {
+                    SelectionAdapter = selectionAdapter;
+                }
+                else
                 {
                     // Built in support for wrapping a Selector control
                     SelectionAdapter = new SelectingItemsControlSelectionAdapter(ListBox);
                 }
-                else
-                    SelectionAdapter = adapter;
             }
-            
 
             base.OnApplyTemplate(e);
         }
@@ -252,7 +250,7 @@ namespace AvaloniaStyles.Controls
         /// </remarks>
         protected ISelectionAdapter SelectionAdapter
         {
-            get { return adapter!; }
+            get => adapter!;
             set
             {
                 if (adapter != null)
@@ -279,7 +277,7 @@ namespace AvaloniaStyles.Controls
         private ToggleButton ToggleButton { get; set; } = null!;
         private TextBox SearchTextBox
         {
-            get { return textBox; }
+            get => textBox;
             set
             {
                 textBoxSubscriptions?.Dispose();
@@ -293,7 +291,7 @@ namespace AvaloniaStyles.Controls
                             .Skip(1)
                             .Subscribe(_ => OnTextBoxTextChanged())
                             .Combine(
-                                textBox.AddDisposableHandler(TextBox.KeyDownEvent, (_, args) =>
+                                textBox.AddDisposableHandler(KeyDownEvent, (_, args) =>
                                 {
                                     if (args.Handled)
                                         return;
@@ -344,8 +342,9 @@ namespace AvaloniaStyles.Controls
                                         SelectionAdapter.HandleKeyDown(args);
                                     }
                                 }))
-                            .Combine(textBox.AddDisposableHandler(InputElement.LostFocusEvent, (_, args) =>
+                            .Combine(textBox.AddDisposableHandler(LostFocusEvent, (_, _) =>
                             {
+                                // don't ever let textbox lost focus
                                 if (IsDropDownOpen)
                                 {
                                     Dispatcher.UIThread.Post(() => FocusManager.Instance.Focus(textBox));
@@ -384,7 +383,7 @@ namespace AvaloniaStyles.Controls
         /// all of the items in the generated view of data that is provided to
         /// the selection-style control adapter.
         /// </summary>
-        private AvaloniaList<object> view = new();
+        private readonly AvaloniaList<object> view = new();
         
         private void TextUpdated(string text)
         {
@@ -406,11 +405,6 @@ namespace AvaloniaStyles.Controls
             populationCancellationTokenSource?.Dispose();
             populationCancellationTokenSource = null;
 
-            if (asyncPopulator == null)
-            {
-                return false;
-            }
-
             populationCancellationTokenSource = new CancellationTokenSource();
             var task = PopulateAsync(searchText, populationCancellationTokenSource.Token);
             if (task.Status == TaskStatus.Created)
@@ -423,7 +417,7 @@ namespace AvaloniaStyles.Controls
         {
             try
             {
-                IEnumerable<object> result = await asyncPopulator!.Invoke(searchText, cancellationToken);
+                IEnumerable<object> result = await asyncPopulator.Invoke(searchText, cancellationToken);
                 var resultList = result.ToList();
 
                 if (cancellationToken.IsCancellationRequested)

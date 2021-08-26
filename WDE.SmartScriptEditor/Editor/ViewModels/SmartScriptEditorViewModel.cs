@@ -1083,7 +1083,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Together.Add(new NewActionViewModel());
             Together.Add(new NewConditionViewModel());
 
-            AutoDispose(script.GlobalVariables.ToStream().Subscribe(e =>
+            AutoDispose(script.GlobalVariables.ToStream(false).Subscribe(e =>
             {
                 if (e.Type == CollectionEventType.Add)
                     Together.Insert(Together.Count - 1, e.Item);
@@ -1091,7 +1091,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     Together.Remove(e.Item);
             }));
             
-            AutoDispose(script.AllSmartObjectsFlat.ToStream().Subscribe((e) =>
+            AutoDispose(script.AllSmartObjectsFlat.ToStream(false).Subscribe((e) =>
             {
                 if (e.Type == CollectionEventType.Add)
                     Together.Insert(Together.Count - 1, e.Item);
@@ -1458,8 +1458,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     int? newActionIndex = await ShowActionPicker(obj.Parent, obj.Source.Id, false);
                     if (!newActionIndex.HasValue)
                         return;
-
+                    
                     smartFactory.UpdateAction(obj, newActionIndex.Value);
+                    
                 }, obj.ToObservable(e => e.Id).Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id).NameReadable)));
                 
                 actionList.Add(new EditableActionData("Type", "Target", async () =>

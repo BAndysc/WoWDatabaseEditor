@@ -168,7 +168,7 @@ namespace WDE.Conditions.ViewModels
                 if (SelectedCondition == null || value == null)
                     return;
                 
-                conditionsFactory.Update(value.Value.Id, SelectedCondition);
+                conditionsFactory.Update(value.Id, SelectedCondition);
             }
         }
 

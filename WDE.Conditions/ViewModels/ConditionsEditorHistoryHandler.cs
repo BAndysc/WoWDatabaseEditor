@@ -12,7 +12,7 @@ namespace WDE.Conditions.ViewModels
         public ConditionsEditorHistoryHandler(ConditionsEditorViewModel viewModel, IConditionsFactory conditionsFactory)
         {
             this.conditionsFactory = conditionsFactory;
-            conditionsSub = viewModel.Conditions.ToStream().SubscribeAction(a =>
+            conditionsSub = viewModel.Conditions.ToStream(false).SubscribeAction(a =>
             {
                 if (a.Type == CollectionEventType.Add)
                 {

@@ -65,14 +65,14 @@ namespace WDE.SmartScriptEditor.Models
             AllSmartObjectsFlat = selectionHelper.AllSmartObjectsFlat;
             AllActions = selectionHelper.AllActions;
             
-            Events.ToStream()
+            Events.ToStream(false)
                 .Subscribe((e) =>
                 {
                     if (e.Type == CollectionEventType.Add)
                         e.Item.Parent = this;
                 });
 
-            GlobalVariables.ToStream().Subscribe(e =>
+            GlobalVariables.ToStream(true).Subscribe(e =>
             {
                 GlobalVariableChanged(null, null);
                 if (e.Type == CollectionEventType.Add)

@@ -15,7 +15,7 @@ namespace WDE.TrinitySmartScriptEditor.History
         public SmartDataGroupsHistory(ObservableCollection<SmartDataGroupsEditorData> groupsData)
         {
             this.groupsData = groupsData;
-            groupsDataSubscription = groupsData.ToStream().Subscribe(e =>
+            groupsDataSubscription = groupsData.ToStream(true).Subscribe(e =>
             {
                 if (e.Type == CollectionEventType.Add)
                 {

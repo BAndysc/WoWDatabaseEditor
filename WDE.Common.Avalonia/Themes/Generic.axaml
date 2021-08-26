@@ -15,15 +15,15 @@
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <ContentPresenter Content="{Binding .}">
-                    <ContentPresenter.DataTemplates>
+                <ContentControl Content="{Binding}">
+                    <ContentControl.ContentTemplate>
                         <themes:ParameterDataTemplateSelector>
                             <themes:ParameterDataTemplateSelector.Generic>
                                 <DataTemplate>
                                     <DockPanel LastChildFill="True">
                                         <Button DockPanel.Dock="Right" Content="  ...  "
                                                 Command="{Binding PickCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
-                                                CommandParameter="{Binding .}"
+                                                CommandParameter="{Binding }"
                                                 Margin="3,0,0,0"
                                                 Focusable="False"
                                                 IsVisible="{Binding HasItems}" />
@@ -70,8 +70,8 @@
                                 </DataTemplate>
                             </themes:ParameterDataTemplateSelector.BoolParameter>
                         </themes:ParameterDataTemplateSelector>
-                    </ContentPresenter.DataTemplates>
-                </ContentPresenter>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
             </ControlTemplate>
         </Setter>
     </Style>

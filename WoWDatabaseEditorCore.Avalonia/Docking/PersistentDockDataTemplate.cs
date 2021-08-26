@@ -77,7 +77,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             if (!bound && DocumentManager != null)
             {
                 bound = true;
-                DocumentManager.OpenedDocuments.ToStream().Where(e => e.Type == CollectionEventType.Remove)
+                DocumentManager.OpenedDocuments.ToStream(false).Where(e => e.Type == CollectionEventType.Remove)
                     .SubscribeAction(item =>
                     {
                         documents.Remove(item.Item);

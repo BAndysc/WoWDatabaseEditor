@@ -23,7 +23,7 @@ namespace WDE.SmartScriptEditor.Models.Helpers
         
         public SmartSelectionHelper(SmartScriptBase script)
         {
-            disposable = script.Events.ToStream().Subscribe(EventReceived);
+            disposable = script.Events.ToStream(false).Subscribe(EventReceived);
         }
 
         private void EventReceived(CollectionEvent<SmartEvent> collectionEvent)
@@ -33,8 +33,8 @@ namespace WDE.SmartScriptEditor.Models.Helpers
             {
                 AllSmartObjectsFlat.Add(collectionEvent.Item);
                 var disposables = new CompositeDisposable(
-                    collectionEvent.Item.Actions.ToStream().Subscribe(ActionReceived),
-                    collectionEvent.Item.Conditions.ToStream().Subscribe(ConditionReceived),
+                    collectionEvent.Item.Actions.ToStream(false).Subscribe(ActionReceived),
+                    collectionEvent.Item.Conditions.ToStream(false).Subscribe(ConditionReceived),
                     collectionEvent.Item.ToObservable(e => e.IsSelected).Subscribe(SelectionChanged),
                     Observable.FromEventPattern<EventHandler, EventArgs>(
                         h => collectionEvent.Item.OnChanged += h,

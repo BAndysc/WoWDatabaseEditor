@@ -25,7 +25,7 @@ namespace WDE.SmartScriptEditor.History
             this.script.BulkEditingStarted += OnBulkEditingStarted;
             this.script.BulkEditingFinished += OnBulkEditingFinished;
 
-            variablesDisposable = this.script.GlobalVariables.ToStream().Subscribe(e =>
+            variablesDisposable = this.script.GlobalVariables.ToStream(true).Subscribe(e =>
             {
                 if (e.Type == CollectionEventType.Add)
                 {

@@ -78,8 +78,8 @@ namespace WDE.Conditions.ViewModels
 
         private async Task EditCondition(ConditionJsonData? item)
         {
-            if (item.HasValue)
-                await OpenEditor(item.Value, false);
+            if (item != null)
+                await OpenEditor(item, false);
         }
 
         private async Task OpenEditor(ConditionJsonData item, bool isCreating)

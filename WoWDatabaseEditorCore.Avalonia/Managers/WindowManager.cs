@@ -1,9 +1,18 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.VisualTree;
+using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
+using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Avalonia.Extensions;
 using WoWDatabaseEditorCore.Avalonia.Views;
 
@@ -13,6 +22,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
     [AutoRegister]
     public class WindowManager : IWindowManager
     {
+        private readonly bool UseExperimentalPopup = false;
         private readonly IMainWindowHolder mainWindowHolder;
 
         public WindowManager(IMainWindowHolder mainWindowHolder)
@@ -24,11 +34,55 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         {
             try
             {
-                DialogWindow view = new DialogWindow();
-                view.Height = viewModel.DesiredHeight;
-                view.Width = viewModel.DesiredWidth;
-                view.DataContext = viewModel;
-                return await view.ShowDialog<bool>(mainWindowHolder.Window);
+                if (UseExperimentalPopup)
+                {
+                    var tcs = new TaskCompletionSource<bool>();
+                    var popup = new Popup();
+                    popup.IsLightDismissEnabled = true;
+                    bool closed = false;
+                    popup.Height = viewModel.DesiredHeight;
+                    popup.Width = viewModel.DesiredWidth;
+                    popup.DataContext = viewModel;
+                    var pres = new ContentPresenter();
+                    ViewBind.SetModel(pres, viewModel);
+                    popup.Child = new Border(){Child = pres, Background = Brushes.White, BorderThickness = new Thickness(1), BorderBrush = Brushes.DarkGray};
+                    viewModel.CloseCancel += () =>
+                    {
+                        closed = true;
+                        popup.Close();
+                        tcs.SetResult(false);
+                    };
+                    viewModel.CloseOk += () =>
+                    {
+                        closed = true;
+                        popup.Close();
+                        tcs.SetResult(true);
+                    };
+                    popup.GetObservable(Popup.IsOpenProperty).Skip(1).SubscribeAction(@is =>
+                    {
+                        if (!@is && !closed)
+                        {
+                            closed = true;
+                            tcs.SetResult(false);
+                        }
+                    });
+                    if (FocusManager.Instance.Current is Control c)
+                    {
+                        popup.PlacementTarget = c;
+                    }
+                    ((DockPanel)mainWindowHolder.Window.GetVisualRoot().VisualChildren[0].VisualChildren[0].VisualChildren[0]).Children.Add(popup);
+                    popup.PlacementMode = PlacementMode.Pointer;
+                    popup.IsOpen = true;
+                    return await tcs.Task;
+                }
+                else
+                { 
+                    DialogWindow view = new DialogWindow();
+                    view.Height = viewModel.DesiredHeight;
+                    view.Width = viewModel.DesiredWidth;
+                    view.DataContext = viewModel;
+                    return await view.ShowDialog<bool>(mainWindowHolder.Window);   
+                }
             }
             catch (Exception e)
             {

@@ -23,7 +23,7 @@ namespace WDE.DatabaseEditors.History
 
         private void BindTableData()
         {
-            disposable = viewModel.Entities.ToStream().SubscribeAction(e =>
+            disposable = viewModel.Entities.ToStream(true).SubscribeAction(e =>
             {
                 if (e.Type == CollectionEventType.Add)
                 {

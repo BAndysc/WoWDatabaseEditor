@@ -14,7 +14,7 @@ namespace WDE.MVVM.Test.Observable
 
             List<int> receivedAdded = new();
             List<int> indices = new();
-            using var disp = ints.ToStream()
+            using var disp = ints.ToStream(false)
                 .SubscribeAction(e =>
                 {
                     Assert.AreEqual(CollectionEventType.Add, e.Type);
@@ -43,7 +43,7 @@ namespace WDE.MVVM.Test.Observable
             List<int> receivedRemoved = new();
             List<int> indices = new();
             int callTimes = 0;
-            using var disp = ints.ToStream()
+            using var disp = ints.ToStream(false)
                 .SubscribeAction(e =>
                 {
                     if (callTimes++ < 5)
@@ -72,7 +72,7 @@ namespace WDE.MVVM.Test.Observable
 
             List<int> receivedRemoved = new();
             List<int> indices = new();
-            using var disp = ints.ToStream()
+            using var disp = ints.ToStream(false)
                 .SubscribeAction(e =>
                 {
                     if (e.Type == CollectionEventType.Add)
@@ -97,7 +97,7 @@ namespace WDE.MVVM.Test.Observable
             List<int> receivedRemoved = new();
             List<int> indicesAdded = new();
             List<int> indicesRemoved = new();
-            using var disp = ints.ToStream()
+            using var disp = ints.ToStream(false)
                 .SubscribeAction(e =>
                 {
                     if (e.Type == CollectionEventType.Add)
@@ -133,7 +133,7 @@ namespace WDE.MVVM.Test.Observable
             List<int> receivedRemoved = new();
             List<int> indicesAdded = new();
             List<int> indicesRemoved = new();
-            using var disp = ints.ToStream()
+            using var disp = ints.ToStream(false)
                 .SubscribeAction(e =>
                 {
                     if (e.Type == CollectionEventType.Add)

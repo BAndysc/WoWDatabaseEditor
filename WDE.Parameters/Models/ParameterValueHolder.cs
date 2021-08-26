@@ -57,6 +57,17 @@ namespace WDE.Parameters.Models
             }
         }
 
+        private bool forceHidden;
+        public bool ForceHidden
+        {
+            get => forceHidden; 
+            set
+            {
+                forceHidden = value;
+                OnPropertyChanged();
+            }
+        }
+        
         private string name;
         public string Name
         {

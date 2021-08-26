@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WDE.Common.CoreVersion;
@@ -26,9 +28,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             SelectItemAction = new AsyncAutoCommand(SelectItem);
 
             Watch(parameter, p => p.IsUsed, nameof(IsHidden));
+            Watch(parameter, p => p.ForceHidden, nameof(IsHidden));
             Watch(parameter, p => p.Parameter, nameof(HasItems));
+            Watch(parameter, p => p.Parameter, nameof(Items));
+            Watch(parameter, p => p.Parameter, nameof(OptionValue));
+            Watch(parameter, p => p.Parameter, nameof(UseModernPicker));
             Watch(parameter, p => p.Parameter, nameof(SpecialCommand));
             Watch(parameter, p => p.Name, nameof(Name));
+            Watch(parameter, p => p.Value, nameof(OptionValue));
         }
 
         public ParameterValueHolder<T> Parameter { get; set; }
@@ -38,12 +45,46 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ICommand SelectItemAction { get; set; }
 
         public string Name => Parameter.Name;
-        
+
+        public IList<object>? Items
+        {
+            get
+            {
+                if (Parameter is not ParameterValueHolder<long> p)
+                    return null;
+                return HasItems
+                    ? p.Items!.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList()
+                    : null;
+            }
+        }
+
         public bool FocusFirst { get; set; }
 
         public Func<Task<object?>>? SpecialCommand => currentCoreVersion.Current.SupportsSpecialCommands ? Parameter.Parameter.SpecialCommand : null;
         
-        public bool IsHidden => !Parameter.IsUsed && (Parameter is not ParameterValueHolder<long> p || p.Value == 0);
+        public bool IsHidden => Parameter.ForceHidden || !Parameter.IsUsed && (Parameter is not ParameterValueHolder<long> p || p.Value == 0);
+
+        public bool UseModernPicker => HasItems && Parameter.Parameter.Items != null && Parameter is ParameterValueHolder<long> && Parameter.Parameter.Items!.Count < 1000;
+
+        public ParameterOption? OptionValue
+        {
+            get
+            {
+                if (Parameter is ParameterValueHolder<long> p)
+                {
+                    if (p.Items != null && p.Items.TryGetValue(p.Value, out var option))
+                        return new ParameterOption(p.Value, option.Name);
+                    return new ParameterOption(p.Value, "Unknown");
+                }
+
+                return null;
+            }
+            set
+            {
+                if (value != null && value.Value is T t)
+                    Parameter.Value = t;
+            }
+        }
         
         public bool HasItems => Parameter.Parameter.HasItems;
         
@@ -82,5 +123,22 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public bool Resizeable { get; } = false;
         public event Action? CloseCancel;
         public event Action? CloseOk;
+    }
+
+    public class ParameterOption
+    {
+        public ParameterOption(long value, string name)
+        {
+            Value = value;
+            Name = name;
+        }
+
+        public long Value { get; }
+        public string Name { get; }
+
+        public override string ToString()
+        {
+            return $"{Name} ({Value})";
+        }
     }
 }

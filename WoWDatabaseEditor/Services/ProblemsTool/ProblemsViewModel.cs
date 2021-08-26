@@ -57,7 +57,7 @@ namespace WoWDatabaseEditorCore.Services.ProblemsTool
                 RequestScrollTo?.Invoke(activeProblems);
             });
 
-            documentManager.Value.OpenedDocuments.ToStream().SubscribeAction(elem =>
+            documentManager.Value.OpenedDocuments.ToStream(false).SubscribeAction(elem =>
             {
                 if (elem.Item is not IProblemSourceDocument problemSource)
                     return;

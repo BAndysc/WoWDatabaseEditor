@@ -8,6 +8,7 @@
                 xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
                 xmlns:themes="clr-namespace:WDE.Common.Avalonia.Themes;assembly=WDE.Common.Avalonia"
                 xmlns:avalonia="clr-namespace:WDE.Common.Avalonia;assembly=WDE.Common.Avalonia"
+                xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
                 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                 Name="Root"
                 x:Class="WDE.Conditions.Avalonia.Views.ConditionsEditorView">
@@ -117,15 +118,15 @@
                 ClipToBounds="True">
             <StackPanel 
                 DataContext="{Binding SelectedCondition}">
-                <ComboBox SelectedItem="{Binding #Root.DataContext.SelectedConditionsType}" 
-                          Items="{Binding #Root.DataContext.ConditionTypes, Mode=OneTime}" 
-                          HorizontalAlignment="Stretch">
-                    <ComboBox.ItemTemplate>
+                <controls1:CompletionComboBox SelectedItem="{Binding #Root.DataContext.SelectedConditionsType}"
+                                              Items="{Binding #Root.DataContext.ConditionTypes, Mode=OneTime}"
+                                              HorizontalAlignment="Stretch">
+                    <controls1:CompletionComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding NameReadable}" />
                         </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                    </controls1:CompletionComboBox.ItemTemplate>
+                </controls1:CompletionComboBox>
                 <views:LabeledControl Header="{Binding Name}" DataContext="{Binding Invert, Mode=OneWay}">
                     <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
                 </views:LabeledControl>

@@ -34,7 +34,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             await Task.Run(() =>
             {
                 visibleCount = 0;
-                foreach (var item in Items)
+                foreach (var item in AllItems)
                 {
                     item.Score = string.IsNullOrEmpty(lower) ? 100 : (item.Name.ToLower() == lower ? 101 : FuzzySharp.Fuzz.WeightedRatio(item.SearchName, lower));
                     if (item.ShowItem)
@@ -55,15 +55,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 return;
             }
             
-            // reordering items in ListBox is very expensive, therefore we are doing a trick
-            // instead of reordering them, I am only updating items on their indices
-            // that works!
-            var filtered = Items.OrderByDescending(f => string.IsNullOrEmpty(lower) ? -f.Order : f.Score).Select(f => new SmartItem().Update(f)).ToList();
-            for (int i = 0; i < filtered.Count; ++i)
-                Items[i].Update(filtered[i]);
+            var filtered = AllItems.OrderByDescending(f => string.IsNullOrEmpty(lower) ? -f.Order : f.Score).ToList();
+            Items.OverrideWith(filtered);
             
-            SelectedItem ??= Items.FirstOrDefault(f => f.ShowItem);
-
+            SelectedItem ??= Items.FirstOrDefault();
             currentToken = null;
         }
 
@@ -97,7 +92,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Accept = new DelegateCommand(() =>
             {
                 if (selectedItem == null)
-                    SelectedItem = FindExactMatching() ?? Items.FirstOrDefault(f => f.ShowItem);
+                    SelectedItem = FindExactMatching() ?? Items.FirstOrDefault();
 
                 CloseOk?.Invoke();
             }, () => selectedItem != null || (visibleCount == 1 || FindExactMatching() != null))
@@ -123,10 +118,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         public void SelectFirstVisible()
         {
-            if (visibleCount > 0)
-                SelectedItem = Items.FirstOrDefault(f => f.ShowItem);
+            SelectedItem = Items.FirstOrDefault();
         }
         
+        public List<SmartItem> AllItems { get; } = new();
         public ObservableCollectionExtended<SmartItem> Items { get; } = new();
         
         private string searchBox = "";
@@ -163,18 +158,21 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         SmartGenericJsonData data = smartDataManager.GetDataByName(type, member);
                         if (predicate != null && !predicate(data))
                             continue;
-                     
-                        SmartItem i = new();   
-                        i.Group = smartDataGroup.Name;
-                        i.Name = data.NameReadable;
-                        i.SearchName = data.SearchTags == null ? data.NameReadable : $"{data.NameReadable} {data.SearchTags}";
-                        i.Id = data.Id;
-                        i.Help = data.Help;
-                        i.IsTimed = data.IsTimed;
-                        i.Deprecated = data.Deprecated;
-                        i.Order = order++;
-                        i.EnumName = data.Name;
 
+                        SmartItem i = new()
+                        {
+                            Group = smartDataGroup.Name,
+                            Name = data.NameReadable,
+                            SearchName = data.SearchTags == null ? data.NameReadable : $"{data.NameReadable} {data.SearchTags}",
+                            Id = data.Id,
+                            Help = data.Help,
+                            IsTimed = data.IsTimed,
+                            Deprecated = data.Deprecated,
+                            Order = order++,
+                            EnumName = data.Name,
+                        };
+
+                        AllItems.Add(i);
                         Items.Add(i);
                     }
                 }
@@ -184,15 +182,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 foreach (var customItem in customItems)
                 {
-                    SmartItem i = new();   
-                    i.Group = "Custom";
-                    i.Name = customItem.name;
-                    i.SearchName = customItem.name;
-                    i.CustomId = customItem.id;
-                    i.IsTimed = false;
-                    i.Deprecated = false;
-                    i.Order = order++;
+                    SmartItem i = new()
+                    {
+                        Group = "Custom",
+                        Name = customItem.name,
+                        SearchName = customItem.name,
+                        CustomId = customItem.id,
+                        IsTimed = false,
+                        Deprecated = false,
+                        Order = order++
+                    };
 
+                    AllItems.Add(i);
                     Items.Add(i);
                 }
             }
@@ -207,16 +208,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         {
                             ConditionJsonData data = conditionDataManager.GetConditionData(member);
 
-                            SmartItem i = new();
-                            i.Group = conditionDataGroup.Name;
-                            i.SearchName = data.NameReadable;
-                            i.Name = data.NameReadable;
-                            i.Id = data.Id;
-                            i.Help = data.Help;
-                            i.Deprecated = false;
-                            i.Order = order++;
-                            i.EnumName = data.Name;
+                            SmartItem i = new()
+                            {
+                                Group = conditionDataGroup.Name,
+                                SearchName = data.NameReadable,
+                                Name = data.NameReadable,
+                                Id = data.Id,
+                                Help = data.Help ?? "",
+                                Deprecated = false,
+                                Order = order++,
+                                EnumName = data.Name,
+                            };
 
+                            AllItems.Add(i);
                             Items.Add(i);
                         }
                     }

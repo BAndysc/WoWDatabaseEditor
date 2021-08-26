@@ -158,6 +158,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
 
             var itemsPerRow = Max(1, (int)Floor(finalSize.Width / itemWidth));
             
+            MeasureOverride(finalSize);
+            
             for (var i = 0; i < visualCount; i++)
             {
                 IVisual visual = visualChildren[i];

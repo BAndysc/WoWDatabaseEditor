@@ -2325,6 +2325,43 @@
 			"4": {"name": "destroy", "description": "used on object destroy (NOT used in client packet handler)"}
 		}
 	},
+	"SmartAiPhaseParameter": {
+		"name": "Smart AI phase",
+		"values": {
+			"0": {"name": "default (0)"},
+			"1": {"name": "phase 1"},
+			"2": {"name": "phase 2"},
+			"3": {"name": "phase 3"},
+			"4": {"name": "phase 4"},
+			"5": {"name": "phase 5"},
+			"6": {"name": "phase 6"},
+			"7": {"name": "phase 7"},
+			"8": {"name": "phase 8"},
+			"9": {"name": "phase 9"},
+			"10": {"name": "phase 10"},
+			"11": {"name": "phase 11"},
+			"12": {"name": "phase 12"}
+		}
+	},
+	"SmartAiPhaseMaskParameter": {
+		"name": "Smart AI phase masek",
+		"isflag": true,
+		"values": {
+			"0": {"name": "default (0)"},
+			"1": {"name": "phase 1"},
+			"2": {"name": "phase 2"},
+			"3": {"name": "phase 3"},
+			"4": {"name": "phase 4"},
+			"5": {"name": "phase 5"},
+			"6": {"name": "phase 6"},
+			"7": {"name": "phase 7"},
+			"8": {"name": "phase 8"},
+			"9": {"name": "phase 9"},
+			"10": {"name": "phase 10"},
+			"11": {"name": "phase 11"},
+			"12": {"name": "phase 12"}
+		}
+	},
 	"UnitStateParameter": {	
 		"name": "Unit state",	
 		"isflag": true,	

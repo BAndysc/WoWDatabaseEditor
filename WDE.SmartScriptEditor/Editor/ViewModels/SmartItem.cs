@@ -5,12 +5,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     public class SmartItem : ObservableBase
     {
         private int score = 100;
-        private string name = "";
-        private string enumName = "";
-        private bool deprecated;
-        private bool isTimed;
-        private string group = "";
-        private string searchName = "";
 
         public bool ShowItem => Score > 61;
         
@@ -24,62 +18,23 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        public string EnumName
-        {
-            get => enumName;
-            set => SetProperty(ref enumName, value);
-        }
+        public string EnumName { get; init; } = "";
 
-        public string Name
-        {
-            get => name;
-            set => SetProperty(ref name, value);
-        }
+        public string Name { get; init; } = "";
 
-        public string SearchName
-        {
-            get => searchName;
-            set => SetProperty(ref searchName, value.ToLower());
-        }
+        public string SearchName { get; init; } = "";
 
-        public bool Deprecated
-        {
-            get => deprecated;
-            set => SetProperty(ref deprecated, value);
-        }
+        public bool Deprecated { get; init; }
 
-        public string Help { get; set; } = "";
-        public int Id { get; set; }
-        public int? CustomId { get; set; }
+        public string Help { get; init; } = "";
 
-        public string Group
-        {
-            get => group;
-            set => SetProperty(ref group, value);
-        }
+        public int Id  { get; init; }
+        public int? CustomId  { get; init; }
 
-        public bool IsTimed
-        {
-            get => isTimed;
-            set => SetProperty(ref isTimed, value);
-        }
+        public string Group { get; init; } = "";
 
-        public int Order { get; set; }
+        public bool IsTimed { get; init; }
 
-        public SmartItem Update(SmartItem other)
-        {
-            Name = other.Name;
-            IsTimed = other.IsTimed;
-            Deprecated = other.Deprecated;
-            Score = other.Score;
-            Group = other.Group;
-            Order = other.Order;
-            Id = other.Id;
-            CustomId = other.CustomId;
-            Help = other.Help;
-            EnumName = other.EnumName;
-            SearchName = other.SearchName;
-            return this;
-        }
+        public int Order  { get; init; }
     }
 }

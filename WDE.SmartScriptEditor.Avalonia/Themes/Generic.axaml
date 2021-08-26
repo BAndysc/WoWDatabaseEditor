@@ -7,7 +7,8 @@
         xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
         xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
         xmlns:themes="clr-namespace:WDE.SmartScriptEditor.Avalonia.Themes"
-        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia">
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles">
 
     <Styles.Resources>
         <themes:IndentToMarginConverter x:Key="IndentToMarginConverter" LeftMultiplier="24" />
@@ -231,6 +232,23 @@
                                                 PickCommand="{Binding DataContext.SelectItemAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.Generic>
+                                    <views:ParameterDataTemplateSelector.BoolParameter>
+                                        <DataTemplate>
+                                            <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
+                                                      DataContext="{Binding Parameter}"
+                                                      IsChecked="{Binding Value, Converter={x:Static converters:CommonConverters.LongToBoolConverter}}" />
+                                        </DataTemplate>
+                                    </views:ParameterDataTemplateSelector.BoolParameter>
+                                    <views:ParameterDataTemplateSelector.FlagParameter>
+                                        <DataTemplate>
+                                            <controls:FlagComboBox SelectedItem="{Binding Parameter.String}" SelectedValue="{Binding Parameter.Value}" Flags="{Binding Parameter.Items}" />
+                                        </DataTemplate>
+                                    </views:ParameterDataTemplateSelector.FlagParameter>
+                                    <views:ParameterDataTemplateSelector.ItemsParameter>
+                                        <DataTemplate>
+                                            <controls1:CompletionComboBox editing:ParameterEditorView.OnEnterPressed="true" SelectedItem="{Binding OptionValue}" Items="{Binding Items}" />
+                                        </DataTemplate>
+                                    </views:ParameterDataTemplateSelector.ItemsParameter>
                                     <views:ParameterDataTemplateSelector.ButtonParameter>
                                         <DataTemplate>
                                             <Button Command="{Binding Command}" Content="{Binding ActionName}" />

@@ -9,32 +9,39 @@ namespace WDE.MVVM.Observable.Functional
     {
         private readonly IEnumerable<T> initial;
         private readonly INotifyCollectionChanged notifyCollectionChanged;
+        private readonly bool onRemoveOnDispose;
 
-        public ObservableCollectionStream(IEnumerable<T> initial, INotifyCollectionChanged notifyCollectionChanged)
+        public ObservableCollectionStream(IEnumerable<T> initial, INotifyCollectionChanged notifyCollectionChanged, bool onRemoveOnDispose)
         {
             this.initial = initial;
             this.notifyCollectionChanged = notifyCollectionChanged;
+            this.onRemoveOnDispose = onRemoveOnDispose;
         }
 
-        public ObservableCollectionStream(ObservableCollection<T> collection) : this(collection, collection)
+        public ObservableCollectionStream(ObservableCollection<T> collection, bool onRemoveOnDispose) : this(collection, collection, onRemoveOnDispose)
         {
         }
 
         public IDisposable Subscribe(IObserver<CollectionEvent<T>> observer)
         {
-            return new Subscription(initial, notifyCollectionChanged, observer);
+            return new Subscription(initial, notifyCollectionChanged, observer, onRemoveOnDispose);
         }
 
         private class Subscription : IDisposable
         {
+            private readonly IEnumerable<T> initial;
             private readonly INotifyCollectionChanged notifyCollectionChanged;
             private readonly IObserver<CollectionEvent<T>> observer;
-            
-            public Subscription(IEnumerable<T> initial, INotifyCollectionChanged changed, IObserver<CollectionEvent<T>> observer)
+            private readonly bool removeOnDispose;
+
+            public Subscription(IEnumerable<T> initial, INotifyCollectionChanged changed,
+                IObserver<CollectionEvent<T>> observer, bool removeOnDispose)
             {
+                this.initial = initial;
                 notifyCollectionChanged = changed;
                 
                 this.observer = observer;
+                this.removeOnDispose = removeOnDispose;
                 changed.CollectionChanged += CollectionOnCollectionChanged;
 
                 int index = 0;
@@ -47,6 +54,11 @@ namespace WDE.MVVM.Observable.Functional
             public void Dispose()
             {
                 notifyCollectionChanged.CollectionChanged -= CollectionOnCollectionChanged;
+                if (removeOnDispose)
+                {
+                    foreach (var t in initial)
+                        observer.OnNext(new CollectionEvent<T>(CollectionEventType.Remove, t, 0));
+                }
             }
             
             private void CollectionOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

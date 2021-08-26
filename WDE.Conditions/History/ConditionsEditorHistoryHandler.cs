@@ -45,9 +45,7 @@ namespace WDE.Conditions.History
                 {
                     for (int i = 0; i < e.NewItems.Count; ++i)
                     {
-                        ConditionJsonData oldItem = e.OldItems[i] is ConditionJsonData ? (ConditionJsonData) e.OldItems[i]! : default;
-                        ConditionJsonData newItem = e.NewItems[i] is ConditionJsonData ? (ConditionJsonData) e.NewItems[i]! : default;
-                        PushAction(new CondtionsListHistoryReplaceAction(in oldItem, in newItem, e.NewStartingIndex, conditionsList));
+                        PushAction(new CondtionsListHistoryReplaceAction((ConditionJsonData)e.OldItems[i]!, (ConditionJsonData)e.NewItems[i]!, e.NewStartingIndex, conditionsList));
                     }
                 }
             }
@@ -112,7 +110,7 @@ namespace WDE.Conditions.History
         private readonly int index;
         private readonly ObservableCollection<ConditionJsonData> collection;
 
-        internal CondtionsListHistoryReplaceAction(in ConditionJsonData old, in ConditionJsonData @new, int index,
+        internal CondtionsListHistoryReplaceAction(ConditionJsonData old, ConditionJsonData @new, int index,
             ObservableCollection<ConditionJsonData> collection)
         {
             this.old = old;

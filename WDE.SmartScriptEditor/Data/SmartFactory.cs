@@ -305,10 +305,15 @@ namespace WDE.SmartScriptEditor.Data
             {
                 element.GetParameter(i).Name = "Parameter " + (i + 1) + " (unused)";
                 element.GetParameter(i).IsUsed = false;
+                element.GetParameter(i).ForceHidden = true;
             }
-            
+
             if (data.Parameters == null)
+            {
+                for (var i = 0; i < element.ParametersCount; ++i)
+                    element.GetParameter(i).ForceHidden = false;
                 return;
+            }
 
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
@@ -327,6 +332,9 @@ namespace WDE.SmartScriptEditor.Data
                 element.GetParameter(i).Parameter = parameter;
                 element.GetParameter(i).IsUsed = true;
             }
+            
+            for (var i = 0; i < element.ParametersCount; ++i)
+                element.GetParameter(i).ForceHidden = false;
         }
         
         private void SetParameterObjects(SmartBaseElement element, ConditionJsonData data)

@@ -97,7 +97,7 @@ namespace WDE.MVVM
         /// <summary>
         /// Adds a disposable to the list to dispose on whole class dispose
         /// </summary>
-        protected T AutoDispose<T>(T disposable) where T : System.IDisposable
+        public T AutoDispose<T>(T disposable) where T : System.IDisposable
         {
             disposables.Add(disposable);
             return disposable;
