@@ -11,6 +11,7 @@
         </Style>
         <StyleInclude Source="avares://Dock.Avalonia/Themes/FluentTheme.axaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/CompletionComboBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/GroupingListBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/WizardPanel.axaml" />
@@ -33,4 +34,5 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TeachingTip.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TreeViewItem.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ToolbarPanel.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/CompletionComboBox.axaml" />
 </Styles>

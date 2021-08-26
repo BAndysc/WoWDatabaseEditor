@@ -17,11 +17,14 @@ namespace AvaloniaStyles.Demo
         
         public string ActiveTab { get; set; }
 
+        public ExampleEnum EnumValue { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
             this.AttachDevTools();
             DataContext = this;
+            EnumValue = ExampleEnum.Cocktail;
             Items.Add(new DemoItem(true, "Brian", 213));
             Items.Add(new DemoItem(false, "Justin", 4125));
             Items.Add(new DemoItem(true, "Ted", 7548));
@@ -35,7 +38,8 @@ namespace AvaloniaStyles.Demo
 
             ActiveTab = Tabs[1];
             
-            Themes.AddRange(Enum.GetValues<SystemThemeOptions>());
+            foreach (var r in Enum.GetValues<SystemThemeOptions>())
+                Themes.Add(r);
             CurrentTheme = Themes[0];
         }
 
@@ -62,5 +66,16 @@ namespace AvaloniaStyles.Demo
         {
             new MessageBox().ShowDialog(this);
         }
+    }
+
+    [Flags]
+    public enum ExampleEnum
+    {
+        Food = 1,
+        Drink = 2,
+        Cocktail = 4,
+        Car = 8,
+        Vehicle = 16,
+        House = 32,
     }
 }

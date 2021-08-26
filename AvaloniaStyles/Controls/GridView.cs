@@ -143,8 +143,12 @@ namespace AvaloniaStyles.Controls
                 int i = 0;
                 foreach (var column in Columns)
                 {
-                    Control control;
-                    if (column.Checkable)
+                    IControl control;
+                    if (column.DataTemplate is { } dt)
+                    {
+                        control = dt.Build(column);
+                    } 
+                    else if (column.Checkable)
                     {
                         control = new CheckBox()
                         {
@@ -160,7 +164,7 @@ namespace AvaloniaStyles.Controls
                         };
                     }
                     
-                    Grid.SetColumn(control, 2 * i++);
+                    Grid.SetColumn((Control)control, 2 * i++);
                     parent.Children.Add(control);
                     
                 }
@@ -205,5 +209,6 @@ namespace AvaloniaStyles.Controls
         public bool Checkable { get; set; }
         public bool IsReadOnly { get; set; }
         public int PreferedWidth { get; set; } = 70;
+        public IDataTemplate? DataTemplate { get; set; }
     }
 }

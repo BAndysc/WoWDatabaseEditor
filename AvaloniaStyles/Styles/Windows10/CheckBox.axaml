@@ -2,5 +2,45 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Style Selector="CheckBox">
       <Setter Property="MinWidth" Value="28" />
+      <Setter Property="MinHeight" Value="20" />
+      
+      <!-- copy paste from original, but changed height from 32 to 20 -->
+      <!-- add 
+                              CornerRadius="{TemplateBinding CornerRadius}"
+                          CornerRadius="{TemplateBinding CornerRadius}"  from avalonia 0.10.7 -->
+      <Setter Property="Template">
+          <ControlTemplate>
+              <Grid x:Name="RootGrid" ColumnDefinitions="20,*">
+                  <Border x:Name="PART_Border"
+                          Grid.ColumnSpan="2"
+                          Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}"/>
+
+                  <Grid VerticalAlignment="Center" Height="20"> <!-- vertical alignment changed from top to center -->
+                      <Border x:Name="NormalRectangle"
+                              BorderThickness="{DynamicResource CheckBoxBorderThemeThickness}"
+                              UseLayoutRounding="False"
+                              Height="20"
+                              Width="20" />
+
+                      <Viewbox UseLayoutRounding="False">
+                          <Panel>
+                              <Panel Height="16" Width="16" />
+                              <Path x:Name="CheckGlyph" Stretch="Uniform" VerticalAlignment="Center" />
+                          </Panel>
+                      </Viewbox>
+                  </Grid>
+                  <ContentPresenter x:Name="ContentPresenter"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    Content="{TemplateBinding Content}"
+                                    Margin="{TemplateBinding Padding}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Grid.Column="1" />
+                  <!-- TODO: TextWrapping="Wrap" on contentpresenter -->
+              </Grid>
+          </ControlTemplate>
+      </Setter>
     </Style>
 </Styles>

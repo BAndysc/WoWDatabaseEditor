@@ -1,0 +1,15 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="controls|CompletionComboBox">
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+        <Setter Property="BorderThickness" Value="0.5" />
+        <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
+    </Style>
+    <Style Selector="controls|CompletionComboBox ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource RaisedContentForeground.Accent}" />
+        <Setter Property="Background" Value="{DynamicResource RaisedContentBackground.Accent}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush.Accent}" />
+    </Style>
+</Styles>

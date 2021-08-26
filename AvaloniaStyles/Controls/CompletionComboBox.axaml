@@ -1,0 +1,62 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
+    <Design.PreviewWith>
+        <controls1:CompletionComboBox />
+    </Design.PreviewWith>
+
+    <Style Selector="controls1|CompletionComboBox.NoPadding ListBoxItem">
+        <Setter Property="Padding" Value="0,0,0,0" />
+    </Style>
+    
+    <Style Selector="controls1|CompletionComboBox.NoPadding ListBoxItem > ContentPresenter">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+    
+    <Style Selector="controls1|CompletionComboBox">
+        <Setter Property="MinHeight" Value="26.5" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid Name="PART_LayoutRoot">
+                    <ToggleButton Content="{TemplateBinding SelectedItem}" 
+                                  HorizontalAlignment="Stretch"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  Background="{TemplateBinding Background}"
+                                  Padding="{TemplateBinding Padding}"
+                                  VerticalAlignment="Stretch"
+                                  Name="PART_Button"
+                                  IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}" ContentTemplate="{TemplateBinding ButtonItemTemplate}"></ToggleButton>
+                    <Popup Name="PART_Popup"
+                           IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                           WindowManagerAddShadowHint="True"
+                           MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                           IsLightDismissEnabled="True"
+                           MaxWidth="700"
+                           MaxHeight="600"
+                           PlacementConstraintAdjustment="SlideY"
+                           PlacementMode="Bottom"
+                           PlacementGravity="Bottom"
+                           PlacementTarget="PART_Button">
+                        <Border Name="PART_SuggestionsContainer"
+                                Padding="{DynamicResource AutoCompleteListMargin}"
+                                BorderThickness="{DynamicResource AutoCompleteListBorderThemeThickness}"
+                                BorderBrush="{DynamicResource AutoCompleteBoxSuggestionsListBorderBrush}"
+                                Background="{DynamicResource AutoCompleteBoxSuggestionsListBackground}"
+                                CornerRadius="{DynamicResource OverlayCornerRadius}">
+                            <DockPanel>
+                                <TextBox Name="PART_SearchTextBox" Text="{TemplateBinding SearchText}" DockPanel.Dock="Top" />
+                                <ListBox Name="PART_SelectingItemsControl"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         ItemTemplate="{TemplateBinding ItemTemplate}"
+                                         Margin="{DynamicResource AutoCompleteListPadding}" />
+                            </DockPanel>
+                        </Border>
+                    </Popup>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

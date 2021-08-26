@@ -22,11 +22,11 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     
-    <Style Selector=":is(Button):pressed">
+    <Style Selector=":is(Button):not(:is(CheckBox)):pressed">
         <Setter Property="Foreground" Value="{DynamicResource RaisedContentForeground.Accent}" />
     </Style>
 
-    <Style Selector=":is(Button):pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button):not(:is(CheckBox)):pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground.Accent}" />
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush.Accent}" />
     </Style>

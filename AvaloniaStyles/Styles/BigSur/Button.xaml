@@ -9,30 +9,30 @@
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
     </Style>
     
-    <Style Selector=":is(Button)">
+    <Style Selector=":is(Button):not(:is(CheckBox))">
         <Setter Property="CornerRadius" Value="6" />
     </Style>
 
-    <Style Selector=":is(Button) /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button):not(:is(CheckBox)) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="BoxShadow" Value="{DynamicResource RaisedContent.Shadow}" />
     </Style>
     
-    <Style Selector=":is(Button):pointerover /template/ ContentPresenter">
+    <Style Selector=":is(Button):not(:is(CheckBox)):pointerover /template/ ContentPresenter">
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}"/>
     </Style>
     
-    <Style Selector=":is(Button) TextBlock">
+    <Style Selector=":is(Button):not(:is(CheckBox)) TextBlock">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Margin" Value="0,2,0,0" />
         <Setter Property="Padding" Value="6,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     
-    <Style Selector=":is(Button):pressed">
+    <Style Selector=":is(Button):not(:is(CheckBox)):pressed">
         <Setter Property="Foreground" Value="{DynamicResource RaisedContentForeground.Accent}" />
     </Style>
 
-    <Style Selector=":is(Button):pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(Button):not(:is(CheckBox)):pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground.Accent}" />
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush.Accent}" />
         <Setter Property="BoxShadow" Value="{DynamicResource RaisedContentPressed.Shadow}" />

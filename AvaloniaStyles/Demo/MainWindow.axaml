@@ -3,6 +3,7 @@
           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+          xmlns:demo="clr-namespace:AvaloniaStyles.Demo"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           SizeToContent="Manual"
           x:Class="AvaloniaStyles.Demo.MainWindow"
@@ -73,6 +74,7 @@
     
     <ScrollViewer Margin="10" Background="{DynamicResource MainColorBackground}">
         <StackPanel Spacing="10" Orientation="Vertical">
+            <controls:CompletionComboBox SelectedItem="{Binding EnumValue, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type demo:ExampleEnum}" />
             <Button>Button</Button>
             <Button IsEnabled="False">Disabled button</Button>
             <CheckBox>Checkbox</CheckBox>

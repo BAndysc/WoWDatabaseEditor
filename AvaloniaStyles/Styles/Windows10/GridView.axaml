@@ -24,10 +24,7 @@
         </Setter>
     </Style>
     <Style Selector="controls|GridView ListBoxItem">
-        <Setter Property="Height" Value="26" />
-    </Style>
-    <Style Selector="controls|GridView ListBoxItem CheckBox">
-        <Setter Property="Margin" Value="0,-6,0,0" />
+        <Setter Property="MinHeight" Value="26" />
     </Style>
     <Style Selector="controls|GridView ListBoxItem TextBlock">
         <Setter Property="Padding" Value="8,0,0,0" />

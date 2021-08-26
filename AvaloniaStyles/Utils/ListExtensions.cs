@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 
-namespace WDE.Common.Utils
+namespace AvaloniaStyles.Utils
 {
-    public static class ListExtensions
+    internal static class ListExtensions
     {
         public static void OverrideWith<T>(this IList<T> that, IList<T> with)
         {
@@ -21,20 +20,6 @@ namespace WDE.Common.Utils
             {
                 that.RemoveAt(that.Count - 1);
             }
-        }
-        public static T? RemoveFirstIf<T>(this IList<T> list, Func<T, bool> pred)
-        {
-            for (int i = 0; i < list.Count; ++i)
-            {
-                if (pred(list[i]))
-                {
-                    var elem = list[i];
-                    list.RemoveAt(i);
-                    return elem;
-                }
-            }
-
-            return default;
         }
     }
 }

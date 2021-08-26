@@ -63,9 +63,6 @@
                 <Setter Property="MinHeight" Value="24" />
                 <Setter Property="Height" Value="24" />
         </Style>
-        <Style Selector="controls|ToolbarPanel > CheckBox /template/ Grid#RootGrid Grid">
-                <Setter Property="Margin" Value="0,-2,0,0" />
-        </Style>
         <Style Selector="controls|ToolbarPanel > ComboBox">
                 <Setter Property="Padding" Value="12,0,5,0"/>
                 <Setter Property="Height" Value="24" />
