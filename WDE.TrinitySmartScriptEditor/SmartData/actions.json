@@ -535,12 +535,12 @@
         "name": "SMART_ACTION_SET_EVENT_PHASE",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase",
                 "description": "Note: This is Smart AI event phase, not actual creature phasemask"
             }
         ],
-        "description": "{source}: Set event phase to {pram1}",
+        "description": "Set event phase to {pram1}",
         "name_readable": "Set event phase",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -558,7 +558,7 @@
                 "name": "Decrement"
             }
         ],
-        "description": "{source}: Increment phase by {pram1} and decrement by {pram2}",
+        "description": "Increment phase by {pram1} and decrement by {pram2}",
         "name_readable": "Increment event phase",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -699,31 +699,31 @@
         "name": "SMART_ACTION_RANDOM_PHASE",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase Id 1"
             },
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase Id 2"
             },
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase Id 3"
             },
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase Id 4"
             },
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase Id 5"
             },
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase Id 6"
             }
         ],
-        "description": "{source}: Set random event phase between: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
+        "description": "Set random event phase between: {pram1}, {pram2}, {pram3}, {pram4}, {pram5}, {pram6}",
         "name_readable": "Random phase",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -733,17 +733,17 @@
         "name": "SMART_ACTION_RANDOM_PHASE_RANGE",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase Min",
                 "description": "Minimum phase to random between (SAI phase)"
             },
             {
-                "type": "Parameter",
+                "type": "SmartAiPhaseParameter",
                 "name": "Phase Max",
                 "description": "Maximum phase to random between (SAI phase)"
             }
         ],
-        "description": "{source}: Set random event phase between range {pram1} and {pram2}",
+        "description": "Set random event phase between range {pram1} and {pram2}",
         "name_readable": "Random phase range",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
