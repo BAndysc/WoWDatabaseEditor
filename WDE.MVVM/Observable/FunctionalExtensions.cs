@@ -26,6 +26,15 @@ namespace WDE.MVVM.Observable
             return new ObservableCollectionStream<T>(collection, onRemoveOnDispose);
         }
 
+        public static System.IDisposable DisposeOnRemove<T>(this ObservableCollection<T> collection) where T : System.IDisposable
+        {
+            return collection.ToStream(true).SubscribeAction(e =>
+            {
+                if (e.Type == CollectionEventType.Remove)
+                    e.Item.Dispose();
+            });
+        }
+
         public static System.IDisposable ToStreamForEach<T, R>(this ObservableCollection<T> source, Expression<Func<T, R>> get, Action<T, R> onNext) where T : class, INotifyPropertyChanged
         {
             Dictionary<T, System.IDisposable> disposables = new(ReferenceEqualityComparer<T>.Instance);
@@ -34,6 +43,29 @@ namespace WDE.MVVM.Observable
                 if (i.Type == CollectionEventType.Add)
                 {
                     disposables.Add(i.Item, i.Item.ToObservable(get).SubscribeAction(e =>
+                    {
+                        onNext(i.Item, e);
+                    }));
+                }
+                else if (i.Type == CollectionEventType.Remove)
+                {
+                    if (disposables.TryGetValue(i.Item, out var disp))
+                    {
+                        disp.Dispose();
+                        disposables.Remove(i.Item);
+                    }
+                }
+            });
+        }
+        
+        public static System.IDisposable ToStreamForEachValue<T>(this ObservableCollection<T> source, Action<T, PropertyValueChangedEventArgs> onNext) where T : class, INotifyPropertyValueChanged
+        {
+            Dictionary<T, System.IDisposable> disposables = new(ReferenceEqualityComparer<T>.Instance);
+            return source.ToStream(true).SubscribeAction(i =>
+            {
+                if (i.Type == CollectionEventType.Add)
+                {
+                    disposables.Add(i.Item, i.Item.ToObservableValue().SubscribeAction(e =>
                     {
                         onNext(i.Item, e);
                     }));

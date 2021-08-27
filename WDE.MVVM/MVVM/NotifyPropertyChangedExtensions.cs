@@ -7,6 +7,11 @@ namespace WDE.MVVM
 {
     public static class NotifyPropertyChangedExtensions
     {
+        public static IObservable<PropertyValueChangedEventArgs> ToObservableValue<T>(this T obj) where T : INotifyPropertyValueChanged
+        {
+            return new NotifyPropertyValueToObservable<T>(obj);
+        }
+        
         public static IObservable<T> ToObservable<T, R>(this R obj, Expression<Func<R, T>> getter) where R : INotifyPropertyChanged
         {
             return new NotifyPropertyToObservable<T, R>(obj, getter);

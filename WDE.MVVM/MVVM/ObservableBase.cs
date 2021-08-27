@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Prism.Mvvm;
 using WDE.MVVM.Observable;
 
 namespace WDE.MVVM
 {
-    public abstract class ObservableBase : BindableBase, IDisposable
+    public abstract class ObservableBase : BindableBase, IDisposable, INotifyPropertyValueChanged
     {
         private List<IDisposable> disposables = new();
 
@@ -94,6 +95,23 @@ namespace WDE.MVVM
             AutoDispose(this.ToObservable(property).SubscribeAction(action));
         }
         
+        protected bool SetPropertyWithOldValue<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(storage, value)) return false;
+
+            var old = storage;
+            storage = value;
+            RaisePropertyChanged(propertyName!);
+            RaisePropertyValueChanged(propertyName!, old, value);
+
+            return true;
+        }
+
+        protected void RaisePropertyValueChanged<T>(string propertyName, T old, T @new)
+        {
+            PropertyValueChanged?.Invoke(this, new TypedPropertyValueChangedEventArgs<T>(propertyName, old, @new));
+        }
+
         /// <summary>
         /// Adds a disposable to the list to dispose on whole class dispose
         /// </summary>
@@ -105,9 +123,13 @@ namespace WDE.MVVM
         
         public void Dispose()
         {
-            foreach (var d in disposables)
-                d.Dispose();
-            disposables.Clear();
+            while (disposables.Count > 0)
+            {
+                disposables[^1].Dispose();
+                disposables.RemoveAt(disposables.Count - 1);
+            }
         }
+
+        public event PropertyValueChangedEventHandler? PropertyValueChanged;
     }
 }
