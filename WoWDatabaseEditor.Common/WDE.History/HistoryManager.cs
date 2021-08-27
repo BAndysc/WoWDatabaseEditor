@@ -67,7 +67,7 @@ namespace WDE.History
         public int UndoCount => history.Count;
         public int RedoCount => future.Count;
 
-        public void AddHandler(HistoryHandler handler)
+        public T AddHandler<T>(T handler) where T : HistoryHandler
         {
             handler.ActionPush += (sender, action) =>
             {
@@ -80,8 +80,9 @@ namespace WDE.History
                 Future.Clear();
                 RecalculateValues();
             };
+            return handler;
         }
-
+        
         public void Undo()
         {
             if (history.Count == 0)

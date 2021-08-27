@@ -9,6 +9,12 @@ namespace WDE.Common.History
         private bool inBulkEditing;
         public event EventHandler<IHistoryAction> ActionPush = delegate { };
 
+        protected IDisposable WithinBulk(string name)
+        {
+            StartBulkEdit();
+            return new EndBulkEditing(this, name);
+        }
+        
         protected void StartBulkEdit()
         {
             inBulkEditing = true;
@@ -31,6 +37,23 @@ namespace WDE.Common.History
                 bulkEditing.Add(action);
             else
                 ActionPush(this, action);
+        }
+
+        private readonly struct EndBulkEditing : System.IDisposable
+        {
+            private readonly HistoryHandler historyHandler;
+            private readonly string name;
+
+            public EndBulkEditing(HistoryHandler historyHandler, string name)
+            {
+                this.historyHandler = historyHandler;
+                this.name = name;
+            }
+
+            public void Dispose()
+            {
+                historyHandler.EndBulkEdit(name);
+            }
         }
     }
 }

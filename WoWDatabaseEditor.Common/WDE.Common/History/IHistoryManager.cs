@@ -20,6 +20,6 @@ namespace WDE.Common.History
         void MarkAsSaved();
         void MarkNoSave();
 
-        void AddHandler(HistoryHandler handler);
+        T AddHandler<T>(T handler) where T : HistoryHandler;
     }
 }
