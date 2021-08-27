@@ -358,7 +358,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     entity.Floats[pair.Key] = pair.Value;
                 foreach (var pair in created.Values.Guids)
                     entity.Guids[pair.Key] = pair.Value;
-                SetAppendOnNext("Created " + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position));
+                SetAppendOnNext("Created " + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation));
                 PrintValues(basePacket, created.Guid, created.Values, null, false);
                 SetAppendOnNext(null);
             }
@@ -375,11 +375,14 @@ namespace WDE.PacketViewer.Processing.Processors
             return base.Process(basePacket, packet);
         }
 
-        private string VecToString(Vec3? pos)
+        private string VecToString(Vec3? pos, float? orientation)
         {
             if (pos == null)
                 return "(unknown)";
-            return $"({pos.X}, {pos.Y}, {pos.Z})";
+            if (orientation.HasValue)
+                return $"({pos.X}, {pos.Y}, {pos.Z}, {orientation})";
+            else
+                return $"({pos.X}, {pos.Y}, {pos.Z})";
         }
 
         private void PrintValues(PacketBase basePacket, UniversalGuid guid, UpdateValues values, Entity? entity, bool isUpdate)
