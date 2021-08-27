@@ -22,6 +22,7 @@ namespace WDE.Common.Utils
                 that.RemoveAt(that.Count - 1);
             }
         }
+        
         public static T? RemoveFirstIf<T>(this IList<T> list, Func<T, bool> pred)
         {
             for (int i = 0; i < list.Count; ++i)
@@ -31,6 +32,19 @@ namespace WDE.Common.Utils
                     var elem = list[i];
                     list.RemoveAt(i);
                     return elem;
+                }
+            }
+
+            return default;
+        }
+        
+        public static T? RemoveIf<T>(this IList<T> list, Func<T, bool> pred)
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (pred(list[i]))
+                {
+                    list.RemoveAt(i);
                 }
             }
 
