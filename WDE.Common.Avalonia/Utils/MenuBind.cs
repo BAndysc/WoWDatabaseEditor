@@ -10,6 +10,7 @@ using Avalonia.LogicalTree;
 using AvaloniaEdit;
 using AvaloniaEdit.Editing;
 using Prism.Commands;
+using WDE.Common.Avalonia.Controls;
 using WDE.Common.Menu;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -104,7 +105,8 @@ namespace WDE.Common.Avalonia.Utils
                     command = OverrideCommand<TextBox>(command, Key.V, key, cmd, tb => tb.Paste());
                     command = OverrideCommand<TextBox>(command, Key.Z, key, cmd, Undo);
                     command = OverrideCommand<TextBox>(command, Key.Y, key, cmd, Redo);
-                    
+                    command = OverrideCommand<FixedTextBox>(command, Key.V, key, cmd, tb => tb.CustomPaste());
+
                     command = OverrideCommand<TextArea>(command, Key.Z, key, cmd, tb => GetTextEditor(tb)?.Undo());
                     command = OverrideCommand<TextArea>(command, Key.Y, key, cmd, tb => GetTextEditor(tb)?.Redo());
                     command = OverrideCommand<TextArea>(command, Key.C, key, cmd, tb => ApplicationCommands.Copy.Execute(null, tb));

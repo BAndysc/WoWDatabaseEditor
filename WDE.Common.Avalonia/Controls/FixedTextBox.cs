@@ -18,5 +18,10 @@ namespace WDE.Common.Avalonia.Controls
                     base.OnTextInput(e);
             }
         }
+
+        public virtual void CustomPaste()
+        {
+            Paste();
+        }
     }
 }
