@@ -133,6 +133,17 @@ namespace WDE.Parameters
             });
         }
 
+        public void RegisterCombined(string name, string param1, string param2, string param3, string param4,
+            Func<IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>> creator)
+        {
+            OnRegisterLong(param1)
+                .CombineLatest(OnRegisterLong(param2), OnRegisterLong(param3), OnRegisterLong(param4))
+                .Subscribe(pair =>
+            {
+                Register(name, creator(pair.First, pair.Second, pair.Third, pair.Fourth));
+            });
+        }
+
         public void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<long>> creator)
         {
             OnRegisterLong(dependsOn).Subscribe(item =>

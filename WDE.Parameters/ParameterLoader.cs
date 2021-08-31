@@ -8,6 +8,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.MVVM.Observable;
+using WDE.Parameters.Parameters;
 using WDE.Parameters.Providers;
 
 namespace WDE.Parameters
@@ -68,7 +69,14 @@ namespace WDE.Parameters
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
             factory.Register("PercentageParameter", new PercentageParameter());
+            factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
+            factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
+                (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
+            factory.RegisterDepending("UnitBytes1Parameter", "StandStateParameter", standState => new UnitBytes1Parameter(standState));
+            factory.RegisterCombined("UnitBytes2Parameter", "SheathStateParameter",  "UnitPVPStateFlagParameter","UnitBytesPetFlagParameter", "ShapeshiftFormParameter", 
+                (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift));
 
+            
             loadingEventAggregator.OnEvent<DatabaseLoadedEvent>().SubscribeAction(_ =>
             {
                 foreach (var p in databaseParameters)
