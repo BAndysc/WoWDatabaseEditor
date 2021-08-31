@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.Parameters;
 using WDE.Module.Attributes;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
@@ -11,7 +14,7 @@ using WowPacketParser.Proto.Processing;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : PacketProcessor<bool>, IPacketTextDumper
+    public class StoryTellerDumper : PacketProcessor<bool>, IPacketTextDumper, ITwoStepPacketBoolProcessor
     {
         private class Entity
         {
@@ -23,6 +26,8 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly IDatabaseProvider databaseProvider;
         private readonly IDbcStore dbcStore;
         private readonly ISpellStore spellStore;
+        private readonly IParameterFactory parameterFactory;
+        private readonly IWaypointProcessor waypointProcessor;
         private readonly StringBuilder sb;
         private readonly TextWriter writer;
         private DateTime? lastTime;
@@ -34,13 +39,35 @@ namespace WDE.PacketViewer.Processing.Processors
 
         private readonly Dictionary<UniversalGuid, Entity> entities = new();
 
+        private IParameter<long> unitFlagsParameter;
+        private IParameter<long> unitFlags2Parameter;
+        private IParameter<long> factionParameter;
+        private IParameter<long> emoteParameter;
+        private IParameter<long> npcFlagsParameter;
+        private IParameter<long> gameobjectBytes1Parameter;
+        private IParameter<long>[] unitBytesParameters = new IParameter<long>[3];
+        
         public StoryTellerDumper(IDatabaseProvider databaseProvider, 
             IDbcStore dbcStore,
-            ISpellStore spellStore)
+            ISpellStore spellStore,
+            IParameterFactory parameterFactory,
+            IWaypointProcessor waypointProcessor)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
             this.spellStore = spellStore;
+            this.parameterFactory = parameterFactory;
+            this.waypointProcessor = waypointProcessor;
+            unitFlagsParameter = parameterFactory.Factory("UnitFlagParameter");
+            unitFlags2Parameter = parameterFactory.Factory("UnitFlags2Parameter");
+            factionParameter = parameterFactory.Factory("FactionParameter");
+            emoteParameter = parameterFactory.Factory("EmoteParameter");
+            npcFlagsParameter = parameterFactory.Factory("NpcFlagParameter");
+            gameobjectBytes1Parameter = parameterFactory.Factory("GameobjectBytes1Parameter");
+            unitBytesParameters[0] = parameterFactory.Factory("UnitBytes0Parameter");
+            unitBytesParameters[1] = parameterFactory.Factory("UnitBytes1Parameter");
+            unitBytesParameters[2] = parameterFactory.Factory("UnitBytes2Parameter");
+            
             this.sb = new();
             this.writer = new StringWriter(sb);
         }
@@ -135,6 +162,11 @@ namespace WDE.PacketViewer.Processing.Processors
             if (dbc.TryGetValue(id, out var name))
                 return $"{name} ({id})";
             return id.ToString();
+        }
+
+        public bool PreProcess(PacketHolder packet)
+        {
+            return waypointProcessor.Process(packet);
         }
         
         protected override bool Process(PacketBase basePacket, PacketChat packet)
@@ -247,17 +279,39 @@ namespace WDE.PacketViewer.Processing.Processors
             return base.Process(basePacket, packet);
         }
 
+        private string GetQuestName(uint questId)
+        {
+            var template = databaseProvider.GetQuestTemplate(questId);
+            return (template == null ? questId.ToString() : $"{template.Name} ({questId})");
+        }
+        
         protected override bool Process(PacketBase basePacket, PacketQuestGiverAcceptQuest packet)
         {
-            var template = databaseProvider.GetQuestTemplate(packet.QuestId);
-            AppendLine(basePacket, "Player accepts quest: " + (template == null ? packet.QuestId : $"{template.Name} ({packet.QuestId})"));
+            AppendLine(basePacket, "Player accepts quest: " + GetQuestName(packet.QuestId));
             return base.Process(basePacket, packet);
         }
 
         protected override bool Process(PacketBase basePacket, PacketQuestGiverQuestComplete packet)
         {
-            var template = databaseProvider.GetQuestTemplate(packet.QuestId);
-            AppendLine(basePacket, "Player rewards quest: " + (template == null ? packet.QuestId : $"{template.Name} ({packet.QuestId})"));
+            AppendLine(basePacket, "Player rewards quest: " + GetQuestName(packet.QuestId));
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketQuestComplete packet)
+        {
+            AppendLine(basePacket, "Quest completed: " + GetQuestName(packet.QuestId));
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketQuestAddKillCredit packet)
+        {
+            AppendLine(basePacket, $"Added kill credit {packet.KillCredit} for quest " + GetQuestName(packet.QuestId) + $" ({packet.Count}/{packet.RequiredCount}");
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketQuestFailed packet)
+        {
+            AppendLine(basePacket, "Quest failed: " + GetQuestName(packet.QuestId));
             return base.Process(basePacket, packet);
         }
 
@@ -283,23 +337,54 @@ namespace WDE.PacketViewer.Processing.Processors
                     sb.Append(" stops");
                 else
                 {
-                    if (packet.Points.Count + packet.PackedPoints.Count == 1)
+                    if (!waypointProcessor.State.TryGetValue(packet.Mover, out var state))
+                        return true;
+
+                    var path = state.Paths.FirstOrDefault(p => p.FirstPacketNumber == basePacket.Number);
+
+                    if (path == null)
+                        return true;
+
+                    int i = 1;
+                    sb.AppendLine($" goes by waypoints [{path.TotalMoveTime} ms]: {{");
+                    foreach (var segment in path.Segments)
+                    {
+                        sb.AppendLine($"     Segment {i++}, dist: {segment.OriginalDistance}, average speed: {segment.OriginalDistance / segment.MoveTime * 1000} yd/s");
+                        foreach (var waypoint in segment.Waypoints)
+                            sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z})");
+                    }
+                    sb.Append("       }");
+                    
+                    /*if (packet.Points.Count + packet.PackedPoints.Count == 1)
                     {
                         var vec = packet.PackedPoints.Count == 1 ? packet.PackedPoints[0] : packet.Points[0];
+                        sb.Append(" move time: " + packet.MoveTime);
                         sb.Append($" goes to: ({vec.X}, {vec.Y}, {vec.Z})");
                     }
                     else
                     {
-                        sb.AppendLine(" goes by " + (packet.Points.Count + packet.PackedPoints.Count) + " waypoints: {");
+                        sb.Append(" move time: " + packet.MoveTime);
+                        if ((packet.Flags & UniversalSplineFlag.UncompressedPath) != 0)
+                        {
+                            Debug.Assert(packet.PackedPoints.Count == 0);
+                            sb.AppendLine(" goes by " + (packet.Points.Count) + " waypoints: {");
 
-                        foreach (var waypoint in packet.PackedPoints)
-                            sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z})");
+                            foreach (var point in packet.Points)
+                                sb.AppendLine($"               ({point.X}, {point.Y}, {point.Z})");
+                            sb.Append("       }");
+                        }
+                        else
+                        {
+                            Debug.Assert(packet.Points.Count == 1);
+                            sb.AppendLine(" goes by " + (packet.PackedPoints.Count + 1) + " waypoints: {");
 
-                        foreach (var point in packet.Points)
-                            sb.AppendLine($"               ({point.X}, {point.Y}, {point.Z})");
+                            foreach (var waypoint in packet.PackedPoints)
+                                sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z})");
+                            sb.Append("       }");   
 
-                        sb.Append("       }");
-                    }
+                            sb.AppendLine($" with destination ({packet.Points[0].X}, {packet.Points[0].Y}, {packet.Points[0].Z})");
+                        }
+                    }*/
                 }
             }
 
@@ -326,6 +411,24 @@ namespace WDE.PacketViewer.Processing.Processors
             }
 
             AppendLine(basePacket, sb.ToString());
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketOneShotAnimKit packet)
+        {
+            AppendLine(basePacket, NiceGuid(packet.Unit) + " plays one shot anim kit " + packet.AnimKit);
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketClientAreaTrigger packet)
+        {
+            AppendLine(basePacket, "Player " + (packet.Enter ? "enters" : "leaves") + " clientside area trigger " + packet.AreaTrigger);
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketSetAnimKit packet)
+        {
+            AppendLine(basePacket, NiceGuid(packet.Unit) + " sets anim kit " + packet.AnimKit);
             return base.Process(basePacket, packet);
         }
 
@@ -385,6 +488,34 @@ namespace WDE.PacketViewer.Processing.Processors
                 return $"({pos.X}, {pos.Y}, {pos.Z})";
         }
 
+        private string? TryGenerateFlagsDiff(IParameter<long>? param, string key, long old, long nnew)
+        {
+            if (param == null || !param.HasItems)
+                return null;
+
+            if (param is not FlagParameter fp)
+                return null;
+
+            List<string> flags = new();
+            for (int i = 0; i < 32; ++i)
+            {
+                long flag = (1L << i);
+                var oldHad = (old & flag) == flag;
+                var newHas = (nnew & flag) == flag;
+                if (!fp.Items!.TryGetValue(flag, out var flagName))
+                    continue;
+                
+                if (oldHad && !newHas)
+                    flags.Add($" (-) {flagName.Name}");
+                if (oldHad && newHas)
+                    flags.Add($" {flagName.Name}");
+                if (!oldHad && newHas)
+                    flags.Add($" (+) {flagName.Name}");
+            }
+
+            return string.Join(", ", flags);
+        }
+
         private void PrintValues(PacketBase basePacket, UniversalGuid guid, UpdateValues values, Entity? entity, bool isUpdate)
         {
             var newEntity = entity ?? new Entity();
@@ -400,9 +531,22 @@ namespace WDE.PacketViewer.Processing.Processors
                 }
 
                 if (entity == null || !entity.Ints.TryGetValue(val.Key, out var intValue))
-                    AppendLine(basePacket, $"     {val.Key} = {val.Value}", true);
+                {
+                    var param = GetPrettyParameter(val.Key);
+                    var stringValue = param == null ? "" : $" [{param.ToString(val.Value)}]";
+                    AppendLine(basePacket, $"     {val.Key} = {val.Value}{stringValue}", true);
+                }
                 else if (intValue != val.Value)
-                    AppendLine(basePacket, $"     {val.Key} = {val.Value} (old: {intValue})", true);
+                {
+                    var param = GetPrettyParameter(val.Key);
+                    var oldStringValue = param == null ? "" : $" [{param.ToString(intValue)}]";
+                    var newStringValue = param == null ? "" : $" [{param.ToString(val.Value)}]";
+                    var change = TryGenerateFlagsDiff(param, val.Key, intValue, val.Value);
+                    if (change == null)
+                        AppendLine(basePacket, $"     {val.Key} = {val.Value}{newStringValue} (old: {intValue}{oldStringValue})", true);
+                    else
+                        AppendLine(basePacket, $"     {val.Key} = {val.Value} (old: {intValue}) {change}", true);
+                }
                 newEntity.Ints[val.Key] = val.Value;
             }
             
@@ -437,6 +581,33 @@ namespace WDE.PacketViewer.Processing.Processors
             }
         }
 
+        private IParameter<long>? GetPrettyParameter(string field)
+        {
+            switch (field)
+            {
+                case "UNIT_FIELD_FACTIONTEMPLATE":
+                    return factionParameter;
+                case "UNIT_FIELD_FLAGS":
+                    return unitFlagsParameter;
+                case "UNIT_FIELD_FLAGS_2":
+                    return unitFlags2Parameter;
+                case "UNIT_NPC_EMOTESTATE":
+                    return emoteParameter;
+                case "UNIT_NPC_FLAGS":
+                    return npcFlagsParameter;
+                case "UNIT_FIELD_BYTES_0":
+                    return unitBytesParameters[0];
+                case "UNIT_FIELD_BYTES_1":
+                    return unitBytesParameters[1];
+                case "UNIT_FIELD_BYTES_2":
+                    return unitBytesParameters[2];
+                case "GAMEOBJECT_BYTES_1":
+                    return gameobjectBytes1Parameter;
+            }
+
+            return null;
+        }
+
         private bool IsUpdateFieldInteresting(string field, bool isUpdate)
         {
             switch (field)
@@ -448,6 +619,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 case "UNIT_FIELD_FLAGS":
                 case "UNIT_FIELD_FLAGS_2":
                 case "UNIT_NPC_EMOTESTATE":
+                case "UNIT_NPC_FLAGS":
                 case "GAMEOBJECT_BYTES_1":
                     return true;
             }
