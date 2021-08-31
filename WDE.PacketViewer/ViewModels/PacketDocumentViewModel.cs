@@ -237,6 +237,23 @@ namespace WDE.PacketViewer.ViewModels
                 long i = 0;
                 foreach (var pair in dumpers)
                 {
+                    // ReSharper disable once SuspiciousTypeConversion.Global
+                    if (pair.dumper is ITwoStepPacketBoolProcessor preprocessor)
+                    {
+                        packetsCount *= 2;
+                        foreach (var packet in FilteredPackets)
+                        {
+                            i++;
+                            preprocessor.PreProcess(packet.Packet);
+                            if ((i % 100) == 0)
+                            {
+                                if (cancellationToken.IsCancellationRequested)
+                                    break;
+                                Report(i * 1.0f / packetsCount);
+                            }
+                        }
+                    }
+                    
                     foreach (var packet in FilteredPackets)
                     {
                         i++;
