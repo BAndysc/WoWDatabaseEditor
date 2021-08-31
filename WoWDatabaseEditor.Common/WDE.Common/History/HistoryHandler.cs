@@ -8,6 +8,7 @@ namespace WDE.Common.History
         private readonly List<IHistoryAction> bulkEditing = new();
         private bool inBulkEditing;
         public event EventHandler<IHistoryAction> ActionPush = delegate { };
+        public event EventHandler<IHistoryAction> ActionDone = delegate { };
 
         protected IDisposable WithinBulk(string name)
         {
@@ -37,6 +38,14 @@ namespace WDE.Common.History
                 bulkEditing.Add(action);
             else
                 ActionPush(this, action);
+        }
+        
+        protected void DoAction(IHistoryAction action)
+        {
+            if (inBulkEditing)
+                throw new Exception("Cannot execute action while bulk editing!");
+            else
+                ActionDone(this, action);
         }
 
         private readonly struct EndBulkEditing : System.IDisposable

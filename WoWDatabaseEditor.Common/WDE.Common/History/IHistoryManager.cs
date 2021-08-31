@@ -21,5 +21,6 @@ namespace WDE.Common.History
         void MarkNoSave();
 
         T AddHandler<T>(T handler) where T : HistoryHandler;
+        void Clear();
     }
 }

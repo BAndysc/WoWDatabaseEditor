@@ -80,6 +80,23 @@ namespace WDE.History
                 Future.Clear();
                 RecalculateValues();
             };
+            handler.ActionDone += (sender, action) =>
+            {
+                if (!acceptNew)
+                    throw new Exception("Cannot do history action when not accepting new actions");
+                
+                acceptNew = false;
+
+                history.Push(action);
+                Past.Add(action);
+                future.Clear();
+                Future.Clear();
+                RecalculateValues();
+                
+                action.Redo();
+                
+                acceptNew = true;
+            };
             return handler;
         }
         
@@ -140,6 +157,7 @@ namespace WDE.History
             future.Clear();
             CanUndo = false;
             CanRedo = false;
+            IsSaved = true;
         }
 
         private void RecalculateValues()
