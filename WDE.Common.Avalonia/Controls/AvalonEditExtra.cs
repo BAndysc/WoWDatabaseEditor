@@ -45,7 +45,14 @@ namespace WDE.Common.Avalonia.Controls
             });
             SyntaxProperty.Changed.AddClassHandler<TextEditor>((editor, args) =>
             {
-                editor.SyntaxHighlighting = AvaloniaEditSyntaxManager.Instance.GetDefinition((string)args.NewValue!);
+                try
+                {
+                    editor.SyntaxHighlighting = AvaloniaEditSyntaxManager.Instance.GetDefinition((string)args.NewValue!);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             });
         }
     }
@@ -105,9 +112,17 @@ namespace WDE.Common.Avalonia.Controls
 
             var originalExtension = extension;
             var path = $"Resources/Syntax/{extension}.xml";
-            
-            definitionsByExtension[originalExtension] = GetDefinition(path);
-            return definitionsByExtension[originalExtension];
+
+            try
+            {
+                definitionsByExtension[originalExtension] = GetDefinition(path);
+                return definitionsByExtension[originalExtension];
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
     }
 }
