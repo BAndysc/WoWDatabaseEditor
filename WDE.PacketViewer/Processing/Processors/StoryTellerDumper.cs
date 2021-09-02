@@ -28,6 +28,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly ISpellStore spellStore;
         private readonly IParameterFactory parameterFactory;
         private readonly IWaypointProcessor waypointProcessor;
+        private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly StringBuilder sb;
         private readonly TextWriter writer;
         private DateTime? lastTime;
@@ -51,13 +52,15 @@ namespace WDE.PacketViewer.Processing.Processors
             IDbcStore dbcStore,
             ISpellStore spellStore,
             IParameterFactory parameterFactory,
-            IWaypointProcessor waypointProcessor)
+            IWaypointProcessor waypointProcessor,
+            HighLevelUpdateDump highLevelUpdateDump)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
             this.spellStore = spellStore;
             this.parameterFactory = parameterFactory;
             this.waypointProcessor = waypointProcessor;
+            this.highLevelUpdateDump = highLevelUpdateDump;
             unitFlagsParameter = parameterFactory.Factory("UnitFlagParameter");
             unitFlags2Parameter = parameterFactory.Factory("UnitFlags2Parameter");
             factionParameter = parameterFactory.Factory("FactionParameter");
@@ -113,14 +116,14 @@ namespace WDE.PacketViewer.Processing.Processors
                 var cr = databaseProvider.GetCreatureTemplate(id);
                 if (cr == null)
                     return null;
-                return $"{cr.Name} ({id})(GUID {shortGuid})";
+                return $"{cr.Name} ({id}) (GUID {shortGuid})";
             }
             else if (type == UniversalHighGuid.GameObject || type == UniversalHighGuid.Transport || type == UniversalHighGuid.WorldTransaction)
             {
                 var cr = databaseProvider.GetGameObjectTemplate(id);
                 if (cr == null)
                     return null;
-                return $"{cr.Name} ({id})(GUID {shortGuid})";
+                return $"{cr.Name} ({id}) (GUID {shortGuid})";
             }
             return null;
         }
@@ -146,7 +149,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 var pretty = GetPrettyFormat(guid.Type, guid.Entry, shortGuid);
                 return pretty ?? "Creature " + guid.Entry + (shortGuid > 0 ? " (GUID " + shortGuid + ")" : "") + (withFull?" "+(guid.Guid64?.Low ?? guid.Guid128.Low).ToString("X8"):"");
             }
-            if (guid.Type == UniversalHighGuid.GameObject)
+            if (guid.Type == UniversalHighGuid.GameObject || guid.Type == UniversalHighGuid.Transport)
             {
                 var pretty = GetPrettyFormat(guid.Type, guid.Entry, shortGuid);
                 return pretty ?? "GameObject " + guid.Entry + (shortGuid > 0 ? " (GUID " + shortGuid + ")" : "") + (withFull ? " " + (guid.Guid64?.Low ?? guid.Guid128.Low).ToString("X8") : "");
@@ -215,16 +218,14 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (update.Remove && auras[packet.Unit].ContainsKey(update.Slot))
                 {
                     AppendLine(basePacket,
-                        "    removed aura: " +
-                        (spellStore.HasSpell(auras[packet.Unit][update.Slot]) ? spellStore.GetName(auras[packet.Unit][update.Slot]) + " (" + auras[packet.Unit][update.Slot] + " ) " : auras[packet.Unit][update.Slot]));
+                        "    removed aura: " + GetSpellName(auras[packet.Unit][update.Slot]));
                     auras[packet.Unit].Remove(update.Slot);
                 }
                 else if (!update.Remove)
                 {
                     auras[packet.Unit][update.Slot] = update.Spell;
                     AppendLine(basePacket,
-                        "    applied aura: " +
-                        (spellStore.HasSpell(auras[packet.Unit][update.Slot]) ? spellStore.GetName(auras[packet.Unit][update.Slot]) + " (" + auras[packet.Unit][update.Slot] + ") " : auras[packet.Unit][update.Slot]));
+                        "    applied aura: " + GetSpellName(auras[packet.Unit][update.Slot]));
                 }
             }
             return base.Process(basePacket, packet);
@@ -252,8 +253,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 targetLine += "\n       }";
             }
 
-            AppendLine(basePacket, NiceGuid(packet.Data.Caster) + " casts: " + 
-                                   (spellStore.HasSpell(packet.Data.Spell) ? spellStore.GetName(packet.Data.Spell) + " (" + packet.Data.Spell + ") " : packet.Data.Spell) + targetLine);
+            AppendLine(basePacket, NiceGuid(packet.Data.Caster) + " casts: " + GetSpellName(packet.Data.Spell) + " " + targetLine);
             return base.Process(basePacket, packet);
         }
 
@@ -279,6 +279,11 @@ namespace WDE.PacketViewer.Processing.Processors
             return base.Process(basePacket, packet);
         }
 
+        private string GetSpellName(uint spellId)
+        {
+            return spellStore.HasSpell(spellId) ? spellStore.GetName(spellId) + " (" + spellId + ")" : $"spell {spellId}";
+        }
+        
         private string GetQuestName(uint questId)
         {
             var template = databaseProvider.GetQuestTemplate(questId);
@@ -305,7 +310,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         protected override bool Process(PacketBase basePacket, PacketQuestAddKillCredit packet)
         {
-            AppendLine(basePacket, $"Added kill credit {packet.KillCredit} for quest " + GetQuestName(packet.QuestId) + $" ({packet.Count}/{packet.RequiredCount}");
+            AppendLine(basePacket, $"Added kill credit {packet.KillCredit} for quest " + GetQuestName(packet.QuestId) + $" ({packet.Count}/{packet.RequiredCount})");
             return base.Process(basePacket, packet);
         }
 
@@ -314,7 +319,7 @@ namespace WDE.PacketViewer.Processing.Processors
             AppendLine(basePacket, "Quest failed: " + GetQuestName(packet.QuestId));
             return base.Process(basePacket, packet);
         }
-
+        
         protected override bool Process(PacketBase basePacket, PacketSpellClick packet)
         {
             AppendLine(basePacket, "Player spell click on: " + NiceGuid(packet.Target));
@@ -325,7 +330,13 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             StringBuilder sb = new StringBuilder();
 
-            if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation)
+            if (packet.Flags.HasFlag(UniversalSplineFlag.TransportEnter))
+                sb.Append(" enters " +
+                          (packet.TransportGuid.Type == UniversalHighGuid.Vehicle ? "vehicle" : "transport") + " " +
+                          NiceGuid(packet.TransportGuid) + " on seat " + packet.VehicleSeat);
+            else if (packet.Flags.HasFlag(UniversalSplineFlag.TransportExit))
+                sb.Append(" exits vehicle/transport");
+            else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation)
                 sb.Append(" looks at " + packet.LookOrientation);
             else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookTarget)
                 sb.Append(" looks at " + NiceGuid(packet.LookTarget.Target));
@@ -411,6 +422,12 @@ namespace WDE.PacketViewer.Processing.Processors
             }
 
             AppendLine(basePacket, sb.ToString());
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketClientUseItem packet)
+        {
+            AppendLine(basePacket, "Player uses item in backpack and cast spell " + GetSpellName(packet.SpellId));
             return base.Process(basePacket, packet);
         }
 
@@ -546,6 +563,10 @@ namespace WDE.PacketViewer.Processing.Processors
                         AppendLine(basePacket, $"     {val.Key} = {val.Value}{newStringValue} (old: {intValue}{oldStringValue})", true);
                     else
                         AppendLine(basePacket, $"     {val.Key} = {val.Value} (old: {intValue}) {change}", true);
+
+                    foreach (var extra in highLevelUpdateDump.Produce(val.Key, (uint)intValue, (uint)val.Value))
+                        AppendLine(basePacket, $"       -> {extra}", true);   
+                    
                 }
                 newEntity.Ints[val.Key] = val.Value;
             }
