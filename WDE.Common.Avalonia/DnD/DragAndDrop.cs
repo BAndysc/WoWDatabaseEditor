@@ -348,7 +348,7 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = listBox.ListBoxImpl!.ItemCount;
 
-            var dropInfo = new DropInfo(dragInfo.Value.draggedElement[0]!)
+            var dropInfo = new DropInfo(listBox.ListBoxImpl?.SelectionMode == SelectionMode.Multiple ? dragInfo.Value.draggedElement : dragInfo.Value.draggedElement[0]!)
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
@@ -398,7 +398,7 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = listBox.ListBoxImpl!.ItemCount;
             
-            dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
+            dropHandler.Drop(new DropInfo(listBox.ListBoxImpl?.SelectionMode == SelectionMode.Multiple ? dragInfo.Value.draggedElement : dragInfo.Value.draggedElement[0]!)
             {
                 InsertIndex = indexOfDrop,
                 TargetItem = listBox.Items
@@ -603,7 +603,7 @@ namespace WDE.Common.Avalonia.DnD
                     drawRect = new Rect(container.Bounds.X, container.Bounds.Bottom, container.Bounds.Width, 1);
             }
 
-            drawRect = new Rect(drawRect.X, drawRect.Y - listBox.Scroll.Offset.Y, drawRect.Width, drawRect.Height);
+            drawRect = new Rect(drawRect.X, drawRect.Y - (listBox.VirtualizationMode == ItemVirtualizationMode.None ? listBox.Scroll.Offset.Y : 0), drawRect.Width, drawRect.Height);
             
             InvalidateVisual();
         }

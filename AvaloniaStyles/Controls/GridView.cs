@@ -1,21 +1,81 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Generators;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Selection;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Metadata;
+using Avalonia.Styling;
+using Avalonia.VisualTree;
+using WDE.MVVM.Utils;
 
 namespace AvaloniaStyles.Controls
 {
+    public class GridViewListBox : ListBox, IStyleable
+    {
+        protected override IItemContainerGenerator CreateItemContainerGenerator()
+        {
+            return new ItemContainerGenerator<GridViewItem>(
+                this, 
+                GridViewItem.ContentProperty,
+                GridViewItem.ContentTemplateProperty);
+        }
+        Type IStyleable.StyleKey => typeof(ListBox);
+    }
+
+    public class GridViewItem : ListBoxItem, IStyleable
+    {
+        Type IStyleable.StyleKey => typeof(ListBoxItem);
+        static GridViewItem()
+        {
+            ContentProperty.Changed.AddClassHandler<GridViewItem>((item, args) =>
+            {
+                var old = GetClassName(args.OldValue);
+                var @new = GetClassName(args.NewValue);
+                if (old != @new)
+                {
+                    if (old != null)
+                        item.Classes.Remove(old);
+                    if (@new != null)
+                        item.Classes.Add(@new);
+                }
+            });
+        }
+
+        private static string? GetClassName(object? obj)
+        {
+            if (obj == null)
+                return null;
+
+            return obj.GetType().Name;
+        }
+    }
+    
     public class GridView : TemplatedControl
     {
         private const int SplitterWidth = 5;
         
         public static readonly DirectProperty<GridView, IEnumerable> ItemsProperty =
             AvaloniaProperty.RegisterDirect<GridView, IEnumerable>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
+        
+        public static readonly StyledProperty<SelectionMode> SelectionModeProperty =
+            AvaloniaProperty.Register<GridView, SelectionMode>(nameof(SelectionMode));
+        
+        public SelectionMode SelectionMode
+        {
+            get => GetValue(SelectionModeProperty);
+            set => SetValue(SelectionModeProperty, value);
+        }
         
         private IEnumerable items = new AvaloniaList<object>();
         
@@ -24,6 +84,19 @@ namespace AvaloniaStyles.Controls
         {
             get => items;
             set => SetAndRaise(ItemsProperty, ref items, value);
+        }
+        
+        public static readonly DirectProperty<GridView, ISelectionModel> SelectionProperty =
+            AvaloniaProperty.RegisterDirect<GridView, ISelectionModel>(
+                nameof(Selection),
+                o => o.Selection,
+                (o, v) => o.Selection = v);
+
+        private ISelectionModel selection = null!;
+        public ISelectionModel Selection
+        {
+            get => selection;
+            set => SetAndRaise(SelectionProperty, ref selection, value);
         }
 
         public static readonly DirectProperty<GridView, object?> SelectedItemProperty =
@@ -92,6 +165,100 @@ namespace AvaloniaStyles.Controls
                 Grid.SetColumn(splitter, i++);
                 header.Children.Add(splitter);
             }
+
+            handlersDisposable?.Dispose();
+            handlersDisposable = null;
+            /*
+             * GridView default selection algorithm doesn't support both multiselect and drag and drop
+             * because by default, as soon as you start to drag a selected group of items, everything is deselected
+             * and this item is selected. This fixes that behaviour, using non public ListBox API, this can break
+             * in future Avalonia versions.
+             */
+            if (SelectionMode.HasFlag(SelectionMode.Multiple))
+            {
+                handlersDisposable = listBox.AddDisposableHandler(PointerPressedEvent, (_, e) =>
+                {
+                    if (listBox.Selection.Count <= 0) 
+                        return;
+
+                    if (e.Source is not IVisual source)
+                        return;
+                    
+                    var point = e.GetCurrentPoint(source);
+
+                    if (!point.Properties.IsLeftButtonPressed && !point.Properties.IsRightButtonPressed) 
+                        return;
+                    
+                    var containerIndex = GetContainerIndexFromEventSource(listBox, e.Source);
+
+                    if (!containerIndex.HasValue)
+                        return;
+                                
+                    var range = e.KeyModifiers.HasAllFlags(KeyModifiers.Shift);
+                    var toggle = e.KeyModifiers.HasAllFlags(KeyModifiers.Control);
+                    var isSelected = listBox.Selection.SelectedIndexes.Contains(containerIndex.Value);
+
+                    if (isSelected || toggle || range)
+                        e.Handled = true;
+                }, RoutingStrategies.Tunnel);
+                
+                handlersDisposable = handlersDisposable.Combine(listBox.AddDisposableHandler(PointerReleasedEvent, (sender, e) =>
+                {
+                    if (listBox.Selection.Count <= 0) 
+                        return;
+                    
+                    if (e.Source is not IVisual source) 
+                        return;
+
+                    var point = e.GetCurrentPoint(source);
+
+                    if (point.Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased || 
+                        point.Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
+                    {
+                        var containerIndex = GetContainerIndexFromEventSource(listBox, e.Source);
+
+                        if (containerIndex.HasValue)
+                        {
+                            typeof(SelectingItemsControl).GetMethod("UpdateSelection",
+                                    BindingFlags.NonPublic | BindingFlags.Instance,
+                                    null,
+                                    new []{typeof(int), typeof(bool), typeof(bool), typeof(bool), typeof(bool)},
+                                    null)!
+                                .Invoke(listBox, new object[]
+                                {
+                                    containerIndex.Value, true,
+                                    e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
+                                    e.KeyModifiers.HasAllFlags(KeyModifiers.Control),
+                                    point.Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased
+                                });
+                            e.Handled = true;
+                        }
+                    }
+                }, RoutingStrategies.Tunnel));   
+            }
+        }
+
+        private System.IDisposable? handlersDisposable;
+        
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            handlersDisposable?.Dispose();
+            handlersDisposable = null;
+        }
+
+        protected static int? GetContainerIndexFromEventSource(ListBox listBox, IInteractive? eventSource)
+        {
+            for (var current = eventSource as IVisual; current != null; current = current.VisualParent)
+            {
+                if (current is IControl control && control.LogicalParent == listBox)
+                {
+                    int? index = listBox.ItemContainerGenerator?.IndexFromContainer(control);
+                    return index == -1 ? null : index;
+                }
+            }
+
+            return null;
         }
 
         private Grid ConstructGrid()
@@ -166,7 +333,6 @@ namespace AvaloniaStyles.Controls
                     
                     Grid.SetColumn((Control)control, 2 * i++);
                     parent.Children.Add(control);
-                    
                 }
                 return parent;
             }, true);
