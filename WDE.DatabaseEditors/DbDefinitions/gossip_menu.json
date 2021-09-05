@@ -45,7 +45,13 @@
         {
           "name": "Text ID",
           "db_column_name": "TextID",
-          "value_type": "NpcTextParameter"
+          "value_type": "NpcTextParameter",
+          "preferred_width": 300
+        },
+        {
+          "is_condition": true,
+          "name": "Conditions",
+          "db_column_name": "conditions"
         },
         {
           "name": "Verified Build",

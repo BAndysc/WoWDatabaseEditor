@@ -181,6 +181,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore));
                 parameterFactory.Register("ClassMaskParameter", new DbcMaskParameter(ClassStore, -1));
                 parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
+                parameterFactory.Register("RaceMaskParameter", new DbcMaskParameter(RaceStore, -1));
                 parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore));
                 parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore));
                 parameterFactory.Register("ZoneAreaParameter", new DbcParameter(AreaStore));
@@ -392,7 +393,7 @@ namespace WDE.DbcStore
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (int key in storage.Keys)
-                Items.Add(1 << (key + offset), new SelectOption(storage[key]));
+                Items.Add(1L << (key + offset), new SelectOption(storage[key]));
         }
     }
     

@@ -204,36 +204,6 @@
 			"536870912": {"name": "VAULTKEEPER"}
 		}
 	},
-	"RaceMaskParameter": {
-		"isflag": true,
-		"inmenu": true,
-		"name": "Race masks",
-		"values": {
-			"1": { "name": "Human" },
-			"2": { "name": "Orc" },
-			"4": { "name": "Dwarf" },
-			"8": { "name": "Night Elf" },
-			"16": { "name": "Undead" },
-			"32": { "name": "Tauren" },
-			"64": { "name": "Gnome" },
-			"128": { "name": "Troll" },
-			"256": { "name": "Goblin" },
-			"512": { "name": "Blood Elf" },
-			"1024": { "name": "Draenei" },
-			"2048": { "name": "Fel Orc" },
-			"4096": { "name": "Naga" },
-			"8192": { "name": "Broken" },
-			"16384": { "name": "Skeleton" },
-			"32768": { "name": "Vrykul" },
-			"65536": { "name": "Tuskarr" },
-			"131072": { "name": "Forest Troll" },
-			"262144": { "name": "Taunka" },
-			"524288": { "name": "Northrend Skeleton" },
-			"1048576": { "name": "Ice Troll" },
-			"2097152": { "name": "Worgen" },
-			"4194304": { "name": "Gilnean" }
-		}
-	},
 	"FlagApplyModeParameter": {
 		"isflag": false,
 		"inmenu": false,

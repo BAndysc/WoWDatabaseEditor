@@ -269,7 +269,7 @@
 		"help": "Condition is met if target (only player) is given class",
 		"parameters": [
 			{
-				"type": "ClassParameter",
+				"type": "ClassMaskParameter",
 				"name": "Class",
 				"description": "Only for players"
 			}
@@ -284,7 +284,7 @@
 		"help": "Condition is met if target (only player) is given race",
 		"parameters": [
 			{
-				"type": "RaceParameter",
+				"type": "RaceMaskParameter",
 				"name": "Race",
 				"description": "Only for players"
 			}
