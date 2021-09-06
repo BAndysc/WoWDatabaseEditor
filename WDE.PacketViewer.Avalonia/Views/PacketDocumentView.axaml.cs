@@ -38,8 +38,16 @@ namespace WDE.PacketViewer.Avalonia.Views
 
         private void Handler(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Return && _completionWindow == null)
+            if (e.Key == Key.Return)
             {
+                if (_completionWindow != null)
+                {
+                    if (_completionWindow.CompletionList.CurrentList.Count == 0)
+                        _completionWindow.Close();
+                    else
+                        return;
+                }
+                
                 if (e.KeyModifiers == KeyModifiers.Shift)
                 {
                     editor.TextArea.PerformTextInput("\n");
