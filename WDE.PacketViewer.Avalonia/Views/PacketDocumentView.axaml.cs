@@ -64,9 +64,9 @@ namespace WDE.PacketViewer.Avalonia.Views
         {
             if (e.Text == ".")
             {
-                var word = GetLastWord(editor.CaretOffset - 2);
+                var word = GetLastWord(editor.CaretOffset - 2).ToLower();
 
-                if (word != "packet" && word != "SMSG" && word != "CMSG")
+                if (word != "packet" && word != "smsg" && word != "cmsg")
                     return;
                 
                 _completionWindow = new CompletionWindow(editor.TextArea);
@@ -80,12 +80,12 @@ namespace WDE.PacketViewer.Avalonia.Views
                     data.Add(new CompletionData("opcode", "(string) String representation of packet opcode (e.g. SMSG_CHAT)")); 
                     data.Add(new CompletionData("entry", "(int) Entry of main object in packet. E.g. caster for SMSG_SPELL_GO. 0 for packets without 'main object' (e.g. SMSG_UPDATE_OBJECT)"));   
                 }
-                else if (word == "SMSG")
+                else if (word == "smsg")
                 {
                     foreach (var smsg in Enum.GetNames<ServerOpcodes>())
                         data.Add(new CompletionData(smsg, null));
                 }
-                else if (word == "CMSG")
+                else if (word == "cmsg")
                 {
                     foreach (var cmsg in Enum.GetNames<ClientOpcodes>())
                         data.Add(new CompletionData(cmsg, null));

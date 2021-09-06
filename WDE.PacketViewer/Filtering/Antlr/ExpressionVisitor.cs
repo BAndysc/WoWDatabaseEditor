@@ -140,7 +140,7 @@ namespace WDE.PacketViewer.Filtering.Antlr
                 }
             }
             else
-                return left + "_" + right;
+                return left.ToUpper() + "_" + right;
             
 
             throw new Exception($"Unknown field {left}.{right}");
