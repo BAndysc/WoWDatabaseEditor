@@ -46,6 +46,8 @@
             <components:WdeImage ImageUri="icons/icon_word_wrap.png" />
         </ToggleButton>
         
+        <components:ButtonImage IsVisible="False" ToolTip.Tip="Go to packet" Image="icons/icon_goto_packet.png" Command="{Binding GoToPacketCommand}" />
+        
         <controls:ToolbarSpacer />
 
         <CheckBox ToolTip.Tip="If enabled, UPDATE_OBJECT packets will be split for each update, what makes filtering way easier (because you can filter individual updates)." 

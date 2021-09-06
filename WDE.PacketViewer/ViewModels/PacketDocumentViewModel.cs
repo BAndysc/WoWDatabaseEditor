@@ -15,6 +15,7 @@ using WDE.Common.Database;
 using WDE.Common.Disposables;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
@@ -56,6 +57,7 @@ namespace WDE.PacketViewer.ViewModels
             IWindowManager windowManager,
             IPacketViewerSettings packetSettings,
             IEnumerable<IPacketDumperProvider> dumperProviders,
+            IInputBoxService inputBoxService,
             ISniffLoader sniffLoader)
         {
             this.solutionItem = solutionItem;
@@ -189,6 +191,31 @@ namespace WDE.PacketViewer.ViewModels
                 AutoDispose(proc.ToObservable(p => p.IsChecked)
                     .SubscribeAction(_ => RunProcessors.RaiseCanExecuteChanged()));
 
+            GoToPacketCommand = new AsyncAutoCommand(async () =>
+            {
+                var min = filteredPackets[0].Id;
+                var max = filteredPackets[^1].Id;
+                var jumpTo = await inputBoxService.GetUInt("Go to packet number", $"Specify the packet id to jump to ({min}-{max})");
+                if (!jumpTo.HasValue)
+                    return;
+
+                int? jumpToId = null;
+                for (var index = 0; index < filteredPackets.Count; index++)
+                {
+                    if (filteredPackets[index].Id == jumpTo.Value)
+                    {
+                        jumpToId = index;
+                        break;
+                    }
+                }
+
+                if (jumpToId.HasValue)
+                    SelectedPacket = filteredPackets[jumpToId.Value];
+            }, _ => filteredPackets.Count > 0);
+
+            AutoDispose(this.ToObservable(o => o.FilteredPackets)
+                .SubscribeAction(_ => GoToPacketCommand.RaiseCanExecuteChanged()));
+            
             wrapLines = packetSettings.Settings.WrapLines;
             splitUpdate = packetSettings.Settings.AlwaysSplitUpdates;
             if (!string.IsNullOrEmpty(packetSettings.Settings.DefaultFilter))
@@ -456,6 +483,7 @@ namespace WDE.PacketViewer.ViewModels
         private ObservableCollectionExtended<PacketViewModel>? AllPacketsSplit { get; set; }
         public ReadOnlyObservableCollection<string> MostRecentlySearched { get; }
 
+        public AsyncAutoCommand GoToPacketCommand { get; }
         public ICommand OpenHelpCommand { get; }
         public IAsyncCommand SaveToFileCommand { get; }
         public AsyncCommand ApplyFilterCommand { get; }
