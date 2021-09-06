@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WowPacketParser.Proto;
@@ -64,7 +65,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return true;
         }
 
-        public string Generate()
+        public async Task<string> Generate()
         {
             StringBuilder sb = new();
             foreach (var state in states)

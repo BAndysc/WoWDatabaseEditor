@@ -4,17 +4,19 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Module.Attributes;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
+using WDE.PacketViewer.Processing.Runners;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : PacketProcessor<bool>, IPacketTextDumper, ITwoStepPacketBoolProcessor
+    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor>, IPacketTextDumper, ITwoStepPacketBoolProcessor
     {
         private class Entity
         {
@@ -28,6 +30,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly ISpellStore spellStore;
         private readonly IParameterFactory parameterFactory;
         private readonly IWaypointProcessor waypointProcessor;
+        private readonly IChatEmoteSoundProcessor chatProcessor;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly StringBuilder sb;
         private readonly TextWriter writer;
@@ -53,13 +56,15 @@ namespace WDE.PacketViewer.Processing.Processors
             ISpellStore spellStore,
             IParameterFactory parameterFactory,
             IWaypointProcessor waypointProcessor,
-            HighLevelUpdateDump highLevelUpdateDump)
+            IChatEmoteSoundProcessor chatProcessor,
+            HighLevelUpdateDump highLevelUpdateDump) : base(waypointProcessor, chatProcessor)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
             this.spellStore = spellStore;
             this.parameterFactory = parameterFactory;
             this.waypointProcessor = waypointProcessor;
+            this.chatProcessor = chatProcessor;
             this.highLevelUpdateDump = highLevelUpdateDump;
             unitFlagsParameter = parameterFactory.Factory("UnitFlagParameter");
             unitFlags2Parameter = parameterFactory.Factory("UnitFlags2Parameter");
@@ -166,15 +171,14 @@ namespace WDE.PacketViewer.Processing.Processors
                 return $"{name} ({id})";
             return id.ToString();
         }
-
-        public bool PreProcess(PacketHolder packet)
-        {
-            return waypointProcessor.Process(packet);
-        }
         
         protected override bool Process(PacketBase basePacket, PacketChat packet)
         {
-            AppendLine(basePacket, NiceGuid(packet.Sender) + " says: " + packet.Text);
+            var emote = chatProcessor.GetEmoteForChat(basePacket);
+            var sound = chatProcessor.GetSoundForChat(basePacket);
+            AppendLine(basePacket, NiceGuid(packet.Sender) + " says: `" + packet.Text + "`"
+                                   + (emote.HasValue ? " with emote " + GetStringFromDbc(dbcStore.EmoteStore, emote.Value) : "")
+                                   + (sound.HasValue ? " with sound " + GetStringFromDbc(dbcStore.SoundStore, (int)sound.Value) : ""));
             return base.Process(basePacket, packet);
         }
 
@@ -186,12 +190,16 @@ namespace WDE.PacketViewer.Processing.Processors
 
         protected override bool Process(PacketBase basePacket, PacketEmote packet)
         {
+            if (chatProcessor.IsEmoteForChat(basePacket))
+                return false;
             AppendLine(basePacket, NiceGuid(packet.Sender) + " plays emote: " + GetStringFromDbc(dbcStore.EmoteStore, packet.Emote));
             return base.Process(basePacket, packet);
         }
 
         protected override bool Process(PacketBase basePacket, PacketPlaySound packet)
         {
+            if (chatProcessor.IsSoundForChat(basePacket))
+                return false;
             AppendLine(basePacket, NiceGuid(packet.Source) + " plays sound: " + GetStringFromDbc(dbcStore.SoundStore, (int)packet.Sound));
             return base.Process(basePacket, packet);
         }
@@ -204,6 +212,8 @@ namespace WDE.PacketViewer.Processing.Processors
 
         protected override bool Process(PacketBase basePacket, PacketPlayObjectSound packet)
         {
+            if (chatProcessor.IsSoundForChat(basePacket))
+                return false;
             AppendLine(basePacket, $"{NiceGuid(packet.Source)} plays object sound: {GetStringFromDbc(dbcStore.SoundStore, (int)packet.Sound)} to {NiceGuid(packet.Target)}");
             return base.Process(basePacket, packet);
         }
@@ -661,7 +671,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return false;
         }
 
-        public string Generate()
+        public async Task<string> Generate()
         {
             return sb.ToString();
         }

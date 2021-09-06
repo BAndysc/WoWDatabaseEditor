@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
@@ -5,7 +6,7 @@ namespace WDE.PacketViewer.Processing
 {
     public interface IPacketTextDumper : IPacketProcessor<bool>
     {
-        string Generate();
+        Task<string> Generate();
     }
     
     public interface ITwoStepPacketBoolProcessor : ITwoStepPacketProcessor<bool>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Utils;
 using WowPacketParser.Proto;
@@ -74,7 +75,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public bool Process(PacketHolder packet) => waypointProcessor.Process(packet);
 
-        public string Generate()
+        public async Task<string> Generate()
         {
             StringBuilder sb = new();
             foreach (var unit in waypointProcessor.State)

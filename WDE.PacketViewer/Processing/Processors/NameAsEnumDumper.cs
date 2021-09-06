@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common.Utils;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
@@ -38,7 +39,7 @@ namespace WDE.PacketViewer.Processing.Processors
             return true;
         }
 
-        public string Generate()
+        public async Task<string> Generate()
         {
             return string.Join(",\n", entries.Values.SelectMany(e => e));
         }

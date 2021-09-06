@@ -293,9 +293,14 @@ namespace WDE.PacketViewer.ViewModels
                         }
                     }
 
+                    Report(-1);
+                    
+                    var task = pair.dumper.Generate();
+                    task.Wait(cancellationToken);
+                    
                     if (processors.Count > 1)
                         output.AppendLine(" -- " + pair.viewModel.Name);
-                    output.Append(pair.dumper.Generate());
+                    output.Append(task.Result);
 
                     if (processors.Count > 1)
                         output.AppendLine("\n\n");

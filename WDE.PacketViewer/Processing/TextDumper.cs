@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.Tasks;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
@@ -26,7 +27,7 @@ namespace WDE.PacketViewer.Processing
             return inner.Process(packet);
         }
 
-        public string Generate()
+        public async Task<string> Generate()
         {
             return sb.ToString();
         }
