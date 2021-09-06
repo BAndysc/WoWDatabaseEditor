@@ -8,5 +8,6 @@
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.TextDocumentToolBar">
     <controls:ToolbarPanel>
         <components:ButtonImage Image="icons/icon_save.png" Command="{Binding SaveCommand}" />
+        <components:ButtonImage Image="icons/icon_play.png" IsVisible="{Binding IsSqlText}" Command="{Binding ExecuteSql}" /> 
     </controls:ToolbarPanel>
 </UserControl>
