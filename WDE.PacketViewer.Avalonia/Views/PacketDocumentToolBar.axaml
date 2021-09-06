@@ -5,8 +5,11 @@
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
+             d:DataContext="{d:DesignInstance viewModels:PacketDocumentViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WDE.PacketViewer.Avalonia.Views.PacketDocumentToolBar">
+    
     <UserControl.Resources>
         <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
     </UserControl.Resources>
@@ -25,11 +28,15 @@
                 <ItemsPresenter Items="{Binding Processors}">
                     <ItemsPresenter.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsChecked}">
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-                                    <TextBlock Text="{Binding Description}" />
-                                </StackPanel>
+                            <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,0,12" HorizontalAlignment="Stretch">
+                                <DockPanel>
+                                    <components:WdeImage Image="{Binding Image}" Width="24" Height="24" VerticalAlignment="Center" />
+                                    <StackPanel Orientation="Vertical" Margin="3,0,0,0">
+                                        <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+                                        <TextBlock Text="{Binding Description}" />
+                                        <TextBlock Opacity="0.7" Text="{Binding Format, StringFormat=Format: {0}}" />
+                                    </StackPanel>
+                                </DockPanel>
                             </CheckBox>
                         </DataTemplate>
                     </ItemsPresenter.ItemTemplate>

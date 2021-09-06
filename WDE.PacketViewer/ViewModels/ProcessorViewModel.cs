@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Prism.Mvvm;
+using WDE.Common.Types;
 using WDE.PacketViewer.Processing;
 using WDE.PacketViewer.Processing.ProcessorProviders;
 
@@ -24,6 +25,8 @@ namespace WDE.PacketViewer.ViewModels
         public string Name => dumperProvider.Name;
         public string Extension => dumperProvider.Extension;
         public string? Description => dumperProvider.Description;
+        public string? Format => dumperProvider.Extension == "txt" ? "text" : dumperProvider.Extension;
+        public ImageUri Image => dumperProvider.Image ?? new ImageUri("icons/document_sniff.png");
         public Task<IPacketTextDumper> CreateProcessor() => dumperProvider.CreateDumper();
     }
 }
