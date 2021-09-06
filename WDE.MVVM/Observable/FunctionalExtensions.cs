@@ -21,6 +21,11 @@ namespace WDE.MVVM.Observable
             return observable.Select(t => !t);
         }
 
+        public static IObservable<int> ToCountChangedObservable<T>(this ObservableCollection<T> collection)
+        {
+            return collection.ToObservable(o => o.Count);
+        }
+
         public static IObservable<CollectionEvent<T>> ToStream<T>(this ObservableCollection<T> collection, bool onRemoveOnDispose)
         {
             return new ObservableCollectionStream<T>(collection, onRemoveOnDispose);
