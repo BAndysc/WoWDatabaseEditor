@@ -53,7 +53,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             Task.FromResult<IList<int>>(new List<int>());
         
         public IBroadcastText? GetBroadcastTextByText(string text) => null;
-        
+
+        public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => Task.FromResult<IBroadcastText?>(null);
+
         public ICreature? GetCreatureByGuid(uint guid) => null;
 
         public IGameObject? GetGameObjectByGuid(uint guid) => null;

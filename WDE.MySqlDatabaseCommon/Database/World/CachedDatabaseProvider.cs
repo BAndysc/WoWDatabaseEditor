@@ -169,6 +169,15 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return null;
         }
 
+        public async Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text)
+        {
+            if (broadcastTextsCache == null)
+                return await nonCachedDatabase.GetBroadcastTextByTextAsync(text);
+            if (broadcastTextsCache.TryGetValue(text, out var val))
+                return val;
+            return null;
+        }
+        
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
         {
             if (databaseSpellDbcCache != null)

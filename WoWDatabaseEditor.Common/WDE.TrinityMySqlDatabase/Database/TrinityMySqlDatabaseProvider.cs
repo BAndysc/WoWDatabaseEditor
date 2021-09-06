@@ -407,6 +407,15 @@ namespace WDE.TrinityMySqlDatabase.Database
             return (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefault();
         }
 
+        public async Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text)
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
+                return null;
+            
+            await using var model = Database();
+            return await (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefaultAsync();
+        }
+
         public ICreature? GetCreatureByGuid(uint guid)
         {
             using var model = Database();

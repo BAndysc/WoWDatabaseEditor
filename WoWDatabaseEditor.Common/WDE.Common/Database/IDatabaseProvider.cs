@@ -45,6 +45,7 @@ namespace WDE.Common.Database
         IEnumerable<ISmartScriptProject> GetProjects();
 
         IBroadcastText? GetBroadcastTextByText(string text);
+        Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
 
         ICreature? GetCreatureByGuid(uint guid);
         IGameObject? GetGameObjectByGuid(uint guid);

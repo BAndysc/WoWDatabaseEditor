@@ -52,6 +52,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             impl.GetSmartScriptEntriesByType(scriptType);
         
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
+        public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => impl.GetBroadcastTextByTextAsync(text);
+
         public ICreature? GetCreatureByGuid(uint guid) => impl.GetCreatureByGuid(guid);
         public IGameObject? GetGameObjectByGuid(uint guid) => impl.GetGameObjectByGuid(guid);
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => impl.GetCreaturesByEntry(entry);
