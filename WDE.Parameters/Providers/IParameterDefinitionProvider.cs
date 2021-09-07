@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.Parameters.Models;
 
@@ -16,7 +18,16 @@ namespace WDE.Parameters.Providers
         {
             var allParameters = new Dictionary<string, ParameterSpecModel>();
 
-            foreach (var source in Directory.GetFiles("Parameters/", "*.json", SearchOption.AllDirectories))
+            var files = Directory
+                .GetFiles("Parameters/", "*.json", SearchOption.AllDirectories)
+                .OrderBy(t => t, Compare.CreateComparer<string>((a, b) =>
+                {
+                    if (Path.GetFileName(a) == "parameters.json")
+                        return -1;
+                    return 1;
+                })).ToList();
+            
+            foreach (var source in files)
             {
                 string data = File.ReadAllText(source);
                 var parameters = JsonConvert.DeserializeObject<Dictionary<string, ParameterSpecModel>>(data);
