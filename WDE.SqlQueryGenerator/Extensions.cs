@@ -172,7 +172,7 @@ namespace WDE.SqlQueryGenerator
         
         internal static string ToSqlEscapeString(this string str)
         {
-            return "\"" +  str.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n") + "\"";
+            return "\"" +  str.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "\\n") + "\"";
         }
     }
 }
