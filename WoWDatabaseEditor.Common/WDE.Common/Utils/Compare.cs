@@ -30,7 +30,7 @@ namespace WDE.Common.Utils
             }
         }
         
-        public static IEqualityComparer<TSource> Create<TSource>(Func<TSource?, TSource?, bool> equals, Func<TSource, int> hashcode)
+        public static IEqualityComparer<TSource> CreateEqualityComparer<TSource>(Func<TSource?, TSource?, bool> equals, Func<TSource, int> hashcode)
         {
             return new DelegateEqualityComparer<TSource>(equals, hashcode);
         }
@@ -54,6 +54,25 @@ namespace WDE.Common.Utils
             public int GetHashCode(T obj)
             {
                 return hashcode(obj);
+            }
+        }
+        public static IComparer<TSource> CreateComparer<TSource>(Func<TSource?, TSource?, int> comparer)
+        {
+            return new DelegateComparer<TSource>(comparer);
+        }
+
+        private class DelegateComparer<T> : IComparer<T>
+        {
+            private readonly Func<T?, T?, int> comparer;
+
+            public DelegateComparer(Func<T?, T?, int> comparer)
+            {
+                this.comparer = comparer;
+            }
+
+            public int Compare(T? x, T? y)
+            {
+                return comparer(x, y);
             }
         }
     }
