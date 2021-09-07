@@ -15,6 +15,8 @@ namespace WDE.PacketViewer.Processing.Processors
                 return packet.QueryGameObjectResponse.Entry;
             if (packet.KindCase == PacketHolder.KindOneofCase.QuestGiverRequestItems)
                 return packet.QuestGiverRequestItems.QuestGiverEntry;
+            if (packet.KindCase == PacketHolder.KindOneofCase.QuestAddKillCredit)
+                return packet.QuestAddKillCredit.KillCredit;
 
             var guid = guidExtractor.Process(packet);
             return guid?.Entry ?? 0;

@@ -12,11 +12,13 @@ using WDE.Module.Attributes;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 using WDE.PacketViewer.Processing.Runners;
+using WDE.PacketViewer.Utils;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor>, IPacketTextDumper, ITwoStepPacketBoolProcessor
+    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector>,
+        IPacketTextDumper, ITwoStepPacketBoolProcessor
     {
         private class Entity
         {
@@ -31,6 +33,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly IParameterFactory parameterFactory;
         private readonly IWaypointProcessor waypointProcessor;
         private readonly IChatEmoteSoundProcessor chatProcessor;
+        private readonly IRandomMovementDetector randomMovementDetector;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly StringBuilder sb;
         private readonly TextWriter writer;
@@ -57,7 +60,8 @@ namespace WDE.PacketViewer.Processing.Processors
             IParameterFactory parameterFactory,
             IWaypointProcessor waypointProcessor,
             IChatEmoteSoundProcessor chatProcessor,
-            HighLevelUpdateDump highLevelUpdateDump) : base(waypointProcessor, chatProcessor)
+            IRandomMovementDetector randomMovementDetector,
+            HighLevelUpdateDump highLevelUpdateDump) : base(waypointProcessor, chatProcessor, randomMovementDetector)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
@@ -65,6 +69,7 @@ namespace WDE.PacketViewer.Processing.Processors
             this.parameterFactory = parameterFactory;
             this.waypointProcessor = waypointProcessor;
             this.chatProcessor = chatProcessor;
+            this.randomMovementDetector = randomMovementDetector;
             this.highLevelUpdateDump = highLevelUpdateDump;
             unitFlagsParameter = parameterFactory.Factory("UnitFlagParameter");
             unitFlags2Parameter = parameterFactory.Factory("UnitFlags2Parameter");
@@ -101,7 +106,7 @@ namespace WDE.PacketViewer.Processing.Processors
             else
             {
                 TimeSpan diff = packet.Time.ToDateTime().Subtract(lastTime.Value);
-                if (diff.TotalMilliseconds > 100)
+                if (diff.TotalMilliseconds > 130)
                 {
                     writer.WriteLine();
                     writer.WriteLine("After " + diff.TotalMilliseconds + " ms");
@@ -338,78 +343,97 @@ namespace WDE.PacketViewer.Processing.Processors
 
         protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
         {
+            if (randomMovementDetector.RandomMovementPacketRatio(packet.Mover) > 0.90f)
+                return false;
+
+            bool lastPathSegmentHadOrientation = false;
             StringBuilder sb = new StringBuilder();
 
             if (packet.Flags.HasFlag(UniversalSplineFlag.TransportEnter))
-                sb.Append(" enters " +
+                sb.Append("enters " +
                           (packet.TransportGuid.Type == UniversalHighGuid.Vehicle ? "vehicle" : "transport") + " " +
                           NiceGuid(packet.TransportGuid) + " on seat " + packet.VehicleSeat);
             else if (packet.Flags.HasFlag(UniversalSplineFlag.TransportExit))
-                sb.Append(" exits vehicle/transport");
-            else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation)
-                sb.Append(" looks at " + packet.LookOrientation);
-            else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookTarget)
-                sb.Append(" looks at " + NiceGuid(packet.LookTarget.Target));
-            else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookPosition)
-                sb.Append($" looks at ({packet.LookPosition.X}, {packet.LookPosition.Y}, {packet.LookPosition.Z})");
-            else
+                sb.Append("exits vehicle/transport");
+            else if (packet.Points.Count > 0)
             {
-                if (packet.Points.Count + packet.PackedPoints.Count == 0)
-                    sb.Append(" stops");
-                else
+                if (!waypointProcessor.State.TryGetValue(packet.Mover, out var state))
+                    return true;
+
+                var path = state.Paths.FirstOrDefault(p => p.FirstPacketNumber == basePacket.Number);
+
+                if (path == null)
+                    return true;
+
+                int i = 1;
+                sb.AppendLine($"goes by waypoints [{path.TotalMoveTime} ms]: {{");
+                foreach (var segment in path.Segments)
                 {
-                    if (!waypointProcessor.State.TryGetValue(packet.Mover, out var state))
-                        return true;
-
-                    var path = state.Paths.FirstOrDefault(p => p.FirstPacketNumber == basePacket.Number);
-
-                    if (path == null)
-                        return true;
-
-                    int i = 1;
-                    sb.AppendLine($" goes by waypoints [{path.TotalMoveTime} ms]: {{");
-                    foreach (var segment in path.Segments)
+                    sb.AppendLine($"     Segment {i++}, dist: {segment.OriginalDistance}, average speed: {segment.OriginalDistance / segment.MoveTime * 1000} yd/s");
+                    for (var j = 0; j < segment.Waypoints.Count; j++)
                     {
-                        sb.AppendLine($"     Segment {i++}, dist: {segment.OriginalDistance}, average speed: {segment.OriginalDistance / segment.MoveTime * 1000} yd/s");
-                        foreach (var waypoint in segment.Waypoints)
+                        var waypoint = segment.Waypoints[j];
+                        if (segment.FinalOrientation.HasValue && j == segment.Waypoints.Count - 1)
+                            sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z}, {segment.FinalOrientation.Value})");
+                        else
                             sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z})");
                     }
-                    sb.Append("       }");
-                    
-                    /*if (packet.Points.Count + packet.PackedPoints.Count == 1)
+
+                    lastPathSegmentHadOrientation = segment.FinalOrientation.HasValue;
+                }
+                sb.Append("       }");
+                
+                /*if (packet.Points.Count + packet.PackedPoints.Count == 1)
+                {
+                    var vec = packet.PackedPoints.Count == 1 ? packet.PackedPoints[0] : packet.Points[0];
+                    sb.Append(" move time: " + packet.MoveTime);
+                    sb.Append($" goes to: ({vec.X}, {vec.Y}, {vec.Z})");
+                }
+                else
+                {
+                    sb.Append(" move time: " + packet.MoveTime);
+                    if ((packet.Flags & UniversalSplineFlag.UncompressedPath) != 0)
                     {
-                        var vec = packet.PackedPoints.Count == 1 ? packet.PackedPoints[0] : packet.Points[0];
-                        sb.Append(" move time: " + packet.MoveTime);
-                        sb.Append($" goes to: ({vec.X}, {vec.Y}, {vec.Z})");
+                        Debug.Assert(packet.PackedPoints.Count == 0);
+                        sb.AppendLine(" goes by " + (packet.Points.Count) + " waypoints: {");
+
+                        foreach (var point in packet.Points)
+                            sb.AppendLine($"               ({point.X}, {point.Y}, {point.Z})");
+                        sb.Append("       }");
                     }
                     else
                     {
-                        sb.Append(" move time: " + packet.MoveTime);
-                        if ((packet.Flags & UniversalSplineFlag.UncompressedPath) != 0)
-                        {
-                            Debug.Assert(packet.PackedPoints.Count == 0);
-                            sb.AppendLine(" goes by " + (packet.Points.Count) + " waypoints: {");
+                        Debug.Assert(packet.Points.Count == 1);
+                        sb.AppendLine(" goes by " + (packet.PackedPoints.Count + 1) + " waypoints: {");
 
-                            foreach (var point in packet.Points)
-                                sb.AppendLine($"               ({point.X}, {point.Y}, {point.Z})");
-                            sb.Append("       }");
-                        }
-                        else
-                        {
-                            Debug.Assert(packet.Points.Count == 1);
-                            sb.AppendLine(" goes by " + (packet.PackedPoints.Count + 1) + " waypoints: {");
+                        foreach (var waypoint in packet.PackedPoints)
+                            sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z})");
+                        sb.Append("       }");   
 
-                            foreach (var waypoint in packet.PackedPoints)
-                                sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z})");
-                            sb.Append("       }");   
-
-                            sb.AppendLine($" with destination ({packet.Points[0].X}, {packet.Points[0].Y}, {packet.Points[0].Z})");
-                        }
-                    }*/
-                }
+                        sb.AppendLine($" with destination ({packet.Points[0].X}, {packet.Points[0].Y}, {packet.Points[0].Z})");
+                    }
+                }*/
             }
 
-            AppendLine(basePacket, NiceGuid(packet.Mover) + sb);
+            var skipOrientation = lastPathSegmentHadOrientation &&
+                                  packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation;
+            if (packet.FacingCase != PacketMonsterMove.FacingOneofCase.None && !skipOrientation)
+            {
+                if (sb.Length > 0)
+                    sb.Append("\n    then ");
+                if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation)
+                    sb.Append("looks at " + packet.LookOrientation);
+                else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookTarget)
+                    sb.Append("looks at " + NiceGuid(packet.LookTarget.Target));
+                else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookPosition)
+                    sb.Append($"looks at ({packet.LookPosition.X}, {packet.LookPosition.Y}, {packet.LookPosition.Z})");   
+            }
+
+            if (sb.Length == 0)
+                sb.Append("stops");
+
+            var randomRatio = randomMovementDetector.RandomMovementPacketRatio(packet.Mover);
+            AppendLine(basePacket, NiceGuid(packet.Mover) + $" [random movement chance: {randomRatio*100:0}%] " + sb);
             return base.Process(basePacket, packet);
         }
 
@@ -483,7 +507,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     continue;
                 var entity = new Entity();
                 foreach (var pair in created.Values.Ints)
-                    entity.Ints[pair.Key] = pair.Value;
+                    entity.Ints[pair.Key] = RemoveUselessFlag(pair.Key, pair.Value);
                 foreach (var pair in created.Values.Floats)
                     entity.Floats[pair.Key] = pair.Value;
                 foreach (var pair in created.Values.Guids)
@@ -551,34 +575,35 @@ namespace WDE.PacketViewer.Processing.Processors
             
             foreach (var val in values.Ints)
             {
+                var newValue = RemoveUselessFlag(val.Key, val.Value);
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
                 {
-                    newEntity.Ints[val.Key] = val.Value;
+                    newEntity.Ints[val.Key] = newValue;
                     continue;
                 }
 
                 if (entity == null || !entity.Ints.TryGetValue(val.Key, out var intValue))
                 {
                     var param = GetPrettyParameter(val.Key);
-                    var stringValue = param == null ? "" : $" [{param.ToString(val.Value)}]";
-                    AppendLine(basePacket, $"     {val.Key} = {val.Value}{stringValue}", true);
+                    var stringValue = param == null ? "" : $" [{param.ToString(newValue)}]";
+                    AppendLine(basePacket, $"     {val.Key} = {newValue}{stringValue}", true);
                 }
-                else if (intValue != val.Value)
+                else if (intValue != newValue)
                 {
                     var param = GetPrettyParameter(val.Key);
                     var oldStringValue = param == null ? "" : $" [{param.ToString(intValue)}]";
-                    var newStringValue = param == null ? "" : $" [{param.ToString(val.Value)}]";
-                    var change = TryGenerateFlagsDiff(param, val.Key, intValue, val.Value);
+                    var newStringValue = param == null ? "" : $" [{param.ToString(newValue)}]";
+                    var change = TryGenerateFlagsDiff(param, val.Key, intValue, newValue);
                     if (change == null)
-                        AppendLine(basePacket, $"     {val.Key} = {val.Value}{newStringValue} (old: {intValue}{oldStringValue})", true);
+                        AppendLine(basePacket, $"     {val.Key} = {newValue}{newStringValue} (old: {intValue}{oldStringValue})", true);
                     else
-                        AppendLine(basePacket, $"     {val.Key} = {val.Value} (old: {intValue}) {change}", true);
+                        AppendLine(basePacket, $"     {val.Key} = {newValue} (old: {intValue}) {change}", true);
 
-                    foreach (var extra in highLevelUpdateDump.Produce(val.Key, (uint)intValue, (uint)val.Value))
+                    foreach (var extra in highLevelUpdateDump.Produce(val.Key, (uint)intValue, (uint)newValue))
                         AppendLine(basePacket, $"       -> {extra}", true);   
                     
                 }
-                newEntity.Ints[val.Key] = val.Value;
+                newEntity.Ints[val.Key] = newValue;
             }
             
             foreach (var val in values.Floats)
@@ -637,6 +662,16 @@ namespace WDE.PacketViewer.Processing.Processors
             }
 
             return null;
+        }
+
+        private long RemoveUselessFlag(string field, long value)
+        {
+            if (field == "UNIT_FIELD_FLAGS")
+            {
+                value = value & ~ (uint)GameDefines.UnitFlags.ServerSideControlled;
+            }
+
+            return value;
         }
 
         private bool IsUpdateFieldInteresting(string field, bool isUpdate)

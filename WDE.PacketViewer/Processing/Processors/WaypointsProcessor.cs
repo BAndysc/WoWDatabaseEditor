@@ -36,13 +36,15 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public class Segment
         {
-            public Segment(uint moveTime, float originalDistance, Vec3 initialNpcPosition)
+            public Segment(uint moveTime, float originalDistance, Vec3 initialNpcPosition, float? finalOrientation)
             {
                 MoveTime = moveTime;
                 OriginalDistance = originalDistance;
                 InitialNpcPosition = initialNpcPosition;
+                FinalOrientation = finalOrientation;
             }
 
+            public float? FinalOrientation { get; }
             public uint MoveTime { get; }
             public Vec3 InitialNpcPosition { get; }
             public List<Vec3> Waypoints { get; } = new();
@@ -109,8 +111,6 @@ namespace WDE.PacketViewer.Processing.Processors
     [AutoRegister]
     public class WaypointsProcessor : PacketProcessor<bool>, IWaypointProcessor
     {
-        private static uint FlagInCombat = 524288;
-
         public Dictionary<UniversalGuid, IWaypointProcessor.UnitMovementState> State { get; } = new();
 
         private IWaypointProcessor.UnitMovementState Get(UniversalGuid guid)
@@ -186,8 +186,11 @@ namespace WDE.PacketViewer.Processing.Processors
                 distance = packet.Position.TotalDistance(packet.PackedPoints, packet.Points[0]);
             else
                 distance = packet.Position.TotalDistance(packet.Points);
-            
-            state.Paths[^1].Segments.Add(new IWaypointProcessor.Segment(packet.MoveTime, distance, packet.Position));
+
+            float? finalOrientation = packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation
+                ? packet.LookOrientation
+                : null;
+            state.Paths[^1].Segments.Add(new IWaypointProcessor.Segment(packet.MoveTime, distance, packet.Position, finalOrientation));
             state.LastSegment = state.Paths[^1].Segments[^1];            
 
             if (packet.PackedPoints.Count > 0)
@@ -216,13 +219,13 @@ namespace WDE.PacketViewer.Processing.Processors
             foreach (var create in packet.Created)
             {
                 if (create.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var flags))
-                    Get(create.Guid).InCombat = (flags & FlagInCombat) == FlagInCombat;
+                    Get(create.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.UnitFlagInCombat) == (uint)GameDefines.UnitFlags.UnitFlagInCombat;
             }
             
             foreach (var update in packet.Updated)
             {
                 if (update.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var flags))
-                    Get(update.Guid).InCombat = (flags & FlagInCombat) == FlagInCombat;
+                    Get(update.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.UnitFlagInCombat) == (uint)GameDefines.UnitFlags.UnitFlagInCombat;
             }
 
             return true;

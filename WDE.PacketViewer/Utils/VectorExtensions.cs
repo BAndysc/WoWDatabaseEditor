@@ -59,5 +59,15 @@ namespace WDE.PacketViewer.Utils
             distance += prev.Distance2D(end);
             return distance;
         }
+
+        public static Vec3 Lerp(this Vec3 a, Vec3 b, float t)
+        {
+            return new Vec3()
+            {
+                X = a.X + (b.X - a.X) * t,
+                Y = a.Y + (b.Y - a.Y) * t,
+                Z = a.Z + (b.Z - a.Z) * t,
+            };
+        }
     }
 }
