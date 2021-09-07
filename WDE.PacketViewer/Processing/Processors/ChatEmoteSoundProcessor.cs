@@ -66,7 +66,7 @@ namespace WDE.PacketViewer.Processing.Processors
             
             var timeA = a.Time.ToDateTime();
             var timeB = b.Time.ToDateTime();
-            return Math.Abs((timeB - timeA).TotalMilliseconds) < 250;
+            return Math.Abs((timeB - timeA).TotalMilliseconds) < 200;
         }
         
         protected override bool Process(PacketBase basePacket, PacketChat packet)
