@@ -15,7 +15,7 @@ using WDE.MVVM;
 using WDE.MVVM.Observable;
 
 namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
-{
+{ 
     public abstract class ItemFromListProviderViewModel<T> : ObservableBase, IDialog where T : notnull
     {
         public Dictionary<T, SelectOption>? Items { get; }
@@ -45,6 +45,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 .Subscribe());
             FilteredItems = outFilteredList;
 
+            CheckableSelectOption<T>? selected = null;
             if (items != null)
             {
                 this.items.Edit(list =>
@@ -54,11 +55,13 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                         bool isSelected = shouldBeSelected(key);
                         var item = new CheckableSelectOption<T>(key, items[key], isSelected);
                         if (isSelected)
-                            SelectedItem = item;
+                            selected = item;
                         list.Add(item);
                     }
                 });
             }
+
+            SelectedItem = selected;
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
@@ -91,7 +94,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
         public ReadOnlyObservableCollection<CheckableSelectOption<T>> FilteredItems { get; }
-
+        
         private CheckableSelectOption<T>? selectedItem;
         public CheckableSelectOption<T>? SelectedItem
         {

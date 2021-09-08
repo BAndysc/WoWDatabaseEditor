@@ -22,14 +22,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            DispatcherTimer.RunOnce(() =>
-            {
-                GridView gridView = this.FindControl<GridView>("GridView");
-                if (gridView != null && gridView.SelectedItem != null)
-                {
-                    gridView.ScrollIntoView(gridView.SelectedItem);
-                }
-            }, TimeSpan.FromMilliseconds(1));
         }
 
         private void InputElement_OnKeyDown(object? sender, KeyEventArgs e)

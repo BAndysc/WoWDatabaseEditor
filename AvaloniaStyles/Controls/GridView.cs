@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Avalonia;
@@ -16,7 +15,10 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Metadata;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.MVVM.Utils;
 
 namespace AvaloniaStyles.Controls
@@ -27,8 +29,8 @@ namespace AvaloniaStyles.Controls
         {
             return new ItemContainerGenerator<GridViewItem>(
                 this, 
-                GridViewItem.ContentProperty,
-                GridViewItem.ContentTemplateProperty);
+                ContentControl.ContentProperty,
+                ContentControl.ContentTemplateProperty);
         }
         Type IStyleable.StyleKey => typeof(ListBox);
     }
@@ -86,17 +88,15 @@ namespace AvaloniaStyles.Controls
             set => SetAndRaise(ItemsProperty, ref items, value);
         }
         
-        public static readonly DirectProperty<GridView, ISelectionModel> SelectionProperty =
-            AvaloniaProperty.RegisterDirect<GridView, ISelectionModel>(
-                nameof(Selection),
-                o => o.Selection,
-                (o, v) => o.Selection = v);
+        public static readonly StyledProperty<ISelectionModel> SelectionProperty =
+            AvaloniaProperty.Register<GridView, ISelectionModel>(
+                nameof(Selection), new SelectionModel<object>());
 
-        private ISelectionModel selection = null!;
+        private IDisposable? selectionDisposable;
         public ISelectionModel Selection
         {
-            get => selection;
-            set => SetAndRaise(SelectionProperty, ref selection, value);
+            get => GetValue(SelectionProperty);
+            set => SetValue(SelectionProperty, value);
         }
 
         public static readonly DirectProperty<GridView, object?> SelectedItemProperty =
@@ -106,11 +106,18 @@ namespace AvaloniaStyles.Controls
                 (o, v) => o.SelectedItem = v,
                 defaultBindingMode: BindingMode.TwoWay);
 
-        private object? selectedItem;
         public object? SelectedItem
         {
-            get => selectedItem;
-            set => SetAndRaise(SelectedItemProperty, ref selectedItem, value);
+            get => Selection.SelectedItem;
+            set => Selection.SelectedItem = value;
+        }
+
+        public static readonly StyledProperty<bool> AutoScrollToSelectedItemProperty = AvaloniaProperty.Register<GridView, bool>(nameof (AutoScrollToSelectedItem), true);
+
+        public bool AutoScrollToSelectedItem
+        {
+            get => GetValue(SelectingItemsControl.AutoScrollToSelectedItemProperty);
+            set => SetValue(SelectingItemsControl.AutoScrollToSelectedItemProperty, value);
         }
         
         public static readonly DirectProperty<GridView, IEnumerable<GridColumnDefinition>> ColumnsProperty =
@@ -236,10 +243,27 @@ namespace AvaloniaStyles.Controls
                     }
                 }, RoutingStrategies.Tunnel));   
             }
+            
+            void ExecuteScrollWhenLayoutUpdated(object? sender, EventArgs e)
+            {
+                LayoutUpdated -= ExecuteScrollWhenLayoutUpdated;
+                Dispatcher.UIThread.Post(AutoScrollToSelectedItemIfNecessary);
+            }
+
+            if (AutoScrollToSelectedItem)
+            {
+                LayoutUpdated += ExecuteScrollWhenLayoutUpdated;
+            }
         }
 
-        private System.IDisposable? handlersDisposable;
-        
+        private IDisposable? handlersDisposable;
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            AutoScrollToSelectedItemIfNecessary();
+        }
+
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnDetachedFromVisualTree(e);
@@ -283,19 +307,50 @@ namespace AvaloniaStyles.Controls
             }
         }
 
-        public void ScrollIntoView(object e)
+        private void AutoScrollToSelectedItemIfNecessary()
         {
-            listBox?.ScrollIntoView(e);
-        }
+            if (listBox == null)
+                return;
 
-        public void ScrollIntoView(int index)
-        {
-            listBox?.ScrollIntoView(index);
+            if (!AutoScrollToSelectedItem)
+                return;
+
+            if (SelectedItem == null)
+                return;
+
+            var index = listBox.SelectedIndex;
+
+            var visible = listBox.GetVisualDescendants().Count(t => t is ListBoxItem);
+                    
+            var scroll = listBox.FindDescendantOfType<ScrollViewer>();
+                    
+            if (index < scroll.Offset.Y || index > scroll.Offset.Y + visible)
+                scroll.Offset = new Vector(scroll.Offset.X, Math.Max(0, index - visible / 2));
         }
 
         static GridView()
         {
             ColumnsProperty.Changed.AddClassHandler<GridView>(OnColumnsModified);
+
+            SelectedItemProperty.Changed.AddClassHandler<GridView>((view, args) =>
+            {
+                if (!view.AutoScrollToSelectedItem)
+                    return;
+                
+                Dispatcher.UIThread.Post(view.AutoScrollToSelectedItemIfNecessary);
+            });
+
+            SelectionProperty.Changed.AddClassHandler<GridView>((view, args) =>
+            {
+                view.selectionDisposable?.Dispose();
+                view.selectionDisposable = null;
+                if (args.NewValue == null)
+                    return;
+                view.selectionDisposable = ((ISelectionModel)args.NewValue).ToObservable(o => o.SelectedItem).SubscribeAction(sel =>
+                {
+                    view.RaisePropertyChanged(SelectedItemProperty, null, sel);
+                });
+            });
         }
 
         private static void OnColumnsModified(GridView gridView, AvaloniaPropertyChangedEventArgs args)
@@ -304,6 +359,7 @@ namespace AvaloniaStyles.Controls
 
         public GridView()
         {
+            Selection = new SelectionModel<object>();
             ItemTemplate = new FuncDataTemplate(_ => true, (_, _) =>
             {
                 var parent = ConstructGrid();

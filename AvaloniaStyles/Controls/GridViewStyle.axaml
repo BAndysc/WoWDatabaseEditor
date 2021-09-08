@@ -20,8 +20,7 @@
                             
                             <!-- AutoScrollToSelectedItem=false on purpose, because of some weird Avalonia bug -->
                             <controls:GridViewListBox Items="{TemplateBinding Items}" 
-                                             SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}"
-                                             Selection="{TemplateBinding Selection, Mode=TwoWay}"
+                                             Selection="{TemplateBinding Selection, Mode=OneWay}"
                                              ItemTemplate="{TemplateBinding ItemTemplate}"
                                              SelectionMode="{TemplateBinding SelectionMode}"
                                              BorderThickness="0"
