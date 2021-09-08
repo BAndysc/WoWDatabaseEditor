@@ -167,10 +167,10 @@ namespace WDE.Solutions.Explorer.ViewModels
                     solutionTasksService.SaveAndReloadSolutionTask(selected.Item);
             }, () => solutionTasksService.CanSaveAndReloadRemotely);
 
-            ExportToServerItem = new DelegateCommand<SolutionItemViewModel>(item =>
+            ExportToServerItem = new DelegateCommand<object>(item =>
             {
-                if (item != null)
-                    solutionTasksService.SaveAndReloadSolutionTask(item.Item);
+                if (item is SolutionItemViewModel si)
+                    solutionTasksService.SaveAndReloadSolutionTask(si.Item);
             }, item => solutionTasksService.CanSaveAndReloadRemotely);
         }
 
@@ -185,19 +185,44 @@ namespace WDE.Solutions.Explorer.ViewModels
                 SelectedItem = null;
         }
 
+        private SolutionItemViewModel? HasSolutionItem(ObservableCollection<SolutionItemViewModel>? items, ISolutionItem item)
+        {
+            if (items == null)
+                return null;
+            foreach (var i in items)
+            {
+                if (i.Item.Equals(item))
+                    return i;
+                var inner = HasSolutionItem(i.Children, item);
+                if (inner != null)
+                    return inner;
+            }
+
+            return null;
+        }
+
         private void DoAddItem(ISolutionItem item)
         {
-            if (selected == null)
-                solutionManager.Items.Add(item);
-            else if (selected.Item.Items != null && selected.Item.IsContainer)
-                selected.Item.Items.Add(item);
-            else if (selected.Parent != null)
+            var existing = HasSolutionItem(Root, item);
+            if (existing == null)
             {
-                var indexOf = selected.Parent.Item.Items?.IndexOf(selected.Item) ?? -1;
-                if (indexOf != -1)
-                    selected.Parent.Item.Items!.Insert(indexOf + 1, item);
+                if (selected == null)
+                    solutionManager.Items.Add(item);
+                else if (selected.Item.Items != null && selected.Item.IsContainer)
+                    selected.Item.Items.Add(item);
+                else if (selected.Parent != null)
+                {
+                    var indexOf = selected.Parent.Item.Items?.IndexOf(selected.Item) ?? -1;
+                    if (indexOf != -1)
+                        selected.Parent.Item.Items!.Insert(indexOf + 1, item);
+                }
             }
-                    
+            else
+            {
+                SelectedItem = existing;
+                item = existing.Item;
+            }
+            
             if (item is not SolutionFolderItem)
                 ea.GetEvent<EventRequestOpenItem>().Publish(item);
         }
@@ -210,7 +235,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         public DelegateCommand<SolutionItemViewModel> SelectedItemChangedCommand { get; }
         public DelegateCommand<SolutionItemViewModel> RequestOpenItem { get; }
         public DelegateCommand ExportToServer { get; }
-        public DelegateCommand<SolutionItemViewModel> ExportToServerItem { get; }
+        public DelegateCommand<object> ExportToServerItem { get; }
         public DelegateCommand UpdateDatabase { get; }
         
         public void DragOver(IDropInfo dropInfo)

@@ -56,6 +56,21 @@ namespace WDE.Solutions.Manager
                 InitItem(item);
                 Items.Add(item);
             }
+
+            RemoveDuplicates(Items, new HashSet<ISolutionItem>());
+        }
+
+        private void RemoveDuplicates(ObservableCollection<ISolutionItem> items, HashSet<ISolutionItem> added)
+        {
+            for (var index = items.Count - 1; index >= 0; index--)
+            {
+                var i = items[index];
+                if (i.Items != null)
+                    RemoveDuplicates(i.Items, added);
+                
+                if (!added.Add(items[index]))
+                    items.RemoveAt(index);
+            }
         }
 
         private void ItemsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
