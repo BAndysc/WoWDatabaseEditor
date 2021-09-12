@@ -6,6 +6,7 @@
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:avalonia="clr-namespace:WDE.Common.Avalonia;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              Name="SqlUserControl">
     <UserControl.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
@@ -13,5 +14,6 @@
     <avaloniaEdit:TextEditor controls:AvalonEditExtra.SyntaxExtension="sql" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
                              ShowLineNumbers="True"
                              BorderThickness="0"
+                             utils:FocusUtils.FocusFirst="True"
                              FontFamily="Consolas,Menlo,Courier,Courier New" />
 </UserControl>
