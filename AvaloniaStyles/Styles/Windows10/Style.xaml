@@ -9,7 +9,7 @@
                         <FontFamily x:Key="MainFontSans">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
                 </Style.Resources>
         </Style>
-        <StyleInclude Source="avares://Dock.Avalonia/Themes/FluentTheme.axaml"/>
+        <StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/CompletionComboBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />

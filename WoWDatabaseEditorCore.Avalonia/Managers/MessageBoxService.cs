@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Events;
@@ -17,6 +18,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
     {
         private readonly IMainWindowHolder mainWindowHolder;
         private bool loaded;
+        private bool dialogOpened;
         private List<Func<Task>> pending = new();
 
         public MessageBoxService(IMainWindowHolder mainWindowHolder,
@@ -37,32 +39,41 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             if (loaded)
                 return;
             loaded = true;
-            ExecutePending().ListenErrors();
-        }
-
-        private async Task ExecutePending()
-        {
-            while (pending.Count > 0)
+            if (pending.Count > 0)
             {
-                await pending[0]();
+                var first = pending[0];
                 pending.RemoveAt(0);
+                first().ListenErrors();
             }
         }
 
         private async Task<T?> ShowNow<T>(IMessageBox<T> messageBox)
         {
+            Debug.Assert(!dialogOpened);
+            dialogOpened = true;
             MessageBoxView view = new MessageBoxView();
             var viewModel = new MessageBoxViewModel<T>(messageBox);
             view.DataContext = viewModel;
             await view.ShowDialog<bool>(mainWindowHolder.Window);
+            dialogOpened = false;
+
+            if (pending.Count > 0)
+            {
+                var first = pending[0];
+                pending.RemoveAt(0);
+                first().ListenErrors(); // no await! this is another dialog
+            }
+            
             return viewModel.SelectedOption;
         }
         
         public Task<T?> ShowDialog<T>(IMessageBox<T> messageBox)
         {
-            if (loaded)
+            if (loaded && !dialogOpened)
+            {
                 return ShowNow(messageBox);
-            
+            }
+
             TaskCompletionSource<T?> completionSource = new();
             Func<Task> f = async () =>
             {
