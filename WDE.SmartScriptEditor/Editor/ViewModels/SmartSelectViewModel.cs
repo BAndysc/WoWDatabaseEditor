@@ -36,7 +36,30 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 visibleCount = 0;
                 foreach (var item in AllItems)
                 {
-                    item.Score = string.IsNullOrEmpty(lower) ? 100 : (item.Name.ToLower() == lower ? 101 : FuzzySharp.Fuzz.WeightedRatio(item.SearchName, lower));
+                    if (string.IsNullOrEmpty(lower))
+                    {
+                        item.Score = 100;
+                    }
+                    else if (item.Name.ToLower() == lower)
+                    {
+                        item.Score = 101;
+                    } else
+                    {
+                        int indexOf = item.SearchName.IndexOf(lower, StringComparison.Ordinal);
+                        bool contains = indexOf != -1;
+                        bool isFullWorld = false;
+                        if (contains)
+                        {
+                            isFullWorld = true;
+                            if (indexOf > 0 && item.SearchName[indexOf - 1] != ' ')
+                                isFullWorld = false;
+                            indexOf += lower.Length;
+                            if (indexOf < item.SearchName.Length && item.SearchName[indexOf] != ' ')
+                                isFullWorld = false;
+                        }
+                        var score = FuzzySharp.Fuzz.WeightedRatio(item.SearchName, lower);
+                        item.Score = contains ? (Math.Max(score, isFullWorld ? 85 : 62)) : score;
+                    }
                     if (item.ShowItem)
                         visibleCount++;
                     else if (item == SelectedItem)

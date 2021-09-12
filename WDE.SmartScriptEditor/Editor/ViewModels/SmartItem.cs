@@ -5,6 +5,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
     public class SmartItem : ObservableBase
     {
         private int score = 100;
+        private readonly string searchName = "";
 
         public bool ShowItem => Score > 61;
         
@@ -22,7 +23,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public string Name { get; init; } = "";
 
-        public string SearchName { get; init; } = "";
+        public string SearchName
+        {
+            get => searchName;
+            init => searchName = value.ToLower();
+        }
 
         public bool Deprecated { get; init; }
 
