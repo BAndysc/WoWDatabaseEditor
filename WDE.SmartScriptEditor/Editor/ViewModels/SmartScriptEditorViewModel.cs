@@ -1282,7 +1282,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             return smartTypeListProvider.Get(SmartType.SmartTarget,
                 data =>
                 {
-                    if (data.UsableWithEventTypes != null && parentEvent != null && data.UsableWithEventTypes.Contains(parentEvent.Id))
+                    if (data.UsableWithEventTypes != null && parentEvent != null && !data.UsableWithEventTypes.Contains(parentEvent.Id))
                         return false;
                     
                     return (eventSupportsActionInvoker || !data.IsInvoker) &&
