@@ -15,6 +15,7 @@ namespace WDE.Common.CoreVersion
         IConditionFeatures ConditionFeatures { get; }
         bool SupportsRbac => true;
         bool SupportsSpecialCommands => false;
+        bool SupportsReverseCommands => false;
     }
 
     public interface IConditionFeatures

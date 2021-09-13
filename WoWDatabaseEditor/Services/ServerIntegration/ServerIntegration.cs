@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
@@ -25,6 +26,7 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
         public ServerIntegration(IRemoteConnectorService remoteConnectorService,
             IStatusBar statusBar, Lazy<IWindowManager> windowManager,
             IMainThread mainThread,
+            ICurrentCoreVersion currentCoreVersion,
             IEnumerable<IReverseRemoteCommand> reverseRemoteCommands)
         {
             this.remoteConnectorService = remoteConnectorService;
@@ -41,7 +43,8 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
                 commands.Add(new(){Name = atr.Name, Command = command});
             }
             
-            new Thread(BeginFetchLoop).Start();
+            if (currentCoreVersion.Current.SupportsReverseCommands)
+                new Thread(BeginFetchLoop).Start();
         }
 
         private void BeginFetchLoop()
