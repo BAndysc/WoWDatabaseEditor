@@ -38,7 +38,7 @@
         "condition": "script.source_type == 9 && event.param(1) == event.param(2)"
       },
       {
-        "description": "Once [IC]",
+        "description": "Once (IC)",
         "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
       },
       {
@@ -46,27 +46,27 @@
         "condition": "script.source_type == 9 && event.param(1) != event.param(2)"
       },
       {
-        "description": "Every {pram1} seconds [IC]",
+        "description": "Every {pram1} seconds (IC)",
         "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
       },
       {
-        "description": "Time = {pram1} seconds [IC]",
+        "description": "Time = {pram1} seconds (IC)",
         "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
       },
       {
-        "description": "Time between {pram1} - {pram2} seconds [IC]",
+        "description": "Time between {pram1} - {pram2} seconds (IC)",
         "condition": "event.param(3) == 0"
       },
       {
-        "description": "Every {pram1} - {pram2} seconds [IC]",
+        "description": "Every {pram1} - {pram2} seconds (IC)",
         "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
       },
       {
-        "description": "Every {pram3} seconds ({pram1}s initially) [IC]",
+        "description": "Every {pram3} seconds ({pram1}s initially) (IC)",
         "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
       },
       {
-        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) [IC]"
+        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) (IC)"
       }
     ]
   },
@@ -114,31 +114,31 @@
         "condition": "script.source_type == 9 && event.param(1) != event.param(2)"
       },
       {
-        "description": "Once [OOC]",
+        "description": "Once (OOC)",
         "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
       },
       {
-        "description": "Every {pram1} seconds [OOC]",
+        "description": "Every {pram1} seconds (OOC)",
         "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
       },
       {
-        "description": "Time = {pram1} seconds [OOC]",
+        "description": "Time = {pram1} seconds (OOC)",
         "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
       },
       {
-        "description": "Time between {pram1} - {pram2} seconds [OOC]",
+        "description": "Time between {pram1} - {pram2} seconds (OOC)",
         "condition": "event.param(3) == 0"
       },
       {
-        "description": "Every {pram1} - {pram2} seconds [OOC]",
+        "description": "Every {pram1} - {pram2} seconds (OOC)",
         "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
       },
       {
-        "description": "Every {pram3} seconds ({pram1}s initially) [OOC]",
+        "description": "Every {pram3} seconds ({pram1}s initially) (OOC)",
         "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
       },
       {
-        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) [OOC]"
+        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) (OOC)"
       }
     ]
   },
