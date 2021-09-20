@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Prism.Events;
 using WDBXEditor.Storage;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.DbcStore.FastReader;
 using WDE.DbcStore.Providers;
+using WDE.DbcStore.Spells;
+using WDE.DbcStore.Spells.Cataclysm;
+using WDE.DbcStore.Spells.Wrath;
 using WDE.Module.Attributes;
 
 namespace WDE.DbcStore
@@ -22,11 +27,14 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore
+    public class DbcStore : IDbcStore, ISpellService
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IEventAggregator eventAggregator;
+        private readonly NullSpellService nullSpellService;
+        private readonly CataSpellService cataSpellService;
+        private readonly WrathSpellService wrathSpellService;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
 
@@ -34,14 +42,21 @@ namespace WDE.DbcStore
             ITaskRunner taskRunner,
             IDbcSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            NullSpellService nullSpellService,
+            CataSpellService cataSpellService,
+            WrathSpellService wrathSpellService)
         {
             this.parameterFactory = parameterFactory;
             this.taskRunner = taskRunner;
             dbcSettingsProvider = settingsProvider;
             this.messageBoxService = messageBoxService;
             this.eventAggregator = eventAggregator;
+            this.nullSpellService = nullSpellService;
+            this.cataSpellService = cataSpellService;
+            this.wrathSpellService = wrathSpellService;
 
+            spellServiceImpl = nullSpellService;
             Load();
         }
         
@@ -193,6 +208,20 @@ namespace WDE.DbcStore
                 parameterFactory.Register("CreatureModelDataParameter", new CreatureModelParameter(CreatureModelDataStore, CreatureDisplayInfoStore));
                 parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
                 parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore));
+
+                switch (dbcSettingsProvider.GetSettings().DBCVersion)
+                {
+                    case DBCVersions.WOTLK_12340:
+                        store.spellServiceImpl = store.wrathSpellService;
+                        break;
+                    case DBCVersions.CATA_15595:
+                        store.spellServiceImpl = store.cataSpellService;
+                        break;
+                    case DBCVersions.LEGION_26972:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
                 
                 store.eventAggregator.GetEvent<DbcLoadedEvent>().Publish(store);
             }
@@ -211,6 +240,7 @@ namespace WDE.DbcStore
                 {
                     case DBCVersions.WOTLK_12340:
                     {
+                        store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
                         max = 22;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 3, SkillStore);
@@ -238,6 +268,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.CATA_15595:
                     {
+                        store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
                         max = 24;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
@@ -313,6 +344,15 @@ namespace WDE.DbcStore
                 throw new Exception("Invalid DBC!");
             }
         }
+
+        private ISpellService spellServiceImpl;
+        public bool Exists(uint spellId) => spellServiceImpl.Exists(spellId);
+
+        public T GetAttributes<T>(uint spellId) where T : Enum => spellServiceImpl.GetAttributes<T>(spellId);
+        public uint? GetSkillLine(uint spellId) => spellServiceImpl.GetSkillLine(spellId);
+        public int GetSpellEffectsCount(uint spellId) => spellServiceImpl.GetSpellEffectsCount(spellId);
+        public SpellEffectType GetSpellEffectType(uint spellId, int index) => spellServiceImpl.GetSpellEffectType(spellId, index);
+        public uint GetSpellEffectMiscValueA(uint spellId, int index) => spellServiceImpl.GetSpellEffectMiscValueA(spellId, index);
     }
 
     internal class FactionParameter : ParameterNumbered
