@@ -14,7 +14,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 {
     public interface IRelatedPacketsFinder
     {
-        IFilterData Find(ICollection<PacketViewModel> packets, int start, CancellationToken token);
+        IFilterData Find(IList<PacketViewModel> packets, IList<PacketViewModel> unfilteredPackets, int start, CancellationToken token);
     }
     
     [AutoRegister]
@@ -33,7 +33,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             
         }
         
-        public IFilterData Find(ICollection<PacketViewModel> packets, int start, CancellationToken token)
+        public IFilterData Find(IList<PacketViewModel> packets, IList<PacketViewModel> unfilteredPackets, int start, CancellationToken token)
         {
             var processor = actionReactionProcessorCreator.Create();
             EventHappened? happenReason = null;
@@ -45,9 +45,18 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     throw new TaskCanceledException();
             }
 
-            foreach (var f in packets)
+            int i = 0;
+            int j = 0;
+            for (var index = 0; index < packets.Count; index++)
             {
-                processor.Process(f.Packet);
+                var packet = packets[index];
+
+                while (j < unfilteredPackets.Count && unfilteredPackets[j].Id < packet.Id)
+                    processor.ProcessUnfiltered(unfilteredPackets[j++].Packet);
+
+                i++;
+                j++;
+                processor.Process(packet.Packet);
                 if (token.IsCancellationRequested)
                     throw new TaskCanceledException();
             }

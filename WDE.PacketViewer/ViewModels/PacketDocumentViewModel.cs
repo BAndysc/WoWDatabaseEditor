@@ -720,8 +720,9 @@ namespace WDE.PacketViewer.ViewModels
         {
             try
             {
+                var all = splitUpdate ? AllPacketsSplit! : AllPackets!;
                 return await Task.Run(() =>
-                    relatedPacketsFinder.Find(filteredPackets, start, token), token);
+                    relatedPacketsFinder.Find(filteredPackets, all, start, token), token);
             }
             catch (TaskCanceledException)
             {

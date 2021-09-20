@@ -29,7 +29,11 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         GameObjectActivated,
         GossipSelect,
         GossipMessage,
-        FactionChanged
+        FactionChanged,
+        EnableImmuneNpc,
+        DisableImmuneNpc,
+        EnableImmunePc,
+        DisableImmunePc
     }
     
     public readonly struct ActionHappened
@@ -54,6 +58,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly IPlayerGuidFollower playerGuidFollower;
         private readonly IWaypointProcessor waypointProcessor;
+        private readonly IAuraSlotTracker auraSlotTracker;
 
         public ActionGenerator(
             ISpellService spellService,
@@ -61,7 +66,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             IChatEmoteSoundProcessor chatEmote,
             IUpdateObjectFollower updateObjectFollower,
             IPlayerGuidFollower playerGuidFollower,
-            IWaypointProcessor waypointProcessor)
+            IWaypointProcessor waypointProcessor,
+            IAuraSlotTracker auraSlotTracker)
         {
             this.spellService = spellService;
             this.unitPosition = unitPosition;
@@ -69,8 +75,21 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             this.updateObjectFollower = updateObjectFollower;
             this.playerGuidFollower = playerGuidFollower;
             this.waypointProcessor = waypointProcessor;
+            this.auraSlotTracker = auraSlotTracker;
         }
 
+        private bool IsSpellImportant(uint spellId)
+        {
+            if (!spellService.Exists(spellId) ||
+                !spellService.GetAttributes<SpellAttr0>(spellId).HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
+                return false;
+
+            if (spellService.GetSkillLine(spellId) == 777) // Mounts
+                return false;
+
+            return true;
+        }
+        
         protected override IEnumerable<ActionHappened>? Process(PacketBase basePacket, PacketMonsterMove packet)
         {
             var originalSpline = waypointProcessor.GetOriginalSpline(basePacket.Number);
@@ -84,8 +103,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 Description = $"{packet.Mover.ToWowParserString()} " + (originalSpline.HasValue ? "continue" : "start") + " movement",
                 EventLocation = unitPosition.GetPosition(packet.Mover, basePacket.Time.ToDateTime()),
                 Time = basePacket.Time.ToDateTime(),
-                CustomEntry = originalSpline,
-                RestrictEvent = originalSpline.HasValue ? EventType.StartMovement : null
+                CustomEntry = originalSpline
             };
         }
 
@@ -138,6 +156,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         {
             foreach (var update in packet.Updates)
             {
+                var spellId = auraSlotTracker.GetSpellForAuraSlot(packet.Unit, update.Slot);
+                if (!spellId.HasValue || !IsSpellImportant(spellId.Value))
+                    continue;
+                
                 if (update.Remove)
                 {
                     yield return new ActionHappened()
@@ -213,12 +235,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 justUsedItemSpellID.Value != packet.Data.Spell)
             {
                 // skip boring spells, usually casted by a player
-                if (!spellService.Exists(packet.Data.Spell))
+                if (!IsSpellImportant(packet.Data.Spell))
                     yield break;
 
-                if (spellService.GetSkillLine(packet.Data.Spell) == 777) // Mounts
-                    yield break;
-                
                 if (!(spellService.GetAttributes<SpellAttr0>(packet.Data.Spell)
                         .HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog) ||
                      spellService.GetAttributes<SpellAttr0>(packet.Data.Spell)
@@ -234,7 +253,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 AdditionalActors = packet.Data.TargetUnit.ToSingletonList(),
                 Description = $"{packet.Data.Caster.ToWowParserString()} casts spell {packet.Data.Spell}",
                 EventLocation = unitPosition.GetPosition(packet.Data.Caster, basePacket.Time.ToDateTime()),
-                Time = basePacket.Time.ToDateTime()
+                Time = basePacket.Time.ToDateTime(),
+                CustomEntry = (int)packet.Data.Spell
             };
         }
 
@@ -341,6 +361,34 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                         EventLocation = unitPosition.GetPosition(update.Guid, basePacket.Time.ToDateTime()),
                         Time = basePacket.Time.ToDateTime(),
                         TimeFactor = exitsCombat ? 6f : 1f // exit combat action can only join with enters combat and we allow very far away enter combat
+                    };
+                }
+                
+                if (FlagChanged(update, "UNIT_FIELD_FLAGS", (long)GameDefines.UnitFlags.ImmuneToNpc, out var enableImmuneNpc,
+                    out var disableImmuneNpc))
+                {
+                    yield return new ActionHappened()
+                    {
+                        Kind = enableImmuneNpc ? ActionType.EnableImmuneNpc : ActionType.DisableImmuneNpc,
+                        PacketNumber = basePacket.Number,
+                        MainActor = update.Guid,
+                        Description = $"{update.Guid.ToWowParserString()} " + (enableImmuneNpc ? " becomes immune to NPC" : " disables UNIT_FLAGS_IMMUNE_TO_NPC"),
+                        EventLocation = unitPosition.GetPosition(update.Guid, basePacket.Time.ToDateTime()),
+                        Time = basePacket.Time.ToDateTime()
+                    };
+                }
+                
+                if (FlagChanged(update, "UNIT_FIELD_FLAGS", (long)GameDefines.UnitFlags.ImmuneToPc, out var enableImmunePc,
+                    out var disableImmunePc))
+                {
+                    yield return new ActionHappened()
+                    {
+                        Kind = enableImmunePc ? ActionType.EnableImmunePc : ActionType.DisableImmunePc,
+                        PacketNumber = basePacket.Number,
+                        MainActor = update.Guid,
+                        Description = $"{update.Guid.ToWowParserString()} " + (enableImmuneNpc ? " becomes immune to PC" : " disables UNIT_FLAGS_IMMUNE_TO_PC"),
+                        EventLocation = unitPosition.GetPosition(update.Guid, basePacket.Time.ToDateTime()),
+                        Time = basePacket.Time.ToDateTime()
                     };
                 }
 

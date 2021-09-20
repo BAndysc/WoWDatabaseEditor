@@ -92,47 +92,67 @@ namespace WDE.PacketViewer.IntegrationTests
             
             foreach (var group in testCaseGroup.TestCases)
             {
-                Console.WriteLine("\n\n" + group.TestName);
-                var startPackets = FindPacket(split, group.SearchTextStartPacket);
-                Console.WriteLine($"Text: '{group.SearchTextStartPacket}' found in packet id {startPackets!.Id}");
-                var result = relatedPacketsFinder.Find(split, startPackets!.Id, CancellationToken.None);
-
-                var mustIncludeGuids = group.MustIncludeGuid.StringToGuids().ToList();
-                var mayIncludeGuids = group.MightIncludeGuid.StringToGuids().ToList();
-                var includesButShouldNot = group.CurrentlyIncludedGuidButShouldNotBe.StringToGuids().ToList();
-                var notIncludesButShould = group.CurrentlyNotIncludedGuidButShouldBe.StringToGuids().ToList();
-
-                if (group.MustStartPacketId.HasValue && (!result.MinPacketNumber.HasValue ||
-                                                       group.MustStartPacketId.Value != result.MinPacketNumber.Value))
-                    throw new Exception("Invalid start packet");
-                
-                if (group.MustEndPacketId.HasValue && (!result.MaxPacketNumber.HasValue ||
-                                                       group.MustEndPacketId.Value != result.MaxPacketNumber.Value))
-                    throw new Exception("Invalid end packet");
-                
-                if (mustIncludeGuids.Any(guid =>
-                    !(result.IncludedGuids ?? new HashSet<UniversalGuid>()).Contains(guid)))
-                    throw new Exception("Some guid is not present!");
-                
-                if (result.IncludedGuids != null &&
-                    result.IncludedGuids.Any(guid => !mustIncludeGuids.Contains(guid) && 
-                                                     !mayIncludeGuids.Contains(guid) &&
-                                                     !includesButShouldNot.Contains(guid) && 
-                                                     !notIncludesButShould.Contains(guid)))
-                    throw new Exception("Too many guids are present!");
-
-                foreach (var unnecessary in includesButShouldNot)
+                try
                 {
-                    if (result.IncludedGuids != null && !result.IncludedGuids.Contains(unnecessary))
-                        Console.WriteLine(unnecessary.ToWowParserString() + " is no longer included, that's a success!");
+                    TestSingle(@group, split);
                 }
-                
-                foreach (var necessary in notIncludesButShould)
+                catch (Exception e)
                 {
-                    if (result.IncludedGuids != null && result.IncludedGuids.Contains(necessary))
-                        Console.WriteLine(necessary.ToWowParserString() + " is now included, that's a success!");
+                    Console.WriteLine("FAILED: ");
+                    Console.WriteLine(e.Message);
                 }
-                
+                finally
+                {
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine();
+                }
+            }
+        }
+
+        private void TestSingle(RelatedPacketsTestCase @group, List<PacketViewModel> split)
+        {
+            Console.WriteLine("\n\n" + @group.TestName);
+            var startPackets = FindPacket(split, @group.SearchTextStartPacket);
+            Console.WriteLine($"Text: '{@group.SearchTextStartPacket}' found in packet id {startPackets!.Id}");
+            var result = relatedPacketsFinder.Find(split, split, startPackets!.Id, CancellationToken.None);
+
+            var mustIncludeGuids = @group.MustIncludeGuid.StringToGuids().ToList();
+            var mayIncludeGuids = @group.MightIncludeGuid.StringToGuids().ToList();
+            var includesButShouldNot = @group.CurrentlyIncludedGuidButShouldNotBe.StringToGuids().ToList();
+            var notIncludesButShould = @group.CurrentlyNotIncludedGuidButShouldBe.StringToGuids().ToList();
+
+            if (@group.MustStartPacketId.HasValue && (!result.MinPacketNumber.HasValue ||
+                                                     @group.MustStartPacketId.Value != result.MinPacketNumber.Value))
+                throw new Exception("Invalid start packet");
+
+            if (@group.MustEndPacketId.HasValue && (!result.MaxPacketNumber.HasValue ||
+                                                   @group.MustEndPacketId.Value != result.MaxPacketNumber.Value))
+                throw new Exception("Invalid end packet");
+
+            var notIncluded = mustIncludeGuids.Where(guid =>
+                !(result.IncludedGuids ?? new HashSet<UniversalGuid>()).Contains(guid)).ToList();
+            if (notIncluded.Count > 0)
+                throw new Exception("Some guid is not present: " +
+                                    string.Join("\n", notIncluded.Select(s => s.ToWowParserString())));
+
+            if (result.IncludedGuids != null &&
+                result.IncludedGuids.Any(guid => !mustIncludeGuids.Contains(guid) &&
+                                                 !mayIncludeGuids.Contains(guid) &&
+                                                 !includesButShouldNot.Contains(guid) &&
+                                                 !notIncludesButShould.Contains(guid)))
+                throw new Exception("Too many guids are present!");
+
+            foreach (var unnecessary in includesButShouldNot)
+            {
+                if (result.IncludedGuids != null && !result.IncludedGuids.Contains(unnecessary))
+                    Console.WriteLine(unnecessary.ToWowParserString() + " is no longer included, that's a success!");
+            }
+
+            foreach (var necessary in notIncludesButShould)
+            {
+                if (result.IncludedGuids != null && result.IncludedGuids.Contains(necessary))
+                    Console.WriteLine(necessary.ToWowParserString() + " is now included, that's a success!");
             }
         }
 

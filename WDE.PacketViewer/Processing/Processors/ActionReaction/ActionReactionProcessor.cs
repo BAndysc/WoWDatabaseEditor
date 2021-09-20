@@ -8,7 +8,7 @@ using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 {
-    public class ActionReactionProcessor : IPacketProcessor<bool>, ITwoStepPacketBoolProcessor
+    public class ActionReactionProcessor : IPacketProcessor<bool>, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor
     {
         private readonly ActionGenerator actionGenerator;
         private readonly EventDetectorProcessor eventDetectorProcessor;
@@ -18,6 +18,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         private readonly IUnitPositionFollower unitPositionFollower;
         private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly IPlayerGuidFollower playerGuidFollower;
+        private readonly IAuraSlotTracker auraSlotTracker;
 
         public ActionReactionProcessor(
             ActionGenerator actionGenerator,
@@ -27,7 +28,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             IWaypointProcessor waypointsProcessor,
             IUnitPositionFollower unitPositionFollower,
             IUpdateObjectFollower updateObjectFollower,
-            IPlayerGuidFollower playerGuidFollower)
+            IPlayerGuidFollower playerGuidFollower,
+            IAuraSlotTracker auraSlotTracker)
         {
             this.actionGenerator = actionGenerator;
             this.eventDetectorProcessor = eventDetectorProcessor;
@@ -37,6 +39,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             this.unitPositionFollower = unitPositionFollower;
             this.updateObjectFollower = updateObjectFollower;
             this.playerGuidFollower = playerGuidFollower;
+            this.auraSlotTracker = auraSlotTracker;
         }
 
         public EventHappened? GetLastEventHappened()
@@ -109,7 +112,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 if (timePassed.TotalSeconds > 20 || (@event.TimeCutOff.HasValue && timePassed > @event.TimeCutOff.Value))
                     break;
                 
-                // special cases
+                // special casesF
 
                 
                 if (@event.RestrictedAction.HasValue &&
@@ -136,12 +139,16 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     continue;
                 
                 // special cases
-                
-                if (@event.Kind == EventType.StartMovement &&
-                    action.Kind == ActionType.ContinueMovement &&
-                    @event.CustomEntry != action.CustomEntry)
-                    continue;
-                
+
+                if (action.Kind == ActionType.ContinueMovement)
+                {
+                    if (@event.Kind != EventType.StartMovement && @event.Kind != EventType.FinishingMovement)
+                        continue;
+                    
+                    if (@event.CustomEntry != action.CustomEntry)
+                        continue;
+                }
+
                 //
                 
                 if (@event.Kind == EventType.SpellCasted &&
@@ -160,9 +167,14 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     !action.MainActor!.Equals(@event.MainActor)))
                     continue;
                 
+                if (action.Kind == ActionType.SpellCasted &&
+                    @event.Kind == EventType.ItemUsed &&
+                    action.CustomEntry != @event.CustomEntry)
+                    continue;
+
                 //
-                
-                var actorsRating = (action.MainActor?.Equals(@event.MainActor) ?? false) ? Const.One : Const.Zero;
+                var mainActorMatches = action.MainActor?.Equals(@event.MainActor) ?? false;
+                var actorsRating = mainActorMatches ? Const.One : Const.Zero;
                 if (actorsRating.Value == 0 && action.AdditionalActors != null &&
                     action.AdditionalActors[0].Equals(@event.MainActor))
                     actorsRating = Const.One;
@@ -210,6 +222,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 if (@event.Kind == EventType.Movement && distRating.Value < 0.01)
                     bonusMult = 0;
 
+                if (mainActorMatches)
+                    bonusMult += 1.2f;
+                
                 var ratingBonused = new Multiply(rating, bonusMult);
 
                 if (ratingBonused.Value > 0.5f || ratingBonused.Value > 0.25f && actorsRating.Value > 0.5f)
@@ -230,9 +245,18 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         
         // reverse lookup: event packet id -> what are possible actions, this event caused
         private Dictionary<int, List<(int packetId, double chance, EventHappened happened)>>? reverseLookup;
-
+        
+        public void ProcessUnfiltered(PacketHolder packet)
+        {
+            auraSlotTracker.Process(packet);
+            playerGuidFollower.Process(packet);
+            unitPositionFollower.Process(packet);
+            updateObjectFollower.Process(packet);
+        }
+        
         public virtual bool Process(PacketHolder packet)
         {
+            auraSlotTracker.Process(packet);
             playerGuidFollower.Process(packet);
             unitPositionFollower.Process(packet);
             

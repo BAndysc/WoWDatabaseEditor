@@ -43,7 +43,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         OpenGameObjectBySpell,
         GossipMessageShown,
         EmoteState,
-        GossipHello
+        GossipHello,
+        LookAt,
+        FinishingMovement
     }
         
     public readonly struct EventHappened
@@ -74,6 +76,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         private readonly IWaypointProcessor waypointsProcessor;
         private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly IPlayerGuidFollower playerGuidFollower;
+        private readonly IAuraSlotTracker auraSlotTracker;
         private List<EventHappened> eventsFeed = new();
         private List<EventHappened> futureEvents = new();
 
@@ -224,7 +227,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             IChatEmoteSoundProcessor chatProcessor,
             IWaypointProcessor waypointsProcessor,
             IUpdateObjectFollower updateObjectFollower,
-            IPlayerGuidFollower playerGuidFollower)
+            IPlayerGuidFollower playerGuidFollower,
+            IAuraSlotTracker auraSlotTracker)
         {
             this.spellService = spellService;
             this.positionFollower = positionFollower;
@@ -233,6 +237,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             this.waypointsProcessor = waypointsProcessor;
             this.updateObjectFollower = updateObjectFollower;
             this.playerGuidFollower = playerGuidFollower;
+            this.auraSlotTracker = auraSlotTracker;
         }
         
         public void Flush(DateTime time)
@@ -261,6 +266,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             bool anyRemoved = false;
             foreach (var aura in packet.Updates)
             {
+                var spellId = auraSlotTracker.GetSpellForAuraSlot(packet.Unit, aura.Slot);
+                if (!spellId.HasValue || !IsSpellImportant(spellId.Value))
+                    continue;
+                
                 if (aura.Remove)
                 {
                     anyRemoved = true;
@@ -289,11 +298,21 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             return base.Process(basePacket, packet);
         }
 
+        private bool IsSpellImportant(uint spellId)
+        {
+            if (!spellService.Exists(spellId) ||
+                !spellService.GetAttributes<SpellAttr0>(spellId).HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
+                return false;
+
+            if (spellService.GetSkillLine(spellId) == 777) // Mounts
+                return false;
+            return true;
+        }
+
         protected override bool Process(PacketBase basePacket, PacketSpellGo packet)
         {
             var spellId = packet.Data.Spell;
-            if (!spellService.Exists(spellId) ||
-                !spellService.GetAttributes<SpellAttr0>(spellId).HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
+            if (!IsSpellImportant(spellId))
                 return false;
 
             var effects = spellService.GetSpellEffectsCount(spellId);
@@ -379,7 +398,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 .SetDescription($"Quest {packet.QuestId} accepted")
                 .AddActor(packet.QuestGiver)
                 .AddActor(playerGuidFollower.PlayerGuid)
-                .SetTimeFactor(0.2f)
+                .SetTimeFactor(0.4f)
                 .Push();
             return base.Process(basePacket, packet);
         }
@@ -446,6 +465,31 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     .SetDescription($"{packet.Mover.ToWowParserString()} finshed movement")
                     .AddActor(packet.Mover)
                     .SetLocation(packet.Points[^1])
+                    .Push();
+                
+                Event(basePacket, EventType.FinishingMovement)
+                    .InFuture(TimeSpan.FromMilliseconds(packet.MoveTime * 0.9f))
+                    .SetDescription($"{packet.Mover.ToWowParserString()} is approaching to finishing movement (90% done)")
+                    .AddActor(packet.Mover)
+                    .SetCustomEntry(originalSpline ?? basePacket.Number)
+                    .SetLocation(packet.Points[^1])
+                    .RestrictAction(ActionType.ContinueMovement)
+                    .Push();
+            }
+            else if (packet.FacingCase != PacketMonsterMove.FacingOneofCase.None)
+            {
+                string? desc = null;
+                if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookPosition)
+                    desc = $"looks at {packet.LookPosition.X}, {packet.LookPosition.Y}, {packet.LookPosition.Z}";
+                else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookTarget)
+                    desc = $"looks at {packet.LookTarget.Target.ToWowParserString()}";
+                else
+                    desc = $"sets orientation to {packet.LookOrientation}";
+                Event(basePacket, EventType.LookAt)
+                    .SetDescription($"{packet.Mover.ToWowParserString()} {desc}")
+                    .AddActor(packet.Mover)
+                    .AddActor(packet.LookTarget?.Target)
+                    .SetLocation(packet.Position)
                     .Push();
             }
             return base.Process(basePacket, packet);

@@ -19,7 +19,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             IWaypointProcessor waypointsProcessor, 
             IUnitPositionFollower unitPositionFollower,
             IUpdateObjectFollower updateObjectFollower,
-            IPlayerGuidFollower playerGuidFollower) : base(actionGenerator, eventDetectorProcessor, randomMovementDetector, chatEmoteSoundProcessor, waypointsProcessor, unitPositionFollower, updateObjectFollower, playerGuidFollower)
+            IPlayerGuidFollower playerGuidFollower,
+            IAuraSlotTracker auraSlotTracker) : base(actionGenerator, eventDetectorProcessor, randomMovementDetector, chatEmoteSoundProcessor, waypointsProcessor, unitPositionFollower, updateObjectFollower, playerGuidFollower, auraSlotTracker)
         {
         }
 
