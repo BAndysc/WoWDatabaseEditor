@@ -6,12 +6,15 @@ namespace WDE.PacketViewer.Solutions
 {
     public class PacketDocumentSolutionItem : ISolutionItem
     {
-        public PacketDocumentSolutionItem(string file)
+        public PacketDocumentSolutionItem(string file, int? version = null)
         {
             File = file;
+            CustomVersion = version;
         }
 
         public string File { get; set; }
+        
+        public int? CustomVersion { get; set; }
         
         [JsonIgnore]
         public bool IsContainer => false;
@@ -25,6 +28,6 @@ namespace WDE.PacketViewer.Solutions
         [JsonIgnore] 
         public bool IsExportable => false;
 
-        public ISolutionItem Clone() => new PacketDocumentSolutionItem(File);
+        public ISolutionItem Clone() => new PacketDocumentSolutionItem(File, CustomVersion);
     }
 }

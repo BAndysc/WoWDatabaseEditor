@@ -72,7 +72,7 @@ namespace WDE.PacketViewer.IntegrationTests
         
         public async Task RunSingleTestCase(string basePath, RelatedPacketsTestCaseGroup testCaseGroup)
         {
-            var sniff = await sniffLoader.LoadSniff(Path.Combine(basePath, testCaseGroup.SniffFilePath), CancellationToken.None, new Progress<float>());
+            var sniff = await sniffLoader.LoadSniff(Path.Combine(basePath, testCaseGroup.SniffFilePath), null, CancellationToken.None, new Progress<float>());
             var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor());
             List<PacketViewModel> split = new();
             foreach (var packet in sniff.Packets_)

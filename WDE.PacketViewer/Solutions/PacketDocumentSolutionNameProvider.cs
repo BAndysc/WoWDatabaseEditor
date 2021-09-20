@@ -10,6 +10,8 @@ namespace WDE.PacketViewer.Solutions
     {
         public string GetName(PacketDocumentSolutionItem item)
         {
+            if (item.CustomVersion.HasValue)
+                return $"Sniff {Path.GetFileNameWithoutExtension(item.File)} ({item.CustomVersion.Value})";
             return "Sniff " + Path.GetFileNameWithoutExtension(item.File);
         }
 

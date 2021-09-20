@@ -71,6 +71,7 @@ namespace WDE.PacketViewer.ViewModels
             IActionReactionProcessorCreator actionReactionProcessorCreator,
             IRelatedPacketsFinder relatedPacketsFinder,
             ITeachingTipService teachingTipService,
+            PacketDocumentSolutionNameProvider solutionNameProvider,
             ISniffLoader sniffLoader)
         {
             this.solutionItem = solutionItem;
@@ -84,7 +85,7 @@ namespace WDE.PacketViewer.ViewModels
             history.LimitStack(20);
             packetViewModelCreator = new PacketViewModelFactory(databaseProvider);
             MostRecentlySearched = mostRecentlySearchedService.MostRecentlySearched;
-            Title = "Sniff " + Path.GetFileNameWithoutExtension(solutionItem.File);
+            Title = solutionNameProvider.GetName(this.solutionItem);
             SolutionItem = solutionItem;
             FilterText = nativeTextDocumentCreator();
             SelectedPacketPreview = nativeTextDocumentCreator();
@@ -666,7 +667,7 @@ namespace WDE.PacketViewer.ViewModels
             
             try
             {
-                var packets = await sniffLoader.LoadSniff(solutionItem.File, currentActionToken.Token, this);
+                var packets = await sniffLoader.LoadSniff(solutionItem.File, solutionItem.CustomVersion, currentActionToken.Token, this);
 
                 if (currentActionToken.IsCancellationRequested)
                 {

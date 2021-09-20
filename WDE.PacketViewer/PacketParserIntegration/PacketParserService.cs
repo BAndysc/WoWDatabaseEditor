@@ -46,7 +46,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
             }
         }
         
-        public async Task RunParser(string input, ParserConfiguration config, DumpFormatType dumpType, CancellationToken token, IProgress<float> progress)
+        public async Task RunParser(string input, ParserConfiguration config, DumpFormatType dumpType, int? customVersion, CancellationToken token, IProgress<float> progress)
         {
             var path = locator.GetPacketParserPath();
             if (path == null)
@@ -79,6 +79,9 @@ namespace WDE.PacketViewer.PacketParserIntegration
                 .Where(tuple => tuple.defaults != tuple.Item1)
                 .Select(tuple => $"--{tuple.key} \"{tuple.Item1}\""));
 
+            if (customVersion.HasValue)
+                configuration += $" --ClientBuild {customVersion.Value}";
+                    
             var args = $"{configuration} --DumpFormat {(int) dumpType} \"{input}\"";
 
             var executable = path;

@@ -1,3 +1,4 @@
+using System;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Solution;
@@ -14,7 +15,7 @@ namespace WDE.PacketViewer.Solutions
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 25,
-                StringValue = item.File
+                StringValue = item.CustomVersion.HasValue ? $"{item.CustomVersion.Value}|{item.File}" : item.File
             };
         }
 
@@ -22,7 +23,18 @@ namespace WDE.PacketViewer.Solutions
         {
             if (projectItem.Type == 25 && !string.IsNullOrEmpty(projectItem.StringValue))
             {
-                solutionItem = new PacketDocumentSolutionItem(projectItem.StringValue);
+                var indexOfPipe = projectItem.StringValue.IndexOf("|", StringComparison.Ordinal);
+                var path = projectItem.StringValue;
+                int? version = null;
+                if (indexOfPipe != -1)
+                {
+                    if (int.TryParse(path.Substring(0, indexOfPipe), out var version_))
+                    {
+                        version = version_;
+                        path = path.Substring(indexOfPipe + 1);
+                    }
+                }
+                solutionItem = new PacketDocumentSolutionItem(path, version);
                 return true;
             }
             solutionItem = null;

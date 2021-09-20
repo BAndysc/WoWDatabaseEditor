@@ -28,23 +28,23 @@ namespace WDE.PacketViewer.PacketParserIntegration
             this.viewerSettings = viewerSettings;
         }
         
-        public async Task<Packets> LoadSniff(string path, CancellationToken token, IProgress<float> progress)
+        public async Task<Packets> LoadSniff(string path, int? customVersion, CancellationToken token, IProgress<float> progress)
         {
             Packets packets = null!;
             var extension = Path.GetExtension(path);
 
-            if (extension != ".pkt" && extension != ".dat")
+            if (extension != ".pkt" && extension != ".bin" && extension != ".dat")
             {
                 extension = await messageBoxService.ShowDialog(new MessageBoxFactory<string>()
                     .SetTitle("Unknown file type")
-                    .SetMainInstruction("File doesn't have .pkt nor .dat extension")
+                    .SetMainInstruction("File doesn't have .pkt, .bin nor .dat extension")
                     .SetContent("Therefore, cannot determine whether to open the file as parsed sniff or unparsed sniff")
                     .WithButton("Open as parsed sniff", ".dat")
                     .WithButton("Open as raw sniff", ".pkt")
                     .Build());
             }
             
-            if (extension == ".pkt")
+            if (extension == ".pkt" || extension == ".bin")
             {
                 progress.Report(-1);
                 var parsedPath = Path.ChangeExtension(path, null) + "_parsed.dat";
@@ -56,7 +56,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
 
                 if (runParser)
                 {
-                    await packetParserService.RunParser(path, viewerSettings.Settings.Parser, DumpFormatType.UniversalProtoWithText, token, progress);
+                    await packetParserService.RunParser(path, viewerSettings.Settings.Parser, DumpFormatType.UniversalProtoWithText, customVersion, token, progress);
                     if (token.IsCancellationRequested)
                         File.Delete(parsedPath);
                 }

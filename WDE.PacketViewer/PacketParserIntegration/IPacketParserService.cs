@@ -8,7 +8,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
     [UniqueProvider]
     public interface IPacketParserService
     {
-        Task RunParser(string input, ParserConfiguration config, DumpFormatType dumpType, CancellationToken token, IProgress<float> progress);
+        Task RunParser(string input, ParserConfiguration config, DumpFormatType dumpType, int? customVersion, CancellationToken token, IProgress<float> progress);
     }
     
     public enum DumpFormatType

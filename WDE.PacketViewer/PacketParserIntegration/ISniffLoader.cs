@@ -7,6 +7,6 @@ namespace WDE.PacketViewer.PacketParserIntegration
 {
     public interface ISniffLoader
     {
-        Task<Packets> LoadSniff(string path, CancellationToken token, IProgress<float> progress);
+        Task<Packets> LoadSniff(string path, int? customVersion, CancellationToken token, IProgress<float> progress);
     }
 }
