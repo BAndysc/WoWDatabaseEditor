@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
@@ -18,15 +19,8 @@ namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
     public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector>,
-        IPacketTextDumper, ITwoStepPacketBoolProcessor
+        IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor
     {
-        private class Entity
-        {
-            public Dictionary<string, long> Ints { get; } = new();
-            public Dictionary<string, float> Floats { get; } = new();
-            public Dictionary<string, UniversalGuid> Guids { get; } = new();
-        }
-
         private readonly IDatabaseProvider databaseProvider;
         private readonly IDbcStore dbcStore;
         private readonly ISpellStore spellStore;
@@ -34,6 +28,8 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly IWaypointProcessor waypointProcessor;
         private readonly IChatEmoteSoundProcessor chatProcessor;
         private readonly IRandomMovementDetector randomMovementDetector;
+        private readonly ISpellService spellService;
+        private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly StringBuilder sb;
         private readonly TextWriter writer;
@@ -44,8 +40,6 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly Dictionary<UniversalGuid, Dictionary<int, uint>> auras = new();
         private readonly Dictionary<uint, Dictionary<uint, string>> gossips = new();
 
-        private readonly Dictionary<UniversalGuid, Entity> entities = new();
-
         private IParameter<long> unitFlagsParameter;
         private IParameter<long> unitFlags2Parameter;
         private IParameter<long> factionParameter;
@@ -53,6 +47,8 @@ namespace WDE.PacketViewer.Processing.Processors
         private IParameter<long> npcFlagsParameter;
         private IParameter<long> gameobjectBytes1Parameter;
         private IParameter<long>[] unitBytesParameters = new IParameter<long>[3];
+
+        public bool RequiresSplitUpdateObject => true;
         
         public StoryTellerDumper(IDatabaseProvider databaseProvider, 
             IDbcStore dbcStore,
@@ -61,6 +57,8 @@ namespace WDE.PacketViewer.Processing.Processors
             IWaypointProcessor waypointProcessor,
             IChatEmoteSoundProcessor chatProcessor,
             IRandomMovementDetector randomMovementDetector,
+            ISpellService spellService,
+            IUpdateObjectFollower updateObjectFollower,
             HighLevelUpdateDump highLevelUpdateDump) : base(waypointProcessor, chatProcessor, randomMovementDetector)
         {
             this.databaseProvider = databaseProvider;
@@ -70,6 +68,8 @@ namespace WDE.PacketViewer.Processing.Processors
             this.waypointProcessor = waypointProcessor;
             this.chatProcessor = chatProcessor;
             this.randomMovementDetector = randomMovementDetector;
+            this.spellService = spellService;
+            this.updateObjectFollower = updateObjectFollower;
             this.highLevelUpdateDump = highLevelUpdateDump;
             unitFlagsParameter = parameterFactory.Factory("UnitFlagParameter");
             unitFlags2Parameter = parameterFactory.Factory("UnitFlags2Parameter");
@@ -227,27 +227,33 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             if (!auras.ContainsKey(packet.Unit))
                 auras[packet.Unit] = new Dictionary<int, uint>();
-            AppendLine(basePacket, NiceGuid(packet.Unit) + " auras update:");
+            SetAppendOnNext(NiceGuid(packet.Unit) + " auras update:");
             foreach (var update in packet.Updates)
             {
                 if (update.Remove && auras[packet.Unit].ContainsKey(update.Slot))
                 {
-                    AppendLine(basePacket,
+                    if (spellService.Exists(auras[packet.Unit][update.Slot]))
+                        AppendLine(basePacket,
                         "    removed aura: " + GetSpellName(auras[packet.Unit][update.Slot]));
                     auras[packet.Unit].Remove(update.Slot);
                 }
                 else if (!update.Remove)
                 {
                     auras[packet.Unit][update.Slot] = update.Spell;
-                    AppendLine(basePacket,
-                        "    applied aura: " + GetSpellName(auras[packet.Unit][update.Slot]));
+                    
+                    if (spellService.Exists(update.Spell))
+                        AppendLine(basePacket, "    applied aura: " + GetSpellName(update.Spell));
                 }
             }
+            SetAppendOnNext(null);
             return base.Process(basePacket, packet);
         }
 
         protected override bool Process(PacketBase basePacket, PacketSpellGo packet)
         {
+            if (!spellService.Exists(packet.Data.Spell))
+                return false;
+            
             string targetLine = "";
             int targetCount = packet.Data.HitTargets.Count;
 
@@ -304,7 +310,13 @@ namespace WDE.PacketViewer.Processing.Processors
             var template = databaseProvider.GetQuestTemplate(questId);
             return (template == null ? questId.ToString() : $"{template.Name} ({questId})");
         }
-        
+
+        protected override bool Process(PacketBase basePacket, PacketClientUseGameObject packet)
+        {
+            AppendLine(basePacket, "Player uses gameobject: " + NiceGuid(packet.GameObject));
+            return base.Process(basePacket, packet);
+        }
+
         protected override bool Process(PacketBase basePacket, PacketQuestGiverAcceptQuest packet)
         {
             AppendLine(basePacket, "Player accepts quest: " + GetQuestName(packet.QuestId));
@@ -489,7 +501,6 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
-                entities.Remove(destroyed.Guid);
                 AppendLine(basePacket, "Destroyed " + NiceGuid(destroyed.Guid));
             }
 
@@ -497,7 +508,6 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (destroyed.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
-                entities.Remove(destroyed.Guid);
                 AppendLine(basePacket, "Out of range: " + NiceGuid(destroyed.Guid));
             }
 
@@ -505,15 +515,8 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (created.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
-                var entity = new Entity();
-                foreach (var pair in created.Values.Ints)
-                    entity.Ints[pair.Key] = RemoveUselessFlag(pair.Key, pair.Value);
-                foreach (var pair in created.Values.Floats)
-                    entity.Floats[pair.Key] = pair.Value;
-                foreach (var pair in created.Values.Guids)
-                    entity.Guids[pair.Key] = pair.Value;
                 SetAppendOnNext("Created " + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation));
-                PrintValues(basePacket, created.Guid, created.Values, null, false);
+                PrintValues(basePacket, created.Guid, created.Values, false);
                 SetAppendOnNext(null);
             }
             
@@ -521,9 +524,22 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (updated.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
-                entities.TryGetValue(updated.Guid, out var entity);
+                if (updated.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var unitFlags))
+                {
+                    long old = 0;
+                    updateObjectFollower.TryGetIntOrDefault(updated.Guid, "updateObjectFollower", out old);
+
+                    var inCombat = (unitFlags & (long)GameDefines.UnitFlags.InCombat) > 0;
+                    var wasInCombat = (old & (long)GameDefines.UnitFlags.InCombat) > 0;
+                    
+                    if (wasInCombat && !inCombat)
+                        AppendLine(basePacket, NiceGuid(updated.Guid) + " exits combat");
+                    else if (!wasInCombat && inCombat)
+                        AppendLine(basePacket, NiceGuid(updated.Guid) + " enters combat");
+                }
+                
                 SetAppendOnNext("Updated " + NiceGuid(updated.Guid));
-                PrintValues(basePacket, updated.Guid, updated.Values, entity, true);
+                PrintValues(basePacket, updated.Guid, updated.Values, true);
                 SetAppendOnNext(null);
             }
             return base.Process(basePacket, packet);
@@ -567,29 +583,23 @@ namespace WDE.PacketViewer.Processing.Processors
             return string.Join(", ", flags);
         }
 
-        private void PrintValues(PacketBase basePacket, UniversalGuid guid, UpdateValues values, Entity? entity, bool isUpdate)
+        private void PrintValues(PacketBase basePacket, UniversalGuid guid, UpdateValues values, bool isUpdate)
         {
-            var newEntity = entity ?? new Entity();
-            if (entity == null)
-                entities[guid] = newEntity;
-            
             foreach (var val in values.Ints)
             {
-                var newValue = RemoveUselessFlag(val.Key, val.Value);
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
-                {
-                    newEntity.Ints[val.Key] = newValue;
                     continue;
-                }
+                var newValue = RemoveUselessFlag(val.Key, val.Value, guid);
 
-                if (entity == null || !entity.Ints.TryGetValue(val.Key, out var intValue))
+                if (!isUpdate || !updateObjectFollower.TryGetIntOrDefault(guid, val.Key, out var intValue))
                 {
                     var param = GetPrettyParameter(val.Key);
                     var stringValue = param == null ? "" : $" [{param.ToString(newValue)}]";
                     AppendLine(basePacket, $"     {val.Key} = {newValue}{stringValue}", true);
                 }
-                else if (intValue != newValue)
+                else if (RemoveUselessFlag(val.Key, intValue, guid) != newValue)
                 {
+                    intValue = RemoveUselessFlag(val.Key, intValue, guid);
                     var param = GetPrettyParameter(val.Key);
                     var oldStringValue = param == null ? "" : $" [{param.ToString(intValue)}]";
                     var newStringValue = param == null ? "" : $" [{param.ToString(newValue)}]";
@@ -603,37 +613,28 @@ namespace WDE.PacketViewer.Processing.Processors
                         AppendLine(basePacket, $"       -> {extra}", true);   
                     
                 }
-                newEntity.Ints[val.Key] = newValue;
             }
             
             foreach (var val in values.Floats)
             {
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
-                {
-                    newEntity.Floats[val.Key] = val.Value;
                     continue;
-                }
                 
-                if (entity == null || !entity.Floats.TryGetValue(val.Key, out var intValue))
+                if (!isUpdate || !updateObjectFollower.TryGetFloat(guid, val.Key, out var intValue))
                     AppendLine(basePacket, $"     {val.Key} = {val.Value}", true);
                 else if (Math.Abs(intValue - val.Value) > 0.01f)
                     AppendLine(basePacket, $"     {val.Key} = {val.Value} (old: {intValue})", true);
-                newEntity.Floats[val.Key] = val.Value;
             }
             
             foreach (var val in values.Guids)
             {
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
-                {
-                    newEntity.Guids[val.Key] = val.Value;
                     continue;
-                }
                 
-                if (entity == null || !entity.Guids.TryGetValue(val.Key, out var intValue))
+                if (!isUpdate || !updateObjectFollower.TryGetGuid(guid, val.Key, out var intValue))
                     AppendLine(basePacket, $"     {val.Key} = {val.Value}", true);
                 else if (!intValue.Equals(val.Value))
                     AppendLine(basePacket, $"     {val.Key} = {val.Value} (old: {intValue})", true);
-                newEntity.Guids[val.Key] = val.Value;
             }
         }
 
@@ -664,11 +665,13 @@ namespace WDE.PacketViewer.Processing.Processors
             return null;
         }
 
-        private long RemoveUselessFlag(string field, long value)
+        private long RemoveUselessFlag(string field, long value, UniversalGuid guid)
         {
             if (field == "UNIT_FIELD_FLAGS")
             {
                 value = value & ~ (uint)GameDefines.UnitFlags.ServerSideControlled;
+                if (guid.Type == UniversalHighGuid.Player)
+                    value = value & ~(uint)GameDefines.UnitFlags.Looting;
             }
 
             return value;
@@ -709,6 +712,19 @@ namespace WDE.PacketViewer.Processing.Processors
         public async Task<string> Generate()
         {
             return sb.ToString();
+        }
+
+        public override bool Process(PacketHolder packet)
+        {
+            var ret = base.Process(packet);
+            updateObjectFollower.Process(packet);
+            return ret;
+        }
+
+        public void ProcessUnfiltered(PacketHolder unfiltered)
+        {
+            if (unfiltered.KindCase == PacketHolder.KindOneofCase.UpdateObject)
+                updateObjectFollower.Process(unfiltered);
         }
     }
 }

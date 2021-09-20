@@ -1,10 +1,14 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Reflection;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -20,11 +24,19 @@ namespace WDE.PacketViewer.ViewModels
         private bool alwaysSplitUpdates;
         private bool wrapLines;
         private bool isModified;
+        private bool alwaysHidePlayerMovePackets;
+        private string defaultTestCasePath = "";
 
         public bool AlwaysSplitUpdates
         {
             get => alwaysSplitUpdates;
             set => SetProperty(ref alwaysSplitUpdates, value);
+        }
+
+        public bool AlwaysHidePlayerMovePackets
+        {
+            get => alwaysHidePlayerMovePackets;
+            set => SetProperty(ref alwaysHidePlayerMovePackets, value);
         }
 
         public bool WrapLines
@@ -37,11 +49,16 @@ namespace WDE.PacketViewer.ViewModels
 
         public ObservableCollection<ParserSettingViewModel> ParserSettings { get; } = new();
 
-        public PacketViewerConfigurationViewModel(IPacketViewerSettings settings, INativeTextDocument nativeText)
+        public PacketViewerConfigurationViewModel(IPacketViewerSettings settings, 
+            INativeTextDocument nativeText, 
+            IWindowManager windowManager,
+            IUserSettings userSettings,
+            IntegrationTests.RelatedPacketsTester tester)
         {
             this.settings = settings;
             wrapLines = settings.Settings.WrapLines;
             alwaysSplitUpdates = settings.Settings.AlwaysSplitUpdates;
+            alwaysHidePlayerMovePackets = settings.Settings.AlwaysHidePlayerMovePackets;
             DefaultFilterText = nativeText;
             DefaultFilterText.FromString(settings.Settings.DefaultFilter ?? "");
 
@@ -68,6 +85,21 @@ namespace WDE.PacketViewer.ViewModels
                 AutoDispose(setting.ToObservable(t => t.StringValue).SubscribeAction(_ => IsModified = true));
             }
 
+            defaultTestCasePath = userSettings.Get<PacketsIntegrationTestSettings>().DefaultTestPath;
+            RunTestsCommand = new AsyncAutoCommand(async () =>
+            {
+                var path = defaultTestCasePath;
+                if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                {
+                    path = await windowManager.ShowOpenFileDialog("Test case (.json)|json");
+                    if (path != null)
+                        userSettings.Update(new PacketsIntegrationTestSettings(){DefaultTestPath = path});
+                    DefaultTestCasePath = path ?? "";
+                }
+                if (path != null)
+                    await tester.RunTests(path);
+            });
+
             Save = new DelegateCommand(() =>
             {
                 var parser = ParserConfiguration.Defaults;
@@ -79,12 +111,14 @@ namespace WDE.PacketViewer.ViewModels
                     AlwaysSplitUpdates = AlwaysSplitUpdates,
                     WrapLines = WrapLines,
                     DefaultFilter = string.IsNullOrEmpty(defaultFilter) ? null : defaultFilter,
+                    AlwaysHidePlayerMovePackets = alwaysHidePlayerMovePackets,
                     Parser = parser
                 };
                 IsModified = false;
             });
             On(() => WrapLines, _ => IsModified = true);
             On(() => AlwaysSplitUpdates, _ => IsModified = true);
+            On(() => AlwaysHidePlayerMovePackets, _ => IsModified = true);
 
             IsModified = false;
         }
@@ -95,6 +129,19 @@ namespace WDE.PacketViewer.ViewModels
             set => SetProperty(ref isModified, value);
         }
 
+        public string DefaultTestCasePath
+        {
+            get => defaultTestCasePath;
+            set => SetProperty(ref defaultTestCasePath, value);
+        }
+
+        #if DEBUG
+        public bool IsDebugBuild => true;
+        #else
+        public bool IsDebugBuild => false;
+        #endif
+        
+        public ICommand RunTestsCommand { get; }
         public ICommand Save { get; }
         public string Name => "Packet viewer";
         public string? ShortDescription =>
@@ -167,5 +214,10 @@ namespace WDE.PacketViewer.ViewModels
         }
 
         public override string StringValue => Value ? "true" : "false";
+    }
+
+    public struct PacketsIntegrationTestSettings : ISettings
+    {
+        public string DefaultTestPath { get; set; }
     }
 }

@@ -16,6 +16,32 @@
     <controls:ToolbarPanel DockPanel.Dock="Top"
                            IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}">
         <components:ButtonImage ToolTip.Tip="Saves to text file filtered packets" Command="{Binding SaveToFileCommand}" Image="icons/icon_save_to_txt.png" />
+
+        <ToggleButton ToolTip.Tip="Find" IsChecked="{Binding FindPanelEnabled, Mode=TwoWay}">
+            <components:WdeImage ImageUri="icons/icon_find.png" />
+        </ToggleButton>
+        
+        <Border Width="15" />
+
+        <components:ButtonImage ToolTip.Tip="Select previous packet&#xA;&#xA;Shortcut: Control + Z" Command="{Binding UndoCommand}" Image="icons/icon_left.png" />
+
+        <components:ButtonImage ToolTip.Tip="Select next packet&#xA;&#xA;Shortcut: Control + Y" Command="{Binding RedoCommand}" Image="icons/icon_right.png" />
+        
+        <components:ButtonImage ToolTip.Tip="Go to packet&#xA;&#xA;Shortcut: Control + G" Image="icons/icon_goto_packet.png" Command="{Binding GoToPacketCommand}" />
+        
+        <ToggleButton ToolTip.Tip="Toggle 'reason panel' visibility. This panel shows what is most likely trigger of the action inside the packet." IsChecked="{Binding ReasonPanelVisibility, Mode=TwoWay}">
+            <components:WdeImage ImageUri="icons/icon_bulb.png" />
+        </ToggleButton>
+        
+        <ToggleButton ToolTip.Tip="Wrap/don't wrap lines in the preview" IsChecked="{Binding WrapLines, Mode=TwoWay}">
+            <components:WdeImage ImageUri="icons/icon_word_wrap.png" />
+        </ToggleButton>
+
+        <ToggleButton ToolTip.Tip="Temporarily disable filters" IsChecked="{Binding DisableFilters, Mode=TwoWay}">
+            <components:WdeImage ImageUri="icons/icon_filters_disable.png" />
+        </ToggleButton>
+        
+        <Border Width="15" />
         
         <controls:DropDownButton>
             <controls:DropDownButton.Button>
@@ -49,14 +75,11 @@
             </StackPanel>
         </controls:DropDownButton>
         
-        <ToggleButton ToolTip.Tip="Wrap/don't wrap lines in the preview" IsChecked="{Binding WrapLines, Mode=TwoWay}">
-            <components:WdeImage ImageUri="icons/icon_word_wrap.png" />
-        </ToggleButton>
-        
-        <components:ButtonImage ToolTip.Tip="Go to packet" Image="icons/icon_goto_packet.png" Command="{Binding GoToPacketCommand}" />
-        
         <controls:ToolbarSpacer />
 
+        <CheckBox ToolTip.Tip="If enabled, CMSG_MOVE* and SMSG_MOVE* packets will be hidden. Note: SMSG_ON_MONSTER_MOVE will be still displayed." 
+                  IsChecked="{Binding HidePlayerMove}">Hide player MOVE</CheckBox>
+                  
         <CheckBox ToolTip.Tip="If enabled, UPDATE_OBJECT packets will be split for each update, what makes filtering way easier (because you can filter individual updates)." 
                   IsChecked="{Binding SplitUpdate}">Split UPDATE_OBJECT</CheckBox>
         

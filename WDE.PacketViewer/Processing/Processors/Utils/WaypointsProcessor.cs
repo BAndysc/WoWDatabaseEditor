@@ -15,6 +15,7 @@ namespace WDE.PacketViewer.Processing.Processors
     public interface IWaypointProcessor : IPacketProcessor<bool>
     {
         Dictionary<UniversalGuid, UnitMovementState> State { get; }
+        int? GetOriginalSpline(int packetNumber);
         
         public class UnitMovementState
         {
@@ -85,7 +86,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (unit.Value.Paths.Count == 0)
                     continue;
 
-                sb.AppendLine("Creature " + unit.Key.ToHexString() + $" (entry: {unit.Key.Entry})");
+                sb.AppendLine("Creature " + unit.Key.ToWowParserString() + $" (entry: {unit.Key.Entry})");
                 int i = 0;
                 foreach (var path in unit.Value.Paths)
                 {
@@ -111,6 +112,7 @@ namespace WDE.PacketViewer.Processing.Processors
     [AutoRegister]
     public class WaypointsProcessor : PacketProcessor<bool>, IWaypointProcessor
     {
+        private Dictionary<int, int> PacketToOriginalSplinePacket { get; } = new();
         public Dictionary<UniversalGuid, IWaypointProcessor.UnitMovementState> State { get; } = new();
 
         private IWaypointProcessor.UnitMovementState Get(UniversalGuid guid)
@@ -147,6 +149,7 @@ namespace WDE.PacketViewer.Processing.Processors
             else if (state.Paths.Count > 0 && timeSinceLastMovement.TotalMilliseconds < state.LastMoveTime)
             {
                 Debug.Assert(state.LastSegment != null);
+                PacketToOriginalSplinePacket[basePacket.Number] = state.Paths[^1].FirstPacketNumber;
 
                 var howManyFinished = timeSinceLastMovement.TotalMilliseconds / state.LastMoveTime;
 
@@ -203,9 +206,9 @@ namespace WDE.PacketViewer.Processing.Processors
                 Debug.Assert(packet.Points.Count == 1);
                 state.Paths[^1].Segments[^1].Waypoints.Add(packet.Points[0]);
             }
-            else if (packet.Points.Count == 1)
+            else if (packet.Points.Count >= 1)
             {
-                state.Paths[^1].Segments[^1].Waypoints.Add(packet.Points[0]);
+                state.Paths[^1].Segments[^1].Waypoints.AddRange(packet.Points);
             }
 
             state.LastMovement = basePacket.Time.ToDateTime();
@@ -219,16 +222,23 @@ namespace WDE.PacketViewer.Processing.Processors
             foreach (var create in packet.Created)
             {
                 if (create.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var flags))
-                    Get(create.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.UnitFlagInCombat) == (uint)GameDefines.UnitFlags.UnitFlagInCombat;
+                    Get(create.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
             }
             
             foreach (var update in packet.Updated)
             {
                 if (update.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var flags))
-                    Get(update.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.UnitFlagInCombat) == (uint)GameDefines.UnitFlags.UnitFlagInCombat;
+                    Get(update.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
             }
 
             return true;
+        }
+        
+        public int? GetOriginalSpline(int packetNumber)
+        {
+            if (PacketToOriginalSplinePacket.TryGetValue(packetNumber, out var original))
+                return original;
+            return null;
         }
     }
 }

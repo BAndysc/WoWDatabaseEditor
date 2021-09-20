@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using WDE.Common.Database;
+using WDE.Module.Attributes;
 using WDE.PacketViewer.Processing.Processors;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.ViewModels
 {
+    [AutoRegister]
     public class PacketViewModelFactory : IPacketProcessor<PacketViewModel>
     {
         private readonly IDatabaseProvider databaseProvider;
@@ -27,6 +29,8 @@ namespace WDE.PacketViewer.ViewModels
         {
             if (packet.KindCase == PacketHolder.KindOneofCase.PlayerLogin)
                 playerGuid = packet.PlayerLogin.PlayerGuid;
+            else if (playerGuid == null && packet.KindCase == PacketHolder.KindOneofCase.ClientMove)
+                playerGuid = packet.ClientMove.Mover;
             
             if (packet.KindCase == PacketHolder.KindOneofCase.QueryGameObjectResponse)
                 gameobjectNames[packet.QueryGameObjectResponse.Entry] = packet.QueryGameObjectResponse.Name;
@@ -46,11 +50,25 @@ namespace WDE.PacketViewer.ViewModels
                 if (guid.Type == UniversalHighGuid.Creature ||
                     guid.Type == UniversalHighGuid.Pet ||
                     guid.Type == UniversalHighGuid.Vehicle)
-                    creatureNames.TryGetValue(entry, out name);
+                {
+                    if (!creatureNames.TryGetValue(entry, out name))
+                    {
+                        var template = databaseProvider.GetCreatureTemplate(entry);
+                        if (template != null)
+                            name = creatureNames[entry] = template.Name;
+                    }
+                }
                 else if (guid.Type == UniversalHighGuid.GameObject ||
                          guid.Type == UniversalHighGuid.WorldTransaction ||
                          guid.Type == UniversalHighGuid.Transport)
-                    gameobjectNames.TryGetValue(entry, out name);
+                {
+                    if (!gameobjectNames.TryGetValue(entry, out name))
+                    {
+                        var template = databaseProvider.GetGameObjectTemplate(entry);
+                        if (template != null)
+                            name = gameobjectNames[entry] = template.Name;
+                    }
+                }
                 else if (guid.Type == UniversalHighGuid.Player)
                 {
                     if (playerNames.TryGetValue(guid, out var playerName))
@@ -82,7 +100,7 @@ namespace WDE.PacketViewer.ViewModels
             if (guid != null && playerGuid != null && guid.Equals(playerGuid))
                 name = "You";
             
-            return new PacketViewModel(packet, entry, name);
+            return new PacketViewModel(packet, entry, guid, name);
         }
     }
 }

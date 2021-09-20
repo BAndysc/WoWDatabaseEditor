@@ -1,12 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using WDE.Module.Attributes;
 using WDE.PacketViewer.Utils;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
-    public class UnitPositionFollower : PacketProcessor<bool>
+    [UniqueProvider]
+    public interface IUnitPositionFollower : IPacketProcessor<bool>
+    {
+        Vec3? GetPosition(UniversalGuid? guid, DateTime currentTime);
+    }
+
+    [AutoRegister]
+    public class UnitPositionFollower : PacketProcessor<bool>, IUnitPositionFollower
     {
         private Dictionary<UniversalGuid, State> states = new();
 
@@ -23,7 +32,7 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             if (states.TryGetValue(guid, out var state))
                 return state;
-            return states[guid] = new();
+            return states[guid] = new(){ IsDestroyed = false };
         }
 
         public Vec3? GetPosition(UniversalGuid? guid, DateTime currentTime)
@@ -47,6 +56,13 @@ namespace WDE.PacketViewer.Processing.Processors
             return lerp;
         }
 
+        protected override bool Process(PacketBase basePacket, PacketClientMove packet)
+        {
+            var state = GetState(packet.Mover);
+            state.CurrentPosition = new Vec3() { X = packet.Position.X, Y = packet.Position.Y, Z = packet.Position.Z };
+            return base.Process(basePacket, packet);
+        }
+
         protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
         {
             var state = GetState(packet.Mover);
@@ -63,28 +79,37 @@ namespace WDE.PacketViewer.Processing.Processors
             return base.Process(basePacket, packet);
         }
 
+        private List<UniversalGuid> toDestroy = new();
+
         protected override bool Process(PacketBase basePacket, PacketUpdateObject packet)
         {
+            if (toDestroy.Count > 0)
+            {
+                // we are destroying object with delay, so that other packets could still use its position
+                foreach (var destroyed in toDestroy)
+                {
+                    var state = GetState(destroyed);
+                    state.IsDestroyed = true;
+                }
+                toDestroy.Clear();
+            }
+            
             if (packet.Created != null)
             {
                 foreach (var create in packet.Created)
                 {
-                    if (create.Movement?.Position == null)
+                    if (create.Movement?.Position == null && create.Stationary?.Position == null)
                         continue;
                     
                     var state = GetState(create.Guid);
                     state.IsDestroyed = false;
-                    state.CurrentPosition = create.Movement.Position;
+                    state.CurrentPosition = (create.Movement?.Position ?? create.Stationary?.Position)!;
                 }
             }
             
             if (packet.Destroyed != null)
             {
-                foreach (var destroyed in packet.Destroyed)
-                {
-                    var state = GetState(destroyed.Guid);
-                    state.IsDestroyed = true;
-                }
+                toDestroy.AddRange(packet.Destroyed.Select(s => s.Guid));
             }
 
             if (packet.OutOfRange != null)

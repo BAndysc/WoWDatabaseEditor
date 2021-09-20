@@ -7,9 +7,12 @@
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:codeCompletion="clr-namespace:AvaloniaEdit.CodeCompletion;assembly=AvaloniaEdit"
              xmlns:views="clr-namespace:WDE.PacketViewer.Avalonia.Views"
+             d:DataContext="{d:DesignInstance viewModels:PacketDocumentViewModel, IsDesignTimeCreatable=False}"
              xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="Root"
              x:Class="WDE.PacketViewer.Avalonia.Views.PacketDocumentView">
     <UserControl.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
@@ -18,7 +21,14 @@
         <converters:BoolToScrollBarVisibilityConverter x:Key="BoolToScrollBarVisibilityConverter" WhenTrue="Disabled" WhenFalse="Auto"/>
         <views:EntryToNiceBackgroundConverter x:Key="EntryToNiceBackgroundConverter" />
     </UserControl.Resources>
+    <UserControl.KeyBindings>
+        <KeyBinding Command="{Binding GoToPacketCommand}" Gesture="Ctrl+G" />
+        <KeyBinding Command="{Binding GoToPacketCommand}" Gesture="Cmd+G" />
+        <KeyBinding Command="{Binding ToggleFindCommand}" Gesture="Ctrl+F" />
+        <KeyBinding Command="{Binding ToggleFindCommand}" Gesture="Cmd+F" />
+    </UserControl.KeyBindings>
     <UserControl.Styles>
+        <StyleInclude Source="avares://WDE.PacketViewer.Avalonia/Views/SearchControl.axaml" />
         <Style Selector="codeCompletion|CompletionList TextBlock">
             <Setter Property="Foreground" Value="Black" />
         </Style>
@@ -78,90 +88,227 @@
         </Style>
     </UserControl.Styles>
     
-    <DockPanel LastChildFill="True">
-        <!-- Toolbar -->
-        <Grid ColumnDefinitions="*,5,*"
-              IsEnabled="{Binding LoadingInProgress, Converter={StaticResource InversedBoolConverter}}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" MinHeight="30" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <!-- Filter bar -->
-                <DockPanel LastChildFill="True" DockPanel.Dock="Top" Margin="0,5,0,0">
-                    <ComboBox Classes="ComboDropDown" Margin="0,0,5,0" VerticalAlignment="Stretch"
-                              Width="32"
-                              DockPanel.Dock="Left" Items="{Binding MostRecentlySearched}"
-                              SelectedItem="{Binding MostRecentlySearchedItem}" />
-                    <Panel>
-                        <views:FilterTextEditor Document="{Binding FilterText, Converter={StaticResource DocumentConverter}}"
-                                            BorderThickness="0"
-                                            Background="Transparent"
-                                            Padding="0"
-                                            Name="TextEditor" />
-                        <TextBlock FontFamily="Consolas,Menlo,Courier,Courier New" 
-                                   IsVisible="{Binding #TextEditor.Document.TextLength, Converter={StaticResource IntToBoolConverter}}"
-                                   Opacity="0.5"
-                                   IsHitTestVisible="False"
-                                   FontStyle="Italic">Filter packets... e.g. packet.opcode == SMSG.SPELL_START</TextBlock>
-                    </Panel>
-                </DockPanel>
-                <GridSplitter Grid.Row="1" />
-                
-                <!-- packets view -->
-                <DockPanel LastChildFill="True" Grid.Row="2">
-                    <ProgressBar Height="2"
-                                 Minimum="0"
-                                 Maximum="100"
-                                 IsIndeterminate="{Binding ProgressUnknown}"
-                                 DockPanel.Dock="Bottom"
-                                 Value="{Binding FilteringProgress, Mode=OneWay}"
-                                 IsVisible="{Binding FilteringInProgress}" />
-                    <controls:GridView Items="{Binding FilteredPackets}"
-                                       SelectedItem="{Binding SelectedPacket, Mode=TwoWay}"
-                                       IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch">
-                        <controls:GridView.Columns>
-                            <controls:GridColumnDefinition Name="Id"
-                                                           Property="Id"
-                                                           PreferedWidth="50" />
-                            <controls:GridColumnDefinition Name="Opcode"
-                                                           Property="Opcode"
-                                                           PreferedWidth="150" />
-                            <controls:GridColumnDefinition Name="Diff (ms)"
-                                                           Property="Diff"
-                                                           PreferedWidth="90" />
-                            <controls:GridColumnDefinition Name="Entry"
-                                                           Property="Entry"
-                                                           PreferedWidth="70" />
-                            <controls:GridColumnDefinition Name="Object name"
-                                                           Property="ObjectName"
-                                                           PreferedWidth="160" />
-                        </controls:GridView.Columns>
-                        <controls:GridView.Styles>
-                            <Style Selector="ListBoxItem">
-                                <Setter Property="Background" Value="{Binding Entry, Converter={StaticResource EntryToNiceBackgroundConverter}}"></Setter>
-                            </Style>
-                        </controls:GridView.Styles>
-                    </controls:GridView>
-                </DockPanel>
-            </Grid>
-            <GridSplitter Grid.Column="1" />
+    <Panel>
+        <DockPanel LastChildFill="True" >
+            <!-- search panel -->
+            <views:SearchControl  DockPanel.Dock="Top" 
+                                  FindPreviousCommand="{Binding FindPreviousCommand}"
+                                  FindNextCommand="{Binding FindNextCommand}"
+                                  IsVisible="{Binding FindPanelEnabled}"
+                                  IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}"
+                                  CloseCommand="{Binding CloseFindCommand}" />
             
-            <!-- text view -->
-            <avaloniaEdit:TextEditor
-                Grid.Column="2"
-                BorderThickness="0"
-                Padding="2"
-                Document="{Binding SelectedPacketPreview, Converter={StaticResource DocumentConverter}}"
-                ShowLineNumbers="True"
-                HorizontalScrollBarVisibility="{Binding WrapLines, Converter={StaticResource BoolToScrollBarVisibilityConverter}}"
-                VerticalScrollBarVisibility="Auto"
-                controls1:AvalonEditExtra.Syntax="Resources/PacketTextViewSyntax.xml"
-                Name="PacketPreview"
-                FontFamily="Consolas,Menlo,Courier,Courier New" />
-        </Grid>
-    </DockPanel>
+            <Grid ColumnDefinitions="*,5,*" 
+                  IsEnabled="{Binding LoadingInProgress, Converter={StaticResource InversedBoolConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" MinHeight="30" />
+                        <RowDefinition Height="5" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <!-- Filter bar -->
+                    <DockPanel LastChildFill="True" DockPanel.Dock="Top" Margin="0,5,0,0">
+                        <ComboBox Classes="ComboDropDown" Margin="0,0,5,0" VerticalAlignment="Stretch"
+                                  Width="32"
+                                  DockPanel.Dock="Left" Items="{Binding MostRecentlySearched}"
+                                  SelectedItem="{Binding MostRecentlySearchedItem}" />
+                        <Button DockPanel.Dock="Right" Command="{Binding OpenFilterDialogCommand}">
+                            <components:WdeImage ImageUri="icons/icon_filter.png" Width="24" Height="24" />
+                        </Button>
+                        <Panel>
+                            <views:FilterTextEditor Document="{Binding FilterText, Converter={StaticResource DocumentConverter}}"
+                                                BorderThickness="0"
+                                                Background="Transparent"
+                                                Padding="0"
+                                                Name="TextEditor" />
+                            <TextBlock FontFamily="Consolas,Menlo,Courier,Courier New" 
+                                       IsVisible="{Binding #TextEditor.Document.TextLength, Converter={StaticResource IntToBoolConverter}}"
+                                       Opacity="0.5"
+                                       IsHitTestVisible="False"
+                                       FontStyle="Italic">Filter packets... e.g. packet.opcode == SMSG.SPELL_START</TextBlock>
+                        </Panel>
+                    </DockPanel>
+                    <GridSplitter Grid.Row="1" />
+                    
+                    <!-- packets view -->
+                    <DockPanel LastChildFill="True" Grid.Row="2">
+                        <ProgressBar Height="2"
+                                     Minimum="0"
+                                     Maximum="100"
+                                     IsIndeterminate="{Binding ProgressUnknown}"
+                                     DockPanel.Dock="Bottom"
+                                     Value="{Binding FilteringProgress, Mode=OneWay}"
+                                     IsVisible="{Binding FilteringInProgress}" />
+                        <controls:GridView Items="{Binding VisiblePackets}"
+                                           SelectedItem="{Binding SelectedPacket, Mode=TwoWay}"
+                                           IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch">
+                            <controls:GridView.Columns>
+                                <controls:GridColumnDefinition Name="Id"
+                                                               Property="Id"
+                                                               PreferedWidth="50" />
+                                <controls:GridColumnDefinition Name="Opcode"
+                                                               Property="Opcode"
+                                                               PreferedWidth="150" />
+                                <controls:GridColumnDefinition Name="Diff (ms)"
+                                                               Property="Diff"
+                                                               PreferedWidth="90" />
+                                <controls:GridColumnDefinition Name="Entry"
+                                                               Property="Entry"
+                                                               PreferedWidth="70" />
+                                <controls:GridColumnDefinition Name="Object name"
+                                                               Property="ObjectName"
+                                                               PreferedWidth="160" />
+                            </controls:GridView.Columns>
+                            <controls:GridView.Styles>
+                                <Style Selector="ListBoxItem:selected TextBlock">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </Style>
+                                <Style Selector="ListBoxItem">
+                                    <Setter Property="Background" Value="{Binding Entry, Converter={StaticResource EntryToNiceBackgroundConverter}}" />
+                                    <Setter Property="ContextFlyout">
+                                        <Setter.Value>
+                                            <MenuFlyout>
+                                                <MenuItem Header="Exclude entry" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeEntryCommand}" />
+                                                <MenuItem Header="Include entry" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeEntryCommand}" />
+                                                <Separator />
+                                                <MenuItem Header="Exclude guid" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeGuidCommand}" />
+                                                <MenuItem Header="Include guid" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeGuidCommand}" />
+                                                <Separator />
+                                                <MenuItem Header="Exclude opcode" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeOpcodeCommand}" />
+                                                <MenuItem Header="Include opcode" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeOpcodeCommand}" />
+                                                <Separator />
+                                                <MenuItem Header="Find related packets" Command="{Binding #Root.DataContext.FindRelatedPacketsCommands}" />
+                                            </MenuFlyout>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </controls:GridView.Styles>
+                        </controls:GridView>
+                    </DockPanel>
+                </Grid>
+                
+                <GridSplitter Grid.Column="1" />
+                
+                <!-- right panel -->
+                <Grid Grid.Column="2" RowDefinitions="*,5,50" Name="RightPanel">
+                    <!-- text view -->
+                    <avaloniaEdit:TextEditor
+                        BorderThickness="0"
+                        Padding="2"
+                        Document="{Binding SelectedPacketPreview, Converter={StaticResource DocumentConverter}}"
+                        ShowLineNumbers="True"
+                        HorizontalScrollBarVisibility="{Binding WrapLines, Converter={StaticResource BoolToScrollBarVisibilityConverter}}"
+                        VerticalScrollBarVisibility="Auto"
+                        controls1:AvalonEditExtra.Syntax="Resources/PacketTextViewSyntax.xml"
+                        Name="PacketPreview"
+                        FontFamily="Consolas,Menlo,Courier,Courier New" />
+                    
+                    <GridSplitter Grid.Row="1" IsVisible="{Binding ReasonPanelVisibility}" />
+
+                    <!-- packet details -->
+                    <TabControl Grid.Row="2" IsVisible="{Binding ReasonPanelVisibility}">
+                        <TabItem Header="Reason predictions">
+                            <DockPanel>
+                                <controls:GroupingHeader GroupName="What are the possible reasons for sending the packet" DockPanel.Dock="Top" />
+                                <ListBox Items="{Binding Predictions}"
+                                         Name="ActionReasonsView">
+                                    <ListBox.Styles>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        </Style>
+                                    </ListBox.Styles>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel>
+                                                <TextBlock Margin="0,0,5,0" Text="{Binding PacketNumber}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
+                                                    <TextBlock Grid.Column="0" Text="{Binding Chance, StringFormat=Score: {0}}" DockPanel.Dock="Left" />
+                                                    <TextBlock Grid.Column="2" Padding="0,0,20,0" Text="{Binding Diff, StringFormat=Diff: {0} ms}" DockPanel.Dock="Right" />
+                                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" Opacity="0.6" Text="{Binding Description}" />
+                                                </Grid>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                    <Interaction.Behaviors>
+                                        <EventTriggerBehavior EventName="DoubleTapped">
+                                            <InvokeCommandAction CommandParameter="{Binding #ActionReasonsView.SelectedItem.PacketNumber, FallbackValue={x:Null}}" Command="{Binding JumpToPacketCommand}" />
+                                        </EventTriggerBehavior>
+                                    </Interaction.Behaviors>
+                                </ListBox>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="Possible actions">
+                            <DockPanel>
+                                <controls:GroupingHeader GroupName="What other packets may have been sent because of this packet" DockPanel.Dock="Top" />
+                                <ListBox Items="{Binding PossibleActions}"
+                                         Name="PossibleActionsView">
+                                    <ListBox.Styles>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        </Style>
+                                    </ListBox.Styles>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel>
+                                                <TextBlock Margin="0,0,5,0" Text="{Binding PacketNumber}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
+                                                    <TextBlock Grid.Column="0" Text="{Binding Chance, StringFormat=Score: {0}}" DockPanel.Dock="Left" />
+                                                    <TextBlock Grid.Column="2" Padding="0,0,20,0" Text="{Binding Diff, StringFormat=Diff: {0} ms}" DockPanel.Dock="Right" />
+                                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" Opacity="0.6" Text="{Binding Description}" />
+                                                </Grid>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                    <Interaction.Behaviors>
+                                        <EventTriggerBehavior EventName="DoubleTapped">
+                                            <InvokeCommandAction CommandParameter="{Binding #PossibleActionsView.SelectedItem.PacketNumber, FallbackValue={x:Null}}" Command="{Binding JumpToPacketCommand}" />
+                                        </EventTriggerBehavior>
+                                    </Interaction.Behaviors>
+                                </ListBox>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="Detected actions">
+                            <DockPanel>
+                                <controls:GroupingHeader GroupName="What actions have been detected in this packet" DockPanel.Dock="Top" />
+                                <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                                    <ScrollViewer.Styles>
+                                        <Style Selector="TextBlock">
+                                            <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                                        </Style>
+                                    </ScrollViewer.Styles>
+                                    <ItemsControl Items="{Binding DetectedActions}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                                                    <TextBlock Text="{Binding ActionKind, StringFormat=Action: {0}}" FontWeight="Bold" />
+                                                    <TextBlock Text="{Binding Description}" />
+                                                    <TextBlock IsVisible="{Binding MainActor, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                               Text="{Binding MainActor, StringFormat=Actor: {0}}" Opacity="0.6" />
+                                                    <TextBlock IsVisible="{Binding Location, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                               Text="{Binding Location, StringFormat=Position of action: {0}}" Opacity="0.6" />
+                                                    <TextBlock Text="Additional actors:" IsVisible="{Binding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}" />
+                                                    <ItemsPresenter IsVisible="{Binding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                                    Items="{Binding AdditionalActors}">
+                                                        <ItemsPresenter.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <StackPanel Margin="10,0,0,0 "/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsPresenter.ItemsPanel>
+                                                    </ItemsPresenter>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </DockPanel>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </Grid>
+        </DockPanel>
+            
+        <controls:TeachingTip IsOpened="{Binding ShowSplitUpdateTip}" VerticalAlignment="Bottom" Margin="20" Header="Split UPDATE_OBJECT">Important info: splitting update_object not only splits packets into many, but also renumber them and can change the order among packets sent in the same millisecond!&#xA;&#xA;Please note 'Number: ' in the text view is not updated tho!</controls:TeachingTip>
+    </Panel>
 </UserControl>

@@ -1,0 +1,163 @@
+<controls1:DialogViewBase xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
+                xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+                xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+                xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+                xmlns:converters="clr-namespace:WDE.PacketViewer.Avalonia.Views.Converters"
+                mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                Name="Root"
+                d:DataContext="{d:DesignInstance viewModels:PacketFilterDialogViewModel, IsDesignTimeCreatable=False}"
+                x:Class="WDE.PacketViewer.Avalonia.Views.PacketFilterDialogView">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="10">
+                <Expander Header="{Binding EntriesHeader}" HorizontalContentAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock TextWrapping="WrapWithOverflow">
+                            Comma separated list of entries. If "include entry" list is not empty, only packets with "included" entries will be displayed. If included is empty, all packets with those entries will be skipped (warning: some packets do not have entry in the viewer).
+                        </TextBlock>
+                        
+                        <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,*" MinHeight="300">
+                            <controls:GroupingHeader Grid.Row="0" Grid.Column="0" GroupName="Excluded" />
+                            <TextBox Grid.Row="1" Grid.Column="0"  Text="{Binding ExcludedEntries}" 
+                                     TextWrapping="WrapWithOverflow" 
+                                     VerticalContentAlignment="Top" 
+                                     AcceptsReturn="True" />
+
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" />
+                            
+                            <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
+                            <TextBox Grid.Row="1" Grid.Column="2"  Text="{Binding IncludedEntries}" 
+                                     TextWrapping="WrapWithOverflow" 
+                                     VerticalContentAlignment="Top" 
+                                     AcceptsReturn="True" />
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+                <Expander Header="{Binding OpcodesHeader}" HorizontalContentAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock TextWrapping="WrapWithOverflow">
+                            Comma separated list of opcodes. If included list is non empty, only packets with those opcodes will be displayed. If included is empty, all packets with opcodes in excluded list will be skipped.
+                        </TextBlock>
+                        
+                        <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,*" MinHeight="300">
+                            <controls:GroupingHeader Grid.Row="0" Grid.Column="0" GroupName="Excluded" />
+                            <TextBox Grid.Row="1" Grid.Column="0"  Text="{Binding ExcludedOpcodes}" 
+                                     TextWrapping="WrapWithOverflow" 
+                                     VerticalContentAlignment="Top" 
+                                     AcceptsReturn="True" />
+                    
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" />
+                            
+                            <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
+                            <TextBox Grid.Row="1" Grid.Column="2"  Text="{Binding IncludedOpcodes}" 
+                                     TextWrapping="WrapWithOverflow" 
+                                     VerticalContentAlignment="Top" 
+                                     AcceptsReturn="True" />
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+                <Expander Header="{Binding GuidsHeader}" HorizontalContentAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock TextWrapping="WrapWithOverflow">
+                            If included list is non empty, only packets with those GUIDs in them will be displayed. If included is empty, all packets with guid in excluded list will be skipped.
+                        </TextBlock>
+                        <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,*" MinHeight="300">
+                            <controls:GroupingHeader Grid.Row="0" Grid.Column="0" GroupName="Excluded" />
+                    
+                            <ListBox Grid.Row="1" Grid.Column="0"
+                                     SelectionMode="Multiple"
+                                     Items="{Binding  ExcludedGuids}">
+                                <ListBox.KeyBindings>
+                                    <KeyBinding Gesture="Back" Command="{Binding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Delete" Command="{Binding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                </ListBox.KeyBindings>
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="ContextFlyout">
+                                            <Setter.Value>
+                                                <MenuFlyout>
+                                                    <MenuItem Header="Delete" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.DeleteExcludedGuid}" />
+                                                </MenuFlyout>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.Styles>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ., Converter={x:Static converters:UniversalGuidToHexConverter.Instance}}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                    
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" />
+                            
+                            <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
+                    
+                            <ListBox Grid.Row="1" Grid.Column="2"
+                                     SelectionMode="Multiple"
+                                     Items="{Binding IncludedGuids}">
+                                <ListBox.KeyBindings>
+                                    <KeyBinding Gesture="Back" Command="{Binding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Delete" Command="{Binding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                </ListBox.KeyBindings>
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="ContextFlyout">
+                                            <Setter.Value>
+                                                <MenuFlyout>
+                                                    <MenuItem Header="Delete" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.DeleteIncludedGuid}" />
+                                                </MenuFlyout>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.Styles>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ., Converter={x:Static converters:UniversalGuidToHexConverter.Instance}}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+                
+                <Expander Header="Min-max packet number" HorizontalContentAlignment="Stretch">
+                    <StackPanel>
+                        <TextBlock TextWrapping="WrapWithOverflow">
+                            Minimum and maximum packet number to include in the list.
+                        </TextBlock>
+                        <Grid ColumnDefinitions="Auto,5,*,20,Auto,5,*">
+                            <CheckBox IsChecked="{Binding HasMinPacketNumber}" />
+                            <TextBox Text="{Binding MinPacketNumber}" IsEnabled="{Binding HasMinPacketNumber}" Grid.Column="2" />
+                        
+                            <CheckBox IsChecked="{Binding HasMaxPacketNumber}" Grid.Column="4" />
+                            <TextBox Text="{Binding MaxPacketNumber}" IsEnabled="{Binding HasMaxPacketNumber}" Grid.Column="6" />
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+                
+                <Expander Header="Force include packet numbers" HorizontalContentAlignment="Stretch">
+                    <Grid MinHeight="250" RowDefinitions="Auto,*">
+                        <TextBlock TextWrapping="WrapWithOverflow">
+                            Comma separated list of packet numbers that will be included, even if other conditions fail.
+                        </TextBlock>
+                        <TextBox Text="{Binding CommaSeparatedPackets}" TextWrapping="WrapWithOverflow" VerticalContentAlignment="Top" AcceptsReturn="True" Grid.Row="1" />
+                    </Grid>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding Cancel}"  Content="Cancel" />
+            <Button Command="{Binding Accept}" Grid.Column="2" Content="Ok" />
+        </Grid>
+    </Grid>
+</controls1:DialogViewBase>

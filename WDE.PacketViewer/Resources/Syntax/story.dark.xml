@@ -13,7 +13,7 @@
             After\s*(\d)+\s*ms
         </Rule>
         <Rule color="Coords">
-            \(\d+\.\d+,\s*\d+\.\d+,\s*\d+\.\d+\)
+            \(-?\d+\.\d+,\s*-?\d+\.\d+,\s*-?\d+\.\d+\)
         </Rule>
         <Rule color="Punctuation">
             [?,.;()\[\]{}+\-/%*&lt;&gt;^=~!&amp;]+

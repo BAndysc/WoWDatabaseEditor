@@ -110,6 +110,21 @@ namespace WDE.PacketViewer.Processing.Processors
             return packet.QuestGiver;
         }
 
+        protected override UniversalGuid? Process(PacketBase basePacket, PacketClientUseGameObject packet)
+        {
+            return packet.GameObject;
+        }
+
+        protected override UniversalGuid? Process(PacketBase basePacket, PacketClientMove packet)
+        {
+            return packet.Mover;
+        }
+
+        protected override UniversalGuid? Process(PacketBase basePacket, PacketClientQuestGiverChooseReward packet)
+        {
+            return packet.QuestGiver;
+        }
+        
         protected override UniversalGuid? Process(PacketBase basePacket, PacketUpdateObject packet)
         {
             if (packet.Created.Count + packet.Destroyed.Count + packet.Updated.Count + packet.OutOfRange.Count > 1)

@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using DynamicData.Binding;
 using WDE.Module.Attributes;
+using WDE.PacketViewer.Services;
+using WDE.PacketViewer.Utils;
 using WDE.PacketViewer.ViewModels;
 using WowPacketParser.Proto;
 
@@ -14,8 +16,92 @@ namespace WDE.PacketViewer.Filtering
     [SingleInstance]
     public class ParallelPacketFilteringService : IPacketFilteringService
     {
+        private bool AcceptFilterData(PacketViewModel packet, IReadOnlyFilterData filterData)
+        {
+            if (filterData.ForceIncludePacketNumbers != null)
+            {
+                if (filterData.ForceIncludePacketNumbers.Contains(packet.Id))
+                    return true;
+            }
+            
+            if (filterData.MinPacketNumber.HasValue && packet.Id < filterData.MinPacketNumber.Value)
+                return false;
+            if (filterData.MaxPacketNumber.HasValue && packet.Id > filterData.MaxPacketNumber.Value)
+                return false;
+            
+            if (filterData.IncludedEntries != null)
+            {
+                if (!filterData.IncludedEntries.Contains(packet.Entry))
+                    return false;
+            }
+            else if (filterData.ExcludedEntries != null)
+            {
+                if (filterData.ExcludedEntries.Contains(packet.Entry))
+                    return false;
+            }
+            
+            if (filterData.IncludedOpcodes != null)
+            {
+                if (!filterData.IncludedOpcodes.Contains(packet.Opcode))
+                    return false;
+            }
+            else if (filterData.ExcludedOpcodes != null)
+            {
+                if (filterData.ExcludedOpcodes.Contains(packet.Opcode))
+                    return false;
+            }
+
+            if (filterData.IncludedOpcodesWildcards != null)
+            {
+                bool any = false;
+                foreach (var prefix in filterData.IncludedOpcodesWildcards)
+                {
+                    if (packet.Opcode.StartsWith(prefix))
+                    {
+                        any = true;
+                        break;
+                    }
+                }
+
+                if (!any)
+                    return false;
+            }
+            if (filterData.ExcludedOpcodesWildcards != null)
+            {
+                foreach (var prefix in filterData.ExcludedOpcodesWildcards)
+                {
+                    if (packet.Opcode.StartsWith(prefix))
+                        return false;
+                }
+            }
+            
+            if (filterData.IncludedGuids != null)
+            {
+                foreach (var guid in filterData.IncludedGuids)
+                {
+                    if ((packet.MainActor?.Equals(guid) ?? false) || packet.Text.Contains(guid.ToHexString()))
+                        return true;
+                }
+
+                return false;
+            }
+            else if (filterData.ExcludedGuids != null)
+            {
+                foreach (var guid in filterData.ExcludedGuids)
+                {
+                    if (packet.Text.Contains(guid.ToHexString()))
+                        return false;
+                }
+
+                return true;
+            }
+
+            return true;
+        }
+        
         public async Task<ObservableCollection<PacketViewModel>?> Filter(IList<PacketViewModel> all, 
             string filter, 
+            IReadOnlyFilterData? filterData,
             CancellationToken cancellationToken,
             IProgress<float> progress)
         {
@@ -28,7 +114,21 @@ namespace WDE.PacketViewer.Filtering
             if (string.IsNullOrEmpty(filter))
             {
                 using (filtered.SuspendNotifications())
-                    filtered.AddRange(all);
+                {
+                    // fast hot path
+                    if (filterData == null)
+                    {
+                        filtered.AddRange(all);
+                    }
+                    else
+                    {
+                        foreach (var packet in all)
+                        {
+                            if (AcceptFilterData(packet, filterData))
+                                filtered.Add(packet);
+                        }
+                    }
+                }
             }
             else
             {
@@ -48,12 +148,15 @@ namespace WDE.PacketViewer.Filtering
                     
                         for (int index = CPU * packetsPerThread; index < upTo; ++index)
                         {
-                            if (evaluator.Evaluate(all[index]) is true)
-                                partialResult.Add(all[index]);
-
+                            if (filterData == null || AcceptFilterData(all[index], filterData))
+                            {
+                                if (evaluator.Evaluate(all[index]) is true)
+                                    partialResult.Add(all[index]);
+                            }
+                            
                             if (cancellationToken.IsCancellationRequested)
                                 break;
-                        
+
                             if (CPU == 0)
                             {
                                 if (index % 100 == 0)
@@ -76,17 +179,6 @@ namespace WDE.PacketViewer.Filtering
                     foreach (var partialResult in partialResults)
                         filtered.AddRange(partialResult);
             }
-
-            if (filtered.Count > 0)
-            {
-                DateTime prevTime = filtered[0].Time;
-                foreach (var packet in filtered)
-                {
-                    packet.Diff = (int)packet.Time.Subtract(prevTime).TotalMilliseconds;
-                    prevTime = packet.Time;
-                }
-            }
-
             return filtered;
         }
 

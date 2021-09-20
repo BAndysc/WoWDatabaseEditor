@@ -1,0 +1,29 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:WDE.PacketViewer.Avalonia.Views"
+        xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia">
+    <Design.PreviewWith>
+        <controls:SearchControl />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|SearchControl">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderBrush="Gray" BorderThickness="0,0,0,1" Padding="5" Background="#10000000">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto,50,Auto" Height="24">
+                        <components:WdeImage ImageUri="Icons/icon_find.png" Width="24" Height="24" />
+                        <TextBox Name="SearchText" Grid.Column="1" MinHeight="24" Padding="3" Margin="0,0,10,0" Watermark="Type what do you want to find">
+                            <TextBox.KeyBindings>
+                                <KeyBinding Gesture="Enter" CommandParameter="{Binding #SearchText.Text}" Command="{Binding #NextButton.Command}" />
+                            </TextBox.KeyBindings>
+                        </TextBox>
+                        <components:ButtonImage CommandParameter="{Binding #SearchText.Text, Mode=OneWay}" Command="{TemplateBinding FindPreviousCommand}" Grid.Column="2" Image="Icons/icon_left.png" />
+                        <components:ButtonImage Name="NextButton" CommandParameter="{Binding #SearchText.Text, Mode=OneWay}" Command="{TemplateBinding FindNextCommand}" Grid.Column="3" Image="Icons/icon_right.png" />
+                        <Button Grid.Column="5" Command="{TemplateBinding CloseCommand}">Done</Button>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             d:DataContext="{d:DesignInstance viewModels:PacketFilterDialogViewModel, IsDesignTimeCreatable=False}"
+             x:Class="WDE.PacketViewer.Avalonia.Views.PacketFilterDialogToolBar">
+    <controls:ToolbarPanel>
+        <components:ButtonImage Command="{Binding  CopyFiltersCommand}" Image="icons/icon_copy.png" Text="Copy filter" />
+        <components:ButtonImage Command="{Binding  PasteFiltersCommand}" Image="icons/icon_paste.png" Text="Paste filter" />
+        <controls:ToolbarSpacer />
+        <components:ButtonImage Command="{Binding  ClearFiltersCommand}" Image="icons/icon_delete.png" Text="Clear filters" />
+    </controls:ToolbarPanel>
+</UserControl>

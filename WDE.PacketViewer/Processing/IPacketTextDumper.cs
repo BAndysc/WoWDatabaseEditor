@@ -6,6 +6,7 @@ namespace WDE.PacketViewer.Processing
 {
     public interface IPacketTextDumper : IPacketProcessor<bool>
     {
+        bool RequiresSplitUpdateObject => false;
         Task<string> Generate();
     }
     
@@ -16,5 +17,10 @@ namespace WDE.PacketViewer.Processing
     public interface ITwoStepPacketProcessor<T>
     {
         T? PreProcess(PacketHolder packet);
+    }
+
+    public interface IUnfilteredPacketProcessor
+    {
+        void ProcessUnfiltered(PacketHolder unfiltered);
     }
 }

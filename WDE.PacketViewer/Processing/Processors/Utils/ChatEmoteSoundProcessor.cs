@@ -25,6 +25,9 @@ namespace WDE.PacketViewer.Processing.Processors
          * Returns true if processor thinks this emote packet is sent with other chat packet
          */
         bool IsEmoteForChat(PacketBase emote);
+        bool IsEmoteForChat(int packetNumber);
+        
+        int? GetChatPacketForEmote(int emoteNumber);
         
         /**
          * Returns true if processor thinks this sound (play sound or play object sound) packet is sent with other chat packet
@@ -120,9 +123,18 @@ namespace WDE.PacketViewer.Processing.Processors
             return null;
         }
 
-        public bool IsEmoteForChat(PacketBase emote)
+        public bool IsEmoteForChat(PacketBase emote) => IsEmoteForChat(emote.Number);
+
+        public bool IsEmoteForChat(int packetNumber)
         {
-            return emotePacketIdToChatPacketId.ContainsKey(emote.Number);
+            return emotePacketIdToChatPacketId.ContainsKey(packetNumber);
+        }
+
+        public int? GetChatPacketForEmote(int emoteNumber)
+        {
+            if (emotePacketIdToChatPacketId.TryGetValue(emoteNumber, out var packetId))
+                return packetId;
+            return null;
         }
 
         public bool IsSoundForChat(PacketBase sound)
