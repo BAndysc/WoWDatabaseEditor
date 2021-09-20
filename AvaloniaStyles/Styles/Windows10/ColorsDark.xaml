@@ -69,6 +69,13 @@
         <SolidColorBrush x:Key="NumberIndicatorBackground" Color="#34495e" />
         <SolidColorBrush x:Key="NumberIndicatorBackgroundActive" Color="#17632E" />
         <SolidColorBrush x:Key="NumberIndicatorForeground" Color="#bdc3c7" />
+        
+        <!-- tabs -->
+        <SolidColorBrush x:Key="TabControlBorder" Color="#333333" />
+        <SolidColorBrush x:Key="TabItemHeaderForegroundUnselected" Color="#CCCCCC" />
+        <SolidColorBrush x:Key="TabItemHeaderBackgroundSelected" Color="#161617" />
+        <SolidColorBrush x:Key="TabItemHeaderBackgroundSelectedPointerOver" Color="#202021" />
+        <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="#202021" />
     </Styles.Resources>
     
     <Style Selector="GridSplitter">

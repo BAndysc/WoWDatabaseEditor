@@ -84,6 +84,17 @@
             <RadioButton IsChecked="True">Checked radio</RadioButton>
             <TextBox Watermark="Textbox" />
             <ComboBox Items="{Binding Themes}" SelectedItem="{Binding CurrentTheme, Mode=TwoWay}" />
+            <TabControl>
+                <TabItem Header="Main">
+                    <Button>Tab a</Button>
+                </TabItem>
+                <TabItem Header="Edit">
+                    <TextBlock>Tab b</TextBlock>
+                </TabItem>
+                <TabItem Header="More">
+                    <TextBox Text="Tab c" />
+                </TabItem>
+            </TabControl>
             <ListBox>
                 <ListBoxItem>A</ListBoxItem>
                 <ListBoxItem>B</ListBoxItem>
