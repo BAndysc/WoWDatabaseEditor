@@ -172,13 +172,13 @@
                                             <MenuFlyout>
                                                 <MenuItem Header="Exclude entry" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeEntryCommand}" />
                                                 <MenuItem Header="Include entry" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeEntryCommand}" />
-                                                <Separator />
+                                                <MenuItem Header="-" />
                                                 <MenuItem Header="Exclude guid" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeGuidCommand}" />
                                                 <MenuItem Header="Include guid" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeGuidCommand}" />
-                                                <Separator />
+                                                <MenuItem Header="-" />
                                                 <MenuItem Header="Exclude opcode" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeOpcodeCommand}" />
                                                 <MenuItem Header="Include opcode" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeOpcodeCommand}" />
-                                                <Separator />
+                                                <MenuItem Header="-" />
                                                 <MenuItem Header="Find related packets" Command="{Binding #Root.DataContext.FindRelatedPacketsCommands}" />
                                             </MenuFlyout>
                                         </Setter.Value>

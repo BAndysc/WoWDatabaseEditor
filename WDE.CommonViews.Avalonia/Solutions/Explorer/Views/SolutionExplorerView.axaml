@@ -74,7 +74,7 @@
                 </MenuItem>
                 <MenuItem Header="Remove"
                           Command="{Binding #tv.DataContext.RemoveItem, Mode=OneTime}" />
-                <Separator />
+                <MenuItem Header="-" />
                 <MenuItem Header="Generate query"
                           Command="{Binding #tv.DataContext.GenerateSQL, Mode=OneTime}"
                           IsEnabled="{Binding IsExportable}" />
