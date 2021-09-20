@@ -2123,6 +2123,9 @@
     "usable_with_script_types": [
       "Creature"
     ],
+    "tags": [
+      "Azeroth", "TrinityWrath", "TrinityMaster"
+    ],
     "is_timed": true,
     "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT",
     "parameters": [
@@ -2161,6 +2164,57 @@
       ]
     }
   },
+  {
+    "id": 74,
+    "usable_with_script_types": [
+      "Creature"
+    ],
+    "tags": [
+      "TrinityCata"
+    ],
+    "is_timed": true,
+    "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT_TC_CATA",
+    "parameters": [
+      {
+        "type": "PercentageParameter",
+        "name": "Minimum HP",
+        "description": "Target from first action must be: CREATURE_RANGE, CREATURE_GUID, CREATURE_DISTANCE, CLOSEST_CREATURE, CLOSEST_PLAYER, PLAYER_RANGE, PLAYER_DISTANCE"
+      },
+      {
+        "type": "PercentageParameter",
+        "name": "Maximum HP"
+      },
+      {
+        "type": "Parameter",
+        "name": "Radius"
+      },
+      {
+        "type": "Parameter",
+        "name": "Repeat Minimum",
+        "description": "Core will check whether this event should fire every min - max milliseconds"
+      }
+    /*,
+      {
+        "type": "Parameter",
+        "name": "Repeat Maximum",
+        "description": "Core will check whether this event should fire every min - max milliseconds"
+      }*/
+    ],
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When nearby friendly unit in {pram3} yd has HP between {pram1} - {pram2} {pram5value:choose(0):(check once)|(check every {pram4} - {pram5} ms)}",
+    "name_readable": "Targets health %",
+    "invoker": {
+      "name": "Friendly unit",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
+  },  
   {
     "id": 75,
     "usable_with_script_types": [
