@@ -22,5 +22,6 @@ namespace WDE.Common.History
 
         T AddHandler<T>(T handler) where T : HistoryHandler;
         void Clear();
+        void LimitStack(int limit);
     }
 }

@@ -10,6 +10,8 @@ namespace WDE.Common.Types
         string ToString();
         void FromString(string str);
 
+        void DisableUndo();
+        
         void Append(string str);
     }
 }

@@ -25,6 +25,11 @@ namespace WDE.Common.Avalonia.Types
             Native.Text = str;
         }
 
+        public void DisableUndo()
+        {
+            Native.UndoStack.SizeLimit = 0;
+        }
+
         public void Append(string str)
         {
             Native.BeginUpdate();

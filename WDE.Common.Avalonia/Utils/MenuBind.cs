@@ -107,8 +107,22 @@ namespace WDE.Common.Avalonia.Utils
                     command = OverrideCommand<TextBox>(command, Key.Y, key, cmd, Redo);
                     command = OverrideCommand<FixedTextBox>(command, Key.V, key, cmd, tb => tb.CustomPaste());
 
-                    command = OverrideCommand<TextArea>(command, Key.Z, key, cmd, tb => GetTextEditor(tb)?.Undo());
-                    command = OverrideCommand<TextArea>(command, Key.Y, key, cmd, tb => GetTextEditor(tb)?.Redo());
+                    command = OverrideCommand<TextArea>(command, Key.Z, key, cmd, tb =>
+                    {
+                        var te = GetTextEditor(tb);
+                        if (te == null || te.Document.UndoStack.SizeLimit == 0)
+                            return false;
+                        te.Undo();
+                        return true;
+                    });
+                    command = OverrideCommand<TextArea>(command, Key.Y, key, cmd, tb =>
+                    {
+                        var te = GetTextEditor(tb);
+                        if (te == null || te.Document.UndoStack.SizeLimit == 0)
+                            return false;
+                        te.Redo();
+                        return true;
+                    });
                     command = OverrideCommand<TextArea>(command, Key.C, key, cmd, tb => ApplicationCommands.Copy.Execute(null, tb));
                     command = OverrideCommand<TextArea>(command, Key.X, key, cmd, tb => ApplicationCommands.Cut.Execute(null, tb));
                     command = OverrideCommand<TextArea>(command, Key.V, key, cmd, tb => ApplicationCommands.Paste.Execute(null, tb));
@@ -152,6 +166,26 @@ namespace WDE.Common.Avalonia.Utils
             undoMethod.Invoke(undoHelper, null);
         }
 
+        private static ICommand OverrideCommand<T>(ICommand command, Key require, Key commandKey, IMenuCommandItem item, Func<T, bool> func)
+        {
+            if (require != commandKey || !(item.Shortcut?.Control ?? false))
+                return command;
+
+            return new DelegateCommand(() =>
+            {
+                bool executed = false;
+                if (FocusManager.Instance.Current is T t)
+                    executed = func(t);
+                if (!executed && command.CanExecute(null))
+                    command.Execute(null);
+            }, () =>
+            {
+                if (FocusManager.Instance.Current is T t)
+                    return true;
+                return command.CanExecute(null);
+            });
+        }
+        
         private static ICommand OverrideCommand<T>(ICommand command, Key require, Key commandKey, IMenuCommandItem item, Action<T> func)
         {
             if (require != commandKey || !(item.Shortcut?.Control ?? false))

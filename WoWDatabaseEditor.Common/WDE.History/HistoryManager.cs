@@ -11,20 +11,16 @@ namespace WDE.History
     [AutoRegister]
     public class HistoryManager : IHistoryManager, INotifyPropertyChanged
     {
-        private readonly Stack<IHistoryAction> future;
-        private readonly Stack<IHistoryAction> history;
-        
         private IHistoryAction savedPoint;
         private bool forceNoSave;
         private bool acceptNew;
         private bool canRedo;
         private bool canUndo;
         private bool isSaved;
+        private int? limit;
 
         public HistoryManager()
         {
-            history = new Stack<IHistoryAction>();
-            future = new Stack<IHistoryAction>();
             savedPoint = null;
             acceptNew = true;
             forceNoSave = false;
@@ -64,8 +60,8 @@ namespace WDE.History
             }
         }
 
-        public int UndoCount => history.Count;
-        public int RedoCount => future.Count;
+        public int UndoCount => Past.Count;
+        public int RedoCount => Future.Count;
 
         public T AddHandler<T>(T handler) where T : HistoryHandler
         {
@@ -74,9 +70,8 @@ namespace WDE.History
                 if (!acceptNew)
                     return;
 
-                history.Push(action);
+                EnsureLimits();
                 Past.Add(action);
-                future.Clear();
                 Future.Clear();
                 RecalculateValues();
             };
@@ -87,9 +82,8 @@ namespace WDE.History
                 
                 acceptNew = false;
 
-                history.Push(action);
+                EnsureLimits();
                 Past.Add(action);
-                future.Clear();
                 Future.Clear();
                 RecalculateValues();
                 
@@ -99,14 +93,19 @@ namespace WDE.History
             };
             return handler;
         }
-        
+
+        private void EnsureLimits()
+        {
+            if (limit.HasValue && Past.Count == limit.Value)
+                Past.RemoveAt(0);
+        }
+
         public void Undo()
         {
-            if (history.Count == 0)
+            if (Past.Count == 0)
                 throw new NothingToUndoException();
 
-            IHistoryAction action = history.Pop();
-            future.Push(action);
+            IHistoryAction action = Past[^1];
             Past.RemoveAt(Past.Count - 1);
             Future.Insert(0, action);
             acceptNew = false;
@@ -118,11 +117,10 @@ namespace WDE.History
 
         public void Redo()
         {
-            if (future.Count == 0)
+            if (Future.Count == 0)
                 throw new NothingToRedoException();
 
-            IHistoryAction action = future.Pop();
-            history.Push(action);
+            IHistoryAction action = Future[0];
             Future.RemoveAt(0);
             Past.Add(action);
             acceptNew = false;
@@ -134,8 +132,8 @@ namespace WDE.History
 
         public void MarkAsSaved()
         {
-            if (history.Count > 0)
-                savedPoint = history.Peek();
+            if (Past.Count > 0)
+                savedPoint = Past[^1];
             forceNoSave = false;
             RecalculateValues();
         }
@@ -153,18 +151,21 @@ namespace WDE.History
         {
             Past.Clear();
             Future.Clear();
-            history.Clear();
-            future.Clear();
             CanUndo = false;
             CanRedo = false;
             IsSaved = true;
         }
 
+        public void LimitStack(int newLimit)
+        {
+            this.limit = newLimit;
+        }
+
         private void RecalculateValues()
         {
-            CanUndo = history.Count > 0;
-            CanRedo = future.Count > 0;
-            IsSaved = !forceNoSave && ((history.Count == 0 && savedPoint == null) || (history.Count > 0 && savedPoint == history.Peek()));
+            CanUndo = Past.Count > 0;
+            CanRedo = Future.Count > 0;
+            IsSaved = !forceNoSave && ((Past.Count == 0 && savedPoint == null) || (Past.Count > 0 && savedPoint == Past[^1]));
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName]
