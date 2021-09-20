@@ -15,4 +15,11 @@
         <KeyBinding Gesture="Escape" Command="{Binding Cancel}" />
         <KeyBinding Gesture="Enter" Command="{Binding Accept}" />
     </controls:ExtendedWindow.KeyBindings>
+    <controls:ExtendedWindow.ToolBar>
+        <controls:ToolBar>
+            <controls:ToolBar.MiddleContent>
+                <ContentPresenter DataContext="{Binding #ThisWindow.DataContext}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+            </controls:ToolBar.MiddleContent>
+        </controls:ToolBar>
+    </controls:ExtendedWindow.ToolBar>
 </controls:ExtendedWindow>

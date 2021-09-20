@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.Conditions.Avalonia.Views.ConditionsEditorToolBar">
+    <controls:ToolbarPanel>
+        <components:ButtonImage Image="icons/icon_left.png" Command="{Binding UndoCommand}" />
+        <components:ButtonImage Image="icons/icon_right.png" Command="{Binding RedoCommand}" />
+        <Panel Width="20" />
+            
+        <components:ButtonImage Image="icons/icon_copy.png" Command="{Binding CopyCommand}" />
+        <components:ButtonImage Image="icons/icon_cut.png" Command="{Binding CutCommand}" />
+        <components:ButtonImage Image="icons/icon_paste.png" Command="{Binding PasteCommand}" />
+        <Panel Width="20" />
+
+        <components:ButtonImage Image="icons/icon_add.png" Command="{Binding AddItemCommand}" />
+        <components:ButtonImage Image="icons/icon_delete.png" Command="{Binding RemoveItemCommand}" />
+    </controls:ToolbarPanel>
+</UserControl>

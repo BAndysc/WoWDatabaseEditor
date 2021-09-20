@@ -40,5 +40,9 @@
         <DependentUpon>SessionToolView.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="SQLEditor\Views\CustomQueryEditorView.axaml.cs">
+        <DependentUpon>CustomQueryEditorView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

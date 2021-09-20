@@ -60,8 +60,6 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (item == null)
                     return;
 
-                taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(item));
-                
                 if (DocumentManager.ActiveSolutionItemDocument!.Save?.CanExecute(null) ?? false)
                 {
                     DocumentManager.ActiveSolutionItemDocument.Save.Execute(null);
@@ -76,6 +74,9 @@ namespace WoWDatabaseEditorCore.ViewModels
                     else if (solutionTasksService.CanSaveToDatabase)
                         solutionTasksService.SaveSolutionToDatabaseTask(item);
                 }
+                
+                taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(item));
+
             }, () => DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase));
 

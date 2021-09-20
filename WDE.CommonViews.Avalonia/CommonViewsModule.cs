@@ -46,6 +46,7 @@ namespace WDE.CommonViews.Avalonia
             // sql editor
             viewLocator.Bind<SqlEditorViewModel, SqlEditorView>();
             viewLocator.BindToolBar<SqlEditorViewModel, SqlEditorToolBar>();
+            viewLocator.Bind<CustomQueryEditorViewModel, CustomQueryEditorView>();
             // updater
             viewLocator.Bind<ChangeLogViewModel, ChangeLogView>();
             viewLocator.Bind<UpdaterConfigurationViewModel, UpdaterConfigurationView>();
