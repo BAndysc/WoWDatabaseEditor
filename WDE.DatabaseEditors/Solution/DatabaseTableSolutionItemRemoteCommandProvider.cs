@@ -22,8 +22,9 @@ namespace WDE.DatabaseEditors.Solution
             var definition = tableDefinitionProvider.GetDefinition(item.DefinitionId);
             if (definition == null || definition.ReloadCommand == null)
                 return Array.Empty<IRemoteCommand>();
-
-            return new IRemoteCommand[] {new ReloadRemoteCommand(definition.ReloadCommand)};
+            if (definition.Condition == null)
+                return new IRemoteCommand[] {new ReloadRemoteCommand(definition.ReloadCommand)};
+            return new IRemoteCommand[] {new ReloadRemoteCommand(definition.ReloadCommand), new ReloadRemoteCommand("reload conditions")};
         }
     }
 }
