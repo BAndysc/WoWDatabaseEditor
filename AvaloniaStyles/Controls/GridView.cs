@@ -23,7 +23,7 @@ using WDE.MVVM.Utils;
 
 namespace AvaloniaStyles.Controls
 {
-    public class GridViewListBox : ListBox, IStyleable
+    public class GridViewListBox : ListBox
     {
         protected override IItemContainerGenerator CreateItemContainerGenerator()
         {
@@ -32,7 +32,6 @@ namespace AvaloniaStyles.Controls
                 ContentControl.ContentProperty,
                 ContentControl.ContentTemplateProperty);
         }
-        Type IStyleable.StyleKey => typeof(ListBox);
     }
 
     public class GridViewItem : ListBoxItem, IStyleable
@@ -155,7 +154,7 @@ namespace AvaloniaStyles.Controls
             SetupGridColumns(header, true);
             
             // additional column in header makes it easier to resize
-            header.ColumnDefinitions.Add(new ColumnDefinition(10, GridUnitType.Pixel));
+            header.ColumnDefinitions.Add(new ColumnDefinition(20, GridUnitType.Pixel));
             
             int i = 0;
             foreach (var column in Columns)
