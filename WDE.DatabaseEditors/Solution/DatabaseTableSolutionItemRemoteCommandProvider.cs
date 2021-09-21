@@ -20,8 +20,15 @@ namespace WDE.DatabaseEditors.Solution
         public IRemoteCommand[] GenerateCommand(DatabaseTableSolutionItem item)
         {
             var definition = tableDefinitionProvider.GetDefinition(item.DefinitionId);
-            if (definition == null || definition.ReloadCommand == null)
+            if (definition == null)
                 return Array.Empty<IRemoteCommand>();
+            if (definition.ReloadCommand == null)
+            {
+                if (definition.Condition != null) 
+                    return new IRemoteCommand[] {new ReloadRemoteCommand("reload conditions")};
+
+                return Array.Empty<IRemoteCommand>();
+            }
             if (definition.Condition == null)
                 return new IRemoteCommand[] {new ReloadRemoteCommand(definition.ReloadCommand)};
             return new IRemoteCommand[] {new ReloadRemoteCommand(definition.ReloadCommand), new ReloadRemoteCommand("reload conditions")};
