@@ -524,6 +524,14 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (updated.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
+                if (updated.Values.Ints.TryGetValue("UNIT_FIELD_HEALTH", out var hp) &&
+                    hp == 0)
+                {
+                    var oldHp = updateObjectFollower.GetInt(updated.Guid, "UNIT_FIELD_HEALTH") ?? 1;
+                    if (oldHp != 0)
+                        AppendLine(basePacket, NiceGuid(updated.Guid) + " dies");
+                }
+                
                 if (updated.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var unitFlags))
                 {
                     long old = 0;

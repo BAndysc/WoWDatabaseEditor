@@ -405,7 +405,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     };
                 }
 
-                if (FieldChanged(update, "UNIT_NPC_EMOTESTATE", out var newValue))
+                if (FieldChanged(update, "UNIT_NPC_EMOTESTATE", out var newValue) &&
+                    update.Guid.Type != UniversalHighGuid.Player)
                 {
                     yield return new ActionHappened()
                     {

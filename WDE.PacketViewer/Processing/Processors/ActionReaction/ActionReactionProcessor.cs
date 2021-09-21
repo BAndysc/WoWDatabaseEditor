@@ -222,8 +222,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 if (@event.Kind == EventType.Movement && distRating.Value < 0.01)
                     bonusMult = 0;
 
+                // we are giving a bonus if the thing happened by exactly the same actor, within last 4 seconds
                 if (mainActorMatches)
-                    bonusMult += 1.2f;
+                    bonusMult += 0.2f * (float)(1 - Math.Clamp(timePassed.TotalSeconds / 4, 0, 1));
                 
                 var ratingBonused = new Multiply(rating, bonusMult);
 

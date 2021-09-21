@@ -564,7 +564,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                         .Push();
                 }
                 
-                if (FieldChanged(update, "UNIT_NPC_EMOTESTATE", out var newValue))
+                if (FieldChanged(update, "UNIT_NPC_EMOTESTATE", out var newValue) &&
+                    update.Guid.Type != UniversalHighGuid.Player)
                 {
                     Event(basePacket, EventType.EmoteState)
                         .SetDescription($"Unit {update.Guid.ToWowParserString()} changes emote state to " + newValue)
