@@ -64,7 +64,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             // Firstly we go backwards to find first ever possible event
             // This will be treated as a general reason of packet
             int pid = start;
-            happenReason = null;
+            happenReason = processor.GetPossibleActionsForEvent(start).Select(s => s.happened).FirstOrDefault();
             HashSet<int> visited = new();
             while (true)
             {
