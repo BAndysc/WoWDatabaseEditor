@@ -3471,7 +3471,8 @@
         "description": "       Wait {pram1} seconds",
         "name_readable": "Wait",
         "target_is_source": false,
-        "implicit_source": "SMART_TARGET_NONE"
+        "implicit_source": "SMART_TARGET_NONE",
+        "flags": "WaitAction"
     },
     {
         "id": 9998,

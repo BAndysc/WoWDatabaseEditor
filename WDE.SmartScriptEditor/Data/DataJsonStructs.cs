@@ -46,6 +46,7 @@ namespace WDE.SmartScriptEditor.Data
         IncreaseIndent = 8,
         DecreaseIndent = 16,
         ConditionInParameter1 = 32,
+        WaitAction
     }
 
     [ExcludeFromCodeCoverage]

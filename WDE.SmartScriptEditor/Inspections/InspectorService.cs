@@ -49,6 +49,8 @@ namespace WDE.SmartScriptEditor.Inspections
                 if (ev.IsInvoker)
                     AddTargetRule(ev.Id, new TargetRequiresInvoker());
             }
+
+            AddEventRule(6, new NoWaitInDeathEventInspection(smartDataManager));
             
             eventInspections.Add(new ParameterRangeInspection());
             eventInspections.Add(new NoActionInspection());
@@ -60,6 +62,7 @@ namespace WDE.SmartScriptEditor.Inspections
             if (!currentCoreVersion.Current.SmartScriptFeatures.SupportsCreatingTimedEventsInsideTimedEvents)
                 actionInspections.Add(new NoTimedCallsInTimedEventInspection());
             
+            scriptInspections.Add(new WaitInCombatEventInspection(smartDataManager));
             scriptInspections.Add(new TimedEventInspection());
             scriptInspections.Add(new DuplicateEventsInspection());
             scriptInspections.Add(new TimedActionListAfter0EventsInspection());
