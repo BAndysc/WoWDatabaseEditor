@@ -1229,11 +1229,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 source.GetParameter(0).Value = sourcePick.Value.Item1;
 
             SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
+            SmartGenericJsonData targetData = smartDataManager.GetRawData(SmartType.SmartTarget, target.Id);
             ev.Parent = e;
             bool anyUsed = ev.GetParameter(0).IsUsed ||
                               source.GetParameter(0).IsUsed ||
                               target.GetParameter(0).IsUsed ||
-                              actionData.CommentField != null;
+                              actionData.CommentField != null ||
+                              targetData.UsesTargetPosition;
             if (!anyUsed || await EditActionCommand(ev))
                 e.Actions.Add(ev);
         }
