@@ -1,0 +1,48 @@
+{
+  "id": "quest_conditions",
+  "compatibility": [
+    "TrinityWrath", "TrinityMaster", "Azeroth", "TrinityCata"
+  ],
+  "name": "Quest conditions",
+  "single_solution_name": "{name} quest conditions",
+  "multi_solution_name": "Multiple quests conditions",
+  "description": "Use to define custom conditions when quests can be taken",
+  "table_name": "quest_condition",
+  "table_index_name": "quest_id",
+  "multi_record": true,
+  "icon_path": "Icons/document_quest_conditions.png",
+  "group_name": "Common scripting tables",
+  "picker": "QuestParameter",
+  "only_conditions": true,
+  "primary_key": [
+    "quest_id"
+  ],
+  "conditions": {
+    "source_type": 19,
+    "source_entry": "quest_id",
+    "targets": [
+      {
+        "id": 0,
+        "name": "player"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Quest Id",
+          "db_column_name": "quest_id",
+          "value_type": "QuestParameter",
+          "read_only": true
+        },
+        {
+          "is_condition": true,
+          "name": "Conditions",
+          "db_column_name": "conditions"
+        }
+      ]
+    }
+  ]
+}
