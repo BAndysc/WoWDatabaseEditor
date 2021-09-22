@@ -17,6 +17,18 @@ namespace AvaloniaStyles
     
     public class SystemTheme : StyleInclude
     {
+        public static event Action<double?>? CustomScalingUpdated;
+
+        public static double? CustomScalingValue
+        {
+            get => customScalingValue;
+            set
+            {
+                customScalingValue = value;
+                CustomScalingUpdated?.Invoke(value);
+            }
+        }
+
         internal static SystemThemeOptions EffectiveTheme { get; private set; }
         public static bool EffectiveThemeIsDark { get; private set; }
         
@@ -45,6 +57,8 @@ namespace AvaloniaStyles
         }
         
         private SystemThemeOptions mode;
+        private static double? customScalingValue;
+
         public SystemThemeOptions Mode
         {
             get => mode;

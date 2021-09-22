@@ -17,7 +17,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
 
         public ThemeManager(IThemeSettingsProvider themeSettings)
         {
-            string currentThemeName = themeSettings.GetSettings().Name;
+            var settings = themeSettings.GetSettings();
+            string currentThemeName = settings.Name;
 
             Theme theme = new(currentThemeName);
 
@@ -27,6 +28,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
             SetTheme(theme);
             if (Enum.TryParse<SystemThemeOptions>(theme.Name, out var t))
                 AvaloniaThemeStyle.Theme = t;
+            SystemTheme.CustomScalingValue = settings.UseCustomScaling ? Math.Clamp(settings.CustomScaling, 0.5, 4) : null;
         }
 
         private List<Theme> themes { get; } = Enum.GetNames<SystemThemeOptions>().Select(name => new Theme(name)).ToList();
@@ -35,6 +37,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
 
         public IEnumerable<Theme> Themes => themes;
 
+        public void UpdateCustomScaling(double? value)
+        {
+            SystemTheme.CustomScalingValue = value;
+        }
+        
         public void SetTheme(Theme theme)
         {
             if (!IsValidTheme(theme))

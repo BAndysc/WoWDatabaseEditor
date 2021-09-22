@@ -7,6 +7,7 @@ namespace WDE.Common.Managers
         Theme CurrentTheme { get; }
         IEnumerable<Theme> Themes { get; }
         void SetTheme(Theme theme);
+        void UpdateCustomScaling(double? value);
     }
 
     public struct Theme

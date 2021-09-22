@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -7,6 +9,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.Threading;
 
 namespace AvaloniaStyles.Controls
 {
@@ -79,6 +82,12 @@ namespace AvaloniaStyles.Controls
         
         static ExtendedWindow()
         {
+            IsActiveProperty.Changed.AddClassHandler<Window>((w, _) =>
+            {
+                if (!SystemTheme.CustomScalingValue.HasValue)
+                    return;
+                UpdateScaling(w);
+            });
             IsActiveProperty.Changed.AddClassHandler<ExtendedWindow>((x, _) =>
                 x.PseudoClasses.Set(":focused", x.IsActive));
             ToolBarProperty.Changed.AddClassHandler<ExtendedWindow>((x, e) => x.ContentChanged(e, ":has-toolbar"));
@@ -125,6 +134,42 @@ namespace AvaloniaStyles.Controls
                 PseudoClasses.Add(":windows");
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 PseudoClasses.Add(":linux");
+            SystemTheme.CustomScalingUpdated += SystemThemeOnCustomScalingUpdated;
+        }
+
+        private static void UpdateScaling(Window window)
+        {
+            double scaling = 1;
+            if (!SystemTheme.CustomScalingValue.HasValue)
+            {
+                var primaryScreen = window.Screens.Primary ?? window.Screens.All.FirstOrDefault();
+                scaling = (primaryScreen?.PixelDensity ?? 1);
+            }
+            else
+                scaling = SystemTheme.CustomScalingValue.Value;
+            
+            var impl = window.PlatformImpl;
+            var f = impl.GetType().GetField("_scaling", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (f != null)
+            {
+                var curVal = (double)f.GetValue(impl)!;
+                if (Math.Abs(curVal - scaling) > 0.01)
+                {
+                    f.SetValue(impl, scaling);
+                    impl.ScalingChanged(scaling);
+                }
+            }
+        }
+
+        private void SystemThemeOnCustomScalingUpdated(double? obj)
+        {
+            UpdateScaling(this);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            SystemTheme.CustomScalingUpdated -= SystemThemeOnCustomScalingUpdated;
+            base.OnClosed(e);
         }
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)

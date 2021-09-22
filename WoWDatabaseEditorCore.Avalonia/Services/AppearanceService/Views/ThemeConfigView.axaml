@@ -2,21 +2,24 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              prism:ViewModelLocator.AutoWireViewModel="False">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Label Content="Current:" />
-        <Label Content="{Binding CurrentThemeName}" Grid.Row="0" Grid.Column="1" />
-        <Label Content="All:" Grid.Row="1" />
-        <ComboBox Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Top" Items="{Binding Themes}"
+    <StackPanel>
+        <controls:SettingsHeader Text="Themes" />
+        <TextBlock VerticalAlignment="Center"  Text="{Binding CurrentThemeName, StringFormat=Current: {0}}" />
+        <TextBlock VerticalAlignment="Center"  Text="All:" />
+        <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{Binding Themes}"
                   SelectedItem="{Binding ThemeName, Mode=TwoWay}" />
-    </Grid>
+        
+        <controls:SettingsHeader Text="Scaling" />
+        <TextBlock VerticalAlignment="Center"  Text="{Binding RecommendedScalingPercentage, StringFormat=Recommended scaling: {0}%}" />
+        <TextBlock VerticalAlignment="Center"  Text="Custom scaling [EXPERIMENTAL]:" />
+        <CheckBox IsEnabled="{Binding AllowCustomScaling}" Margin="30,0,0,0" IsChecked="{Binding UseCustomScaling}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <Grid ColumnDefinitions="Auto,*" IsEnabled="{Binding UseCustomScaling}">
+                <TextBlock Width="90" VerticalAlignment="Center" Text="{Binding ScalingValuePercentage, StringFormat={}{0}%}"></TextBlock>
+                <Slider Grid.Column="1" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{Binding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
+            </Grid>
+        </CheckBox>
+        <TextBlock IsVisible="{Binding AllowCustomScaling, Converter={x:Static BoolConverters.Not}}">Info: Custom scaling is available only on Windows</TextBlock>
+    </StackPanel>
 </UserControl>
