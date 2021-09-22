@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.PacketViewer.Utils;
 using WowPacketParser.Proto;
@@ -77,6 +79,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly IPlayerGuidFollower playerGuidFollower;
         private readonly IAuraSlotTracker auraSlotTracker;
+        private readonly IDatabaseProvider databaseProvider;
         private List<EventHappened> eventsFeed = new();
         private List<EventHappened> futureEvents = new();
 
@@ -228,7 +231,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             IWaypointProcessor waypointsProcessor,
             IUpdateObjectFollower updateObjectFollower,
             IPlayerGuidFollower playerGuidFollower,
-            IAuraSlotTracker auraSlotTracker)
+            IAuraSlotTracker auraSlotTracker,
+            IDatabaseProvider databaseProvider)
         {
             this.spellService = spellService;
             this.positionFollower = positionFollower;
@@ -238,6 +242,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             this.updateObjectFollower = updateObjectFollower;
             this.playerGuidFollower = playerGuidFollower;
             this.auraSlotTracker = auraSlotTracker;
+            this.databaseProvider = databaseProvider;
         }
         
         public void Flush(DateTime time)
@@ -545,6 +550,16 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 
                 if (updateObjectFollower.HasBeenCreated(create.Guid))
                     continue;
+
+                #if VERIFY_IF_SPAWN_EXIST
+                if (create.Guid.Type != UniversalHighGuid.GameObject)
+                {
+                    var creaturesInDb = databaseProvider.GetCreaturesByEntry(create.Guid.Entry);
+                    if (creaturesInDb.Any(c => Dist((c.X, c.Y, c.Z),
+                        (create.Movement.Position.X, create.Movement.Position.Y, create.Movement.Position.Z)) < 5))
+                        continue;
+                }
+                #endif
                 
                 create.Values.Guids.TryGetValue("UNIT_FIELD_DEMON_CREATOR", out var summoner);
                 Event(basePacket, EventType.Spawned)
@@ -607,6 +622,13 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 }
             }
             return base.Process(basePacket, packet);
+        }
+
+        private float Dist((float X, float Y, float Z) a, (float X, float Y, float Z) b)
+        {
+            return (float)Math.Sqrt((a.X - b.X) * (a.X - b.X) +
+                                    (a.Y - b.Y) * (a.Y - b.Y) +
+                                    (a.Z - b.Z) * (a.Z - b.Z));
         }
 
         private bool FieldChanged(UpdateObject update, string field, out long newValue)

@@ -1,4 +1,5 @@
 using System;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 
@@ -22,6 +23,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         private readonly Func<IUpdateObjectFollower> update;
         private readonly Func<IPlayerGuidFollower> player;
         private readonly Func<IAuraSlotTracker> auraSlotTracker;
+        private readonly Func<IDatabaseProvider> databaseProvider;
 
         public ActionReactionProcessorCreator(
             ISpellService spellService,
@@ -31,7 +33,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             Func<IWaypointProcessor> waypointProcessor,
             Func<IUpdateObjectFollower> update,
             Func<IPlayerGuidFollower> player,
-            Func<IAuraSlotTracker> auraSlotTracker)
+            Func<IAuraSlotTracker> auraSlotTracker,
+            Func<IDatabaseProvider> databaseProvider)
         {
             this.spellService = spellService;
             this.random = random;
@@ -41,6 +44,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             this.update = update;
             this.player = player;
             this.auraSlotTracker = auraSlotTracker;
+            this.databaseProvider = databaseProvider;
         }
         
         public ActionReactionProcessor Create()
@@ -55,7 +59,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             return new ActionReactionProcessor(
                 new ActionGenerator(spellService, unitFollower, chatEmote, update, player, waypointProcessor, auraSlotTracker),
                 new EventDetectorProcessor(spellService, unitFollower, random, chatEmote, waypointProcessor, update,
-                    player, auraSlotTracker),
+                    player, auraSlotTracker, databaseProvider()),
                 random,
                 chatEmote,
                 waypointProcessor,
@@ -75,7 +79,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             return new ActionReactionToTextProcessor(
                 new ActionGenerator(spellService, unitFollower, chatEmote, update, player, waypointProcessor, auraSlotTracker),
                 new EventDetectorProcessor(spellService, unitFollower, random, chatEmote, waypointProcessor, update,
-                    player, auraSlotTracker),
+                    player, auraSlotTracker, databaseProvider()),
                 random,
                 chatEmote,
                 waypointProcessor,

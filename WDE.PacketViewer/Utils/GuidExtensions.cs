@@ -144,8 +144,10 @@ namespace WDE.PacketViewer.Utils
             }
         }
 
-        public static string ToWowParserString(this UniversalGuid guid)
+        public static string ToWowParserString(this UniversalGuid? guid)
         {
+            if (guid == null)
+                return "0x0 (null)";
             if (guid.KindCase == UniversalGuid.KindOneofCase.Guid128 && (guid.Guid128.High != 0 || guid.Guid128.Low != 0))
             {
                 if (guid.HasEntry())
