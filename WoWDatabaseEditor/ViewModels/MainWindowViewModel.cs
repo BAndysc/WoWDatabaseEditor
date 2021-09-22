@@ -42,10 +42,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             Func<QuickStartViewModel> quickStartCreator,
             Func<TextDocumentViewModel> textDocumentCreator,
             ISolutionTasksService solutionTasksService,
-            IMostRecentlyUsedService mostRecentlyUsedService,
             ISessionService sessionService,
             ITaskRunner taskRunner,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IMainThread mainThread)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
@@ -100,10 +100,11 @@ namespace WoWDatabaseEditorCore.ViewModels
             foreach (var window in documentManager.AllTools)
                 toolById[window.UniqueId] = window;
 
-            if (GlobalApplication.Backend == GlobalApplication.AppBackend.Avalonia)
-                ShowStartPage();
-            else
-                ShowAbout();
+            documentManager.OpenedDocuments.ToCountChangedObservable().SubscribeAction(count =>
+            {
+                if (count == 0)
+                    mainThread.Dispatch(ShowStartPage);
+            });
             //LoadDefault();
             
             Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowExportButtons));

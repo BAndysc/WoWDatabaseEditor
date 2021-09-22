@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.Common.Menu;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Providers
 {
@@ -13,9 +15,15 @@ namespace WoWDatabaseEditorCore.Providers
         public List<IMenuItem> SubItems { get; }
         public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityHigh;
 
-        public EditorViewMenuItemProvider(IDocumentManager documentManager)
+        public EditorViewMenuItemProvider(IDocumentManager documentManager, 
+            Func<QuickStartViewModel> quickStartCreator)
         {
-            SubItems = new List<IMenuItem>(capacity: documentManager.AllTools.Count);
+            SubItems = new List<IMenuItem>(documentManager.AllTools.Count);
+            SubItems.Add(new ModuleMenuItem("Open quick start", new DelegateCommand(() =>
+            {
+                documentManager.OpenDocument(quickStartCreator());
+            })));
+            SubItems.Add(new ModuleManuSeparatorItem());
             foreach (var window in documentManager.AllTools)
             {
                 SubItems.Add(new ModuleMenuItem(window.Title, new DelegateCommand(() => documentManager.OpenTool(window.GetType()))));

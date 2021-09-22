@@ -8,7 +8,6 @@ namespace WDE.Common.Tasks
         public enum AppBackend
         {
             Uninitialized,
-            WPF,
             Avalonia
         }
 

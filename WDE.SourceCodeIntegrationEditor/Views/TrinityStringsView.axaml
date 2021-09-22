@@ -34,7 +34,7 @@
                 <ItemsControl Padding="10,0" Items="{Binding TrinityStringsNoDatabase}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected, Mode=TwoWay}">
+                            <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="0,0,0,7">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding Id}" Width="50" />
                                     <TextBlock Text="{Binding EnumName}" FontFamily="Consolas,Menlo,Courier,Courier New" FontWeight="Bold" />
