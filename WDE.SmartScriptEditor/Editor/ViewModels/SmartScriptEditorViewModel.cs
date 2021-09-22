@@ -1606,7 +1606,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         for (var i = 0; i < originalCondition.ParametersCount; ++i)
                             originalCondition.GetParameter(i).Value = obj.GetParameter(i).Value;
                     }
-                });
+                },
+                "Condition");
             
             return viewModel;
         }
@@ -1679,7 +1680,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             for (var i = 0; i < originalEvent.ParametersCount; ++i)
                                 originalEvent.GetParameter(i).Value = ev.GetParameter(i).Value;
                         }
-                    });
+                    },
+                "Event specific");
 
             return viewModel;
         }

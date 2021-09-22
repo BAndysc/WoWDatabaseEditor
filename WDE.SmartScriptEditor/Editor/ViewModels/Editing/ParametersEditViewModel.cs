@@ -25,7 +25,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             IEnumerable<(ParameterValueHolder<float> parameter, string name)>? floatParameters = null,
             IEnumerable<(ParameterValueHolder<string> parameter, string name)>? stringParameters = null,
             IEnumerable<EditableActionData>? actionParameters = null,
-            System.Action? saveAction = null)
+            System.Action? saveAction = null,
+            string? focusFirstGroup = null)
         {
             HashSet<IEditableParameterViewModel> visible = new();
             SourceList<IEditableParameterViewModel> visibleParameters = new();
@@ -36,20 +37,25 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 foreach (EditableActionData act in actionParameters)
                     allParameters.Add(new EditableParameterActionViewModel(act));
 
+            bool first = focusFirst;
             if (parameters != null)
             {
-                bool first = focusFirst;
                 foreach (var parameter in parameters)
                 {
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion){FocusFirst = first && parameter.parameter.IsUsed}));
-                    if (!allParameters[^1].IsHidden)
+                    var canFocusThis = first && (focusFirstGroup == null || focusFirstGroup == parameter.name);
+                    var focusThis = canFocusThis && parameter.parameter.IsUsed;
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion){FocusFirst = focusThis}));
+                    if (focusThis)
                         first = false;
                 }
             }
 
             if (floatParameters != null)
                 foreach (var parameter in floatParameters)
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion)));
+                {
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion){FocusFirst = first}));
+                    first = false;
+                }
 
             if (stringParameters != null)
                 foreach (var parameter in stringParameters)
