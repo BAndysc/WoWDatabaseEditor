@@ -5,7 +5,7 @@ using WDE.Common;
 
 namespace WDE.SQLEditor.Solutions
 {
-    public class CustomSqlSolutionItem : ISolutionItem, IEquatable<CustomSqlSolutionItem>
+    public class CustomSqlSolutionItem : ISolutionItem, IRenameableSolutionItem, IEquatable<CustomSqlSolutionItem>
     {
         public string Id { get; set; }
 
@@ -24,6 +24,11 @@ namespace WDE.SQLEditor.Solutions
         public ISolutionItem Clone()
         {
             return new CustomSqlSolutionItem() { Id = Id, Query = Query };
+        }
+
+        public void Rename(string newName)
+        {
+            Name = newName;
         }
 
         public bool Equals(CustomSqlSolutionItem other)

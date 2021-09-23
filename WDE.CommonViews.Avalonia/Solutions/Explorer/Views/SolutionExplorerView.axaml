@@ -73,15 +73,22 @@
                     </MenuItem.Styles>
                 </MenuItem>
                 <MenuItem Header="Remove"
+                          CommandParameter="{Binding #tv.SelectedItem}"
                           Command="{Binding #tv.DataContext.RemoveItem, Mode=OneTime}" />
+                <MenuItem Header="Rename"
+                          CommandParameter="{Binding #tv.SelectedItem}"
+                          Command="{Binding #tv.DataContext.RenameItem, Mode=OneTime}" />
                 <MenuItem Header="-" />
                 <MenuItem Header="Generate query"
+                          CommandParameter="{Binding #tv.SelectedItem}"
                           Command="{Binding #tv.DataContext.GenerateSQL, Mode=OneTime}"
                           IsEnabled="{Binding IsExportable}" />
                 <MenuItem Header="Save to database"
+                          CommandParameter="{Binding #tv.SelectedItem}"
                           Command="{Binding #tv.DataContext.UpdateDatabase, Mode=OneTime}"
                           IsEnabled="{Binding IsExportable}" />
                 <MenuItem Header="Save to database and reload server"
+                          CommandParameter="{Binding #tv.SelectedItem}"
                           Command="{Binding #tv.DataContext.ExportToServer, Mode=OneTime}"
                           IsEnabled="{Binding IsExportable}" />
             </ContextMenu>

@@ -6,7 +6,7 @@ using WDE.Common;
 
 namespace WDE.Solutions
 {
-    public class SolutionFolderItem : ISolutionItem
+    public class SolutionFolderItem : ISolutionItem, IRenameableSolutionItem
     {
         public SolutionFolderItem(string name, IEnumerable<ISolutionItem> children)
         {
@@ -45,5 +45,10 @@ namespace WDE.Solutions
         }
 
         public ISolutionItem Clone() => new SolutionFolderItem(MyName, Items.Select(i => i.Clone()));
+        
+        public void Rename(string newName)
+        {
+            MyName = newName;
+        }
     }
 }

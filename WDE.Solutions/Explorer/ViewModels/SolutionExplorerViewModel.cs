@@ -10,8 +10,11 @@ using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Providers;
 using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
+using WDE.Common.Utils;
 using WDE.Common.Utils.DragDrop;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
@@ -29,6 +32,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         private readonly ISolutionManager solutionManager;
         private readonly IStatusBar statusBar;
         private readonly ISolutionItemIconRegistry solutionItemIconRegistry;
+        private readonly IInputBoxService inputBoxService;
 
         private SolutionItemViewModel? selected;
         private bool visibility;
@@ -45,13 +49,16 @@ namespace WDE.Solutions.Explorer.ViewModels
             ISolutionTasksService solutionTasksService,
             IStatusBar statusBar,
             ISolutionItemIconRegistry solutionItemIconRegistry,
-            ISolutionItemProvideService provider)
+            ISolutionItemProvideService provider,
+            IInputBoxService inputBoxService,
+            IMessageBoxService messageBoxService)
         {
             this.itemNameRegistry = itemNameRegistry;
             this.solutionManager = solutionManager;
             this.ea = ea;
             this.statusBar = statusBar;
             this.solutionItemIconRegistry = solutionItemIconRegistry;
+            this.inputBoxService = inputBoxService;
 
             Root = new ObservableCollection<SolutionItemViewModel>();
             itemToViewmodel = new Dictionary<ISolutionItem, SolutionItemViewModel>();
@@ -93,15 +100,31 @@ namespace WDE.Solutions.Explorer.ViewModels
             Dictionary<string, AddItemCategoryMenuViewModel> byNameCategories = new();
             Func<ISolutionItemProvider, Task> insertItemCommand = async provider =>
             {
-                var item = await provider.CreateSolutionItem();
+                ISolutionItem? item = null;
+                if (provider is INamedSolutionItemProvider namedProvider)
+                {
+                    var name = await this.inputBoxService.GetString("New",
+                        "Please provide a name for " + namedProvider.GetName(), "");
+                    if (name == null || name.Length < 3)
+                    {
+                        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("New")
+                            .SetMainInstruction("Name is too short")
+                            .SetContent("Name can't be shorter than 3 characters")
+                            .WithOkButton(true)
+                            .Build());
+                        return;
+                    }
+
+                    item = await namedProvider.CreateSolutionItem(name);
+                }
+                else
+                    item = await provider.CreateSolutionItem();
                 if (item != null)
                     DoAddItem(item);
             };
             foreach (var item in provider.AllCompatible)
             {
-                if (item is INamedSolutionItemProvider)
-                    continue;
-                
                 if (!byNameCategories.TryGetValue(item.GetGroupName(), out var category))
                 {
                     category = new AddItemCategoryMenuViewModel(item.GetGroupName());
@@ -121,7 +144,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                 .ObservesProperty(() => SelectedItem)
                 .ObservesProperty(() => SelectedItems.Count);
 
-            RemoveItem = new DelegateCommand(() =>
+            RemoveItem = new DelegateCommand<SolutionItemViewModel>(vm =>
             {
                 if (SelectedItems.Count > 0)
                 {
@@ -131,13 +154,36 @@ namespace WDE.Solutions.Explorer.ViewModels
                     }
                     SelectedItems.Clear();
                 }
-                else if (selected != null)
+                else if (vm != null)
                 {
-                    DeleteSolutionItem(selected);
+                    DeleteSolutionItem(vm);
                 }
-            }, () => SelectedItem != null || SelectedItems.Count > 0)
-                .ObservesProperty(() => SelectedItem)
+            }, vm => vm != null || SelectedItems.Count > 0)
                 .ObservesProperty(() => SelectedItems.Count);
+
+            RenameItem = new AsyncAutoCommand<SolutionItemViewModel>(async vm =>
+            {
+                if (vm.Item is IRenameableSolutionItem renameable)
+                {
+                    var newName = await inputBoxService.GetString("Rename", "Please provide a new name", vm.Name);
+                    if (newName != null)
+                    {
+                        if (newName.Length < 3)
+                        {
+                            await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                                .SetTitle("Rename")
+                                .SetMainInstruction("Name too short")
+                                .SetContent("The name can't be shorter than 3 characters")
+                                .SetIcon(MessageBoxIcon.Warning)
+                                .WithOkButton(true)
+                                .Build());
+                            return;
+                        }
+                        renameable.Rename(newName);
+                        solutionManager.Refresh(vm.Item);
+                    }
+                }
+            }, o => o is SolutionItemViewModel vm && vm.Item is IRenameableSolutionItem);
 
             SelectedItemChangedCommand = new DelegateCommand<SolutionItemViewModel>(ob => { selected = ob; });
 
@@ -147,25 +193,25 @@ namespace WDE.Solutions.Explorer.ViewModels
                     this.ea.GetEvent<EventRequestOpenItem>().Publish(item.Item);
             });
 
-            GenerateSQL = new DelegateCommand(() =>
+            GenerateSQL = new DelegateCommand<SolutionItemViewModel>(vm =>
             {
-                if (selected != null)
+                if (vm != null)
                 {
-                    solutionSqlService.OpenDocumentWithSqlFor(selected.Item);
+                    solutionSqlService.OpenDocumentWithSqlFor(vm.Item);
                 }
-            });
+            }, vm => vm != null);
 
-            UpdateDatabase = new DelegateCommand(() =>
+            UpdateDatabase = new DelegateCommand<SolutionItemViewModel>(vm =>
             {
-                if (selected != null)
-                    solutionTasksService.SaveSolutionToDatabaseTask(selected.Item);
-            }, () => solutionTasksService.CanSaveToDatabase);
+                if (vm != null)
+                    solutionTasksService.SaveSolutionToDatabaseTask(vm.Item);
+            }, vm => vm != null && solutionTasksService.CanSaveToDatabase);
             
-            ExportToServer = new DelegateCommand(() =>
+            ExportToServer = new DelegateCommand<SolutionItemViewModel>(vm =>
             {
-                if (selected != null)
-                    solutionTasksService.SaveAndReloadSolutionTask(selected.Item);
-            }, () => solutionTasksService.CanSaveAndReloadRemotely);
+                if (vm != null)
+                    solutionTasksService.SaveAndReloadSolutionTask(vm.Item);
+            }, vm => vm != null && solutionTasksService.CanSaveAndReloadRemotely);
 
             ExportToServerItem = new DelegateCommand<object>(item =>
             {
@@ -230,13 +276,14 @@ namespace WDE.Solutions.Explorer.ViewModels
         public ObservableCollection<SolutionItemViewModel> Root { get; }
         public ObservableCollection<AddItemCategoryMenuViewModel> AddItems { get; } = new();
         public DelegateCommand AddItem { get; }
-        public DelegateCommand RemoveItem { get; }
-        public DelegateCommand GenerateSQL { get; }
+        public DelegateCommand<SolutionItemViewModel> RemoveItem { get; }
+        public AsyncAutoCommand<SolutionItemViewModel> RenameItem { get; }
+        public DelegateCommand<SolutionItemViewModel> GenerateSQL { get; }
         public DelegateCommand<SolutionItemViewModel> SelectedItemChangedCommand { get; }
         public DelegateCommand<SolutionItemViewModel> RequestOpenItem { get; }
-        public DelegateCommand ExportToServer { get; }
+        public DelegateCommand<SolutionItemViewModel> ExportToServer { get; }
         public DelegateCommand<object> ExportToServerItem { get; }
-        public DelegateCommand UpdateDatabase { get; }
+        public DelegateCommand<SolutionItemViewModel> UpdateDatabase { get; }
         
         public void DragOver(IDropInfo dropInfo)
         {

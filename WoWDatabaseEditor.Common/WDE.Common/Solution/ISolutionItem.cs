@@ -16,4 +16,9 @@ namespace WDE.Common
 
         ISolutionItem Clone();
     }
+
+    public interface IRenameableSolutionItem : ISolutionItem
+    {
+        void Rename(string newName);
+    }
 }

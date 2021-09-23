@@ -20,6 +20,7 @@ namespace WDE.Solutions.Providers
         public async Task<string> GenerateSql(SolutionFolderItem item)
         {
             StringBuilder sb = new();
+            sb.AppendLine(" -- " + item.MyName);
             foreach (ISolutionItem i in item.Items)
             {
                 if (i.IsExportable)
