@@ -155,8 +155,15 @@ namespace AvaloniaStyles.Controls
                 var curVal = (double)f.GetValue(impl)!;
                 if (Math.Abs(curVal - scaling) > 0.01)
                 {
+                    var oldWidth = window.Width * curVal;
+                    var oldHeight = window.Height * curVal;
                     f.SetValue(impl, scaling);
                     impl.ScalingChanged(scaling);
+                    DispatcherTimer.RunOnce(() =>
+                    {
+                        window.Width = oldWidth / scaling;
+                        window.Height = oldHeight / scaling;
+                    }, TimeSpan.FromMilliseconds(1));
                 }
             }
         }

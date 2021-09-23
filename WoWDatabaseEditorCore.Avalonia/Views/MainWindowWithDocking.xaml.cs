@@ -23,20 +23,24 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     {
         private static string DockSettingsFile = "~/dock.ava.layout";
         private readonly IFileSystem fileSystem;
+        private readonly IUserSettings userSettings;
         private AvaloniaDockAdapter avaloniaDockAdapter;
 
         public MainWindowWithDocking()
         {
             fileSystem = null!;
+            userSettings = null!;
             avaloniaDockAdapter = null!;
         }
         
         public MainWindowWithDocking(IMainWindowHolder mainWindowHolder, 
             IDocumentManager documentManager, 
             ILayoutViewModelResolver layoutViewModelResolver,
-            IFileSystem fileSystem)
+            IFileSystem fileSystem,
+            IUserSettings userSettings)
         {
             this.fileSystem = fileSystem;
+            this.userSettings = userSettings;
             avaloniaDockAdapter = new AvaloniaDockAdapter(documentManager, layoutViewModelResolver);
             
             // we have to do it before InitializeComponent!
@@ -67,6 +71,27 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             }
 
             dock.Layout = avaloniaDockAdapter.Initialize(serializedDock);
+
+            var lastSize = userSettings.Get<WindowLastSize>();
+            
+            if (lastSize.LastX.HasValue && lastSize.LastY.HasValue && lastSize.LastWidth.HasValue &&
+                lastSize.LastHeight.HasValue)
+            {
+                var p = new PixelPoint(lastSize.LastX.Value + 20, lastSize.LastY.Value + 20);
+                var screen = Screens.ScreenFromPoint(p);
+                if (screen != null)
+                {
+                    Position = new PixelPoint(lastSize.LastX.Value, lastSize.LastY.Value);
+                    if (!(lastSize.WasMaximized ?? false))
+                    {
+                        var tl = this.PointToClient(new PixelPoint(lastSize.LastX.Value, lastSize.LastY.Value));
+                        var br = this.PointToClient(new PixelPoint(lastSize.LastX.Value + lastSize.LastWidth.Value, lastSize.LastY.Value + lastSize.LastHeight.Value));
+                        Width = br.X - tl.X;
+                        Height = br.Y - tl.Y;   
+                    }
+                }
+            }
+            WindowState = (lastSize.WasMaximized ?? false) ? WindowState.Maximized : WindowState.Normal;
         }
 
         protected override void OnDataContextChanged(EventArgs e)
@@ -88,6 +113,17 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
+            // we use screen coords for size so that size is custom app scaling independent 
+            var screenTopLeftPoint = this.PointToScreen(new Point(Position.X, Position.Y));
+            var screenBottomRightPoint = this.PointToScreen(new Point(Position.X + Width, Position.Y + Height));
+            userSettings.Update(new WindowLastSize()
+            {
+                WasMaximized = WindowState == WindowState.Maximized || WindowState == WindowState.FullScreen,
+                LastX = Position.X,
+                LastY = Position.Y,
+                LastWidth = screenBottomRightPoint.X - screenTopLeftPoint.X,
+                LastHeight = screenBottomRightPoint.Y - screenTopLeftPoint.Y,
+            });
             fileSystem.WriteAllText(DockSettingsFile,
                 JsonConvert.SerializeObject(avaloniaDockAdapter.SerializeDock(), Formatting.Indented));
             if (!realClosing && DataContext is MainWindowViewModel closeAwareViewModel)
@@ -110,6 +146,15 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 realClosing = true;
                 Close();
             }
+        }
+
+        public struct WindowLastSize : ISettings
+        {
+            public bool? WasMaximized { get; set; }
+            public int? LastX { get; set; }
+            public int? LastY { get; set; }
+            public int? LastWidth { get; set; }
+            public int? LastHeight { get; set; }
         }
     }
 }
