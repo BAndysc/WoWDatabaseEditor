@@ -72,7 +72,7 @@ namespace WDE.Parameters
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
                 (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
-            factory.RegisterDepending("UnitBytes1Parameter", "StandStateParameter", standState => new UnitBytes1Parameter(standState));
+            factory.RegisterCombined("UnitBytes1Parameter", "StandStateParameter", "AnimTierParameter", (standState, animTier) => new UnitBytes1Parameter(standState, animTier));
             factory.RegisterCombined("UnitBytes2Parameter", "SheathStateParameter",  "UnitPVPStateFlagParameter","UnitBytesPetFlagParameter", "ShapeshiftFormParameter", 
                 (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift));
 

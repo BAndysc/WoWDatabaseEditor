@@ -2362,5 +2362,15 @@
 			"134217728": {"name": "UNIT_STATE_FOLLOW_MOVE"},	
 			"268435456": {"name": "UNIT_STATE_IGNORE_PATHFINDING"}	
 		}	
-	}	
+	},
+	"AnimTierParameter": {
+		"name": "Anim tier",
+		"values": {
+			"0": {"name": "ground"},
+			"1": {"name": "swim"},
+			"2": {"name": "hover"},
+			"3": {"name": "fly"},
+			"4": {"name": "submerged"}
+		}
+	}
 }

@@ -6,10 +6,12 @@ namespace WDE.Parameters.Parameters
     public class UnitBytes1Parameter : Parameter
     {
         private readonly IParameter<long> standStateParameter;
+        private readonly IParameter<long> animTierParameter;
 
-        public UnitBytes1Parameter(IParameter<long> standStateParameter)
+        public UnitBytes1Parameter(IParameter<long> standStateParameter, IParameter<long> animTierParameter)
         {
             this.standStateParameter = standStateParameter;
+            this.animTierParameter = animTierParameter;
         }
 
         public override string ToString(long key)
@@ -26,7 +28,7 @@ namespace WDE.Parameters.Parameters
             if (visibilityState != 0)
                 sb.Append(", Visibility state: " + visibilityState);
             if (animTier != 0)
-                sb.Append(", Anim tier: " + animTier);
+                sb.Append(", Anim tier: " + animTierParameter.ToString(animTier));
             return sb.ToString();
         }
     }
