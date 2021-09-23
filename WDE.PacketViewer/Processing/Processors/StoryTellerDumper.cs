@@ -18,7 +18,7 @@ using WDE.PacketViewer.Utils;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector>,
+    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector>,
         IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor
     {
         private readonly IDatabaseProvider databaseProvider;
@@ -59,7 +59,8 @@ namespace WDE.PacketViewer.Processing.Processors
             IRandomMovementDetector randomMovementDetector,
             ISpellService spellService,
             IUpdateObjectFollower updateObjectFollower,
-            HighLevelUpdateDump highLevelUpdateDump) : base(waypointProcessor, chatProcessor, randomMovementDetector)
+            HighLevelUpdateDump highLevelUpdateDump,
+            IDespawnDetector despawnDetector) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
@@ -71,6 +72,7 @@ namespace WDE.PacketViewer.Processing.Processors
             this.spellService = spellService;
             this.updateObjectFollower = updateObjectFollower;
             this.highLevelUpdateDump = highLevelUpdateDump;
+            this.despawnDetector = despawnDetector;
             unitFlagsParameter = parameterFactory.Factory("UnitFlagParameter");
             unitFlags2Parameter = parameterFactory.Factory("UnitFlags2Parameter");
             factionParameter = parameterFactory.Factory("FactionParameter");
@@ -515,7 +517,9 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (created.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
-                SetAppendOnNext("Created " + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation));
+                var spawnTime = despawnDetector.GetSpawnLength(created.Guid, basePacket.Number);
+                SetAppendOnNext("Created " + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation) +
+                                (spawnTime == null ? "" : $" (despawned in {spawnTime.Value.TotalSeconds} seconds)"));
                 PrintValues(basePacket, created.Guid, created.Values, false);
                 SetAppendOnNext(null);
             }

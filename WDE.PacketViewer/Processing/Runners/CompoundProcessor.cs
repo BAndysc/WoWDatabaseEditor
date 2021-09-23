@@ -60,4 +60,32 @@ namespace WDE.PacketViewer.Processing.Runners
             return true;
         }
     }
+    
+    public abstract class CompoundProcessor<T, R1, R2, R3, R4> : PacketProcessor<T>, ITwoStepPacketProcessor<bool> where R1 : IPacketProcessor<T> 
+        where R2 : IPacketProcessor<T>
+        where R3 : IPacketProcessor<T>
+        where R4 : IPacketProcessor<T>
+    {
+        private readonly R1 r1;
+        private readonly R2 r2;
+        private readonly R3 r3;
+        private readonly R4 r4;
+
+        protected CompoundProcessor(R1 r1, R2 r2, R3 r3, R4 r4)
+        {
+            this.r1 = r1;
+            this.r2 = r2;
+            this.r3 = r3;
+            this.r4 = r4;
+        }
+
+        public bool PreProcess(PacketHolder packet)
+        {
+            r1.Process(packet);
+            r2.Process(packet);
+            r3.Process(packet);
+            r4.Process(packet);
+            return true;
+        }
+    }
 }
