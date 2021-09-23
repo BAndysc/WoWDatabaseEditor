@@ -89,8 +89,8 @@ namespace WDE.SQLEditor.Solutions
         }
     }
 
-    [AutoRegister]
-    [SingleInstance]
+    //[AutoRegister]
+    //[SingleInstance]
     public class ItemProvider : ISolutionItemProvider, INamedSolutionItemProvider
     {
         public string GetName()
