@@ -43,6 +43,18 @@
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackgroundPressed}" />
     </Style>
+    <!-- titlebar button style  > ContentPresenter -->
+    <Style Selector="controls1|ToolbarPanel > ContentPresenter > :is(Button):pressed">
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > ContentPresenter > :is(Button) TextBlock">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="controls1|ToolbarPanel > ContentPresenter > :is(Button):pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource RaisedContentBackgroundPressed}" />
+    </Style>
     
     <!-- dropdown button style -->
     <Style Selector="controls1|ToolbarPanel > controls1|DropDownButton ToggleButton :is(Button):pressed">

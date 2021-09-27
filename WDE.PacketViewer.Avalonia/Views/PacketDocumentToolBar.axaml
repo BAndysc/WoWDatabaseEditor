@@ -8,6 +8,7 @@
              xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
              d:DataContext="{d:DesignInstance viewModels:PacketDocumentViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="Root"
              x:Class="WDE.PacketViewer.Avalonia.Views.PacketDocumentToolBar">
     
     <UserControl.Resources>
@@ -74,6 +75,30 @@
                 </Button>
             </StackPanel>
         </controls:DropDownButton>
+        
+        <Border Width="15" />
+        
+        <ItemsPresenter Items="{Binding Processors}">
+            <ItemsPresenter.ItemTemplate>
+                <DataTemplate>
+                    <Button Command="{Binding #Root.DataContext.QuickRunProcessor}"
+                            CommandParameter="{Binding .}"
+                        ToolTip.Tip="{Binding Name}">
+                        <components:WdeImage Image="{Binding Image}" />
+                    </Button>
+                </DataTemplate>
+            </ItemsPresenter.ItemTemplate>
+            <ItemsPresenter.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <controls:ToolbarPanel />
+                </ItemsPanelTemplate>
+            </ItemsPresenter.ItemsPanel>
+            <ItemsPresenter.Styles>
+                <Style Selector="components|WdeImage">
+                    <Setter Property="Height" Value="20" />
+                </Style>
+            </ItemsPresenter.Styles>
+        </ItemsPresenter>
         
         <controls:ToolbarSpacer />
 

@@ -176,6 +176,38 @@ namespace WDE.PacketViewer.ViewModels
             foreach (var dumper in dumperProviders)
                 Processors.Add(new(dumper));
 
+            QuickRunProcessor = new AsyncAutoCommand<ProcessorViewModel>(async (processor) =>
+            {
+                LoadingInProgress = true;
+                FilteringInProgress = true;
+                try
+                {
+                    var tokenSource = new CancellationTokenSource();
+                    AssertNoOnGoingTask();
+                    currentActionToken = tokenSource;
+
+                    var output = await RunProcessorsThreaded(new List<ProcessorViewModel>(){processor}, tokenSource.Token).ConfigureAwait(true);
+
+                    if (output != null && !tokenSource.IsCancellationRequested)
+                        documentManager.OpenDocument(textDocumentService.CreateDocument( $"{processor.Name} ({Title})", output,  processor.Extension));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetIcon(MessageBoxIcon.Error)
+                        .SetTitle("Fatal error")
+                        .SetMainInstruction("Fatal error during processing")
+                        .SetContent(
+                            "Sorry, fatal error occured, this is probably a bug in processors, please report it in github\n\n" + e)
+                        .WithOkButton(true)
+                        .Build());
+                }
+                LoadingInProgress = false;
+                FilteringInProgress = false;
+                currentActionToken = null;
+            });
+            
             RunProcessors = new AsyncAutoCommand(async () =>
             {
                 var processors = Processors.Where(s => s.IsChecked).ToList();
@@ -928,6 +960,7 @@ namespace WDE.PacketViewer.ViewModels
         private CancellationTokenSource? filteringToken;
         private CancellationTokenSource? currentActionToken;
         public AsyncAutoCommand RunProcessors { get; }
+        public AsyncAutoCommand<ProcessorViewModel> QuickRunProcessor { get; }
         public ObservableCollection<ProcessorViewModel> Processors { get; } = new();
         private ObservableCollectionExtended<PacketViewModel> AllPackets { get; } = new ();
         private ObservableCollectionExtended<PacketViewModel>? AllPacketsSplit { get; set; }
