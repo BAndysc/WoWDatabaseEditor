@@ -20,7 +20,8 @@ namespace WDE.AzerothCore
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
             typeof(IConversationTemplate),
             typeof(IAuthRbacPermission),
-            typeof(IAuthRbacLinkedPermission)
+            typeof(IAuthRbacLinkedPermission),
+            typeof(IPointOfInterest)
         };
         
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>

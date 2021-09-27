@@ -30,8 +30,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IGossipMenu> GetGossipMenus() => Enumerable.Empty<IGossipMenu>();
         
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() => Enumerable.Empty<ICreatureClassLevelStat>();
-        
+
+        public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) =>
+            Task.FromResult(new List<IGossipMenuOption>());
+
         public IEnumerable<INpcText> GetNpcTexts() => Enumerable.Empty<INpcText>();
+        public INpcText? GetNpcText(uint entry) => null;
+        public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => Task.FromResult(new List<IPointOfInterest>());
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
 
@@ -53,7 +58,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             Task.FromResult<IList<int>>(new List<int>());
         
         public IBroadcastText? GetBroadcastTextByText(string text) => null;
-
+        
+        public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => Task.FromResult<IBroadcastText?>(null);
+        
         public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => Task.FromResult<IBroadcastText?>(null);
 
         public ICreature? GetCreatureByGuid(uint guid) => null;

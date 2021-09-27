@@ -29,12 +29,14 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlConditionLine> Conditions => GetTable<MySqlConditionLine>();
         public ITable<MySqlSpellScriptName> SpellScriptNames => GetTable<MySqlSpellScriptName>();
         public ITable<MySqlGossipMenuLine> GossipMenus => GetTable<MySqlGossipMenuLine>();
+        public ITable<MySqlGossipMenuOption> GossipMenuOptions => GetTable<MySqlGossipMenuOption>();
         public ITable<MySqlNpcText> NpcTexts => GetTable<MySqlNpcText>();
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
         public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
         public ITable<ITrinityString> Strings => GetTable<TrinityString, ACoreString, ITrinityString>();
         public ITable<IDatabaseSpellDbc> SpellDbc => GetTable<TrinityMySqlSpellDbc, AzerothMySqlSpellDbc, IDatabaseSpellDbc>();
+        public ITable<MySqlPointOfInterest> PointsOfInterest => GetTable<MySqlPointOfInterest>();
 
         private ITable<T> GetTable<R, S, T>() where T : class 
             where S : class, T

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using KTrie;
 using Prism.Events;
@@ -27,6 +28,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         private List<IConversationTemplate>? conversationTemplates;
         private List<IGossipMenu>? gossipMenusCache;
         private List<INpcText>? npcTextsCache;
+        private Dictionary<uint, INpcText>? npcTextsByIdCache;
         private List<ICreatureClassLevelStat>? creatureClassLevelStatsCache;
         private IList<IDatabaseSpellDbc>? databaseSpellDbcCache;
 
@@ -115,9 +117,25 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => conversationTemplates ?? nonCachedDatabase.GetConversationTemplates();
 
         public IEnumerable<IGossipMenu> GetGossipMenus() => gossipMenusCache ?? nonCachedDatabase.GetGossipMenus();
-        
+
+        public Task<List<IGossipMenu>> GetGossipMenusAsync() => gossipMenusCache == null
+            ? nonCachedDatabase.GetGossipMenusAsync()
+            : Task.FromResult(gossipMenusCache);
+
+        public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => nonCachedDatabase.GetGossipMenuOptionsAsync(menuId);
+
         public IEnumerable<INpcText> GetNpcTexts() => npcTextsCache ?? nonCachedDatabase.GetNpcTexts();
-        
+
+        public INpcText? GetNpcText(uint entry)
+        {
+            if (npcTextsByIdCache == null)
+                return nonCachedDatabase.GetNpcText(entry);
+            npcTextsByIdCache.TryGetValue(entry, out var val);
+            return val;
+        }
+
+        public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => nonCachedDatabase.GetPointsOfInterestsAsync();
+
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
             areaTriggerTemplates ?? nonCachedDatabase.GetAreaTriggerTemplates();
 
@@ -177,6 +195,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                 return val;
             return null;
         }
+
+        public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => nonCachedDatabase.GetBroadcastTextByIdAsync(id);
         
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
         {
@@ -235,6 +255,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
                     progress.Report(6, steps, "Loading npc texts");
                     cache.npcTextsCache = await cache.nonCachedDatabase.GetNpcTextsAsync();
+                    cache.npcTextsByIdCache = cache.npcTextsCache.ToDictionary(npcText => npcText.Id);
 
                     progress.Report(7, steps, "Loading quests");
                     cache.questTemplateCache = await cache.nonCachedDatabase.GetQuestTemplatesAsync();

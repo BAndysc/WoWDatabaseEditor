@@ -12,7 +12,6 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync();
         Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync();
         Task<List<IQuestTemplate>> GetQuestTemplatesAsync();
-        Task<List<IGossipMenu>> GetGossipMenusAsync();
         Task<List<INpcText>> GetNpcTextsAsync();
         Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync();
         Task<List<IBroadcastText>> GetBroadcastTextsAsync();

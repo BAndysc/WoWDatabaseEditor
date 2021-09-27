@@ -23,10 +23,12 @@ namespace WDE.SkyFireMySqlDatabase.Models
         public ITable<MySqlConditionLine> Conditions => GetTable<MySqlConditionLine>();
         public ITable<MySqlSpellScriptName> SpellScriptNames => GetTable<MySqlSpellScriptName>();
         public ITable<MySqlGossipMenuLine> GossipMenus => GetTable<MySqlGossipMenuLine>();
+        public ITable<MySqlGossipMenuOption> GossipMenuOptions => GetTable<MySqlGossipMenuOption>();
         public ITable<MySqlNpcText> NpcTexts => GetTable<MySqlNpcText>();
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
         public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
         public ITable<SkyfireString> TrinityStrings => GetTable<SkyfireString>();
+        public ITable<MySqlPointOfInterest> PointsOfInterest => GetTable<MySqlPointOfInterest>();
     }
 }

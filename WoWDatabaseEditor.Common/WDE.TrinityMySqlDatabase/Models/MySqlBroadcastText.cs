@@ -18,5 +18,32 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         [Column(Name = "Text1")]
         public string? Text1 { get; set; }
+        
+        [Column(Name = "EmoteID1")]
+        public uint EmoteId1  { get; set; }
+        
+        [Column(Name = "EmoteID2")]
+        public uint EmoteId2 { get; set; }
+        
+        [Column(Name = "EmoteID3")]
+        public uint EmoteId3 { get; set; }
+        
+        [Column(Name = "EmoteDelay1")]
+        public uint EmoteDelay1 { get; set; }
+        
+        [Column(Name = "EmoteDelay2")]
+        public uint EmoteDelay2 { get; set; }
+        
+        [Column(Name = "EmoteDelay3")]
+        public uint EmoteDelay3 { get; set; }
+        
+        [Column(Name = "SoundEntriesID")]
+        public uint SoundEntriesId { get; set; }
+        
+        [Column(Name = "EmotesID")]
+        public uint EmotesId { get; set; }
+        
+        [Column(Name = "Flags")]
+        public uint Flags { get; set; }
     }
 }

@@ -11,6 +11,9 @@ namespace WDE.SkyFireMySqlDatabase.Models
         [Column(Name = "entry")]
         public uint Entry { get; set; }
 
+        [Column(Name = "gossip_menu_id")] 
+        public uint GossipMenuId { get; set; }
+
         [Column(Name = "name")] 
         public string Name { get; set; } = "";
 

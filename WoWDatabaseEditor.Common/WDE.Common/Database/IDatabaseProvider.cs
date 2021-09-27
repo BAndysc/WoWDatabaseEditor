@@ -26,7 +26,11 @@ namespace WDE.Common.Database
         IEnumerable<IGameEvent> GetGameEvents();
         IEnumerable<IConversationTemplate> GetConversationTemplates();
         IEnumerable<IGossipMenu> GetGossipMenus();
+        Task<List<IGossipMenu>> GetGossipMenusAsync();
+        Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
         IEnumerable<INpcText> GetNpcTexts();
+        INpcText? GetNpcText(uint entry);
+        Task<List<IPointOfInterest>> GetPointsOfInterestsAsync();
 
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
 
@@ -46,6 +50,7 @@ namespace WDE.Common.Database
 
         IBroadcastText? GetBroadcastTextByText(string text);
         Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
+        Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
 
         ICreature? GetCreatureByGuid(uint guid);
         IGameObject? GetGameObjectByGuid(uint guid);

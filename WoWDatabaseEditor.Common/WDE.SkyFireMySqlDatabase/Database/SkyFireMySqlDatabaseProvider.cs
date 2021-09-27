@@ -130,6 +130,12 @@ namespace WDE.SkyFireMySqlDatabase.Database
                 .ToList<IGossipMenu>();
         }
 
+        public async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
+        {
+            await using var model = new SkyFireDatabase();
+            return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
+        }
+        
         public IEnumerable<INpcText> GetNpcTexts()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
@@ -146,6 +152,15 @@ namespace WDE.SkyFireMySqlDatabase.Database
             
             await using var model = new SkyFireDatabase();
             return await (from t in model.NpcTexts orderby t.Id select t).ToListAsync<INpcText>();
+        }
+
+        public INpcText? GetNpcText(uint entry)
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+                return null;
+            
+            using var model = new SkyFireDatabase();
+            return model.NpcTexts.FirstOrDefault(text => text.Id == entry);
         }
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
@@ -393,7 +408,15 @@ namespace WDE.SkyFireMySqlDatabase.Database
             await using var model = new SkyFireDatabase();
             return await (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefaultAsync();
         }
-
+        
+        public async Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id)
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
+                return null;
+            await using var model = new SkyFireDatabase();
+            return await (from t in model.BroadcastTexts where t.Id == id select t).FirstOrDefaultAsync();
+        }
+        
         public ICreature? GetCreatureByGuid(uint guid)
         {
             using var model = new SkyFireDatabase();
@@ -454,6 +477,14 @@ namespace WDE.SkyFireMySqlDatabase.Database
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
         {
             return Task.FromResult<IList<IDatabaseSpellDbc>>(new List<IDatabaseSpellDbc>());
+        }
+
+        public async Task<List<IPointOfInterest>> GetPointsOfInterestsAsync()
+        {
+            if (!Supports<IPointOfInterest>())
+                return new List<IPointOfInterest>();
+            await using var model = new SkyFireDatabase();
+            return await model.PointsOfInterest.OrderBy(t => t.Id).ToListAsync<IPointOfInterest>();
         }
 
         private bool Supports<T>()

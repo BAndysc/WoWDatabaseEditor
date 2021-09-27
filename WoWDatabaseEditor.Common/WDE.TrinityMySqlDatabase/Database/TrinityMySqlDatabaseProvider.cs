@@ -135,6 +135,21 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToList<IGossipMenu>();
         }
 
+        public async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
+        {
+            await using var model = Database();
+            return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
+        }
+
+        public INpcText? GetNpcText(uint entry)
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+                return null;
+            
+            using var model = Database();
+            return model.NpcTexts.FirstOrDefault(text => text.Id == entry);
+        }
+
         public IEnumerable<INpcText> GetNpcTexts()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
@@ -415,6 +430,14 @@ namespace WDE.TrinityMySqlDatabase.Database
             await using var model = Database();
             return await (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefaultAsync();
         }
+        
+        public async Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id)
+        {
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
+                return null;
+            await using var model = Database();
+            return await (from t in model.BroadcastTexts where t.Id == id select t).FirstOrDefaultAsync();
+        }
 
         public ICreature? GetCreatureByGuid(uint guid)
         {
@@ -456,6 +479,15 @@ namespace WDE.TrinityMySqlDatabase.Database
         {
             await using var model = Database();
             return await model.SpellDbc.ToListAsync();
+        }
+        
+        public async Task<List<IPointOfInterest>> GetPointsOfInterestsAsync()
+        {
+            if (!Supports<IPointOfInterest>())
+                return new List<IPointOfInterest>();
+            
+            await using var model = Database();
+            return await model.PointsOfInterest.OrderBy(t => t.Id).ToListAsync<IPointOfInterest>();
         }
 
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();

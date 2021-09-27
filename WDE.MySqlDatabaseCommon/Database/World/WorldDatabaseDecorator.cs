@@ -23,9 +23,15 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => impl.GetConversationTemplates();
+        public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => impl.GetGossipMenuOptionsAsync(menuId);
         public IEnumerable<INpcText> GetNpcTexts() => impl.GetNpcTexts();
+        public INpcText? GetNpcText(uint entry) => impl.GetNpcText(entry);
+        public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => impl.GetPointsOfInterestsAsync();
+
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() => impl.GetCreatureClassLevelStats();
         public IEnumerable<IGossipMenu> GetGossipMenus() => impl.GetGossipMenus();
+        public Task<List<IGossipMenu>> GetGossipMenusAsync() => impl.GetGossipMenusAsync();
+
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) =>
             impl.GetScriptFor(entryOrGuid, type);
         public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script) =>
@@ -53,6 +59,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
         public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => impl.GetBroadcastTextByTextAsync(text);
+        public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => impl.GetBroadcastTextByIdAsync(id);
 
         public ICreature? GetCreatureByGuid(uint guid) => impl.GetCreatureByGuid(guid);
         public IGameObject? GetGameObjectByGuid(uint guid) => impl.GetGameObjectByGuid(guid);
