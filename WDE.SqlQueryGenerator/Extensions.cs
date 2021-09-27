@@ -64,28 +64,68 @@ namespace WDE.SqlQueryGenerator
             bool first = true;
             PropertyInfo[] properties = null!;
             var sb = new StringBuilder();
-            var lines = new List<string>();
+            var lines = new List<(string row, bool ignored, string? comment)>();
+            PropertyInfo? commentProperty = null;
+            PropertyInfo? ignoredProperty = null;
             foreach (var o in objects)
             {
                 if (first)
                 {
                     var type = o.GetType();
-                    properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                    commentProperty = type.GetProperty("__comment", BindingFlags.Instance | BindingFlags.Public);
+                    ignoredProperty = type.GetProperty("__ignored", BindingFlags.Instance | BindingFlags.Public);
+                    properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                        .Where(prop => prop != commentProperty && prop != ignoredProperty)
+                        .ToArray();
                     var cols = string.Join(", ", properties.Select(c => $"`{c.Name}`"));
                     var ignore = insertIgnore ? " IGNORE" : "";
                     sb.AppendLine($"INSERT{ignore} INTO `{table.TableName}` ({cols}) VALUES");
                     first = false;
                 }
 
+                var comment = (string?)commentProperty?.GetValue(o) ?? null;
+                var ignored = (bool)((bool?)ignoredProperty?.GetValue(o) ?? false);
                 var row = string.Join(", ", properties.Select(p => p.GetValue(o).ToSql()));
-                lines.Add($"({row})");
+                lines.Add((row, ignored, comment));
             }
 
             if (first)
                 return new Query(table, "");
 
-            sb.Append(string.Join(",\n", lines));
-            sb.Append(';');
+
+            var lastNotIgnored = lines.FindLastIndex( row => !row.ignored);
+            var lastIgnored = lines.FindLastIndex(row => row.ignored);
+            
+            for (var index = 0; index < lines.Count; index++)
+            {
+                var isLast = index == lines.Count - 1;
+                var line = lines[index];
+
+                if (line.ignored)
+                    sb.Append(" -- ");
+                
+                sb.Append('(');
+                sb.Append(line.Item1);
+                sb.Append(')');
+                
+                if ((lastIgnored == -1 && !isLast) || (lastIgnored >= 0 && (lastIgnored < lastNotIgnored && !isLast) || (lastIgnored > lastNotIgnored && index < lastNotIgnored)))
+                    sb.Append(',');
+                else
+                {
+                    if (!line.ignored)
+                        sb.Append(';');
+                }
+                
+                if (line.comment != null)
+                {
+                    sb.Append(" -- ");
+                    sb.Append(line.comment);
+                }
+
+                if (!isLast)
+                    sb.AppendLine();
+            }
+            
             return new Query(table, sb.ToString());
         }
         
@@ -126,13 +166,13 @@ namespace WDE.SqlQueryGenerator
             return new UpdateQuery(query, key, value.ToSql());
         }
 
-        public static IQuery Update(this IUpdateQuery query)
+        public static IQuery Update(this IUpdateQuery query, string? comment = null)
         {
             var upd = string.Join(", ", query.Updates.Select(pair => $"`{pair.Item1}` = {pair.Item2}"));
             string where = "";
             if (query.Condition.Condition != "1")
                 where = $" WHERE {query.Condition.Condition}";
-            return new Query(query.Condition.Table, $"UPDATE `{query.Condition.Table.TableName}` SET {upd}{where};");
+            return new Query(query.Condition.Table, $"UPDATE `{query.Condition.Table.TableName}` SET {upd}{where};" + (comment == null ? "" : " -- " + comment));
         }
 
         public static IQuery Comment(this IMultiQuery query, string comment)
@@ -147,7 +187,7 @@ namespace WDE.SqlQueryGenerator
 
         public static IQuery BlankLine(this IMultiQuery query)
         {
-            return new Query(query, "\n");
+            return new Query(query, "");
         }
 
         public static IVariable Variable(this IMultiQuery query, string name)
