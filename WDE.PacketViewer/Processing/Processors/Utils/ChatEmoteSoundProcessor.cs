@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using WDE.Module.Attributes;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
@@ -93,19 +94,49 @@ namespace WDE.PacketViewer.Processing.Processors
 
         protected override bool Process(PacketBase basePacket, PacketPlayObjectSound packet)
         {
-            Get(packet.Source).LastSound = (basePacket, packet.Sound);
+            var state = Get(packet.Source);
+            if (state.LastChat.HasValue &&
+                !chatPacketIdToSound.ContainsKey(state.LastChat.Value.packet.Number) &&
+                HasJustHappened(state.LastChat?.packet, basePacket))
+            {
+                var chatId = state.LastChat!.Value.packet.Number;
+                chatPacketIdToSound[chatId] = packet.Sound;
+                soundPacketIdToChatPacketId[basePacket.Number] = chatId;
+            }
+            else
+                Get(packet.Source).LastSound = (basePacket, packet.Sound);
             return true;
         }
 
         protected override bool Process(PacketBase basePacket, PacketPlaySound packet)
         {
-            Get(packet.Source).LastSound = (basePacket, packet.Sound);
+            var state = Get(packet.Source);
+            if (state.LastChat.HasValue &&
+                !chatPacketIdToSound.ContainsKey(state.LastChat.Value.packet.Number) &&
+                HasJustHappened(state.LastChat?.packet, basePacket))
+            {
+                var chatId = state.LastChat!.Value.packet.Number;
+                chatPacketIdToSound[chatId] = packet.Sound;
+                soundPacketIdToChatPacketId[basePacket.Number] = chatId;
+            }
+            else
+                Get(packet.Source).LastSound = (basePacket, packet.Sound);
             return true;
         }
 
         protected override bool Process(PacketBase basePacket, PacketEmote packet)
         {
-            Get(packet.Sender).LastEmote = (basePacket, packet.Emote);
+            var state = Get(packet.Sender);
+            if (state.LastChat.HasValue &&
+                !chatPacketIdToEmote.ContainsKey(state.LastChat.Value.packet.Number) &&
+                HasJustHappened(state.LastChat?.packet, basePacket))
+            {
+                var chatId = state.LastChat!.Value.packet.Number;
+                chatPacketIdToEmote[chatId] = packet.Emote;
+                emotePacketIdToChatPacketId[basePacket.Number] = chatId;
+            }
+            else
+                state.LastEmote = (basePacket, packet.Emote);
             return true;
         }
 
