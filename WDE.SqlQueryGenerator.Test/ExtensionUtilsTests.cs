@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 namespace WDE.SqlQueryGenerator.Test
@@ -49,13 +50,16 @@ namespace WDE.SqlQueryGenerator.Test
         [Test]
         public void TestBlankLine()
         {
-            Assert.AreEqual("\n", Queries.BeginTransaction().BlankLine().QueryString);
+            var trans = Queries.BeginTransaction();
+            trans.BlankLine();
+            trans.BlankLine();
+            Assert.AreEqual(Environment.NewLine, trans.Close().QueryString);
         }
         
         [Test]
         public void TestQueryToString()
         {
-            Assert.AreEqual("\n", Queries.BeginTransaction().BlankLine().ToString());
+            Assert.AreEqual("", Queries.BeginTransaction().BlankLine().ToString());
         }
     }
 }

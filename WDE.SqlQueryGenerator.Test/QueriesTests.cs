@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 namespace WDE.SqlQueryGenerator.Test
@@ -22,7 +23,7 @@ namespace WDE.SqlQueryGenerator.Test
             var query = Queries.BeginTransaction();
             query.Table("abc").Where(r => true).Delete();
             query.Table("def").Where(r => true).Delete();
-            Assert.AreEqual("DELETE FROM `abc`;\nDELETE FROM `def`;", query.Close().QueryString);
+            Assert.AreEqual($"DELETE FROM `abc`;{Environment.NewLine}DELETE FROM `def`;", query.Close().QueryString);
         }
     }
 }

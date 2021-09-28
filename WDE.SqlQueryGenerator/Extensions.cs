@@ -54,7 +54,7 @@ namespace WDE.SqlQueryGenerator
             if (first)
                 return new Query(table, "");
 
-            sb.Append(string.Join(",\n", lines));
+            sb.Append(string.Join("," + Environment.NewLine, lines));
             sb.Append(';');
             return new Query(table, sb.ToString());
         }
