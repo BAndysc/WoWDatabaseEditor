@@ -136,6 +136,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => nonCachedDatabase.GetPointsOfInterestsAsync();
 
+        public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => nonCachedDatabase.GetCreatureTextsByEntry(entry);
+
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
             areaTriggerTemplates ?? nonCachedDatabase.GetAreaTriggerTemplates();
 

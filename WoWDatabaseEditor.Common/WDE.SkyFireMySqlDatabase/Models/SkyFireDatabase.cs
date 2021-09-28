@@ -30,5 +30,6 @@ namespace WDE.SkyFireMySqlDatabase.Models
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
         public ITable<SkyfireString> TrinityStrings => GetTable<SkyfireString>();
         public ITable<MySqlPointOfInterest> PointsOfInterest => GetTable<MySqlPointOfInterest>();
+        public ITable<MySqlCreatureText> CreatureTexts => GetTable<MySqlCreatureText>();
     }
 }

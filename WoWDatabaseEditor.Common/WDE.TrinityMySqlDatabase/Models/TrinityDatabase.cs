@@ -37,6 +37,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<ITrinityString> Strings => GetTable<TrinityString, ACoreString, ITrinityString>();
         public ITable<IDatabaseSpellDbc> SpellDbc => GetTable<TrinityMySqlSpellDbc, AzerothMySqlSpellDbc, IDatabaseSpellDbc>();
         public ITable<MySqlPointOfInterest> PointsOfInterest => GetTable<MySqlPointOfInterest>();
+        public ITable<MySqlCreatureText> CreatureTexts => GetTable<MySqlCreatureText>();
 
         private ITable<T> GetTable<R, S, T>() where T : class 
             where S : class, T

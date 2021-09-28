@@ -50,6 +50,15 @@ namespace WDE.SkyFireMySqlDatabase.Database
             return await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync<ICreatureTemplate>();
         }
 
+        public async Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry)
+        {
+            await using var model = new SkyFireDatabase();
+            return await model.CreatureTexts.Where(t => t.CreatureId == entry)
+                .OrderBy(t => t.GroupId)
+                .ThenBy(t => t.Id)
+                .ToListAsync<ICreatureText>();
+        }
+
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
             using var model = new SkyFireDatabase();

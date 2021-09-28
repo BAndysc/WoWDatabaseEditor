@@ -37,7 +37,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<INpcText> GetNpcTexts() => Enumerable.Empty<INpcText>();
         public INpcText? GetNpcText(uint entry) => null;
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => Task.FromResult(new List<IPointOfInterest>());
-
+        public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => Task.FromResult(new List<ICreatureText>());
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
 
         public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script) => Task.FromResult(false);

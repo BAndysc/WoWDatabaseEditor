@@ -32,6 +32,8 @@ namespace WDE.Common.Database
         INpcText? GetNpcText(uint entry);
         Task<List<IPointOfInterest>> GetPointsOfInterestsAsync();
 
+        Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry);
+
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
 
         Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script);
