@@ -7,6 +7,7 @@ namespace WDE.Updater.Models
     {
         public long LatestVersion { get; set; }
         public string? DownloadUrl { get; set; }
+        public string? DownloadMd5 { get; set; }
         public ChangeLogEntry[]? ChangeLog { get; set; }
     }
 }

@@ -106,7 +106,12 @@ namespace WDE.Updater.ViewModels
         {
             try
             {
-                await updateService.DownloadLatestVersion(taskProgress);
+                if (!await updateService.DownloadLatestVersion(taskProgress))
+                {
+                    statusBar.PublishNotification(new PlainNotification(NotificationType.Warning,
+                        "Failed to download the update, update file got corrupted. Please try later."));
+                    return;
+                }
                 statusBar.PublishNotification(new PlainNotification(NotificationType.Info, 
                     "Update ready to install. It will be installed on the next editor restart or when you click here",
                     new AsyncAutoCommand(async () =>

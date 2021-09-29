@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WDE.Common.Managers;
@@ -16,7 +17,7 @@ namespace WDE.Updater.Services
     {
         bool CanCheckForUpdates();
         Task<string?> CheckForUpdates();
-        Task DownloadLatestVersion(ITaskProgress taskProgress);
+        Task<bool> DownloadLatestVersion(ITaskProgress taskProgress);
         Task CloseForUpdate();
     }
     
@@ -32,6 +33,7 @@ namespace WDE.Updater.Services
         private readonly IStandaloneUpdater standaloneUpdater;
         private readonly IUpdaterSettingsProvider settings;
         private readonly IAutoUpdatePlatformService platformService;
+        private readonly IUpdateVerifier updateVerifier;
         private IUpdateClient? updateClient;
         private CheckVersionResponse? cachedResponse;
 
@@ -56,7 +58,8 @@ namespace WDE.Updater.Services
             IFileSystem fileSystem,
             IStandaloneUpdater standaloneUpdater,
             IUpdaterSettingsProvider settings,
-            IAutoUpdatePlatformService platformService)
+            IAutoUpdatePlatformService platformService,
+            IUpdateVerifier updateVerifier)
         {
             this.data = data;
             this.clientFactory = clientFactory;
@@ -66,6 +69,7 @@ namespace WDE.Updater.Services
             this.standaloneUpdater = standaloneUpdater;
             this.settings = settings;
             this.platformService = platformService;
+            this.updateVerifier = updateVerifier;
             standaloneUpdater.RenameIfNeeded();
         }
 
@@ -90,20 +94,42 @@ namespace WDE.Updater.Services
             return cachedResponse?.DownloadUrl;
         }
 
-        public async Task DownloadLatestVersion(ITaskProgress taskProgress)
+        public async Task<bool> DownloadLatestVersion(ITaskProgress taskProgress)
         {
             cachedResponse ??= await InternalCheckForUpdates();
             
             if (cachedResponse != null)
             {
                 var physPath = fileSystem.ResolvePhysicalPath(platformService.UpdateZipFilePath);
-                await UpdateClient.DownloadUpdate(cachedResponse, physPath.FullName, taskProgress.ToProgress());
+                bool success = false;
+                int trial = 0;
+                do
+                {
+                    trial++;
+                    success = true;
+                    await UpdateClient.DownloadUpdate(cachedResponse, physPath.FullName, taskProgress.ToProgress());
+                    if (!string.IsNullOrEmpty(cachedResponse.DownloadMd5))
+                    {
+                        success = await updateVerifier.IsUpdateValid((FileInfo)physPath, cachedResponse.DownloadMd5);
+                    }
+                } while (!success && trial < 3);
 
+                if (!success)
+                {
+                    physPath.Delete();
+                    taskProgress.ReportFinished();
+                    return false;
+                }
+                
                 if (cachedResponse.ChangeLog?.Length > 0)
                     fileSystem.WriteAllText("~/changelog.json", JsonConvert.SerializeObject(cachedResponse.ChangeLog));
+                
+                taskProgress.ReportFinished();
+                return true;
             }
             
             taskProgress.ReportFinished();
+            return false;
         }
 
         public async Task CloseForUpdate()
