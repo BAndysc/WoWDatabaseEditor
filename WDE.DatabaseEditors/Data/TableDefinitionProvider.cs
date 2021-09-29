@@ -13,6 +13,7 @@ namespace WDE.DatabaseEditors.Data
     {
         private readonly Dictionary<string, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitions = new();
+        private readonly Dictionary<string, DatabaseTableDefinitionJson> definitionsByTableName = new();
         
         public TableDefinitionProvider(ITableDefinitionDeserializer serializationProvider,
             ITableDefinitionJsonProvider jsonProvider,
@@ -53,10 +54,13 @@ namespace WDE.DatabaseEditors.Data
                     }
                 }
 
-                if (definition.Compatibility.Contains(currentCoreVersion.Current.Tag) || 
-                    fileToExtraCompatibility.TryGetValue(source.file, out var reference) && 
+                if (definition.Compatibility.Contains(currentCoreVersion.Current.Tag) ||
+                    fileToExtraCompatibility.TryGetValue(source.file, out var reference) &&
                     reference.Any(r => r.Compatibility == currentCoreVersion.Current.Tag))
+                {
                     definitions[definition.Id] = definition;
+                    definitionsByTableName[definition.TableName] = definition;
+                }
                 else
                     incompatibleDefinitions[definition.Id] = definition;
             }
@@ -68,8 +72,19 @@ namespace WDE.DatabaseEditors.Data
                 return definition.Compatibility;
             return null;
         }
+
+        public DatabaseTableDefinitionJson? GetDefinitionByTableName(string? tableName)
+        {
+            if (tableName == null)
+                return null;
+            
+            if (definitionsByTableName.TryGetValue(tableName, out var definition))
+                return definition;
+            
+            return null;
+        }
         
-        public DatabaseTableDefinitionJson? GetDefinition(string definitionId)
+        public DatabaseTableDefinitionJson? GetDefinition(string? definitionId)
         {
             if (definitionId != null && definitions.TryGetValue(definitionId, out var definition))
                 return definition;

@@ -17,10 +17,10 @@ namespace WoWDatabaseEditorCore.Services.TextDocumentService
             this.creator = creator;
         }
 
-        public IDocument CreateDocument(string title, string text, string extenion)
+        public IDocument CreateDocument(string title, string text, string extension, bool inspectQuery = false)
         {
             var doc = creator();
-            doc.Set(title, text, extenion);
+            doc.Set(title, text, extension, inspectQuery);
             return doc;
         }
     }

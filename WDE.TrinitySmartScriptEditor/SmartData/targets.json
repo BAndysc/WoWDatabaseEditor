@@ -101,6 +101,7 @@
         "help": "Absolute world position, use xyz from event params",
         "name_readable": "Absolute position",
         "is_only_target": true,
+        "uses_target_position": true,
         "types": [
             "Position"
         ]

@@ -189,7 +189,7 @@ namespace WDE.PacketViewer.ViewModels
                     var output = await RunProcessorsThreaded(new List<ProcessorViewModel>(){processor}, tokenSource.Token).ConfigureAwait(true);
 
                     if (output != null && !tokenSource.IsCancellationRequested)
-                        documentManager.OpenDocument(textDocumentService.CreateDocument( $"{processor.Name} ({Title})", output,  processor.Extension));
+                        documentManager.OpenDocument(textDocumentService.CreateDocument( $"{processor.Name} ({Title})", output,  processor.Extension, true));
                 }
                 catch (Exception e)
                 {
@@ -229,7 +229,7 @@ namespace WDE.PacketViewer.ViewModels
                         var extension = processors.Select(p => p.Extension).Distinct().Count() == 1
                             ? processors[0].Extension
                             : "txt";
-                        documentManager.OpenDocument(textDocumentService.CreateDocument( $"{processors[0].Name} ({Title})", output,  extension));
+                        documentManager.OpenDocument(textDocumentService.CreateDocument( $"{processors[0].Name} ({Title})", output,  extension, true));
                     }
                 }
                 catch (Exception e)

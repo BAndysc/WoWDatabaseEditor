@@ -6,6 +6,6 @@ namespace WDE.Common.Services
     [UniqueProvider]
     public interface ITextDocumentService
     {
-        IDocument CreateDocument(string title, string text, string extension);
+        IDocument CreateDocument(string title, string text, string extension, bool inspectQuery = false);
     }
 }

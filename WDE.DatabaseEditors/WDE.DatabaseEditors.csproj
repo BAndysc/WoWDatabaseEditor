@@ -16,6 +16,7 @@
     <ItemGroup>
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+      <ProjectReference Include="..\WDE.SqlInterpreter\WDE.SqlInterpreter.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
     <ItemGroup>

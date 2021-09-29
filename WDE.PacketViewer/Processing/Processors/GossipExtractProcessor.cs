@@ -607,7 +607,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
                 any = true;
                 multiQuery.Table("gossip_menu")
-                    .Where(row => row.Column<uint>("MenuId") == menu.Key)
+                    .Where(row => row.Column<uint>("MenuID") == menu.Key)
                     .Delete();
             }
 
@@ -616,13 +616,13 @@ namespace WDE.PacketViewer.Processing.Processors
                     .Where(menu => menusAlreadyInDb.Contains(menu.Key) == existing)
                     .SelectMany(menu => menu.Value.TextsId.Select(text => new
                     {
-                        MenuId = menu.Key,
-                        TextId = text,
+                        MenuID = menu.Key,
+                        TextID = text,
                         __comment = (string?)null
                     }).Concat(menu.Value.DatabaseOnlyTextsId.Select(dbText => new
                     {
-                        MenuId = menu.Key,
-                        TextId = dbText,
+                        MenuID = menu.Key,
+                        TextID = dbText,
                         __comment = (string?)"not in sniff"
                     }))));
 
@@ -636,12 +636,12 @@ namespace WDE.PacketViewer.Processing.Processors
         private static void DumpGossipMenuOptions(IMultiQuery multiQuery, KeyValuePair<uint, GossipMenu> menu)
         {
             multiQuery.Table("gossip_menu_option")
-                .Where(row => row.Column<uint>("MenuId") == menu.Key)
+                .Where(row => row.Column<uint>("MenuID") == menu.Key)
                 .Delete();
             var options = menu.Value.Options.Select(option => (option.Index, (object)new
             {
-                MenuId = menu.Key,
-                OptionId = option.Index,
+                MenuID = menu.Key,
+                OptionID = option.Index,
                 OptionIcon = (uint)option.Icon,
                 OptionText = option.Text,
                 OptionBroadcastTextID = option.BroadcastTextId,
@@ -660,8 +660,8 @@ namespace WDE.PacketViewer.Processing.Processors
                 var isConflicting = menu.Value.Options.Any(o => o.Index == option.Index);
                 return (option.Index, (object)new
                 {
-                    MenuId = menu.Key,
-                    OptionId = option.Index,
+                    MenuID = menu.Key,
+                    OptionID = option.Index,
                     OptionIcon = (uint)option.Icon,
                     OptionText = option.Text,
                     OptionBroadcastTextID = option.BroadcastTextId,
