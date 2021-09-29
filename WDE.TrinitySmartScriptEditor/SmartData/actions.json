@@ -1038,7 +1038,7 @@
         "name": "SMART_ACTION_SUMMON_GO",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "GameobjectParameter",
                 "name": "Game Object"
             },
             {
@@ -1222,6 +1222,7 @@
     {
         "id": 58,
         "name": "SMART_ACTION_INSTALL_AI_TEMPLATE",
+        "tags": ["TrinityCata", "TrinityMaster", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1413,9 +1414,10 @@
         "id": 66,
         "name": "SMART_ACTION_SET_ORIENTATION",
         "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
-        "description": "{source}: {targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}",
+        "description": "{source}: {targetid:choose(1|8):Set orientation to home position orientation|Set orientation to [s]{target_o}[/s]|Look at {target}}",
         "name_readable": "Set orientation",
         "target_is_source": false,
+        "target_types": ["GameObject", "Player", "Creature", "Position"],
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
     },
@@ -1436,7 +1438,7 @@
         ],
         "description": "{source}: {pram2value:choose(0):{targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}|Set random orientation}{pram1value:choose(0):| (instant change)}",
         "name_readable": "Set orientation",
-        "target_types": ["GameObject", "Player", "Creature"],
+        "target_types": ["GameObject", "Player", "Creature", "Position"],
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
         "uses_target_position": true
@@ -1894,7 +1896,7 @@
         "name": "SMART_ACTION_SET_UNIT_FIELD_BYTES_1",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "StandStateParameter",
                 "name": "Value"
             },
             {
@@ -1916,7 +1918,17 @@
                 }
             }
         ],
-        "description": "{source}: Set UNIT_FIELD_BYTES_1 with Type {pram2} to {pram1}",
+        "description": "{source}: Set UNIT_FIELD_BYTES_1 with type {pram2} to {pram1}",
+        "description_rules": [
+            {
+                "description": "{source}: Set stand state to {pram1}",
+                "condition": "action.param(2) == 0"
+            },
+            {
+                "description": "{source}: Set anim tier to {pram1}",
+                "condition": "action.param(2) == 3"
+            }
+        ],
         "name_readable": "Set UNIT_FIELD_BYTES_1",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -1926,7 +1938,7 @@
         "name": "SMART_ACTION_REMOVE_UNIT_FIELD_BYTES_1",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "StandStateParameter",
                 "name": "Bytes"
             },
             {
@@ -1949,6 +1961,16 @@
             }
         ],
         "description": "{source}: Remove {pram1} bytes from UNIT_FIELD_BYTES_1 with Type {pram2}",
+        "description_rules": [
+            {
+                "description": "{source}: Remove stand state {pram1}",
+                "condition": "action.param(2) == 0"
+            },
+            {
+                "description": "{source}: Remove anim tier {pram1}",
+                "condition": "action.param(2) == 3"
+            }
+        ],
         "name_readable": "Remove UNIT_FIELD_BYTES_1",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -1993,6 +2015,7 @@
     {
         "id": 94,
         "name": "SMART_ACTION_SET_DYNAMIC_FLAG",
+        "tags": ["TrinityCata", "TrinityMaster", "Azeroth"],
         "parameters": [
             {
                 "type": "FlagParameter",
@@ -3020,7 +3043,7 @@
     },
     {
         "id": 143,
-        "name": "SMART_ACTION_TALK_CONVERSATION",
+        "name": "SMART_ACTION_CREATE_CONVERSATION",
         "tags": ["TrinityMaster"],
         "parameters": [
             {
@@ -3036,6 +3059,52 @@
         "name_readable": "Start conversation",
         "implicit_source": "SMART_TARGET_NONE"
     },
+    {
+        "id": 144,
+        "name": "SMART_ACTION_SET_IMMUNE_PC",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Enable/Disable"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable Immune to PC|Enable Immune to PC}",
+        "name_readable": "Set immune to PC",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 145,
+        "name": "SMART_ACTION_SET_IMMUNE_NPC",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Enable/Disable"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable Immune to NPC|Enable Immune to NPC}",
+        "name_readable": "Set immune to NPC",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 146,
+        "name": "SMART_ACTION_SET_UNINTERACTIBLE",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Enable/Disable"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Set interactable|Set uninteractable}",
+        "name_readable": "Set interactable",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    
     {
         "id": 201,
         "name": "SMART_ACTION_MOVE_TO_POS_TARGET_AC",
