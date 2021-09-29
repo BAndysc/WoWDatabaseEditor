@@ -1,0 +1,65 @@
+{
+  "id": "points_of_interest",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Points Of Interest",
+  "single_solution_name": "{name} POI editor",
+  "multi_solution_name": "multiple POI editor",
+  "description": "POI that can be displayed when user select an gossip option",
+  "table_name": "points_of_interest",
+  "table_index_name": "ID",
+  "reload_command": "reload points_of_interest",
+  "picker": "Parameter",
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "PositionX",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "PositionY",
+          "value_type": "float"
+        },
+        {
+          "name": "Icon",
+          "db_column_name": "Icon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "uint"
+        },
+        {
+          "name": "Importance",
+          "db_column_name": "Importance",
+          "value_type": "uint"
+        },
+        {
+          "name": "Name",
+          "db_column_name": "Name",
+          "value_type": "string"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

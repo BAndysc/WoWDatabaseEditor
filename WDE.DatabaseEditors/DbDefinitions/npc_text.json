@@ -1,0 +1,493 @@
+{
+  "id": "npc_text_wrath",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Npc Text",
+  "single_solution_name": "{name} npc text editor",
+  "multi_solution_name": "Multiple npc texts editor",
+  "description": "Npc text is text visible when you talk with an npc",
+  "table_name": "npc_text",
+  "table_index_name": "ID",
+  "multi_record": true,
+  "picker": "NpcTextParameter",
+  "group_name": "Common scripting tables",
+  "sort_by": ["ID"],
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Text 0 0",
+          "db_column_name": "text0_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 0 1",
+          "db_column_name": "text0_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text ID 0",
+          "db_column_name": "BroadcastTextID0",
+          "value_type": "int"
+        },
+        {
+          "name": "Lang 0",
+          "db_column_name": "lang0",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 0",
+          "db_column_name": "Probability0",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote Delay 0 0",
+          "db_column_name": "EmoteDelay0_0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 0 0",
+          "db_column_name": "Emote0_0",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 0 1",
+          "db_column_name": "EmoteDelay0_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 0 1",
+          "db_column_name": "Emote0_1",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 0 2",
+          "db_column_name": "EmoteDelay0_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 0 2",
+          "db_column_name": "Emote0_2",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Text 1 0",
+          "db_column_name": "text1_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 1 1",
+          "db_column_name": "text1_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text ID 1",
+          "db_column_name": "BroadcastTextID1",
+          "value_type": "int"
+        },
+        {
+          "name": "Lang 1",
+          "db_column_name": "lang1",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 1",
+          "db_column_name": "Probability1",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote Delay 1 0",
+          "db_column_name": "EmoteDelay1_0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 1 0",
+          "db_column_name": "Emote1_0",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 1 1",
+          "db_column_name": "EmoteDelay1_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 1 1",
+          "db_column_name": "Emote1_1",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 1 2",
+          "db_column_name": "EmoteDelay1_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 1 2",
+          "db_column_name": "Emote1_2",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Text 2 0",
+          "db_column_name": "text2_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 2 1",
+          "db_column_name": "text2_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text ID 2",
+          "db_column_name": "BroadcastTextID2",
+          "value_type": "int"
+        },
+        {
+          "name": "Lang 2",
+          "db_column_name": "lang2",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 2",
+          "db_column_name": "Probability2",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote Delay 2 0",
+          "db_column_name": "EmoteDelay2_0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 2 0",
+          "db_column_name": "Emote2_0",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 2 1",
+          "db_column_name": "EmoteDelay2_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 2 1",
+          "db_column_name": "Emote2_1",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 2 2",
+          "db_column_name": "EmoteDelay2_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 2 2",
+          "db_column_name": "Emote2_2",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Text 3 0",
+          "db_column_name": "text3_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 3 1",
+          "db_column_name": "text3_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text ID 3",
+          "db_column_name": "BroadcastTextID3",
+          "value_type": "int"
+        },
+        {
+          "name": "Lang 3",
+          "db_column_name": "lang3",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 3",
+          "db_column_name": "Probability3",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote Delay 3 0",
+          "db_column_name": "EmoteDelay3_0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 3 0",
+          "db_column_name": "Emote3_0",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 3 1",
+          "db_column_name": "EmoteDelay3_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 3 1",
+          "db_column_name": "Emote3_1",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 3 2",
+          "db_column_name": "EmoteDelay3_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 3 2",
+          "db_column_name": "Emote3_2",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Text 4 0",
+          "db_column_name": "text4_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 4 1",
+          "db_column_name": "text4_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text ID 4",
+          "db_column_name": "BroadcastTextID4",
+          "value_type": "int"
+        },
+        {
+          "name": "Lang 4",
+          "db_column_name": "lang4",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 4",
+          "db_column_name": "Probability4",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote Delay 4 0",
+          "db_column_name": "EmoteDelay4_0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 4 0",
+          "db_column_name": "Emote4_0",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 4 1",
+          "db_column_name": "EmoteDelay4_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 4 1",
+          "db_column_name": "Emote4_1",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 4 2",
+          "db_column_name": "EmoteDelay4_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 4 2",
+          "db_column_name": "Emote4_2",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Text 5 0",
+          "db_column_name": "text5_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 5 1",
+          "db_column_name": "text5_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text ID 5",
+          "db_column_name": "BroadcastTextID5",
+          "value_type": "int"
+        },
+        {
+          "name": "Lang 5",
+          "db_column_name": "lang5",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 5",
+          "db_column_name": "Probability5",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote Delay 5 0",
+          "db_column_name": "EmoteDelay5_0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 5 0",
+          "db_column_name": "Emote5_0",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 5 1",
+          "db_column_name": "EmoteDelay5_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 5 1",
+          "db_column_name": "Emote5_1",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 5 2",
+          "db_column_name": "EmoteDelay5_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 5 2",
+          "db_column_name": "Emote5_2",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Text 6 0",
+          "db_column_name": "text6_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 6 1",
+          "db_column_name": "text6_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text ID 6",
+          "db_column_name": "BroadcastTextID6",
+          "value_type": "int"
+        },
+        {
+          "name": "Lang 6",
+          "db_column_name": "lang6",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 6",
+          "db_column_name": "Probability6",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote Delay 6 0",
+          "db_column_name": "EmoteDelay6_0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 6 0",
+          "db_column_name": "Emote6_0",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 6 1",
+          "db_column_name": "EmoteDelay6_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 6 1",
+          "db_column_name": "Emote6_1",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 6 2",
+          "db_column_name": "EmoteDelay6_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 6 2",
+          "db_column_name": "Emote6_2",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Text 7 0",
+          "db_column_name": "text7_0",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Text 7 1",
+          "db_column_name": "text7_1",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Broadcast Text ID 7",
+          "db_column_name": "BroadcastTextID7",
+          "value_type": "int"
+        },
+        {
+          "name": "Lang 7",
+          "db_column_name": "lang7",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability 7",
+          "db_column_name": "Probability7",
+          "value_type": "float"
+        },
+        {
+          "name": "Emote Delay 7 0",
+          "db_column_name": "EmoteDelay7_0",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 7 0",
+          "db_column_name": "Emote7_0",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 7 1",
+          "db_column_name": "EmoteDelay7_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 7 1",
+          "db_column_name": "Emote7_1",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Emote Delay 7 2",
+          "db_column_name": "EmoteDelay7_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote 7 2",
+          "db_column_name": "Emote7_2",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}
