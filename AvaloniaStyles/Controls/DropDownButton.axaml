@@ -14,7 +14,7 @@
                     <Popup IsOpen="{TemplateBinding IsDropDownOpened, Mode=TwoWay}"
                            IsLightDismissEnabled="True"
                            PlacementAnchor="BottomLeft" PlacementTarget="{TemplateBinding}">
-                        <Border Child="{TemplateBinding Child}" Background="{DynamicResource ContentBackground}" Padding="10" CornerRadius="5"></Border>
+                        <Border BorderThickness="1" BorderBrush="Gray" Child="{TemplateBinding Child}" Background="{DynamicResource ContentBackground}" Padding="10" CornerRadius="5"></Border>
                     </Popup>
                 </Grid>
             </ControlTemplate>
