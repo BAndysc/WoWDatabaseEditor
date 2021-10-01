@@ -13,6 +13,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
         public static readonly AttachedProperty<bool> OnEnterPressedProperty = 
             AvaloniaProperty.RegisterAttached<CompletionComboBox, bool>("OnEnterPressed", typeof(ParameterEditorView));
 
+        private bool specialCopying;
+        public static readonly DirectProperty<ParameterEditorView, bool> SpecialCopyingProperty = AvaloniaProperty.RegisterDirect<ParameterEditorView, bool>("SpecialCopying", o => o.SpecialCopying, (o, v) => o.SpecialCopying = v);
+
         static ParameterEditorView()
         {
             OnEnterPressedProperty.Changed.AddClassHandler<CompletionComboBox>((box, args) =>
@@ -24,6 +27,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
                         box.SelectedItem = new ParameterOption(l, "(unknown)");
                 };
             });
+        }
+
+        public bool SpecialCopying
+        {
+            get => specialCopying;
+            set => SetAndRaise(SpecialCopyingProperty, ref specialCopying, value);
         }
 
         public static bool GetOnEnterPressed(IAvaloniaObject obj)

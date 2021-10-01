@@ -30,6 +30,7 @@
                                         <controls:ParameterTextBox VerticalContentAlignment="Center"
                                                                    Focusable="True"
                                                                    Name="TextBox"
+                                                                   SpecialCopying="{Binding SpecialCopying, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
                                                                    Text="{Binding Value, Mode=TwoWay}"
                                                                    FontFamily="Consolas,Menlo,Courier,Courier New"
                                                                    Classes="InnerContentWithPadding">

@@ -19,13 +19,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly ICurrentCoreVersion currentCoreVersion;
 
-        public EditableParameterViewModel(ParameterValueHolder<T> parameter, string group, IItemFromListProvider itemFromListProvider, ICurrentCoreVersion currentCoreVersion)
+        public EditableParameterViewModel(ParameterValueHolder<T> parameter, 
+            string group, 
+            IItemFromListProvider itemFromListProvider,
+            ICurrentCoreVersion currentCoreVersion)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.currentCoreVersion = currentCoreVersion;
             Group = group;
             Parameter = parameter;
             SelectItemAction = new AsyncAutoCommand(SelectItem);
+            SpecialCopying = typeof(T) == typeof(float);
 
             Watch(parameter, p => p.IsUsed, nameof(IsHidden));
             Watch(parameter, p => p.ForceHidden, nameof(IsHidden));
@@ -41,6 +45,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ParameterValueHolder<T> Parameter { get; set; }
 
         public string Group { get; }
+        
+        public bool SpecialCopying { get; }
         
         public ICommand SelectItemAction { get; set; }
 

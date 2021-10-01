@@ -1,7 +1,11 @@
 using System;
+using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Styling;
+using Avalonia.Threading;
 
 namespace WDE.Common.Avalonia.Controls
 {
@@ -16,6 +20,24 @@ namespace WDE.Common.Avalonia.Controls
             {
                 if (AcceptsReturn || (e.Text != "\r" && e.Text != "\n"))
                     base.OnTextInput(e);
+            }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            var keymap = AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>();
+            if (keymap.Paste.Any(g => g.Matches(e)))
+            {
+                CustomPaste();
+                e.Handled = true;
+            }
+            else
+                base.OnKeyDown(e);
+            
+            if (Text == "" && DataValidationErrors.GetHasErrors(this))
+            {
+                Text = "0";
+                SelectAll();
             }
         }
 

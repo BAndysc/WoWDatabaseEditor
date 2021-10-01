@@ -73,6 +73,10 @@ test_script:
 
     dotnet test WDE.SqlQueryGenerator.Test/WDE.SqlQueryGenerator.Test.csproj
 
+    dotnet test WDE.SqlInterpreter.Test/WDE.SqlInterpreter.Test.csproj
+
+    dotnet test WDE.Common.Test/WDE.Common.Test.csproj
+
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
 artifacts:
 - path: WoWDatabaseEditorMacOs.zip

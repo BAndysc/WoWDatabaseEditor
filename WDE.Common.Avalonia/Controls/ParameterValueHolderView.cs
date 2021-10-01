@@ -17,6 +17,9 @@ namespace WDE.Common.Avalonia.Controls
         
         private Func<Task<object?>>? specialCommand;
         public static readonly DirectProperty<ParameterValueHolderView, Func<Task<object?>>?> SpecialCommandProperty = AvaloniaProperty.RegisterDirect<ParameterValueHolderView, Func<Task<object?>>?>("SpecialCommand", o => o.SpecialCommand, (o, v) => o.SpecialCommand = v);
+        
+        private bool specialCopying;
+        public static readonly DirectProperty<ParameterValueHolderView, bool> SpecialCopyingProperty = AvaloniaProperty.RegisterDirect<ParameterValueHolderView, bool>("SpecialCopying", o => o.SpecialCopying, (o, v) => o.SpecialCopying = v);
 
         public ICommand? PickCommand
         {
@@ -32,10 +35,16 @@ namespace WDE.Common.Avalonia.Controls
         
         public ICommand? PickSpecial { get; }
 
+        public bool SpecialCopying
+        {
+            get => specialCopying;
+            set => SetAndRaise(SpecialCopyingProperty, ref specialCopying, value);
+        }
+
         protected override void OnGotFocus(GotFocusEventArgs e)
         {
             base.OnGotFocus(e);
-            if (e.Source == this)
+            if (ReferenceEquals(e.Source, this))
             {
                 Dispatcher.UIThread.Post(() =>
                 {

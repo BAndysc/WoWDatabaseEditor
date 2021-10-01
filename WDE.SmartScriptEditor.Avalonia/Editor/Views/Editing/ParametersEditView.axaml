@@ -30,6 +30,7 @@
                                 <ItemsPresenter.ItemTemplate>
                                     <DataTemplate>
                                         <editing:ParameterEditorView utils:FocusUtils.FocusFirst="{Binding FocusFirst}"
+                                                                     SpecialCopying="{Binding SpecialCopying}"
                                                                      Margin="0,0,0,5" />
                                     </DataTemplate>
                                 </ItemsPresenter.ItemTemplate>
