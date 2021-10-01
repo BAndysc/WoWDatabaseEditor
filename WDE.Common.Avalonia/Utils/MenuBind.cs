@@ -38,13 +38,13 @@ namespace WDE.Common.Avalonia.Utils
                 foreach (var subItem in m.SubItems)
                 {
                     if (subItem.ItemName == "Separator")
-                        item = new NativeMenuItemSeperator();
+                        item = new NativeMenuItemSeparator();
                     else
                     {
                         var nativeMenuItem = new NativeMenuItem(subItem.ItemName.Replace("_", ""));
                         if (subItem is IMenuCommandItem cmd)
                         {
-                            nativeMenuItem.Command = cmd.ItemCommand;
+                            nativeMenuItem.Command = WrapCommand(cmd.ItemCommand, cmd);
                             if (cmd.Shortcut.HasValue && Enum.TryParse(cmd.Shortcut.Value.Key, out Key key))
                             { 
                                 var keyGesture = new KeyGesture(key, cmd.Shortcut.Value.Control ? systemWideControlModifier : KeyModifiers.None);
@@ -74,6 +74,48 @@ namespace WDE.Common.Avalonia.Utils
         
         public static IList<IMainMenuItem> GetMenuItemsGestures(Window control) => (IList<IMainMenuItem>)control.GetValue(MenuItemsGesturesProperty);
         public static void SetMenuItemsGestures(Window control, object value) => control.SetValue(MenuItemsGesturesProperty, value);
+
+        private static ICommand WrapCommand(ICommand command, IMenuCommandItem cmd)
+        {
+            if (!cmd.Shortcut.HasValue || !Enum.TryParse(cmd.Shortcut.Value.Key, out Key key)) 
+                return command;
+            
+            // ok, so this is terrible, but TextBox gestures handling is inside OnKeyDown
+            // which is executed AFTER handling application wise shortcuts
+            // However application wise shortcuts take higher priority
+            // and effectively TextBox doesn't handle copy/paste/cut/undo/redo -.-
+            var original = command;
+            command = OverrideCommand<TextBox>(command, Key.C, key, cmd, tb => tb.Copy());
+            command = OverrideCommand<TextBox>(command, Key.X, key, cmd, tb => tb.Cut());
+            command = OverrideCommand<TextBox>(command, Key.V, key, cmd, tb => tb.Paste());
+            command = OverrideCommand<TextBox>(command, Key.Z, key, cmd, Undo);
+            command = OverrideCommand<TextBox>(command, Key.Y, key, cmd, Redo);
+            command = OverrideCommand<FixedTextBox>(command, Key.V, key, cmd, tb => tb.CustomPaste());
+
+            command = OverrideCommand<TextArea>(command, Key.Z, key, cmd, tb =>
+            {
+                var te = GetTextEditor(tb);
+                if (te == null || te.Document.UndoStack.SizeLimit == 0)
+                    return false;
+                te.Undo();
+                return true;
+            });
+            command = OverrideCommand<TextArea>(command, Key.Y, key, cmd, tb =>
+            {
+                var te = GetTextEditor(tb);
+                if (te == null || te.Document.UndoStack.SizeLimit == 0)
+                    return false;
+                te.Redo();
+                return true;
+            });
+            command = OverrideCommand<TextArea>(command, Key.C, key, cmd, tb => ApplicationCommands.Copy.Execute(null, tb));
+            command = OverrideCommand<TextArea>(command, Key.X, key, cmd, tb => ApplicationCommands.Cut.Execute(null, tb));
+            command = OverrideCommand<TextArea>(command, Key.V, key, cmd, tb => ApplicationCommands.Paste.Execute(null, tb));
+
+            var newCommand = new DelegateCommand(() => command.Execute(null), () => command.CanExecute(null));
+            original.CanExecuteChanged += (_, _) => newCommand.RaiseCanExecuteChanged();
+            return newCommand;
+        }
         
         private static IList<IMainMenuItem> OnMenuGesturesChanged(IAvaloniaObject targetLocation, IList<IMainMenuItem> viewModel)
         {
@@ -95,38 +137,8 @@ namespace WDE.Common.Avalonia.Utils
                         continue;
                     
                     var keyGesture = new KeyGesture(key, cmd.Shortcut.Value.Control ? systemWideControlModifier : KeyModifiers.None);
-                    var command = cmd.ItemCommand;
-                    // ok, so this is terrible, but TextBox gestures handling is inside OnKeyDown
-                    // which is executed AFTER handling application wise shortcuts
-                    // However application wise shortcuts take higher priority
-                    // and effectively TextBox doesn't handle copy/paste/cut/undo/redo -.-
-                    command = OverrideCommand<TextBox>(command, Key.C, key, cmd, tb => tb.Copy());
-                    command = OverrideCommand<TextBox>(command, Key.X, key, cmd, tb => tb.Cut());
-                    command = OverrideCommand<TextBox>(command, Key.V, key, cmd, tb => tb.Paste());
-                    command = OverrideCommand<TextBox>(command, Key.Z, key, cmd, Undo);
-                    command = OverrideCommand<TextBox>(command, Key.Y, key, cmd, Redo);
-                    command = OverrideCommand<FixedTextBox>(command, Key.V, key, cmd, tb => tb.CustomPaste());
+                    var command = WrapCommand(cmd.ItemCommand, cmd);
 
-                    command = OverrideCommand<TextArea>(command, Key.Z, key, cmd, tb =>
-                    {
-                        var te = GetTextEditor(tb);
-                        if (te == null || te.Document.UndoStack.SizeLimit == 0)
-                            return false;
-                        te.Undo();
-                        return true;
-                    });
-                    command = OverrideCommand<TextArea>(command, Key.Y, key, cmd, tb =>
-                    {
-                        var te = GetTextEditor(tb);
-                        if (te == null || te.Document.UndoStack.SizeLimit == 0)
-                            return false;
-                        te.Redo();
-                        return true;
-                    });
-                    command = OverrideCommand<TextArea>(command, Key.C, key, cmd, tb => ApplicationCommands.Copy.Execute(null, tb));
-                    command = OverrideCommand<TextArea>(command, Key.X, key, cmd, tb => ApplicationCommands.Cut.Execute(null, tb));
-                    command = OverrideCommand<TextArea>(command, Key.V, key, cmd, tb => ApplicationCommands.Paste.Execute(null, tb));
-                    
                     window.KeyBindings.Add(new KeyBinding(){Command = command, Gesture = keyGesture});
                 }
             }
