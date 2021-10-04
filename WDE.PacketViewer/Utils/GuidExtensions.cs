@@ -7,6 +7,20 @@ namespace WDE.PacketViewer.Utils
 {
     public static class GuidExtensions
     {
+        public static bool IsEmpty(this UniversalGuid? guid)
+        {
+            if (guid == null)
+                return true;
+            
+            if (guid.KindCase == UniversalGuid.KindOneofCase.Guid64)
+                return guid.Guid64.Low == 0 && guid.Guid64.High == 0;
+            
+            if (guid.KindCase == UniversalGuid.KindOneofCase.Guid128)
+                return guid.Guid128.Low == 0 && guid.Guid128.High == 0;
+            
+            return true;
+        }
+        
         public static string ToHexString(this UniversalGuid guid)
         {
             if (guid.KindCase == UniversalGuid.KindOneofCase.Guid64)

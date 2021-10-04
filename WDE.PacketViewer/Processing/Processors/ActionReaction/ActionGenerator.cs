@@ -33,7 +33,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         EnableImmuneNpc,
         DisableImmuneNpc,
         EnableImmunePc,
-        DisableImmunePc
+        DisableImmunePc,
+        CreateObjectInRange
     }
     
     public readonly struct ActionHappened
@@ -80,11 +81,20 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
         private bool IsSpellImportant(uint spellId)
         {
+            if (!spellService.Exists(spellId))
+                return false;
+            
+            if (spellService.GetSpellFocus(spellId).HasValue) // spells with spell focus seems interesting
+                return true;
+            
+            if (spellService.GetSkillLine(spellId) == 777) // Mounts
+                return false;
+            
+            if (spellService.GetDescription(spellId) == null) // empty description means something interesting
+                return true;
+            
             if (!spellService.Exists(spellId) ||
                 !spellService.GetAttributes<SpellAttr0>(spellId).HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
-                return false;
-
-            if (spellService.GetSkillLine(spellId) == 777) // Mounts
                 return false;
 
             return true;
@@ -278,30 +288,48 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         {
             foreach (var create in packet.Created)
             {
-                if (create.Guid.Type != UniversalHighGuid.Creature &&
-                    create.Guid.Type != UniversalHighGuid.GameObject &&
-                    create.Guid.Type != UniversalHighGuid.Vehicle)
-                    continue;
-
-                bool wasCreated = updateObjectFollower.HasBeenCreated(create.Guid);
-                
-                if (!create.Values.Guids.TryGetValue("UNIT_FIELD_DEMON_CREATOR", out var summoner) &&
-                    !create.Values.Guids.TryGetValue("UNIT_FIELD_SUMMONEDBY", out summoner) &&
-                    !create.Values.Guids.TryGetValue("UNIT_FIELD_CREATEDBY", out summoner))
+                if (create.CreateType == CreateObjectType.Spawn)
                 {
+                    if (create.Guid.Type != UniversalHighGuid.Creature &&
+                        create.Guid.Type != UniversalHighGuid.GameObject &&
+                        create.Guid.Type != UniversalHighGuid.Vehicle)
+                        continue;
+                    
+                    bool _ = (!create.Values.Guids.TryGetValue("UNIT_FIELD_DEMON_CREATOR", out var summoner) &&
+                     !create.Values.Guids.TryGetValue("UNIT_FIELD_SUMMONEDBY", out summoner) &&
+                     !create.Values.Guids.TryGetValue("UNIT_FIELD_CREATEDBY", out summoner));
+                    yield return new ActionHappened()
+                    {
+                        Kind = ActionType.Summon,
+                        PacketNumber = basePacket.Number,
+                        MainActor = create.Guid,
+                        AdditionalActors = summoner.ToSingletonList(),
+                        Description = $"{create.Guid.ToWowParserString()} summoned",
+                        EventLocation = unitPosition.GetPosition(create.Guid, basePacket.Time.ToDateTime()),
+                        Time = basePacket.Time.ToDateTime(),
+                        TimeFactor = 0.25f,
+                        CustomEntry = create.Values.Ints.TryGetValue("UNIT_CREATED_BY_SPELL", out var spellSummon) ? (int)spellSummon : null
+                    };
                 }
-                yield return new ActionHappened()
+                else
                 {
-                    Kind = ActionType.Summon,
-                    PacketNumber = basePacket.Number,
-                    MainActor = create.Guid,
-                    AdditionalActors = summoner.ToSingletonList(),
-                    Description = $"{create.Guid.ToWowParserString()} summoned",
-                    EventLocation = unitPosition.GetPosition(create.Guid, basePacket.Time.ToDateTime()),
-                    Time = basePacket.Time.ToDateTime(),
-                    TimeFactor = wasCreated ? 0.03f : 0.25f, // summon action should join only with very recent events
-                    CustomEntry = create.Values.Ints.TryGetValue("UNIT_CREATED_BY_SPELL", out var spellSummon) ? (int)spellSummon : null
-                };
+                    if (create.Guid.Type != UniversalHighGuid.Creature &&
+                         create.Guid.Type != UniversalHighGuid.GameObject &&
+                         create.Guid.Type != UniversalHighGuid.Vehicle &&
+                         create.Guid.Type != UniversalHighGuid.Player)
+                        continue;
+                    
+                    yield return new ActionHappened()
+                    {
+                        Kind = ActionType.CreateObjectInRange,
+                        PacketNumber = basePacket.Number,
+                        MainActor = create.Guid,
+                        Description = $"{create.Guid.ToWowParserString()} in range",
+                        EventLocation = unitPosition.GetPosition(create.Guid, basePacket.Time.ToDateTime()),
+                        Time = basePacket.Time.ToDateTime(),
+                        RestrictEvent = EventType.TeleportUnit
+                    };
+                }
             }
 
             foreach (var destroy in packet.Destroyed)

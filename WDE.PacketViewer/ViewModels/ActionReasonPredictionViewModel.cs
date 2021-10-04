@@ -43,6 +43,26 @@ namespace WDE.PacketViewer.ViewModels
         public List<string>? AdditionalActors { get; }
     }
 
+
+    public class DetectedEventViewModel
+    {
+        public DetectedEventViewModel(EventHappened eventHappened)
+        {
+            EventKind = eventHappened.Kind.ToString();
+            Description = eventHappened.Description;
+            MainActor = eventHappened.MainActor?.ToWowParserString();
+            AdditionalActors = eventHappened.AdditionalActors?.Select(s => s.ToWowParserString()).ToList();
+            if (eventHappened.EventLocation != null)
+                Location = $"X: {eventHappened.EventLocation.X} Y: {eventHappened.EventLocation.Y} Z: {eventHappened.EventLocation.Z}";
+        }
+
+        public string EventKind { get; }
+        public string Description { get; }
+        public string? MainActor { get; }
+        public string? Location { get; }
+        public List<string>? AdditionalActors { get; }
+    }
+
     public class PossibleActionViewModel
     {
         public int PacketNumber { get; }

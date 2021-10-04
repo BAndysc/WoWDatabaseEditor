@@ -47,7 +47,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         EmoteState,
         GossipHello,
         LookAt,
-        FinishingMovement
+        FinishingMovement,
+        TeleportUnit
     }
         
     public readonly struct EventHappened
@@ -127,7 +128,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             
             public EventBuilder AddActor(UniversalGuid? actor)
             {
-                if (actor == null)
+                if (actor.IsEmpty())
                     return this;
 
                 if (mainActor == null)
@@ -136,7 +137,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 {
                     if (actors == null)
                         actors = new List<UniversalGuid>();
-                    actors.Add(actor);
+                    actors.Add(actor!);
                 }
                 
                 return this;
@@ -305,12 +306,22 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
         private bool IsSpellImportant(uint spellId)
         {
+            if (!spellService.Exists(spellId))
+                return false;
+
+            if (spellService.GetSpellFocus(spellId).HasValue) // spells with spell focus seems interesting
+                return true;
+
+            if (spellService.GetSkillLine(spellId) == 777) // Mounts
+                return false;
+            
+            if (spellService.GetDescription(spellId) == null) // empty description means something interesting
+                return true;
+            
             if (!spellService.Exists(spellId) ||
                 !spellService.GetAttributes<SpellAttr0>(spellId).HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
                 return false;
 
-            if (spellService.GetSkillLine(spellId) == 777) // Mounts
-                return false;
             return true;
         }
 
@@ -344,6 +355,16 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                         .AddActors(packet.Data.HitTargets)
                         .SetTimeFactor(0.2f)
                         .RestrictAction(ActionType.GameObjectActivated)
+                        .Push();
+                }
+                else if (effectType == SpellEffectType.TeleportUnits)
+                {
+                    Event(basePacket, EventType.TeleportUnit)
+                        .SetDescription("On effect TeleportUnits of spell " + packet.Data.Spell + " casted by " + packet.Data.Caster.ToWowParserString())
+                        .AddActors(packet.Data.HitTargets)
+                        .SetLocation(packet.Data.DstLocation)
+                        .RestrictAction(ActionType.CreateObjectInRange)
+                        .SetTimeFactor(2)
                         .Push();
                 }
             }
@@ -548,7 +569,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     create.Guid.Type != UniversalHighGuid.Vehicle)
                     continue;
                 
-                if (updateObjectFollower.HasBeenCreated(create.Guid))
+                if (create.CreateType != CreateObjectType.Spawn)
                     continue;
 
                 #if VERIFY_IF_SPAWN_EXIST

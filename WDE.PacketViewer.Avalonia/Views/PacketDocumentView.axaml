@@ -304,6 +304,41 @@
                                 </ScrollViewer>
                             </DockPanel>
                         </TabItem>
+                        <TabItem Header="Detected events">
+                            <DockPanel>
+                                <controls:GroupingHeader GroupName="What events (reasons) have been detected in this packet" DockPanel.Dock="Top" />
+                                <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                                    <ScrollViewer.Styles>
+                                        <Style Selector="TextBlock">
+                                            <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                                        </Style>
+                                    </ScrollViewer.Styles>
+                                    <ItemsControl Items="{Binding DetectedEvents}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                                                    <TextBlock Text="{Binding EventKind, StringFormat=Event: {0}}" FontWeight="Bold" />
+                                                    <TextBlock Text="{Binding Description}" />
+                                                    <TextBlock IsVisible="{Binding MainActor, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                               Text="{Binding MainActor, StringFormat=Actor: {0}}" Opacity="0.6" />
+                                                    <TextBlock IsVisible="{Binding Location, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                               Text="{Binding Location, StringFormat=Position of event: {0}}" Opacity="0.6" />
+                                                    <TextBlock Text="Additional actors:" IsVisible="{Binding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}" />
+                                                    <ItemsPresenter IsVisible="{Binding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                                    Items="{Binding AdditionalActors}">
+                                                        <ItemsPresenter.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <StackPanel Margin="10,0,0,0 "/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsPresenter.ItemsPanel>
+                                                    </ItemsPresenter>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </DockPanel>
+                        </TabItem>
                     </TabControl>
                 </Grid>
             </Grid>

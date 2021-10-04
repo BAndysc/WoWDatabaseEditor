@@ -56,6 +56,14 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             return state.Item2;
         }
         
+        public IEnumerable<EventHappened>? GetAllEvents(int number)
+        {
+            BuildReverseLookup();
+            if (!eventsHappened.TryGetValue(number, out var state))
+                return null;
+            return state;
+        }
+
         public ActionHappened? GetAction(int number)
         {
             if (!actionsHappened.TryGetValue(number, out var state))
@@ -150,6 +158,19 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 }
 
                 //
+
+                if (action.Kind == ActionType.CreateObjectInRange &&
+                    @event.Kind == EventType.TeleportUnit)
+                {
+                    var dist = @event.EventLocation!.Distance3D(action.EventLocation!);
+                    if (dist > 4 || action.MainActor == null)
+                        continue;
+                    if (!action.MainActor.Equals(@event.MainActor) &&
+                        !(@event.AdditionalActors != null && @event.AdditionalActors.Contains(action.MainActor)))
+                        continue;
+                }
+                
+                //
                 
                 if (@event.Kind == EventType.SpellCasted &&
                     action.Kind == ActionType.AuraApplied &&
@@ -209,7 +230,11 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 if (@event.Kind == EventType.SummonBySpell &&
                     action.Kind == ActionType.Summon && action.MainActor!.Entry == @event.CustomEntry)
                     bonusMult += 10;
-
+                
+                if (action.Kind == ActionType.CreateObjectInRange &&
+                    @event.Kind == EventType.TeleportUnit)
+                    bonusMult += 2;
+                
                 if (@event.Kind == EventType.Spellclick &&
                     action.Kind == ActionType.SpellCasted)
                     bonusMult += 0.5f;
@@ -243,6 +268,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         
         // action packet Id -> what are actions
         private Dictionary<int, (int, List<ActionHappened>)> actionsHappened = new();
+        
+        // event packet Id -> what are events
+        private Dictionary<int, List<EventHappened>> eventsHappened = new();
         
         // reverse lookup: event packet id -> what are possible actions, this event caused
         private Dictionary<int, List<(int packetId, double chance, EventHappened happened)>>? reverseLookup;
@@ -295,6 +323,14 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                         r = reverseLookup[reason.@event.PacketNumber] = new();
                     r.Add((actionPacketId.Key, reason.rate.Value, reason.@event));
                 }
+            }
+
+            for (int i = 0; i < eventDetectorProcessor.CurrentIndex; ++i)
+            {
+                var e = eventDetectorProcessor.GetEvent(i);
+                if (!eventsHappened.TryGetValue(e.PacketNumber, out var list))
+                    list = eventsHappened[e.PacketNumber] = new();
+                list.Add(e);
             }
         }
 

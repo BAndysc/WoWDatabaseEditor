@@ -14,6 +14,7 @@ using DynamicData.Binding;
 using Prism.Commands;
 using WDE.Common;
 using WDE.Common.Database;
+using WDE.Common.DBC;
 using WDE.Common.Disposables;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -72,7 +73,8 @@ namespace WDE.PacketViewer.ViewModels
             IRelatedPacketsFinder relatedPacketsFinder,
             ITeachingTipService teachingTipService,
             PacketDocumentSolutionNameProvider solutionNameProvider,
-            ISniffLoader sniffLoader)
+            ISniffLoader sniffLoader,
+            ISpellStore spellStore)
         {
             this.solutionItem = solutionItem;
             this.mainThread = mainThread;
@@ -83,7 +85,7 @@ namespace WDE.PacketViewer.ViewModels
             this.sniffLoader = sniffLoader;
             History = history;
             history.LimitStack(20);
-            packetViewModelCreator = new PacketViewModelFactory(databaseProvider);
+            packetViewModelCreator = new PacketViewModelFactory(databaseProvider, spellStore);
             MostRecentlySearched = mostRecentlySearchedService.MostRecentlySearched;
             Title = solutionNameProvider.GetName(this.solutionItem);
             SolutionItem = solutionItem;
@@ -442,6 +444,11 @@ namespace WDE.PacketViewer.ViewModels
                 var detected = actionReactionProcessor.GetAllActions(selectedPacket.Id);
                 if (detected != null)
                     DetectedActions.AddRange(detected.Select(s => new DetectedActionViewModel(s)));
+                
+                DetectedEvents.Clear();
+                var events = actionReactionProcessor.GetAllEvents(selectedPacket.Id);
+                if (events != null)
+                    DetectedEvents.AddRange(events.Select(s => new DetectedEventViewModel(s)));
                 
                 var reasons = actionReactionProcessor.GetPossibleEventsForAction(selectedPacket.Packet.BaseData);
                 Predictions.Clear();
@@ -968,7 +975,8 @@ namespace WDE.PacketViewer.ViewModels
         public ObservableCollection<ActionReasonPredictionViewModel> Predictions { get; } = new();
         public ObservableCollection<PossibleActionViewModel> PossibleActions { get; } = new();
         public ObservableCollection<DetectedActionViewModel> DetectedActions { get; } = new();
-
+        public ObservableCollection<DetectedEventViewModel> DetectedEvents { get; } = new();
+        
         public IFilterData FilterData { get; set; } = new FilterData();
         public ICommand ToggleFindCommand { get; }
         public ICommand CloseFindCommand { get; }

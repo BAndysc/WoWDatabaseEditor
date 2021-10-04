@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using WDE.Common.Database;
+using WDE.Common.DBC;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Processing.Processors;
 using WowPacketParser.Proto;
@@ -11,6 +13,7 @@ namespace WDE.PacketViewer.ViewModels
     public class PacketViewModelFactory : IPacketProcessor<PacketViewModel>
     {
         private readonly IDatabaseProvider databaseProvider;
+        private readonly ISpellStore spellStore;
         private static EntryExtractorProcessor entryExtractorProcessor = new ();
         private static GuidExtractorProcessor guidExtractorProcessor = new ();
 
@@ -20,9 +23,10 @@ namespace WDE.PacketViewer.ViewModels
 
         private UniversalGuid? playerGuid;
 
-        public PacketViewModelFactory(IDatabaseProvider databaseProvider)
+        public PacketViewModelFactory(IDatabaseProvider databaseProvider, ISpellStore spellStore)
         {
             this.databaseProvider = databaseProvider;
+            this.spellStore = spellStore;
         }
         
         public PacketViewModel? Process(PacketHolder packet)
@@ -99,6 +103,20 @@ namespace WDE.PacketViewer.ViewModels
 
             if (guid != null && playerGuid != null && guid.Equals(playerGuid))
                 name = "You";
+
+            if (packet.KindCase == PacketHolder.KindOneofCase.SpellGo
+                || packet.KindCase == PacketHolder.KindOneofCase.SpellStart)
+            {
+                var spellId = packet.SpellGo?.Data.Spell ?? packet.SpellStart.Data.Spell;
+                var spellName = spellStore.HasSpell(spellId) ? spellStore.GetName(spellId) : null;
+                if (spellName != null)
+                {
+                    if (name != null)
+                        name = name + " / " + spellName;
+                    else
+                        name = spellName;
+                }
+            }
             
             return new PacketViewModel(packet, entry, guid, name);
         }

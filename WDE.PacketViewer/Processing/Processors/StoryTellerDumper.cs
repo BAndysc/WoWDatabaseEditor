@@ -548,7 +548,8 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (created.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
                 var spawnTime = despawnDetector.GetSpawnLength(created.Guid, basePacket.Number);
-                SetAppendOnNext("Created " + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation) +
+                var createType = created.CreateType == CreateObjectType.InRange ? "In range " : "Spawned ";
+                SetAppendOnNext(createType + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation) +
                                 (spawnTime == null ? "" : $" (despawned in {spawnTime.Value.TotalSeconds} seconds)"));
                 PrintValues(basePacket, created.Guid, created.Values, false);
                 SetAppendOnNext(null);
