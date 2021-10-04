@@ -36,6 +36,16 @@ namespace WDE.DbcStore.Spells.Cataclysm
             public uint EffectIndex { get; init; }
             public uint EffectAttributes { get; init; }
         }
+
+        private class SpellCastingRequirements
+        {
+            public uint FacingCasterFlags { get; init; }
+            public uint MinFactionId { get; init; }
+            public uint MinReputation { get; init; }
+            public uint RequiredAreasId { get; init; }
+            public uint RequiredAuraVision { get; init; }
+            public uint RequiresSpellFocus { get; init; }
+        }
         
         private class SpellData
         {
@@ -52,15 +62,34 @@ namespace WDE.DbcStore.Spells.Cataclysm
             public SpellAttr9 Attr9 { get; init; }
             public SpellAttr10 Attr10 { get; init; }
             public SpellEffect[]? SpellEffects { get; set; }
+            public uint SpellCastingRequirementsId { get; init; }
+            public SpellCastingRequirements? SpellCastingRequirements { get; init; }
             
+            public string Name { get; init; }
+            public string? Description { get; init; }
             public uint? SkillLine { get; set; }
         }
 
+        private Dictionary<uint, SpellCastingRequirements> requirements = new();
         private Dictionary<uint, SpellData> spells = new();
         
         public void Load(string path)
         {
             var opener = new DatabaseClientFileOpener();
+
+            foreach (var row in opener.Open(Path.Join(path, "SpellCastingRequirements.dbc")))
+            {
+                requirements[row.GetUInt(0)] = new SpellCastingRequirements()
+                {
+                    FacingCasterFlags = row.GetUInt(1),
+                    MinFactionId = row.GetUInt(2),
+                    MinReputation = row.GetUInt(3),
+                    RequiredAreasId = row.GetUInt(4),
+                    RequiredAuraVision = row.GetUInt(5),
+                    RequiresSpellFocus = row.GetUInt(6)
+                };
+            }
+            
             foreach (var row in opener.Open(Path.Join(path, "Spell.dbc")))
             {
                 int i = 0;
@@ -77,6 +106,9 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 SpellAttr9 attr9 = (SpellAttr9)row.GetUInt(i++);
                 SpellAttr10 attr10 = (SpellAttr10)row.GetUInt(i++);
 
+                var castingRequirements = row.GetUInt(34);
+                var description = row.GetString(23);
+
                 spells[id] = new SpellData()
                 {
                     Id = id,
@@ -90,7 +122,11 @@ namespace WDE.DbcStore.Spells.Cataclysm
                     Attr7 = attr7,
                     Attr8 = attr8,
                     Attr9 = attr9,
-                    Attr10 = attr10
+                    Attr10 = attr10,
+                    SpellCastingRequirementsId = castingRequirements,
+                    SpellCastingRequirements = castingRequirements > 0 && requirements.ContainsKey(castingRequirements) ? requirements[castingRequirements] : null,
+                    Name = row.GetString(21),
+                    Description = string.IsNullOrEmpty(description) ? null : description
                 };
             }
 
@@ -193,6 +229,20 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 return (T)(object)spell.Attr10;
             
             return default;
+        }
+
+        public uint? GetSpellFocus(uint spellId)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return spell.SpellCastingRequirements?.RequiresSpellFocus;
+            return null;
+        }
+
+        public string? GetDescription(uint spellId)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return spell.Description;
+            return null;
         }
 
         public int GetSpellEffectsCount(uint spellId)

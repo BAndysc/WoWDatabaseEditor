@@ -238,6 +238,20 @@ namespace WDE.DbcStore.Spells.Wrath
             return null;
         }
 
+        public uint? GetSpellFocus(uint spellId)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return spell.RequiresSpellFocus == 0 ? null : spell.RequiresSpellFocus;
+            return null;
+        }
+
+        public string? GetDescription(uint spellId)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return string.IsNullOrEmpty(spell.Description) ? null : spell.Description;
+            return null;
+        }
+
         public int GetSpellEffectsCount(uint spellId)
         {
             if (spells.TryGetValue(spellId, out var spell))

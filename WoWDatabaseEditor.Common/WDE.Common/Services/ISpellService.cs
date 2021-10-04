@@ -699,6 +699,8 @@ namespace WDE.Common.Services
         bool Exists(uint spellId);
         T GetAttributes<T>(uint spellId) where T : Enum;
         uint? GetSkillLine(uint spellId);
+        uint? GetSpellFocus(uint spellId);
+        string? GetDescription(uint spellId);
         int GetSpellEffectsCount(uint spellId);
         SpellEffectType GetSpellEffectType(uint spellId, int index);
         uint GetSpellEffectMiscValueA(uint spellId, int index);

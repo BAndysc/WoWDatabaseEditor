@@ -350,6 +350,9 @@ namespace WDE.DbcStore
 
         public T GetAttributes<T>(uint spellId) where T : Enum => spellServiceImpl.GetAttributes<T>(spellId);
         public uint? GetSkillLine(uint spellId) => spellServiceImpl.GetSkillLine(spellId);
+        public uint? GetSpellFocus(uint spellId) => spellServiceImpl.GetSpellFocus(spellId);
+        public string? GetDescription(uint spellId) => spellServiceImpl.GetDescription(spellId);
+
         public int GetSpellEffectsCount(uint spellId) => spellServiceImpl.GetSpellEffectsCount(spellId);
         public SpellEffectType GetSpellEffectType(uint spellId, int index) => spellServiceImpl.GetSpellEffectType(spellId, index);
         public uint GetSpellEffectMiscValueA(uint spellId, int index) => spellServiceImpl.GetSpellEffectMiscValueA(spellId, index);
