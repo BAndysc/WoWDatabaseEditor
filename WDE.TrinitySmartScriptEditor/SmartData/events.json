@@ -422,7 +422,7 @@
     "builtin_rules": [
       "minmax(3, 4)"
     ],
-    "description": "When {pram1} unit in line of sight (out of combat)",
+    "description": "On {pram1} unit in line of sight (OOC)",
     "name_readable": "On move in line of sight (out of combat)",
     "invoker": {
       "name": "Unit in LOS",
@@ -979,7 +979,7 @@
     "builtin_rules": [
       "minmax(3, 4)"
     ],
-    "description": "When {pram1} unit in line of sight (in combat){pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+    "description": "On {pram1} unit in line of sight (in combat){pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On move in line of sight (in combat)",
     "invoker": {
       "name": "Unit in LOS",
@@ -1894,7 +1894,7 @@
       "AreaTriggerEntityServerSide"
     ],
     "name": "SMART_EVENT_JUST_CREATED",
-    "description": "When just created",
+    "description": "On just created",
     "name_readable": "On just created"
   },
   {
@@ -1905,7 +1905,7 @@
     ],
     "tags": ["TrinityCata", "TrinityMaster", "Azeroth"],
     "name": "SMART_EVENT_GOSSIP_HELLO",
-    "description": "When player opened gossip dialog",
+    "description": "On player opened gossip",
     "parameters": [
       {
         "type": "BoolParameter",
@@ -1939,7 +1939,7 @@
     ],
     "tags": ["TrinityWrath"],
     "name": "SMART_EVENT_GOSSIP_HELLO_TC_WRATH",
-    "description": "When player opened gossip dialog",
+    "description": "On player opened gossip",
     "name_readable": "On gossip hello",
     "invoker": {
       "name": "Gossip player",
