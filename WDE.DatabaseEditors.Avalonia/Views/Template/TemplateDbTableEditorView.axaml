@@ -23,32 +23,38 @@
                 <DataTemplate>
                     <controls:FastBoolCellView Width="300" Margin="0,0,10,0"
                         ToolTip.Tip="{Binding OriginalValueTooltip}"
-                        Focusable="False"
-                        IsActive="{Binding IsVisible}"
-                        IsModified="{Binding IsModified}" 
-                        IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
-                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
-                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
-                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
-                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
                         Value="{Binding AsBoolValue}"/>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.BoolTemplate>
+            
+            <helpers:FieldValueTemplateSelector.FlagsTemplate>
+                <DataTemplate>
+                    <controls:FastFlagCellView Width="300" Margin="0,0,10,0"
+                                               Height="24"
+                                               SelectedItem="{Binding OptionValue, Mode=TwoWay}"
+                                               SelectedValue="{Binding AsLongValue, Mode=TwoWay}"
+                                               Flags="{Binding Flags}"
+                                               StringValue="{Binding ParameterValue.String}">
+                    </controls:FastFlagCellView>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.FlagsTemplate>
+            <helpers:FieldValueTemplateSelector.ItemsTemplate>
+                <DataTemplate>
+                    <controls:FastItemCellView Width="300" Margin="0,0,10,0"
+                                               Height="24"
+                                               SelectedItem="{Binding OptionValue, Mode=TwoWay}"
+                                               Items="{Binding Items}"
+                                               StringValue="{Binding ParameterValue.String}">
+                    </controls:FastItemCellView>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.ItemsTemplate>
             <helpers:FieldValueTemplateSelector.GenericTemplate>
                 <DataTemplate>
                     <controls:FastCellView Width="300" Margin="0,0,10,0"
                         ToolTip.Tip="{Binding OriginalValueTooltip}"
-                        Focusable="False"
-                        IsActive="{Binding IsVisible}"
-                        IsModified="{Binding IsModified}" 
-                        ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
-                        IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
                         Value="{Binding ParameterValue.Value}"
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
-                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
-                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
-                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
-                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
                         StringValue="{Binding ParameterValue.String}">
                     </controls:FastCellView>
                 </DataTemplate>
@@ -72,6 +78,21 @@
         </DataTemplate>
     </UserControl.Resources>
     <UserControl.Styles>
+        <Style Selector="ItemsPresenter">
+            <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
+        </Style>
+        <Style Selector="StackPanel">
+            <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
+        </Style>
+        <Style Selector=":is(controls|FastCellViewBase)">
+            <Setter Property="IsActive" Value="{Binding IsVisible}" />
+            <Setter Property="IsModified" Value="{Binding IsModified}" />
+            <Setter Property="IsReadOnly" Value="{Binding Parent.IsReadOnly, Mode=OneTime}" />
+            <Setter Property="SetNullCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}" />
+            <Setter Property="RevertCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}" />
+            <Setter Property="RemoveTemplateCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}" />
+            <Setter Property="CanBeNull" Value="{Binding CanBeSetToNull, Mode=OneTime}" />
+        </Style>
         <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
                                        LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastCellView.axaml" />

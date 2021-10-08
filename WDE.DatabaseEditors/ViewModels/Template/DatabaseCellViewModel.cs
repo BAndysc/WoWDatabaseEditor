@@ -5,12 +5,11 @@ using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels.Template
 {
-    public class DatabaseCellViewModel : ObservableBase
+    public class DatabaseCellViewModel : BaseDatabaseCellViewModel
     {
         public DatabaseRowViewModel Parent { get; }
         public DatabaseEntity ParentEntity { get; }
         public IDatabaseField? TableField { get; }
-        public IParameterValue ParameterValue { get; }
         public bool IsVisible { get; private set; } = true;
         public bool IsModified { get; private set; }
         public string? OriginalValueTooltip { get; private set; }
@@ -47,6 +46,16 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 RaisePropertyChanged(nameof(OriginalValueTooltip));
                 RaisePropertyChanged(nameof(AsBoolValue));
             }));
+            
+            if (UseItemPicker)
+            {
+                AutoDispose(ParameterValue.ToObservable().Subscribe(_ => RaisePropertyChanged(nameof(OptionValue))));
+            }
+
+            if (UseFlagsPicker)
+            {
+                AutoDispose(ParameterValue.ToObservable().Subscribe(_ => RaisePropertyChanged(nameof(AsLongValue))));
+            }
             inConstructor = false;
         }
 
@@ -64,21 +73,6 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     parent.AnyFieldModified();
             }));
             inConstructor = false;
-        }
-
-        public bool? AsBoolValue
-        {
-            get =>  ParameterValue.IsNull ? null : ((ParameterValue as ParameterValue<long>)?.Value ?? 0) != 0;
-            set
-            {
-                if (ParameterValue is ParameterValue<long> longParam)
-                {
-                    if (value == null)
-                        longParam.SetNull();
-                    else
-                        longParam.Value = value.Value ? 1 : 0;
-                }
-            }
         }
     }
 }

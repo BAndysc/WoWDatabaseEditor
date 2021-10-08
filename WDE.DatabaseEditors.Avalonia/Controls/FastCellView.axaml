@@ -5,7 +5,17 @@
         <controls:FastCellView />
     </Design.PreviewWith>
 
+    <Style Selector="controls|ButtonFastCellView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Button Name="PART_Button" Focusable="False" Command="{Binding ActionCommand}" CommandParameter="{Binding}" Content="{Binding ActionLabel}" />
+            </ControlTemplate>
+        </Setter>  
+    </Style>
+    
     <Style Selector="controls|FastCellView">
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="Margin" Value="-2,-2,0,0" />
         <Setter Property="Padding" Value="16,0,0,0" />
         <Setter Property="FontFamily" Value="Consolas,Menlo,Courier,Courier New" />
         <Setter Property="Template">

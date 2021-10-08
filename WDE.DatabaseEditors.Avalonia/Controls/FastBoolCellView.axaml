@@ -12,14 +12,20 @@
 
     <Style Selector="controls|FastBoolCellView">
         <!-- Set Defaults -->
+        <Setter Property="Focusable" Value="True" />
         <Setter Property="Template">
             <ControlTemplate>
-                <CheckBox HorizontalAlignment="Center" 
-                          IsThreeState="{TemplateBinding CanBeNull}"
-                          IsEnabled="{TemplateBinding IsReadOnly, Converter={StaticResource InvertBoolConverter}}"
-                          IsChecked="{TemplateBinding Value, Mode=TwoWay}"
-                          HorizontalContentAlignment="Center">
-                </CheckBox>
+                <Panel Background="Transparent" Name="PART_Panel">
+                    <CheckBox 
+                        Focusable="False"
+                        Name="PART_CheckBox"        
+                        HorizontalAlignment="Center" 
+                        IsThreeState="{TemplateBinding CanBeNull}"
+                        IsEnabled="{TemplateBinding IsReadOnly, Converter={StaticResource InvertBoolConverter}}"
+                        IsChecked="{TemplateBinding Value, Mode=TwoWay}"
+                        HorizontalContentAlignment="Center">
+                    </CheckBox>
+                </Panel>
             </ControlTemplate>
         </Setter>
     </Style>

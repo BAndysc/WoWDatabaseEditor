@@ -161,7 +161,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private void SetToNull(DatabaseCellViewModel? view)
         {
             if (view != null && view.CanBeNull && !view.Parent.IsReadOnly) 
-                view.ParameterValue.SetNull();
+                view.ParameterValue!.SetNull();
         }
 
         private async Task Revert(DatabaseCellViewModel? view)
@@ -169,7 +169,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             if (view == null || view.Parent.IsReadOnly || view.TableField == null)
                 return;
             
-            view.ParameterValue.Revert();
+            view.ParameterValue!.Revert();
             
             if (!view.ParentEntity.ExistInDatabase)
                 return;
@@ -233,7 +233,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return false;
         }
 
-        private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue);
+        private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue!);
 
         protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
         {

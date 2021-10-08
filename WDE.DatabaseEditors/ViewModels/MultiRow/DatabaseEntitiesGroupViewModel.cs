@@ -14,16 +14,19 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             Name = name;
         }
 
-        public void Remove(DatabaseEntity entity)
+        public DatabaseEntityViewModel? GetAndRemove(DatabaseEntity entity)
         {
             for (int i = 0; i < Count; ++i)
             {
                 if (this[i].Entity == entity)
                 {
+                    var vm = this[i];
                     RemoveAt(i);
-                    break;
+                    return vm;
                 }
             }
+
+            return null;
         }
     }
 }

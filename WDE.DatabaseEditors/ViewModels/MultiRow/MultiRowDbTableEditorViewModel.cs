@@ -24,6 +24,7 @@ using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
+using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -39,10 +40,52 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IQueryGenerator queryGenerator;
         private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IConditionEditService conditionEditService;
+        private readonly IDatabaseEditorsSettings editorSettings;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private Dictionary<uint, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
         public ObservableCollection<DatabaseEntitiesGroupViewModel> Rows { get; } = new();
+
+        private DatabaseEntityViewModel? selectedRow;
+        public DatabaseEntityViewModel? SelectedRow
+        {
+            get => selectedRow;
+            set => SetProperty(ref selectedRow, value);
+        }
+
+        private MultiRowSplitMode splitMode;
+        public bool SplitView => splitMode != MultiRowSplitMode.None;
+
+        public bool SplitHorizontal
+        {
+            get => splitMode == MultiRowSplitMode.Horizontal;
+            set
+            {
+                if (value && splitMode == MultiRowSplitMode.Horizontal)
+                    return;
+                
+                splitMode = value ? MultiRowSplitMode.Horizontal : (splitMode == MultiRowSplitMode.Horizontal ? MultiRowSplitMode.None : splitMode);
+                editorSettings.MultiRowSplitMode = splitMode;
+                RaisePropertyChanged(nameof(SplitHorizontal));
+                RaisePropertyChanged(nameof(SplitVertical));
+                RaisePropertyChanged(nameof(SplitView));
+            }
+        }
+        public bool SplitVertical
+        {
+            get => splitMode == MultiRowSplitMode.Vertical;
+            set
+            {
+                if (value && splitMode == MultiRowSplitMode.Vertical)
+                    return;
+                
+                splitMode = value ? MultiRowSplitMode.Vertical : (splitMode == MultiRowSplitMode.Vertical ? MultiRowSplitMode.None : splitMode);
+                editorSettings.MultiRowSplitMode = splitMode;
+                RaisePropertyChanged(nameof(SplitHorizontal));
+                RaisePropertyChanged(nameof(SplitVertical));
+                RaisePropertyChanged(nameof(SplitView));
+            }
+        }
 
         private IList<DatabaseColumnJson> columns = new List<DatabaseColumnJson>();
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
@@ -72,7 +115,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
             ITableDefinitionProvider tableDefinitionProvider,
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
-            ISessionService sessionService) 
+            ISessionService sessionService, IDatabaseEditorsSettings editorSettings) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -87,6 +130,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.queryGenerator = queryGenerator;
             this.modelGenerator = modelGenerator;
             this.conditionEditService = conditionEditService;
+            this.editorSettings = editorSettings;
+
+            splitMode = editorSettings.MultiRowSplitMode;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
             RemoveTemplateCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
@@ -311,7 +357,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return false;
             
             Entities.RemoveAt(indexOfEntity);
-            byEntryGroups[entity.Key].Remove(entity);
+            var vm = byEntryGroups[entity.Key].GetAndRemove(entity);
+            if (SelectedRow == vm)
+                SelectedRow = null;
 
             return true;
         }
@@ -334,7 +382,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 if (column.IsConditionColumn)
                 {
                     var label = entity.ToObservable(e => e.Conditions).Select(c => "Edit (" + (c?.Count ?? 0) + ")");
-                    cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, "conditions", EditConditionsCommand, row, entity, label));
+                    cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, "Conditions", EditConditionsCommand, row, entity, label));
                 }
                 else
                 {
@@ -371,6 +419,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             EnsureKey(entity.Key);
             
             byEntryGroups[entity.Key].Add(row);
+            SelectedRow = row;
             return true;
         }
 

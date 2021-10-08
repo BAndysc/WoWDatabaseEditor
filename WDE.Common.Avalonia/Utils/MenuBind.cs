@@ -12,6 +12,7 @@ using AvaloniaEdit.Editing;
 using Prism.Commands;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Menu;
+using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 
@@ -85,6 +86,8 @@ namespace WDE.Common.Avalonia.Utils
             // However application wise shortcuts take higher priority
             // and effectively TextBox doesn't handle copy/paste/cut/undo/redo -.-
             var original = command;
+            command = OverrideCommand<ICustomCopyPaste>(command, Key.C, key, cmd, tb => tb.DoCopy((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))));
+            command = OverrideCommand<ICustomCopyPaste>(command, Key.V, key, cmd, tb => tb.DoPaste().ListenErrors());
             command = OverrideCommand<TextBox>(command, Key.C, key, cmd, tb => tb.Copy());
             command = OverrideCommand<TextBox>(command, Key.X, key, cmd, tb => tb.Cut());
             command = OverrideCommand<TextBox>(command, Key.V, key, cmd, tb => tb.Paste());

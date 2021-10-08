@@ -7,25 +7,85 @@
              xmlns:helpers="clr-namespace:WDE.DatabaseEditors.Avalonia.Helpers"
              xmlns:controls2="clr-namespace:WDE.DatabaseEditors.Avalonia.Controls"
              xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             xmlns:multiRow="clr-namespace:WDE.DatabaseEditors.Avalonia.Views.MultiRow"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="rootWindow"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorView">
     <UserControl.Resources>
+        <converters:BoolToIntegerConverter x:Key="BoolToInt2" TrueValue="2" FalseValue="0" />
+        <converters:BoolToIntegerConverter x:Key="BoolToInt1" TrueValue="1" FalseValue="0" />
+        <converters:BoolToIntegerConverter x:Key="BoolToInt1Max" TrueValue="1" FalseValue="2000000" />
+        <converters:BoolToRowDefinitionsConverter x:Key="RowsConverter">
+            <converters:BoolToRowDefinitionsConverter.TrueValue>
+                <RowDefinitions>
+                    <RowDefinition MinHeight="150" />
+                    <RowDefinition Height="3" />
+                    <RowDefinition Height="Auto" />
+                </RowDefinitions>
+            </converters:BoolToRowDefinitionsConverter.TrueValue>
+            <converters:BoolToRowDefinitionsConverter.FalseValue>
+                <RowDefinitions>
+                    <RowDefinition />
+                </RowDefinitions>
+            </converters:BoolToRowDefinitionsConverter.FalseValue>
+        </converters:BoolToRowDefinitionsConverter>
+        <converters:BoolToColumnDefinitionsConverter x:Key="ColumnsConverter">
+            <converters:BoolToColumnDefinitionsConverter.TrueValue>
+                <ColumnDefinitions>
+                    <ColumnDefinition MinWidth="150" />
+                    <ColumnDefinition Width="3" />
+                    <ColumnDefinition Width="340" />
+                </ColumnDefinitions>
+            </converters:BoolToColumnDefinitionsConverter.TrueValue>
+            <converters:BoolToColumnDefinitionsConverter.FalseValue>
+                <ColumnDefinitions>
+                    <ColumnDefinition />
+                </ColumnDefinitions>
+            </converters:BoolToColumnDefinitionsConverter.FalseValue>
+        </converters:BoolToColumnDefinitionsConverter>
+        
         <ItemsPanelTemplate x:Key="HorizontalRowPanel">
-            <Grid helpers:GridColumnsBinder.Columns="{Binding DataContext.Columns, ElementName=rootWindow}">
-                                                            
+            <Grid 
+                KeyboardNavigation.TabNavigation="Continue"
+                helpers:GridColumnsBinder.Columns="{Binding DataContext.Columns, ElementName=rootWindow}">
             </Grid>
         </ItemsPanelTemplate>
+        <ItemsPanelTemplate x:Key="VerticalRowPanel">
+            <controls:DynamicColumnsPanel 
+                KeyboardNavigation.TabNavigation="Continue"
+                MaximumColumnsCount="{Binding #rootWindow.DataContext.SplitHorizontal, Converter={StaticResource BoolToInt1Max}}" ColumnWidth="400" HorizontalSpacing="10" Spacing="5"></controls:DynamicColumnsPanel>
+        </ItemsPanelTemplate>
         <DataTemplate x:Key="RowTemplate">
-            <Panel Classes="alternating">
-                <ItemsPresenter Items="{Binding Cells, Mode=OneTime}" ItemsPanel="{StaticResource HorizontalRowPanel}">
+            <multiRow:SelectablePanel>
+                <ItemsPresenter 
+                    KeyboardNavigation.TabNavigation="Continue"
+                    Items="{Binding Cells, Mode=OneTime}" 
+                    ItemsPanel="{StaticResource HorizontalRowPanel}">
                     <ItemsPresenter.Styles>
                         <Style Selector="Grid > ContentPresenter">
                             <Setter Property="(Grid.Column)" Value="{Binding ColumnIndex}" />
                         </Style>
                     </ItemsPresenter.Styles>
                 </ItemsPresenter>
-            </Panel>
+            </multiRow:SelectablePanel>
+        </DataTemplate>
+        <DataTemplate x:Key="VerticalRowTemplate">
+            <ItemsPresenter 
+                KeyboardNavigation.TabNavigation="Continue"
+                Items="{Binding Cells, Mode=OneWay}"
+                ItemsPanel="{StaticResource VerticalRowPanel}">
+                <ItemsPresenter.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel LastChildFill="True">
+                            <TextBlock Text="{Binding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
+                            <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" BorderBrush="Gray" Content="{Binding}" Margin="20,0,0,0" />
+                        </DockPanel>
+
+                    </DataTemplate>
+                </ItemsPresenter.ItemTemplate>
+            </ItemsPresenter>
         </DataTemplate>
     </UserControl.Resources>
     <UserControl.Styles>
@@ -33,11 +93,20 @@
                                        LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastCellView.axaml" />
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastBoolCellView.axaml" />
-        <Style Selector="Panel.alternating">
+        <Style Selector="ItemsPresenter">
+            <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
+        </Style>
+        <Style Selector="StackPanel">
+            <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
+        </Style>
+        <Style Selector="multiRow|SelectablePanel">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
         </Style>
-        <Style Selector="Panel.alternating.odd">
+        <Style Selector="multiRow|SelectablePanel.odd">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
+        </Style>
+        <Style Selector="multiRow|SelectablePanel:selected">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Selected}" />
         </Style>
         <Style Selector="Border.header">
             <Setter Property="Height" Value="32" />
@@ -61,54 +130,64 @@
             <Setter Property="Padding" Value="4" />
             <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
         </Style>
-        <Style Selector="GridSplitter">
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border 
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        Background="{DynamicResource TextControlBackground}"/>
-                </ControlTemplate>
-            </Setter>
+        <Style Selector=":is(controls2|FastCellViewBase)">
+            <Setter Property="SetNullCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}" />
+            <Setter Property="RevertCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}" />
+            <Setter Property="DuplicateCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.DuplicateCommand, Mode=OneTime}" />
+            <Setter Property="RemoveTemplateCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}" />
+            <Setter Property="CanBeNull" Value="{Binding CanBeSetToNull, Mode=OneTime}" />
         </Style>
     </UserControl.Styles>
     <UserControl.DataTemplates>
         <helpers:FieldValueTemplateSelector>
             <helpers:FieldValueTemplateSelector.CommandTemplate>
                 <DataTemplate>
-                    <Button Command="{Binding ActionCommand}" CommandParameter="{Binding}" Content="{Binding ActionLabel}" />
+                    <controls2:ButtonFastCellView />
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.CommandTemplate>
             <helpers:FieldValueTemplateSelector.BoolTemplate>
                 <DataTemplate>
                     <controls2:FastBoolCellView Height="24"
                         ToolTip.Tip="{Binding OriginalValueTooltip}"
-                        Focusable="False"
                         IsActive="True"
                         IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
-                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
-                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
-                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
-                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
                         Value="{Binding AsBoolValue}"/>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.BoolTemplate>
+            <helpers:FieldValueTemplateSelector.FlagsTemplate>
+                <DataTemplate>
+                    <controls2:FastFlagCellView
+                        Height="24"
+                        SelectedItem="{Binding OptionValue, Mode=TwoWay}"
+                        SelectedValue="{Binding AsLongValue, Mode=TwoWay}"
+                        Flags="{Binding Flags}"
+                        Padding="5,0,0,0"
+                        StringValue="{Binding ParameterValue.String}">
+                    </controls2:FastFlagCellView>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.FlagsTemplate>
+            <helpers:FieldValueTemplateSelector.ItemsTemplate>
+                <DataTemplate>
+                    <controls2:FastItemCellView
+                        Height="24"
+                        Value="{Binding ParameterValue.Value}"
+                        SelectedItem="{Binding OptionValue, Mode=TwoWay}"
+                        Items="{Binding Items}"
+                        Padding="5,0,0,0"
+                        StringValue="{Binding ParameterValue.String}">
+                    </controls2:FastItemCellView>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.ItemsTemplate>
             <helpers:FieldValueTemplateSelector.GenericTemplate>
                 <DataTemplate>
                     <controls2:FastCellView Height="24"
                         ToolTip.Tip="{Binding OriginalValueTooltip}"
-                        Focusable="False"
                         IsActive="True"
                         ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
                         IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
                         Value="{Binding ParameterValue.Value}"
-                        Padding="2,0,0,0"
+                        Padding="5,0,0,0"
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
-                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
-                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
-                        DuplicateCommand="{Binding ElementName=rootWindow, Path=DataContext.DuplicateCommand, Mode=OneTime}"
-                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
-                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
                         StringValue="{Binding ParameterValue.String}">
                     </controls2:FastCellView>
                 </DataTemplate>
@@ -116,8 +195,10 @@
         </helpers:FieldValueTemplateSelector>
     </UserControl.DataTemplates>
     
-    <DockPanel LastChildFill="True">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto">
+    <Grid utils:GridUtils.DynamicRows="{Binding SplitVertical, Converter={StaticResource RowsConverter}}"
+          utils:GridUtils.DynamicColumns="{Binding SplitHorizontal, Converter={StaticResource ColumnsConverter}}"
+    >
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
             <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
                 <Border Classes="header" DockPanel.Dock="Top">
                     <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{Binding Columns, Mode=OneTime}" />
@@ -125,18 +206,57 @@
                 <ItemsPresenter Items="{Binding Rows, Mode=OneTime}">
                     <ItemsPresenter.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel>
+                            <StackPanel
+                                KeyboardNavigation.TabNavigation="Continue">
                                 <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}">
                                     <controls1:GroupingHeader.CustomContent>
                                         <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{Binding ., Mode=OneTime}">+</Button>
                                     </controls1:GroupingHeader.CustomContent>
                                 </controls1:GroupingHeader>
-                                <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}" MinHeight="20" ItemTemplate="{StaticResource RowTemplate}" />
+                                <controls:AlternatingItemsControl multiRow:SelectablePanel.SelectedItem="{Binding #rootWindow.DataContext.SelectedRow, Mode=TwoWay}" 
+                                                                  multiRow:SelectablePanel.ObserveItems="True"
+                                                                  Items="{Binding ., Mode=OneTime}" 
+                                                                  MinHeight="20" 
+                                                                  ItemTemplate="{StaticResource RowTemplate}" />
                             </StackPanel>
                         </DataTemplate>
                     </ItemsPresenter.ItemTemplate>
                 </ItemsPresenter>
             </DockPanel>
+            <ScrollViewer.Styles>
+                <Style Selector="GridSplitter">
+                    <Setter Property="Template">
+                        <ControlTemplate>
+                            <Border 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{DynamicResource TextControlBackground}"/>
+                        </ControlTemplate>
+                    </Setter>
+                </Style>
+            </ScrollViewer.Styles>
         </ScrollViewer>
-    </DockPanel>
+        <GridSplitter IsVisible="{Binding SplitView}"
+                      Background="#CCC"
+                      Grid.Row="{Binding SplitVertical, Converter={StaticResource BoolToInt1}}" 
+                      Grid.Column="{Binding SplitHorizontal, Converter={StaticResource BoolToInt1}}"  />
+        <Border IsVisible="{Binding SplitView}"
+                Grid.Row="{Binding SplitVertical, Converter={StaticResource BoolToInt2}}" 
+                Grid.Column="{Binding SplitHorizontal, Converter={StaticResource BoolToInt2}}" 
+                Background="{DynamicResource SlightlyDifferentBackground}" Padding="3">
+            <DockPanel LastChildFill="True">
+                <controls1:GroupingHeader GroupName="Selected row" DockPanel.Dock="Top" />
+                <ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
+                    <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{Binding SelectedRow}">
+            
+                    </ContentControl>
+                </ScrollViewer>
+            </DockPanel>
+            <Border.Styles>
+                <Style Selector=":is(controls2|OpenableFastCellViewBase)">
+                    <Setter Property="DisableDoubleClick" Value="True" />
+                </Style>
+            </Border.Styles>
+        </Border>
+    </Grid>
 </UserControl>

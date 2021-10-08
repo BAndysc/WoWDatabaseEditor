@@ -119,5 +119,11 @@
         <SolidColorBrush x:Key="TabItemHeaderBackgroundSelected" Color="White" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundSelectedPointerOver" Color="White" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="#DDDDE2" />
+        
+        <!-- -->
+        <SolidColorBrush x:Key="GroupingHeaderColor" Color="#226E8B" />
     </Styles.Resources>
+    <Style Selector="GridSplitter">
+        <Setter Property="Background" Value="#CCC" />
+    </Style>
 </Styles>

@@ -76,6 +76,9 @@
         <SolidColorBrush x:Key="TabItemHeaderBackgroundSelected" Color="#161617" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundSelectedPointerOver" Color="#202021" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="#202021" />
+        
+        <!-- -->
+        <SolidColorBrush x:Key="GroupingHeaderColor" Color="#2AA0C4" />
     </Styles.Resources>
     
     <Style Selector="GridSplitter">

@@ -242,7 +242,7 @@
                                     </views:ParameterDataTemplateSelector.BoolParameter>
                                     <views:ParameterDataTemplateSelector.FlagParameter>
                                         <DataTemplate>
-                                            <controls:FlagComboBox SelectedItem="{Binding Parameter.String}" SelectedValue="{Binding Parameter.Value}" Flags="{Binding Parameter.Items}" />
+                                            <extendedTextBlock:FlagComboBox SelectedItem="{Binding Parameter.String}" SelectedValue="{Binding Parameter.Value}" Flags="{Binding Parameter.Items}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.FlagParameter>
                                     <views:ParameterDataTemplateSelector.ItemsParameter>

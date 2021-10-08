@@ -6,6 +6,8 @@
         <SolidColorBrush x:Key="TreeViewItem.Content.Background.Modified" Color="#000099" Opacity=".3"/>
         <SolidColorBrush x:Key="TreeViewItem.Content.Background.Normal" Color="#FFFFFFFF"/>
         <SolidColorBrush x:Key="TreeViewItem.Content.Background.NormalAlternate" Color="#F0F0F0"/>
+        <SolidColorBrush x:Key="TreeViewItem.Content.Background.Selected" Color="LightBlue"/>
 
+        <SolidColorBrush x:Key="SlightlyDifferentBackground" Color="#F7F7F7" />
     </Styles.Resources>
 </Styles>

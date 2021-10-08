@@ -1,17 +1,22 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Input;
+using WDE.Common.Parameters;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WDE.Parameters.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class DatabaseCellViewModel : ObservableBase
+    public class DatabaseCellViewModel : BaseDatabaseCellViewModel
     {
         public DatabaseEntityViewModel Parent { get; }
         public DatabaseEntity ParentEntity { get; }
         public IDatabaseField? TableField { get; }
-        public IParameterValue? ParameterValue { get; }
         public bool IsVisible { get; private set; } = true;
         public string? OriginalValueTooltip { get; private set; }
         public bool CanBeNull { get; }
@@ -29,11 +34,21 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ColumnIndex = columnIndex * 2;
             CanBeNull = columnDefinition.CanBeNull;
             IsReadOnly = columnDefinition.IsReadOnly;
-            ColumnName = columnDefinition.DbColumnName;
+            ColumnName = columnDefinition.Name;
             ParentEntity = parentEntity;
             Parent = parent;
             TableField = tableField;
             ParameterValue = parameterValue;
+
+            if (UseItemPicker)
+            {
+                AutoDispose(ParameterValue.ToObservable().Subscribe(_ => RaisePropertyChanged(nameof(OptionValue))));
+            }
+
+            if (UseFlagsPicker)
+            {
+                AutoDispose(ParameterValue.ToObservable().Subscribe(_ => RaisePropertyChanged(nameof(AsLongValue))));
+            }
 
             AutoDispose(parameterValue.ToObservable().SubscribeAction(_ =>
             {
@@ -59,18 +74,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 ActionLabel = s;
                 RaisePropertyChanged(nameof(ActionLabel));
             }));
-        }
-
-        public bool AsBoolValue
-        {
-            get => ((ParameterValue as ParameterValue<long>)?.Value ?? 0) != 0;
-            set
-            {
-                if (ParameterValue is ParameterValue<long> longParam)
-                {
-                    longParam.Value = value ? 1 : 0;
-                }
-            }
         }
     }
 }

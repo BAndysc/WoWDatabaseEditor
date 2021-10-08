@@ -1,10 +1,13 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.VisualTree;
+using WDE.DatabaseEditors.Avalonia.Views.MultiRow;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
@@ -114,7 +117,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         static FastCellViewBase()
         {
             AffectsRender<FastCellViewBase>(IsModifiedProperty);
-            
+
             // I am doing it in code behind for performance reason
             // I do not know why Avalonia allocates tooooons of memory
             // when it is in xaml...
@@ -151,6 +154,101 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             {
                 context.DrawRectangle(Brushes.Red, null, new Rect(0, 6, 12, 12));
             }
+        }
+
+        private bool MoveLeft(Key key, KeyModifiers modifiers, bool leftRight)
+        {
+            return (key == Key.Tab && (modifiers & KeyModifiers.Shift) != 0) ||
+                   (key == Key.Left && (leftRight || (modifiers & (KeyModifiers.Control | KeyModifiers.Meta)) != 0));
+        }
+
+        private bool MoveRight(Key key, KeyModifiers modifiers, bool leftRight)
+        {
+            return (key == Key.Tab && (modifiers & KeyModifiers.Shift) == 0) ||
+                   (key == Key.Right && (leftRight || (modifiers & (KeyModifiers.Control | KeyModifiers.Meta)) != 0));
+        }
+
+        private bool MoveDown(Key key, KeyModifiers modifiers)
+        {
+            return key == Key.Down;
+        }
+        
+        private bool MoveUp(Key key, KeyModifiers modifiers)
+        {
+            return key == Key.Up;
+        }
+        
+        protected virtual void EndEditing(bool commit = true) {}
+        
+        protected void HandleMoveLeftRightUpBottom(KeyEventArgs args, bool leftRight)
+        {
+            if (MoveLeft(args.Key, args.KeyModifiers, leftRight) || MoveRight(args.Key, args.KeyModifiers, leftRight))
+            {
+                var wrapper = (this.GetVisualParent().GetVisualParent().GetVisualParent() as ContentPresenter) ?? this.GetVisualParent() as ContentPresenter;
+
+                var itemsPresenter = wrapper?.FindAncestorOfType<ItemsPresenter>();
+                if (itemsPresenter == null)
+                    return;
+
+                var index = itemsPresenter.ItemContainerGenerator.IndexFromContainer(wrapper);
+
+                if (MoveLeft(args.Key, args.KeyModifiers, leftRight))
+                    index--;
+                else
+                    index++;
+
+                var next = itemsPresenter.ItemContainerGenerator.ContainerFromIndex(index)?.FindDescendantOfType<FastCellViewBase>();
+                
+                if (next != null)
+                {
+                    EndEditing();
+                    FocusManager.Instance.Focus(next, NavigationMethod.Tab);
+                    args.Handled = true;
+                }
+            }
+
+            if (MoveUp(args.Key, args.KeyModifiers) || MoveDown(args.Key, args.KeyModifiers))
+            {
+                var wrapper = this.GetVisualParent() as IControl;
+                var itemsPresenter = wrapper?.VisualParent?.VisualParent as ItemsPresenter;
+                var row = itemsPresenter?.GetVisualParent()?.VisualParent as IControl;
+                var rows = row?.VisualParent?.VisualParent as ItemsPresenter;
+                if (wrapper == null || itemsPresenter == null || row == null || rows == null)
+                    return;
+                
+                var innerIndex = itemsPresenter.ItemContainerGenerator.IndexFromContainer(wrapper);
+                var rowIndex = rows.ItemContainerGenerator.IndexFromContainer(row);
+
+                if (MoveDown(args.Key, args.KeyModifiers))
+                    rowIndex++;
+                else
+                    rowIndex--;
+
+                var newRow = rows.ItemContainerGenerator.ContainerFromIndex(rowIndex)
+                    ?.VisualChildren[0]?.VisualChildren[0] as ItemsPresenter;
+                newRow ??= rows.ItemContainerGenerator.ContainerFromIndex(rowIndex)
+                    ?.VisualChildren[0]?.VisualChildren[1] as ItemsPresenter;
+                
+                if (newRow == null)
+                    return;
+
+                var newCell = newRow.ItemContainerGenerator.ContainerFromIndex(innerIndex)?.VisualChildren[0] as FastCellViewBase;
+
+                if (newCell == null)
+                    return;
+                
+                this.EndEditing();
+                FocusManager.Instance.Focus(newCell, NavigationMethod.Tab);
+                args.Handled = true;
+            }
+        }
+
+        protected override void OnGotFocus(GotFocusEventArgs e)
+        {
+            var selectableParent = this.FindAncestorOfType<SelectablePanel>();
+            if (selectableParent != null)
+                selectableParent.Select();
+            base.OnGotFocus(e);
         }
 
         protected override void OnPointerPressed(PointerPressedEventArgs e)

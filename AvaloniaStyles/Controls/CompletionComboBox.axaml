@@ -32,10 +32,10 @@
                            IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
                            WindowManagerAddShadowHint="True"
                            MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
-                           IsLightDismissEnabled="True"
+                           IsLightDismissEnabled="{TemplateBinding IsLightDismissEnabled}"
                            MaxWidth="700"
                            MaxHeight="600"
-                           PlacementConstraintAdjustment="SlideY"
+                           PlacementConstraintAdjustment="SlideY,SlideX"
                            PlacementMode="Bottom"
                            PlacementGravity="Bottom"
                            PlacementTarget="PART_Button">
@@ -59,4 +59,7 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    <Style Selector="controls1|CompletionComboBox:hideButton ToggleButton">
+        <Setter Property="Opacity" Value="0" />
+    </Style>  
 </Styles>

@@ -6,7 +6,7 @@
             <Setter.Value>
                 <ControlTemplate>
                     <Grid VerticalAlignment="Center" DockPanel.Dock="Top" ColumnDefinitions="15,Auto,Auto,*">
-                        <Rectangle Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
+                        <Rectangle Fill="{DynamicResource GroupingHeaderColor}" Height="1" Margin="0,7,0,0"></Rectangle>
                         <ContentPresenter Content="{TemplateBinding CustomContent}" Grid.Column="1" Padding="3" 
                                           Margin="0,5,0,0" />
                         <ContentPresenter Content="{TemplateBinding GroupName}" 
@@ -16,11 +16,11 @@
                             <ContentPresenter.Styles>
                                 <Style Selector="TextBlock">
                                     <Setter Property="FontWeight" Value="Bold" />
-                                    <Setter Property="Foreground" Value="#FF226E8B"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource GroupingHeaderColor}"/>
                                 </Style>
                             </ContentPresenter.Styles>
                         </ContentPresenter>
-                        <Rectangle Grid.Column="3" Fill="#FF226E8B" Height="1" Margin="0,7,0,0"></Rectangle>
+                        <Rectangle Grid.Column="3" Fill="{DynamicResource GroupingHeaderColor}" Height="1" Margin="0,7,0,0"></Rectangle>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

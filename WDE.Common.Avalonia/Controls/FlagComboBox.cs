@@ -6,18 +6,18 @@ using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Styling;
 using AvaloniaStyles.Controls;
 using FuzzySharp;
 using WDE.Common.Parameters;
 using WDE.MVVM.Observable;
-using Avalonia.Controls.Primitives;
-using Avalonia.Media;
 
-namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
+namespace WDE.Common.Avalonia.Controls
 {
     public class FlagComboBox : CompletionComboBox, IStyleable
     {

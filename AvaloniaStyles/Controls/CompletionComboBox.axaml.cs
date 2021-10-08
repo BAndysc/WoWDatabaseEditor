@@ -17,6 +17,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Utils;
+using FuzzySharp;
 using WDE.MVVM.Utils;
 
 namespace AvaloniaStyles.Controls
@@ -87,6 +88,18 @@ namespace AvaloniaStyles.Controls
             set => SetValue(ButtonItemTemplateProperty, value);
         }
         
+        public bool HideButton
+        {
+            get => GetValue(HideButtonProperty);
+            set => SetValue(HideButtonProperty, value);
+        }
+
+        public bool IsLightDismissEnabled
+        {
+            get => GetValue(IsLightDismissEnabledProperty);
+            set => SetValue(IsLightDismissEnabledProperty, value);
+        }
+        
         public static readonly StyledProperty<IDataTemplate?> ButtonItemTemplateProperty =
             AvaloniaProperty.Register<CompletionComboBox, IDataTemplate?>(nameof(ButtonItemTemplate));
         
@@ -123,6 +136,14 @@ namespace AvaloniaStyles.Controls
                 (o, v) => o.SelectedItem = v,
                 defaultBindingMode: BindingMode.TwoWay);
 
+        public static readonly StyledProperty<bool> IsLightDismissEnabledProperty =
+            AvaloniaProperty.Register<CompletionComboBox, bool>(nameof (IsLightDismissEnabled), true);
+
+        public static readonly StyledProperty<bool> HideButtonProperty =
+            AvaloniaProperty.Register<CompletionComboBox, bool>(nameof (HideButton));
+        
+        public event Action? Closed;
+        
         public CompletionComboBox()
         {
             // Default async populator searches in Items (toString) using Fuzzy match or normal match depending on the collection size
@@ -138,7 +159,7 @@ namespace AvaloniaStyles.Controls
                 {
                     if (o.Count < 250)
                     {
-                        return FuzzySharp.Process.ExtractSorted(s, items.Select(item => item.ToString()), cutoff: 51)
+                        return Process.ExtractSorted(s, items.Select(item => item.ToString()), cutoff: 51)
                             .Select(item => o[item.Index]!);   
                     }
 
@@ -165,7 +186,7 @@ namespace AvaloniaStyles.Controls
             if (!e.Handled && e.Text != "\n" && e.Text != "\r")
             {
                 IsDropDownOpen = true;
-                SearchTextBox.RaiseEvent(new TextInputEventArgs()
+                SearchTextBox.RaiseEvent(new TextInputEventArgs
                 {
                     Device = e.Device,
                     Handled = false,
@@ -180,6 +201,10 @@ namespace AvaloniaStyles.Controls
         
         static CompletionComboBox()
         {
+            HideButtonProperty.Changed.AddClassHandler<CompletionComboBox>((box, args) =>
+            {
+                box.PseudoClasses.Set(":hideButton", args.NewValue is true);
+            });
             ItemTemplateProperty.Changed.AddClassHandler<CompletionComboBox>((box, args) =>
             {
                 if (box.ButtonItemTemplate == null)
@@ -308,7 +333,7 @@ namespace AvaloniaStyles.Controls
                                     }
                                     else if (args.Key == Key.Tab)
                                     {
-                                        SelectionAdapter.HandleKeyDown(new KeyEventArgs()
+                                        SelectionAdapter.HandleKeyDown(new KeyEventArgs
                                         {
                                             Device = args.Device,
                                             Key = (args.KeyModifiers & KeyModifiers.Shift) != 0 ? Key.Up : Key.Down,
@@ -375,6 +400,7 @@ namespace AvaloniaStyles.Controls
         {
             IsDropDownOpen = false;
             FocusManager.Instance.Focus(ToggleButton, NavigationMethod.Tab);
+            Closed?.Invoke();
         }
         
         /// Filter logic
