@@ -7,7 +7,7 @@ namespace WDE.SmartScriptEditor
 {
     public abstract class SmartScriptIconBaseProvider<T> : ISolutionItemIconProvider<T> where T : ISmartScriptSolutionItem
     {
-        public ImageUri GetIcon(T item)
+        public virtual ImageUri GetIcon(T item)
         {
             switch (item.SmartType)
             {

@@ -7,6 +7,7 @@ using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor;
@@ -55,7 +56,7 @@ namespace WDE.TrinitySmartScriptEditor
     }
 
     [AutoRegisterToParentScopeAttribute]
-    public class SmartScriptCreatureProvider : SmartScriptSolutionItemProvider
+    public class SmartScriptCreatureProvider : SmartScriptSolutionItemProvider, IRelatedSolutionItemCreator
     {
         private readonly Lazy<ICreatureEntryOrGuidProviderService> creatureEntryProvider;
 
@@ -74,10 +75,21 @@ namespace WDE.TrinitySmartScriptEditor
                 return null;
             return new SmartScriptSolutionItem(entry.Value, SmartScriptType.Creature);
         }
+        
+        public Task<ISolutionItem?> CreateRelatedSolutionItem(RelatedSolutionItem related)
+        {
+            return Task.FromResult<ISolutionItem>(
+                new SmartScriptSolutionItem((int)related.Entry, SmartScriptType.Creature));
+        }
+
+        public bool CanCreatedRelatedSolutionItem(RelatedSolutionItem related)
+        {
+            return related.Type == RelatedSolutionItem.RelatedType.CreatureEntry;
+        }
     }
 
     [AutoRegisterToParentScopeAttribute]
-    public class SmartScriptGameobjectProvider : SmartScriptSolutionItemProvider
+    public class SmartScriptGameobjectProvider : SmartScriptSolutionItemProvider, IRelatedSolutionItemCreator
     {
         private readonly Lazy<IGameobjectEntryOrGuidProviderService> goProvider;
 
@@ -95,6 +107,17 @@ namespace WDE.TrinitySmartScriptEditor
             if (!entry.HasValue)
                 return null;
             return new SmartScriptSolutionItem(entry.Value, SmartScriptType.GameObject);
+        }
+
+        public Task<ISolutionItem?> CreateRelatedSolutionItem(RelatedSolutionItem related)
+        {
+            return Task.FromResult<ISolutionItem>(
+                new SmartScriptSolutionItem((int)related.Entry, SmartScriptType.GameObject));
+        }
+
+        public bool CanCreatedRelatedSolutionItem(RelatedSolutionItem related)
+        {
+            return related.Type == RelatedSolutionItem.RelatedType.GameobjectEntry;
         }
     }
 

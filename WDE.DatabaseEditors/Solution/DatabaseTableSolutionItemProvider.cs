@@ -2,9 +2,11 @@
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.CoreVersion;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
@@ -21,35 +23,44 @@ namespace WDE.DatabaseEditors.Solution
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
+        private readonly IDatabaseProvider databaseProvider;
 
         public DatabaseTableSolutionItemProviderProvider(ITableDefinitionProvider definitionProvider,
             IDatabaseTableDataProvider tableDataProvider, 
             IItemFromListProvider itemFromListProvider,
             IMessageBoxService messageBoxService,
-            IParameterFactory parameterFactory)
+            IParameterFactory parameterFactory,
+            IDatabaseProvider databaseProvider)
         {
             this.definitionProvider = definitionProvider;
             this.tableDataProvider = tableDataProvider;
             this.itemFromListProvider = itemFromListProvider;
             this.messageBoxService = messageBoxService;
             this.parameterFactory = parameterFactory;
+            this.databaseProvider = databaseProvider;
         }
         
         public IEnumerable<ISolutionItemProvider> Provide()
         {
             foreach (var definition in definitionProvider.Definitions)
             {
-                yield return new DatabaseTableSolutionItemProvider(definition, tableDataProvider, itemFromListProvider, messageBoxService, parameterFactory);
+                yield return new DatabaseTableSolutionItemProvider(definition, 
+                    tableDataProvider,
+                    itemFromListProvider,
+                    messageBoxService, 
+                    parameterFactory,
+                    databaseProvider);
             }
         }
     }
 
-    internal class DatabaseTableSolutionItemProvider : ISolutionItemProvider
+    internal class DatabaseTableSolutionItemProvider : ISolutionItemProvider, IRelatedSolutionItemCreator
     {
         private readonly IDatabaseTableDataProvider tableDataProvider;
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
+        private readonly IDatabaseProvider databaseProvider;
         private readonly DatabaseTableDefinitionJson definition;
         private readonly ImageUri itemIcon;
         
@@ -57,12 +68,14 @@ namespace WDE.DatabaseEditors.Solution
             IDatabaseTableDataProvider tableDataProvider, 
             IItemFromListProvider itemFromListProvider, 
             IMessageBoxService messageBoxService,
-            IParameterFactory parameterFactory)
+            IParameterFactory parameterFactory,
+            IDatabaseProvider databaseProvider)
         {
             this.tableDataProvider = tableDataProvider;
             this.itemFromListProvider = itemFromListProvider;
             this.messageBoxService = messageBoxService;
             this.parameterFactory = parameterFactory;
+            this.databaseProvider = databaseProvider;
             this.definition = definition;
             this.itemIcon = new ImageUri($"Icons/document_big.png");
         }
@@ -88,34 +101,68 @@ namespace WDE.DatabaseEditors.Solution
             var key = await itemFromListProvider.GetItemFromList(parameter.HasItems ? parameter.Items! : new Dictionary<long, SelectOption>(), false);
             if (key.HasValue)
             {
-                var data = await tableDataProvider.Load(definition.Id, (uint)key.Value);
-                
-                if (data == null)
-                    return null;
-                
-                if (data.TableDefinition.IsMultiRecord)
-                    return new DatabaseTableSolutionItem((uint)key.Value, false, definition.Id);
-                else
-                {
-                    if (data.Entities.Count == 0)
-                        return null; 
-                    
-                    if (!data.Entities[0].ExistInDatabase)
-                    {
-                        if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                            .SetTitle("Entity doesn't exist in database")
-                            .SetMainInstruction($"Entity {data.Entities[0].Key} doesn't exist in the database")
-                            .SetContent(
-                                "WoW Database Editor will be generating DELETE/INSERT query instead of UPDATE. Do you want to continue?")
-                            .WithYesButton(true)
-                            .WithNoButton(false).Build()))
-                            return null;
-                    }
-                    return new DatabaseTableSolutionItem(data.Entities[0].Key, data.Entities[0].ExistInDatabase, definition.Id);
-                }
+                return await Create((uint)key.Value);
             }
-
             return null;
+        }
+
+        private async Task<ISolutionItem?> Create(uint key)
+        {
+            var data = await tableDataProvider.Load(definition.Id, key);
+                
+            if (data == null)
+                return null;
+                
+            if (data.TableDefinition.IsMultiRecord)
+                return new DatabaseTableSolutionItem(key, false, definition.Id);
+            else
+            {
+                if (data.Entities.Count == 0)
+                    return null; 
+                    
+                if (!data.Entities[0].ExistInDatabase)
+                {
+                    if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetTitle("Entity doesn't exist in database")
+                        .SetMainInstruction($"Entity {data.Entities[0].Key} doesn't exist in the database")
+                        .SetContent(
+                            "WoW Database Editor will be generating DELETE/INSERT query instead of UPDATE. Do you want to continue?")
+                        .WithYesButton(true)
+                        .WithNoButton(false).Build()))
+                        return null;
+                }
+                return new DatabaseTableSolutionItem(data.Entities[0].Key, data.Entities[0].ExistInDatabase, definition.Id);
+            }
+        }
+
+        public Task<ISolutionItem?> CreateRelatedSolutionItem(RelatedSolutionItem related)
+        {
+            if (definition.Picker == "GossipMenuParameter" &&
+                related.Type == RelatedSolutionItem.RelatedType.CreatureEntry)
+            {
+                var template = databaseProvider.GetCreatureTemplate((uint)related.Entry);
+                if (template == null || template.GossipMenuId == 0)
+                    return Task.FromResult<ISolutionItem?>(null);
+                return Create(template.GossipMenuId);
+            }
+            return Create((uint)related.Entry);
+        }
+
+        public bool CanCreatedRelatedSolutionItem(RelatedSolutionItem related)
+        {
+            if (related.Type == RelatedSolutionItem.RelatedType.CreatureEntry &&
+                definition.Picker == "GossipMenuParameter")
+            {
+                var template = databaseProvider.GetCreatureTemplate((uint)related.Entry);
+                return template != null && template.GossipMenuId != 0;
+            }
+            
+            return related.Type == RelatedSolutionItem.RelatedType.CreatureEntry &&
+                   definition.Picker == "CreatureParameter" ||
+                   related.Type == RelatedSolutionItem.RelatedType.GameobjectEntry &&
+                   definition.Picker == "GameobjectParameter" ||
+                   related.Type == RelatedSolutionItem.RelatedType.GossipMenu &&
+                   definition.Picker == "GossipMenuParameter";
         }
     }
 }

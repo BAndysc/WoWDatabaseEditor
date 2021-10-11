@@ -12,5 +12,16 @@ namespace WDE.TrinitySmartScriptEditor.Providers
         public SmartScriptNameProvider(IDatabaseProvider database, ISpellStore spellStore) : base(database, spellStore)
         {
         }
+        
+        public override string GetName(SmartScriptSolutionItem item)
+        {
+            var name = base.GetName(item);
+            if (item.SmartType == SmartScriptType.Creature ||
+                item.SmartType == SmartScriptType.GameObject ||
+                item.SmartType == SmartScriptType.TimedActionList ||
+                item.SmartType == SmartScriptType.AreaTrigger)
+                return name + " smart ai";
+            return name;
+        }
     }
 }

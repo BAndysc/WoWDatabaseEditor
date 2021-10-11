@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
+using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
 
@@ -21,6 +22,13 @@ namespace WDE.Common
 
         Task<ISolutionItem?> CreateSolutionItem();
     }
+
+    [NonUniqueProvider]
+    public interface IRelatedSolutionItemCreator : ISolutionItemProvider
+    {
+        Task<ISolutionItem?> CreateRelatedSolutionItem(RelatedSolutionItem related);
+        bool CanCreatedRelatedSolutionItem(RelatedSolutionItem related);
+    }
     
     // Dynamic provider of ISolutionItemProvider
     [NonUniqueProvider]
@@ -33,6 +41,7 @@ namespace WDE.Common
     public interface ISolutionItemProvideService
     {
         IEnumerable<ISolutionItemProvider> AllCompatible { get; }
+        IEnumerable<IRelatedSolutionItemCreator> GetRelatedCreators(RelatedSolutionItem related);
     }
 
     public interface INamedSolutionItemProvider : ISolutionItemProvider

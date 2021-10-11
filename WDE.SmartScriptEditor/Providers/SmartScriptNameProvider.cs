@@ -53,7 +53,7 @@ namespace WDE.SmartScriptEditor.Providers
             return null;
         }
         
-        public string GetName(T item)
+        public virtual string GetName(T item)
         {
             var name = TryGetName(item.Entry, item.SmartType);
             if (!string.IsNullOrEmpty(name))

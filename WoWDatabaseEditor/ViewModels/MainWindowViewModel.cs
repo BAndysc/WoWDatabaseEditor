@@ -37,6 +37,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             IMessageBoxService messageBoxService,
             TasksViewModel tasksViewModel,
             EditorMainMenuItemsProvider menuItemProvider,
+            RelatedSolutionItems relatedSolutionItems,
             ISolutionSqlService solutionSqlService,
             Func<AboutViewModel> aboutViewModelCreator,
             Func<QuickStartViewModel> quickStartCreator,
@@ -94,6 +95,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 });
             
             TasksViewModel = tasksViewModel;
+            RelatedSolutionItems = relatedSolutionItems;
 
             MenuItemProviders = menuItemProvider.GetItems();
 
@@ -135,6 +137,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public IDocumentManager DocumentManager { get; }
 
         public TasksViewModel TasksViewModel { get; }
+        public RelatedSolutionItems RelatedSolutionItems { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 

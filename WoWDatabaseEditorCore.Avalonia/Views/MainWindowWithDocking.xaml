@@ -45,6 +45,28 @@
             <controls:ToolBar.MiddleContent>
                 <ContentPresenter DataContext="{Binding DocumentManager.ActiveDocument}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
             </controls:ToolBar.MiddleContent>
+            <controls:ToolBar.RightContent>
+                <ItemsPresenter Items="{Binding RelatedSolutionItems.List}">
+                    <ItemsPresenter.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding CreateCommand}"
+                                    ToolTip.Tip="{Binding Name}">
+                                <components:WdeImage Image="{Binding Icon}" />
+                            </Button>
+                        </DataTemplate>
+                    </ItemsPresenter.ItemTemplate>
+                    <ItemsPresenter.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <controls:ToolbarPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsPresenter.ItemsPanel>
+                    <ItemsPresenter.Styles>
+                        <Style Selector="components|WdeImage">
+                            <Setter Property="Height" Value="20" />
+                        </Style>
+                    </ItemsPresenter.Styles>
+                </ItemsPresenter>
+            </controls:ToolBar.RightContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>
     
