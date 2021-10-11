@@ -86,6 +86,7 @@ namespace AvaloniaStyles.Controls
                 {
                     previousChildSize = child.DesiredSize.Width + Math.Max(0, leftSpace);
                     rcChild = rcChild.WithWidth(previousChildSize);
+                    previousChildSize += spacing;
                 }
                 else if (child is ToolbarSpacer)
                 {
