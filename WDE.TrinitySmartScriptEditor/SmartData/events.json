@@ -480,6 +480,7 @@
     ],
     "is_timed": true,
     "name": "SMART_EVENT_TARGET_HEALTH_PCT",
+    "tags": ["Azeroth", "TrinityMaster", "TrinityCata"],
     "parameters": [
       {
         "type": "PercentageParameter",
@@ -560,6 +561,7 @@
     ],
     "is_timed": true,
     "name": "SMART_EVENT_FRIENDLY_HEALTH",
+    "tags": ["Azeroth", "TrinityMaster", "TrinityCata"],
     "parameters": [
       {
         "type": "Parameter",
@@ -720,6 +722,7 @@
     ],
     "is_timed": true,
     "name": "SMART_EVENT_TARGET_MANA_PCT",
+    "tags": ["Azeroth", "TrinityMaster", "TrinityCata"],
     "parameters": [
       {
         "type": "PercentageParameter",
@@ -1983,6 +1986,7 @@
     ],
     "is_timed": true,
     "name": "SMART_EVENT_IS_BEHIND_TARGET",
+    "tags": ["Azeroth", "TrinityMaster", "TrinityCata"],
     "parameters": [
       {
         "type": "FloatParameter",
