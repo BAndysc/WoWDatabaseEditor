@@ -4,9 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using MySqlConnector;
+using Prism.Events;
 using WDE.Common.Database;
+using WDE.Common.Events;
+using WDE.Common.Tasks;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
+using WDE.SqlInterpreter;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.MySqlDatabaseCommon.Database
@@ -15,16 +19,25 @@ namespace WDE.MySqlDatabaseCommon.Database
     {
         private readonly IMySqlWorldConnectionStringProvider worldConnectionString;
         private readonly IDatabaseProvider databaseProvider;
+        private readonly IQueryEvaluator queryEvaluator;
+        private readonly IEventAggregator eventAggregator;
+        private readonly IMainThread mainThread;
         private readonly DatabaseLogger databaseLogger;
         
         public bool IsConnected => databaseProvider.IsConnected;
 
         public MySqlExecutor(IMySqlWorldConnectionStringProvider worldConnectionString,
             IDatabaseProvider databaseProvider,
+            IQueryEvaluator queryEvaluator,
+            IEventAggregator eventAggregator,
+            IMainThread mainThread,
             DatabaseLogger databaseLogger)
         {
             this.worldConnectionString = worldConnectionString;
             this.databaseProvider = databaseProvider;
+            this.queryEvaluator = queryEvaluator;
+            this.eventAggregator = eventAggregator;
+            this.mainThread = mainThread;
             this.databaseLogger = databaseLogger;
         }
 
@@ -174,6 +187,12 @@ namespace WDE.MySqlDatabaseCommon.Database
                 throw new IMySqlExecutor.QueryFailedDatabaseException(ex);
             }
             await conn.CloseAsync();
+
+            foreach (var tableName in queryEvaluator.Extract(query).Select(q => q.TableName).Distinct())
+            {
+                mainThread.Dispatch(() =>
+                    eventAggregator.GetEvent<DatabaseTableChanged>().Publish(tableName));
+            }
         }
 
         public async Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query)

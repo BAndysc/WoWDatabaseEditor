@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Database;
+using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
@@ -22,6 +23,7 @@ namespace WDE.Parameters
         private readonly IEventAggregator eventAggregator;
         private readonly ILoadingEventAggregator loadingEventAggregator;
 
+        private Dictionary<Type, List<IDatabaseObserver>> reloadable = new();
         private List<LateLoadParameter> databaseParameters = new();
         public ParameterLoader(IDatabaseProvider database, 
             IParameterDefinitionProvider parameterDefinitionProvider,
@@ -75,7 +77,14 @@ namespace WDE.Parameters
             factory.RegisterCombined("UnitBytes1Parameter", "StandStateParameter", "AnimTierParameter", (standState, animTier) => new UnitBytes1Parameter(standState, animTier));
             factory.RegisterCombined("UnitBytes2Parameter", "SheathStateParameter",  "UnitPVPStateFlagParameter","UnitBytesPetFlagParameter", "ShapeshiftFormParameter", 
                 (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift));
-
+            
+            eventAggregator.GetEvent<DatabaseCacheReloaded>().Subscribe(type =>
+            {
+                if (!reloadable.TryGetValue(type, out var list))
+                    return;
+                foreach (var parameter in list)
+                    parameter.Reload();
+            }, ThreadOption.UIThread, true);
             
             loadingEventAggregator.OnEvent<DatabaseLoadedEvent>().SubscribeAction(_ =>
             {
@@ -89,6 +98,12 @@ namespace WDE.Parameters
     
         private T AddDatabaseParameter<T>(T t) where T : LateLoadParameter
         {
+            if (t is IDatabaseObserver databaseObserver)
+            {
+                if (!reloadable.TryGetValue(databaseObserver.ObservedType, out var list))
+                    list = reloadable[databaseObserver.ObservedType] = new();
+                list.Add(databaseObserver);
+            }
             databaseParameters.Add(t);
             return t;
         }
@@ -139,6 +154,12 @@ namespace WDE.Parameters
         protected abstract void LazyLoad();
     }
 
+    internal interface IDatabaseObserver
+    {
+        Type ObservedType { get; }
+        void Reload();
+    }
+    
     public class CreatureParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;
@@ -184,7 +205,7 @@ namespace WDE.Parameters
         }
     }
     
-    public class GossipMenuParameter : LateLoadParameter
+    public class GossipMenuParameter : LateLoadParameter, IDatabaseObserver
     {
         private readonly IDatabaseProvider database;
 
@@ -203,6 +224,9 @@ namespace WDE.Parameters
                         .Replace("\n", "")
                         .Truncate(100)));
         }
+
+        public Type ObservedType => typeof(IGossipMenu);
+        public void Reload() => LateLoad();
     }
 
     internal static class StringExtensions
@@ -215,7 +239,7 @@ namespace WDE.Parameters
         }
     }
 
-    public class NpcTextParameter : LateLoadParameter
+    public class NpcTextParameter : LateLoadParameter, IDatabaseObserver
     {
         private readonly IDatabaseProvider database;
 
@@ -230,6 +254,10 @@ namespace WDE.Parameters
             foreach (INpcText item in database.GetNpcTexts())
                 Items.Add(item.Id, new SelectOption(item.Text0_0 ?? item.Text0_1 ?? ""));
         }
+
+        public Type ObservedType => typeof(INpcText);
+        
+        public void Reload() => LateLoad();
     }
     
     public class QuestParameter : LateLoadParameter

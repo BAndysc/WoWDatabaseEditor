@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using KTrie;
 using Prism.Events;
 using WDE.Common.Database;
+using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 
 namespace WDE.MySqlDatabaseCommon.Database.World
 {
@@ -52,11 +54,51 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             this.eventAggregator = eventAggregator;
             this.loadingEventAggregator = loadingEventAggregator;
             this.parameterFactory = parameterFactory;
+            eventAggregator.GetEvent<DatabaseTableChanged>().Subscribe(tableName =>
+            {
+                if (tableName == "creature_template")
+                    Refresh(RefreshCreatureTemplate);
+                else if (tableName == "gossip_menu")
+                    Refresh(RefreshGossipMenu);
+                else if (tableName == "npc_text")
+                    Refresh(RefreshNpcTexts);
+            }, true);
+        }
+
+        private void Refresh(Func<Task<System.Type>> refreshingFunc)
+        {
+            taskRunner.ScheduleTask("Refresh database", async () =>
+                {
+                    var type = await refreshingFunc();
+                    eventAggregator.GetEvent<DatabaseCacheReloaded>().Publish(type);
+                }).ListenErrors();
+        }
+        
+        private async Task<Type> RefreshNpcTexts()
+        {
+            npcTextsCache = await nonCachedDatabase.GetNpcTextsAsync().ConfigureAwait(false);
+            npcTextsByIdCache = npcTextsCache.ToDictionary(npcText => npcText.Id);
+            return typeof(INpcText);
+        }
+        
+        private async Task<Type> RefreshGossipMenu()
+        {
+            gossipMenusCache = await nonCachedDatabase.GetGossipMenusAsync().ConfigureAwait(false);
+            return typeof(IGossipMenu);
+        }
+
+        private async Task<Type> RefreshCreatureTemplate()
+        {
+            var templates = await nonCachedDatabase.GetCreatureTemplatesAsync().ConfigureAwait(false);
+            Dictionary<uint, ICreatureTemplate> tempDict = templates.ToDictionary(t => t.Entry);
+            creatureTemplateCache = templates;
+            creatureTemplateByEntry = tempDict;
+            return typeof(ICreatureTemplate);
         }
 
         public Task TryConnect()
         {
-            return taskRunner.ScheduleTask(new DatabaseCacheTask(this));;
+            return taskRunner.ScheduleTask(new DatabaseCacheTask(this));
         }
 
         public bool IsConnected => nonCachedDatabase.IsConnected;
