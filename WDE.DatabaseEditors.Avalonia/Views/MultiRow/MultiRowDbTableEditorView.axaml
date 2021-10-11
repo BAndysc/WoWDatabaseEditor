@@ -216,6 +216,7 @@
                                 <controls:AlternatingItemsControl multiRow:SelectablePanel.SelectedItem="{Binding #rootWindow.DataContext.SelectedRow, Mode=TwoWay}" 
                                                                   multiRow:SelectablePanel.ObserveItems="True"
                                                                   Items="{Binding ., Mode=OneTime}" 
+                                                                  ClipToBounds="False"
                                                                   MinHeight="20" 
                                                                   ItemTemplate="{StaticResource RowTemplate}" />
                             </StackPanel>
