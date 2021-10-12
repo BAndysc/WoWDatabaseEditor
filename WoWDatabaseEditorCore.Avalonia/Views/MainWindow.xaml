@@ -59,6 +59,26 @@
             </controls:ToolBar.MiddleContent>
             <controls:ToolBar.RightContent>
                 <controls:ToolbarPanel>
+                    <ItemsPresenter Items="{Binding RelatedSolutionItems.List}">
+                        <ItemsPresenter.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding CreateCommand}"
+                                        ToolTip.Tip="{Binding Name}">
+                                    <components:WdeImage Image="{Binding Icon}" />
+                                </Button>
+                            </DataTemplate>
+                        </ItemsPresenter.ItemTemplate>
+                        <ItemsPresenter.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <controls:ToolbarPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsPresenter.ItemsPanel>
+                        <ItemsPresenter.Styles>
+                            <Style Selector="components|WdeImage">
+                                <Setter Property="Height" Value="20" />
+                            </Style>
+                        </ItemsPresenter.Styles>
+                    </ItemsPresenter>
                     <components:ButtonImage IsVisible="{Binding ShowExportButtons}" Command="{Binding GenerateCurrentSqlCommand}" Text="SQL" />
                 </controls:ToolbarPanel>
             </controls:ToolBar.RightContent>

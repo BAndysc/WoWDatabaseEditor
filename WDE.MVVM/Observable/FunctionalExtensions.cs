@@ -31,6 +31,15 @@ namespace WDE.MVVM.Observable
             return new ObservableCollectionStream<T>(collection, onRemoveOnDispose);
         }
 
+        public static System.IDisposable DisposeOnRemove<T>(this ObservableCollection<T> collection, Func<bool> shouldDispose) where T : System.IDisposable
+        {
+            return collection.ToStream(true).SubscribeAction(e =>
+            {
+                if (e.Type == CollectionEventType.Remove && shouldDispose())
+                    e.Item.Dispose();
+            });
+        }
+        
         public static System.IDisposable DisposeOnRemove<T>(this ObservableCollection<T> collection) where T : System.IDisposable
         {
             return collection.ToStream(true).SubscribeAction(e =>

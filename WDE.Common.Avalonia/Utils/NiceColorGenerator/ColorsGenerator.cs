@@ -10,25 +10,29 @@ namespace WDE.Common.Avalonia.Utils.NiceColorGenerator
         private double lumo;
         private double satu;
 
-        private static double BaseLuminance => SystemTheme.EffectiveThemeIsDark ? 0.16 : 0.84;
-        private static double LuminanceChange => SystemTheme.EffectiveThemeIsDark ? 0.1 : -0.1;
+        private double baseSaturation;
+        private double? customLuminance;
+        private double BaseLuminance => customLuminance ?? (SystemTheme.EffectiveThemeIsDark ? 0.16 : 0.84);
+        private double LuminanceChange => SystemTheme.EffectiveThemeIsDark ? 0.1 : -0.1;
 
         public void Reset()
         {
             hue = 0;
             lumo = BaseLuminance;
-            satu = 0.66;
+            satu = baseSaturation;
         }
 
-        public ColorsGenerator()
+        public ColorsGenerator(double customSaturation = 0.66, double? customLuminance = null)
         {
+            baseSaturation = customSaturation;
+            this.customLuminance = customLuminance;
             Reset();
         }
 
         public Color GetNext()
         {
             Color c = Utils.HSL2RGB(hue, satu, lumo);
-            if (hue < 1)
+            if (hue < 0.95)
                 hue = Math.Min(1, hue + 0.1);
             else
             {

@@ -120,6 +120,21 @@ namespace WDE.MVVM
             disposables.Add(disposable);
             return disposable;
         }
+
+        private bool disposed = false;
+
+        /**
+         * for ViewModels that are allowed to dispose in the middle of their lifetime, use
+         * DisposePartial instead of Dispose, because Dispose is assumed to be called only once
+         */
+        protected void DisposePartial()
+        {
+            while (disposables.Count > 0)
+            {
+                disposables[^1].Dispose();
+                disposables.RemoveAt(disposables.Count - 1);
+            }
+        }
         
         public void Dispose()
         {
@@ -128,6 +143,8 @@ namespace WDE.MVVM
                 disposables[^1].Dispose();
                 disposables.RemoveAt(disposables.Count - 1);
             }
+
+            disposed = true;
         }
 
         public event PropertyValueChangedEventHandler? PropertyValueChanged;
