@@ -179,6 +179,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => nonCachedDatabase.GetPointsOfInterestsAsync();
 
         public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => nonCachedDatabase.GetCreatureTextsByEntry(entry);
+       
+        public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => nonCachedDatabase.GetLinesCallingSmartTimedActionList(timedActionList);
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
             areaTriggerTemplates ?? nonCachedDatabase.GetAreaTriggerTemplates();
@@ -188,7 +190,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetScriptFor(entryOrGuid, type);
         }
 
-        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)
+        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
         {
             await nonCachedDatabase.InstallScriptFor(entryOrGuid, type, script);
         }

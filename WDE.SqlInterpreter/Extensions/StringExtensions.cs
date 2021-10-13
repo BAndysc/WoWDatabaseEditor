@@ -32,6 +32,8 @@ namespace WDE.SqlInterpreter.Extensions
                 return null;
             if (str == "NULL")
                 return null;
+            if (str.StartsWith("@"))
+                return str;
             if (str.IsStringLiteral())
                 return str.DropQuotes();
             if (long.TryParse(str, out var lng))

@@ -197,6 +197,12 @@ namespace WDE.SqlQueryGenerator
                 disableWrapSql = false;
                 return Expression.Constant($"@{arg2.Value}");
             }
+            else if (node.Method.Name == "Raw" && node.Arguments.Count == 1 &&
+                Visit(node.Arguments[0]) is ConstantExpression arg3)
+            {
+                disableWrapSql = false;
+                return Expression.Constant($"{arg3.Value}");
+            }
 
             throw new Exception("Not sure what to do here: return base.VisitMethodCall(node);?");
         }

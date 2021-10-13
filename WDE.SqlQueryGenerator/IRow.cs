@@ -4,5 +4,6 @@ namespace WDE.SqlQueryGenerator
     {
         T? Column<T>(string name);
         T? Variable<T>(string name);
+        T? Raw<T>(string name);
     }
 }

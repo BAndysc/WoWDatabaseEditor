@@ -68,7 +68,7 @@ namespace WDE.SmartScriptEditor.Data
         public SmartGenericJsonData GetRawData(SmartType type, int id)
         {
             if (!smartIdData[type].ContainsKey(id))
-                throw new NullReferenceException();
+                throw new Exception("There is no " + type + " with id " + id);
 
             return smartIdData[type][id];
         }
@@ -76,7 +76,7 @@ namespace WDE.SmartScriptEditor.Data
         public SmartGenericJsonData GetDataByName(SmartType type, string name)
         {
             if (!smartNameData[type].ContainsKey(name))
-                throw new NullReferenceException();
+                throw new Exception("There is no " + type + " with name " + name);
 
             return smartNameData[type][name];
         }

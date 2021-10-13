@@ -40,16 +40,15 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             var query = Queries.BeginTransaction();
             query.Comment(nameProvider.GetName(item));
             query.DefineVariable("ENTRY", script.EntryOrGuid);
-            BuildDelete(query);
+            var (serializedScript, serializedConditions) = scriptExporter.ToDatabaseCompatibleSmartScript(script);
+            BuildDelete(query, serializedScript);
             BuildUpdate(query);
-            BuildInsert(query);
+            BuildInsert(query, serializedScript, serializedConditions);
             return query.Close();
         }
         
-        private void BuildInsert(IMultiQuery query)
+        private void BuildInsert(IMultiQuery query, ISmartScriptLine[] serializedScript, IConditionLine[] serializedConditions)
         {
-            var (serializedScript, serializedConditions) = scriptExporter.ToDatabaseCompatibleSmartScript(script);
-
             if (serializedScript.Length == 0)
                 return;
 
@@ -69,10 +68,23 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         private object GenerateSingleSai(IMultiQuery query, ISmartScriptLine line)
         {
+            IRawText entryOrGuid = query.Raw("@ENTRY");
+            if (line.EntryOrGuid != script.EntryOrGuid)
+            {
+                if (line.EntryOrGuid / 100 == script.EntryOrGuid)
+                {
+                    string plus = "";
+                    if (line.EntryOrGuid % 100 != 0)
+                        plus = " + " + (line.EntryOrGuid % 100);
+                    entryOrGuid = query.Raw("@ENTRY * 100" + plus);
+                }
+                else
+                    entryOrGuid = query.Raw(line.EntryOrGuid.ToString());
+            }
             return new
             {
-                entryorguid = query.Variable("ENTRY"),
-                source_type = (int) script.SourceType,
+                entryorguid = entryOrGuid,
+                source_type = (int) line.ScriptSourceType,
                 id = line.Id,
                 link = line.Link,
 
@@ -214,11 +226,27 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
         }
 
-        private void BuildDelete(IMultiQuery query)
+        private void BuildDelete(IMultiQuery query, ISmartScriptLine[] serializedLines)
         {
-            query.Table("smart_scripts")
-                .Where(r => r.Column<int>("entryOrGuid") == r.Variable<int>("ENTRY") &&
-                            r.Column<int>("source_type") == (int)script.SourceType).Delete();
+            foreach (var pair in serializedLines.Select(l => (l.ScriptSourceType, l.EntryOrGuid))
+                .Concat(new (int ScriptSourceType, int EntryOrGuid)[]{((int)script.SourceType, script.EntryOrGuid)})
+                .Distinct()
+                .GroupBy(pair => pair.ScriptSourceType))
+            {
+                var entries = pair.Select(p => p.EntryOrGuid).ToList();
+                if (entries.Count == 1 && script.EntryOrGuid == entries[0])
+                {
+                    query.Table("smart_scripts")
+                        .Where(r => r.Column<int>("source_type") == pair.Key && 
+                                    r.Column<int>("entryOrGuid") == r.Variable<int>("ENTRY")).Delete();   
+                }
+                else
+                {
+                    query.Table("smart_scripts")
+                        .Where(r => r.Column<int>("source_type") == pair.Key)
+                        .WhereIn("entryOrGuid", entries, true).Delete();   
+                }
+            }
         }
     }
 }

@@ -64,6 +64,16 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToListAsync<ICreatureText>();
         }
 
+        public async Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList)
+        {
+            await using var model = Database();
+            return await model.SmartScript.Where(line =>
+                    (line.ActionType == 80 && line.ActionParam1 == timedActionList) ||
+                    (line.ActionType == 88 && timedActionList >= line.ActionParam1 && timedActionList <= line.ActionParam2) ||
+                   (line.ActionType == 87 && (line.ActionParam1 == timedActionList || line.ActionParam2 == timedActionList || line.ActionParam3 == timedActionList || line.ActionParam4 == timedActionList || line.ActionParam5 == timedActionList || line.ActionParam6 == timedActionList)))
+                .ToListAsync<ISmartScriptLine>();
+        }
+
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
             using var model = Database();
@@ -260,13 +270,17 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
         }
 
-        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)
+        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
         {
             using var writeLock = await DatabaseLock.WriteLock();
             await using var model = Database();
 
             await model.BeginTransactionAsync(IsolationLevel.ReadCommitted);
-            await model.SmartScript.Where(x => x.EntryOrGuid == entryOrGuid && x.ScriptSourceType == (int) type).DeleteAsync();
+            
+            foreach (var pair in script.Select(l => (l.ScriptSourceType, l.EntryOrGuid))
+                .Concat(new (int ScriptSourceType, int EntryOrGuid)[]{((int)type, entryOrGuid)})
+                .Distinct())
+                await model.SmartScript.Where(x => x.EntryOrGuid == pair.EntryOrGuid && x.ScriptSourceType == pair.ScriptSourceType).DeleteAsync();
 
             switch (type)
             {

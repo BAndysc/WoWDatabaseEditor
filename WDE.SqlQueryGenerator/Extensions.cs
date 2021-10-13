@@ -143,10 +143,13 @@ namespace WDE.SqlQueryGenerator
             return new Where(table, $"`{columnName}` IN ({str})");
         }
 
-        public static IWhere WhereIn<T>(this IWhere where, string columnName, IEnumerable<T> values)
+        public static IWhere WhereIn<T>(this IWhere where, string columnName, IEnumerable<T> values, bool skipBrackets = false)
         {
             var str = string.Join(", ", values);
-            return new Where(where.Table, $"({where.Condition}) AND (`{columnName}` IN ({str}))");
+            if (skipBrackets)
+                return new Where(where.Table, $"{where.Condition} AND `{columnName}` IN ({str})");
+            else
+                return new Where(where.Table, $"({where.Condition}) AND (`{columnName}` IN ({str}))");
         }
         
         public static IQuery Delete(this IWhere query)
@@ -193,6 +196,11 @@ namespace WDE.SqlQueryGenerator
         public static IVariable Variable(this IMultiQuery query, string name)
         {
             return new Variable(name);
+        }
+        
+        public static IRawText Raw(this IMultiQuery query, string text)
+        {
+            return new RawText(text);
         }
         
         internal static string ToSql(this object? o)

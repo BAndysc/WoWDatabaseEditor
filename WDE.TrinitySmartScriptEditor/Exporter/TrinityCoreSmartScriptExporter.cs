@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
+using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Exporter;
@@ -21,6 +23,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ISolutionItemNameRegistry nameRegistry;
         private readonly IDatabaseProvider databaseProvider;
+        private readonly IMessageBoxService messageBoxService;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
         public TrinityCoreSmartScriptExporter(ISmartFactory smartFactory,
@@ -28,6 +31,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             ICurrentCoreVersion currentCoreVersion,
             ISolutionItemNameRegistry nameRegistry,
             IDatabaseProvider databaseProvider,
+            IMessageBoxService messageBoxService,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.smartFactory = smartFactory;
@@ -35,6 +39,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             this.currentCoreVersion = currentCoreVersion;
             this.nameRegistry = nameRegistry;
             this.databaseProvider = databaseProvider;
+            this.messageBoxService = messageBoxService;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
@@ -51,6 +56,43 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 .Select(e => e.GetParameter(0).Value)
                 .DefaultIfEmpty(0)
                 .Max() + 1;
+
+            var usedTimedActionLists = script.Events
+                .SelectMany(e => e.Actions)
+                .Where(a => a.Id == SmartConstants.ActionCallTimedActionList ||
+                            a.Id == SmartConstants.ActionCallRandomTimedActionList ||
+                            a.Id == SmartConstants.ActionCallRandomRangeTimedActionList)
+                .SelectMany(a =>
+                {
+                    if (a.Id == SmartConstants.ActionCallRandomTimedActionList)
+                        return new int[]
+                        {
+                            (int)a.GetParameter(0).Value,
+                            (int)a.GetParameter(1).Value,
+                            (int)a.GetParameter(2).Value,
+                            (int)a.GetParameter(3).Value,
+                            (int)a.GetParameter(4).Value,
+                            (int)a.GetParameter(5).Value,
+                        };
+                    if (a.Id == SmartConstants.ActionCallRandomRangeTimedActionList &&
+                        a.GetParameter(1).Value - a.GetParameter(0).Value < 20)
+                        return Enumerable.Range((int)a.GetParameter(0).Value, (int)(a.GetParameter(1).Value - a.GetParameter(0).Value + 1));
+                    return new int[] { (int)a.GetParameter(0).Value };
+                })
+                .Where(id => id != 0)
+                .ToHashSet();
+
+            int firstUnusedActionList = Math.Abs(script.EntryOrGuid) * 100 -1;
+            int GetNextUnusedTimedActionList()
+            {
+                do
+                {
+                    firstUnusedActionList++;
+                } while (usedTimedActionLists.Contains(firstUnusedActionList));
+
+                usedTimedActionLists.Add(firstUnusedActionList);
+                return firstUnusedActionList;
+            }
             
             foreach (var gv in script.GlobalVariables)
                 lines.Add(gv.ToMetaSmartScriptLine(script.EntryOrGuid, script.SourceType, eventId++));    
@@ -80,14 +122,38 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
             else
             {
+                SmartEvent originalEvent;
+                List<SmartEvent> additionalEvents = new();
+
+                void FlushLines(SmartEvent? eventForConditions)
+                {
+                    if (eventForConditions != null)
+                    {
+                        var serializedConditions = eventForConditions.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script.EntryOrGuid, script.SourceType, eventId);
+                        if (serializedConditions != null)
+                            conditions.AddRange(serializedConditions);
+                    }
+                    
+                    foreach (var toSerialize in new SmartEvent[] {originalEvent}.Concat(additionalEvents))
+                    {
+                        if (toSerialize.Actions.Count == 0)
+                            continue;
+                        var serialized = toSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, true);
+                        eventId += serialized.Length;
+                        lines.AddRange(serialized);
+                    }
+                    additionalEvents.ForEach(d => d.Actions.Clear());
+                    originalEvent.Actions.Clear();
+                }
+                
                 foreach (SmartEvent e in script.Events)
                 {
                     if (e.Actions.Count == 0)
                         continue;
 
-                    SmartEvent originalEvent = e.ShallowCopy();
+                    originalEvent = e.ShallowCopy();
                     originalEvent.Parent = script;
-                    List<SmartEvent> delayedWaits = new();
+                    additionalEvents.Clear();
                     SmartEvent lastEvent = originalEvent;
                     
                     long accumulatedWaits = 0;
@@ -98,11 +164,86 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                             var eventTimed = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
                             eventTimed.Parent = script;
                             eventTimed.GetParameter(0).Value = nextTriggerId++;
-                            delayedWaits.Add(eventTimed);
+                            additionalEvents.Add(eventTimed);
                             lastEvent = eventTimed;
                         }
-                     
-                        if (e.Actions[index].Id == SmartConstants.ActionWait)
+
+                        if (e.Actions[index].Id == SmartConstants.ActionBeginInlineActionList ||
+                            e.Actions[index].Id == SmartConstants.ActionAfter)
+                        {
+                            var timedActionListId = GetNextUnusedTimedActionList();
+                            SmartAction callTimedActionList = smartFactory.ActionFactory(SmartConstants.ActionCallTimedActionList,
+                                smartFactory.SourceFactory(SmartConstants.SourceSelf),
+                                smartFactory.TargetFactory(SmartConstants.TargetSelf));
+                            callTimedActionList.GetParameter(0).Value = timedActionListId;
+                            if (e.Actions[index].Id == SmartConstants.ActionBeginInlineActionList)
+                            {
+                                callTimedActionList.GetParameter(1).Value = e.Actions[index].GetParameter(0).Value;
+                                callTimedActionList.GetParameter(2).Value = e.Actions[index].GetParameter(1).Value;
+                                index++;
+                            }
+                            callTimedActionList.Comment = SmartConstants.CommentInlineActionList;
+                            lastEvent.AddAction(callTimedActionList);
+
+                            FlushLines(e);
+                            
+                            long afterTimeMin = 0;
+                            long afterTimeMax = 0;
+                            int timedEventId = 0;
+                            for (; index < e.Actions.Count; ++index)
+                            {
+                                if (e.Actions[index].Id == SmartConstants.ActionAfter || e.Actions[index].Id == SmartConstants.ActionWait)
+                                {
+                                    afterTimeMin += e.Actions[index].GetParameter(0).Value;
+                                    afterTimeMax += e.Actions[index].GetParameter(1).Value;
+                                    if (e.Actions[index].GetParameter(1).Value == 0)
+                                        afterTimeMax += e.Actions[index].GetParameter(0).Value;
+                                }
+                                else if (e.Actions[index].Id == SmartConstants.ActionAfterMovement && index > 0)
+                                {
+                                    afterTimeMin = 0;
+                                    afterTimeMax = 0;
+                                    var pathId = e.Actions[index - 1].GetParameter(1).Value;
+                                    timedActionListId = GetNextUnusedTimedActionList();
+
+                                    var eventFinishedMovement =
+                                        smartFactory.EventFactory(SmartConstants.EventWaypointsEnded);
+                                    eventFinishedMovement.Parent = script;
+                                    eventFinishedMovement.GetParameter(1).Value = pathId;
+                                    
+                                    var callAnotherTimedActionList = smartFactory.ActionFactory(SmartConstants.ActionCallTimedActionList,
+                                        smartFactory.SourceFactory(SmartConstants.SourceSelf),
+                                        smartFactory.TargetFactory(SmartConstants.TargetSelf));
+                                    callAnotherTimedActionList.GetParameter(0).Value = timedActionListId;
+                                    callAnotherTimedActionList.Comment = SmartConstants.CommentInlineMovementActionList;
+                                    
+                                    eventFinishedMovement.AddAction(callAnotherTimedActionList);
+                                    additionalEvents.Add(eventFinishedMovement);
+                                    FlushLines(null);
+                                }
+                                else
+                                {
+                                    SmartEvent after = smartFactory.EventFactory(SmartConstants.EventUpdateInCombat);
+                                    after.GetParameter(0).Value = afterTimeMin;
+                                    after.GetParameter(1).Value = afterTimeMax;
+                                    SmartAction actualAction = e.Actions[index].Copy();
+                                    AdjustCoreCompatibleAction(actualAction);
+                        
+                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(timedActionListId, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService);
+                                    after.AddAction(actualAction);
+                        
+                                    var serialized = after.ToSmartScriptLines(timedActionListId, SmartScriptType.TimedActionList, timedEventId++, false, 0);
+
+                                    if (serialized.Length != 1)
+                                        throw new InvalidOperationException();
+
+                                    lines.Add(serialized[0]);
+                                    afterTimeMin = 0;
+                                    afterTimeMax = 0;
+                                }
+                            }
+                        }
+                        else if (e.Actions[index].Id == SmartConstants.ActionWait)
                         {
                             accumulatedWaits += e.Actions[index].GetParameter(0).Value;
 
@@ -131,17 +272,8 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
                     if (originalEvent.Actions.Count == 0)
                         continue;
-                    
-                    var serializedConditions = e.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script.EntryOrGuid, script.SourceType, eventId);
-                    if (serializedConditions != null)
-                        conditions.AddRange(serializedConditions);
-                    
-                    foreach (var toSerialize in new SmartEvent[] {originalEvent}.Concat(delayedWaits))
-                    {
-                        var serialized = toSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, true);
-                        eventId += serialized.Length;
-                        lines.AddRange(serialized);
-                    }
+
+                    FlushLines(e);
                 }
             }
             

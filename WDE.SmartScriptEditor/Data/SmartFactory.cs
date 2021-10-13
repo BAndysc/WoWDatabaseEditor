@@ -112,10 +112,13 @@ namespace WDE.SmartScriptEditor.Data
             return condition;
         }
 
-        public SmartAction ActionFactory(int id, SmartSource source, SmartTarget target)
+        public SmartAction ActionFactory(int id, SmartSource? source, SmartTarget? target)
         {
             if (!smartDataManager.Contains(SmartType.SmartAction, id))
                 throw new InvalidSmartActionException(id);
+
+            source ??= SourceFactory(0);
+            target ??= TargetFactory(0);
 
             SmartAction action = new(id, source, target);
             var raw = smartDataManager.GetRawData(SmartType.SmartAction, id);

@@ -3,7 +3,10 @@
         "name": "Script",
         "group_members": [
             "SMART_ACTION_META_WAIT",
-            "SMART_ACTION_META_COMMENT"
+            "SMART_ACTION_META_COMMENT",
+            "SMART_ACTION_META_BEGIN_ACTIONLIST",
+            "SMART_ACTION_META_AFTER",
+            "SMART_ACTION_META_AFTER_MOVEMENT"
         ]
     },
     {
@@ -62,6 +65,7 @@
             "SMART_ACTION_RANDOM_MOVE",
             "SMART_ACTION_FLEE_FOR_ASSIST",
             "SMART_ACTION_WP_START",
+            "SMART_ACTION_WP_START_TC_WRATH",
             "SMART_ACTION_WP_PAUSE",
             "SMART_ACTION_WP_RESUME",
             "SMART_ACTION_WP_STOP",
@@ -81,6 +85,7 @@
             "SMART_ACTION_ACTIVATE_TAXI",
             "SMART_ACTION_START_CLOSEST_WAYPOINT",
             "SMART_ACTION_MOVE_OFFSET",
+            "SMART_ACTION_RISE_UP",
             "SMART_ACTION_SET_CAN_FLY",
             "SMART_ACTION_FLEE",
             "SMART_ACTION_STOP_MOTION",
@@ -182,8 +187,10 @@
             "SMART_ACTION_ATTACK_START",
             "SMART_ACTION_ATTACK_STOP",
             "SMART_ACTION_KILL_UNIT",
+            "SMART_ACTION_CALL_FOR_HELP_335_CATA",
             "SMART_ACTION_CALL_FOR_HELP",
-            "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE"
+            "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE",
+            "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE_335_CATA"
         ]
     },
     {

@@ -28,6 +28,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public INpcText? GetNpcText(uint entry) => impl.GetNpcText(entry);
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => impl.GetPointsOfInterestsAsync();
         public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => impl.GetCreatureTextsByEntry(entry);
+        public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => impl.GetLinesCallingSmartTimedActionList(timedActionList);
 
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() => impl.GetCreatureClassLevelStats();
         public IEnumerable<IGossipMenu> GetGossipMenus() => impl.GetGossipMenus();
@@ -35,7 +36,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) =>
             impl.GetScriptFor(entryOrGuid, type);
-        public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script) =>
+        public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script) =>
             impl.InstallScriptFor(entryOrGuid, type, script);
 
         public Task InstallConditions(IEnumerable<IConditionLine> conditions,

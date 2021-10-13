@@ -1159,7 +1159,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var lines = (await smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType)).ToList();
             var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.SmartType).ToList();
             var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.SmartType).ToList();
-            smartScriptImporter.Import(script, lines, conditions, targetSourceConditions);
+            await smartScriptImporter.Import(script, false, lines, conditions, targetSourceConditions);
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
             TeachingTips.Start();
@@ -1349,6 +1349,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                 if (possibleSourcesOfAction == null || possibleSourcesOfSource == null)
                     return false;
+
+                if (sourceData.Id == SmartConstants.SourceSelf && script.SourceType == SmartScriptType.Creature)
+                    return possibleSourcesOfAction.Contains("Creature");
+                
+                if (sourceData.Id == SmartConstants.SourceSelf && script.SourceType == SmartScriptType.GameObject)
+                    return possibleSourcesOfAction.Contains("GameObject");
 
                 return possibleSourcesOfAction.Intersect(possibleSourcesOfSource).Any();
             }

@@ -58,7 +58,17 @@ namespace WDE.SkyFireMySqlDatabase.Database
                 .ThenBy(t => t.Id)
                 .ToListAsync<ICreatureText>();
         }
-
+        
+        public async Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList)
+        {
+            await using var model = new SkyFireDatabase();
+            return await model.SmartScript.Where(line =>
+                    (line.ActionType == 80 && line.ActionParam1 == timedActionList) ||
+                    (line.ActionType == 88 && timedActionList >= line.ActionParam1 && timedActionList <= line.ActionParam2) ||
+                    (line.ActionType == 87 && (line.ActionParam1 == timedActionList || line.ActionParam2 == timedActionList || line.ActionParam3 == timedActionList || line.ActionParam4 == timedActionList || line.ActionParam5 == timedActionList || line.ActionParam6 == timedActionList)))
+                .ToListAsync<ISmartScriptLine>();
+        }
+        
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
         {
             using var model = new SkyFireDatabase();
@@ -248,7 +258,7 @@ namespace WDE.SkyFireMySqlDatabase.Database
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry);
         }
 
-        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IEnumerable<ISmartScriptLine> script)
+        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
         {
             using var writeLock = await DatabaseLock.WriteLock();
             await using var model = new SkyFireDatabase();

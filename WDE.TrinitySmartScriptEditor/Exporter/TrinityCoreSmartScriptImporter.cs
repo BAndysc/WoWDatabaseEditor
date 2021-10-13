@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
+using WDE.Parameters.Models;
+using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models;
@@ -19,15 +22,19 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ISmartFactory smartFactory;
         private readonly ISmartDataManager smartDataManager;
         private readonly IMessageBoxService messageBoxService;
+        private readonly IDatabaseProvider databaseProvider;
 
         public TrinityCoreSmartScriptImporter(ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
-            IMessageBoxService messageBoxService)
+            IMessageBoxService messageBoxService,
+            IDatabaseProvider databaseProvider)
         {
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
             this.messageBoxService = messageBoxService;
+            this.databaseProvider = databaseProvider;
         }
+        
         private bool TryParseGlobalVariable(SmartScript script, ISmartScriptLine line)
         {
             if (line.EventType != SmartConstants.EventAiInitialize)
@@ -58,12 +65,14 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             return true;
         }
 
-        public void Import(SmartScript script, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine> targetConditions)
+        public async Task Import(SmartScript script, bool doNotTouchIfPossible, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine> targetConditions)
         {
             int? entry = null;
             SmartScriptType? source = null;
+            bool? shouldMergeUserLastAnswer = doNotTouchIfPossible ? false : null;
 
             var conds = script.ParseConditions(conditions);
+            SortedDictionary<long, SmartEvent> startPathToActionParent = new();
             SortedDictionary<long, SmartEvent> triggerIdToActionParent = new();
             SortedDictionary<long, SmartEvent> triggerIdToEvent = new();
             Dictionary<int, SmartEvent> linkToSmartEventParent = new();
@@ -89,24 +98,24 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
 
             SmartEvent? lastEvent = null;
-            foreach (ISmartScriptLine line in lines)
+            foreach (var line in lines)
             {
                 if (TryParseGlobalVariable(script, line))
                     continue;
-                
+
                 SmartEvent? currentEvent = null;
-                
+
                 if (!entry.HasValue)
                     entry = line.EntryOrGuid;
                 else
                     Debug.Assert(entry.Value == line.EntryOrGuid);
 
                 if (!source.HasValue)
-                    source = (SmartScriptType) line.ScriptSourceType;
+                    source = (SmartScriptType)line.ScriptSourceType;
                 else
-                    Debug.Assert((int) source.Value == line.ScriptSourceType);
+                    Debug.Assert((int)source.Value == line.ScriptSourceType);
 
-                if (source == SmartScriptType.TimedActionList && lastEvent != null && 
+                if (source == SmartScriptType.TimedActionList && lastEvent != null &&
                     line.EventParam1 == 0 && line.EventParam2 == 0)
                     currentEvent = lastEvent;
                 else if (!linkToSmartEventParent.TryGetValue(line.Id, out currentEvent))
@@ -135,8 +144,10 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     else
                         continue;
                 }
-                
-                string comment = line.Comment.Contains(" // ") ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim() : "";
+
+                string comment = line.Comment.Contains(" // ")
+                    ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim()
+                    : "";
 
                 if (!string.IsNullOrEmpty(comment) && line.ActionType == SmartConstants.ActionNone)
                 {
@@ -144,7 +155,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 }
 
                 SmartAction? action = script.SafeActionFactory(line);
-                
+
                 if (action != null)
                 {
                     var raw = smartDataManager.GetRawData(SmartType.SmartAction, line.ActionType);
@@ -156,16 +167,70 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                             action.Source.GetParameter(i).Copy(action.Target.GetParameter(i));
                             action.Target.GetParameter(i).Value = 0;
                         }
+
                         smartFactory.UpdateTarget(action.Target, 0);
                     }
-                    
-                    if (comment != SmartConstants.CommentWait)
+
+                    if (comment != SmartConstants.CommentWait &&
+                        comment != SmartConstants.CommentInlineActionList &&
+                        comment != SmartConstants.CommentInlineMovementActionList)
                         action.Comment = comment;
-                    if (action.Id == SmartConstants.ActionCreateTimed && comment == SmartConstants.CommentWait)
-                        triggerIdToActionParent[action.GetParameter(0).Value] = currentEvent;
-                    currentEvent.AddAction(action);
+
+                    bool mergeList = action.Id == SmartConstants.ActionCallTimedActionList &&
+                                     (comment == SmartConstants.CommentInlineActionList ||
+                                      comment == SmartConstants.CommentInlineMovementActionList);
+
+                    if (action.Id == SmartConstants.ActionCallTimedActionList && line.Link == 0 && !mergeList)
+                    {
+                        var shouldMerge =
+                            await TryMergeTimedActionList(action.GetParameter(0).Value, shouldMergeUserLastAnswer);
+                        if (!shouldMerge.usedMultiple)
+                        {
+                            mergeList = shouldMerge.userAnswer ?? false;
+                            shouldMergeUserLastAnswer = shouldMerge.userAnswer;
+                        }
+                    }
+
+                    if (mergeList)
+                    {
+                        var timedScript = databaseProvider.GetScriptFor((int)action.GetParameter(0).Value,
+                            SmartScriptType.TimedActionList);
+                        var beginInlineAction = smartFactory.ActionFactory(SmartConstants.ActionBeginInlineActionList,
+                            smartFactory.SourceFactory(SmartConstants.SourceSelf),
+                            smartFactory.TargetFactory(SmartConstants.TargetSelf));
+                        beginInlineAction.GetParameter(0).Value = action.GetParameter(1).Value;
+                        beginInlineAction.GetParameter(1).Value = action.GetParameter(2).Value;
+                        var pseudoScript = new SmartScript(
+                            new SmartScriptSolutionItem((int)action.GetParameter(0).Value,
+                                SmartScriptType.TimedActionList),
+                            smartFactory, smartDataManager, messageBoxService);
+                        await Import(pseudoScript, doNotTouchIfPossible, timedScript.ToList(), new List<IConditionLine>(),
+                            new List<IConditionLine>());
+                        currentEvent.AddAction(beginInlineAction);
+                        foreach (var e in pseudoScript.Events)
+                        {
+                            if (e.GetParameter(0).Value > 0)
+                            {
+                                var afterAction = smartFactory.ActionFactory(SmartConstants.ActionAfter, null, null);
+                                afterAction.GetParameter(0).Value = e.GetParameter(0).Value;
+                                afterAction.GetParameter(1).Value = e.GetParameter(0).Value == e.GetParameter(1).Value
+                                    ? 0
+                                    : e.GetParameter(1).Value;
+                                currentEvent.AddAction(afterAction);
+                            }
+
+                            foreach (var a in e.Actions)
+                                currentEvent.AddAction(a);
+                        }
+                    }
+                    else
+                    {
+                        if (action.Id == SmartConstants.ActionCreateTimed && comment == SmartConstants.CommentWait)
+                            triggerIdToActionParent[action.GetParameter(0).Value] = currentEvent;
+                        currentEvent.AddAction(action);
+                    }
                 }
-                
+
                 if (line.Link != 0 && !doubleLinks.Contains(line.Link))
                 {
                     linkToSmartEventParent[line.Link] = currentEvent;
@@ -219,11 +284,39 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 foreach (SmartAction a in @event.Actions)
                     caller.InsertAction(a, indexOfAction++);
             }
+
+            foreach (var e in script.Events)
+            {
+                if (e.Actions.Count > 0)
+                {
+                    var a = e.Actions[^1];
+                    if (a.Id == SmartConstants.ActionStartWaypointsPath)
+                        startPathToActionParent[a.GetParameter(1).Value] = e;
+                }
+            }
             
+            for (var index = script.Events.Count - 1; index >= 0; index--)
+            {
+                var e = script.Events[index];
+                if (e.Id != SmartConstants.EventWaypointsEnded || e.GetParameter(0).Value != 0)
+                    continue;
+                
+                if (e.Actions.Count == 0 || e.Actions[0].Id != SmartConstants.ActionBeginInlineActionList)
+                    continue;
+
+                if (!startPathToActionParent.TryGetValue(e.GetParameter(1).Value, out var startPathEvent))
+                    continue;
+                
+                script.Events.Remove(e);
+                startPathEvent.AddAction(smartFactory.ActionFactory(SmartConstants.ActionAfterMovement, null, null));
+                for (int i = 1; i < e.Actions.Count; ++i)
+                    startPathEvent.AddAction(e.Actions[i]);
+            }
+
 
             if (doubleLinks.Count > 0)
             {
-                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Script modified")
+                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Script modified")
                     .SetMainInstruction("Script with multiple links")
                     .SetContent(
                         "This script contains multiple events pointing to the same event (at least two events have the same `link` field). This is not supported by design in this editor. Therefore those links has been replaced with trigger_timed_event for you. The effect of the script should be the same")
@@ -232,6 +325,29 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     .SetIcon(MessageBoxIcon.Warning)
                     .Build());
             }
+        }
+
+        private async Task<(bool usedMultiple, bool? userAnswer)> TryMergeTimedActionList(long timedActionList, bool? mergeIfPossible)
+        {
+            if (mergeIfPossible is false)
+                return (true, mergeIfPossible);
+            
+            var lines = await databaseProvider.GetLinesCallingSmartTimedActionList((int)timedActionList);
+            if (lines.Count > 1)
+                return (true, mergeIfPossible);
+
+            if (mergeIfPossible is true)
+                return (false, mergeIfPossible);
+            
+            return (false, await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                .SetTitle("Merge timed action list")
+                .SetMainInstruction("Do you want to merge timed action list into main script?")
+                .SetContent(
+                    "The editor has detected calling timed action list, that is called only once in whole database.\n\nThat means this timed action list can be merged into the main script.\nThe generated query will be the same as now.\n\nDo you want to merge it?")
+                .WithYesButton(true)
+                .WithNoButton(false)
+                .SetIcon(MessageBoxIcon.Information)
+                .Build()));
         }
     }
 }
