@@ -61,7 +61,7 @@ namespace WDE.SqlQueryGenerator.Test
         public void TestDeleteSimpleConditionUshort() => Test("`Id` = 123", r => r.Column<ushort>("Id") == (ushort)123);
         
         [Test]
-        public void TestDeleteSimpleConditionString() => Test("`Id` = \"abc \\\"2\\\"\"", r => r.Column<string>("Id") == "abc \"2\"");
+        public void TestDeleteSimpleConditionString() => Test("`Id` = 'abc \"2\"'", r => r.Column<string>("Id") == "abc \"2\"");
         
         [Test]
         public void TestDeleteSimpleConditionFloat() => Test("`Id` = 2.5", r => r.Column<float>("Id") == 2.5f);

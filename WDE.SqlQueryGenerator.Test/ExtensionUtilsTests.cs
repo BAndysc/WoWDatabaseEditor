@@ -38,7 +38,7 @@ namespace WDE.SqlQueryGenerator.Test
         [Test]
         public void TestDefineVariableString()
         {
-            Assert.AreEqual("SET @A := \"abc\";", Queries.BeginTransaction().DefineVariable("A", "abc").QueryString);
+            Assert.AreEqual("SET @A := 'abc';", Queries.BeginTransaction().DefineVariable("A", "abc").QueryString);
         }
         
         [Test]

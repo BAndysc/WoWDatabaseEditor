@@ -209,10 +209,12 @@ namespace WDE.SqlQueryGenerator
                 return b ? "1" : "0";
             return o.ToString() ?? "[INVALID TYPE]";
         }
+
+        private static string StringQuotes = "'";
         
         internal static string ToSqlEscapeString(this string str)
         {
-            return "\"" +  str.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "\\n") + "\"";
+            return StringQuotes + str.Replace("\\", "\\\\").Replace(StringQuotes, "\\" + StringQuotes).Replace("\r", "").Replace("\n", "\\n") + StringQuotes;
         }
     }
 }

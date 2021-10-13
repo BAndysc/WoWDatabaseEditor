@@ -22,7 +22,7 @@ namespace WDE.SqlQueryGenerator.Test
         public void TripleSet()
         {
             var query = Queries.Table("a").Where(r => true).Set("b", 2).Set("c", 3.5).Set("d", "abc").Update();
-            Assert.AreEqual("UPDATE `a` SET `b` = 2, `c` = 3.5, `d` = \"abc\";", query.QueryString);
+            Assert.AreEqual("UPDATE `a` SET `b` = 2, `c` = 3.5, `d` = 'abc';", query.QueryString);
         }
         
         [Test]
