@@ -67,7 +67,8 @@
         "name": "Summons",
         "group_members": [
             "SMART_EVENT_SUMMONED_UNIT",
-            "SMART_EVENT_SUMMON_DESPAWNED"
+            "SMART_EVENT_SUMMON_DESPAWNED",
+            "SMART_EVENT_SUMMONED_UNIT_DIES"
         ]
     },
     {

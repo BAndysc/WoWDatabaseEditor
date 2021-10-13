@@ -2331,6 +2331,43 @@
     "name_readable": "On counter set"
   },
   {
+    "id": 82,
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "name": "SMART_EVENT_SUMMONED_UNIT_DIES",
+    "tags": ["TrinityWrath"],
+    "parameters": [
+      {
+        "type": "CreatureParameter",
+        "name": "Entry",
+        "description": "If 0, any creature will trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
+    "description": "On summoned creature {pram1value:choose(0):|{pram1} }died{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
+    "name_readable": "On summon death",
+    "invoker": {
+      "name": "Summoned unit",
+      "types": [
+        "Creature"
+      ]
+    }
+  },  
+  {
     "id": 101,
     "name": "SMART_EVENT_NEAR_PLAYERS_AC",
     "name_readable": "When at least x players nearby",
