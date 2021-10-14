@@ -100,6 +100,7 @@ namespace WDE.PacketViewer.Avalonia.Views
                 if (word == "packet")
                 {
                     data.Add(new CompletionData("id", "(int) Number of packet"));
+                    data.Add(new CompletionData("originalId", "(int) Original number of packet. If split UPDATE_OBJECT is disabled, then this is the same as Id. If splitting is enabled, then this field contains original packet number"));
                     data.Add(new CompletionData("text", "(string) Raw packet output from Packet Parser"));
                     data.Add(new CompletionData("opcode", "(string) String representation of packet opcode (e.g. SMSG_CHAT)")); 
                     data.Add(new CompletionData("entry", "(int) Entry of main object in packet. E.g. caster for SMSG_SPELL_GO. 0 for packets without 'main object' (e.g. SMSG_UPDATE_OBJECT)"));   

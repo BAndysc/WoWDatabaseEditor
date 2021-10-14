@@ -135,6 +135,9 @@ namespace WDE.PacketViewer.Filtering.Antlr
                         return packet.Text;
                     case "id":
                         return (long) packet.Id;
+                    case "original_id":
+                    case "originalId":
+                        return (long) packet.OriginalId;
                     case "entry":
                         return (long) packet.Entry;
                 }

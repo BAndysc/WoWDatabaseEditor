@@ -6,7 +6,7 @@ using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
-    public class SplitUpdateProcessor : PacketProcessor<IEnumerable<PacketHolder>?>
+    public class SplitUpdateProcessor : PacketProcessor<IEnumerable<(PacketHolder, int)>?>
     {
         private readonly GuidExtractorProcessor guidExtractorProcessor;
 
@@ -50,8 +50,8 @@ namespace WDE.PacketViewer.Processing.Processors
             return 5;
         }
 
-        private List<PacketHolder> afterSplit = new();
-        public IEnumerable<PacketHolder>? Finalize()
+        private List<(PacketHolder, int)> afterSplit = new();
+        public IEnumerable<(PacketHolder, int)>? Finalize()
         {
             pending.Sort(Comparer<PacketHolder>.Create((a, b) => GetPriority(a).CompareTo(GetPriority(b))));
 
@@ -64,24 +64,24 @@ namespace WDE.PacketViewer.Processing.Processors
             }
             pending.Clear();
 
-            var created = new List<PacketHolder>();
-            var moveToFirst = new List<PacketHolder>();
+            var created = new List<(PacketHolder, int)>();
+            var moveToFirst = new List<(PacketHolder, int)>();
             foreach (var a in afterSplit)
             {
-                if (a.KindCase == PacketHolder.KindOneofCase.UpdateObject && a.UpdateObject.Created.Count == 1)
+                if (a.Item1.KindCase == PacketHolder.KindOneofCase.UpdateObject && a.Item1.UpdateObject.Created.Count == 1)
                     created.Add(a);
             }
 
             foreach (var a in afterSplit)
             {
-                if (a.KindCase != PacketHolder.KindOneofCase.UpdateObject)
+                if (a.Item1.KindCase != PacketHolder.KindOneofCase.UpdateObject)
                 {
-                    var guid = guidExtractorProcessor.Process(a);
+                    var guid = guidExtractorProcessor.Process(a.Item1);
                     if (guid == null)
                         continue;
                     foreach (var create in created)
                     {
-                        if (create.UpdateObject.Created[0].Guid.Equals(guid))
+                        if (create.Item1.UpdateObject.Created[0].Guid.Equals(guid))
                         {
                             moveToFirst.Add(create);
                             created.Remove(create);
@@ -96,14 +96,14 @@ namespace WDE.PacketViewer.Processing.Processors
             
             foreach (var p in moveToFirst.Concat(afterSplit))
             {
-                yield return new PacketHolder(p)
+                yield return (new PacketHolder(p.Item1)
                 {
-                    BaseData = new PacketBase(p.BaseData) { Number = NextNumber++ },
-                };
+                    BaseData = new PacketBase(p.Item1.BaseData) { Number = NextNumber++ },
+                }, p.Item2);
             }
         }
         
-        public override IEnumerable<PacketHolder>? Process(PacketHolder packet)
+        public override IEnumerable<(PacketHolder, int)>? Process(PacketHolder packet)
         {
             var packetTime = packet.BaseData.Time.ToDateTime();
             if (!LastPacketTime.HasValue || (packetTime - LastPacketTime.Value).TotalMilliseconds > 1)
@@ -119,7 +119,7 @@ namespace WDE.PacketViewer.Processing.Processors
             pending.Add(packet);
         }
         
-        private IEnumerable<PacketHolder>? InnerSplit(PacketHolder packet)
+        private IEnumerable<(PacketHolder, int)>? InnerSplit(PacketHolder packet)
         {
             if (packet.KindCase == PacketHolder.KindOneofCase.UpdateObject)
             {
@@ -134,54 +134,54 @@ namespace WDE.PacketViewer.Processing.Processors
             }
             else
             {
-                yield return packet;
+                yield return (packet, packet.BaseData.Number);
             }
         }
 
-        protected override IEnumerable<PacketHolder>? Process(PacketBase basePacket, PacketUpdateObject packet)
+        protected override IEnumerable<(PacketHolder, int)>? Process(PacketBase basePacket, PacketUpdateObject packet)
         {
             foreach (var destroyed in packet.Destroyed)
             {
                 var fake = new PacketUpdateObject();
                 fake.Destroyed.Add(destroyed);
-                yield return new PacketHolder()
+                yield return (new PacketHolder()
                 {
                     BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, destroyed.Text)},
                     UpdateObject = fake
-                };
+                }, basePacket.Number);
             }
             
             foreach (var outOfRange in packet.OutOfRange)
             {
                 var fake = new PacketUpdateObject();
                 fake.OutOfRange.Add(outOfRange);
-                yield return new PacketHolder()
+                yield return (new PacketHolder()
                 {
                     BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, outOfRange.Text)},
                     UpdateObject = fake
-                };
+                }, basePacket.Number);
             }
             
             foreach (var created in packet.Created)
             {
                 var fake = new PacketUpdateObject();
                 fake.Created.Add(created);
-                yield return new PacketHolder()
+                yield return (new PacketHolder()
                 {
                     BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, created.Text)},
                     UpdateObject = fake
-                };
+                }, basePacket.Number);
             }
             
             foreach (var updated in packet.Updated)
             {
                 var fake = new PacketUpdateObject();
                 fake.Updated.Add(updated);
-                yield return new PacketHolder()
+                yield return (new PacketHolder()
                 {
                     BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, updated.Text)},
                     UpdateObject = fake
-                };
+                }, basePacket.Number);
             }
         }
     }

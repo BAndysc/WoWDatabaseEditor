@@ -10,7 +10,7 @@ using WowPacketParser.Proto.Processing;
 namespace WDE.PacketViewer.ViewModels
 {
     [AutoRegister]
-    public class PacketViewModelFactory : IPacketProcessor<PacketViewModel>
+    public class PacketViewModelFactory
     {
         private readonly IDatabaseProvider databaseProvider;
         private readonly ISpellStore spellStore;
@@ -29,7 +29,7 @@ namespace WDE.PacketViewer.ViewModels
             this.spellStore = spellStore;
         }
         
-        public PacketViewModel? Process(PacketHolder packet)
+        public PacketViewModel? Process(PacketHolder packet, int originalId)
         {
             if (packet.KindCase == PacketHolder.KindOneofCase.PlayerLogin)
                 playerGuid = packet.PlayerLogin.PlayerGuid;
@@ -118,7 +118,7 @@ namespace WDE.PacketViewer.ViewModels
                 }
             }
             
-            return new PacketViewModel(packet, entry, guid, name);
+            return new PacketViewModel(packet, originalId, entry, guid, name);
         }
     }
 }

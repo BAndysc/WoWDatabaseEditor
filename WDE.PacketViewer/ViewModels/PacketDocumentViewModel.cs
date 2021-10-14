@@ -52,7 +52,7 @@ namespace WDE.PacketViewer.ViewModels
         private readonly IActionReactionProcessorCreator actionReactionProcessorCreator;
         private readonly IRelatedPacketsFinder relatedPacketsFinder;
         private readonly ISniffLoader sniffLoader;
-        private readonly IPacketProcessor<PacketViewModel> packetViewModelCreator;
+        private readonly PacketViewModelFactory packetViewModelCreator;
         
         public PacketDocumentViewModel(PacketDocumentSolutionItem solutionItem, 
             IMainThread mainThread,
@@ -590,14 +590,14 @@ namespace WDE.PacketViewer.ViewModels
                     else
                     {
                         foreach (var split in splitted)
-                            AllPacketsSplit.Add(packetViewModelCreator.Process(split)!);
+                            AllPacketsSplit.Add(packetViewModelCreator.Process(split.Item1, split.Item2)!);
                     }
                 }
 
                 var finalized = splitter.Finalize();
                 if (finalized != null)
                     foreach (var split in finalized)
-                        AllPacketsSplit.Add(packetViewModelCreator.Process(split)!);
+                        AllPacketsSplit.Add(packetViewModelCreator.Process(split.Item1, split.Item2)!);
             });
         }
 
@@ -718,7 +718,7 @@ namespace WDE.PacketViewer.ViewModels
                 using (AllPackets.SuspendNotifications())
                 {
                     foreach (var packet in packets.Packets_)
-                        AllPackets.Add(packetViewModelCreator.Process(packet)!);
+                        AllPackets.Add(packetViewModelCreator.Process(packet, packet.BaseData.Number)!);
                 }
             }
             catch (ParserException e)

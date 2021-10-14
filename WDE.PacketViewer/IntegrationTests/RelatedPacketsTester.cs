@@ -80,14 +80,14 @@ namespace WDE.PacketViewer.IntegrationTests
                 var output = splitter.Process(packet);
                 if (output != null)
                     foreach (var p in output)
-                        if (viewModelFactory.Process(p) is PacketViewModel pvm)
+                        if (viewModelFactory.Process(p.Item1, p.Item2) is PacketViewModel pvm)
                             split.Add(pvm);
             }
 
             var finalized = splitter.Finalize();
             if (finalized != null)
                 foreach (var p in finalized)
-                    if (viewModelFactory.Process(p) is PacketViewModel pvm)
+                    if (viewModelFactory.Process(p.Item1, p.Item2) is PacketViewModel pvm)
                         split.Add(pvm);
             
             foreach (var group in testCaseGroup.TestCases)

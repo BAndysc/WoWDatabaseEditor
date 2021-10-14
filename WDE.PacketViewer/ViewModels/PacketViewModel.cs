@@ -8,6 +8,7 @@ namespace WDE.PacketViewer.ViewModels
     public class PacketViewModel : INotifyPropertyChanged
     {
         private int diff;
+        public int OriginalId { get; }
         public int Id => Packet.BaseData.Number;
         public string Opcode => Packet.BaseData.Opcode;
         public string Text => Packet.BaseData.StringData;
@@ -28,8 +29,9 @@ namespace WDE.PacketViewer.ViewModels
         public UniversalGuid? MainActor { get; }
         public string? ObjectName { get; }
         
-        public PacketViewModel(PacketHolder packet, uint entry, UniversalGuid? mainActor, string? objectName)
+        public PacketViewModel(PacketHolder packet, int originalId, uint entry, UniversalGuid? mainActor, string? objectName)
         {
+            OriginalId = originalId;
             Packet = packet;
             Entry = entry;
             MainActor = mainActor;
