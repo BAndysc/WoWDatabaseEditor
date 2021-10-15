@@ -33,6 +33,7 @@
         <ProjectReference Include="..\Dock\src\Dock.Model\Dock.Model.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
+        <ProjectReference Include="..\Dock\src\Dock.ProportionalStackPanel\Dock.ProportionalStackPanel.csproj" />
     </ItemGroup>
     <ItemGroup>
       <Resource Include="Icon.ico" />

@@ -134,6 +134,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Avalonia", "Dock\src\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Model.ReactiveUI", "Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj", "{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.ProportionalStackPanel", "WoWDatabaseEditor\Dock\src\Dock.ProportionalStackPanel\Dock.ProportionalStackPanel.csproj", "{8C768953-5901-48D7-A34A-1B692F6750EF}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseEditors.Avalonia", "WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj", "{DCD5F40C-139E-4404-8EF0-DC85DD595E44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Conditions.Avalonia", "WDE.Conditions.Avalonia\WDE.Conditions.Avalonia.csproj", "{93427DB8-F7A4-43B2-9BCB-AF13544CE1DC}"
@@ -514,6 +516,10 @@ Global
 		{87974B90-DAD7-4027-A1F6-4405DC41F733}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87974B90-DAD7-4027-A1F6-4405DC41F733}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87974B90-DAD7-4027-A1F6-4405DC41F733}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C768953-5901-48D7-A34A-1B692F6750EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C768953-5901-48D7-A34A-1B692F6750EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C768953-5901-48D7-A34A-1B692F6750EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C768953-5901-48D7-A34A-1B692F6750EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -586,5 +592,6 @@ Global
 		{6E0C8CDD-031A-4318-B612-9F1A575163AC} = {8A37024A-7A68-4BCB-B800-766D92E041EF}
 		{DACACBB1-29B3-435E-B1E5-CCE54C76D3A5} = {8A37024A-7A68-4BCB-B800-766D92E041EF}
 		{87974B90-DAD7-4027-A1F6-4405DC41F733} = {6C7361F8-036F-4C9A-8002-A94B71005DDB}
+		{8C768953-5901-48D7-A34A-1B692F6750EF} = {AE8F68E4-310D-4A59-9B78-5B44CAB1DBF6}
 	EndGlobalSection
 EndGlobal

@@ -51,7 +51,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                     documentDock.IsCollapsable = serializedDock.IsCollapsable;
                     return documentDock;
                 case SerializedDockableType.Splitter:
-                    return dockFactory.CreateSplitterDockable();
+                    return dockFactory.CreateProportionalDockSplitter();
                 case SerializedDockableType.ToolDock:
                     if (serializedDock.Children.Count == 0)
                         return null;
@@ -117,7 +117,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
                 serialized.DockableType = SerializedDockableType.ToolDock;
                 serialized.Proportion = toolDock.Proportion;
             }
-            else if (dockable is ISplitterDockable splitterDockable)
+            else if (dockable is IProportionalDockSplitter splitterDockable)
             {
                 serialized.DockableType = SerializedDockableType.Splitter;
             }

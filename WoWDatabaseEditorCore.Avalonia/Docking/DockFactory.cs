@@ -38,7 +38,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     Proportion = 0.2f,
                     CanFloat = false
                 };
-                AddDockable(layout, CreateSplitterDockable());
+                AddDockable(layout, CreateProportionalDockSplitter());
                 AddDockable(layout, toolDock);
             }
             

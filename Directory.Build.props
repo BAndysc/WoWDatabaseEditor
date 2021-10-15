@@ -2,7 +2,7 @@
 <Project>
     <PropertyGroup>
         <NoWarn>CS0067,CS3021,CS1998,CA1416</NoWarn>
-        <AvaloniaVersion>0.10.7</AvaloniaVersion>
+        <AvaloniaVersion>0.10.8</AvaloniaVersion>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
 </Project>

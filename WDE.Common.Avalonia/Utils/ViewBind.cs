@@ -50,7 +50,7 @@ namespace WDE.Common.Avalonia.Utils
         public static IDataTemplate Template { get; } = new ToolbarDataTemplate();
         public IControl Build(object param)
         {
-            if (ViewBind.AppViewLocator != null &&
+            if (ViewBind.AppViewLocator != null && param != null &&
                 ViewBind.AppViewLocator.TryResolveToolBar(param.GetType(), out var toolbarType))
             {
                 try
