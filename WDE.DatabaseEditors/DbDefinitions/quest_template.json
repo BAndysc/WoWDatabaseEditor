@@ -15,7 +15,7 @@
   "foreign_tables": [
     {
       "table_name": "quest_template_addon",
-      "foreign_key": "ID"
+      "foreign_key": ["ID"]
     }
   ],
   "primary_key": [

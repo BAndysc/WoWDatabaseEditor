@@ -34,7 +34,7 @@ namespace WDE.DatabaseEditors.Loaders
             this.tableModelGenerator = tableModelGenerator;
         }
 
-        private string BuildSQLQueryFromTableDefinition(in DatabaseTableDefinitionJson tableDefinitionJson, uint[] entries)
+        private string BuildSQLQueryFromTableDefinition(DatabaseTableDefinitionJson tableDefinitionJson, uint[] entries)
         {
             var tableName = tableDefinitionJson.TableName;
             var tablePrimaryKey = tableDefinitionJson.TablePrimaryKeyColumnName;
@@ -49,7 +49,11 @@ namespace WDE.DatabaseEditors.Loaders
             if (tableDefinitionJson.ForeignTable != null)
             {
                 joins += string.Join(" ", tableDefinitionJson.ForeignTable.Select(table =>
-                    $"LEFT JOIN `{table.TableName}` ON `{table.TableName}`.`{table.ForeignKey}` = `{tableName}`.`{tablePrimaryKey}`"));
+                {
+                    var where = table.ForeignKeys.Zip(tableDefinitionJson.PrimaryKey!)
+                        .Select(pair => $"`{table.TableName}`.`{pair.First}` = `{tableName}`.`{pair.Second}`");
+                    return $"LEFT JOIN `{table.TableName}` ON " + string.Join(" AND ", where);
+                }));
             }
             
             return

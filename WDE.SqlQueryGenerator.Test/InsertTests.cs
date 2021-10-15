@@ -30,7 +30,7 @@ namespace WDE.SqlQueryGenerator.Test
             var query = Queries
                 .Table("a")
                 .Insert(new Dictionary<string, object?>(){ {"b", 1} });
-            Assert.AreEqual($"INSERT INTO `a` (`b`) VALUES{Environment.NewLine}(1);", query.QueryString);
+            Assert.AreEqual($"INSERT INTO `a` (`b`) VALUES (1);", query.QueryString);
         }
         
         [Test]
@@ -57,7 +57,7 @@ namespace WDE.SqlQueryGenerator.Test
             var query = Queries
                 .Table("a")
                 .InsertIgnore(new Dictionary<string, object?>(){ {"b", 1} });
-            Assert.AreEqual($"INSERT IGNORE INTO `a` (`b`) VALUES{Environment.NewLine}(1);", query.QueryString);
+            Assert.AreEqual($"INSERT IGNORE INTO `a` (`b`) VALUES (1);", query.QueryString);
         }
         
         [Test]

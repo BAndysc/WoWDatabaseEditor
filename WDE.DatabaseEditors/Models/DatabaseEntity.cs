@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -55,6 +56,17 @@ namespace WDE.DatabaseEditors.Models
             if (Cells.TryGetValue(columnName, out var cell))
                 return cell;
             return null;
+        }
+
+        public T? GetTypedValueOrThrow<T>(string columnName) where T : IComparable<T>
+        {
+            var cell = GetCell(columnName);
+            if (cell == null)
+                throw new Exception("No column named " + columnName);
+            var typed = cell as DatabaseField<T>;
+            if (typed == null)
+                throw new Exception("No column named " + columnName + " with type " + typeof(T));
+            return typed.Current.Value;
         }
 
         public DatabaseEntity Clone()

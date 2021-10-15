@@ -1,7 +1,7 @@
 {
     "id": "spell_linked_spell",
     "compatibility": [
-      "TrinityWrath"
+      "TrinityWrath", "TrinityCata"
     ],
     "name": "Spell Linked Spell",
     "single_solution_name": "{name} linked spell editor",

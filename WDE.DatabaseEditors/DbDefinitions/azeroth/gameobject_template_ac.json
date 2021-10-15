@@ -17,7 +17,7 @@
   "foreign_tables": [
     {
       "table_name": "gameobject_template_addon",
-      "foreign_key": "entry"
+      "foreign_key": ["entry"]
     }
   ],
   "groups": [

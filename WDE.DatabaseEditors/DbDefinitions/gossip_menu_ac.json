@@ -1,7 +1,7 @@
 {
   "id": "gossip_menu",
   "compatibility": [
-    "TrinityWrath", "TrinityCata"
+    "Azeroth"
   ],
   "name": "Gossip Menu",
   "single_solution_name": "{key} gossip menu",
@@ -52,11 +52,6 @@
           "is_condition": true,
           "name": "Conditions",
           "db_column_name": "conditions"
-        },
-        {
-          "name": "Verified Build",
-          "db_column_name": "VerifiedBuild",
-          "value_type": "int"
         }
       ]
     }

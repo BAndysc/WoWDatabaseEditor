@@ -8,6 +8,6 @@ namespace WDE.DatabaseEditors.Data.Structs
         public string TableName { get; set; }
         
         [JsonProperty(PropertyName = "foreign_key")]
-        public string ForeignKey { get; set; }
+        public string[] ForeignKeys { get; set; }
     }
 }

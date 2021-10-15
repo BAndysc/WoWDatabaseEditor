@@ -30,7 +30,7 @@ namespace WDE.SqlQueryGenerator
             return table.BulkInsert(new[] { obj }, insertIgnore);
         }
         
-        public static IQuery BulkInsert(this ITable table, IEnumerable<Dictionary<string, object?>> objects, bool insertIgnore = false)
+        public static IQuery BulkInsert(this ITable table, ICollection<Dictionary<string, object?>> objects, bool insertIgnore = false)
         {
             bool first = true;
             IList<string> properties = null!;
@@ -43,7 +43,11 @@ namespace WDE.SqlQueryGenerator
                     properties = o.Keys.ToList();
                     var cols = string.Join(", ", properties.Select(c => $"`{c}`"));
                     var ignore = insertIgnore ? " IGNORE" : "";
-                    sb.AppendLine($"INSERT{ignore} INTO `{table.TableName}` ({cols}) VALUES");
+                    sb.Append($"INSERT{ignore} INTO `{table.TableName}` ({cols}) VALUES");
+                    if (objects.Count > 1 || properties.Count > 1)
+                        sb.AppendLine();
+                    else
+                        sb.Append(' ');
                     first = false;
                 }
 
@@ -134,6 +138,14 @@ namespace WDE.SqlQueryGenerator
             var condition = new ToSqlExpression().Visit(new SimplifyExpression().Visit(predicate.Body));
             if (condition is ConstantExpression c && c.Value is string s)
                 return new Where(table, s);
+            throw new Exception();
+        }
+        
+        public static IWhere Where(this IWhere where, Expression<Func<IRow, bool>> predicate)
+        {
+            var condition = new ToSqlExpression().Visit(new SimplifyExpression().Visit(predicate.Body));
+            if (condition is ConstantExpression c && c.Value is string s)
+                return new Where(where.Table, $"({where.Condition}) AND ({s})");
             throw new Exception();
         }
 

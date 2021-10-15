@@ -1,7 +1,7 @@
 {
   "id": "npc_text_wrath",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Npc Text",
   "single_solution_name": "{name} npc text editor",
