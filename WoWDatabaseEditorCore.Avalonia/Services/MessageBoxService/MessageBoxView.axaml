@@ -10,6 +10,8 @@
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              CanResize="False"
+             SizeToContent="WidthAndHeight"
+             MaxWidth="500"
              WindowStartupLocation="CenterOwner"
              d:DataContext="{d:DesignInstance messageBoxService:MessageBoxViewModelDesignModel}"
              Background="{DynamicResource MenuDefaultBackground}">

@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Input;
@@ -20,37 +21,71 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
             InitializeComponent();
             this.AttachDevTools();
         }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            // this is hack to make fit to content work
-            ClientSize = new Size(500, 2000);
-            var ret = MeasureOriginal(new Size(500, 2000));
-            ClientSize = ret;
-            return ret;
-        }
         
-        private Size MeasureOriginal(Size availableSize)
+        protected virtual Size MeasureOverrideInternal(Size availableSize)
         {
-            double width = 0;
-            double height = 0;
-
-            var visualChildren = VisualChildren;
-            var visualCount = visualChildren.Count;
-
-            for (var i = 0; i < visualCount; i++)
+            double num1 = 0.0;
+            double num2 = 0.0;
+            IAvaloniaList<IVisual> visualChildren = this.VisualChildren;
+            int count = visualChildren.Count;
+            for (int index = 0; index < count; ++index)
             {
-                IVisual visual = visualChildren[i];
-
-                if (visual is ILayoutable layoutable)
+                if (visualChildren[index] is ILayoutable layoutable)
                 {
                     layoutable.Measure(availableSize);
-                    width = Math.Max(width, layoutable.DesiredSize.Width);
-                    height = Math.Max(height, layoutable.DesiredSize.Height);
+                    num1 = Math.Max(num1, layoutable.DesiredSize.Width);
+                    num2 = Math.Max(num2, layoutable.DesiredSize.Height);
+                }
+            }
+            return new Size(num1, num2);
+        }
+        
+        // this is a workaround to broken SizeToContent with MaxWidth
+        // this is copied base.MeasureOverride with added Math.Min MaxWidth constraint
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            var sizeToContent = SizeToContent;
+            var clientSize = ClientSize;
+            var constraint = clientSize;
+            var maxAutoSize = PlatformImpl?.MaxAutoSizeHint ?? Size.Infinity;
+
+            if (sizeToContent.HasAllFlags(SizeToContent.Width))
+            {
+                constraint = constraint.WithWidth(Math.Min(maxAutoSize.Width, MaxWidth));
+            }
+
+            if (sizeToContent.HasAllFlags(SizeToContent.Height))
+            {
+                constraint = constraint.WithHeight(maxAutoSize.Height);
+            }
+
+            var result = MeasureOverrideInternal(constraint);
+
+            if (!sizeToContent.HasAllFlags(SizeToContent.Width))
+            {
+                if (!double.IsInfinity(availableSize.Width))
+                {
+                    result = result.WithWidth(availableSize.Width);
+                }
+                else
+                {
+                    result = result.WithWidth(clientSize.Width);
                 }
             }
 
-            return new Size(width, height);
+            if (!sizeToContent.HasAllFlags(SizeToContent.Height))
+            {
+                if (!double.IsInfinity(availableSize.Height))
+                {
+                    result = result.WithHeight(availableSize.Height);
+                }
+                else
+                {
+                    result = result.WithHeight(clientSize.Height);
+                }
+            }
+
+            return result;
         }
 
         private void InitializeComponent()
