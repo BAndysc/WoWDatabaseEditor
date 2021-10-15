@@ -53,7 +53,15 @@ namespace WoWDatabaseEditor.Services.SolutionService
                     progress.Report(0, 2, "Generate query");
                     var query = await sqlGenerator.GenerateSql(item);
                     progress.Report(1, 2, "Execute query");
-                    await sqlExecutor.ExecuteSql(query); 
+                    try
+                    {
+                        await sqlExecutor.ExecuteSql(query);
+                    }
+                    catch (IMySqlExecutor.QueryFailedDatabaseException e)
+                    {
+                        statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Couldn't apply SQL: " + e.InnerException!.Message));
+                        throw;
+                    }
                     progress.ReportFinished();
                 });
         }
