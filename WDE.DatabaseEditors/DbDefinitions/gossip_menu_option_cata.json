@@ -1,0 +1,151 @@
+{
+  "id": "gossip_menu_option",
+  "compatibility": [
+    "TrinityCata"
+  ],
+  "name": "Gossip Menu Option",
+  "single_solution_name": "{key} gossip menu options",
+  "multi_solution_name": "Multiple gossip menu options",
+  "description": "Gossip menu options are possible choices when a player talk to the npc",
+  "table_name": "gossip_menu_option",
+  "table_index_name": "MenuId",
+  "multi_record": true,
+  "icon_path": "Icons/gossip.png",
+  "reload_command": "reload gossip_menu_option",
+  "picker": "GossipMenuParameter",
+  "group_name": "Common scripting tables",
+  "primary_key": [
+    "MenuId",
+    "OptionIndex"
+  ],
+  "foreign_tables": [
+    {
+      "table_name": "gossip_menu_option_action",
+      "foreign_key": ["MenuId", "OptionIndex"]
+    },
+    {
+      "table_name": "gossip_menu_option_box",
+      "foreign_key": ["MenuId", "OptionIndex"]
+    }
+  ],
+  "sort_by": ["MenuId", "OptionIndex"],
+  "commands": [
+    {
+      "command_id": "creatureTextToBroadcastId",
+      "parameters": ["OptionText", "OptionBroadcastTextId"]
+    }
+  ],
+  "conditions": {
+    "source_type": 15,
+    "source_group": "MenuId",
+    "source_entry": "OptionIndex",
+    "targets": [
+      {
+        "id": 0,
+        "name": "player"
+      },
+      {
+        "id": 1,
+        "name": "gossip sender"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Menu ID",
+          "db_column_name": "MenuId",
+          "value_type": "GossipMenuParameter",
+          "preferred_width": 80,
+          "read_only": true
+        },
+        {
+          "name": "ID",
+          "db_column_name": "OptionIndex",
+          "value_type": "uint",
+          "autoincrement": true,
+          "preferred_width": 50
+        },
+        {
+          "name": "Icon",
+          "db_column_name": "OptionIcon",
+          "value_type": "GossipIconParameter",
+          "preferred_width": 110
+        },
+        {
+          "name": "Text",
+          "db_column_name": "OptionText",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 200
+        },
+        {
+          "name": "Broadcast Text",
+          "db_column_name": "OptionBroadcastTextId",
+          "value_type": "int"
+        },
+        {
+          "name": "Type",
+          "db_column_name": "OptionType",
+          "default": 1,
+          "value_type": "GossipOptionTypeParameter"
+        },
+        {
+          "name": "Npc Flag",
+          "db_column_name": "OptionNpcflag",
+          "default": 1,
+          "value_type": "NpcFlagParameter"
+        },
+        {
+          "name": "Submenu id",
+          "db_column_name": "ActionMenuId",
+          "value_type": "GossipMenuParameter",
+          "foreign_table": "gossip_menu_option_action"
+        },
+        {
+          "is_condition": true,
+          "name": "Conditions",
+          "db_column_name": "conditions"
+        },
+        {
+          "name": "Action Poi ID",
+          "db_column_name": "ActionPoiId",
+          "value_type": "uint",
+          "foreign_table": "gossip_menu_option_action"
+        },
+        {
+          "name": "Box Coded",
+          "db_column_name": "BoxCoded",
+          "value_type": "uint",
+          "foreign_table": "gossip_menu_option_box"
+        },
+        {
+          "name": "Box Money",
+          "db_column_name": "BoxMoney",
+          "value_type": "uint",
+          "foreign_table": "gossip_menu_option_box"
+        },
+        {
+          "name": "Box Text",
+          "db_column_name": "BoxText",
+          "value_type": "string",
+          "can_be_null": true,
+          "foreign_table": "gossip_menu_option_box"
+        },
+        {
+          "name": "Box Broadcast Text ID",
+          "db_column_name": "BoxBroadcastTextId",
+          "value_type": "int",
+          "foreign_table": "gossip_menu_option_box"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}
