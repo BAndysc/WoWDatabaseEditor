@@ -8,5 +8,20 @@
              x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorToolBar">
     <controls:ToolbarPanel>
         <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new" Image="icons/icon_add.png" />
+        <ItemsPresenter Items="{Binding Commands}">
+            <ItemsPresenter.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <controls:ToolbarPanel />
+                </ItemsPanelTemplate>
+            </ItemsPresenter.ItemsPanel>
+            <ItemsPresenter.ItemTemplate>
+                <DataTemplate>
+                    <Button Command="{Binding Command}"
+                            ToolTip.Tip="{Binding Name}">
+                        <components:WdeImage Image="{Binding Icon}" />
+                    </Button>
+                </DataTemplate>
+            </ItemsPresenter.ItemTemplate>
+        </ItemsPresenter>
     </controls:ToolbarPanel>
 </UserControl>

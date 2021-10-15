@@ -17,6 +17,7 @@ using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.CustomCommands;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Extensions;
@@ -115,11 +116,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
             ITableDefinitionProvider tableDefinitionProvider,
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
-            ISessionService sessionService, IDatabaseEditorsSettings editorSettings) 
+            ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
+            IDatabaseTableCommandService commandService) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
-            tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService)
+            tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;

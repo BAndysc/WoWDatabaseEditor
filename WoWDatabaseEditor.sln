@@ -51,7 +51,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.RemoteSOAP", "WDE.Remot
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.RemoteSOAP.Test", "WDE.RemoteSOAP.Test\WDE.RemoteSOAP.Test.csproj", "{0CA0846F-F6F3-4B4B-B0BA-8FF9502F9CEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common.Test", "WoWDatabaseEditor\WDE.Common.Test\WDE.Common.Test.csproj", "{87974B90-DAD7-4027-A1F6-4405DC41F733}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.Common.Test", "WDE.Common.Test\WDE.Common.Test.csproj", "{87974B90-DAD7-4027-A1F6-4405DC41F733}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "Solution Items", "{E9668961-BD19-4360-8ABE-B9BD55EB52CA}"
 	ProjectSection(SolutionItems) = preProject

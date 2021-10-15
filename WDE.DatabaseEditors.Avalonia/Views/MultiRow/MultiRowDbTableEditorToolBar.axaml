@@ -15,5 +15,21 @@
         <ToggleButton ToolTip.Tip="Split view vertically" IsChecked="{Binding SplitVertical, Mode=TwoWay}">
             <components:WdeImage ImageUri="icons/icon_split_vert.png" />
         </ToggleButton>
+        
+        <ItemsPresenter Items="{Binding Commands}">
+            <ItemsPresenter.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <controls:ToolbarPanel />
+                </ItemsPanelTemplate>
+            </ItemsPresenter.ItemsPanel>
+            <ItemsPresenter.ItemTemplate>
+                <DataTemplate>
+                    <Button Command="{Binding Command}"
+                            ToolTip.Tip="{Binding Name}">
+                        <components:WdeImage Image="{Binding Icon}" />
+                    </Button>
+                </DataTemplate>
+            </ItemsPresenter.ItemTemplate>
+        </ItemsPresenter>
     </controls:ToolbarPanel>
 </UserControl>

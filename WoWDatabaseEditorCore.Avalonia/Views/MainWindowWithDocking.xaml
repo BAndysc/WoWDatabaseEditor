@@ -60,11 +60,6 @@
                             <controls:ToolbarPanel />
                         </ItemsPanelTemplate>
                     </ItemsPresenter.ItemsPanel>
-                    <ItemsPresenter.Styles>
-                        <Style Selector="components|WdeImage">
-                            <Setter Property="Height" Value="20" />
-                        </Style>
-                    </ItemsPresenter.Styles>
                 </ItemsPresenter>
             </controls:ToolBar.RightContent>
         </controls:ToolBar>

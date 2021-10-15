@@ -18,6 +18,7 @@ using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.CustomCommands;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Expressions;
 using WDE.DatabaseEditors.Extensions;
@@ -71,10 +72,12 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             IQueryGenerator queryGenerator, ITeachingTipService teachingTipService,
             ICreatureStatCalculatorService creatureStatCalculatorService,
             ITableDefinitionProvider tableDefinitionProvider,
-            ISolutionItemIconRegistry iconRegistry, ISessionService sessionService) : base(history, solutionItem, solutionItemName, 
+            ISolutionItemIconRegistry iconRegistry, ISessionService sessionService,
+            IDatabaseTableCommandService commandService) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, 
-            tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService)
+            tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService,
+            commandService)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;

@@ -19,6 +19,12 @@
     "OptionID"
   ],
   "sort_by": ["MenuID", "OptionID"],
+  "commands": [
+    {
+      "command_id": "creatureTextToBroadcastId",
+      "parameters": ["OptionText", "OptionBroadcastTextID"]
+    }
+  ],
   "conditions": {
     "source_type": 15,
     "source_group": "MenuID",

@@ -16,6 +16,12 @@
   "group_name": "Common scripting tables",
   "primary_key": ["CreatureID", "GroupID", "ID"],
   "sort_by": ["CreatureID", "GroupID", "ID"],
+  "commands": [
+    {
+      "command_id": "creatureTextToBroadcastId",
+      "parameters": ["Text", "BroadcastTextId"]
+    }
+  ],
   "groups": [
     {
       "group_name": "only",

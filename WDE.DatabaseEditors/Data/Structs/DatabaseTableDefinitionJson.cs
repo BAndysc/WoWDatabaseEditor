@@ -67,6 +67,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "groups")]
         public IList<DatabaseColumnsGroupJson> Groups { get; set; } = new List<DatabaseColumnsGroupJson>();
 
+        [JsonProperty(PropertyName = "commands")]
+        public IList<DatabaseCommandDefinitionJson>? Commands { get; set; }
+        
         [JsonIgnore]
         public string FileName { get; set; } = "";
         
@@ -75,6 +78,15 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonIgnore] 
         public IDictionary<string, DatabaseForeignTableJson> ForeignTableByName { get; set; } = null!;
+    }
+
+    public class DatabaseCommandDefinitionJson
+    {
+        [JsonProperty(PropertyName = "command_id")]
+        public string CommandId { get; set; } = "";
+        
+        [JsonProperty(PropertyName = "parameters")]
+        public string[]? Parameters { get; set; }
     }
     
     public class DatabaseConditionReferenceJson

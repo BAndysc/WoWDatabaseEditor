@@ -3,6 +3,8 @@
              xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles;assembly=AvaloniaStyles"
              xmlns:appearanceService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.AppearanceService"
              xmlns:controls="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
+             xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              x:Class="WoWDatabaseEditorCore.Avalonia.App"
              Name="WoW Database Editor">
     <Application.Resources>
@@ -58,6 +60,9 @@
         </Style>
         <Style Selector="controls|ProportionalStackPanel">
             <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
+        </Style>
+        <Style Selector="controls1|ToolbarPanel > ItemsPresenter components|WdeImage">
+            <Setter Property="Height" Value="20" />
         </Style>
     </Application.Styles>
 </Application>

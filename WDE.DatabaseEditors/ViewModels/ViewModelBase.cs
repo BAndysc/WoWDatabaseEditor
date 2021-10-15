@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -19,6 +20,7 @@ using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.CustomCommands;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Extensions;
@@ -42,6 +44,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly IParameterFactory parameterFactory;
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly ISessionService sessionService;
+        private readonly IDatabaseTableCommandService commandService;
 
         protected ViewModelBase(IHistoryManager history,
             DatabaseTableSolutionItem solutionItem,
@@ -57,7 +60,8 @@ namespace WDE.DatabaseEditors.ViewModels
             ITableDefinitionProvider tableDefinitionProvider,
             IItemFromListProvider itemFromListProvider,
             ISolutionItemIconRegistry iconRegistry,
-            ISessionService sessionService)
+            ISessionService sessionService,
+            IDatabaseTableCommandService commandService)
         {
             this.solutionItemName = solutionItemName;
             this.solutionManager = solutionManager;
@@ -69,6 +73,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.parameterFactory = parameterFactory;
             this.itemFromListProvider = itemFromListProvider;
             this.sessionService = sessionService;
+            this.commandService = commandService;
             this.solutionItem = solutionItem;
             History = history;
             
@@ -173,10 +178,30 @@ namespace WDE.DatabaseEditors.ViewModels
             }
 
             solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
+
+            LoadAndCreateCommands(data);
             
             Entities.Clear();
             await InternalLoadData(data);
             IsLoading = false;
+        }
+
+        private void LoadAndCreateCommands(DatabaseTableData data)
+        {
+            if (data.TableDefinition.Commands == null)
+                return;
+
+            foreach (var command in data.TableDefinition.Commands)
+            {
+                var cmd = commandService.FindCommand(command.CommandId);
+                if (cmd == null)
+                    throw new Exception("Command " + command.CommandId + " not found!");
+                
+                Commands.Add(new TableCommandViewModel(cmd, new AsyncAutoCommand(async () =>
+                {
+                    await cmd.Process(command, new DatabaseTableData(data.TableDefinition, Entities));
+                })));
+            }
         }
 
         protected string GenerateName(uint entity)
@@ -186,6 +211,8 @@ namespace WDE.DatabaseEditors.ViewModels
         
         protected DatabaseTableDefinitionJson tableDefinition = null!;
         public ObservableCollection<DatabaseEntity> Entities { get; } = new();
+
+        public ObservableCollection<TableCommandViewModel> Commands { get; } = new();
 
         private DelegateCommand undoCommand;
         private DelegateCommand redoCommand;
