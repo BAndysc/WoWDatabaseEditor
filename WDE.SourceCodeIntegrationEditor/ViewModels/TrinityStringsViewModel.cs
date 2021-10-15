@@ -23,7 +23,7 @@ namespace WDE.SourceCodeIntegrationEditor.ViewModels
         private readonly IDatabaseProvider databaseProvider;
         private readonly ITrinityStringSqlGenerator trinityStringSqlGenerator;
         public string Title => "Trinity strings wizard";
-        public ImageUri? Icon => new ImageUri("icons/document_trinity_strings.png");
+        public ImageUri? Icon => new ImageUri("Icons/document_trinity_strings.png");
 
         public ObservableCollection<TrinityStringViewModel> TrinityStringsNoDatabase { get; } = new();
         public ObservableCollection<TrinityStringViewModel> ChosenStrings { get; } = new();

@@ -17,13 +17,13 @@
     </UserControl.Styles>
     <DockPanel>
        <controls:ToolbarPanel DockPanel.Dock="Top">
-           <components:ButtonImage Command="{Binding NewSessionCommand, Mode=OneTime}" Image="icons/icon_new.png" ToolTip.Tip="New session" />
-           <components:ButtonImage Command="{Binding SaveCurrentCurrent, Mode=OneTime}" Image="icons/icon_save.png" ToolTip.Tip="Save session" />
-           <components:ButtonImage Command="{Binding PreviewCurrentCommand}" Image="icons/icon_to_sql.png" ToolTip.Tip="Preview current total SQL" />
-           <components:ButtonImage Command="{Binding ForgetCurrentCurrent}" Image="icons/icon_trash.png" ToolTip.Tip="Forget session" />
+           <components:ButtonImage Command="{Binding NewSessionCommand, Mode=OneTime}" Image="Icons/icon_new.png" ToolTip.Tip="New session" />
+           <components:ButtonImage Command="{Binding SaveCurrentCurrent, Mode=OneTime}" Image="Icons/icon_save.png" ToolTip.Tip="Save session" />
+           <components:ButtonImage Command="{Binding PreviewCurrentCommand}" Image="Icons/icon_to_sql.png" ToolTip.Tip="Preview current total SQL" />
+           <components:ButtonImage Command="{Binding ForgetCurrentCurrent}" Image="Icons/icon_trash.png" ToolTip.Tip="Forget session" />
            <controls:ToolbarSpacer />
-           <components:ButtonImage Command="{Binding DeleteSelectedItem}" Image="icons/icon_delete.png" ToolTip.Tip="Remove item" />
-           <components:ButtonImage ToolTip.Tip="Open sessions help website" Command="{Binding OpenHelpCommand}" Image="icons/icon_help.png" />
+           <components:ButtonImage Command="{Binding DeleteSelectedItem}" Image="Icons/icon_delete.png" ToolTip.Tip="Remove item" />
+           <components:ButtonImage ToolTip.Tip="Open sessions help website" Command="{Binding OpenHelpCommand}" Image="Icons/icon_help.png" />
        </controls:ToolbarPanel>
        <ComboBox DockPanel.Dock="Top" HorizontalAlignment="Stretch" 
                  IsVisible="{Binding HasAnySessions}"

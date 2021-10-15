@@ -11,6 +11,7 @@
     "table_index_name": "spell_trigger",
     "multi_record": true,
     "reload_command": "reload spell_linked_spell",
+    "icon_path": "Icons/document_spell_linked.png",
     "picker": "SpellParameter",
     "primary_key": [
       "spell_trigger",

@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new" Image="icons/icon_add.png" />
+        <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new" Image="Icons/icon_add.png" />
         <ItemsPresenter Items="{Binding Commands}">
             <ItemsPresenter.ItemsPanel>
                 <ItemsPanelTemplate>

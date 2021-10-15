@@ -7,13 +7,13 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new key" Image="icons/icon_add.png"/>
+        <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new key" Image="Icons/icon_add.png"/>
         
         <ToggleButton ToolTip.Tip="Split view horizontally" IsChecked="{Binding SplitHorizontal, Mode=TwoWay}">
-            <components:WdeImage ImageUri="icons/icon_split_horiz.png" />
+            <components:WdeImage ImageUri="Icons/icon_split_horiz.png" />
         </ToggleButton>
         <ToggleButton ToolTip.Tip="Split view vertically" IsChecked="{Binding SplitVertical, Mode=TwoWay}">
-            <components:WdeImage ImageUri="icons/icon_split_vert.png" />
+            <components:WdeImage ImageUri="Icons/icon_split_vert.png" />
         </ToggleButton>
         
         <ItemsPresenter Items="{Binding Commands}">

@@ -14,7 +14,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Name => "Creature/gameobject name dump";
         public string Description => "Generate all unique creature and gameobject names as c++ like enum";
         public string Extension => "cpp";
-        public ImageUri? Image { get; } = new ImageUri("icons/document_creature_template_big.png");
+        public ImageUri? Image { get; } = new ImageUri("Icons/document_creature_template_big.png");
         public Task<IPacketTextDumper> CreateDumper() =>
             Task.FromResult<IPacketTextDumper>(new NameAsEnumDumper(new CreatureGameObjectNameProcessor()));
     }

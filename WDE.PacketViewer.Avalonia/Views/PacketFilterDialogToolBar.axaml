@@ -9,9 +9,9 @@
              d:DataContext="{d:DesignInstance viewModels:PacketFilterDialogViewModel, IsDesignTimeCreatable=False}"
              x:Class="WDE.PacketViewer.Avalonia.Views.PacketFilterDialogToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Command="{Binding  CopyFiltersCommand}" Image="icons/icon_copy.png" Text="Copy filter" />
-        <components:ButtonImage Command="{Binding  PasteFiltersCommand}" Image="icons/icon_paste.png" Text="Paste filter" />
+        <components:ButtonImage Command="{Binding  CopyFiltersCommand}" Image="Icons/icon_copy.png" Text="Copy filter" />
+        <components:ButtonImage Command="{Binding  PasteFiltersCommand}" Image="Icons/icon_paste.png" Text="Paste filter" />
         <controls:ToolbarSpacer />
-        <components:ButtonImage Command="{Binding  ClearFiltersCommand}" Image="icons/icon_delete.png" Text="Clear filters" />
+        <components:ButtonImage Command="{Binding  ClearFiltersCommand}" Image="Icons/icon_delete.png" Text="Clear filters" />
     </controls:ToolbarPanel>
 </UserControl>

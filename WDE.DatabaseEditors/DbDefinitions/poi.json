@@ -10,6 +10,7 @@
   "table_name": "points_of_interest",
   "table_index_name": "ID",
   "reload_command": "reload points_of_interest",
+  "icon_path": "Icons/document_point_of_interest.png",
   "picker": "Parameter",
   "primary_key": [
     "ID"

@@ -33,7 +33,7 @@ namespace WDE.SourceCodeIntegrationEditor.ViewModels
         private readonly ICommandsSourceParser commandsSourceParser;
         private readonly ICommandSqlGenerator sqlGenerator;
         public string Title => "Commands wizard";
-        public ImageUri? Icon => new ImageUri("icons/document_rbac.png");
+        public ImageUri? Icon => new ImageUri("Icons/document_rbac.png");
         
         public ObservableCollection<CommandViewModel> CommandsNoRbac { get; } = new();
         public ObservableCollection<CommandViewModel> Commands { get; } = new();

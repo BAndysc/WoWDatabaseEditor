@@ -35,11 +35,11 @@
         <controls:ToolBar>
             <controls:ToolBar.LeftContent>
                 <controls:ToolbarPanel>
-                    <components:ButtonImage Image="icons/icon_play.png" IsVisible="{Binding ShowPlayButtons}" Command="{Binding ExecuteChangedCommand}" />
+                    <components:ButtonImage Image="Icons/icon_play.png" IsVisible="{Binding ShowPlayButtons}" Command="{Binding ExecuteChangedCommand}" />
                     <components:ButtonImage Command="{Binding GenerateCurrentSqlCommand}"
                                             IsVisible="{Binding ShowExportButtons}"
                                             Text="To SQL" 
-                                            Image="icons/icon_to_sql.png" />
+                                            Image="Icons/icon_to_sql.png" />
                 </controls:ToolbarPanel>
             </controls:ToolBar.LeftContent>
             <controls:ToolBar.MiddleContent>

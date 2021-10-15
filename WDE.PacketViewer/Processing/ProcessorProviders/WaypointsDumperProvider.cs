@@ -14,7 +14,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Name => "Creature waypoints dump";
         public string Description => "Generate all waypoints per each unit in sniff [ALPHA]";
         public string Extension => "txt";
-        public ImageUri? Image { get; } = new ImageUri("icons/document_waypoints_big.png");
+        public ImageUri? Image { get; } = new ImageUri("Icons/document_waypoints_big.png");
         public Task<IPacketTextDumper> CreateDumper() =>
             Task.FromResult<IPacketTextDumper>(new WaypointsToTextProcessor(new WaypointsProcessor()));
     }

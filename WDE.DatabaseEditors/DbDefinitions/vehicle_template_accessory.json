@@ -12,6 +12,7 @@
   "multi_record": true,
   "reload_command": "reload vehicle_template_accessory",
   "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_vehicle_template.png",
   "picker": "CreatureParameter",
   "primary_key": [
     "entry",

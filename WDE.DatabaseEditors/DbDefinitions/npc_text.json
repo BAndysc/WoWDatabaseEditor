@@ -12,6 +12,7 @@
   "multi_record": true,
   "picker": "NpcTextParameter",
   "group_name": "Common scripting tables",
+  "icon_path": "Icons/document_npc_text.png",
   "sort_by": ["ID"],
   "primary_key": [
     "ID"

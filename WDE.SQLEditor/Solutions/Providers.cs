@@ -23,7 +23,7 @@ namespace WDE.SQLEditor.Solutions
 
         public ImageUri GetIcon(CustomSqlSolutionItem icon)
         {
-            return new ImageUri("icons/document_sql.png");
+            return new ImageUri("Icons/document_sql.png");
         }
     }
 
@@ -100,7 +100,7 @@ namespace WDE.SQLEditor.Solutions
 
         public ImageUri GetImage()
         {
-            return new ImageUri("icons/document_sql.png");
+            return new ImageUri("Icons/document_sql.png");
         }
 
         public string GetDescription()

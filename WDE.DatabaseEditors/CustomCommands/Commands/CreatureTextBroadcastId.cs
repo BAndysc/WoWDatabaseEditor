@@ -13,7 +13,7 @@ namespace WDE.DatabaseEditors.CustomCommands.Commands
     public class CreatureTextBroadcastId : IDatabaseTableCommand
     {
         private readonly IDatabaseProvider databaseProvider;
-        public ImageUri Icon => new ImageUri("icons/icon_discover.png");
+        public ImageUri Icon => new ImageUri("Icons/icon_discover.png");
         public string Name => "Fill BroadcastTextId";
         public string CommandId => "creatureTextToBroadcastId";
 

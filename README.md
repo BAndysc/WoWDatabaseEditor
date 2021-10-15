@@ -1,7 +1,7 @@
 # WoW Database Editor
 Integrated development environment (IDE) for Smart Scripts and database editing for TrinityCore based servers.
 
-This project is continuation of [Visual SAI Studio](https://github.com/BandyscLegacy/VisualSAIStudio), but rewritten from scratch. Anyone is welcome to help :-) Together we can make great wow emu editor! **Smart script editing is already in good enough shape to use it on daily basis** 
+This project is a continuation of [Visual SAI Studio](https://github.com/BandyscLegacy/VisualSAIStudio), but rewritten from scratch. Anyone is welcome to help :-) Together we can make great wow emu editor! **Smart script and database editing is already in good enough shape to use it on daily basis** 
 
 (screenshots below)
 
@@ -12,12 +12,19 @@ This project is continuation of [Visual SAI Studio](https://github.com/BandyscLe
  
  (9.0.x dbc support in progress)
 
+# Sponsors
+
+WoW Database Editor is sponsored by [Atlantiss](https://atlantiss.org/) and [Tauri](https://tauriwow.com/).
+
+![Atlantiss & Tauri](https://i.imgur.com/gj0HPAk.png)
+
 # Download latest version
 
-Application has built in auto updater, so you do not have to redownload here to upgrade the app.
+Application has a built-in auto updater, so you do **not** have to redownload a zip to upgrade.
 
 ## Mac OS / Linux / Windows version
-**To run the cross platform version, you need [.NET 5 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0) for your OS**.
+
+**To run the editor, you need [.NET 5 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0) for your OS**.
 
 WoW Database Editor is compatibile with both MacOS, Linux and Windows.
 
@@ -29,13 +36,11 @@ WoW Database Editor is compatibile with both MacOS, Linux and Windows.
 # I want to contribute!
 That's a fantastic news! There is still a lot to do in the IDE, if you do not know what you can do, check out [opened issues, especially those marked as "help wanted"](https://github.com/BAndysc/WoWDatabaseEditor/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
 
-# Sponsors
-
-WoW Database Editor is sponsored by [Atlantiss](https://atlantiss.org/) and [Tauri](https://tauriwow.com/).
-
-![Atlantiss & Tauri](https://i.imgur.com/gj0HPAk.png)
-
 # How to build
+
+**In order to build WoW Database Editor you need to install [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)**
+
+**If you want to use Visual Studio, you need Visual Studio 2022 (even though it is still in preview!)**. That's because older Visual Studio version doesn't support .NET 6.0!
 
 WoW Database Editor is using [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), therefore after you clone, after you pull you have to download submodules:
 
@@ -43,9 +48,9 @@ WoW Database Editor is using [git submodules](https://git-scm.com/book/en/v2/Git
 git submodule update --init --recursive
 ```
 
-Now you can open solution in Visual Studio or other C#/.NET IDE and build. Start "WoWDatabaseCore.Avalonia" project
+Now you can open the solution in Visual Studio or other C#/.NET IDE and build. Start "WoWDatabaseCore.Avalonia" project
 
-**To build version to distribute:**
+**To build a version to distribute:**
 
 ```
 -- Windows version
@@ -66,10 +71,11 @@ dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseedi
  * TrinityCore, Cmangos and everyone who contributes to WoW Core!
  * [Avalonia](https://avaloniaui.net/) - WoW Database Editor is built upon Avalonia UI framework
 
-![screenshot7](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot7.png)
-![screenshot4](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot4_macos.png)
-![screenshot5](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot6.png)
-![screenshot6](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot5_macos.png)
-![screenshot1](https://github.com/BAndysc/WoWDatabaseEditor/blob/680b3d10896fe017f9731c1b114df7b43308ae8f/Examples/screenshot2.png?raw=true)
-![screenshot3](https://github.com/BAndysc/WoWDatabaseEditor/blob/680b3d10896fe017f9731c1b114df7b43308ae8f/Examples/screenshot3.png?raw=true)
-![darktheme](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/darktheme.png)
+![screenshot8](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot8.png)
+![screenshot9](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot9.png)
+![screenshot10](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot10.png)
+![screenshot11](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot11.png)
+![screenshot12](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot12.png)
+![screenshot13](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot13.png)
+![screenshot14](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot14.png)
+![screenshot15](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot15.png)

@@ -20,7 +20,7 @@
         <controls:WizardPanel.TitleTemplate>
             <DataTemplate>
                 <StackPanel Orientation="Horizontal">
-                    <components:WdeImage ImageUri="icons/document_trinity_strings_big.png" Width="44" Height="44" Margin="0,0,10, 0" />
+                    <components:WdeImage ImageUri="Icons/document_trinity_strings_big.png" Width="44" Height="44" Margin="0,0,10, 0" />
                     <TextBlock VerticalAlignment="Bottom" Text="{Binding $parent[controls:WizardPanel].StepTitle}" />
                 </StackPanel>
             </DataTemplate>

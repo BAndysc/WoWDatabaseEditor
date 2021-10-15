@@ -103,7 +103,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.inspectQuery = inspectQuery;
             Title = title;
             Extension = extension;
-            Icon = new ImageUri($"icons/document_{extension.ToLower()}.png");
+            Icon = new ImageUri($"Icons/document_{extension.ToLower()}.png");
             document.FromString(content);
             return this;
         }

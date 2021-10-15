@@ -7,6 +7,6 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WDE.CommonViews.Avalonia.SQLEditor.Views.SqlEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Image="icons/icon_play.png" Command="{Binding ExecuteSql}" /> 
+        <components:ButtonImage Image="Icons/icon_play.png" Command="{Binding ExecuteSql}" /> 
     </controls:ToolbarPanel>
 </UserControl>

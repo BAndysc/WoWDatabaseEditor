@@ -113,7 +113,7 @@
                                   DockPanel.Dock="Left" Items="{Binding MostRecentlySearched}"
                                   SelectedItem="{Binding MostRecentlySearchedItem}" />
                         <Button DockPanel.Dock="Right" Command="{Binding OpenFilterDialogCommand}">
-                            <components:WdeImage ImageUri="icons/icon_filter.png" Width="24" Height="24" />
+                            <components:WdeImage ImageUri="Icons/icon_filter.png" Width="24" Height="24" />
                         </Button>
                         <Panel>
                             <views:FilterTextEditor Document="{Binding FilterText, Converter={StaticResource DocumentConverter}}"
