@@ -1643,7 +1643,7 @@
       "minmax(1, 2)",
       "minmax(3, 4)"
     ],
-    "description": "On creature healed by {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+    "description": "On creature {pram2value:choose(0):healed|healed by {pram1} - {pram2} HP}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
     "name_readable": "On heal receive",
     "invoker": {
       "name": "Healer",
