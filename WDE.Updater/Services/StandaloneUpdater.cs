@@ -1,6 +1,9 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.Updater.Services
@@ -11,11 +14,13 @@ namespace WDE.Updater.Services
     {
         private readonly IAutoUpdatePlatformService platform;
         private readonly IFileSystem fs;
+        private readonly IMessageBoxService messageBoxService;
 
-        public StandaloneUpdater(IAutoUpdatePlatformService platform, IFileSystem fs)
+        public StandaloneUpdater(IAutoUpdatePlatformService platform, IFileSystem fs, IMessageBoxService messageBoxService)
         {
             this.platform = platform;
             this.fs = fs;
+            this.messageBoxService = messageBoxService;
         }
 
         public bool HasPendingUpdate()
@@ -59,8 +64,21 @@ namespace WDE.Updater.Services
         {
             if (File.Exists(file))
             {
-                Process.Start(file);
-                return true;
+                try
+                {
+                    Process.Start(file);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetTitle("Updater")
+                        .SetMainInstruction("Error while starting the updater")
+                        .SetContent("While trying to start the updater, following error occured: " + e.Message +
+                                    ".\n\nYou can try to run the Updater.exe (Updater on Linux) manually")
+                        .WithOkButton(true)
+                        .Build()).ListenErrors();
+                }
             }
 
             return false;
