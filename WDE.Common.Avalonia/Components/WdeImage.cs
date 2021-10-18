@@ -78,6 +78,9 @@ namespace WDE.Common.Avalonia.Components
                     uri = hdpiUri;
             }
 
+            if (string.IsNullOrEmpty(uri))
+                return null;
+
             var path = Path.Combine(Environment.CurrentDirectory, uri);
 
             if (!File.Exists(path))
