@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DynamicData;
@@ -248,6 +249,11 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
         }
 
+        public override DatabaseEntity AddRow(uint key)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
             if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
@@ -389,9 +395,12 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
             await AsyncAddEntities(data.Entities);
             
-            History.AddHandler(AutoDispose(new TemplateTableEditorHistoryHandler(this)));
+            historyHandler = History.AddHandler(AutoDispose(new TemplateTableEditorHistoryHandler(this)));
         }
 
+        private TemplateTableEditorHistoryHandler? historyHandler;
+        protected override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
+        
         private void RowOnFieldModified()
         {
             if (teachingTipService.ShowTip(TipYouCanRevertId))

@@ -18,5 +18,12 @@ namespace WDE.DatabaseEditors.ViewModels
             Name = command.Name;
             Command = cmd;
         }
+        
+        public TableCommandViewModel(IDatabaseTablePerKeyCommand command, ICommand cmd)
+        {
+            Icon = command.Icon;
+            Name = command.Name;
+            Command = cmd;
+        }
     }
 }

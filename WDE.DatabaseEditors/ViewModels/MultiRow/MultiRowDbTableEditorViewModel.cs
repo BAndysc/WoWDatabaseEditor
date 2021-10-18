@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using DynamicData;
 using Prism.Commands;
@@ -148,7 +149,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ScheduleLoading();
         }
 
-        public DatabaseEntity AddRow(uint key)
+        public override DatabaseEntity AddRow(uint key)
         {
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
             if (autoIncrementColumn != null)
@@ -282,9 +283,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 EnsureKey(entity.Key);
 
             await AsyncAddEntities(data.Entities);
-            History.AddHandler(AutoDispose(new MultiRowTableEditorHistoryHandler(this)));
+            historyHandler = History.AddHandler(AutoDispose(new MultiRowTableEditorHistoryHandler(this)));
         }
 
+        protected override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
+
+        private MultiRowTableEditorHistoryHandler? historyHandler;
+        
         protected override void UpdateSolutionItem()
         {
             solutionItem.Entries = keys.Select(e =>

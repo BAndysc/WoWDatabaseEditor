@@ -6,5 +6,6 @@ namespace WDE.DatabaseEditors.CustomCommands
     public interface IDatabaseTableCommandService
     {
         IDatabaseTableCommand? FindCommand(string id);
+        IDatabaseTablePerKeyCommand? FindPerKeyCommand(string id);
     }
 }

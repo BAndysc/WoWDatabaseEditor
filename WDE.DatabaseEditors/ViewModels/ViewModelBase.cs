@@ -32,7 +32,7 @@ using WDE.MVVM;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator
+    public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator, IAddRowKey
     {
         private readonly ISolutionItemNameRegistry solutionItemName;
         private readonly ISolutionManager solutionManager;
@@ -94,7 +94,9 @@ namespace WDE.DatabaseEditors.ViewModels
             tableDefinition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId)!;
             nameGeneratorParameter = parameterFactory.Factory(tableDefinition.Picker);
         }
-        
+
+        protected abstract System.IDisposable BulkEdit(string name);
+
         protected async Task EditParameter(IParameterValue parameterValue)
         {
             if (!parameterValue.BaseParameter.HasItems)
@@ -194,13 +196,51 @@ namespace WDE.DatabaseEditors.ViewModels
             foreach (var command in data.TableDefinition.Commands)
             {
                 var cmd = commandService.FindCommand(command.CommandId);
-                if (cmd == null)
-                    throw new Exception("Command " + command.CommandId + " not found!");
-                
-                Commands.Add(new TableCommandViewModel(cmd, new AsyncAutoCommand(async () =>
+                if (cmd != null)
                 {
-                    await cmd.Process(command, new DatabaseTableData(data.TableDefinition, Entities));
-                })));
+                    Commands.Add(new TableCommandViewModel(cmd, new AsyncAutoCommand( () =>
+                    {
+                        return messageBoxService.WrapError(() => 
+                            WrapBulkEdit(
+                            () => WrapBlockingTask(
+                                () => cmd.Process(command, new DatabaseTableData(data.TableDefinition, Entities))
+                                ), cmd.Name));
+                    })));
+                }
+                else
+                {
+                    var cmdPerKey = commandService.FindPerKeyCommand(command.CommandId);
+                    if (cmdPerKey == null)  
+                        throw new Exception("Command " + command.CommandId + " not found!");
+
+                    Commands.Add(new TableCommandViewModel(cmdPerKey, new AsyncAutoCommand( () =>
+                    {
+                        return messageBoxService.WrapError(() => 
+                            WrapBulkEdit(
+                                () => WrapBlockingTask(() => cmdPerKey.Process(command,
+                            new DatabaseTableData(data.TableDefinition, Entities), GenerateKeys(), this))
+                                    , cmdPerKey.Name));
+                    })));
+                }
+            }
+        }
+
+        protected async Task WrapBulkEdit(Func<Task> t, string name)
+        {
+            using var disp = BulkEdit(name);
+            await t();
+        }
+        
+        protected async Task WrapBlockingTask(Func<Task> t)
+        {
+            TaskInProgress = true;
+            try
+            {
+                await t();
+            }
+            finally
+            {
+                TaskInProgress = false;
             }
         }
 
@@ -237,6 +277,13 @@ namespace WDE.DatabaseEditors.ViewModels
             get => title;
             set => SetProperty(ref title, value);
         }
+
+        private bool taskInProgress;
+        public bool TaskInProgress
+        {
+            get => taskInProgress;
+            private set => SetProperty(ref taskInProgress, value);
+        }
         
         public ICommand Undo => undoCommand;
         public ICommand Redo => redoCommand;
@@ -250,5 +297,6 @@ namespace WDE.DatabaseEditors.ViewModels
         public IHistoryManager History { get; }
         protected DatabaseTableSolutionItem solutionItem;
         public ISolutionItem SolutionItem => solutionItem;
+        public abstract DatabaseEntity AddRow(uint key);
     }
 }

@@ -5,6 +5,7 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             IsEnabled="{Binding TaskInProgress, Converter={x:Static BoolConverters.Not}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorToolBar">
     <controls:ToolbarPanel>
         <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new" Image="Icons/icon_add.png" />

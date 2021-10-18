@@ -58,6 +58,17 @@ namespace WDE.DatabaseEditors.Models
             return null;
         }
 
+        public void SetTypedCellOrThrow<T>(string column, T? value) where T : IComparable<T>
+        {
+            var cell = GetCell(column);
+            if (cell == null)
+                throw new Exception("No column named " + column);
+            var typed = cell as DatabaseField<T>;
+            if (typed == null)
+                throw new Exception("No column named " + column + " with type " + typeof(T));
+            typed.Current.Value = value;
+        }
+        
         public T? GetTypedValueOrThrow<T>(string columnName) where T : IComparable<T>
         {
             var cell = GetCell(columnName);

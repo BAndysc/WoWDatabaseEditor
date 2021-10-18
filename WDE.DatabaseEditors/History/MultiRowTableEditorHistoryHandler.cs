@@ -17,6 +17,8 @@ namespace WDE.DatabaseEditors.History
             BindTableData();
         }
 
+        public IDisposable BulkEdit(string name) => WithinBulk(name);
+        
         public void Dispose()
         {
             UnbindTableData();
