@@ -2372,5 +2372,16 @@
 			"3": {"name": "fly"},
 			"4": {"name": "submerged"}
 		}
+	},
+	"TextRangeParameter": {
+		"name": "Text range",
+		"values": {
+			"0": {"name": "default"},
+			"1": {"name": "area"},
+			"2": {"name": "zone"},
+			"3": {"name": "map"},
+			"4": {"name": "world"},
+			"5": {"name": "personal"}
+		}
 	}
 }

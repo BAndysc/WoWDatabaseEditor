@@ -35,7 +35,8 @@
           "name": "Quest start",
           "db_column_name": "quest_start",
           "value_type": "QuestParameter",
-          "help": "The spell will be casted/allowed in this area ONLY if 'quest start' is in 'quest start status'"
+          "help": "The spell will be casted/allowed in this area ONLY if 'quest start' is in 'quest start status'",
+          "zero_is_blank": true
         },
         {
           "name": "Quest start required status",
@@ -43,13 +44,15 @@
           "help": "The spell will be casted/allowed in this area ONLY if 'quest start' is in this state",
           "default": 64,
           "value_type": "QuestStatusParameter",
-          "preferred_width": 150
+          "preferred_width": 150,
+          "zero_is_blank": true
         },
         {
           "name": "Quest end",
           "db_column_name": "quest_end",
           "value_type": "QuestParameter",
-          "help": "The spell will be casted/allowed in this area ONLY if 'quest end' is in 'quest end status'"
+          "help": "The spell will be casted/allowed in this area ONLY if 'quest end' is in 'quest end status'",
+          "zero_is_blank": true
         },
         {
           "name": "Quest end required status",
@@ -57,7 +60,8 @@
           "help": "The spell will be casted/allowed in this area ONLY if 'quest end' is in this state",
           "default": 11,
           "value_type": "QuestStatusParameter",
-          "preferred_width": 150
+          "preferred_width": 150,
+          "zero_is_blank": true
         },
         {
           "name": "Autocast",
@@ -70,7 +74,8 @@
         {
           "name": "Aura condition",
           "db_column_name": "aura_spell",
-          "value_type": "SpellAreaSpellParameter"
+          "value_type": "SpellAreaSpellParameter",
+          "zero_is_blank": true
         },
         {
           "name": "Race condition",
@@ -82,7 +87,8 @@
           "db_column_name": "gender",
           "default": 2,
           "value_type": "GenderParameter",
-          "preferred_width": 90
+          "preferred_width": 90,
+          "zero_is_blank": true
         }
       ]
     }

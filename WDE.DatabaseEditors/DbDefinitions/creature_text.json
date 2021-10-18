@@ -78,22 +78,26 @@
         {
           "name": "Duration",
           "db_column_name": "Duration",
-          "value_type": "uint"
+          "value_type": "uint",
+          "zero_is_blank": true
         },
         {
           "name": "Sound",
           "db_column_name": "Sound",
-          "value_type": "SoundParameter"
+          "value_type": "SoundParameter",
+          "zero_is_blank": true
         },
         {
           "name": "Broadcast text",
           "db_column_name": "BroadcastTextId",
-          "value_type": "uint"
+          "value_type": "uint",
+          "zero_is_blank": true
         },
         {
           "name": "Text range",
           "db_column_name": "TextRange",
-          "value_type": "uint"
+          "value_type": "TextRangeParameter",
+          "zero_is_blank": true
         },
         {
           "name": "Comment",

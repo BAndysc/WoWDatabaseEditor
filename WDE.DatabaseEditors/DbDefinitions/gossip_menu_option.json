@@ -91,7 +91,8 @@
         {
           "name": "Submenu id",
           "db_column_name": "ActionMenuID",
-          "value_type": "GossipMenuParameter"
+          "value_type": "GossipMenuParameter",
+          "zero_is_blank": true
         },
         {
           "is_condition": true,
@@ -101,17 +102,20 @@
         {
           "name": "Action Poi ID",
           "db_column_name": "ActionPoiID",
-          "value_type": "uint"
+          "value_type": "uint",
+          "zero_is_blank": true
         },
         {
           "name": "Box Coded",
           "db_column_name": "BoxCoded",
-          "value_type": "uint"
+          "value_type": "uint",
+          "zero_is_blank": true
         },
         {
           "name": "Box Money",
           "db_column_name": "BoxMoney",
-          "value_type": "uint"
+          "value_type": "uint",
+          "zero_is_blank": true
         },
         {
           "name": "Box Text",
@@ -122,7 +126,8 @@
         {
           "name": "Box Broadcast Text ID",
           "db_column_name": "BoxBroadcastTextID",
-          "value_type": "int"
+          "value_type": "int",
+          "zero_is_blank": true
         },
         {
           "name": "Verified Build",

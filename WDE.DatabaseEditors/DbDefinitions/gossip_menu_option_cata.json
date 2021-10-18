@@ -102,7 +102,8 @@
           "name": "Submenu id",
           "db_column_name": "ActionMenuId",
           "value_type": "GossipMenuParameter",
-          "foreign_table": "gossip_menu_option_action"
+          "foreign_table": "gossip_menu_option_action",
+          "zero_is_blank": true
         },
         {
           "is_condition": true,
@@ -113,19 +114,22 @@
           "name": "Action Poi ID",
           "db_column_name": "ActionPoiId",
           "value_type": "uint",
-          "foreign_table": "gossip_menu_option_action"
+          "foreign_table": "gossip_menu_option_action",
+          "zero_is_blank": true
         },
         {
           "name": "Box Coded",
           "db_column_name": "BoxCoded",
           "value_type": "uint",
-          "foreign_table": "gossip_menu_option_box"
+          "foreign_table": "gossip_menu_option_box",
+          "zero_is_blank": true
         },
         {
           "name": "Box Money",
           "db_column_name": "BoxMoney",
           "value_type": "uint",
-          "foreign_table": "gossip_menu_option_box"
+          "foreign_table": "gossip_menu_option_box",
+          "zero_is_blank": true
         },
         {
           "name": "Box Text",

@@ -416,6 +416,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                         parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                     }
 
+                    parameterValue.DefaultIsBlank = column.IsZeroBlank;
+
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column, row, entity, cell, parameterValue));
                 }
                 row.Cells.Add(cellViewModel);

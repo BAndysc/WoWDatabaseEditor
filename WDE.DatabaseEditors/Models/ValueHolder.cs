@@ -20,6 +20,7 @@ namespace WDE.DatabaseEditors.Models
         void SetNull();
         void Revert();
         IParameter BaseParameter { get; }
+        bool DefaultIsBlank { get; set; }
     }
 
     public sealed class ParameterValue<T> : IParameterValue where T : notnull
@@ -34,8 +35,20 @@ namespace WDE.DatabaseEditors.Models
         }
 
         public IParameter BaseParameter => parameter;
-        
+
+        public bool DefaultIsBlank
+        {
+            get => defaultIsBlank;
+            set
+            {
+                defaultIsBlank = value;
+                OnPropertyChanged(nameof(String));
+            }
+        }
+
         private IParameter<T> parameter;
+        private bool defaultIsBlank;
+
         public IParameter<T> Parameter
         {
             get => parameter;
@@ -55,7 +68,7 @@ namespace WDE.DatabaseEditors.Models
             this.value = value;
             this.originalValue = originalValue;
             this.parameter = parameter;
-            OriginalString = originalValue.IsNull ? "(null)" : parameter.ToString(originalValue.Value!);
+            OriginalString = ToString(originalValue);
             value.PropertyChanged += (_, _) =>
             {
                 OnPropertyChanged(nameof(String));
@@ -80,9 +93,16 @@ namespace WDE.DatabaseEditors.Models
                 value.Value = originalValue.Value;
         }
 
+        private string ToString(ValueHolder<T> val)
+        {
+            if (DefaultIsBlank && Comparer<T>.Default.Compare(val.Value, default) == 0)
+                return "";
+            return val.IsNull ? "(null)" : parameter.ToString(val.Value!);
+        }
+        
         public override string ToString()
         {
-            return value.IsNull ? "(null)" : parameter.ToString(Value!);
+            return ToString(value);
         }
         
         public event PropertyChangedEventHandler? PropertyChanged;

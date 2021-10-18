@@ -34,7 +34,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "is_condition")]
         public bool IsConditionColumn { get; set; }
         
-        [JsonProperty(PropertyName = "is_zero_blank")]
+        [JsonProperty(PropertyName = "zero_is_blank")]
         public bool IsZeroBlank { get; set; }
         
         [JsonProperty(PropertyName = "autogenerate_comment")]
