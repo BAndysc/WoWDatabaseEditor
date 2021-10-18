@@ -108,6 +108,14 @@ namespace WDE.DbcStore.Spells.Wrath
             }
         }
     }
+
+    public class SpellCastTime
+    {
+        public uint Id;
+        public uint BaseTimeMs;
+        public uint PerLevelMs;
+        public uint MinimumMs;
+    }
     
     public class SpellStructure
     {
@@ -218,5 +226,6 @@ namespace WDE.DbcStore.Spells.Wrath
         public uint Difficulty;
         
         public uint? SkillLine { get; set; }
+        public SpellCastTime? CastingTime { get; set; }
     }
 }

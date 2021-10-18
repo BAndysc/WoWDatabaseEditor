@@ -8,10 +8,29 @@ namespace WDE.DbcStore.Spells.Wrath
 {
     public class WrathSpellService : ISpellService
     {
+        private Dictionary<uint, SpellCastTime> spellCastTimes = new();
         private Dictionary<uint, SpellStructure> spells = new();
+        
         public void Load(string path)
         {
             var opener = new DatabaseClientFileOpener();
+            
+            foreach (var row in opener.Open(Path.Join(path, "SpellCastTimes.dbc")))
+            {
+                var id = row.GetUInt(0);
+                var baseTimeMs = row.GetUInt(1);
+                var perLevelMs = row.GetUInt(2);
+                var minimumMs = row.GetUInt(3);
+                
+                spellCastTimes[id] = new SpellCastTime()
+                {
+                    Id = id,
+                    BaseTimeMs = baseTimeMs,
+                    PerLevelMs = perLevelMs,
+                    MinimumMs = minimumMs
+                };
+            }
+            
             foreach (var row in opener.Open(Path.Join(path, "Spell.dbc")))
             {
                 int i = 0;
@@ -176,6 +195,9 @@ namespace WDE.DbcStore.Spells.Wrath
                 spell.DescriptionVariablesId = row.GetUInt(i++);
                 spell.Difficulty = row.GetUInt(i++);
 
+                if (spell.CastingTimeIndex != 0 && spellCastTimes.TryGetValue(spell.CastingTimeIndex, out var castTime))
+                    spell.CastingTime = castTime;
+                
                 spells[spell.Id] = spell;
             }
             
@@ -245,6 +267,13 @@ namespace WDE.DbcStore.Spells.Wrath
             return null;
         }
 
+        public TimeSpan? GetSpellCastingTime(uint spellId)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return spell.CastingTime == null ? null : TimeSpan.FromMilliseconds(Math.Max(spell.CastingTime.BaseTimeMs, spell.CastingTime.MinimumMs));
+            return null;
+        }
+
         public string? GetDescription(uint spellId)
         {
             if (spells.TryGetValue(spellId, out var spell))
@@ -266,6 +295,13 @@ namespace WDE.DbcStore.Spells.Wrath
             if (spells.TryGetValue(spellId, out var spell))
                 return spell.Effect[index];
             return SpellEffectType.None;
+        }
+
+        public (SpellTarget, SpellTarget) GetSpellEffectTargetType(uint spellId, int index)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return ((SpellTarget)spell.ImplicitTargetA[index], (SpellTarget)spell.ImplicitTargetB[index]);
+            return (SpellTarget.NoTarget, SpellTarget.NoTarget);
         }
 
         public uint GetSpellEffectMiscValueA(uint spellId, int index)

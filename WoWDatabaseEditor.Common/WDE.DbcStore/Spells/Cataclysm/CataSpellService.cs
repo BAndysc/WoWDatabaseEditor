@@ -9,6 +9,14 @@ namespace WDE.DbcStore.Spells.Cataclysm
 {
     public class CataSpellService : ISpellService
     {
+        private class SpellCastTime
+        {
+            public uint Id;
+            public uint BaseTimeMs;
+            public uint PerLevelMs;
+            public uint MinimumMs;
+        }
+        
         private class SpellEffect
         {
             public uint Id { get; init; }
@@ -61,6 +69,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
             public SpellAttr8 Attr8 { get; init; }
             public SpellAttr9 Attr9 { get; init; }
             public SpellAttr10 Attr10 { get; init; }
+            public uint SpellCastTimeIndex { get; init; }
             public SpellEffect[]? SpellEffects { get; set; }
             public uint SpellCastingRequirementsId { get; init; }
             public SpellCastingRequirements? SpellCastingRequirements { get; init; }
@@ -68,8 +77,10 @@ namespace WDE.DbcStore.Spells.Cataclysm
             public string Name { get; init; }
             public string? Description { get; init; }
             public uint? SkillLine { get; set; }
+            public SpellCastTime? CastTime { get; set; }
         }
 
+        private Dictionary<uint, SpellCastTime> spellCastTimes = new();
         private Dictionary<uint, SpellCastingRequirements> requirements = new();
         private Dictionary<uint, SpellData> spells = new();
         
@@ -90,6 +101,22 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 };
             }
             
+            foreach (var row in opener.Open(Path.Join(path, "SpellCastTimes.dbc")))
+            {
+                var id = row.GetUInt(0);
+                var baseTimeMs = row.GetUInt(1);
+                var perLevelMs = row.GetUInt(2);
+                var minimumMs = row.GetUInt(3);
+                
+                spellCastTimes[id] = new SpellCastTime()
+                {
+                    Id = id,
+                    BaseTimeMs = baseTimeMs,
+                    PerLevelMs = perLevelMs,
+                    MinimumMs = minimumMs
+                };
+            }
+
             foreach (var row in opener.Open(Path.Join(path, "Spell.dbc")))
             {
                 int i = 0;
@@ -105,6 +132,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 SpellAttr8 attr8 = (SpellAttr8)row.GetUInt(i++);
                 SpellAttr9 attr9 = (SpellAttr9)row.GetUInt(i++);
                 SpellAttr10 attr10 = (SpellAttr10)row.GetUInt(i++);
+                uint spellCastTimeIndex = row.GetUInt(i++);
 
                 var castingRequirements = row.GetUInt(34);
                 var description = row.GetString(23);
@@ -123,7 +151,9 @@ namespace WDE.DbcStore.Spells.Cataclysm
                     Attr8 = attr8,
                     Attr9 = attr9,
                     Attr10 = attr10,
+                    SpellCastTimeIndex = spellCastTimeIndex,
                     SpellCastingRequirementsId = castingRequirements,
+                    CastTime = spellCastTimeIndex > 0 && spellCastTimes.ContainsKey(spellCastTimeIndex) ? spellCastTimes[spellCastTimeIndex] : null,
                     SpellCastingRequirements = castingRequirements > 0 && requirements.ContainsKey(castingRequirements) ? requirements[castingRequirements] : null,
                     Name = row.GetString(21),
                     Description = string.IsNullOrEmpty(description) ? null : description
@@ -238,6 +268,13 @@ namespace WDE.DbcStore.Spells.Cataclysm
             return null;
         }
 
+        public TimeSpan? GetSpellCastingTime(uint spellId)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return spell.CastTime == null ? null : TimeSpan.FromMilliseconds(spell.CastTime.BaseTimeMs);
+            return null;
+        }
+
         public string? GetDescription(uint spellId)
         {
             if (spells.TryGetValue(spellId, out var spell))
@@ -276,6 +313,13 @@ namespace WDE.DbcStore.Spells.Cataclysm
             if (TryGetEffect(spellId, index, out var effect))
                 return effect.EffectType;
             return SpellEffectType.None;
+        }
+
+        public (SpellTarget, SpellTarget) GetSpellEffectTargetType(uint spellId, int index)
+        {
+            if (TryGetEffect(spellId, index, out var effect))
+                return ((SpellTarget)effect.ImplicitTarget[0], (SpellTarget)effect.ImplicitTarget[1]);
+            return (SpellTarget.NoTarget, SpellTarget.NoTarget);
         }
 
         public uint GetSpellEffectMiscValueA(uint spellId, int index)
