@@ -228,7 +228,13 @@
                 "name": "TargetsLimit"
             }
         ],
-        "description": "{source}: Cast spell {pram1} on{pram4value:choose(0):| random {pram4}} {target}{pram2value:choose(0):| (flags: {pram2})}",
+        "description_rules": [
+            {
+                "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram3value:choose(0):| with {pram3} trigger flags}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
+                "condition": "(action.param(2) & 2) == 2"
+            }
+        ],
+        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
         "name_readable": "Cast",
         "target_types": ["Player", "Creature"],
         "target_is_source": false,
@@ -1956,8 +1962,15 @@
                 "name": "TargetsLimit"
             }
         ],
-        "description": "{pram4value:choose(0):|Random {pram4} }{source}: Cast spell {pram1} on self",
-        "name_readable": "Invoker cast",
+        "description_rules": [
+            {
+                "description": "{pram4value:choose(0):|Random {pram4} }{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on self{pram3value:choose(0):| with {pram3} trigger flags}",
+                "condition": "(action.param(2) & 2) == 2"
+            }
+        ],
+        "description": "{pram4value:choose(0):|Random {pram4} }{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on self",
+        "name_readable": "Self cast",
+        "help": "Makes an object cast a spell on self (on the caster)",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
     },
@@ -2998,22 +3011,32 @@
     {
         "id": 134,
         "name": "SMART_ACTION_INVOKER_CAST",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "SpellParameter",
-                "name": "SpellID"
+                "name": "Spell"
             },
             {
                 "type": "SmartCastFlagsParameter",
-                "name": "CastFlags"
+                "name": "Cast flags"
             },
             {
-                "type": "Parameter",
-                "name": "triggeredFlags"
+                "type": "TriggerFlagParameter",
+                "name": "Triggered flags"
+            },
+            {
+                "name": "Targets limit",
+                "type": "Parameter"
             }
         ],
-        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}",
+        "description_rules": [
+            {
+                "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram3value:choose(0):| with {pram3} trigger flags}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
+                "condition": "(action.param(2) & 2) == 2"
+            }
+        ],
+        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
         "name_readable": "Invoker Cast",
         "target_types": ["Creature", "Player"],
         "target_is_source": false,
