@@ -25,7 +25,7 @@ namespace WDE.RemoteSOAP.ViewModels
             port = (settings.GetSettings().Port ?? 7878).ToString();
             user = settings.GetSettings().User;
             pass = settings.GetSettings().Password;
-            host = settings.GetSettings().Host ?? "localhost";
+            host = settings.GetSettings().Host ?? "127.0.0.1";
             this.settings = settings;
 
             Save = new DelegateCommand(() =>
