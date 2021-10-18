@@ -30,6 +30,7 @@ namespace WDE.Common.Solution
             CreatureEntry,
             GameobjectEntry,
             GossipMenu,
+            QuestEntry
         }
     }
     

@@ -24,6 +24,8 @@ namespace WDE.DatabaseEditors.Solution
                     definitionToRelatedType[defi.Id] = RelatedSolutionItem.RelatedType.GameobjectEntry;
                 else if (defi.Picker == "GossipMenuParameter")
                     definitionToRelatedType[defi.Id] = RelatedSolutionItem.RelatedType.GossipMenu;
+                else if (defi.Picker == "QuestParameter")
+                    definitionToRelatedType[defi.Id] = RelatedSolutionItem.RelatedType.QuestEntry;
             }
         }
 

@@ -162,7 +162,9 @@ namespace WDE.DatabaseEditors.Solution
                    related.Type == RelatedSolutionItem.RelatedType.GameobjectEntry &&
                    definition.Picker == "GameobjectParameter" ||
                    related.Type == RelatedSolutionItem.RelatedType.GossipMenu &&
-                   definition.Picker == "GossipMenuParameter";
+                   definition.Picker == "GossipMenuParameter" ||
+                   related.Type == RelatedSolutionItem.RelatedType.QuestEntry &&
+                   definition.Picker == "QuestParameter";
         }
     }
 }

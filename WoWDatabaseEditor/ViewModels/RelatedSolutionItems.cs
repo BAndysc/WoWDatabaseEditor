@@ -21,6 +21,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly ISolutionItemProvideService provideService;
         private readonly ISolutionItemRelatedRegistry relatedRegistry;
         private readonly IEventAggregator eventAggregator;
+        private readonly IWindowManager windowManager;
         private readonly ICurrentCoreVersion currentCoreVersion;
         public ObservableCollection<ViewModel> List { get; } = new();
 
@@ -31,12 +32,14 @@ namespace WoWDatabaseEditorCore.ViewModels
             ISolutionItemRelatedRegistry relatedRegistry,
             IEventAggregator eventAggregator,
             ISolutionManager solutionManager,
+            IWindowManager windowManager,
             ICurrentCoreVersion currentCoreVersion)
         {
             this.documentManager = documentManager;
             this.provideService = provideService;
             this.relatedRegistry = relatedRegistry;
             this.eventAggregator = eventAggregator;
+            this.windowManager = windowManager;
             this.currentCoreVersion = currentCoreVersion;
             solutionManager.RefreshRequest += _ => DoProcess(documentManager.ActiveSolutionItemDocument);
             documentManager.ToObservable(t => t.ActiveSolutionItemDocument).SubscribeAction(DoProcess);
@@ -76,6 +79,19 @@ namespace WoWDatabaseEditorCore.ViewModels
                     if (newItem == null)
                         return;
                     eventAggregator.GetEvent<EventRequestOpenItem>().Publish(newItem);
+                })));
+            }
+
+            if (related.Value.Type == RelatedSolutionItem.RelatedType.CreatureEntry ||
+                related.Value.Type == RelatedSolutionItem.RelatedType.GameobjectEntry ||
+                related.Value.Type == RelatedSolutionItem.RelatedType.QuestEntry)
+            {
+                List.Add(new ViewModel("Open wowhead in a browser", new ImageUri("icons/icon_head_red.png"), new AsyncAutoCommand(async () =>
+                {
+                    var type = related.Value.Type == RelatedSolutionItem.RelatedType.CreatureEntry ? "npc" : "object";
+                    if (related.Value.Type == RelatedSolutionItem.RelatedType.QuestEntry)
+                        type = "quest";
+                    windowManager.OpenUrl($"https://wowhead.com/{type}=" + related.Value.Entry);
                 })));
             }
         }
