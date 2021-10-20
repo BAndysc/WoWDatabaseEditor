@@ -27,5 +27,6 @@ namespace WDE.SmartScriptEditor.Models
         public long GetActionParameter(int index) => action?.GetParameter(index).Value ?? 0;
         public long GetActionSourceParameter(int index) => action?.Source.GetParameter(index).Value ?? 0;
         public long GetActionTargetParameter(int index) => action?.Target.GetParameter(index).Value ?? 0;
+        public long GetTargetType() => action?.Target.Id ?? 0;
     }
 }

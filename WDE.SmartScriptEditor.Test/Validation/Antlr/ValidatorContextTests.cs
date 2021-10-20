@@ -70,6 +70,12 @@ namespace WDE.SmartScriptEditor.Test.Validation.Antlr
         }
         
         [Test]
+        public void TestTarget()
+        {
+            Assert.True(new SmartValidator($"target.type == 1").Evaluate(context));
+        }
+        
+        [Test]
         public void TestActionWithoutAction()
         {
             var context = new TestContext();
@@ -117,6 +123,11 @@ namespace WDE.SmartScriptEditor.Test.Validation.Antlr
                     throw new Exception();
 
                 return (1 + index) * 5;
+            }
+
+            public long GetTargetType()
+            {
+                return 1;
             }
         }
     }

@@ -77,6 +77,11 @@ namespace WDE.SmartScriptEditor.Validation.Antlr.Visitors
             return binaryOperatorVisitor.Visit(context.addOp())(left, right);
         }
 
+        public override long VisitETargetType(SmartScriptValidationParser.ETargetTypeContext context)
+        {
+            return smartContext.GetTargetType();
+        }
+        
         public override long VisitESourceParam(SmartScriptValidationParser.ESourceParamContext context)
         {
             if (!int.TryParse(context.INT().GetText(), out var asInt))

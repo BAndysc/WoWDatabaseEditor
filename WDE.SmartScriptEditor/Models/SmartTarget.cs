@@ -89,7 +89,12 @@ namespace WDE.SmartScriptEditor.Models
                 }
             }
         }
-
+        
+        public string GetCoordsXyz()
+        {
+            return $"({X.ToString(CultureInfo.InvariantCulture)}, {Y.ToString(CultureInfo.InvariantCulture)}, {Z.ToString(CultureInfo.InvariantCulture)})";
+        }
+        
         public string GetCoords()
         {
             return $"({X.ToString(CultureInfo.InvariantCulture)}, {Y.ToString(CultureInfo.InvariantCulture)}, {Z.ToString(CultureInfo.InvariantCulture)}, {O.ToString(CultureInfo.InvariantCulture)})";
@@ -111,7 +116,7 @@ namespace WDE.SmartScriptEditor.Models
             string output = Readable;
             return output.Contains("position") || IsPosition
                 ? output
-                : "position of " + output + (HasPosition() ? " moved by offset " + GetCoords() : "");
+                : "position of " + output + (HasPosition() ? " moved by offset " + GetCoordsXyz() : "");
         }
 
         public new SmartTarget Copy()

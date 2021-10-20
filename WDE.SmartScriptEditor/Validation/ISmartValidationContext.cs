@@ -15,5 +15,6 @@ namespace WDE.SmartScriptEditor.Validation
         public long GetActionParameter(int index);
         public long GetActionSourceParameter(int index);
         public long GetActionTargetParameter(int index);
+        public long GetTargetType();
     }
 }

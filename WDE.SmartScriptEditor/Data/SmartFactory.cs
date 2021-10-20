@@ -224,6 +224,9 @@ namespace WDE.SmartScriptEditor.Data
                 return;
             }
             
+            var targetTypes = raw.Types;
+            smartTarget.IsPosition = targetTypes != null && targetTypes.Contains("Position");
+            
             SetParameterObjects(smartTarget, raw, true);
             UpdateTargetPositionVisibility(smartTarget);
         }

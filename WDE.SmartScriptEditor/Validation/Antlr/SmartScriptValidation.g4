@@ -26,6 +26,7 @@ exprBool
 
 exprInt
     : '-' exprInt                           # ENegate
+    | 'target' '.' 'type'                   # ETargetType
     | 'target' '.' 'param' '(' INT ')'      # ETargetParam
     | 'source' '.' 'param' '(' INT ')'      # ESourceParam
     | 'event' '.' 'param' '(' INT ')'       # EEventParam
