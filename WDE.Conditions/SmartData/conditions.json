@@ -265,8 +265,8 @@
 	{
 		"id": 15,
 		"name": "CONDITION_CLASS",
-		"name_readable": "Is class",
-		"help": "Condition is met if target (only player) is given class",
+		"name_readable": "Is class (classmask)",
+		"help": "Condition is met if class of target (only player) is part of given class mask",
 		"parameters": [
 			{
 				"type": "ClassMaskParameter",
@@ -274,14 +274,14 @@
 				"description": "Only for players"
 			}
 		],
-		"description": "{target} {negate:is|is not} class {pram1}"
+		"description": "{target} class {negate:is|is not} part of classmask {pram1}"
 	},
 
 	{
 		"id": 16,
 		"name": "CONDITION_RACE",
-		"name_readable": "Is race",
-		"help": "Condition is met if target (only player) is given race",
+		"name_readable": "Is race (racemask)",
+		"help": "Condition is met if race of target (only player) is part of given racemask",
 		"parameters": [
 			{
 				"type": "RaceMaskParameter",
@@ -289,7 +289,7 @@
 				"description": "Only for players"
 			}
 		],
-		"description": "{target} {negate:is|is not} race {pram1}"
+		"description": "{target} race {negate:is|is not} part of racemask {pram1}"
 	},
 
 	{
