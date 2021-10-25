@@ -34,7 +34,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         private TrinityDatabase Database()
         {
-            return new TrinityDatabase(currentCoreVersion.Current.DatabaseFeatures.AlternativeTrinityDatabase);
+            return new TrinityDatabase(currentCoreVersion.Current);
         }
         
         public ICreatureTemplate? GetCreatureTemplate(uint entry)
