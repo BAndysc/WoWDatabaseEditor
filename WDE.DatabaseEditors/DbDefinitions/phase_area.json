@@ -1,0 +1,61 @@
+{
+  "id": "phase_area",
+  "compatibility": [
+    "TrinityMaster"
+  ],
+  "name": "Phase area",
+  "description": "You can define what phase shoould be active in what areas",
+  "table_name": "phase_area",
+  "table_index_name": "AreaId",
+  "single_solution_name": "Phases in {name}",
+  "multi_solution_name": "Phases in multiple areas",
+  "reload_command": "reload phase_area",
+  "icon_path": "Icons/document_phase_definitions.png",
+  "multi_record": true,
+  "picker": "ZoneAreaParameter",
+  "group_name": "Common scripting tables",
+  "primary_key": ["AreaId", "PhaseId"],
+  "conditions": {
+    "source_type": 26,
+    "source_group": "PhaseId",
+    "source_entry": "AreaId",
+    "targets": [
+      {
+        "id": 0,
+        "name": "player"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "group_name": "only",
+      "fields": [
+        {
+          "name": "Area",
+          "db_column_name": "AreaId",
+          "read_only": true,
+          "value_type": "ZoneAreaParameter",
+          "preferred_width": 80
+        },
+        {
+          "name": "Phase",
+          "db_column_name": "PhaseId",
+          "value_type": "PhaseParameter",
+          "preferred_width": 180
+        },
+        {
+          "is_condition": true,
+          "name": "Conditions",
+          "db_column_name": "conditions"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "preferred_width": 380,
+          "autogenerate_comment": "thisString.AreaId + ' - ' + thisString.PhaseId"
+        }
+      ]
+    }
+  ]
+}

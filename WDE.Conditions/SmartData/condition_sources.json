@@ -482,6 +482,64 @@
       "description": "npc_vendor.item"
     }
   },
+
+
+  {
+    "id": 24,
+    "name": "CONDITION_SOURCE_TYPE_SPELL_PROC",
+    "description": "Aura {entry} can proc",
+    "targets": {
+      "0": {
+        "description": "Actor",
+        "comment": "Actor"
+      },
+      "1": {
+        "description": "Action target",
+        "comment": "Action target"
+      }
+    },
+    "entry": {
+      "type": "SpellParameter",
+      "name": "Spell",
+      "description": "Spell ID of aura which triggers the proc"
+    }
+  },
+  {
+    "id": 25,
+    "name": "CONDITION_SOURCE_TYPE_TERRAIN_SWAP",
+    "description": "Terrain swap {entry}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "entry": {
+      "type": "Parameter",
+      "name": "Terrain swap"
+    }
+  },
+  {
+    "id": 26,
+    "name": "CONDITION_SOURCE_TYPE_PHASE",
+    "description": "Allow phase {pram1} in zone/area {pram2}",
+    "targets": {
+      "0": {
+        "description": "Player",
+        "comment": "Player"
+      }
+    },
+    "group": {
+      "type": "PhaseParameter",
+      "name": "Phase id"
+    },
+    "entry": {
+      "type": "ZoneAreaParameter",
+      "name": "Zone/Area"
+    }
+  },
+  
+  
   {
     "id": 27,
     "name": "CONDITION_SOURCE_TYPE_PHASE_DEFINITION",
