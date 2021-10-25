@@ -19,6 +19,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WoWDatabaseEditorCore.CoreVersion;
 using WoWDatabaseEditorCore.Extensions;
 using WoWDatabaseEditorCore.Services.Http;
 using WoWDatabaseEditorCore.Services.NewItemService;
@@ -69,15 +70,27 @@ namespace WoWDatabaseEditorCore.ViewModels
             Wizards.AddRange(wizards.Where(w => w.IsCompatibleWithCore(currentCoreVersion.Current)));
             HasWizards = Wizards.Count > 0;
             AboutViewModel = aboutViewModel;
-            foreach (var item in solutionItemProvideService.AllCompatible)
+            
+            foreach (var item in solutionItemProvideService.All)
             {
                 if (item.IsContainer || !item.ShowInQuickStart(currentCoreVersion.Current))
                     continue;
+
+                bool enabled = true;
+
+                if (!item.IsCompatibleWithCore(currentCoreVersion.Current))
+                {
+                    if (currentCoreVersion.IsSpecified)
+                        continue;
+                    else
+                        enabled = false;
+                }
                 
-                var info = new NewItemPrototypeInfo(item);
+                var info = new NewItemPrototypeInfo(item, enabled);
 
                 if (info.RequiresName)
                     continue;
+                
                 FlatItemPrototypes.Add(info);
             }
 

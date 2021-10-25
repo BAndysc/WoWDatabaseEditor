@@ -18,7 +18,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
     {
         private readonly ISolutionItemProvider provider;
 
-        public NewItemPrototypeInfo(ISolutionItemProvider provider)
+        public NewItemPrototypeInfo(ISolutionItemProvider provider, bool enabled)
         {
             this.provider = provider;
             Name = provider.GetName();
@@ -26,6 +26,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
             Image = provider.GetImage();
             IsContainer = provider.IsContainer;
             RequiresName = provider is INamedSolutionItemProvider;
+            IsEnabled = enabled;
         }
 
         public string Name { get; }
@@ -33,6 +34,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
         public ImageUri Image { get; }
         public bool RequiresName { get; }
         public bool IsContainer { get; }
+        public bool IsEnabled { get; }
 
         public Task<ISolutionItem?> CreateSolutionItem(string name)
         {

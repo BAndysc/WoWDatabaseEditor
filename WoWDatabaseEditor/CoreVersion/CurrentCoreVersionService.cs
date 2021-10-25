@@ -46,7 +46,8 @@ namespace WoWDatabaseEditorCore.CoreVersion
         }
         
         public ICoreVersion Current { get; }
-        
+        public bool IsSpecified => Current is not UnspecifiedCoreVersion;
+
         public IEnumerable<ICoreVersion> AllVersions { get; }
         
         public void UpdateCurrentVersion(ICoreVersion version)

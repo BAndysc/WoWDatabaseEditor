@@ -40,6 +40,7 @@ namespace WDE.Common
     [UniqueProvider]
     public interface ISolutionItemProvideService
     {
+        IEnumerable<ISolutionItemProvider> All { get; }
         IEnumerable<ISolutionItemProvider> AllCompatible { get; }
         IEnumerable<IRelatedSolutionItemCreator> GetRelatedCreators(RelatedSolutionItem related);
     }

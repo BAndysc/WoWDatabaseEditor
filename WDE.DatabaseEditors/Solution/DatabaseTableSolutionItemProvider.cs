@@ -49,7 +49,18 @@ namespace WDE.DatabaseEditors.Solution
                     itemFromListProvider,
                     messageBoxService, 
                     parameterFactory,
-                    databaseProvider);
+                    databaseProvider,
+                    true);
+            }
+            foreach (var definition in definitionProvider.IncompatibleDefinitions)
+            {
+                yield return new DatabaseTableSolutionItemProvider(definition, 
+                    tableDataProvider,
+                    itemFromListProvider,
+                    messageBoxService, 
+                    parameterFactory,
+                    databaseProvider,
+                    false);
             }
         }
     }
@@ -63,13 +74,15 @@ namespace WDE.DatabaseEditors.Solution
         private readonly IDatabaseProvider databaseProvider;
         private readonly DatabaseTableDefinitionJson definition;
         private readonly ImageUri itemIcon;
+        private bool isCompatible;
         
         internal DatabaseTableSolutionItemProvider(DatabaseTableDefinitionJson definition,
             IDatabaseTableDataProvider tableDataProvider, 
             IItemFromListProvider itemFromListProvider, 
             IMessageBoxService messageBoxService,
             IParameterFactory parameterFactory,
-            IDatabaseProvider databaseProvider)
+            IDatabaseProvider databaseProvider,
+            bool isCompatible)
         {
             this.tableDataProvider = tableDataProvider;
             this.itemFromListProvider = itemFromListProvider;
@@ -78,6 +91,7 @@ namespace WDE.DatabaseEditors.Solution
             this.databaseProvider = databaseProvider;
             this.definition = definition;
             this.itemIcon = new ImageUri($"Icons/document_big.png");
+            this.isCompatible = isCompatible;
         }
 
         public string GetName() => definition.Name;
@@ -93,7 +107,7 @@ namespace WDE.DatabaseEditors.Solution
         
         public string GetGroupName() => definition.GroupName ?? "Database tables";
 
-        public bool IsCompatibleWithCore(ICoreVersion core) => true;
+        public bool IsCompatibleWithCore(ICoreVersion core) => isCompatible;
 
         public async Task<ISolutionItem?> CreateSolutionItem()
         {

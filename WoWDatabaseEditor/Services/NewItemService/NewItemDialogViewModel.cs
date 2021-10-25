@@ -9,6 +9,7 @@ using DynamicData;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.NewItemService
@@ -19,12 +20,13 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
         private string customName = "New folder";
         private NewItemPrototypeInfo? selectedPrototype;
 
-        public NewItemDialogViewModel(ISolutionItemProvideService provider)
+        public NewItemDialogViewModel(ISolutionItemProvideService provider, ICurrentCoreVersion currentCore)
         {
             Dictionary<string, NewItemPrototypeGroup> groups = new();
             ItemPrototypes = new ObservableCollection<NewItemPrototypeGroup>();
 
-            foreach (var item in provider.AllCompatible)
+            bool coreIsSpecific = currentCore.IsSpecified;
+            foreach (var item in provider.All)
             {
                 if (!groups.TryGetValue(item.GetGroupName(), out var group))
                 {
@@ -33,7 +35,12 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
                     ItemPrototypes.Add(group);
                 }
 
-                var info = new NewItemPrototypeInfo(item);
+                bool isCompatible = item.IsCompatibleWithCore(currentCore.Current);
+                
+                if (!isCompatible && coreIsSpecific)
+                    continue;
+
+                var info = new NewItemPrototypeInfo(item, isCompatible);
                 group.Add(info);
                 FlatItemPrototypes.Add(info);
             }

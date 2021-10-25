@@ -20,6 +20,11 @@
                                  SelectedItem="{Binding SelectedPrototype}"
                                  DoubleTapped="InputElement_OnDoubleTapped"
                                  KeyDown="UIElement_OnKeyDown">
+            <controls:GroupingListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+                </Style>
+            </controls:GroupingListBox.Styles>
             <controls:GroupingListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

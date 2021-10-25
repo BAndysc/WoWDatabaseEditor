@@ -11,6 +11,8 @@
              Name="Root"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.QuickStartView">
     <UserControl.Resources>
+        <converters:BoolToDoubleConverter x:Key="OpacityConverter" WhenTrue="1" WhenFalse="0.3" />
+        <converters:BoolToStringConverter x:Key="TipConverter" WhenTrue="{x:Null}" WhenFalse="Setup 'Core version' in the settings in order enable this item." />
         <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
     </UserControl.Resources>
     <UserControl.Styles>
@@ -111,13 +113,18 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Classes="FlattyButton" 
-                                        Width="100"
-                                        Height="80"
-                                        Margin="0,0,8,8"
-                                        Command="{Binding #Root.DataContext.LoadItemCommand}"
-                                        CommandParameter="{Binding}">
-                                </Button>
+                                <Panel Background="Transparent"
+                                       ToolTip.Tip="{Binding IsEnabled, Converter={StaticResource TipConverter}}">
+                                    <Button Classes="FlattyButton" 
+                                            Width="100"
+                                            Height="80"
+                                            Margin="0,0,8,8"
+                                            IsEnabled="{Binding IsEnabled}" 
+                                            Opacity="{Binding IsEnabled, Converter={StaticResource OpacityConverter}}"
+                                            Command="{Binding #Root.DataContext.LoadItemCommand}"
+                                            CommandParameter="{Binding}">
+                                    </Button>
+                                </Panel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

@@ -11,6 +11,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
     public class SolutionItemProviderService : ISolutionItemProvideService
     {
         private List<IRelatedSolutionItemCreator> relatedCreators { get; }
+        public IEnumerable<ISolutionItemProvider> All { get; set; }
         public IEnumerable<ISolutionItemProvider> AllCompatible { get; }
         
         public IEnumerable<IRelatedSolutionItemCreator> GetRelatedCreators(RelatedSolutionItem related)
@@ -24,8 +25,9 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
             IEnumerable<ISolutionItemProviderProvider> providers,
             ICurrentCoreVersion coreVersion)
         {
-            AllCompatible = items
-                .Concat(providers.SelectMany(p => p.Provide()))
+            All = items.Concat(providers.SelectMany(p => p.Provide())).ToList();
+            
+            AllCompatible = All
                 .Where(i => i.IsCompatibleWithCore(coreVersion.Current))
                 .ToList();
 

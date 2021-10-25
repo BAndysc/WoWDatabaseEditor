@@ -6,5 +6,6 @@ namespace WDE.Common.CoreVersion
     public interface ICurrentCoreVersion
     {
         ICoreVersion Current { get; }
+        bool IsSpecified { get; }
     }
 }

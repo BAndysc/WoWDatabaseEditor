@@ -11,6 +11,7 @@ namespace WDE.DatabaseEditors.Data.Interfaces
         DatabaseTableDefinitionJson? GetDefinitionByTableName(string? tableName);
         IEnumerable<string>? CoreCompatibility(string definitionId);
         IEnumerable<DatabaseTableDefinitionJson> Definitions { get; }
+        IEnumerable<DatabaseTableDefinitionJson> IncompatibleDefinitions { get; }
         
         IEnumerable<DatabaseTableDefinitionJson> AllDefinitions { get; }
     }

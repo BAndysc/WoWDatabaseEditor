@@ -91,8 +91,9 @@ namespace WDE.DatabaseEditors.Data
             return null;
         }
 
+        public IEnumerable<DatabaseTableDefinitionJson> IncompatibleDefinitions => incompatibleDefinitions.Values;
         public IEnumerable<DatabaseTableDefinitionJson> AllDefinitions =>
-            definitions.Values.Concat(incompatibleDefinitions.Values);
+            definitions.Values.Concat(IncompatibleDefinitions);
         public IEnumerable<DatabaseTableDefinitionJson> Definitions => definitions.Values;
     }
 }
