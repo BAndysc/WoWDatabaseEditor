@@ -219,8 +219,6 @@ namespace WDE.DbcStore
                         break;
                     case DBCVersions.LEGION_26972:
                         break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
                 
                 store.eventAggregator.GetEvent<DbcLoadedEvent>().Publish(store);
