@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.Parameters.Models;
@@ -14,7 +16,7 @@ namespace WDE.Parameters.Providers
     {
         public IReadOnlyDictionary<string, ParameterSpecModel> Parameters { get; }
 
-        public ParameterDefinitionProvider()
+        public ParameterDefinitionProvider(IMessageBoxService service)
         {
             var allParameters = new Dictionary<string, ParameterSpecModel>();
 
@@ -30,9 +32,21 @@ namespace WDE.Parameters.Providers
             foreach (var source in files)
             {
                 string data = File.ReadAllText(source);
-                var parameters = JsonConvert.DeserializeObject<Dictionary<string, ParameterSpecModel>>(data);
-                foreach (var keyPair in parameters)
-                    allParameters[keyPair.Key] = keyPair.Value;
+                try {
+                    var parameters = JsonConvert.DeserializeObject<Dictionary<string, ParameterSpecModel>>(data);
+                    foreach (var keyPair in parameters)
+                        allParameters[keyPair.Key] = keyPair.Value;
+                } 
+                catch (Exception e)
+                {
+                    service.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetTitle("Error while loading parameters")
+                        .SetMainInstruction("Parameters file is corrupted")
+                        .SetContent("File " + source +
+                                    " is corrupted, either this is a faulty update or you have made a faulty change.\n\n"  + e.Message)
+                        .WithOkButton(true)
+                        .Build()).ListenErrors();
+                }
             }
 
             Parameters = allParameters;
