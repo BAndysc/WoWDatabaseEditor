@@ -31,6 +31,7 @@ namespace WDE.ProjectSkyFire
             SmartScriptType.TimedActionList,
         };
 
+        public string TableName => "smart_scripts";
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";
         public string ConditionSourcesFile => "SmartData/condition_sources.json";

@@ -18,6 +18,8 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly IConditionQueryGenerator conditionQueryGenerator;
         private readonly ISolutionItemNameRegistry nameProvider;
 
+        private string SmartScriptTableName => currentCoreVersion.Current.SmartScriptFeatures.TableName;
+        
         public ExporterHelper(SmartScript script, 
             IDatabaseProvider databaseProvider,
             ISmartScriptSolutionItem item,
@@ -54,7 +56,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
             var lines = serializedScript.Select(s => GenerateSingleSai(query, s));
 
-            query.Table("smart_scripts").BulkInsert(lines);
+            query.Table(SmartScriptTableName).BulkInsert(lines);
 
             query.BlankLine();
             
@@ -236,13 +238,13 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 var entries = pair.Select(p => p.EntryOrGuid).ToList();
                 if (entries.Count == 1 && script.EntryOrGuid == entries[0])
                 {
-                    query.Table("smart_scripts")
+                    query.Table(SmartScriptTableName)
                         .Where(r => r.Column<int>("source_type") == pair.Key && 
                                     r.Column<int>("entryOrGuid") == r.Variable<int>("ENTRY")).Delete();   
                 }
                 else
                 {
-                    query.Table("smart_scripts")
+                    query.Table(SmartScriptTableName)
                         .Where(r => r.Column<int>("source_type") == pair.Key)
                         .WhereIn("entryOrGuid", entries, true).Delete();   
                 }

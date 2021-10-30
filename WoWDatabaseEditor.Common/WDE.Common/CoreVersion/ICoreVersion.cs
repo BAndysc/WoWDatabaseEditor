@@ -41,5 +41,6 @@ namespace WDE.Common.CoreVersion
         string GameObjectSmartAiName => "SmartGameObjectAI";
 
         string? ForceLoadTag => null;
+        string TableName { get; }
     }
 }
