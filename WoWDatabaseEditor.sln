@@ -139,7 +139,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Avalonia", "Dock\src\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.Model.ReactiveUI", "Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj", "{5395540E-4AA8-4CC2-93E3-FF3AA02C1EB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.ProportionalStackPanel", "WoWDatabaseEditor\Dock\src\Dock.ProportionalStackPanel\Dock.ProportionalStackPanel.csproj", "{8C768953-5901-48D7-A34A-1B692F6750EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dock.ProportionalStackPanel", "Dock\src\Dock.ProportionalStackPanel\Dock.ProportionalStackPanel.csproj", "{8C768953-5901-48D7-A34A-1B692F6750EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseEditors.Avalonia", "WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj", "{DCD5F40C-139E-4404-8EF0-DC85DD595E44}"
 EndProject
