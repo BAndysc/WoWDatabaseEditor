@@ -4,7 +4,6 @@ namespace WDE.Common.Database
     {
         public uint Id { get; }
         public uint FirstLineId { get; }
-        public uint LastLineEndTime { get; }
         public string ScriptName { get; }
     }
 }

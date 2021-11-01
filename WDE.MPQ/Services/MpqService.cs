@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using WDE.Common.MPQ;
 using WDE.Module.Attributes;
 using WDE.MPQ.ViewModels;

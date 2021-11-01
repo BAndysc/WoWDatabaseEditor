@@ -1,3 +1,4 @@
+using System.IO;
 using WDE.Module.Attributes;
 
 namespace WDE.MPQ.ViewModels
