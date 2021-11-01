@@ -1,7 +1,7 @@
 {
     "id": "npc_spellclick_spells",
     "compatibility": [
-        "TrinityWrath"
+        "TrinityWrath", "TrinityCata"
     ],
     "name": "Npc Spellclick Spells",
     "single_solution_name": "{name} npc_spellclick spells editor",
