@@ -5,6 +5,7 @@ using System.Reflection;
 using AsyncAwaitBestPractices;
 using Avalonia;
 using Avalonia.ReactiveUI;
+using WDE.Common.Tasks;
 using WoWDatabaseEditorCore.Managers;
 
 namespace WoWDatabaseEditorCore.Avalonia
@@ -21,7 +22,8 @@ namespace WoWDatabaseEditorCore.Avalonia
                 return;
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             SafeFireAndForgetExtensions.SetDefaultExceptionHandling(Console.WriteLine);
-            var app = BuildAvaloniaApp(args);
+            GlobalApplication.Arguments.Init(args);
+            var app = BuildAvaloniaApp();
             try
             {
                 app.StartWithClassicDesktopLifetime(args);
@@ -40,7 +42,7 @@ namespace WoWDatabaseEditorCore.Avalonia
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.
-        public static AppBuilder BuildAvaloniaApp(string[] args)
+        public static AppBuilder BuildAvaloniaApp()
         {
             var configuration = AppBuilder.Configure<App>()
                 .UsePlatformDetect()
@@ -50,7 +52,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                 .UseReactiveUI()
                 .LogToTrace();
 
-            if (args.Any(arg => arg == "--wgl"))
+            if (GlobalApplication.Arguments.IsArgumentSet("wgl"))
             {
                 configuration = configuration.
                     With(new Win32PlatformOptions() { UseWgl = true });

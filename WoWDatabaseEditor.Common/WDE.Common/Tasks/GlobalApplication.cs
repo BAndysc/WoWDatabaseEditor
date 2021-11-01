@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using WDE.Common.Services.CommandLine;
 
 namespace WDE.Common.Tasks
 {
@@ -13,6 +14,8 @@ namespace WDE.Common.Tasks
 
         public static IMainThread? mainThread;
 
+        public static ICommandLineArgs Arguments { get; } = new CommandLineArgs();
+        
         public static IMainThread MainThread
         {
             get

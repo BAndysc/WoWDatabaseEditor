@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using WDE.Common.Services;
+using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.FileSystemService
@@ -21,6 +22,9 @@ namespace WoWDatabaseEditorCore.Services.FileSystemService
 
         private string TryGetProfile()
         {
+            if (GlobalApplication.Arguments.IsArgumentSet("profile") &&
+                GlobalApplication.Arguments.GetValue("profile") != null)
+                return GlobalApplication.Arguments.GetValue("profile")!;
             if (File.Exists("profile"))
                 return File.ReadAllText("profile");
             return "default";
