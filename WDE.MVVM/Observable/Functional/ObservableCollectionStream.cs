@@ -10,21 +10,23 @@ namespace WDE.MVVM.Observable.Functional
         private readonly IEnumerable<T> initial;
         private readonly INotifyCollectionChanged notifyCollectionChanged;
         private readonly bool onRemoveOnDispose;
+        private readonly bool includeInitial;
 
-        public ObservableCollectionStream(IEnumerable<T> initial, INotifyCollectionChanged notifyCollectionChanged, bool onRemoveOnDispose)
+        public ObservableCollectionStream(IEnumerable<T> initial, INotifyCollectionChanged notifyCollectionChanged, bool onRemoveOnDispose, bool includeInitial)
         {
             this.initial = initial;
             this.notifyCollectionChanged = notifyCollectionChanged;
             this.onRemoveOnDispose = onRemoveOnDispose;
+            this.includeInitial = includeInitial;
         }
 
-        public ObservableCollectionStream(ObservableCollection<T> collection, bool onRemoveOnDispose) : this(collection, collection, onRemoveOnDispose)
+        public ObservableCollectionStream(ObservableCollection<T> collection, bool onRemoveOnDispose, bool includeInitial) : this(collection, collection, onRemoveOnDispose, includeInitial)
         {
         }
 
         public IDisposable Subscribe(IObserver<CollectionEvent<T>> observer)
         {
-            return new Subscription(initial, notifyCollectionChanged, observer, onRemoveOnDispose);
+            return new Subscription(initial, notifyCollectionChanged, observer, onRemoveOnDispose, includeInitial);
         }
 
         private class Subscription : IDisposable
@@ -35,7 +37,7 @@ namespace WDE.MVVM.Observable.Functional
             private readonly bool removeOnDispose;
 
             public Subscription(IEnumerable<T> initial, INotifyCollectionChanged changed,
-                IObserver<CollectionEvent<T>> observer, bool removeOnDispose)
+                IObserver<CollectionEvent<T>> observer, bool removeOnDispose, bool includeInitial)
             {
                 this.initial = initial;
                 notifyCollectionChanged = changed;
@@ -44,10 +46,13 @@ namespace WDE.MVVM.Observable.Functional
                 this.removeOnDispose = removeOnDispose;
                 changed.CollectionChanged += CollectionOnCollectionChanged;
 
-                int index = 0;
-                foreach (var t in initial)
+                if (includeInitial)
                 {
-                    observer.OnNext(new CollectionEvent<T>(CollectionEventType.Add, t, index++));   
+                    int index = 0;
+                    foreach (var t in initial)
+                    {
+                        observer.OnNext(new CollectionEvent<T>(CollectionEventType.Add, t, index++));   
+                    }   
                 }
             }
 

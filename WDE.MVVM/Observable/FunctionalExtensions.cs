@@ -26,9 +26,14 @@ namespace WDE.MVVM.Observable
             return collection.ToObservable(o => o.Count);
         }
 
+        public static IObservable<CollectionEvent<T>> ToStreamForChanges<T>(this ObservableCollection<T> collection)
+        {
+            return new ObservableCollectionStream<T>(collection, false, false);
+        }
+
         public static IObservable<CollectionEvent<T>> ToStream<T>(this ObservableCollection<T> collection, bool onRemoveOnDispose)
         {
-            return new ObservableCollectionStream<T>(collection, onRemoveOnDispose);
+            return new ObservableCollectionStream<T>(collection, onRemoveOnDispose, true);
         }
 
         public static System.IDisposable DisposeOnRemove<T>(this ObservableCollection<T> collection, Func<bool> shouldDispose) where T : System.IDisposable
@@ -97,7 +102,7 @@ namespace WDE.MVVM.Observable
 
         public static IObservable<CollectionEvent<T>> ToStream<T>(this INotifyCollectionChanged collection, IEnumerable<T> initial)
         {
-            return new ObservableCollectionStream<T>(initial, collection, false);
+            return new ObservableCollectionStream<T>(initial, collection, false, true);
         }
 
         public static void RemoveAll<T>(this ObservableCollection<T> collection)
