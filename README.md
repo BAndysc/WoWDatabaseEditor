@@ -70,6 +70,7 @@ dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseedi
  * Atlantiss - the editor begin as internal tool
  * TrinityCore, Cmangos and everyone who contributes to WoW Core!
  * [Avalonia](https://avaloniaui.net/) - WoW Database Editor is built upon Avalonia UI framework
+ * [Thenarden](https://github.com/Thenarden/nmpq) - for Nmpq - A Fully-Managed C# MPQ Parser
 
 ![screenshot8](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot8.png)
 ![screenshot9](https://raw.githubusercontent.com/BAndysc/WoWDatabaseEditor/master/Examples/screenshot9.png)

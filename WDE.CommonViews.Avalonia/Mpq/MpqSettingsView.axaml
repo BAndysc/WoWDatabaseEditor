@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.CommonViews.Avalonia.Mpq.MpqSettingsView">
+    
+    <StackPanel Orientation="Vertical">
+        <controls:SettingsHeader Text="Client files" />
+        <TextBlock Opacity="0.7">Current only Wrath of The Lich King is supported. Please select a folder with Wrath's wow.exe in it.</TextBlock>
+        <DockPanel LastChildFill="True">
+            <TextBlock VerticalAlignment="Center" Margin="0,0,10,0">WoW Path:</TextBlock>
+            <Button DockPanel.Dock="Right" Command="{Binding PickFolder}">...</Button>
+            <TextBox Text="{Binding WoWPath}" IsReadOnly="True" />
+        </DockPanel>
+    </StackPanel>
+</UserControl>

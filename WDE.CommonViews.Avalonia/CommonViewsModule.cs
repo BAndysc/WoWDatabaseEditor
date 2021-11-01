@@ -2,6 +2,7 @@ using WDE.Common.Windows;
 using WDE.CommonViews.Avalonia.DatabaseEditors;
 using WDE.CommonViews.Avalonia.DbcStore.Views;
 using WDE.CommonViews.Avalonia.History.Views;
+using WDE.CommonViews.Avalonia.Mpq;
 using WDE.CommonViews.Avalonia.Parameters.Views;
 using WDE.CommonViews.Avalonia.RemoteSOAP.Views;
 using WDE.CommonViews.Avalonia.Sessions;
@@ -14,6 +15,7 @@ using WDE.DatabaseEditors.Tools;
 using WDE.DbcStore.ViewModels;
 using WDE.HistoryWindow.ViewModels;
 using WDE.Module;
+using WDE.MPQ.ViewModels;
 using WDE.MySqlDatabaseCommon.Tools;
 using WDE.Parameters.ViewModels;
 using WDE.RemoteSOAP.ViewModels;
@@ -54,6 +56,8 @@ namespace WDE.CommonViews.Avalonia
             viewLocator.Bind<SoapConfigViewModel, SoapConfigView>();
             // table editor
             viewLocator.Bind<ToolsViewModel, DefinitionToolView>();
+            //mpq
+            viewLocator.Bind<MpqSettingsViewModel, MpqSettingsView>();
         }
     }
 }
