@@ -2,17 +2,18 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WDE.CommonViews.Avalonia.Mpq;
-
-public class MpqSettingsView : UserControl
+namespace WDE.CommonViews.Avalonia.Mpq
 {
-    public MpqSettingsView()
+    public class MpqSettingsView : UserControl
     {
-        InitializeComponent();
-    }
+        public MpqSettingsView()
+        {
+            InitializeComponent();
+        }
 
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+    }   
 }
