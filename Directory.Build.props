@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
     <PropertyGroup>
+        <RestoreAdditionalProjectSources>
+            https://nuget.avaloniaui.net/repository/avalonia-all/index.json
+        </RestoreAdditionalProjectSources>
         <NoWarn>CS0067,CS3021,CS1998,CA1416</NoWarn>
-        <AvaloniaVersion>0.10.8</AvaloniaVersion>
+        <AvaloniaVersion>0.10.999-cibuild0015264-beta</AvaloniaVersion>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
 </Project>

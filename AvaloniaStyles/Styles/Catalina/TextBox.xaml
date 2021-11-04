@@ -2,7 +2,7 @@
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls"
         xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit">
     <Style Selector="TextBox">
-        <Setter Property="CornerRadius" Value="4" />
+        <!--<Setter Property="CornerRadius" Value="4" />-->
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBoxForeground}" />
         <Setter Property="BorderThickness" Value="0.5" />

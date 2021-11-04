@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
+      <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
+    </ItemGroup>
+    
+    <PropertyGroup>
+        <DefineConstants Condition="'$(RuntimeIdentifier)' == 'win7-x64'">$(DefineConstants);USE_OPENTK</DefineConstants>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <Folder Include="GUI" />
+    </ItemGroup>
+
+</Project>

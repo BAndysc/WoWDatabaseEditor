@@ -2,7 +2,7 @@
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls"
         xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit">
     <Style Selector="TextBox">
-        <Setter Property="CornerRadius" Value="0"></Setter>
+        <!--<Setter Property="CornerRadius" Value="0"></Setter>-->
         <Setter Property="Padding" Value="4"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{DynamicResource TextBoxForeground}" />
@@ -26,7 +26,7 @@
     </Style>
         
     <Style Selector="controls1|ToolBar TextBox">
-        <Setter Property="CornerRadius" Value="5"></Setter>
+        <!--<Setter Property="CornerRadius" Value="5"></Setter>-->
     </Style>
     
     <Style Selector="TextBox /template/ TextBlock#watermark">

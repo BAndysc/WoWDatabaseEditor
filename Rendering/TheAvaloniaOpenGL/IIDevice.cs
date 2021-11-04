@@ -1,0 +1,85 @@
+using OpenGLBindings;
+
+namespace TheAvaloniaOpenGL
+{
+    public interface IDevice
+    {
+        void Begin();
+        void DeleteVertexArrays(int count, int[] buffers);
+        void BindVertexArray(int array);
+        unsafe   void GetIntegerv(GetPName n, int* rv);
+        void GenVertexArrays(int n, int[] rv);
+        void GenerateMipmap(TextureTarget target);
+        void Uniform1I(int location, int lalue);
+        unsafe   void GetProgramiv(int program, GetProgramParameterName pname, int* prams);
+        void GenSamplers(int len, int[] rv);
+        void BindSampler(int unit, int sampler);
+        void UniformBlockBinding(int program, int uniformBlockIndex, int uniformBlockBinding);
+        void BindBufferBase(BufferRangeTarget target, int index, int buffer);
+        void CullFace(CullFaceMode mode);
+        void Disable(EnableCap mode);
+        void Enable(EnableCap mode);
+        void BindBuffer(BufferTarget target, int buffer);
+        void BufferData(BufferTarget target, IntPtr size, IntPtr data, BufferUsageHint usage);
+        void BufferSubData(BufferTarget target, IntPtr offset, IntPtr size, IntPtr data);
+        void ActiveTexture(TextureUnit texture);
+        void BindTexture(TextureTarget target, int fb);
+        unsafe   void DeleteTextures(int count, int* textures);
+        unsafe   void DeleteBuffers(int count, int* buffers);
+        unsafe   void GenFramebuffers(int count, int* res);
+        unsafe   void DeleteFramebuffers(int count, int* framebuffers);
+        void BindFramebuffer(FramebufferTarget target, int fb);
+        unsafe   void GenRenderbuffers(int count, int* res);
+        unsafe   void DeleteRenderbuffers(int count, int* renderbuffers);
+        void BindRenderbuffer(RenderbufferTarget target, int fb);
+        void FramebufferTexture2D(FramebufferTarget target,FramebufferAttachment attachment,TextureTarget texTarget,int texture,int level);
+        void RenderbufferStorage(RenderbufferTarget target, RenderbufferStorage internalFormat, int width, int height);
+        void FramebufferRenderbuffer(FramebufferTarget target, FramebufferAttachment attachment, RenderbufferTarget renderbufferTarget, int renderbuffer);
+        void ClearStencil(int buffer);
+        void ClearColor(float r, float g, float b, float a);
+        void Clear(ClearBufferMask bits);
+        void Viewport(int x, int y, int width, int height);
+        void TexImage3D(TextureTarget target, int level, InternalFormat internalFormat, int width, int height, int depth, int border, PixelFormat format, PixelType type, IntPtr data);
+        void TexSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, PixelFormat format, PixelType type, IntPtr data);
+        void DrawElementsInstanced(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices, int instancesCount);
+        void ClampColor(ClampColorTarget target, ClampColorMode clamp);
+        void TexBuffer(TextureBufferTarget target, SizedInternalFormat internalformat, int buffer);
+        void ValidateProgram(int program);
+        int GetAttribLocation(int program, string name);
+        void VertexAttribPointer(int index, int size, VertexAttribPointerType type, bool normalized, int stride, IntPtr pointer);
+        void EnableVertexAttribArray(int index);
+        void UseProgram(int program);
+        void DrawArrays(PrimitiveType mode, int first, IntPtr count);
+        void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices);
+        int GetUniformLocation(int program, string name);
+        void Uniform1f(int location, float falue);
+        void Uniform4f(int location, float a, float b, float c, float d);
+        void TexImage2D(TextureTarget target, int level, PixelInternalFormat internalFormat, int width, int height, int border, PixelFormat format, PixelType type, IntPtr data);
+        void CopyTexSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int x, int y, int width, int height);
+        void TexParameteri(TextureTarget target, TextureParameterName name, int value);
+        unsafe   string GetProgramInfoLog(int program, int maxLength = 2048);
+        int CreateProgram();
+        void AttachShader(int program, int shader);
+        void LinkProgram(int program);
+        int CreateShader(ShaderType shaderType);
+        void BlendFunc(BlendingFactorSrc src, BlendingFactorDest dst);
+        string CompileShaderAndGetError(int shader, string source);
+        string LinkProgramAndGetError(int program);
+        void CheckError(string what);
+        int GenVertexArray();
+        int GenBuffer();
+        int GenTexture();
+        void ActiveTextureUnit(uint slot);
+        void ActiveTextureUnit(int slot);
+        unsafe void DeleteTexture(int name);
+        unsafe void DeleteBuffer(int name);
+        unsafe int GenFramebuffer();
+        unsafe void DeleteFramebuffer(int name);
+        unsafe int GenRenderbuffer();
+        unsafe void DeleteRenderbuffer(int name);
+        int GetUniformBlockIndex(int program, string uniformBlockName);
+        void TexParameter(TextureTarget target, TextureParameterName name, int value);
+        unsafe int GetProgramParameter(int program, GetProgramParameterName pname);
+        unsafe string GetActiveUniform(int unit, int index, int maxLength, out int length, out int size, out ActiveUniformType type);
+    }
+}

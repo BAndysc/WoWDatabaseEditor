@@ -11,7 +11,7 @@
              xmlns:viewModels="clr-namespace:WDE.DatabaseEditors.ViewModels.Template;assembly=WDE.DatabaseEditors"
              xmlns:controls2="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             IsEnabled="{Binding TaskInProgress, Converter={x:Static BoolConverters.Not}}"
+             IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Name="rootWindow"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorView">
     <UserControl.Resources>

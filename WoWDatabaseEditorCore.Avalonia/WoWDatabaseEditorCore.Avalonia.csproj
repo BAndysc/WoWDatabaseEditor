@@ -24,6 +24,7 @@
         <PackageReference Include="SmartFormat.NET" Version="2.5.3" />
         <PackageReference Include="HarfBuzzSharp" Version="2.8.2-preview.127" />
         <PackageReference Include="SkiaSharp" Version="2.88.0-preview.127" />
+        <PackageReference Include="Avalonia.OpenTK" Version="0.10.999-cibuild0015264-beta" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
@@ -39,4 +40,7 @@
     <ItemGroup>
       <Resource Include="Icon.ico" />
     </ItemGroup>
+    <PropertyGroup>
+        <DefineConstants Condition="'$(RuntimeIdentifier)' == 'win7-x64'">$(DefineConstants);USE_OPENTK</DefineConstants>
+    </PropertyGroup>
 </Project>

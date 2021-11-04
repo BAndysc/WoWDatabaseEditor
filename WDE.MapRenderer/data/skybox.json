@@ -1,0 +1,17 @@
+{
+  "Pixel": {
+    "Path": "data/skybox.frag"
+  },
+  "ZWrite": false,
+  "Instancing": false,
+  "Vertex": {
+    "Path": "data/skybox.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

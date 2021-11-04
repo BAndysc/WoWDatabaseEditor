@@ -1,0 +1,233 @@
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using OpenGLBindings;
+
+namespace TheAvaloniaOpenGL.Resources
+{
+    public class Shader : IDisposable
+    {
+        private readonly IDevice device;
+
+        internal int VertexShader { get; }
+        internal int PixelShader { get; }
+        internal int ProgramHandle { get; }
+        
+        public bool Instancing { get; }
+
+        public bool ZWrite { get; }
+        
+        public bool DepthTest { get; }
+
+        public bool WriteMask { get; }
+
+        private Dictionary<string, int> uniformToLocation = new();
+
+        /*public class ShaderInclude : Include
+        {
+            private readonly string[] incPaths;
+
+            public IDisposable Shadow { get; set; }
+
+            public ShaderInclude(string[] incPaths)
+            {
+                this.incPaths = incPaths;
+            }
+
+            public void Close(Stream stream)
+            {
+                stream.Close();
+            }
+
+            public void Dispose()
+            {
+                throw new NotImplementedException();
+            }
+
+            public Stream Open(IncludeType type, string fileName, Stream parentStream)
+            {
+                foreach (var dir in incPaths)
+                {
+                    if (File.Exists(dir + "/" + fileName))
+                        return new FileStream(dir + "/" + fileName, FileMode.Open);
+                }
+                throw new Exception();
+            }
+        }
+*/
+        
+        internal Shader(IDevice device, string shaderFile, string[] includePaths)
+        {
+            var shaderContent = File.ReadAllText(shaderFile);
+            var shaderData = JsonConvert.DeserializeObject<ShaderData>(shaderContent);
+
+            var shaderDir = Path.GetDirectoryName(shaderFile);
+
+            ZWrite = shaderData.ZWrite;
+            DepthTest = shaderData.DepthTest ?? true;
+            Instancing = shaderData.Instancing;
+            var vertexSource = File.ReadAllText(shaderData.Vertex.Path);
+
+            if (Instancing)
+            {
+                var version = vertexSource.Substring(0, vertexSource.IndexOf('\n'));
+                vertexSource = version + "#define Instancing\n" + vertexSource.Substring(vertexSource.IndexOf('\n') + 1);
+            }
+            
+            VertexShader = device.CreateShader(ShaderType.VertexShader);
+            Console.WriteLine(device.CompileShaderAndGetError(VertexShader, vertexSource));
+            
+            PixelShader = device.CreateShader(ShaderType.FragmentShader);
+            Console.WriteLine(device.CompileShaderAndGetError(PixelShader, File.ReadAllText(shaderData.Pixel.Path)));
+
+            ProgramHandle = device.CreateProgram();
+
+            device.AttachShader(ProgramHandle, VertexShader);
+            device.AttachShader(ProgramHandle, PixelShader);
+
+            var error = device.LinkProgramAndGetError(ProgramHandle);
+            Console.WriteLine(error);
+            Console.WriteLine("Linked program");
+            if (error != null && error.Trim().Length > 0)
+            {
+                Console.WriteLine("Error, EXITING: '" + error + "'");
+                Environment.Exit(2);
+            }
+            device.UseProgram(ProgramHandle);
+
+            var idx = device.GetUniformBlockIndex(ProgramHandle, "SceneData");
+            if (idx != -1)
+                device.UniformBlockBinding(ProgramHandle, idx, Constants.SCENE_BUFFER_INDEX);
+            idx = device.GetUniformBlockIndex(ProgramHandle, "ObjectData");
+            if (idx != -1)
+                device.UniformBlockBinding(ProgramHandle, idx, Constants.OBJECT_BUFFER_INDEX);
+            idx = device.GetUniformBlockIndex(ProgramHandle, "PixelData");
+            if (idx != -1)
+                device.UniformBlockBinding(ProgramHandle, idx, Constants.PIXEL_SCENE_BUFFER_INDEX);
+            
+            int count = device.GetProgramParameter(ProgramHandle, GetProgramParameterName.ActiveUniforms);
+            for (int i = 0; i < count; i++)
+            {
+                var uniformName = device.GetActiveUniform(ProgramHandle, i, 256, out _, out _, out var type);
+                int location = device.GetUniformLocation(ProgramHandle, uniformName);
+                uniformToLocation[uniformName] = location;
+            }
+            
+            
+            /*var shaderInclude = new ShaderInclude(includePaths);
+
+            var vertexMacros = new List<ShaderMacro> { new ShaderMacro("VERTEX_SHADER", 1) };
+            var pixelMacros = new List<ShaderMacro> { new ShaderMacro("PIXEL_SHADER", 1) };
+
+            WriteMask = shaderData.WriteMask;
+            if (Instancing)
+            {
+                vertexMacros.Add(new ShaderMacro("INSTANCING", 1));
+                pixelMacros.Add(new ShaderMacro("INSTANCING", 1));
+            }
+
+            ShaderBytecode vertexShaderByteCode = ShaderBytecode.CompileFromFile(shaderDir + "/" + shaderData.Vertex.Path, shaderData.Vertex.Entry, "vs_5_0", ShaderFlags.None, EffectFlags.None, vertexMacros.ToArray(), shaderInclude);
+            ShaderBytecode pixelShaderByteCode = ShaderBytecode.CompileFromFile(shaderDir + "/" + shaderData.Pixel.Path, shaderData.Pixel.Entry, "ps_5_0", ShaderFlags.None, EffectFlags.None, pixelMacros.ToArray(), shaderInclude);
+
+            InputElement[] inputElements = LoadInputs(shaderData.Vertex.Input, shaderData.Instancing);
+            ShaderInputLayout = new InputLayout(device, ShaderSignature.GetInputSignature(vertexShaderByteCode), inputElements);
+
+            VertexShader = new VertexShader(device, vertexShaderByteCode);
+            PixelShader = new PixelShader(device, pixelShaderByteCode);
+
+
+            vertexShaderByteCode.Dispose();
+            pixelShaderByteCode.Dispose();*/
+            this.device = device;
+        }
+
+        private static int TypeToSize(ShaderData.ShaderInputType type)
+        {
+            int size = 1;
+            switch (type)
+            {
+                case ShaderData.ShaderInputType.Float:
+                    size = 1;
+                    break;
+                case ShaderData.ShaderInputType.Float2:
+                    size = 2;
+                    break;
+                case ShaderData.ShaderInputType.Float3:
+                    size = 3;
+                    break;
+                case ShaderData.ShaderInputType.Float4:
+                    size = 4;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return size;
+        }
+
+        public int GetUniformLocation(string name)
+        {
+            if (uniformToLocation.TryGetValue(name, out var loc))
+                return loc;
+            return -1;
+        }
+
+        public void Validate()
+        {
+            device.ValidateProgram(ProgramHandle);
+            int ret = device.GetProgramParameter(ProgramHandle, GetProgramParameterName.ValidateStatus);
+            if (ret == 0)
+            {
+                var problem = device.GetProgramInfoLog(ProgramHandle);
+                Console.WriteLine(problem);
+                throw new Exception(problem);
+            }
+        }
+        
+        public void Activate()
+        {
+            device.UseProgram(ProgramHandle);
+        }
+
+        public void Dispose()
+        {
+            //PixelShader.Dispose();
+            //VertexShader.Dispose();
+            //ShaderInputLayout.Dispose();
+        }
+    }
+    
+    internal class ShaderData
+    {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum ShaderInputType
+        {
+            Float,
+            Float2,
+            Float3,
+            Float4
+        }
+
+        public class ShaderInput
+        {
+            public ShaderInputType Type { get; set; }
+            public string Semantic { get; set; }
+        }
+
+        public class PixelVertexData
+        {
+            public string Path { get; set; }
+            public string Entry { get; set; }
+            public List<ShaderInput> Input { get; set; }
+        }
+
+        public PixelVertexData Pixel { get; set; }
+        public PixelVertexData Vertex { get; set; }
+        public int Textures { get; set; }
+        public bool Instancing { get; set; }
+
+        public bool ZWrite { get; set; }
+        public bool? DepthTest { get; set; } = true;
+
+        public bool WriteMask { get; set; }
+    }
+}

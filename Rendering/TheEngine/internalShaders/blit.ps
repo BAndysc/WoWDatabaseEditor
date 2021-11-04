@@ -1,0 +1,36 @@
+﻿#include "theengine.cginc"
+
+struct PixelInputType
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD0;
+};
+
+Texture2D shaderTexture : register(t0);
+Texture2D outlineTexture : register(t1);
+
+float4 pixel(PixelInputType input) : SV_TARGET
+{
+	float4 sampled = tex2D(shaderTexture, input.uv);
+
+	float4 Blur = float4(0, 0, 0, 0);
+	float2 texCoord;
+	for (int x = -2; x <= 2; x++)
+	{
+		for (int y = -2; y <= 2; y++)
+		{
+			texCoord.x = 1.0f / (screenWidth) * x / 2 + input.uv.x;
+			texCoord.y = 1.0f / (screenHeight) * y / 2 + input.uv.y;
+			texCoord.x = clamp(texCoord.x,0,1);
+			texCoord.y = clamp(texCoord.y,0,1);
+			Blur += tex2D(outlineTexture, texCoord);
+		}
+	}
+	Blur = Blur / 25;
+	if (Blur.x > 0.95)
+		return sampled;
+	return sampled + Blur;
+
+	//float avg = (sampled.x + sampled.y + sampled.z) / 3;
+	//return lerp(float4(avg, avg, avg, 1), sampled, sin(time/1000));
+}

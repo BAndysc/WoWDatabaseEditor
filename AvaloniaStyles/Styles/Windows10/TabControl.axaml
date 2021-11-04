@@ -11,10 +11,10 @@
   <Style Selector="TabControl">
     <Setter Property="Padding" Value="6"></Setter>
     <Setter Property="Template">
+      <!--      CornerRadius="{TemplateBinding CornerRadius}"-->
       <ControlTemplate>
         <Border BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{TemplateBinding CornerRadius}"
                 Background="{TemplateBinding Background}"
                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                 VerticalAlignment="{TemplateBinding VerticalAlignment}">
@@ -61,11 +61,11 @@
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
+        <!--      CornerRadius="{TemplateBinding CornerRadius}"-->
         <Panel>
           <Border Name="PART_LayoutRoot"
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}"
-                  CornerRadius="{TemplateBinding CornerRadius}"
                   Padding="{TemplateBinding Padding}">
             <ContentPresenter Name="PART_ContentPresenter"
                               ContentTemplate="{TemplateBinding HeaderTemplate}"

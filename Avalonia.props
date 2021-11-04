@@ -4,7 +4,7 @@
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.10" />
         <ProjectReference Include="$(MSBuildThisFileDirectory)\Prism.Avalonia\src\Prism.Avalonia\Prism.Avalonia.csproj" />
     </ItemGroup>
     <ItemGroup>

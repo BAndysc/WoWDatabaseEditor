@@ -8,7 +8,7 @@
     </Style>
     
     <Style Selector=":is(Button)">
-        <Setter Property="CornerRadius" Value="4" />
+        <!--<Setter Property="CornerRadius" Value="4" />-->
     </Style>
     
     <Style Selector=":is(Button):pointerover /template/ ContentPresenter">

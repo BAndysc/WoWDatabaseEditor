@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+<!--        <WarningsAsErrors>nullable</WarningsAsErrors>-->
+    </PropertyGroup>
+    <Import Project="..\Avalonia.props" />
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\WDE.WorldMap\WDE.WorldMap.csproj" />
+        <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.MpqReader\WDE.MpqReader.csproj" />
+        <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+        <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+        <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+        <ProjectReference Include="..\Rendering\OpenGLBindings\OpenGLBindings.csproj" />
+        <ProjectReference Include="..\Rendering\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
+        <ProjectReference Include="..\Rendering\TheEngine\TheEngine.csproj" />
+        <ProjectReference Include="..\Rendering\TheMaths\TheMaths.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="data\*.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+        <None Update="data\*.frag">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="data\*.vert">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="meshes\*.obj">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+</Project>

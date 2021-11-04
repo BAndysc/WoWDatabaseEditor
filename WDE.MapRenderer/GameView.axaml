@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:theEngine="clr-namespace:TheEngine;assembly=TheEngine"
+             xmlns:worldMap="clr-namespace:WDE.WorldMap;assembly=WDE.WorldMap"
+             xmlns:mapRenderer="clr-namespace:WDE.MapRenderer"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.MapRenderer.GameView">
+    <UserControl.Styles>
+        <StyleInclude Source="avares://WDE.WorldMap/WoWMapViewer.axaml" />
+    </UserControl.Styles>
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="M" Command="{Binding ToggleMapVisibilityCommand}" />
+    </UserControl.KeyBindings>
+    <Panel>
+        <!--<theEngine:TheEnginePanel />-->
+        <theEngine:TheEnginePanel Name="TheEnginePanel" Game="{Binding  Game}"/>
+        <Border Margin="100,40" IsVisible="{Binding IsMapVisible}" BorderThickness="10" BorderBrush="DarkGray">
+            <worldMap:WoWMapViewer MapViewModel="{Binding   }"
+                                   MapsPath="{Binding MapData.Path}"
+                                   Map="{Binding SelectedMap.MapPath}">
+                <mapRenderer:MiniMapRenderer Context2="{Binding .}" PointerPressed="InputElement_OnPointerPressed"/>
+            </worldMap:WoWMapViewer>
+        </Border>
+        <TextBlock Text="{Binding #TheEnginePanel.FrameRate, StringFormat={}{0:0.##}}" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
+    </Panel>
+</UserControl>
