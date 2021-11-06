@@ -1,9 +1,14 @@
-﻿using TheAvaloniaOpenGL;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
+using TheEngine.ECS;
 using TheEngine.Input;
 using TheEngine.Interfaces;
 using TheEngine.Managers;
 
+[assembly: InternalsVisibleTo("TheEngine.Test")]
 namespace TheEngine
 {
     public class Engine : IDisposable
@@ -40,6 +45,9 @@ namespace TheEngine
         public IMaterialManager MaterialManager => materialManager;
         public IWindowHost WindowHost { get; }
 
+        internal EntityManager entityManager { get; }
+        public IEntityManager EntityManager => entityManager;
+        
         private Thread renderThread;
         
         private volatile bool isDisposing;
@@ -56,6 +64,8 @@ namespace TheEngine
 
             Device.Initialize();
 
+            entityManager = new EntityManager();
+            
             lightManager = new LightManager(this);
             inputManager = new InputManager(this);
             cameraManger = new CameraManager(this);
@@ -86,6 +96,7 @@ namespace TheEngine
             meshManager.Dispose();
             textureManager.Dispose();
             shaderManager.Dispose();
+            entityManager.Dispose();
             Device.Dispose();
         }
     }
