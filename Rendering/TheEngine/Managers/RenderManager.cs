@@ -1,8 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using OpenGLBindings;
 using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
+using TheEngine.Components;
 using TheEngine.Config;
+using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
@@ -110,11 +115,30 @@ namespace TheEngine.Managers
 
         private BoundingFrustum culler = new BoundingFrustum();
         
+        private Archetype toRenderArchetype;
+        private Archetype updateWorldBoundsArchetype;
+        private Archetype dirtEntities;
+
         internal RenderManager(Engine engine)
         {
             this.engine = engine;
 
             cameraManager = engine.CameraManager;
+
+            dirtEntities = engine.entityManager.NewArchetype()
+                .WithComponentData<DirtyPosition>();
+            
+            updateWorldBoundsArchetype = engine.entityManager.NewArchetype()
+                .WithComponentData<LocalToWorld>()
+                .WithComponentData<WorldMeshBounds>()
+                .WithComponentData<DirtyPosition>()
+                .WithComponentData<MeshBounds>();
+
+            toRenderArchetype = engine.entityManager.NewArchetype()
+                .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<LocalToWorld>()
+                .WithComponentData<WorldMeshBounds>()
+                .WithComponentData<MeshRenderer>();
 
             sceneBuffer = engine.Device.CreateBuffer<SceneBuffer>(BufferTypeEnum.ConstVertex, 1);
             objectBuffer = engine.Device.CreateBuffer<ObjectBuffer>(BufferTypeEnum.ConstVertex, 1);
@@ -315,6 +339,8 @@ namespace TheEngine.Managers
 
             engine.Device.device.CheckError("Before render all");
             RenderAll(null);
+            RenderEntities();
+            ClearDirtyEntityBit();
 
             //engine.Device.RenderClearBuffer();
             //engine.Device.SetRenderTexture(outlineTexture);
@@ -322,6 +348,15 @@ namespace TheEngine.Managers
 
             //RenderAll(unlitMaterial);
             //engine.Device.RenderBlitBuffer();
+        }
+
+        private void ClearDirtyEntityBit()
+        {
+            dirtEntities.ParallelForEach<DirtyPosition>((itr, start, end, dirty) =>
+            {
+                for (int i = start; i < end; ++i)
+                    dirty[i] = (DirtyPosition)false;
+            });
         }
 
         private void RenderAll(Material overrideMaterial)
@@ -356,6 +391,131 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
             SetBlending(false, Blending.One, Blending.Zero);
             material.ActivateUniforms();
             Stats.MaterialActivations++;
+        }
+
+        private void RenderEntities()
+        {
+
+            var cameraPosition = cameraManager.MainCamera.Transform.Position;
+            float drawDistance = 1000 * 1000;
+
+            var frustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
+
+            Stopwatch culler = new Stopwatch();
+            Stopwatch boundsUpdate = new Stopwatch();
+            boundsUpdate.Start();
+            updateWorldBoundsArchetype.ParallelForEach<LocalToWorld, MeshBounds, WorldMeshBounds, DirtyPosition>((itr, start, end, l2w, meshBounds, worldMeshBounds, dirtyBit) =>
+            {
+                Span<Vector3> corners = stackalloc Vector3[8];
+                for (int i = start; i < end; ++i)
+                {
+                    if (!dirtyBit[i])
+                        continue;
+                    var matrix = l2w[i].Matrix;
+                    var min = meshBounds[i].box.Minimum;
+                    var max = meshBounds[i].box.Maximum;
+                    corners[0] = new Vector3(min.X, max.Y, max.Z);
+                    corners[1] = new Vector3(max.X, max.Y, max.Z);
+                    corners[2] = new Vector3(max.X, min.Y, max.Z);
+                    corners[3] = new Vector3(min.X, min.Y, max.Z);
+                    corners[4] = new Vector3(min.X, max.Y, min.Z);
+                    corners[5] = new Vector3(max.X, max.Y, min.Z);
+                    corners[6] = new Vector3(max.X, min.Y, min.Z);
+                    corners[7] = new Vector3(min.X, min.Y, min.Z);
+                    for (int j = 0; j < 8; ++j)
+                    {
+                        var worldspace = Vector4.Transform(new Vector4(corners[j], 1), matrix);
+                        corners[j] = worldspace.XYZ;
+                    }
+
+                    min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+                    max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                    for (int j = 0; j < 8; ++j)
+                    {
+                        min.X = Math.Min(min.X, corners[j].X);
+                        min.Y = Math.Min(min.Y, corners[j].Y);
+                        min.Z = Math.Min(min.Z, corners[j].Z);
+                            
+                        max.X = Math.Max(max.X, corners[j].X);
+                        max.Y = Math.Max(max.Y, corners[j].Y);
+                        max.Z = Math.Max(max.Z, corners[j].Z);
+                    }
+
+                    worldMeshBounds[i] = (WorldMeshBounds)new BoundingBox(min, max);
+                }
+            });
+            boundsUpdate.Stop();
+            culler.Start();
+            toRenderArchetype.ParallelForEach<LocalToWorld, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, bits, worldMeshBounds) =>
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    var boundingBox = worldMeshBounds[i].box;
+                    var pos = l2w[i].Position;
+                    var size = boundingBox.Width + boundingBox.Height + boundingBox.Depth;
+                    bits[i] = (RenderEnabledBit)((pos - cameraPosition).LengthSquared() < (size * 7) * (size * 7));
+                    if (bits[i])
+                    {
+                        if (frustum.Contains(ref boundingBox) == ContainmentType.Disjoint)
+                            bits[i] = (RenderEnabledBit)false;
+                    }
+                }
+            });
+            culler.Stop();
+            
+            Stopwatch sw = new Stopwatch();
+            Stopwatch shadertimer = new Stopwatch();
+            Stopwatch meshtimer = new Stopwatch();
+            Stopwatch materialtimer = new Stopwatch();
+            Stopwatch buffertimer = new Stopwatch();
+            Stopwatch draw = new Stopwatch();
+            sw.Start();
+            toRenderArchetype.ForEach<LocalToWorld, RenderEnabledBit, MeshRenderer>((itr, start, end, l2w, render, meshRenderer) =>
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    if (!render[i])
+                        continue;
+
+                    var mr = meshRenderer[i];
+                    var material = engine.materialManager.GetMaterialByHandle(mr.MaterialHandle);
+                    var shader = material.Shader;
+                    var mesh = engine.meshManager.GetMeshByHandle(mr.MeshHandle);
+                    var meshId = mr.SubMeshId;
+
+                    if (currentShader != shader)
+                    {
+                        currentShader = shader;
+                        //shadertimer.Start();
+                        shader.Activate();
+                        //shadertimer.Stop();
+                    }
+
+                    if (currentMesh != mesh)
+                    {
+                        currentMesh = mesh;
+                        //meshtimer.Start();
+                        mesh.Activate();
+                        //meshtimer.Stop();
+                    }
+                    
+                    //materialtimer.Start();
+                    EnableMaterial(material);
+                    //materialtimer.Stop();
+
+                    //buffertimer.Start();
+                    objectData.WorldMatrix = l2w[i];
+                    objectData.InverseWorldMatrix = l2w[i].Inverse;
+                    objectBuffer.UpdateBuffer(ref objectData);
+                    //buffertimer.Stop();
+                    //currentShader.Validate();
+                    //draw.Start();
+                    engine.Device.DrawIndexed(mesh.IndexCount(meshId), mesh.IndexStart(meshId), 0);
+                    //draw.Stop();
+                }
+            });
+            sw.Stop();
+            Console.WriteLine($"Bounds: {boundsUpdate.Elapsed.TotalMilliseconds:00.##}ms Culling: {culler.Elapsed.TotalMilliseconds:00.##}ms Drawing: {sw.Elapsed.TotalMilliseconds:##.##}ms, shader: {shadertimer.Elapsed.TotalMilliseconds:##.##}ms, mesh: {meshtimer.Elapsed.TotalMilliseconds:##.##}ms, material: {materialtimer.Elapsed.TotalMilliseconds:##.##}ms, buf: {buffertimer.Elapsed.TotalMilliseconds:##.##}ms, draw: {draw.Elapsed.TotalMilliseconds:##.##}ms");
         }
 
         private void RenderRenderers(Material? overrideMaterial, 

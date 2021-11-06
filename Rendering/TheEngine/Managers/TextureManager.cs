@@ -2,6 +2,8 @@
 #define DEBUG_CREATE_CALLSTACK
 #endif
 
+using System;
+using System.Collections.Generic;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;

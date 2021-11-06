@@ -1,4 +1,6 @@
-﻿using TheAvaloniaOpenGL.Resources;
+﻿using System;
+using System.Collections.Generic;
+using TheAvaloniaOpenGL.Resources;
 using TheEngine.Handles;
 using TheMaths;
 
@@ -48,6 +50,7 @@ namespace TheEngine.Entities
 
         internal Shader Shader => shader;
 
+        public MaterialHandle Handle { get; }
         public ShaderHandle ShaderHandle => shaderHandle;
 
         internal Dictionary<int, TextureHandle> textureHandles { get; } = new();
@@ -60,9 +63,10 @@ namespace TheEngine.Entities
         internal int SlotCount => textureHandles.Count + structuredBuffers.Count + structuredPixelsBuffers.Count +
                                   structuredPixelsBuffers.Count;
         
-        internal Material(Engine engine, ShaderHandle shaderHandle)
+        internal Material(Engine engine, ShaderHandle shaderHandle, MaterialHandle materialHandle)
         {
             this.engine = engine;
+            Handle = materialHandle;
             this.shaderHandle = shaderHandle;
             this.shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
 

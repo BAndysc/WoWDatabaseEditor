@@ -26,6 +26,7 @@ namespace WDE.MapRenderer
         public void Initialize(Engine engine)
         {
             this.engine = engine;
+            ModuleManager = new ModuleManager(this, gameView);
             TextureManager = new WoWTextureManager(this);
             MeshManager = new WoWMeshManager(this);
             MdxManager = new MdxManager(this);

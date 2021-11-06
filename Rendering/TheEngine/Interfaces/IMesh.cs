@@ -1,4 +1,6 @@
-﻿using TheEngine.Handles;
+﻿using System;
+using System.Collections.Generic;
+using TheEngine.Handles;
 using TheMaths;
 
 namespace TheEngine.Interfaces
@@ -14,6 +16,8 @@ namespace TheEngine.Interfaces
         int IndexCount(int submesh);
         int IndexStart(int submesh);
         int SubmeshCount { get; }
+        
+        BoundingBox Bounds { get; }
 
         MeshHandle Handle { get; }
         IEnumerable<(Vector4, Vector4, Vector4)> GetFaces(int submesh);

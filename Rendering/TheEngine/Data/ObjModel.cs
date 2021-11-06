@@ -1,4 +1,6 @@
-﻿using TheMaths;
+﻿using System;
+using System.Collections.Generic;
+using TheMaths;
 
 namespace TheEngine.Data
 {

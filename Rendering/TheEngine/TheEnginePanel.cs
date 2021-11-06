@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Avalonia;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -128,7 +130,7 @@ namespace TheEngine
             engine.renderManager.RenderWorld(fb);
             Render(delta);
             engine.renderManager.FinalizeRendering(fb);
-            Dispatcher.UIThread.Post(InvalidateVisual, DispatcherPriority.Background);
+            Dispatcher.UIThread.Post(InvalidateVisual, DispatcherPriority.Render);
 
             // important! we need to restore Avalonia status
             engine.Device.device.ActiveTextureUnit(0);

@@ -2,6 +2,8 @@ using System.Collections;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
+using TheEngine.Components;
+using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheMaths;
@@ -27,6 +29,7 @@ namespace WDE.MapRenderer.Managers
 
         public DynamicRenderHandle terrainHandle;
         public List<StaticRenderHandle> objectHandles = new();
+        public List<Entity> objectHandles2 = new();
 
         public ChunkInstance(int x, int z)
         {
@@ -51,9 +54,18 @@ namespace WDE.MapRenderer.Managers
         private HashSet<(int, int)> loadedChunks = new();
         private List<ChunkInstance> chunks = new();
 
+        private Archetype renderEntityArchetype;
+        
         public ChunkManager(IGameContext gameContext)
         {
             this.gameContext = gameContext;
+            renderEntityArchetype = gameContext.Engine.EntityManager.NewArchetype()
+                .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<LocalToWorld>()
+                .WithComponentData<MeshBounds>()
+                .WithComponentData<DirtyPosition>()
+                .WithComponentData<WorldMeshBounds>()
+                .WithComponentData<MeshRenderer>();
         }
 
         public IEnumerator LoadChunk(int x, int y, bool now)
@@ -279,7 +291,15 @@ namespace WDE.MapRenderer.Managers
                 int j = 0;
                 foreach (var material in m.materials)
                 {
-                    chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(m.mesh.Handle, material, j++, t));
+                    var entity = gameContext.Engine.EntityManager.CreateEntity(renderEntityArchetype);
+                    gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = t.LocalToWorldMatrix;
+                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = j++;
+                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
+                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = m.mesh.Handle;
+                    gameContext.Engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)m.mesh.Bounds;
+                    gameContext.Engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
+                    chunk.objectHandles2.Add(entity);
+//                    chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(m.mesh.Handle, material, j++, t));
                 }
                 
                 yield return null;
@@ -310,7 +330,15 @@ namespace WDE.MapRenderer.Managers
                     int i = 0;
                     foreach (var material in mesh.Item2)
                     {
-                        chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
+                        var entity = gameContext.Engine.EntityManager.CreateEntity(renderEntityArchetype);
+                        gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
+                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i++;
+                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
+                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
+                        gameContext.Engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)mesh.Item1.Bounds;
+                        gameContext.Engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
+                        chunk.objectHandles2.Add(entity);
+                        //chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
                     }
                 }
                 yield return null;
@@ -371,6 +399,8 @@ namespace WDE.MapRenderer.Managers
             gameContext.Engine.RenderManager.UnregisterDynamicRenderer(chunk.terrainHandle);
             foreach (var obj in chunk.objectHandles)
                 gameContext.Engine.RenderManager.UnregisterStaticRenderer(obj);
+            foreach (var entity in chunk.objectHandles2)
+                gameContext.Engine.EntityManager.DestroyEntity(entity);
             
             chunk.Dispose(gameContext);
         }

@@ -1,5 +1,8 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using OpenGLBindings;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Handles;
@@ -17,11 +20,14 @@ namespace TheEngine.Entities
         internal NativeBuffer<UniversalVertex>? VerticesBuffer { get; private set; }
         internal NativeBuffer<int>? IndicesBuffer { get; private set; }
 
+        private BoundingBox bounds;
         private UniversalVertex[]? vertices;
         private int[]? indices;
         private int indicesCount = 0;
         private (int start, int length)[]? submeshesRange;
 
+        public BoundingBox Bounds => bounds;
+        
         public void Activate()
         {
             engine.Device.device.BindVertexArray(VertexArrayObject);
@@ -105,6 +111,7 @@ namespace TheEngine.Entities
             this.vertices = ownVerticesArray ? vertices : vertices.ToArray();
             this.indices = indices;
             this.indicesCount = indicesCount;
+            BuildBoundingBox(vertices);
 
             VertexArrayObject = engine.Device.device.GenVertexArray();
             engine.Device.device.BindVertexArray(VertexArrayObject);
@@ -199,10 +206,29 @@ namespace TheEngine.Entities
             this.vertices = vertices.Select(t => new UniversalVertex() { position = new Vector4(t, 1) }).ToArray();
         }
 
+        private void BuildBoundingBox(UniversalVertex[] vertices)
+        {
+            Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+            Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            foreach (var v in vertices)
+            {
+                min.X = Math.Min(v.position.X, min.X);
+                min.Y = Math.Min(v.position.Y, min.Y);
+                min.Z = Math.Min(v.position.Z, min.Z);
+                
+                max.X = Math.Max(v.position.X, max.X);
+                max.Y = Math.Max(v.position.Y, max.Y);
+                max.Z = Math.Max(v.position.Z, max.Z);
+            }
+
+            bounds = new BoundingBox(min, max);
+        }
+        
         public void Rebuild()
         {
             Debug.Assert(vertices != null);
             Debug.Assert(indices != null);
+            BuildBoundingBox(vertices);
             VerticesBuffer.UpdateBuffer(vertices);
             IndicesBuffer.UpdateBuffer(indices);
             vertices = null;

@@ -1,4 +1,6 @@
-﻿using TheEngine.Entities;
+﻿using System;
+using System.Collections.Generic;
+using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 
@@ -7,6 +9,7 @@ namespace TheEngine.Managers
     internal class MaterialManager : IMaterialManager, IDisposable
     {
         private Engine engine;
+        private List<Material> materials = new();
 
         public MaterialManager(Engine engine)
         {
@@ -15,7 +18,9 @@ namespace TheEngine.Managers
 
         public Material CreateMaterial(ShaderHandle shader)
         {
-            return new Material(engine, shader);
+            var m = new Material(engine, shader, new MaterialHandle(materials.Count));
+            materials.Add(m);
+            return m;
         }
 
         public Material CreateMaterial(string shaderPath)
@@ -26,6 +31,11 @@ namespace TheEngine.Managers
         public void Dispose()
         {
             
+        }
+
+        public Material GetMaterialByHandle(MaterialHandle handle)
+        {
+            return materials[handle.Handle];
         }
     }
 }
