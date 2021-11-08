@@ -64,6 +64,7 @@ namespace WDE.MapRenderer.Managers
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<MeshBounds>()
                 .WithComponentData<DirtyPosition>()
+                .WithComponentData<Collider>()
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<MeshRenderer>();
         }

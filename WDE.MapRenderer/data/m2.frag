@@ -22,6 +22,7 @@ layout (std140) uniform SceneData
 uniform sampler2D texture1;
 uniform float alphaTest;
 uniform float notSupported;
+uniform float highlight;
 
 void main()
 {
@@ -34,6 +35,9 @@ void main()
         discard;
         
     FragColor = vec4(color.rgb * (diffuse + ambient), mix(1, color.a, (sign(alphaTest) + 1) / 2));
+    
+    vec4 highglighted = FragColor + vec4(0.1, 0.1, 0.1, 0);
+    FragColor = mix(FragColor, highglighted, highlight);
     
     FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), FragColor.a);
 }

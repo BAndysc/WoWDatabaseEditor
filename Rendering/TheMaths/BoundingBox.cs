@@ -81,6 +81,7 @@ namespace TheMaths
         /// </summary>
         public float Width
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.Maximum.X - this.Minimum.X; }
         }
 
@@ -89,6 +90,7 @@ namespace TheMaths
         /// </summary>
         public float Height
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.Maximum.Y - this.Minimum.Y; }
         }
 
@@ -97,6 +99,7 @@ namespace TheMaths
         /// </summary>
         public float Depth
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.Maximum.Z - this.Minimum.Z; }
         }
 

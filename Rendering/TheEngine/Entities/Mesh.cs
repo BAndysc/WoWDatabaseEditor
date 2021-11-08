@@ -61,10 +61,17 @@ namespace TheEngine.Entities
         
         public IEnumerable<(Vector4, Vector4, Vector4)> GetFaces(int submesh)
         {
+            if (disposed)
+                throw new Exception("Mesh is disposed");
+            Debug.Assert(vertices != null);
+            Debug.Assert(indices != null);
             int start = IndexStart(submesh);
             int end = IndexCount(submesh);
             for (int i = start; i < start + end; i += 3)
             {
+                if (vertices.Length > indices[i] &&
+                    vertices.Length > indices[i + 1] &&
+                    vertices.Length > indices[i + 2])
                 yield return (vertices[indices[i]].position, vertices[indices[i + 1]].position,
                     vertices[indices[i + 2]].position);
             }
@@ -231,12 +238,15 @@ namespace TheEngine.Entities
             BuildBoundingBox(vertices);
             VerticesBuffer.UpdateBuffer(vertices);
             IndicesBuffer.UpdateBuffer(indices);
-            vertices = null;
-            indices = null;
+            //vertices = null;
+            //indices = null;
         }
+
+        private bool disposed;
 
         public void Dispose()
         {
+            disposed = true;
             VerticesBuffer.Dispose();
             IndicesBuffer.Dispose();
 

@@ -76,7 +76,7 @@ namespace TheEngine.ECS
         public IComponentTypeData TypeData<T>() where T : unmanaged, IComponentData
         {
             if (!typeToIndexMapping.TryGetValue(typeof(T), out var index))
-                index = typeToIndexMapping[typeof(T)] = typeToIndexMapping.Count + 1;
+                index = typeToIndexMapping[typeof(T)] = typeToIndexMapping.Count;
             if (index >= 32)
                 throw new Exception("Currently there is limit of 32 different component datas. If you need more, change BitVector32 to BitVector64 or BitArray");
             return new ComponentTypeData<T>(index);

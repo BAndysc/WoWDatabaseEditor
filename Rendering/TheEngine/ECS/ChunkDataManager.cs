@@ -1,11 +1,14 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace TheEngine.ECS
 {
     internal class ChunkDataManager : IChunkDataIterator, System.IDisposable
     {
-        private readonly byte[][] componentData;
+        private bool disposed;
+        //private readonly byte[][] componentData;
+        private readonly unsafe byte*[] componentData;
         public readonly Archetype Archetype;
         private int capacity;
         private int used;
@@ -14,11 +17,21 @@ namespace TheEngine.ECS
         private Entity[] entityMapping;
         private int[] sparseReverseEntityMapping = new int[1];
 
-        public ChunkDataManager(Archetype archetype)
+        public unsafe ChunkDataManager(Archetype archetype)
         {
             Archetype = archetype;
             componentsCount = archetype.Components.Count;
-            componentData = new byte[archetype.Components.Count][];
+            //componentData = new byte[archetype.Components.Count][];
+            componentData = new byte*[archetype.Components.Count];
+        }
+
+        ~ChunkDataManager()
+        {
+            if (!disposed)
+            {
+                Console.WriteLine("ChunkDataManger not disposed");
+                Dispose();
+            }
         }
 
         public int Length
@@ -33,7 +46,7 @@ namespace TheEngine.ECS
             get => entityMapping[index];
         }
 
-        public ComponentDataAccess<T> DataAccess<T>() where T : unmanaged, IComponentData
+        public unsafe ComponentDataAccess<T> DataAccess<T>() where T : unmanaged, IComponentData
         {
             int i = 0;
             foreach (var c in Archetype.Components)
@@ -46,7 +59,7 @@ namespace TheEngine.ECS
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ResizeIfNeeded(Entity entity)
+        private unsafe void ResizeIfNeeded(Entity entity)
         {
             if (capacity <= used)
             {
@@ -54,14 +67,17 @@ namespace TheEngine.ECS
                 Array.Resize(ref entityMapping, capacity);
                 for (int i = 0; i < componentsCount; ++i)
                 {
-                    Array.Resize(ref componentData[i], capacity * Archetype.Components[i].SizeBytes);
+                    var newMem = Marshal.ReAllocHGlobal((IntPtr)componentData[i],
+                        (IntPtr)(capacity * Archetype.Components[i].SizeBytes));
+                    componentData[i] = (byte*)newMem.ToPointer();
+                    //Array.Resize(ref componentData[i], capacity * Archetype.Components[i].SizeBytes);
                 }
             }
             if (sparseReverseEntityMapping.Length <= entity.Id)
                 Array.Resize(ref sparseReverseEntityMapping, Math.Max((int)entity.Id + 1, sparseReverseEntityMapping.Length * 2 + 1));
         }
 
-        public void AddEntity(Entity entity)
+        public unsafe void AddEntity(Entity entity)
         {
             ResizeIfNeeded(entity);
             entityMapping[used] = entity;
@@ -78,7 +94,7 @@ namespace TheEngine.ECS
             used++;
         }
 
-        public void RemoveEntity(Entity entity)
+        public unsafe void RemoveEntity(Entity entity)
         {
             var index = sparseReverseEntityMapping[entity.Id] - 1;
             var swapWith = used - 1;
@@ -99,10 +115,14 @@ namespace TheEngine.ECS
             used--;
         }
 
-        public void Dispose()
+        public unsafe void Dispose()
         {
+            disposed = true;
             for (int i = 0; i < componentsCount; ++i)
+            {
+                Marshal.FreeHGlobal(new IntPtr(componentData[i]));
                 componentData[i] = null!;
+            }
             sparseReverseEntityMapping = null!;
         }
     }

@@ -98,6 +98,7 @@ namespace WDE.MapRenderer.Managers
                     var m2ShaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/m2.json");
                     var mat = gameContext.Engine.MaterialManager.CreateMaterial(m2ShaderHandle);
 
+                    mat.SetUniform("highlight", 0);
                     mat.SetUniform("notSupported", 0);
                     float alphaTest = 0.003921568f; // 1/255
                     if (materialDef.blendMode == GxBlendMode.GxBlend_Opaque)

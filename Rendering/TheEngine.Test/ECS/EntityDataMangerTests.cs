@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using TheEngine.ECS;
@@ -17,10 +18,15 @@ namespace TheEngine.Test.ECS
             public int x;
         }
         
+        private struct ComponentC : IComponentData
+        {
+        }
+        
         private IEntityManager entityManager = null!;
         private Archetype archetype;
         private Archetype archetypeOnlyA;
         private Archetype archetypeOnlyB;
+        private Archetype archetypeOnlyC;
         
         [SetUp]
         public void Setup()
@@ -35,6 +41,9 @@ namespace TheEngine.Test.ECS
             archetypeOnlyB = entityManager
                 .NewArchetype()
                 .WithComponentData<ComponentB>();
+            archetypeOnlyC = entityManager
+                .NewArchetype()
+                .WithComponentData<ComponentC>();
         }
 
         [Test]
@@ -44,6 +53,17 @@ namespace TheEngine.Test.ECS
             Assert.AreEqual(0, entityManager.GetComponent<ComponentA>(e).a);
             Assert.AreEqual(0, entityManager.GetComponent<ComponentA>(e).b);
             Assert.AreEqual(0, entityManager.GetComponent<ComponentB>(e).x);
+        }
+        
+        [Test]
+        public void AllowEmptyComponentData()
+        {
+            var a = entityManager.CreateEntity(archetype);
+            var b = entityManager.CreateEntity(archetypeOnlyC);
+            var c = entityManager.CreateEntity(archetypeOnlyC);
+            Assert.Throws<Exception>(() => entityManager.GetComponent<ComponentC>(a));
+            entityManager.GetComponent<ComponentC>(b);
+            entityManager.GetComponent<ComponentC>(c);
         }
         
         [Test]

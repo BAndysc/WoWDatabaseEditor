@@ -23,7 +23,7 @@ namespace TheEngine.ECS
             var typeData = EntityManager.TypeData<T>();
             n.components.Add(typeData);
             n.usedComponents = usedComponents;
-            n.usedComponents[typeData.Index] = true;
+            n.usedComponents[(1 << typeData.Index)] = true;
             return n;
         }
 

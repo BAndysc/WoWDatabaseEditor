@@ -7,5 +7,6 @@ namespace TheEngine.Interfaces
     {
         Material CreateMaterial(ShaderHandle shader);
         Material CreateMaterial(string shaderPath);
+        Material GetMaterialByHandle(MaterialHandle handle);
     }
 }

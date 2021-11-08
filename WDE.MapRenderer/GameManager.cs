@@ -1,7 +1,12 @@
 using System.Collections;
+using System.Diagnostics;
 using Nito.AsyncEx;
 using TheEngine;
+using TheEngine.Components;
 using TheEngine.Coroutines;
+using TheEngine.ECS;
+using TheEngine.Entities;
+using TheEngine.PhysicsSystem;
 using WDE.Common.MPQ;
 using WDE.MapRenderer.Managers;
 using WDE.MpqReader;
@@ -33,6 +38,7 @@ namespace WDE.MapRenderer
             WmoManager = new WmoManager(this);
             ChunkManager = new ChunkManager(this);
             CameraManager = new CameraManager(this);
+            RaycastSystem = new RaycastSystem(engine);
         }
         
         private CoroutineManager coroutineManager = new();
@@ -41,12 +47,14 @@ namespace WDE.MapRenderer
         {
             coroutineManager.Start(coroutine);
         }
-        
+
+        private Material? prevMaterial;
         public void Update(float delta)
         {
             coroutineManager.Step();
 
             CameraManager.Update(delta);
+            
             UpdateLoop.Update(delta);
             ChunkManager.Update(delta);
             ModuleManager.Update(delta);
@@ -82,6 +90,7 @@ namespace WDE.MapRenderer
         public MdxManager MdxManager { get; private set; }
         public WmoManager WmoManager { get; private set; }
         public CameraManager CameraManager { get; private set; }
+        public RaycastSystem RaycastSystem { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
         public string CurrentMap { get; set; }
 

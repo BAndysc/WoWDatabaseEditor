@@ -112,29 +112,39 @@ namespace TheEngine
 
         protected override void OnOpenGlRender(GlInterface gl, int fb)
         {
-            engine.Device.device.CheckError("start OnOpenGlRender");
-            engine.Device.device.Begin();
-            engine.inputManager.Update();
-            engine.renderManager.BeginFrame();
-            
-            var delta = (float)sw.Elapsed.TotalMilliseconds;
-            Tick(delta);
-            sw.Restart();
-            RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, FrameRate);
+            try
+            {
+                engine.Device.device.CheckError("start OnOpenGlRender");
+                engine.Device.device.Begin();
+                engine.inputManager.Update();
+                engine.renderManager.BeginFrame();
 
-            Update(delta);
-            engine.inputManager.PostUpdate();
-            
-            // render pass
-            engine.renderManager.PrepareRendering(fb);
-            engine.renderManager.RenderWorld(fb);
-            Render(delta);
-            engine.renderManager.FinalizeRendering(fb);
-            Dispatcher.UIThread.Post(InvalidateVisual, DispatcherPriority.Render);
+                var delta = (float)sw.Elapsed.TotalMilliseconds;
+                Tick(delta);
+                sw.Restart();
+                RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, FrameRate);
 
-            // important! we need to restore Avalonia status
-            engine.Device.device.ActiveTextureUnit(0);
-            engine.Device.device.CheckError("post render");
+                Update(delta);
+                engine.inputManager.PostUpdate();
+
+                // render pass
+                engine.renderManager.PrepareRendering(fb);
+                engine.renderManager.RenderWorld(fb);
+                Render(delta);
+                engine.renderManager.FinalizeRendering(fb);
+                Dispatcher.UIThread.Post(InvalidateVisual, DispatcherPriority.Render);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw e;
+            }
+            finally
+            {
+                // important! we need to restore Avalonia status
+                engine.Device.device.ActiveTextureUnit(0);
+                engine.Device.device.CheckError("post render");
+            }
         }
 
         private IGame? game;

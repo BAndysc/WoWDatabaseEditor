@@ -135,5 +135,32 @@ namespace TheEngine.ECS
                 RunThreads(0, itr.Length, (s, e) => process(itr, s, e, a1, a2, a3, a4));
             }
         }
+        
+        
+        
+        public static void ParallelForEach<T1, T2, T3, T4, T5>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, 
+                ComponentDataAccess<T2>, 
+                ComponentDataAccess<T3>, 
+                ComponentDataAccess<T4>, 
+                ComponentDataAccess<T5>> process)
+            where T1 : unmanaged, IComponentData
+            where T2 : unmanaged, IComponentData
+            where T3 : unmanaged, IComponentData
+            where T4 : unmanaged, IComponentData
+            where T5 : unmanaged, IComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+                var a1 = itr.DataAccess<T1>();
+                var a2 = itr.DataAccess<T2>();
+                var a3 = itr.DataAccess<T3>();
+                var a4 = itr.DataAccess<T4>();
+                var a5 = itr.DataAccess<T5>();
+                RunThreads(0, itr.Length, (s, e) => process(itr, s, e, a1, a2, a3, a4, a5));
+            }
+        }
     }
 }

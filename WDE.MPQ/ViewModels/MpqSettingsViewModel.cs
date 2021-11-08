@@ -33,7 +33,7 @@ namespace WDE.MPQ.ViewModels
                 var folder = await windowManager.ShowFolderPickerDialog(woWPath ?? "");
                 if (folder != null)
                 {
-                    if (!verifier.VerifyFolder(folder))
+                    if (verifier.VerifyFolder(folder) == WoWFilesType.Invalid)
                     {
                         await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                             .SetTitle("WoW Client Data")

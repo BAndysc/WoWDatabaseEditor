@@ -355,7 +355,7 @@ namespace TheEngine.Managers
             dirtEntities.ParallelForEach<DirtyPosition>((itr, start, end, dirty) =>
             {
                 for (int i = start; i < end; ++i)
-                    dirty[i] = (DirtyPosition)false;
+                    dirty[i] = new DirtyPosition(false);
             });
         }
 
@@ -424,7 +424,8 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
                     corners[7] = new Vector3(min.X, min.Y, min.Z);
                     for (int j = 0; j < 8; ++j)
                     {
-                        var worldspace = Vector4.Transform(new Vector4(corners[j], 1), matrix);
+                        var vec4 = new Vector4(corners[j], 1);
+                        Vector4.Transform(ref vec4, ref matrix, out var worldspace);
                         corners[j] = worldspace.XYZ;
                     }
 
@@ -452,13 +453,15 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
                 {
                     var boundingBox = worldMeshBounds[i].box;
                     var pos = l2w[i].Position;
-                    var size = boundingBox.Width + boundingBox.Height + boundingBox.Depth;
-                    bits[i] = (RenderEnabledBit)((pos - cameraPosition).LengthSquared() < (size * 7) * (size * 7));
-                    if (bits[i])
+                    var boundingBoxSize = boundingBox.Size;
+                    var size = boundingBoxSize.X + boundingBoxSize.Y + boundingBoxSize.Z;
+                    bool doRender = (pos - cameraPosition).LengthSquared() < (size * 7) * (size * 7);
+                    if (doRender)
                     {
-                        if (frustum.Contains(ref boundingBox) == ContainmentType.Disjoint)
-                            bits[i] = (RenderEnabledBit)false;
+                        bits[i] = (RenderEnabledBit)(frustum.Contains(ref boundingBox) != ContainmentType.Disjoint);
                     }
+                    else
+                        bits[i] = (RenderEnabledBit)false;
                 }
             });
             culler.Stop();

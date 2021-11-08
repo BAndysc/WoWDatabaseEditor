@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Logging;
@@ -25,13 +26,9 @@ namespace TheAvaloniaOpenGL
             
             using (_context.MakeCurrent())
             {
-                CheckError(_context.GlInterface, "just made current");
                 _context.GlInterface.BindFramebuffer(GL_FRAMEBUFFER, _fb);
-                CheckError(_context.GlInterface, "attach texture");
                 EnsureTextureAttachment();
-                CheckError(_context.GlInterface, "attach depth buffer");
                 EnsureDepthBufferAttachment(_context.GlInterface);
-                CheckError(_context.GlInterface, "after attach depth buffer");
                 if(!CheckFramebufferStatus(_context.GlInterface))
                     return;
                 
@@ -59,7 +56,7 @@ namespace TheAvaloniaOpenGL
                 _attachment = null;
                 _bitmap?.Dispose();
                 _bitmap = null;
-                _bitmap = new OpenGlBitmap(GetPixelSize(), new Vector(96 * 2, 96 * 2));
+                _bitmap = new OpenGlBitmap(GetPixelSize(), new Vector(96, 96));
                 _attachment = _bitmap.CreateFramebufferAttachment(_context);
             }
         }
@@ -159,7 +156,7 @@ namespace TheAvaloniaOpenGL
             GlVersion = _context.Version;
             try
             {
-                _bitmap = new OpenGlBitmap(GetPixelSize(), new Vector(96, 96));
+                _bitmap = new OpenGlBitmap(GetPixelSize(), GetDpi());
                 if (!_bitmap.SupportsContext(_context))
                 {
                     Logger.TryGet(LogEventLevel.Error, "OpenGL")?.Log("OpenGlControlBase",
@@ -181,20 +178,15 @@ namespace TheAvaloniaOpenGL
                 try
                 {
                     _depthBufferSize = GetPixelSize();
-                    CheckError(_context.GlInterface, "get pixel size");
                     var gl = _context.GlInterface;
                     var oneArr = new int[1];
                     gl.GenFramebuffers(1, oneArr);
-                    CheckError(_context.GlInterface, "gen fb");
                     _fb = oneArr[0];
                     gl.BindFramebuffer(GL_FRAMEBUFFER, _fb);
-                    CheckError(_context.GlInterface, "bind fb");
                     
                     EnsureDepthBufferAttachment(gl);
-                    CheckError(_context.GlInterface, "rnable depth");
 
                     EnsureTextureAttachment();
-                    CheckError(_context.GlInterface, "enable texture");
 
                     return CheckFramebufferStatus(gl);
                 }
@@ -235,19 +227,17 @@ namespace TheAvaloniaOpenGL
             using (_context.MakeCurrent())
             {
                 Console.WriteLine($"Initialized {GlVersion.Type} {GlVersion.Major}.{GlVersion.Minor}: {_context.GlInterface.GetString(GL_RENDERER)} Version: {_context.GlInterface.GetString(GL_VERSION)}" );
-             
-                CheckError(_context.GlInterface, "before init");
                 OnOpenGlInit(_context.GlInterface, _fb);
-                CheckError(_context.GlInterface, "after init");
-
             }
 
             return true;
         }
+
+        private Vector GetDpi() => new Vector(96, 96);
         
         private PixelSize GetPixelSize()
         {
-            var scaling = VisualRoot.RenderScaling;
+            var scaling = 1;// VisualRoot.RenderScaling;
             return new PixelSize(Math.Max(1, (int)(Bounds.Width * scaling)),
                 Math.Max(1, (int)(Bounds.Height * scaling)));
         }

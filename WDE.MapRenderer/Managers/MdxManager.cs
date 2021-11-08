@@ -106,7 +106,8 @@ namespace WDE.MapRenderer.Managers
             foreach (var batch in skin.Batches)
             {
                 if (batch.skinSectionIndex == ushort.MaxValue ||
-                    batch.materialIndex >= m2.materials.Length)
+                    batch.materialIndex >= m2.materials.Length ||
+                    batch.skinSectionIndex >= skin.SkinSections.Length)
                     continue;
 
                 var section = skin.SkinSections[batch.skinSectionIndex];
@@ -124,6 +125,9 @@ namespace WDE.MapRenderer.Managers
                 {
                     for (int i = 0; i < batch.textureCount; ++i)
                     {
+                        if (batch.textureComboIndex + i >= m2.textures.Length)
+                            continue;
+                        
                         var textureDef = m2.textures[batch.textureComboIndex + i];
                         var texFile = textureDef.filename.AsString();
                         var tcs = new TaskCompletionSource<TextureHandle>();
@@ -143,6 +147,7 @@ namespace WDE.MapRenderer.Managers
                 if (materialDef.flags.HasFlag(M2MaterialFlags.TwoSided))
                     material.Culling = CullingMode.Off;
 
+                material.SetUniform("highlight", 0);
                 material.SetUniform("notSupported", 0);
                 if (materialDef.blending_mode == M2Blend.M2BlendOpaque)
                 {

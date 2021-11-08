@@ -257,6 +257,7 @@ namespace TheMaths
         /// <see cref="Vector3.LengthSquared"/> may be preferred when only the relative length is needed
         /// and speed is of the essence.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float Length()
         {
             return (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
@@ -270,6 +271,7 @@ namespace TheMaths
         /// This method may be preferred to <see cref="Vector3.Length"/> when only a relative length is needed
         /// and speed is of the essence.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float LengthSquared()
         {
             return (X * X) + (Y * Y) + (Z * Z);
@@ -768,6 +770,7 @@ namespace TheMaths
         /// <param name="left">First source vector.</param>
         /// <param name="right">Second source vector.</param>
         /// <param name="result">When the method completes, contains the dot product of the two vectors.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Dot(ref Vector3 left, ref Vector3 right, out float result)
         {
             result = (left.X * right.X) + (left.Y * right.Y) + (left.Z * right.Z);
@@ -779,6 +782,7 @@ namespace TheMaths
         /// <param name="left">First source vector.</param>
         /// <param name="right">Second source vector.</param>
         /// <returns>The dot product of the two vectors.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Dot(Vector3 left, Vector3 right)
         {
             return (left.X * right.X) + (left.Y * right.Y) + (left.Z * right.Z);
@@ -789,6 +793,7 @@ namespace TheMaths
         /// </summary>
         /// <param name="value">The vector to normalize.</param>
         /// <param name="result">When the method completes, contains the normalized vector.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Normalize(ref Vector3 value, out Vector3 result)
         {
             result = value;
@@ -800,6 +805,7 @@ namespace TheMaths
         /// </summary>
         /// <param name="value">The vector to normalize.</param>
         /// <returns>The normalized vector.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Normalize(Vector3 value)
         {
             value.Normalize();
@@ -816,6 +822,7 @@ namespace TheMaths
         /// <remarks>
         /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Lerp(ref Vector3 start, ref Vector3 end, float amount, out Vector3 result)
         {
             result.X = MathUtil.Lerp(start.X, end.X, amount);
@@ -833,6 +840,7 @@ namespace TheMaths
         /// <remarks>
         /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Lerp(Vector3 start, Vector3 end, float amount)
         {
             Vector3 result;
@@ -847,6 +855,7 @@ namespace TheMaths
         /// <param name="end">End vector.</param>
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <param name="result">When the method completes, contains the cubic interpolation of the two vectors.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SmoothStep(ref Vector3 start, ref Vector3 end, float amount, out Vector3 result)
         {
             amount = MathUtil.SmoothStep(amount);
