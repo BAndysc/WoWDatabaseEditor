@@ -7,7 +7,7 @@
         <ApplicationIcon>Icon.ico</ApplicationIcon>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-        <DefineConstants Condition="'$(RuntimeIdentifier)' == 'win7-x64'">$(DefineConstants);USE_OPENTK</DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(DefineConstants);USE_OPENTK</DefineConstants>
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>

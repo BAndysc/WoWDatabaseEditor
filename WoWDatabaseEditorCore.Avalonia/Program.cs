@@ -5,7 +5,9 @@ using System.Linq;
 using System.Reflection;
 using AsyncAwaitBestPractices;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.OpenGL;
+using Avalonia.OpenTK;
 using Avalonia.ReactiveUI;
 using WDE.Common.Tasks;
 using WoWDatabaseEditorCore.Managers;
@@ -43,6 +45,25 @@ namespace WoWDatabaseEditorCore.Avalonia
                 Directory.SetCurrentDirectory(exePath.Directory.FullName);
         }
 
+        private static T SafeUseOpenTK<T>(T builder, IList<GlVersion> probeVersions) where T : AppBuilderBase<T>, new()
+        {
+            return builder.AfterPlatformServicesSetup(_ =>
+            {
+                var method = typeof(AvaloniaOpenTKIntegration).GetMethod("Initialize",
+                        BindingFlags.NonPublic | BindingFlags.Static);
+
+                try
+                {
+                    method!.Invoke(null, new object?[]{probeVersions});
+                }
+                catch (Exception e)
+                {
+                    GlobalApplication.Supports3D = false;
+                    Console.WriteLine(e);
+                }
+            });
+        }
+        
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
         {
@@ -53,9 +74,11 @@ namespace WoWDatabaseEditorCore.Avalonia
                 //.With(new Win32PlatformOptions(){AllowEglInitialization = false})
                 .UseReactiveUI()
                 .LogToTrace();
-
 #if USE_OPENTK
-            configuration = configuration.UseOpenTK(new List<GlVersion> { new GlVersion(GlProfileType.OpenGL, 4, 1, true) });
+            Console.WriteLine("Initializing OpenGL");
+
+            configuration = SafeUseOpenTK(configuration, new List<GlVersion> { new GlVersion(GlProfileType.OpenGL, 4, 1, true) });
+//            configuration = configuration.UseOpenTK(new List<GlVersion> { new GlVersion(GlProfileType.OpenGL, 4, 1, true) });
 #endif
             if (GlobalApplication.Arguments.IsArgumentSet("wgl"))
             {
