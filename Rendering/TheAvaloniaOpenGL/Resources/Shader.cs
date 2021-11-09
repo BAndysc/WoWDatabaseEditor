@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using OpenGLBindings;
@@ -153,12 +156,10 @@ namespace TheAvaloniaOpenGL.Resources
             
 
             VertexShader = device.CreateShader(ShaderType.VertexShader);
-            Console.WriteLine("VERTEX");
             var vertexSource = ShaderSource.ParseShader(shaderData.Vertex.Path, true, defines.ToArray());
             Console.WriteLine(device.CompileShaderAndGetError(VertexShader, vertexSource));
             
             PixelShader = device.CreateShader(ShaderType.FragmentShader);
-            Console.WriteLine("PIXEL");
             defines = new List<string>() { "PIXEL_SHADER" };
             var fragmentSource = ShaderSource.ParseShader(shaderData.Pixel.Path, true, defines.ToArray());
             Console.WriteLine(device.CompileShaderAndGetError(PixelShader, fragmentSource));

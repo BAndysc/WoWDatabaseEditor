@@ -43,6 +43,8 @@
 * THE SOFTWARE.
 */
 
+using System;
+
 namespace TheMaths
 {
     public static class MathUtil

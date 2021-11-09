@@ -7,6 +7,7 @@
         <ApplicationIcon>Icon.ico</ApplicationIcon>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
+        <DefineConstants Condition="'$(RuntimeIdentifier)' == 'win7-x64'">$(DefineConstants);USE_OPENTK</DefineConstants>
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
@@ -40,7 +41,4 @@
     <ItemGroup>
       <Resource Include="Icon.ico" />
     </ItemGroup>
-    <PropertyGroup>
-        <DefineConstants Condition="'$(RuntimeIdentifier)' == 'win7-x64'">$(DefineConstants);USE_OPENTK</DefineConstants>
-    </PropertyGroup>
 </Project>

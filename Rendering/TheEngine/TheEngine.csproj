@@ -5,16 +5,13 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DefineConstants Condition="'$(RuntimeIdentifier)' == 'win7-x64'">$(DefineConstants);USE_OPENTK</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
       <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
     </ItemGroup>
-    
-    <PropertyGroup>
-        <DefineConstants Condition="'$(RuntimeIdentifier)' == 'win7-x64'">$(DefineConstants);USE_OPENTK</DefineConstants>
-    </PropertyGroup>
     
     <ItemGroup>
       <Folder Include="GUI" />

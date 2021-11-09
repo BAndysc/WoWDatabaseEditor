@@ -2,17 +2,18 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WDE.MapRenderer;
-
-public class GameToolBar : UserControl
+namespace WDE.MapRenderer
 {
-    public GameToolBar()
+    public class GameToolBar : UserControl
     {
-        InitializeComponent();
-    }
+        public GameToolBar()
+        {
+            InitializeComponent();
+        }
 
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
     }
 }

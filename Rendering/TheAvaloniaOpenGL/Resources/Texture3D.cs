@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace TheAvaloniaOpenGL.Resources
 {
     public class TextureCube : IDisposable, ITexture

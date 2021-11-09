@@ -53,7 +53,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                 //.With(new Win32PlatformOptions(){AllowEglInitialization = false})
                 .UseReactiveUI()
                 .LogToTrace();
-            
+
 #if USE_OPENTK
             configuration = configuration.UseOpenTK(new List<GlVersion> { new GlVersion(GlProfileType.OpenGL, 4, 1, true) });
 #endif
