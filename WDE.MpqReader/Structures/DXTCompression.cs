@@ -1,3 +1,4 @@
+using System;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace WDE.MpqReader.Structures

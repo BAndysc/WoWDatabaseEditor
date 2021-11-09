@@ -1,9 +1,91 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using OpenGLBindings;
 
 namespace TheAvaloniaOpenGL.Resources
 {
+    internal struct StringLineEnumerator
+    {
+        private readonly string str;
+        private int start;
+        private int pos;
+        private int prevPos;
+
+        public StringLineEnumerator(string str)
+        {
+            this.str = str;
+            pos = -1;
+            start = 0;
+            prevPos = -1;
+        }
+
+        public ReadOnlySpan<char> Current => str.AsSpan(start, pos - start);
+
+        public ReadOnlySpan<char> Rest => str.AsSpan(pos + 1);
+
+        public bool MoveNext()
+        {
+            pos = str.IndexOf('\n', pos + 1);
+            if (pos == -1)
+                return false;
+
+            start = prevPos + 1;
+            prevPos = pos;
+            return true;
+        }
+    }
+    
+    internal class ShaderSource
+    {
+        private const string IncludeMacro = "#include ";
+        
+        public static string ParseShader(string file, bool mainFile, params string[] defines)
+        {
+            var source = File.ReadAllText(file);
+            var shaderDir = Path.GetDirectoryName(file);
+
+            var lineEnumerator = new StringLineEnumerator(source);
+
+            if (!lineEnumerator.MoveNext())
+                throw new Exception("Shader file is empty");
+
+            var version = lineEnumerator.Current;
+            if (!version.StartsWith("#version") && mainFile)
+                throw new Exception("#version macro missing in the very top of the file");
+            
+            if (!version.StartsWith("#version"))
+                lineEnumerator = new StringLineEnumerator(source);
+            
+            List<string> includes = new();
+            while (lineEnumerator.MoveNext() && lineEnumerator.Current.StartsWith(IncludeMacro))
+            {
+                var path = lineEnumerator.Current.Slice(IncludeMacro.Length + 1,
+                    lineEnumerator.Current.Length - IncludeMacro.Length - 2);
+                includes.Add(ParseShader(Path.Join(shaderDir,  path.ToString()), false));
+            }
+
+            StringBuilder final = new();
+            if (version.StartsWith("#version"))
+            {
+                final.Append(version);
+                final.AppendLine();
+            }
+
+            foreach (var define in defines)
+                final.AppendLine($"#define {define}");
+
+            foreach (var incl in includes)
+                final.AppendLine(incl);
+
+            final.Append(lineEnumerator.Current);
+            final.AppendLine();
+            final.Append(lineEnumerator.Rest);
+            Console.WriteLine(final.ToString());
+            return final.ToString();
+        }
+    }
+    
     public class Shader : IDisposable
     {
         private readonly IDevice device;
@@ -65,19 +147,22 @@ namespace TheAvaloniaOpenGL.Resources
             ZWrite = shaderData.ZWrite;
             DepthTest = shaderData.DepthTest ?? true;
             Instancing = shaderData.Instancing;
-            var vertexSource = File.ReadAllText(shaderData.Vertex.Path);
-
+            var defines = new List<string>() { "VERTEX_SHADER" };
             if (Instancing)
-            {
-                var version = vertexSource.Substring(0, vertexSource.IndexOf('\n'));
-                vertexSource = version + "#define Instancing\n" + vertexSource.Substring(vertexSource.IndexOf('\n') + 1);
-            }
+                defines.Add("Instancing");
+
             
+
             VertexShader = device.CreateShader(ShaderType.VertexShader);
+            Console.WriteLine("VERTEX");
+            var vertexSource = ShaderSource.ParseShader(shaderData.Vertex.Path, true, defines.ToArray());
             Console.WriteLine(device.CompileShaderAndGetError(VertexShader, vertexSource));
             
             PixelShader = device.CreateShader(ShaderType.FragmentShader);
-            Console.WriteLine(device.CompileShaderAndGetError(PixelShader, File.ReadAllText(shaderData.Pixel.Path)));
+            Console.WriteLine("PIXEL");
+            defines = new List<string>() { "PIXEL_SHADER" };
+            var fragmentSource = ShaderSource.ParseShader(shaderData.Pixel.Path, true, defines.ToArray());
+            Console.WriteLine(device.CompileShaderAndGetError(PixelShader, fragmentSource));
 
             ProgramHandle = device.CreateProgram();
 

@@ -7,8 +7,10 @@ namespace WDE.MpqReader.Structures
     public class WorldMapObjectGroup : System.IDisposable
     {
         public WorldMapObjectGroupHeader Header { get; init; }
+        public PooledArray<WorldMapObjectPoly> Polygons { get; set; }
         public PooledArray<int> Indices { get; init; }
         public PooledArray<Vector3> Vertices { get; init; }
+        public int[] CollisionOnlyIndices { get; init; }
         public PooledArray<Vector3> Normals { get; init; }
         public PooledArray<Vector2> UVs { get; init; }
         public WorldMapObjectBatch[] Batches { get; init; }
@@ -34,8 +36,10 @@ namespace WDE.MpqReader.Structures
 
                 var partialReader = new LimitedReader(reader, size);
 
-                if (chunkName == "MOVI")
-                    Indices = ParseIndices(partialReader, size);
+                if (chunkName == "MOPY")
+                    Polygons = ParsePolygons(partialReader, size);
+                else if (chunkName == "MOVI")
+                    Indices = ParseIndices(partialReader, size, Polygons);
                 else if (chunkName == "MOVT")
                     Vertices = ReadVectors3(partialReader, openGlCoords, size);
                 else if (chunkName == "MONR")
@@ -44,9 +48,47 @@ namespace WDE.MpqReader.Structures
                     UVs = ReadVectors2(partialReader, size);
                 else if (chunkName == "MOBA")
                     Batches = ReadBatches(partialReader, size);
-            
+
+                CollisionOnlyIndices = BuildCollisionOnlyIndices(Polygons, Indices);
+                
                 reader.Offset = offset + size;
             }
+        }
+
+        private static int[] BuildCollisionOnlyIndices(PooledArray<WorldMapObjectPoly>? polygons, PooledArray<int>? indices)
+        {
+            if (polygons == null || indices == null)
+                return new int[] { };
+            int triangles = 0;
+            for (int i = 0; i < polygons.Length; ++i)
+            {
+                if (polygons[i].IsCollisionOnly)
+                    triangles++;
+            }
+
+            var collisionOnlyIndices = new int[triangles * 3];
+            int j = 0;
+            for (int i = 0; i < polygons.Length; ++i)
+            {
+                if (polygons[i].IsCollisionOnly)
+                {
+                    collisionOnlyIndices[j++] = indices[i * 3];
+                    collisionOnlyIndices[j++] = indices[i * 3 + 1];
+                    collisionOnlyIndices[j++] = indices[i * 3 + 2];
+                }
+            }
+
+            return collisionOnlyIndices;
+        }
+
+        private static PooledArray<WorldMapObjectPoly> ParsePolygons(IBinaryReader reader, int size)
+        {
+            PooledArray<WorldMapObjectPoly> polygons = new PooledArray<WorldMapObjectPoly>(size / 2);
+            int i = 0;
+            while (!reader.IsFinished())
+                polygons[i++] = new WorldMapObjectPoly(reader);
+
+            return polygons;
         }
 
         private static WorldMapObjectBatch[] ReadBatches(IBinaryReader reader, int size)
@@ -85,12 +127,14 @@ namespace WDE.MpqReader.Structures
             return vertices;
         }
 
-        private static PooledArray<int> ParseIndices(IBinaryReader reader, int size)
+        private static PooledArray<int> ParseIndices(IBinaryReader reader, int size, PooledArray<WorldMapObjectPoly> polygons)
         {
             PooledArray<int> indices = new PooledArray<int>(size / 2);
             int i = 0;
             while (!reader.IsFinished())
             {
+                indices[i++] = reader.ReadUInt16();
+                indices[i++] = reader.ReadUInt16();
                 indices[i++] = reader.ReadUInt16();
             }
 
@@ -99,10 +143,38 @@ namespace WDE.MpqReader.Structures
 
         public void Dispose()
         {
+            Polygons.Dispose();
             Indices.Dispose();
             Vertices.Dispose();
             Normals.Dispose();
             UVs.Dispose();
+        }
+    }
+
+    public struct WorldMapObjectPoly
+    {
+        [Flags]
+        public enum Flags
+        {
+            /*0x01*/ F_UNK_0x01 = 0x1,
+            /*0x02*/ F_NOCAMCOLLIDE = 0x2,
+            /*0x04*/ F_DETAIL = 0x4,
+            /*0x08*/ F_COLLISION = 0x8, // Turns off rendering of water ripple effects. May also do more. Should be used for ghost material triangles.
+            /*0x10*/ F_HINT = 0x10,
+            /*0x20*/ F_RENDER = 0x20,
+            /*0x40*/ F_UNK_0x40 = 0x40,
+            /*0x80*/ F_COLLIDE_HIT = 0x80,
+        }
+
+        public Flags flags;
+        public byte materialId;
+
+        public bool IsCollisionOnly => materialId == 0xFF;
+        
+        public WorldMapObjectPoly(IBinaryReader reader)
+        {
+            flags = (Flags)reader.ReadByte();
+            materialId = reader.ReadByte();
         }
     }
 

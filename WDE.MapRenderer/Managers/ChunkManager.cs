@@ -1,11 +1,17 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Components;
+using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
+using TheEngine.Managers;
 using TheMaths;
 using WDE.Common.Utils;
 using WDE.MapRenderer.StaticData;
@@ -54,17 +60,23 @@ namespace WDE.MapRenderer.Managers
         private HashSet<(int, int)> loadedChunks = new();
         private List<ChunkInstance> chunks = new();
 
+        private Archetype collisionOnlyArchetype;
         private Archetype renderEntityArchetype;
         
         public ChunkManager(IGameContext gameContext)
         {
             this.gameContext = gameContext;
+            collisionOnlyArchetype = gameContext.Engine.EntityManager.NewArchetype()
+                .WithComponentData<LocalToWorld>()
+                .WithComponentData<Collider>()
+                .WithComponentData<WorldMeshBounds>()
+                .WithComponentData<MeshRenderer>();                
             renderEntityArchetype = gameContext.Engine.EntityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<MeshBounds>()
                 .WithComponentData<DirtyPosition>()
-                .WithComponentData<Collider>()
+//                .WithComponentData<Collider>()
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<MeshRenderer>();
         }
@@ -115,23 +127,70 @@ namespace WDE.MapRenderer.Managers
                     var splatMap = splatMapArrayGenerator.Get(64 * 64);
 
                     chunksEnumerator2.MoveNext();
+                    var basePos = chunksEnumerator2.Current.BasePosition;
                     int k_ = 0;
+                    Vector3[] subVertices = new Vector3[145];
                     for (int cy = 0; cy < 17; ++cy)
                     {
                         for (int cx = 0; cx < (cy % 2 == 0 ? 9 : 8); cx++)
                         {
+                            float VERTX = 0;
+                            if (cy % 2 == 0)
+                                VERTX = cx / 8.0f * Constants.ChunkSize;
+                            else
+                                VERTX = (Constants.ChunkSize / 8) * 7 * (cx / 7.0f) + Constants.ChunkSize / 8 / 2;
+                            float VERTY = cy / 16.0f * Constants.ChunkSize;
+                            var vert = new Vector3(-VERTX, chunksEnumerator2.Current.Heights[k_], VERTY) + basePos.ToOpenGlPosition();
+                            subVertices[k_] = vert;
+                            
                             var norm = chunksEnumerator2.Current.Normals[k_];
                             heightsNormal[k++] = new Vector4(
                                 norm.Z,
                                 norm.Y,
                                 -norm.Z,
                                 chunksEnumerator2.Current.Heights[k_] +
-                                chunksEnumerator2.Current.BasePosition.Z
+                                basePos.Z
                             );
                             k_++;
                         }
                     }
-                
+
+                    int[] indices = new int[4 * 8 * 8 * 3];
+                    int k__ = 0;
+                    for (int cx = 0; cx < 8; cx++)
+                    {
+                        for (int cy = 0; cy < 8; cy++)
+                        {
+                            int tl = cy * 17 + cx;
+                            int tr = tl + 1;
+                            int middle = tl + 9;
+                            int bl = middle + 8;
+                            int br = bl + 1;
+
+                            indices[k__++] = tl;
+                            indices[k__++] = middle;
+                            indices[k__++] = tr;
+                            //
+                            indices[k__++] = tl;
+                            indices[k__++] = bl;
+                            indices[k__++] = middle;
+                            //
+                            indices[k__++] = tr;
+                            indices[k__++] = middle;
+                            indices[k__++] = br;
+                            //
+                            indices[k__++] = middle;
+                            indices[k__++] = bl;
+                            indices[k__++] = br;
+                        }
+                    }
+                    var subChunkMesh = gameContext.Engine.MeshManager.CreateMesh(subVertices, indices);
+                    var entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
+                    gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
+                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;
+                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = subChunkMesh.Handle;
+                    gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
+
                     Rgba32[] holeMap = new Rgba32[4 * 4];
                     if (chunksEnumerator2.Current.Holes != null)
                     {
@@ -339,6 +398,13 @@ namespace WDE.MapRenderer.Managers
                         gameContext.Engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)mesh.Item1.Bounds;
                         gameContext.Engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
                         chunk.objectHandles2.Add(entity);
+                        
+                        
+                        entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
+                        gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
+                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
+                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
+                        gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });
                         //chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
                     }
                 }

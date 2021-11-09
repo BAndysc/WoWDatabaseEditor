@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using WDE.Common.Disposables;

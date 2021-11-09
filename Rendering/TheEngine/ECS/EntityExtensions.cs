@@ -46,26 +46,35 @@ namespace TheEngine.ECS
         private static void RunThreads(int start, int total, Action<int, int> action)
         {
             int threads = Environment.ProcessorCount;
+            if (total < threads * 1000)
+                threads = Math.Clamp(total / 1000, 1, threads);
             int perThread = total / threads;
 
-            Thread[] alloc = new Thread[threads];
-            for (int i = 0; i < threads; ++i)
+            if (threads == 1)
             {
-                if (i == threads - 1)
-                    perThread = total - start;
-                    
-                var start1 = start;
-                var end = start + perThread;
-                alloc[i] = new Thread(() =>
-                {
-                    action(start1, end);
-                });
-                alloc[i].Start();
-                start += perThread;
+                action(0, total);
             }
+            else
+            {
+                Thread[] alloc = new Thread[threads];
+                for (int i = 0; i < threads; ++i)
+                {
+                    if (i == threads - 1)
+                        perThread = total - start;
+                    
+                    var start1 = start;
+                    var end = start + perThread;
+                    alloc[i] = new Thread(() =>
+                    {
+                        action(start1, end);
+                    });
+                    alloc[i].Start();
+                    start += perThread;
+                }
 
-            foreach (var t in alloc)
-                t.Join();
+                foreach (var t in alloc)
+                    t.Join();   
+            }
         }
         
         public static void ParallelForEach<T1>(this Archetype archetype, 

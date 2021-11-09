@@ -1,23 +1,11 @@
 #version 330 core
+#include "../internalShaders/theengine.cginc"
 in vec4 Color;
 in vec4 TexCoord;
 in vec4 WorldPos;
 in vec4 SplatId;
 in vec3 Normal;
 out vec4 FragColor;
-
-layout (std140) uniform SceneData
-{
-    mat4 view;
-    mat4 projection;
-    vec4 cameraPos;
-    vec4 lightDir;
-    vec4 lightColor;
-    vec3 lightPosition;
-    float padding;
-    float time;
-    float padding2[3];
-};
 
 uniform sampler2D texture1;
 uniform float alphaTest;

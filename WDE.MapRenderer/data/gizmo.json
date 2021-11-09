@@ -1,0 +1,18 @@
+{
+  "Pixel": {
+    "Path": "data/gizmo.frag"
+  },
+  "ZWrite": true,
+  "DepthTest": true,
+  "Instancing": false,
+  "Vertex": {
+    "Path": "data/gizmo.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

@@ -58,6 +58,18 @@ namespace TheEngine.ECS
             throw new Exception("There is no component data + " + typeof(T) + " in this archetype");
         }
 
+        private static unsafe void AllocOrRealloc(ref byte* addr, ulong size)
+        {
+            if (addr == null)
+            {
+                addr = (byte*)Marshal.AllocHGlobal((IntPtr)size).ToPointer();
+            }
+            else
+            {
+                addr = (byte*)Marshal.ReAllocHGlobal((IntPtr)addr, (IntPtr)size).ToPointer();
+            }
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe void ResizeIfNeeded(Entity entity)
         {
@@ -67,9 +79,7 @@ namespace TheEngine.ECS
                 Array.Resize(ref entityMapping, capacity);
                 for (int i = 0; i < componentsCount; ++i)
                 {
-                    var newMem = Marshal.ReAllocHGlobal((IntPtr)componentData[i],
-                        (IntPtr)(capacity * Archetype.Components[i].SizeBytes));
-                    componentData[i] = (byte*)newMem.ToPointer();
+                    AllocOrRealloc(ref componentData[i], (ulong)capacity * (ulong)Archetype.Components[i].SizeBytes);
                     //Array.Resize(ref componentData[i], capacity * Archetype.Components[i].SizeBytes);
                 }
             }

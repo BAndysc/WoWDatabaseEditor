@@ -1,4 +1,7 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TheEngine.Coroutines;
 using TheEngine.Data;
 using TheEngine.Entities;
@@ -25,8 +28,7 @@ namespace WDE.MapRenderer.Managers
         }
 
         private Dictionary<string, MdxInstance?> meshes = new();
-
-        //private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
+        private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
         private readonly IGameContext gameContext;
 
         public MdxManager(IGameContext gameContext)
@@ -42,11 +44,15 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            //if (meshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
-            //    return await loadInProgress;
+            if (meshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
+            {
+                yield return loadInProgress;
+                result.SetResult(meshes[path]);
+                yield break;
+            }
 
-            //var completion = new TaskCompletionSource<MdxInstance?>();
-            //meshesCurrentlyLoaded[path] = completion.Task;
+            var completion = new TaskCompletionSource<MdxInstance?>();
+            meshesCurrentlyLoaded[path] = completion.Task;
 
             var file =
                 gameContext.ReadFile(path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase));
@@ -62,7 +68,8 @@ namespace WDE.MapRenderer.Managers
             {
                 Console.WriteLine("Cannot find model " + path);
                 meshes[path] = null;
-                //meshesCurrentlyLoaded.Remove(path);
+                completion.SetResult(null);
+                meshesCurrentlyLoaded.Remove(path);
                 result.SetResult(null);
                 yield break;
             }
@@ -179,7 +186,9 @@ namespace WDE.MapRenderer.Managers
                 mesh = mesh,
                 materials = materials.AsSpan(0, j).ToArray()
             };
-            meshes[path] = mdx;
+            meshes.Add(path, mdx);
+            meshesCurrentlyLoaded.Remove(path);
+            completion.SetResult(null);
             result.SetResult(mdx);
         }
 

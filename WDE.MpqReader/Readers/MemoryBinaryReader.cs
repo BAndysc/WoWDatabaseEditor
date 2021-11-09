@@ -1,4 +1,5 @@
-﻿using TheMaths;
+﻿using System;
+using TheMaths;
 
 namespace WDE.MpqReader.Readers
 {

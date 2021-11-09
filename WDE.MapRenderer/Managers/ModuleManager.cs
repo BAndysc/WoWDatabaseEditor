@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace WDE.MapRenderer.Managers
 {
     public class ModuleManager : System.IDisposable

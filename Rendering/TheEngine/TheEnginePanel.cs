@@ -95,11 +95,19 @@ namespace TheEngine
 
         protected override void OnOpenGlInit(GlInterface gl, int fb)
         {
+            try
+            {
 #if USE_OPENTK
-            engine = new Engine(new OpenTKDevice()), new Configuration(), this);
+            engine = new Engine(new OpenTKDevice(), new Configuration(), this);
 #else
-            engine = new Engine(new DebugDevice(new RealDevice(gl)), new Configuration(), this);
+                engine = new Engine(new DebugDevice(new RealDevice(gl)), new Configuration(), this);
 #endif
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         protected override void OnOpenGlDeinit(GlInterface gl, int fb)
@@ -137,7 +145,7 @@ namespace TheEngine
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw e;
+                throw;
             }
             finally
             {

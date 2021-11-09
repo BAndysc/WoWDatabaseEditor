@@ -1,4 +1,7 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -24,12 +27,13 @@ namespace WDE.MapRenderer.Managers
                 {
                     context.Engine.MeshManager.DisposeMesh(mesh.Item1);
                 }
+
                 meshes.Clear();
             }
         }
-        
+
         private Dictionary<string, WmoInstance?> meshes = new();
-        //private Dictionary<string, Task<WmoInstance?>> meshesCurrentlyLoaded = new();
+        private Dictionary<string, Task> meshesCurrentlyLoaded = new();
 
         public WmoManager(IGameContext gameContext)
         {
@@ -44,19 +48,23 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            //if (meshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
-            //    return await loadInProgress;
+            if (meshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
+            {
+                yield return loadInProgress;
+                result.SetResult(meshes[path]);
+                yield break;
+            }
 
-            //var completion = new TaskCompletionSource<WmoInstance?>();
-            //meshesCurrentlyLoaded[path] = completion.Task;
-            
+            var completion = new TaskCompletionSource<WmoInstance?>();
+            meshesCurrentlyLoaded[path] = completion.Task;
+
             var bytes = gameContext.ReadFile(path);
             yield return bytes;
             if (bytes.Result == null)
             {
                 meshes[path] = null;
-                //meshesCurrentlyLoaded.Remove(path);
-                //completion.SetResult(null);
+                meshesCurrentlyLoaded.Remove(path);
+                completion.SetResult(null);
                 result.SetResult(null);
                 yield break;
             }
@@ -80,11 +88,11 @@ namespace WDE.MapRenderer.Managers
             }
 
             var wmoInstance = new WmoInstance();
-            
 
-                foreach (var group in groups)
-                {
-                    var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs.AsArray(), group.Indices.AsArray(), group.Vertices.Length, group.Indices.Length);
+            foreach (var group in groups)
+            {
+                var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs.AsArray(),
+                    group.Indices.AsArray(), group.Vertices.Length, group.Indices.Length);
 
                 var wmoMesh = gameContext.Engine.MeshManager.CreateMesh(wmoMeshData);
                 wmoMesh.SetSubmeshCount(group.Batches.Length);
@@ -156,9 +164,10 @@ namespace WDE.MapRenderer.Managers
                     if (materialDef.texture1Name != null)
                     {
                         var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return gameContext.TextureManager.GetTexture(materialDef.texture1Name, tcs); 
-                        mat.SetTexture("texture1",tcs.Task.Result);
+                        yield return gameContext.TextureManager.GetTexture(materialDef.texture1Name, tcs);
+                        mat.SetTexture("texture1", tcs.Task.Result);
                     }
+
                     materials[j - 1] = mat;
                 }
 
@@ -167,10 +176,12 @@ namespace WDE.MapRenderer.Managers
                 group.Dispose();
             }
 
-            meshes[path] = wmoInstance;
+            meshes.Add(path, wmoInstance);
+            completion.SetResult(wmoInstance);
+            meshesCurrentlyLoaded.Remove(path);
             result.SetResult(wmoInstance);
         }
-        
+
         public void Dispose()
         {
             foreach (var wmo in meshes.Values)

@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Threading.Tasks;
 using TheEngine;
+using TheEngine.PhysicsSystem;
 using WDE.MpqReader;
 
 namespace WDE.MapRenderer.Managers
@@ -16,6 +18,7 @@ namespace WDE.MapRenderer.Managers
         WmoManager WmoManager { get; }
         CameraManager CameraManager { get; }
         UpdateManager UpdateLoop { get; }
+        RaycastSystem RaycastSystem { get; }
         string CurrentMap { get; }
         void StartCoroutine(IEnumerator coroutine);
     }

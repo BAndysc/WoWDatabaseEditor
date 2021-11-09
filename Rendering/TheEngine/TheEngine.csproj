@@ -19,5 +19,20 @@
     <ItemGroup>
       <Folder Include="GUI" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <None Update="internalShaders\theengine.cginc">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\blit.frag">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\blit.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\blit.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 
 </Project>

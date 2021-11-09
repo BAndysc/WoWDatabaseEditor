@@ -1,59 +1,61 @@
-#if VERTEX_SHADER
-cbuffer SceneBuffer : register(b12)
+#ifdef VERTEX_SHADER
+layout (location = 0) in vec4 position;
+layout (location = 1) in vec4 color;
+layout (location = 2) in vec4 normal;
+layout (location = 3) in vec2 uv1;
+layout (location = 4) in vec2 uv2;
+
+layout (std140) uniform SceneData
 {
-    row_major matrix viewMatrix;
-    row_major matrix projectionMatrix;
-	float4 cameraPosition;
-	float3 lightPosition;
-	
-		float align0;
-
-    float time;
-
-    float align1;
-    float align2;
-    float align3;
+	mat4 view;
+	mat4 projection;
+	vec4 cameraPos;
+	vec4 lightDir;
+	vec4 lightColor;
+	vec3 lightPosition;
+	float padding;
+	float time;
+	float padding2[3];
 };
 
-cbuffer ObjectBuffer : register(b13)
+layout (std140) uniform ObjectData
 {
-    row_major matrix worldMatrix;
-};
-
-
-#if INSTANCING
-#define VERTEX_INSTANCING float4 InstancePos0 : TEXCOORD2; \
-	float4 InstancePos1 : TEXCOORD3; \
-	float4 InstancePos2 : TEXCOORD4; \
-	float4 InstancePos3 : TEXCOORD5;
-
-#define VERTEX_SETUP_INSTANCING float4x4 worldMatrix = float4x4(input.InstancePos0, input.InstancePos1, input.InstancePos2, input.InstancePos3);
+#ifdef Instancing
+	mat4 _model;
+	mat4 _inverseModel;
 #else
-#define VERTEX_INSTANCING ;
+	mat4 model;
+	mat4 inverseModel;
+#endif
+};
+
+#ifdef Instancing
+uniform samplerBuffer InstancingModels;
+uniform samplerBuffer InstancingInverseModels;
+#endif
+
+
+#ifdef INSTANCING
+#define VERTEX_SETUP_INSTANCING mat4 model = mat4(texelFetch(InstancingModels, gl_InstanceID * 4), texelFetch(InstancingModels, gl_InstanceID * 4 + 1), texelFetch(InstancingModels, gl_InstanceID * 4 + 2), texelFetch(InstancingModels, gl_InstanceID * 4 + 3)); mat4 inverseModel = mat4(texelFetch(InstancingInverseModels, gl_InstanceID * 4), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 1), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 2), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 3)); 
+#else
 #define VERTEX_SETUP_INSTANCING ;
 #endif
 
 
 #endif
 
-#if PIXEL_SHADER
-cbuffer SceneBuffer : register(b13)
+#ifdef PIXEL_SHADER
+layout (std140) uniform SceneData
 {
-    float4 lightDirection;
-    float4 lightColor;
-	float3 lightPosition;
-
-	float align0;
-
-    float time;
-
-    float screenWidth;
-    float screenHeight;
-    float align3;
+	mat4 view;
+	mat4 projection;
+	vec4 cameraPos;
+	vec4 lightDir;
+	vec4 lightColor;
+	vec3 lightPosition;
+	float padding;
+	float time;
+	float padding2[3];
 };
 
-SamplerState TheDefaultSampler : register(s15);
-
-#define tex3D(TEX, UV, INDEX) (TEX.Sample(TheDefaultSampler, float3(UV, INDEX)))
-#define tex2D(TEX, UV) (TEX.Sample(TheDefaultSampler, UV))
 #endif

@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Nito.AsyncEx;
 using TheEngine;
 using TheEngine.Components;
@@ -7,6 +9,7 @@ using TheEngine.Coroutines;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.PhysicsSystem;
+using TheMaths;
 using WDE.Common.MPQ;
 using WDE.MapRenderer.Managers;
 using WDE.MpqReader;

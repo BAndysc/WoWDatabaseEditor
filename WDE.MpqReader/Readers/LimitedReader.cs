@@ -1,3 +1,5 @@
+using System;
+
 namespace WDE.MpqReader.Readers
 {
     public class LimitedReader : IBinaryReader

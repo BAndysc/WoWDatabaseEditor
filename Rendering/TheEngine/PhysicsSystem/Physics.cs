@@ -30,21 +30,24 @@ namespace TheEngine.PhysicsSystem
             meshManager = engine.meshManager;
             colliders = engine.EntityManager.NewArchetype()
                 .WithComponentData<Collider>()
-                .WithComponentData<RenderEnabledBit>()
+                //.WithComponentData<RenderEnabledBit>()
                 .WithComponentData<MeshRenderer>()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<WorldMeshBounds>();
         }
 
-        public Entity? Raycast(Ray ray)
+        public (Entity, Vector3)? Raycast(Ray ray)
         {
-            ThreadLocal<Entity> localEntities = new ThreadLocal<Entity>(true);
-            colliders.ParallelForEach<Collider, WorldMeshBounds, RenderEnabledBit, MeshRenderer, LocalToWorld>((itr, start, end, colliders, meshBounds, doRender, renderer, localToWorld) =>
+            ThreadLocal<(Entity, float, Vector3)> localEntities = new ThreadLocal<(Entity, float, Vector3)>(true);
+            colliders.ParallelForEach<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld>((itr, start, end, colliders, meshBounds, renderer, localToWorld) =>
             {
+                Entity? touchEntity = null;
+                float minDist = float.MaxValue;
+                Vector3 intersectionPoint = default;
                 for (int i = start; i < end; ++i)
                 {
-                    if (!doRender[i])
-                        continue;
+                    //if (!doRender[i])
+                    //    continue;
                     var bounds = meshBounds[i].box;
                     /*
                      *   a ---- b
@@ -56,17 +59,17 @@ namespace TheEngine.PhysicsSystem
                      *                
                      *        x ->
                      */
-                    var Minimum = bounds.Minimum;
-                    var Maximum = bounds.Maximum;
-                    var a = new Vector3(Minimum.X, Maximum.Y, Maximum.Z);
-                    var b = new Vector3(Maximum.X, Maximum.Y, Maximum.Z);
-                    var c = new Vector3(Minimum.X, Maximum.Y, Minimum.Z);
-                    var d = new Vector3(Maximum.X, Maximum.Y, Minimum.Z);
+                    var min = bounds.Minimum;
+                    var max = bounds.Maximum;
+                    var a = new Vector3(min.X, max.Y, max.Z);
+                    var b = new Vector3(max.X, max.Y, max.Z);
+                    var c = new Vector3(min.X, max.Y, min.Z);
+                    var d = new Vector3(max.X, max.Y, min.Z);
                     
-                    var e = new Vector3(Minimum.X, Minimum.Y, Maximum.Z);
-                    var f = new Vector3(Maximum.X, Minimum.Y, Maximum.Z);
-                    var g = new Vector3(Minimum.X, Minimum.Y, Minimum.Z);
-                    var h = new Vector3(Maximum.X, Minimum.Y, Minimum.Z);
+                    var e = new Vector3(min.X, min.Y, max.Z);
+                    var f = new Vector3(max.X, min.Y, max.Z);
+                    var g = new Vector3(min.X, min.Y, min.Z);
+                    var h = new Vector3(max.X, min.Y, min.Z);
                     bool intersects = Physics.RayIntersectsQuad(in ray, in a, in b, in d, in c, out var inter) ||
                                       Physics.RayIntersectsQuad(in ray, in e, in f, in h, in g, out inter) ||
                                       Physics.RayIntersectsQuad(in ray, in d, in b, in f, in h, out inter) ||
@@ -77,11 +80,41 @@ namespace TheEngine.PhysicsSystem
                     {
                         var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
                         if (Physics.RayIntersectsObject(mesh, localToWorld[i], ray, out inter))
-                            localEntities.Value = itr[i];
+                        {
+                            var dist = (ray.Position - inter).LengthSquared();
+                            if (dist < minDist)
+                            {
+                                minDist = dist;
+                                touchEntity = itr[i];
+                                intersectionPoint = inter;
+                            }
+                        }
                     }
                 }
+
+                if (touchEntity.HasValue)
+                {
+                    localEntities.Value = (touchEntity.Value, minDist, intersectionPoint);
+                }
             });
-            return localEntities.Values.FirstOrDefault();
+
+            if (localEntities.Values.Count == 0)
+                return null;
+
+            float minDist = float.MaxValue;
+            Entity minEntity = default;
+            Vector3 intersectionPoint = default;
+            foreach (var pair in localEntities.Values)
+            {
+                if (pair.Item2 < minDist)
+                {
+                    minDist = pair.Item2;
+                    intersectionPoint = pair.Item3;
+                    minEntity = pair.Item1;
+                }
+            }
+
+            return (minEntity, intersectionPoint);
         }
     }
     

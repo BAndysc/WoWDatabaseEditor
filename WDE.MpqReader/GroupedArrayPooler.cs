@@ -1,11 +1,14 @@
+using System;
 using System.Buffers;
+using System.Collections;
+using System.Diagnostics;
 
 namespace WDE.MpqReader
 {
     public class PooledArray<T> : System.IDisposable
     {
         private readonly T[] array;
-        private readonly int length;
+        private int length;
 
         public PooledArray(int length)
         {
@@ -28,6 +31,12 @@ namespace WDE.MpqReader
         public void Dispose()
         {
             ArrayPool<T>.Shared.Return(array);
+        }
+
+        public void Shrink(int newLength)
+        {
+            Debug.Assert(newLength <= length);
+            length = newLength;
         }
     }
 

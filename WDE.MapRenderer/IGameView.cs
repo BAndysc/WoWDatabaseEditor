@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using WDE.MapRenderer.Managers;
 using WDE.Module.Attributes;
 
