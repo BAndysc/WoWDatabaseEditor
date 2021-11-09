@@ -40,13 +40,11 @@ namespace TheEngine
             lastDeltaIndex %= lastDeltas.Length;
         }
         
-#if USE_OPENTK
         public TheEnginePanel() : base(new OpenGlControlSettings
         {
             ContinuouslyRender = true,
             DeInitializeOnVisualTreeDetachment = false,
         }) { }
-#endif
 
         static TheEnginePanel()
         {
@@ -146,7 +144,6 @@ namespace TheEngine
                 engine.renderManager.RenderWorld(fb);
                 Render(delta);
                 engine.renderManager.FinalizeRendering(fb);
-                Dispatcher.UIThread.Post(InvalidateVisual, DispatcherPriority.Render);
             }
             catch (Exception e)
             {

@@ -8,37 +8,6 @@ using OpenGLBindings;
 
 namespace TheAvaloniaOpenGL.Resources
 {
-    internal struct StringLineEnumerator
-    {
-        private readonly string str;
-        private int start;
-        private int pos;
-        private int prevPos;
-
-        public StringLineEnumerator(string str)
-        {
-            this.str = str;
-            pos = -1;
-            start = 0;
-            prevPos = -1;
-        }
-
-        public ReadOnlySpan<char> Current => str.AsSpan(start, pos - start);
-
-        public ReadOnlySpan<char> Rest => str.AsSpan(pos + 1);
-
-        public bool MoveNext()
-        {
-            pos = str.IndexOf('\n', pos + 1);
-            if (pos == -1)
-                return false;
-
-            start = prevPos + 1;
-            prevPos = pos;
-            return true;
-        }
-    }
-    
     internal class ShaderSource
     {
         private const string IncludeMacro = "#include ";
@@ -170,8 +139,6 @@ namespace TheAvaloniaOpenGL.Resources
             device.AttachShader(ProgramHandle, PixelShader);
 
             var error = device.LinkProgramAndGetError(ProgramHandle);
-            Console.WriteLine(error);
-            Console.WriteLine("Linked program");
             if (error != null && error.Trim().Length > 0)
             {
                 Console.WriteLine("Error, EXITING: '" + error + "'");
