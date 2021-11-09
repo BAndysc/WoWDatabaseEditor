@@ -7,17 +7,16 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Avalonia;
+using Avalonia.Threading;
 using Prism.Commands;
 using TheEngine;
 using TheMaths;
-using WDE.Common.CoreVersion;
 using WDE.Common.DBC;
 using WDE.Common.Disposables;
 using WDE.Common.Documents;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.MPQ;
-using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.MapRenderer.StaticData;
@@ -75,6 +74,8 @@ namespace WDE.MapRenderer
             get => maps;
             set => SetProperty(ref maps, value);
         }
+        
+        public string Stats { get; private set; }
 
         public GameViewModel(IMpqService mpqService, IDbcStore dbcStore, IMapDataProvider mapData, IGameView gameView)
         {
@@ -110,6 +111,16 @@ namespace WDE.MapRenderer
             {
                 var wowPos = Game.CameraManager.Position.ToWoWPosition();
                 cameraViewModel.UpdatePosition(wowPos.X, wowPos.Y, wowPos.Z);
+            });
+            
+            Game.UpdateLoop.Register(d =>
+            {
+                ref var counters = ref Game.Engine.StatsManager.Counters;
+                float w = Game.Engine.StatsManager.PixelSize.X;
+                float h = Game.Engine.StatsManager.PixelSize.Y;
+                Stats =
+                    $"[{w:0}x{h:0}]\nTotal frame time: {counters.FrameTime.Average:0.00} ms\n - Render time: {counters.TotalRender.Average:0.00}\n  - Bounds: {counters.BoundsCalc.Average:0.00}ms\n  - Culling: {counters.Culling.Average:0.00}ms\n  - Drawing: {counters.Drawing.Average:0.00}ms\n  - Present time: {counters.PresentTime.Average:0.00} ms";
+                Dispatcher.UIThread.Post(()=> RaisePropertyChanged(nameof(Stats)), DispatcherPriority.Render);
             });
         }
 
@@ -183,27 +194,6 @@ namespace WDE.MapRenderer
         public override string ToString()
         {
             return MapName == null ? $"/{MapPath} ({Id})" : $"{MapName} [/{MapPath}] ({Id})";
-        }
-    }
-    
-    
-    [AutoRegister]
-    [SingleInstance]
-    public class GameProvider : IWizardProvider
-    {
-        private readonly Func<GameViewModel> creator;
-        public string Name => "WoW World";
-        public ImageUri Image => new ImageUri("Icons/document_minimap_big.png");
-        public bool IsCompatibleWithCore(ICoreVersion core) => true;
-    
-        public GameProvider(Func<GameViewModel> creator)
-        {
-            this.creator = creator;
-        }
-        
-        public Task<IWizard> Create()
-        {
-            return Task.FromResult<IWizard>(creator());
         }
     }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
+﻿using System.Diagnostics;
 using OpenGLBindings;
 using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
-using TheEngine.Config;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -113,8 +109,6 @@ namespace TheEngine.Managers
 
         private Shader currentShader = null;
 
-        private BoundingFrustum culler = new BoundingFrustum();
-        
         private Archetype toRenderArchetype;
         private Archetype updateWorldBoundsArchetype;
         private Archetype dirtEntities;
@@ -333,8 +327,6 @@ namespace TheEngine.Managers
         
         internal void RenderWorld(int dstFrameBuffer)
         {
-            //culler.Update(cameraManager.MainCamera);
-
             //defaultSampler.Activate(Constants.DEFAULT_SAMPLER);
 
             engine.Device.device.CheckError("Before render all");
@@ -434,17 +426,21 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
 
             return (WorldMeshBounds)new BoundingBox(min, max);
         }
-
+        
+        Stopwatch culler = new Stopwatch();
+        Stopwatch boundsUpdate = new Stopwatch();
+        Stopwatch sw = new Stopwatch();
+        Stopwatch shadertimer = new Stopwatch();
+        Stopwatch meshtimer = new Stopwatch();
+        Stopwatch materialtimer = new Stopwatch();
+        Stopwatch buffertimer = new Stopwatch();
+        Stopwatch draw = new Stopwatch();
         private void RenderEntities()
         {
             var cameraPosition = cameraManager.MainCamera.Transform.Position;
-            float drawDistance = 1000 * 1000;
-
             var frustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
 
-            Stopwatch culler = new Stopwatch();
-            Stopwatch boundsUpdate = new Stopwatch();
-            boundsUpdate.Start();
+            boundsUpdate.Restart();
             updateWorldBoundsArchetype.ParallelForEach<LocalToWorld, MeshBounds, WorldMeshBounds, DirtyPosition>((itr, start, end, l2w, meshBounds, worldMeshBounds, dirtyBit) =>
             {
                 Span<Vector3> corners = stackalloc Vector3[8];
@@ -457,7 +453,9 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
                 }
             });
             boundsUpdate.Stop();
-            culler.Start();
+            engine.statsManager.Counters.BoundsCalc.Add(boundsUpdate.Elapsed.TotalMilliseconds);
+            
+            culler.Restart();
             toRenderArchetype.ParallelForEach<LocalToWorld, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, bits, worldMeshBounds) =>
             {
                 for (int i = start; i < end; ++i)
@@ -476,14 +474,9 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
                 }
             });
             culler.Stop();
+            engine.statsManager.Counters.Culling.Add(culler.Elapsed.TotalMilliseconds);
             
-            Stopwatch sw = new Stopwatch();
-            Stopwatch shadertimer = new Stopwatch();
-            Stopwatch meshtimer = new Stopwatch();
-            Stopwatch materialtimer = new Stopwatch();
-            Stopwatch buffertimer = new Stopwatch();
-            Stopwatch draw = new Stopwatch();
-            sw.Start();
+            sw.Restart();
             toRenderArchetype.ForEach<LocalToWorld, RenderEnabledBit, MeshRenderer>((itr, start, end, l2w, render, meshRenderer) =>
             {
                 for (int i = start; i < end; ++i)
@@ -529,7 +522,7 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
                 }
             });
             sw.Stop();
-            Console.WriteLine($"Bounds: {boundsUpdate.Elapsed.TotalMilliseconds:00.##}ms Culling: {culler.Elapsed.TotalMilliseconds:00.##}ms Drawing: {sw.Elapsed.TotalMilliseconds:##.##}ms, shader: {shadertimer.Elapsed.TotalMilliseconds:##.##}ms, mesh: {meshtimer.Elapsed.TotalMilliseconds:##.##}ms, material: {materialtimer.Elapsed.TotalMilliseconds:##.##}ms, buf: {buffertimer.Elapsed.TotalMilliseconds:##.##}ms, draw: {draw.Elapsed.TotalMilliseconds:##.##}ms");
+            engine.statsManager.Counters.Drawing.Add(sw.Elapsed.TotalMilliseconds);
         }
 
         private void RenderRenderers(Material? overrideMaterial, 

@@ -48,6 +48,9 @@ namespace TheEngine
         internal EntityManager entityManager { get; }
         public IEntityManager EntityManager => entityManager;
         
+        internal StatsManager statsManager { get; }
+        public IStatsManager StatsManager => statsManager;
+        
         private Thread renderThread;
         
         private volatile bool isDisposing;
@@ -64,6 +67,7 @@ namespace TheEngine
 
             Device.Initialize();
 
+            statsManager = new StatsManager();
             entityManager = new EntityManager();
             
             lightManager = new LightManager(this);

@@ -13,18 +13,20 @@ using TheAvaloniaOpenGL;
 using TheEngine.Config;
 using MouseButton = TheEngine.Input.MouseButton;
 using OpenTK.Graphics.OpenGL;
+using TheMaths;
 
 namespace TheEngine
 {
 #if USE_OPENTK
-    public class TheEnginePanel : OpenTKGlControl, IWindowHost, IDisposable
+    public class TheEnginePanel : OpenTKGlControl2, IWindowHost, IDisposable
 #else
-    public class TheEnginePanel : OpenGlBase, IWindowHost, IDisposable
+    public class TheEnginePanel : OpenGlBase2, IWindowHost, IDisposable
 #endif
     {
         protected Engine? engine;
         public TheDevice device;
         private Stopwatch sw = new Stopwatch();
+        private Stopwatch renderStopwatch = new Stopwatch();
 
         public float FrameRate => 1000.0f / lastDeltas.Average();
         
@@ -120,6 +122,9 @@ namespace TheEngine
 
         protected override void OnOpenGlRender(GlInterface gl, int fb)
         {
+            engine.statsManager.PixelSize = new Vector2(PixelSize.Item1, PixelSize.Item2);
+            engine.statsManager.Counters.PresentTime.Add(PresentTime);
+            renderStopwatch.Restart();
             try
             {
                 engine.Device.device.CheckError("start OnOpenGlRender");
@@ -129,6 +134,7 @@ namespace TheEngine
 
                 var delta = (float)sw.Elapsed.TotalMilliseconds;
                 Tick(delta);
+                engine.statsManager.Counters.FrameTime.Add(delta);
                 sw.Restart();
                 RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, FrameRate);
 
@@ -153,6 +159,8 @@ namespace TheEngine
                 engine.Device.device.ActiveTextureUnit(0);
                 engine.Device.device.CheckError("post render");
             }
+            renderStopwatch.Stop();
+            engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
         }
 
         private IGame? game;
@@ -185,9 +193,9 @@ namespace TheEngine
         {
             game?.Render(delta);
         }
-        
-        public float WindowWidth => (float)Bounds.Width;
-        public float WindowHeight => (float)Bounds.Height;
+
+        public float WindowWidth => PixelSize.Item1;
+        public float WindowHeight => PixelSize.Item2;
 
         public IGame? Game
         {

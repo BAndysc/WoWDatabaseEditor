@@ -81,7 +81,6 @@ namespace TheAvaloniaOpenGL.Resources
             final.Append(lineEnumerator.Current);
             final.AppendLine();
             final.Append(lineEnumerator.Rest);
-            Console.WriteLine(final.ToString());
             return final.ToString();
         }
     }

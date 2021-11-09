@@ -1,15 +1,17 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using Avalonia;
+using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Logging;
 using Avalonia.Media;
-using Avalonia.OpenGL;
 using Avalonia.OpenGL.Imaging;
+using Avalonia.Threading;
 using static Avalonia.OpenGL.GlConsts;
 
-namespace TheAvaloniaOpenGL
+namespace Avalonia.OpenGL.Controls
 {
-    public abstract class OpenGlBase : Control
+    public abstract class OpenGlBase2 : Control
     {
         private IGlContext _context;
         private int _fb, _depthBuffer;
@@ -18,10 +20,25 @@ namespace TheAvaloniaOpenGL
         private PixelSize _depthBufferSize;
         private bool _glFailed;
         private bool _initialized;
+        private readonly OpenGlControlSettings _settings;
         protected GlVersion GlVersion { get; private set; }
-        private Stopwatch sw = new Stopwatch();
+        // new
+        private Stopwatch sw = new();
         public float PresentTime { get; private set; }
         public (int, int) PixelSize => (_bitmap.PixelSize.Width, _bitmap.PixelSize.Height);
+        // end new
+        
+        public OpenGlBase2(OpenGlControlSettings settings)
+        {
+            _settings = settings.Clone();
+        }
+
+        public OpenGlBase2() : this(new OpenGlControlSettings())
+        {
+            
+        }
+
+
         public sealed override void Render(DrawingContext context)
         {
             if(!EnsureInitialized())
@@ -36,20 +53,26 @@ namespace TheAvaloniaOpenGL
                     return;
                 
                 OnOpenGlRender(_context.GlInterface, _fb);
+                // new
                 sw.Restart();
-                _attachment.Present();
+                _attachment.Present(); // old
                 PresentTime = (float)sw.Elapsed.TotalMilliseconds;
+                //end new
             }
 
             context.DrawImage(_bitmap, new Rect(_bitmap.Size), Bounds);
             base.Render(context);
+
+            if (_settings.ContinuouslyRender)
+                // TODO: replace this once we have something like CompositionTargetRendering
+                Dispatcher.UIThread.Post(InvalidateVisual, DispatcherPriority.Background);
         }
         
-        private void CheckError(GlInterface gl, string what)
+        private void CheckError(GlInterface gl)
         {
             int err;
             while ((err = gl.GetError()) != GL_NO_ERROR)
-                Console.WriteLine(what + ": " + err);
+                Console.WriteLine(err);
         }
 
         void EnsureTextureAttachment()
@@ -86,7 +109,14 @@ namespace TheAvaloniaOpenGL
             gl.BindRenderbuffer(GL_RENDERBUFFER, oldRenderBuffer);
         }
 
-        protected void DoCleanup()
+        void DisposeContextIfNeeded()
+        {
+            if(_settings.Context == null)
+                _context?.Dispose();
+            _context = null;
+        }
+        
+        public void Cleanup()
         {
             if (_context != null)
             {
@@ -112,8 +142,7 @@ namespace TheAvaloniaOpenGL
                     }
                     finally
                     {
-                        _context.Dispose();
-                        _context = null;
+                        DisposeContextIfNeeded();
                     }
                 }
             }
@@ -121,7 +150,7 @@ namespace TheAvaloniaOpenGL
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
-            DoCleanup();
+            Cleanup();
             base.OnDetachedFromVisualTree(e);
         }
 
@@ -135,24 +164,34 @@ namespace TheAvaloniaOpenGL
             
             var feature = AvaloniaLocator.Current.GetService<IPlatformOpenGlInterface>();
             if (feature == null)
-            {
-                Console.WriteLine("no openGL in system");
                 return false;
-            }
-            if (!feature.CanShareContexts)
-            {
-                Console.WriteLine("Cannot share context");
-                Logger.TryGet(LogEventLevel.Error, "OpenGL")?.Log("OpenGlControlBase",
-                    "Unable to initialize OpenGL: current platform does not support multithreaded context sharing");
-                return false;
-            }
+
             try
             {
-                _context = feature.CreateSharedContext();
+                if (_settings.Context != null)
+                    _context = _settings.Context;
+                else if (_settings.ContextFactory != null)
+                {
+                    _context = _settings.ContextFactory();
+                    if (_context == null)
+                        throw new InvalidOperationException("Custom OpenGL context factory returned null");
+                }
+                else if (feature.CanShareContexts)
+                    _context = feature.CreateSharedContext();
+                else
+                    _context = feature.CreateOSTextureSharingCompatibleContext(null, new List<GlVersion>
+                    {
+                        // We are asking to create something usable. For more customization one will have to
+                        // use a custom factory, I guess
+                        // We probably also want to allow to customize that from settings later
+                        new GlVersion(GlProfileType.OpenGL, 3, 2, true),
+                        new GlVersion(GlProfileType.OpenGLES, 3, 0),
+                        new GlVersion(GlProfileType.OpenGLES, 2, 0),
+                        new GlVersion(GlProfileType.OpenGL, 2, 0)
+                    });
             }
             catch (Exception e)
             {
-                Console.WriteLine("Failed to create context");
                 Logger.TryGet(LogEventLevel.Error, "OpenGL")?.Log("OpenGlControlBase",
                     "Unable to initialize OpenGL: unable to create additional OpenGL context: {exception}", e);
                 return false;
@@ -161,7 +200,7 @@ namespace TheAvaloniaOpenGL
             GlVersion = _context.Version;
             try
             {
-                _bitmap = new OpenGlBitmap(GetPixelSize(), GetDpi());
+                _bitmap = new OpenGlBitmap(GetPixelSize(), new Vector(96, 96));
                 if (!_bitmap.SupportsContext(_context))
                 {
                     Logger.TryGet(LogEventLevel.Error, "OpenGL")?.Log("OpenGlControlBase",
@@ -171,8 +210,7 @@ namespace TheAvaloniaOpenGL
             }
             catch (Exception e)
             {
-                _context.Dispose();
-                _context = null;
+                DisposeContextIfNeeded();
                 Logger.TryGet(LogEventLevel.Error, "OpenGL")?.Log("OpenGlControlBase",
                     "Unable to initialize OpenGL: unable to create OpenGlBitmap: {exception}", e);
                 return false;
@@ -190,7 +228,6 @@ namespace TheAvaloniaOpenGL
                     gl.BindFramebuffer(GL_FRAMEBUFFER, _fb);
                     
                     EnsureDepthBufferAttachment(gl);
-
                     EnsureTextureAttachment();
 
                     return CheckFramebufferStatus(gl);
@@ -210,9 +247,17 @@ namespace TheAvaloniaOpenGL
             if (status != GL_FRAMEBUFFER_COMPLETE)
             {
                 int code;
+                int lastError = 0;
                 while ((code = gl.GetError()) != 0)
+                {
+                    if (lastError == code)
+                        continue;
+                    else 
+                        lastError = code;
                     Logger.TryGet(LogEventLevel.Error, "OpenGL")?.Log("OpenGlControlBase",
                         "Unable to initialize OpenGL FBO: {code}", code);
+                }
+
                 return false;
             }
 
@@ -225,24 +270,15 @@ namespace TheAvaloniaOpenGL
                 return true;
             _glFailed = !(_initialized = EnsureInitializedCore());
             if (_glFailed)
-            {
-                Console.WriteLine("Failed to initialize openGL");
                 return false;
-            }
             using (_context.MakeCurrent())
-            {
-                Console.WriteLine($"Initialized {GlVersion.Type} {GlVersion.Major}.{GlVersion.Minor}: {_context.GlInterface.GetString(GL_RENDERER)} Version: {_context.GlInterface.GetString(GL_VERSION)}" );
                 OnOpenGlInit(_context.GlInterface, _fb);
-            }
-
             return true;
         }
-
-        private Vector GetDpi() => new Vector(96, 96);
         
         private PixelSize GetPixelSize()
         {
-            var scaling = 1;// VisualRoot.RenderScaling;
+            var scaling = VisualRoot.RenderScaling;
             return new PixelSize(Math.Max(1, (int)(Bounds.Width * scaling)),
                 Math.Max(1, (int)(Bounds.Height * scaling)));
         }
