@@ -3,7 +3,7 @@
 in vec4 Color;
 in vec4 TexCoord;
 in vec4 WorldPos;
-in vec4 SplatId;
+flat in ivec4 SplatId;
 in vec4 Normal;
 flat in int ChunkId;
 out vec4 FragColor;
@@ -29,9 +29,8 @@ const int FOG_START = 1400;
 const int FOG_END = 1800;
 const vec3 FOG_COLOR = vec3(1, 1, 1);
 
-vec4 sample(float index)
+vec4 sample(int idx)
 {
-    int idx = int(index * 255);
     vec2 uv = TexCoord.xy * 8;
     if (idx == 1)
         return texture(_tex1, uv);

@@ -15,6 +15,14 @@ namespace TheAvaloniaOpenGL.Resources
         StructuredBufferPixelOnly
     }
 
+    public enum BufferInternalFormat
+    {
+        None,
+        Float4,
+        Byte4,
+        Int4
+    }
+
     public interface INativeBuffer
     {
         void Activate(int slot);
@@ -25,6 +33,7 @@ namespace TheAvaloniaOpenGL.Resources
         private static bool UseStorageBuffer = false;
         
         private readonly IDevice device;
+        private readonly BufferInternalFormat internalFormat;
 
         public BufferTypeEnum BufferType { get; }
 
@@ -36,17 +45,19 @@ namespace TheAvaloniaOpenGL.Resources
         
         internal BufferTarget GlBufferType { get; }
         
-        internal NativeBuffer(IDevice device, BufferTypeEnum bufferType, int length)
+        internal NativeBuffer(IDevice device, BufferTypeEnum bufferType, int length, BufferInternalFormat internalFormat)
         {
             this.device = device;
+            this.internalFormat = internalFormat;
             this.BufferType = bufferType;
             GlBufferType = BufferTypeToBindFlags(bufferType);
             CreateBuffer();
         }
 
-        internal NativeBuffer(IDevice device, BufferTypeEnum bufferType, ReadOnlySpan<T> data)
+        internal NativeBuffer(IDevice device, BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat internalFormat)
         {
             this.device = device;
+            this.internalFormat = internalFormat;
             this.BufferType = bufferType;
             GlBufferType = BufferTypeToBindFlags(bufferType);
             CreateBufferWithData(data);
@@ -60,11 +71,13 @@ namespace TheAvaloniaOpenGL.Resources
         {
             BufferHandle = device.GenBuffer();
             device.BindBuffer(GlBufferType, BufferHandle);
+            if (IsStructuredBuffer && internalFormat == BufferInternalFormat.None)
+                throw new Exception("You need to specify internal format for TextureBuffer");
             if (IsUsingBufferTexture)
             {
                 TextureBufferHandle = device.GenTexture();
                 device.BindTexture(TextureTarget.TextureBuffer, TextureBufferHandle);
-                device.TexBuffer(TextureBufferTarget.TextureBuffer, SizedInternalFormat.Rgba32f, BufferHandle);
+                device.TexBuffer(TextureBufferTarget.TextureBuffer,  internalFormat == BufferInternalFormat.Float4 ? SizedInternalFormat.Rgba32f : (internalFormat== BufferInternalFormat.Byte4 ? SizedInternalFormat.Rgba8i : SizedInternalFormat.Rgba32i), BufferHandle);
             }
         }
 

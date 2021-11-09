@@ -152,14 +152,14 @@ namespace TheAvaloniaOpenGL
         }
 
         // Safe multithread call
-        public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size) where T : unmanaged
+        public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged
         {
-            return new NativeBuffer<T>(device, bufferType, size);
+            return new NativeBuffer<T>(device, bufferType, size, format);
         }
         
-        public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data) where T : unmanaged
+        public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged
         {
-            return new NativeBuffer<T>(device, bufferType, data);
+            return new NativeBuffer<T>(device, bufferType, data, format);
         }
 
         public DepthStencil CreateDepthStencilState(bool zWrite)

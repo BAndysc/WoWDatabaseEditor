@@ -88,7 +88,7 @@ namespace TheEngine
         }
         
         public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size) where T : unmanaged => Device.CreateBuffer<T>(bufferType, size);
-        public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data) where T : unmanaged => Device.CreateBuffer<T>(bufferType, data);
+        public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Device.CreateBuffer<T>(bufferType, data, format);
 
         public void Dispose()
         {

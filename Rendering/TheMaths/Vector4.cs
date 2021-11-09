@@ -50,6 +50,40 @@ using System.Runtime.InteropServices;
 
 namespace TheMaths
 {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VectorInt4
+    {
+        public int r;
+        public int g;
+        public int b;
+        public int a;
+
+        public VectorInt4(int r, int g, int b, int a)
+        {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+    }
+    
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct VectorByte4
+    {
+        public byte r;
+        public byte g;
+        public byte b;
+        public byte a;
+
+        public VectorByte4(byte r, byte g, byte b, byte a)
+        {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+    }
+    
     /// <summary>
     /// Represents a four dimensional mathematical vector.
     /// </summary>

@@ -25,9 +25,9 @@ namespace WDE.MapRenderer.Managers
     {
         public int X { get; }
         public int Z { get; }
-        public TextureHandle chunkToSplatTex;
         public TextureHandle splatMapTex;
         public TextureHandle holesMapTex;
+        public NativeBuffer<VectorByte4>? chunkToSplatBuffer;
         public NativeBuffer<Vector4>? heightsNormalBuffer;
         public Material? material;
         public CancellationTokenSource? loading = new CancellationTokenSource();
@@ -47,7 +47,7 @@ namespace WDE.MapRenderer.Managers
 
         public void Dispose(IGameContext context)
         {
-            context.Engine.TextureManager.DisposeTexture(chunkToSplatTex);
+            chunkToSplatBuffer?.Dispose();
             context.Engine.TextureManager.DisposeTexture(splatMapTex);
             context.Engine.TextureManager.DisposeTexture(holesMapTex);
             heightsNormalBuffer?.Dispose();
@@ -105,13 +105,13 @@ namespace WDE.MapRenderer.Managers
             Rgba32[][][] splatMaps = new Rgba32[Constants.ChunksInBlock][][];
             Rgba32[][][] holesMaps = new Rgba32[Constants.ChunksInBlock][][];
             Vector4[] heightsNormal = null!;
-            Rgba32[] chunkToSplatIdx = null!;
+            VectorByte4[] chunkToSplatIdx = null!;
             Dictionary<string, int> textureToSlot = null!;
             ADT adt = null!;
 
        
             heightsNormal = new Vector4[1 * Constants.VerticesInChunk * Constants.ChunksInBlock];
-            chunkToSplatIdx = new Rgba32[Constants.ChunksInBlock];
+            chunkToSplatIdx = new VectorByte4[Constants.ChunksInBlock];
             textureToSlot = new();
 
             adt = new ADT(new MemoryBinaryReader(file.Result));
@@ -145,7 +145,7 @@ namespace WDE.MapRenderer.Managers
                             
                             var norm = chunksEnumerator2.Current.Normals[k_];
                             heightsNormal[k++] = new Vector4(
-                                norm.Z,
+                                norm.X,
                                 norm.Y,
                                 -norm.Z,
                                 chunksEnumerator2.Current.Heights[k_] +
@@ -287,7 +287,7 @@ namespace WDE.MapRenderer.Managers
                             a = textureToSlot[texturePath];
                     }
 
-                    chunkToSplatIdx[chnk] = new Rgba32((byte)(r ?? 0), (byte)(g ?? 0), (byte)(b ?? 0),
+                    chunkToSplatIdx[chnk] = new VectorByte4((byte)(r ?? 0), (byte)(g ?? 0), (byte)(b ?? 0),
                         (byte)(a ?? 0));
 
                     chnk++;
@@ -300,12 +300,11 @@ namespace WDE.MapRenderer.Managers
                 material.SetTexture("_tex" + j, gameContext.TextureManager.EmptyTexture);
             }
         
-            chunk.chunkToSplatTex = gameContext.Engine.TextureManager.CreateTexture(new[] { chunkToSplatIdx }, 256, 1, false);
-            gameContext.Engine.TextureManager.SetFiltering(chunk.chunkToSplatTex, FilteringMode.Nearest);
 
-            chunk.heightsNormalBuffer = gameContext.Engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal);// new NativeBuffer<Vector4>(device.device, BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal);
+            chunk.chunkToSplatBuffer = gameContext.Engine.CreateBuffer<VectorByte4>(BufferTypeEnum.StructuredBufferVertexOnly, chunkToSplatIdx, BufferInternalFormat.Byte4);
+            chunk.heightsNormalBuffer = gameContext.Engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal, BufferInternalFormat.Float4);// new NativeBuffer<Vector4>(device.device, BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal);
         
-            material.SetTexture("chunkToSplat", chunk.chunkToSplatTex);
+            material.SetBuffer("chunkToSplat", chunk.chunkToSplatBuffer);
             material.SetBuffer("heightsNormalBuffer", chunk.heightsNormalBuffer);
 
             chunk.terrainHandle = gameContext.Engine.RenderManager.RegisterDynamicRenderer(chunkMesh.Handle, material, 0, t);
