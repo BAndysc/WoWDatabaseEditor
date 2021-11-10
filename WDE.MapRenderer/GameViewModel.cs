@@ -51,7 +51,7 @@ namespace WDE.MapRenderer
     }
     
     [AutoRegister]
-    public class GameViewModel : ObservableBase, IWizard, IMapContext<GameCameraViewModel>
+    public class GameViewModel : ObservableBase, ITool, IMapContext<GameCameraViewModel>
     {
         public GameManager Game { get; }
         public event Action? RequestDispose;
@@ -131,17 +131,18 @@ namespace WDE.MapRenderer
         }
         public ICommand ToggleMapVisibilityCommand { get; }
 
-        public ICommand Undo { get; set; } = AlwaysDisabledCommand.Command;
-        public ICommand Redo { get; set; } = AlwaysDisabledCommand.Command;
-        public IHistoryManager? History { get; set; }
-        public bool IsModified { get; set; }
+        public string UniqueId => "game_view";
+
+        public bool Visibility
+        {
+            get => visibility;
+            set => SetProperty(ref visibility, value);
+        }
+
+        public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.DocumentCenter;
+        public bool OpenOnStart => false;
+        public bool IsSelected { get; set; }
         public string Title => "Game view";
-        public ICommand Copy { get; set; } = AlwaysDisabledCommand.Command;
-        public ICommand Cut { get; set; } = AlwaysDisabledCommand.Command;
-        public ICommand Paste { get; set; } = AlwaysDisabledCommand.Command;
-        public ICommand Save { get; set; } = AlwaysDisabledCommand.Command;
-        public IAsyncCommand? CloseCommand { get; set; }
-        public bool CanClose => true;
         public void Center(double x, double y)
         {
         }
@@ -154,6 +155,7 @@ namespace WDE.MapRenderer
         }
 
         private GameCameraViewModel cameraViewModel;
+        private bool visibility;
         public ObservableCollection<GameCameraViewModel> Items { get; } = new();
         public IEnumerable<GameCameraViewModel> VisibleItems => Items;
         public GameCameraViewModel? SelectedItem { get; set; }

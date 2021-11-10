@@ -23,7 +23,7 @@ namespace WDE.WorldMap.Services
         private readonly IUserSettings userSettings;
         private readonly IMessageBoxService messageBoxService;
         private readonly IFileSystem fileSystem;
-        private readonly IMapDataDownloadService mapDataDownloadService;
+        private readonly Lazy<IMapDataDownloadService> mapDataDownloadService;
         private string? path;
         private IEnumerable<string> maps = Enumerable.Empty<string>();
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -51,7 +51,7 @@ namespace WDE.WorldMap.Services
         public MapDataProvider(IUserSettings userSettings,
             IMessageBoxService messageBoxService,
             IFileSystem fileSystem,
-            IMapDataDownloadService mapDataDownloadService)
+            Lazy<IMapDataDownloadService> mapDataDownloadService)
         {
             this.userSettings = userSettings;
             this.messageBoxService = messageBoxService;
@@ -89,7 +89,7 @@ namespace WDE.WorldMap.Services
             try
             {
                 var zipFile = System.IO.Path.GetTempFileName();
-                await mapDataDownloadService.DownloadMaps(new FileInfo(zipFile), progress);
+                await mapDataDownloadService.Value.DownloadMaps(new FileInfo(zipFile), progress);
                 
                 var destDir = fileSystem.ResolvePhysicalPath(RelativePath);
                 
