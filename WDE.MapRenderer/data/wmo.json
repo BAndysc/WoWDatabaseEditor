@@ -1,0 +1,17 @@
+{
+  "Pixel": {
+    "Path": "data/wmo.frag"
+  },
+  "ZWrite": true,
+  "Instancing": false,
+  "Vertex": {
+    "Path": "data/wmo.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

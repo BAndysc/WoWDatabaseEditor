@@ -337,6 +337,7 @@ namespace WDE.MapRenderer.Managers
                     yield break;
 
                 TaskCompletionSource<MdxManager.MdxInstance?> result = new();
+                
                 yield return gameContext.MdxManager.LoadM2Mesh(m2.M2Path, result);
                 if (result.Task.Result == null)
                     continue;

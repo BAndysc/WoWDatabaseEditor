@@ -517,7 +517,7 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
                     objectData.InverseWorldMatrix = l2w[i].Inverse;
                     objectBuffer.UpdateBuffer(ref objectData);
                     //buffertimer.Stop();
-                    //currentShader.Validate();
+                    currentShader.Validate();
                     //draw.Start();
                     engine.Device.DrawIndexed(mesh.IndexCount(meshId), mesh.IndexStart(meshId), 0);
                     //draw.Stop();

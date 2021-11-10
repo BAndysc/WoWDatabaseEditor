@@ -452,7 +452,7 @@ namespace TheAvaloniaOpenGL
         {
             int err;
             while ((err = Gl.GetError()) != (int)ErrorCode.NoError)
-                Console.WriteLine(what + ": " + err);
+                Console.WriteLine(what + ": " + ((ErrorCode)err).ToString());
         }
         
         

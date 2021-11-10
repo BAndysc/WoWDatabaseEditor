@@ -9,7 +9,7 @@ out vec4 SplatId;
 out vec3 Normal;
 
 void main()
-{
+{     
     VERTEX_SETUP_INSTANCING;
 
     WorldPos = model * vec4(position.xyz, 1.0);

@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using SixLabors.ImageSharp.PixelFormats;
 using TheMaths;
 using WDE.MpqReader.Readers;
 
@@ -11,9 +12,10 @@ namespace WDE.MpqReader.Structures
         public PooledArray<WorldMapObjectPoly> Polygons { get; set; }
         public PooledArray<int> Indices { get; init; }
         public PooledArray<Vector3> Vertices { get; init; }
+        public PooledArray<Rgba32>? VertexColors { get; init; }
         public int[] CollisionOnlyIndices { get; init; }
         public PooledArray<Vector3> Normals { get; init; }
-        public PooledArray<Vector2> UVs { get; init; }
+        public List<PooledArray<Vector2>> UVs { get; init; } = new();
         public WorldMapObjectBatch[] Batches { get; init; }
     
         public WorldMapObjectGroup(IBinaryReader reader, bool openGlCoords)
@@ -46,9 +48,11 @@ namespace WDE.MpqReader.Structures
                 else if (chunkName == "MONR")
                     Normals = ReadVectors3(partialReader, openGlCoords, size);
                 else if (chunkName == "MOTV")
-                    UVs = ReadVectors2(partialReader, size);
+                    UVs.Add(ReadVectors2(partialReader, size));
                 else if (chunkName == "MOBA")
                     Batches = ReadBatches(partialReader, size);
+                else if (chunkName == "MOCV")
+                    VertexColors = ReadVertexColors(partialReader, size);
 
                 CollisionOnlyIndices = BuildCollisionOnlyIndices(Polygons, Indices);
                 
@@ -82,6 +86,22 @@ namespace WDE.MpqReader.Structures
             return collisionOnlyIndices;
         }
 
+        private PooledArray<Rgba32> ReadVertexColors(IBinaryReader reader, int size)
+        {
+            PooledArray<Rgba32> colors = new PooledArray<Rgba32>(size / 4);
+            int i = 0;
+            while (!reader.IsFinished())
+            {
+                var b = reader.ReadByte();
+                var g = reader.ReadByte();
+                var r = reader.ReadByte();
+                var a = reader.ReadByte();
+                colors[i++] = new Rgba32(r, g, b, a);
+            }
+
+            return colors;
+        }
+        
         private static PooledArray<WorldMapObjectPoly> ParsePolygons(IBinaryReader reader, int size)
         {
             PooledArray<WorldMapObjectPoly> polygons = new PooledArray<WorldMapObjectPoly>(size / 2);
@@ -144,11 +164,13 @@ namespace WDE.MpqReader.Structures
 
         public void Dispose()
         {
+            VertexColors?.Dispose();
             Polygons.Dispose();
             Indices.Dispose();
             Vertices.Dispose();
             Normals.Dispose();
-            UVs.Dispose();
+            foreach (var uv in UVs)
+                uv.Dispose();
         }
     }
 

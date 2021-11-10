@@ -91,8 +91,9 @@ namespace WDE.MapRenderer.Managers
 
             foreach (var group in groups)
             {
-                var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs.AsArray(),
-                    group.Indices.AsArray(), group.Vertices.Length, group.Indices.Length);
+                var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs[0].AsArray(),
+                    group.Indices.AsArray(), group.Vertices.Length, group.Indices.Length,
+                    group.UVs.Count >= 2 ? group.UVs[1].AsArray() : null);
 
                 var wmoMesh = gameContext.Engine.MeshManager.CreateMesh(wmoMeshData);
                 wmoMesh.SetSubmeshCount(group.Batches.Length);
@@ -103,12 +104,13 @@ namespace WDE.MapRenderer.Managers
                     wmoMesh.SetSubmeshIndicesRange(j++, (int)batch.startIndex, batch.count);
 
                     var materialDef = wmo.Materials[batch.material_id];
-                    var m2ShaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/m2.json");
+                    var m2ShaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/wmo.json");
                     var mat = gameContext.Engine.MaterialManager.CreateMaterial(m2ShaderHandle);
 
-                    mat.SetUniform("highlight", 0);
-                    mat.SetUniform("notSupported", 0);
+                    mat.SetUniformInt("shader_id", (int)materialDef.shader);
+                    //mat.SetUniform("notSupported", 0.0f);
                     float alphaTest = 0.003921568f; // 1/255
+                    
                     if (materialDef.blendMode == GxBlendMode.GxBlend_Opaque)
                     {
                         alphaTest = -1.0f;
@@ -153,7 +155,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         alphaTest = -1.0f;
                         mat.BlendingEnabled = false;
-                        mat.SetUniform("notSupported", 1);
+                        //mat.SetUniform("notSupported", 1);
                     }
 
                     mat.SetUniform("alphaTest", alphaTest);
@@ -167,6 +169,17 @@ namespace WDE.MapRenderer.Managers
                         yield return gameContext.TextureManager.GetTexture(materialDef.texture1Name, tcs);
                         mat.SetTexture("texture1", tcs.Task.Result);
                     }
+                    else
+                        mat.SetTexture("texture1", gameContext.TextureManager.EmptyTexture);
+                    
+                    if (materialDef.texture2Name != null)
+                    {
+                        var tcs = new TaskCompletionSource<TextureHandle>();
+                        yield return gameContext.TextureManager.GetTexture(materialDef.texture2Name, tcs);
+                        mat.SetTexture("texture2", tcs.Task.Result);
+                    }
+                    else
+                        mat.SetTexture("texture2", gameContext.TextureManager.EmptyTexture);
 
                     materials[j - 1] = mat;
                 }

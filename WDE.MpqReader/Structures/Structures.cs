@@ -648,8 +648,8 @@ namespace WDE.MpqReader.Structures
         public ushort textureCount;               // 1 to 4. See below. Also seems to be the number of textures to load, starting at the texture lookup in the next field (0x10).
         public ushort textureComboIndex;          // Index into Texture lookup table
         public ushort textureCoordComboIndex;     // Index into the texture unit lookup table.
-        public ushort textureWeightComboIndex;    // Index into transparency lookup table.
-        public ushort textureTransformComboIndex; // Index into uvanimation lookup table. 
+        public ushort transparencyIndex;         // Index into transparency lookup table.
+        public ushort textureAnimIndex;          // Index into uvanimation lookup table. 
 
         private M2Batch(){}
 
@@ -668,8 +668,8 @@ namespace WDE.MpqReader.Structures
                 textureCount = binaryReader.ReadUInt16(),
                 textureComboIndex = binaryReader.ReadUInt16(),
                 textureCoordComboIndex = binaryReader.ReadUInt16(),
-                textureWeightComboIndex = binaryReader.ReadUInt16(),
-                textureTransformComboIndex = binaryReader.ReadUInt16()
+                transparencyIndex = binaryReader.ReadUInt16(),
+                textureAnimIndex = binaryReader.ReadUInt16()
             };
         }
     };

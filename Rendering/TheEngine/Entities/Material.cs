@@ -55,6 +55,7 @@ namespace TheEngine.Entities
 
         internal Dictionary<int, TextureHandle> textureHandles { get; } = new();
         internal Dictionary<int, INativeBuffer> structuredBuffers { get; }
+        internal Dictionary<int, int> intUniforms { get; } = new();
         internal Dictionary<int, float> floatUniforms { get; } = new();
         internal Dictionary<int, Vector4> vector4Uniforms { get; } = new();
         internal Dictionary<int, INativeBuffer> structuredVertexBuffers { get; }
@@ -112,6 +113,11 @@ namespace TheEngine.Entities
             structuredBuffers[GetUniformLocation(name)] = buffer;
         }
         
+        public void SetUniformInt(string name, int value)
+        {
+            intUniforms[GetUniformLocation(name)] = value;
+        }
+
         public void SetUniform(string name, float value)
         {
             floatUniforms[GetUniformLocation(name)] = value;
@@ -157,6 +163,12 @@ namespace TheEngine.Entities
             {
                 engine.Device.device.Uniform1f(floats.Key, floats.Value);
             }
+            engine.Device.device.CheckError("before set int uniform");
+            foreach (var ints in intUniforms)
+            {
+                engine.Device.device.Uniform1I(ints.Key, ints.Value);
+            }
+            engine.Device.device.CheckError("after set int uniforms");
             foreach (var vector in vector4Uniforms)
             {
                 engine.Device.device.Uniform4f(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);

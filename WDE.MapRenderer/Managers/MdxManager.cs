@@ -14,6 +14,34 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers
 {
+    enum ModelPixelShader
+    {
+        Combiners_Opaque = 0,
+        Combiners_Decal,
+        Combiners_Add,
+        Combiners_Mod2x,
+        Combiners_Fade,
+        Combiners_Mod,
+        Combiners_Opaque_Opaque,
+        Combiners_Opaque_Add,
+        Combiners_Opaque_Mod2x,
+        Combiners_Opaque_Mod2xNA,
+        Combiners_Opaque_AddNA,
+        Combiners_Opaque_Mod,
+        Combiners_Mod_Opaque,
+        Combiners_Mod_Add,
+        Combiners_Mod_Mod2x,
+        Combiners_Mod_Mod2xNA,
+        Combiners_Mod_AddNA,
+        Combiners_Mod_Mod,
+        Combiners_Add_Mod,
+        Combiners_Mod2x_Mod2x,
+        Combiners_Opaque_Mod2xNA_Alpha,
+        Combiners_Opaque_AddAlpha,
+        Combiners_Opaque_AddAlpha_Alpha,
+    };
+
+    
     public class MdxManager : System.IDisposable
     {
         public class MdxInstance
@@ -103,7 +131,7 @@ namespace WDE.MapRenderer.Managers
                 }
             }));
 
-            var md = new MeshData(vertices, normals, uv1, new int[] { });
+            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2);
             
             var mesh = gameContext.Engine.MeshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
@@ -128,32 +156,33 @@ namespace WDE.MapRenderer.Managers
                 mesh.SetIndices(indices.AsSpan(), j++);
 
                 TextureHandle? th = null;
-                if (batch.textureCount != ushort.MaxValue)
+                TextureHandle? th2 = null;
+                for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
-                    for (int i = 0; i < batch.textureCount; ++i)
-                    {
-                        if (batch.textureComboIndex + i >= m2.textures.Length)
-                            continue;
-                        
-                        var textureDef = m2.textures[batch.textureComboIndex + i];
-                        var texFile = textureDef.filename.AsString();
-                        var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return gameContext.TextureManager.GetTexture(texFile, tcs);
-                        th = tcs.Task.Result;
-                        break;
-                    }
+                    var textureDef = m2.textures[m2.textureCombos[batch.textureComboIndex + i]];
+                    var texFile = textureDef.filename.AsString();
+                    var tcs = new TaskCompletionSource<TextureHandle>();
+                    yield return gameContext.TextureManager.GetTexture(texFile, tcs);
+                    var resTex = tcs.Task.Result;
+                    if (th.HasValue)
+                        th2 = resTex;
+                    else
+                        th = resTex;
                 }
 
                 var materialDef = m2.materials[batch.materialIndex];
                 var m2ShaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/m2.json");
                 var material = gameContext.Engine.MaterialManager.CreateMaterial(m2ShaderHandle);
 
-                if (th != null)
-                    material.SetTexture("texture1", th.Value);
+                material.SetTexture("texture1", th ?? gameContext.TextureManager.EmptyTexture);
+                material.SetTexture("texture2", th2 ?? gameContext.TextureManager.EmptyTexture);
 
-                if (materialDef.flags.HasFlag(M2MaterialFlags.TwoSided))
-                    material.Culling = CullingMode.Off;
-
+                Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+                
+                material.SetUniform("mesh_color", mesh_color);
+                material.SetUniformInt("pixel_shader", (int)(M2GetPixelShaderID(batch.textureCount, batch.shader_id) ?? ModelPixelShader.Combiners_Opaque));
+                //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
+                
                 material.SetUniform("highlight", 0);
                 material.SetUniform("notSupported", 0);
                 if (materialDef.blending_mode == M2Blend.M2BlendOpaque)
@@ -163,7 +192,9 @@ namespace WDE.MapRenderer.Managers
                 }
                 else if (materialDef.blending_mode == M2Blend.M2BlendAlphaKey)
                 {
-                    material.BlendingEnabled = false;
+                    material.BlendingEnabled = true;
+                    material.SourceBlending = Blending.One;
+                    material.DestinationBlending = Blending.One;
                     material.SetUniform("alphaTest", 224.0f / 255.0f);
                 }
                 else if (materialDef.blending_mode == M2Blend.M2BlendAlpha)
@@ -175,6 +206,9 @@ namespace WDE.MapRenderer.Managers
                 }
                 else
                     material.SetUniform("notSupported", 1);
+
+                if (materialDef.flags.HasFlag(M2MaterialFlags.TwoSided))
+                    material.Culling = CullingMode.Off;
 
                 materials[j - 1] = material;
             }
@@ -192,6 +226,143 @@ namespace WDE.MapRenderer.Managers
             result.SetResult(mdx);
         }
 
+        // https://wowdev.wiki/M2/.skin/WotLK_shader_selection
+        ModelPixelShader? GetPixelShader(ushort texture_count, ushort shader_id)
+        {
+            ushort texture1_fragment_mode = (ushort)((shader_id >> 4) & 7);
+              ushort texture2_fragment_mode = (ushort)(shader_id & 7);
+          // uint16_t texture1_env_map = (shader_id >> 4) & 8;
+          // uint16_t texture2_env_map = shader_id & 8;
+
+          ModelPixelShader? pixel_shader = null;
+
+          if (texture_count == 1)
+          {
+            switch (texture1_fragment_mode)
+            {
+            case 0:
+              pixel_shader = ModelPixelShader.Combiners_Opaque;
+              break;
+            case 2:
+              pixel_shader = ModelPixelShader.Combiners_Decal;
+              break;
+            case 3:
+              pixel_shader = ModelPixelShader.Combiners_Add;
+              break;
+            case 4:
+              pixel_shader = ModelPixelShader.Combiners_Mod2x;
+              break;
+            case 5:
+              pixel_shader = ModelPixelShader.Combiners_Fade;
+              break;
+            default:
+              pixel_shader = ModelPixelShader.Combiners_Mod;
+              break;
+            }
+          }
+          else
+          {
+            if (texture1_fragment_mode == 0)
+            {
+              switch (texture2_fragment_mode)
+              {
+              case 0:
+                pixel_shader = ModelPixelShader.Combiners_Opaque_Opaque;
+                break;
+              case 3:
+                pixel_shader = ModelPixelShader.Combiners_Opaque_Add;
+                break;
+              case 4:
+                pixel_shader = ModelPixelShader.Combiners_Opaque_Mod2x;
+                break;
+              case 6:
+                pixel_shader = ModelPixelShader.Combiners_Opaque_Mod2xNA;
+                break;
+              case 7:
+                pixel_shader = ModelPixelShader.Combiners_Opaque_AddNA;
+                break;
+              default:
+                pixel_shader = ModelPixelShader.Combiners_Opaque_Mod;
+                break;
+              }
+            }
+            else if (texture1_fragment_mode == 1)
+            {
+              switch (texture2_fragment_mode)
+              {
+              case 0:
+                pixel_shader = ModelPixelShader.Combiners_Mod_Opaque;
+                break;
+              case 3:
+                pixel_shader = ModelPixelShader.Combiners_Mod_Add;
+                break;
+              case 4:
+                pixel_shader = ModelPixelShader.Combiners_Mod_Mod2x;
+                break;
+              case 6:
+                pixel_shader = ModelPixelShader.Combiners_Mod_Mod2xNA;
+                break;
+              case 7:
+                pixel_shader = ModelPixelShader.Combiners_Mod_AddNA;
+                break;
+              default:
+                pixel_shader = ModelPixelShader.Combiners_Mod_Mod;
+                break;
+              }
+            }
+            else if (texture1_fragment_mode == 3)
+            {
+              if (texture2_fragment_mode == 1)
+              {
+                pixel_shader = ModelPixelShader.Combiners_Add_Mod;
+              }
+            }
+            else if (texture1_fragment_mode == 4 && texture2_fragment_mode == 4)
+            {
+              pixel_shader = ModelPixelShader.Combiners_Mod2x_Mod2x;
+            }
+            else if (texture2_fragment_mode == 1)
+            {
+              pixel_shader = ModelPixelShader.Combiners_Mod_Mod2x;
+            }
+          }
+         
+
+          return pixel_shader;
+        }
+        
+        ModelPixelShader? M2GetPixelShaderID(ushort texture_count, ushort shader_id)
+        {
+            ModelPixelShader? pixel_shader = null;
+
+            if ((shader_id & 0x8000) == 0)
+            {
+                pixel_shader = GetPixelShader(texture_count, shader_id);
+
+                if (!pixel_shader.HasValue)
+                {
+                    pixel_shader = GetPixelShader(texture_count, 0x11);
+                }
+            }
+            else
+            {
+                switch (shader_id & 0x7FFF)
+                {
+                    case 1:
+                        pixel_shader = ModelPixelShader.Combiners_Opaque_Mod2xNA_Alpha;
+                        break;
+                    case 2:
+                        pixel_shader = ModelPixelShader.Combiners_Opaque_AddAlpha;
+                        break;
+                    case 3:
+                        pixel_shader = ModelPixelShader.Combiners_Opaque_AddAlpha_Alpha;
+                        break;
+                }  
+            }
+
+            return pixel_shader;
+        }
+        
         public void Dispose()
         {
             foreach (var mesh in meshes.Values)
