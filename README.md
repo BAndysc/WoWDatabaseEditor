@@ -40,9 +40,9 @@ That's a fantastic news! There is still a lot to do in the IDE, if you do not kn
 
 # How to build
 
-**In order to build WoW Database Editor you need to install [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)**
+**In order to build WoW Database Editor you need to install [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)** (it is installed automatically with Visual Studio 2022)
 
-**If you want to use Visual Studio, you need Visual Studio 2022 (even though it is still in preview!)**. That's because older Visual Studio version doesn't support .NET 6.0!
+**If you want to use Visual Studio, you need Visual Studio 2022**. That's because older Visual Studio version **doesn't** support .NET 6.0!
 
 WoW Database Editor is using [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), therefore after you clone, after you pull you have to download submodules:
 
