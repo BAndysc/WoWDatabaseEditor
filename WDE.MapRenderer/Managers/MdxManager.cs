@@ -74,7 +74,7 @@ namespace WDE.MapRenderer.Managers
 
             if (meshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
             {
-                yield return loadInProgress;
+                yield return new WaitForTask(loadInProgress);
                 result.SetResult(meshes[path]);
                 yield break;
             }
@@ -82,13 +82,15 @@ namespace WDE.MapRenderer.Managers
             var completion = new TaskCompletionSource<MdxInstance?>();
             meshesCurrentlyLoaded[path] = completion.Task;
 
+            var m2FilePath = path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
+            var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
             var file =
-                gameContext.ReadFile(path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase));
+                gameContext.ReadFile(m2FilePath);
 
             yield return new WaitForTask(file);
 
             var skinFile =
-                gameContext.ReadFile(path.Replace(".mdx", "00.skin", StringComparison.InvariantCultureIgnoreCase));
+                gameContext.ReadFile(skinFilePath);
             
             yield return new WaitForTask(skinFile);
             
@@ -143,7 +145,10 @@ namespace WDE.MapRenderer.Managers
                 if (batch.skinSectionIndex == ushort.MaxValue ||
                     batch.materialIndex >= m2.materials.Length ||
                     batch.skinSectionIndex >= skin.SkinSections.Length)
+                {
+                    Console.WriteLine("Sth wrong with batch " + j + " in model " + path);
                     continue;
+                }
 
                 var section = skin.SkinSections[batch.skinSectionIndex];
 
@@ -159,15 +164,35 @@ namespace WDE.MapRenderer.Managers
                 TextureHandle? th2 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
-                    var textureDef = m2.textures[m2.textureCombos[batch.textureComboIndex + i]];
-                    var texFile = textureDef.filename.AsString();
-                    var tcs = new TaskCompletionSource<TextureHandle>();
-                    yield return gameContext.TextureManager.GetTexture(texFile, tcs);
-                    var resTex = tcs.Task.Result;
-                    if (th.HasValue)
-                        th2 = resTex;
+                    if (batch.textureComboIndex + i >= m2.textureCombos.Length)
+                    {
+                        if (th.HasValue)
+                            th2 = gameContext.TextureManager.EmptyTexture;
+                        else
+                            th = gameContext.TextureManager.EmptyTexture;
+                        Console.WriteLine("File " + path + " batch " + j + " tex " + i + " out of range");
+                        continue;
+                    }
+                    var texId = m2.textureCombos[batch.textureComboIndex + i];
+                    if (texId == -1)
+                    {
+                        if (th.HasValue)
+                            th2 = gameContext.TextureManager.EmptyTexture;
+                        else
+                            th = gameContext.TextureManager.EmptyTexture;
+                    }
                     else
-                        th = resTex;
+                    {
+                        var textureDef = m2.textures[texId];
+                        var texFile = textureDef.filename.AsString();
+                        var tcs = new TaskCompletionSource<TextureHandle>();
+                        yield return gameContext.TextureManager.GetTexture(texFile, tcs);
+                        var resTex = tcs.Task.Result;
+                        if (th.HasValue)
+                            th2 = resTex;
+                        else
+                            th = resTex;
+                    }
                 }
 
                 var materialDef = m2.materials[batch.materialIndex];
@@ -221,8 +246,8 @@ namespace WDE.MapRenderer.Managers
                 materials = materials.AsSpan(0, j).ToArray()
             };
             meshes.Add(path, mdx);
-            meshesCurrentlyLoaded.Remove(path);
             completion.SetResult(null);
+            meshesCurrentlyLoaded.Remove(path);
             result.SetResult(mdx);
         }
 

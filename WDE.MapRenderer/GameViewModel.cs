@@ -17,6 +17,7 @@ using WDE.Common.Documents;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.MPQ;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.MapRenderer.StaticData;
@@ -77,7 +78,11 @@ namespace WDE.MapRenderer
         
         public string Stats { get; private set; }
 
-        public GameViewModel(IMpqService mpqService, IDbcStore dbcStore, IMapDataProvider mapData, IGameView gameView)
+        public GameViewModel(IMpqService mpqService,
+            IDbcStore dbcStore, 
+            IMapDataProvider mapData, 
+            ITaskRunner taskRunner,
+            IGameView gameView)
         {
             MapData = mapData;
             Game = new GameManager(mpqService.Open(), gameView);
@@ -85,14 +90,18 @@ namespace WDE.MapRenderer
             {
                 RequestDispose?.Invoke();
             }));
-            
-            maps = dbcStore.MapDirectoryStore
-                .Select(pair =>
-                {
-                    dbcStore.MapStore.TryGetValue(pair.Key, out var mapName);
-                    return new MapViewModel(pair.Value,  mapName, (uint)pair.Key);
-                }).ToList();
-            SelectedMap = Maps.FirstOrDefault(k => k.MapPath == "Kalimdor") ?? Maps.FirstOrDefault();
+
+            taskRunner.ScheduleTask("Loading maps", async () =>
+            {
+                maps = dbcStore.MapDirectoryStore
+                    .Select(pair =>
+                    {
+                        dbcStore.MapStore.TryGetValue(pair.Key, out var mapName);
+                        return new MapViewModel(pair.Value,  mapName, (uint)pair.Key);
+                    }).ToList();
+                RaisePropertyChanged(nameof(Maps));
+                SelectedMap = Maps.FirstOrDefault(k => k.MapPath == "Kalimdor") ?? Maps.FirstOrDefault();
+            });
 
             AutoDispose(this
                 .ToObservable(i => i.SelectedMap)

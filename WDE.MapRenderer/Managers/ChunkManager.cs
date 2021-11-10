@@ -331,6 +331,7 @@ namespace WDE.MapRenderer.Managers
 
         private IEnumerator LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
         {
+            int index = 0;
             foreach (var m2 in adt.M2Objects)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -340,7 +341,10 @@ namespace WDE.MapRenderer.Managers
                 
                 yield return gameContext.MdxManager.LoadM2Mesh(m2.M2Path, result);
                 if (result.Task.Result == null)
+                {
+                    Console.WriteLine(m2.M2Path + " is null");
                     continue;
+                }
                 var m = result.Task.Result;
 
                 var t = new Transform();
@@ -361,14 +365,18 @@ namespace WDE.MapRenderer.Managers
                     chunk.objectHandles2.Add(entity);
 //                    chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(m.mesh.Handle, material, j++, t));
                 }
+
+                index++;
                 
-                yield return null;
+                if (index % 10 == 0)
+                    yield return null;
             }
         }
 
         private IEnumerator LoadWorldMapObjects(ADT adt, ChunkInstance chunk,
             CancellationToken cancellationToken)
         {
+            int index = 0;
             foreach (var wmoReference in adt.WorldMapObjects)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -408,7 +416,11 @@ namespace WDE.MapRenderer.Managers
                         //chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
                     }
                 }
-                yield return null;
+                
+                index++;
+                
+                if (index % 10 == 0)
+                    yield return null;
             }
         }
 

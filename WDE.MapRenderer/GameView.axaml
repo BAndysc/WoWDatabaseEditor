@@ -13,17 +13,19 @@
     <UserControl.KeyBindings>
         <KeyBinding Gesture="M" Command="{Binding ToggleMapVisibilityCommand}" />
     </UserControl.KeyBindings>
-    <Panel>
-        <!--<theEngine:TheEnginePanel />-->
-        <theEngine:TheEnginePanel Name="TheEnginePanel" Game="{Binding  Game}"/>
-        <Border Margin="100,40" IsVisible="{Binding IsMapVisible}" BorderThickness="10" BorderBrush="DarkGray">
-            <worldMap:WoWMapViewer MapViewModel="{Binding   }"
-                                   MapsPath="{Binding MapData.Path}"
-                                   Map="{Binding SelectedMap.MapPath}">
-                <mapRenderer:MiniMapRenderer Context2="{Binding .}" PointerPressed="InputElement_OnPointerPressed"/>
-            </worldMap:WoWMapViewer>
-        </Border>
-        <TextBlock Text="{Binding #TheEnginePanel.FrameRate, StringFormat={}{0:0.##}}" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
-        <TextBlock Text="{Binding Stats}" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
-    </Panel>
+    <DockPanel LastChildFill="True">
+        <mapRenderer:GameToolBar DockPanel.Dock="Top" />
+        <Panel>
+            <theEngine:TheEnginePanel Name="TheEnginePanel" Game="{Binding  Game}"/>
+            <Border Margin="100,40" IsVisible="{Binding IsMapVisible}" BorderThickness="10" BorderBrush="DarkGray">
+                <worldMap:WoWMapViewer MapViewModel="{Binding   }"
+                                       MapsPath="{Binding MapData.Path}"
+                                       Map="{Binding SelectedMap.MapPath}">
+                    <mapRenderer:MiniMapRenderer Context2="{Binding .}" PointerPressed="InputElement_OnPointerPressed"/>
+                </worldMap:WoWMapViewer>
+            </Border>
+            <TextBlock Text="{Binding #TheEnginePanel.FrameRate, StringFormat={}{0:0.##}}" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
+            <TextBlock Text="{Binding Stats}" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
+        </Panel>
+    </DockPanel>
 </UserControl>

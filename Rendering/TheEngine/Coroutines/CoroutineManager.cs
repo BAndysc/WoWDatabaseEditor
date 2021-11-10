@@ -69,7 +69,10 @@ namespace TheEngine.Coroutines
                 {
                     state.Active = false;
                     if (!StartNested(nested, state))
+                    {
+                        state.Active = true;
                         return CoroutineStep(state);
+                    }
                 }
                 else if (cur is WaitForTask waitForTask)
                 {
@@ -101,13 +104,18 @@ namespace TheEngine.Coroutines
 
         public void Step()
         {
+            var active = 0;
+            var inactive = 0;
             for (int i = coroutines.Count - 1; i >= 0; --i)
             {
                 if (coroutines[i].Active)
                 {
+                    active++;
                     if (!CoroutineStep(coroutines[i]))
                         coroutines.RemoveAt(i);
                 }
+                else
+                    inactive++;
             }
         }
     }

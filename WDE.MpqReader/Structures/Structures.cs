@@ -36,7 +36,7 @@ namespace WDE.MpqReader.Structures
 /*0x068*/  public M2Array<ushort> textureIndicesById { get; init; }                // (alt. name: replacable_texture_lookup)
 /*0x070*/  public M2Array<M2Material> materials { get; init; }                       // Blending modes / render flags.
 /*0x078*/  public M2Array<ushort> boneCombos { get; init; }                        // (alt. name: bone_lookup_table)
-/*0x080*/  public M2Array<ushort> textureCombos { get; init; }                     // (alt. name: texture_lookup_table)
+/*0x080*/  public M2Array<short> textureCombos { get; init; }                     // (alt. name: texture_lookup_table)
 /*0x088*/  public M2Array<ushort> textureTransformBoneMap { get; init; }           // (alt. name: tex_unit_lookup_table)
 /*0x090*/  public M2Array<ushort> textureWeightCombos { get; init; }               // (alt. name: transparency_lookup_table)
 /*0x098*/  public M2Array<ushort> textureTransformCombos { get; init; }            // (alt. name: texture_transforms_lookup_table)
@@ -80,7 +80,7 @@ namespace WDE.MpqReader.Structures
                 textureIndicesById = reader.ReadArrayUInt16(),
                 materials = reader.ReadArray(M2Material.Read),
                 boneCombos = reader.ReadArrayUInt16(),
-                textureCombos = reader.ReadArrayUInt16(),
+                textureCombos = reader.ReadArrayInt16(),
                 textureTransformBoneMap = reader.ReadArrayUInt16(),
                 textureWeightCombos = reader.ReadArrayUInt16(),
                 textureTransformCombos = reader.ReadArrayUInt16(),
@@ -781,6 +781,11 @@ namespace WDE.MpqReader.Structures
             return binaryReader.ReadArray(br => br.ReadUInt16());
         }
     
+        public static M2Array<short> ReadArrayInt16(this IBinaryReader binaryReader)
+        {
+            return binaryReader.ReadArray(br => br.ReadInt16());
+        }
+        
         public static M2Array<Vector3> ReadArrayVector3(this IBinaryReader binaryReader)
         {
             return binaryReader.ReadArray(br => br.ReadVector3());
