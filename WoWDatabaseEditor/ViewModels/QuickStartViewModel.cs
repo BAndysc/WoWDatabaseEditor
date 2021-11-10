@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
@@ -21,6 +22,7 @@ using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.CoreVersion;
 using WoWDatabaseEditorCore.Extensions;
+using WoWDatabaseEditorCore.Services.DotNetUtils;
 using WoWDatabaseEditorCore.Services.Http;
 using WoWDatabaseEditorCore.Services.NewItemService;
 using WoWDatabaseEditorCore.Services.Statistics;
@@ -32,6 +34,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly ISolutionItemIconRegistry iconRegistry;
         private readonly ISolutionItemNameRegistry nameRegistry;
         private readonly IMostRecentlyUsedService mostRecentlyUsedService;
+        private readonly IDotNetService dotNetService;
         private bool showGiveStarBox;
         public AboutViewModel AboutViewModel { get; }
         public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
@@ -62,11 +65,14 @@ namespace WoWDatabaseEditorCore.ViewModels
             IStatisticsService statisticsService,
             IApplicationReleaseConfiguration applicationReleaseConfiguration,
             IUrlOpenService urlOpenService,
+            IDotNetService dotNetService,
+            IWindowManager windowManager,
             AboutViewModel aboutViewModel)
         {
             this.iconRegistry = iconRegistry;
             this.nameRegistry = nameRegistry;
             this.mostRecentlyUsedService = mostRecentlyUsedService;
+            this.dotNetService = dotNetService;
             Wizards.AddRange(wizards.Where(w => w.IsCompatibleWithCore(currentCoreVersion.Current)));
             HasWizards = Wizards.Count > 0;
             AboutViewModel = aboutViewModel;
@@ -134,6 +140,14 @@ namespace WoWDatabaseEditorCore.ViewModels
                 mainThread.Dispatch(ReloadMruList);
             }, true));
 
+            OpenDotNet6Website = new AsyncAutoCommand(async () =>
+            {
+                var url = dotNetService.DownloadDotNet6Link;
+                windowManager.OpenUrl(url.ToString());
+            });
+
+            CheckDotNet().ListenErrors();
+            
             ShowGiveStarBox = statisticsService.RunCounter > 20 &&
                               !applicationReleaseConfiguration.GetBool("SKIP_STAR_BOX").GetValueOrDefault() &&
                               !userSettings.Get<QuickStartSettings>().DismissedLeaveStarBox;
@@ -141,6 +155,13 @@ namespace WoWDatabaseEditorCore.ViewModels
             ReloadMruList();
         }
 
+        private async Task CheckDotNet()
+        {
+            var isInstalled = await dotNetService.IsDotNet6Installed();
+            IsDotNet6Installed = isInstalled;
+            RaisePropertyChanged(nameof(IsDotNet6Installed));
+        }
+        
         private void ReloadMruList()
         {
             MostRecentlyUsedItems.Clear();
@@ -154,6 +175,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
         }
 
+        public bool IsDotNet6Installed { get; private set; } = true;
+        public AsyncAutoCommand OpenDotNet6Website { get; }
         public AsyncAutoCommand<NewItemPrototypeInfo> LoadItemCommand { get; }
         public AsyncAutoCommand<IWizardProvider> LoadWizard { get; }
         public AsyncAutoCommand<MostRecentlyUsedViewModel> OpenMostRecentlyUsedCommand { get; }

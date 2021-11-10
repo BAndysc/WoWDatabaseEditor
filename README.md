@@ -26,6 +26,8 @@ Application has a built-in auto updater, so you do **not** have to redownload a 
 
 **To run the editor, you need [.NET 5 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0) for your OS**.
 
+**Future versions will require [.NET 6 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0), we recommend to install it now already**.
+
 WoW Database Editor is compatibile with both MacOS, Linux and Windows.
 
 **Download links**: 

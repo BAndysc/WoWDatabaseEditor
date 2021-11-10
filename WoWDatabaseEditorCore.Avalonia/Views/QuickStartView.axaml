@@ -85,6 +85,22 @@
                     Padding="10" 
                     Margin="0,10" 
                     BorderThickness="1" 
+                    IsVisible="{Binding IsDotNet6Installed, Converter={StaticResource InversedBoolConverter}}"
+                    BorderBrush="Gray">
+                <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
+                    <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">You need to install .NET 6</TextBlock>
+                    <TextBlock TextWrapping="WrapWithOverflow">In the near future the editor will require new .NET 6. You need to install it in order to continue using the editor. Why not do it now so that you are prepared?</TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Command="{Binding OpenDotNet6Website}" Margin="0,0,5,0">Okay 👍! (this will open the .net website)</Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            
+            <Border Background="{DynamicResource SlightlyHighlightedBackground}" 
+                    CornerRadius="5" 
+                    Padding="10" 
+                    Margin="0,10" 
+                    BorderThickness="1" 
                     IsVisible="{Binding ShowGiveStarBox}"
                     BorderBrush="Gray">
                 <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
