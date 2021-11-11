@@ -266,6 +266,56 @@ namespace TheEngine.Test.Coroutines
             Assert.AreEqual(0, cm.PendingCoroutines);
         }
         
+        [Test]
+        public void NestedException()
+        {
+            int state1 = 0;
+
+            IEnumerator CoroutineC()
+            {
+                throw new Exception();
+            }
+
+            IEnumerator CoroutineB()
+            {
+                yield return CoroutineC();
+            }
+            
+            IEnumerator CoroutineA()
+            {
+                yield return CoroutineB();
+                state1 = 1;
+            }
+
+            Start(CoroutineA);
+            Assert.AreEqual(0, state1);
+        }
+        
+        [Test]
+        public void NestedExceptionIgnore()
+        {
+            int state1 = 0;
+
+            IEnumerator CoroutineC()
+            {
+                throw new Exception();
+            }
+
+            IEnumerator CoroutineB()
+            {
+                yield return CoroutineC();
+            }
+            
+            IEnumerator CoroutineA()
+            {
+                yield return CoroutineB().ContinueOnException();
+                state1 = 1;
+            }
+
+            Start(CoroutineA);
+            Assert.AreEqual(1, state1);
+        }
+        
         private void Start(Func<IEnumerator> a)
         {
             cm.Start(a());

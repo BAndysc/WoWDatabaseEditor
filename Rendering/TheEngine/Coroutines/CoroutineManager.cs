@@ -24,6 +24,8 @@ namespace TheEngine.Coroutines
             public IEnumerator Coroutine;
             public bool Active;
             public CoroutineState? Parent;
+            public Exception? NestedException;
+            public bool IgnoreNestedExceptions;
         }
 
         public int PendingCoroutines => coroutines.Count;
@@ -58,17 +60,42 @@ namespace TheEngine.Coroutines
 
         private bool CoroutineStep(CoroutineState state)
         {
-            if (state.Coroutine.MoveNext())
+            bool hasContinuation = false;
+            try
+            {
+                hasContinuation = state.Coroutine.MoveNext();
+            }
+            catch (Exception e)
+            {
+                if (state.Parent != null && !state.Parent.IgnoreNestedExceptions)
+                {
+                    state.Parent.NestedException = e;
+                    state.Parent = null; // <-- so that it doesn't get activated
+                }
+                Console.WriteLine("Exception while running a continuation: ");
+                Console.WriteLine(e);
+            }
+            if (hasContinuation)
             {
                 var cur = state.Coroutine.Current;
                 if (cur == null)
                 {
                     return true;
                 }
+                else if (cur is ContinueOnExceptionEnumerator continueOnException)
+                {
+                    state.Active = false;
+                    state.IgnoreNestedExceptions = true;
+                    if (!StartNested(continueOnException.Enumerator, state) && state.NestedException == null)
+                    {
+                        state.Active = true;
+                        return CoroutineStep(state);
+                    }
+                }
                 else if (cur is IEnumerator nested)
                 {
                     state.Active = false;
-                    if (!StartNested(nested, state))
+                    if (!StartNested(nested, state) && state.NestedException == null)
                     {
                         state.Active = true;
                         return CoroutineStep(state);
@@ -113,6 +140,12 @@ namespace TheEngine.Coroutines
                     active++;
                     if (!CoroutineStep(coroutines[i]))
                         coroutines.RemoveAt(i);
+                }
+                else if (coroutines[i].NestedException != null)
+                {
+                    if (coroutines[i].Parent != null && !coroutines[i].Parent.IgnoreNestedExceptions)
+                        coroutines[i].Parent.NestedException = coroutines[i].NestedException; // propagate
+                    coroutines.RemoveAt(i);
                 }
                 else
                     inactive++;
