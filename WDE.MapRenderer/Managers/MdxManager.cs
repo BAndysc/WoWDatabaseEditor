@@ -217,9 +217,9 @@ namespace WDE.MapRenderer.Managers
                 }
                 else if (materialDef.blending_mode == M2Blend.M2BlendAlphaKey)
                 {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.One;
-                    material.DestinationBlending = Blending.One;
+                    material.BlendingEnabled = false;
+                    //material.SourceBlending = Blending.One;
+                    //material.DestinationBlending = Blending.Zero;
                     material.SetUniform("alphaTest", 224.0f / 255.0f);
                 }
                 else if (materialDef.blending_mode == M2Blend.M2BlendAlpha)

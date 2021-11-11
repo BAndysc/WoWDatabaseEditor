@@ -144,6 +144,16 @@ namespace TheMaths
             get { return X == 0 && Y == 0; }
         }
 
+        public Vector2 Normalized
+        {
+            get
+            {
+                Vector2 copy = this;
+                copy.Normalize();
+                return copy;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the component at the specified index.
         /// </summary>

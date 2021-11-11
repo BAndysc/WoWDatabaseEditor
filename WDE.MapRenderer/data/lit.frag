@@ -96,4 +96,9 @@ void main()
     float dist = distance(WorldPos, cameraPos);
     float fogFactor = (clamp(dist, FOG_START, FOG_END) - FOG_START) / (FOG_END - FOG_START);
     //FragColor = vec4(mix(FragColor.rgb, FOG_COLOR, fogFactor), 1);
+    
+    float isBorderOfChunk = - min(0, sign(fract(WorldPos.x / 533.333) * 533.333 - 0.5)) + 
+        - min(0, sign(fract(WorldPos.z / 533.333) * 533.333 - 0.5));
+    
+    FragColor = mix(FragColor, FragColor + vec4(0.4, 0.4, 0.4, 0), clamp(isBorderOfChunk, 0, 1));
 }

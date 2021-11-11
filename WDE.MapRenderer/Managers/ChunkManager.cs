@@ -7,6 +7,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Components;
+using TheEngine.Coroutines;
 using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
@@ -29,6 +30,7 @@ namespace WDE.MapRenderer.Managers
         public TextureHandle holesMapTex;
         public NativeBuffer<VectorByte4>? chunkToSplatBuffer;
         public NativeBuffer<Vector4>? heightsNormalBuffer;
+        public float[,] heights;
         public Material? material;
         public CancellationTokenSource? loading = new CancellationTokenSource();
         public Task? chunkLoading;
@@ -59,9 +61,34 @@ namespace WDE.MapRenderer.Managers
         private readonly IGameContext gameContext;
         private HashSet<(int, int)> loadedChunks = new();
         private List<ChunkInstance> chunks = new();
+        private Dictionary<(int, int), ChunkInstance> chunksXY = new();
 
         private Archetype collisionOnlyArchetype;
         private Archetype renderEntityArchetype;
+        private Archetype terrainEntityArchetype;
+
+        private void PosToChunkHeightCoords(Vector3 wowPosition, out (int, int) chunk, out int xIndex, out int yIndex)
+        {
+            chunk = wowPosition.WoWPositionToChunk();
+            var chunkInitPos = chunk.ChunkToWoWPosition();
+            var posWithInChunk = chunkInitPos - wowPosition;
+            int xInt = 533 - (int)Math.Clamp(posWithInChunk.X, 0, 533);
+            int yInt = 533 - (int)Math.Clamp(posWithInChunk.Y, 0, 533);
+            int maxIndex = Constants.ChunksInBlockX * 9 - 1;
+            xIndex = Math.Clamp((int)(xInt / 533.0 * maxIndex), 0, maxIndex);
+            yIndex = Math.Clamp((int)(yInt / 533.0 * maxIndex), 0, maxIndex);
+        }
+        
+        public float? HeightAtPosition(float x, float y)
+        {
+            Vector3 wowPos = new Vector3(x, y, 0);
+            PosToChunkHeightCoords(wowPos, out var chunk, out int xIndex, out int yIndex);
+
+            if (!chunksXY.TryGetValue(chunk, out var c))
+                return null;
+
+            return c.heights[xIndex, yIndex];
+        }
         
         public ChunkManager(IGameContext gameContext)
         {
@@ -70,7 +97,12 @@ namespace WDE.MapRenderer.Managers
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<Collider>()
                 .WithComponentData<WorldMeshBounds>()
-                .WithComponentData<MeshRenderer>();                
+                .WithComponentData<MeshRenderer>();
+            terrainEntityArchetype = gameContext.Engine.EntityManager.NewArchetype()
+                .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<LocalToWorld>()
+                .WithComponentData<WorldMeshBounds>()
+                .WithComponentData<MeshRenderer>();
             renderEntityArchetype = gameContext.Engine.EntityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>()
@@ -91,6 +123,7 @@ namespace WDE.MapRenderer.Managers
             var tasksource = new TaskCompletionSource();
             chunk.chunkLoading = tasksource.Task;
             chunks.Add(chunk);
+            chunksXY[(x, y)] = chunk;
             
             var file = gameContext.ReadFile($"World\\Maps\\{gameContext.CurrentMap}\\{gameContext.CurrentMap}_{y}_{x}.adt");
             yield return file;
@@ -100,6 +133,8 @@ namespace WDE.MapRenderer.Managers
                 chunk.loading = null;
                 yield break;
             }
+
+            chunk.heights = new float[Constants.ChunksInBlockX * 9, Constants.ChunksInBlockY * 9];
 
             using var splatMapArrayGenerator = new GroupedArrayPooler<Rgba32>(Constants.ChunksInBlock);
             Rgba32[][][] splatMaps = new Rgba32[Constants.ChunksInBlock][][];
@@ -117,6 +152,8 @@ namespace WDE.MapRenderer.Managers
             adt = new ADT(new MemoryBinaryReader(file.Result));
             file.Result.Dispose();
 
+            float minHeight = float.MaxValue;
+            float maxHeight = float.MaxValue;
             int k = 0;
             int k2 = 0;
             using var chunksEnumerator2 = ((IEnumerable<AdtChunk>)adt.Chunks).GetEnumerator();
@@ -126,7 +163,10 @@ namespace WDE.MapRenderer.Managers
                 {
                     var splatMap = splatMapArrayGenerator.Get(64 * 64);
 
-                    chunksEnumerator2.MoveNext();
+                    if (!chunksEnumerator2.MoveNext())
+                    {
+                        throw new Exception("Unexpected end of chunks");
+                    }
                     var basePos = chunksEnumerator2.Current.BasePosition;
                     int k_ = 0;
                     Vector3[] subVertices = new Vector3[145];
@@ -136,12 +176,24 @@ namespace WDE.MapRenderer.Managers
                         {
                             float VERTX = 0;
                             if (cy % 2 == 0)
+                            {
                                 VERTX = cx / 8.0f * Constants.ChunkSize;
+                            }
                             else
+                            {
                                 VERTX = (Constants.ChunkSize / 8) * 7 * (cx / 7.0f) + Constants.ChunkSize / 8 / 2;
+                            }
                             float VERTY = cy / 16.0f * Constants.ChunkSize;
                             var vert = new Vector3(-VERTX, chunksEnumerator2.Current.Heights[k_], VERTY) + basePos.ToOpenGlPosition();
                             subVertices[k_] = vert;
+
+                            if (cy % 2 == 0) // inner row, 8 verts
+                            {
+                                int yIndex2 = (15 - j) * 9 + 8 - cx;
+                                int xIndex2 =  (15 - i) * 9 + 8 - cy/2;
+                                chunk.heights[xIndex2, yIndex2] = vert.Y;
+                            }
+                            vert.Y.MinMax(ref minHeight, ref maxHeight);
                             
                             var norm = chunksEnumerator2.Current.Normals[k_];
                             heightsNormal[k++] = new Vector4(
@@ -307,8 +359,19 @@ namespace WDE.MapRenderer.Managers
             material.SetBuffer("chunkToSplat", chunk.chunkToSplatBuffer);
             material.SetBuffer("heightsNormalBuffer", chunk.heightsNormalBuffer);
 
-            chunk.terrainHandle = gameContext.Engine.RenderManager.RegisterDynamicRenderer(chunkMesh.Handle, material, 0, t);
-
+            //chunk.terrainHandle = gameContext.Engine.RenderManager.RegisterDynamicRenderer(chunkMesh.Handle, material, 0, t);
+            
+            var terrainEntity = gameContext.Engine.EntityManager.CreateEntity(terrainEntityArchetype);
+            gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(terrainEntity).Matrix = t.LocalToWorldMatrix;
+            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).SubMeshId = 0;
+            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).MaterialHandle = material.Handle;
+            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).MeshHandle = chunkMesh.Handle; 
+            var localBounds = new BoundingBox(
+                new Vector3(chunkMesh.Bounds.Minimum.X, minHeight, chunkMesh.Bounds.Minimum.Z),
+                new Vector3(chunkMesh.Bounds.Maximum.X, maxHeight, chunkMesh.Bounds.Maximum.Z));
+            gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(terrainEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = t.LocalToWorldMatrix });
+            chunk.objectHandles2.Add(terrainEntity);
+            
             if (cancelationToken.IsCancellationRequested)
             {
                 tasksource.SetResult();
@@ -467,6 +530,7 @@ namespace WDE.MapRenderer.Managers
 
         private async Task UnloadChunk(ChunkInstance chunk)
         {
+            chunksXY.Remove((chunk.X, chunk.Z));
             loadedChunks.Remove((chunk.X, chunk.Z));
             chunks.Remove(chunk);
             if (chunk.loading != null)
