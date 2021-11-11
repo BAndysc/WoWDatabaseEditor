@@ -23,6 +23,7 @@
         public void PostUpdate()
         {
             mouse.PostUpdate();
+            keyboard.PostUpdate();
         }
     }
 }
