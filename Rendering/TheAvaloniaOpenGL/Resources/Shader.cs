@@ -5,6 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using OpenGLBindings;
+using TheMaths;
 
 namespace TheAvaloniaOpenGL.Resources
 {
@@ -73,6 +74,9 @@ namespace TheAvaloniaOpenGL.Resources
 
         public bool WriteMask { get; }
 
+        private Dictionary<int, float> uniformFloatValues = new();
+        private Dictionary<int, Vector4> uniformVectorValues = new();
+        private Dictionary<int, int> uniformIntValues = new();
         private Dictionary<string, int> uniformToLocation = new();
 
         /*public class ShaderInclude : Include
@@ -245,6 +249,37 @@ namespace TheAvaloniaOpenGL.Resources
             //PixelShader.Dispose();
             //VertexShader.Dispose();
             //ShaderInputLayout.Dispose();
+        }
+
+        public void SetUniform(int loc, float f)
+        {
+            if (!uniformFloatValues.TryGetValue(loc, out var curVal) || Math.Abs(curVal - f) > float.Epsilon)
+            {
+                device.Uniform1f(loc, f);
+                uniformFloatValues[loc] = f;
+            }
+        }
+        
+        public void SetUniformInt(int loc, int val)
+        {
+            if (!uniformIntValues.TryGetValue(loc, out var curVal) || curVal != val)
+            {
+                device.Uniform1I(loc, val);
+                uniformIntValues[loc] = val;
+            }
+        }
+
+        public void SetUniform(int loc, float x, float y, float z, float w)
+        {
+            if (!uniformVectorValues.TryGetValue(loc, out var curVal) || 
+                Math.Abs(curVal.X - x) > float.Epsilon ||
+                Math.Abs(curVal.Y - y) > float.Epsilon ||
+                Math.Abs(curVal.Z - z) > float.Epsilon ||
+                Math.Abs(curVal.W - w) > float.Epsilon)
+            {
+                device.Uniform4f(loc, x, y, z, w);
+                uniformVectorValues[loc] = new Vector4(x, y, z, w);
+            }
         }
     }
     

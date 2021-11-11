@@ -148,30 +148,30 @@ namespace TheEngine.Entities
             foreach (var buffer in structuredBuffers)
             {
                 buffer.Value.Activate(slot);
-                engine.Device.device.Uniform1I(buffer.Key, slot);
+                shader.SetUniformInt(buffer.Key, slot);
                 slot++;
             }
             foreach (var pair in textureHandles)
             {
                 var texture = engine.textureManager.GetTextureByHandle(pair.Value);
                 texture.Activate(slot);
-                engine.Device.device.Uniform1I(pair.Key, slot);
+                shader.SetUniformInt(pair.Key, slot);
                 slot++;
             }
 
             foreach (var floats in floatUniforms)
             {
-                engine.Device.device.Uniform1f(floats.Key, floats.Value);
+                shader.SetUniform(floats.Key, floats.Value);
             }
             engine.Device.device.CheckError("before set int uniform");
             foreach (var ints in intUniforms)
             {
-                engine.Device.device.Uniform1I(ints.Key, ints.Value);
+                shader.SetUniformInt(ints.Key, ints.Value);
             }
             engine.Device.device.CheckError("after set int uniforms");
             foreach (var vector in vector4Uniforms)
             {
-                engine.Device.device.Uniform4f(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);
+                shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);
             }
         }
         
