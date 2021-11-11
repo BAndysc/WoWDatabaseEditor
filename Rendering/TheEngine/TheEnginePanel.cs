@@ -24,7 +24,6 @@ namespace TheEngine
 #endif
     {
         protected Engine? engine;
-        public TheDevice device;
         private Stopwatch sw = new Stopwatch();
         private Stopwatch renderStopwatch = new Stopwatch();
 
@@ -100,7 +99,14 @@ namespace TheEngine
 #if USE_OPENTK
             engine = new Engine(new OpenTKDevice(), new Configuration(), this);
 #else
-                engine = new Engine(new DebugDevice(new RealDevice(gl)), new Configuration(), this);
+                IDevice device;
+                var real = new RealDevice(gl);
+#if DEBUG
+                device = new DebugDevice(real);
+#else
+                device = new RealDeviceWrapper(real);
+#endif
+                engine = new Engine(device, new Configuration(), this);
 #endif
             }
             catch (Exception e)
@@ -137,13 +143,23 @@ namespace TheEngine
                 RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, FrameRate);
 
                 Update(delta);
-                engine.inputManager.PostUpdate();
 
                 // render pass
                 engine.renderManager.PrepareRendering(fb);
                 engine.renderManager.RenderWorld(fb);
                 Render(delta);
                 engine.renderManager.FinalizeRendering(fb);
+                
+                if (engine.inputManager.Keyboard.JustPressed(Key.R))
+                {
+                    if (engine.Device.device is DebugDevice debug)
+                    {
+                        var file = new FileInfo("render_debug.txt");
+                        File.WriteAllLines(file.FullName, debug.commands);
+                        Console.WriteLine("Log written to " + file.FullName);
+                    }
+                }
+                engine.inputManager.PostUpdate();
             }
             catch (Exception e)
             {

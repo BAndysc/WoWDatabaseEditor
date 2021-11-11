@@ -125,10 +125,18 @@ namespace WDE.MapRenderer
             Game.UpdateLoop.Register(d =>
             {
                 ref var counters = ref Game.Engine.StatsManager.Counters;
+                ref var stats = ref Game.Engine.StatsManager.RenderStats;
                 float w = Game.Engine.StatsManager.PixelSize.X;
                 float h = Game.Engine.StatsManager.PixelSize.Y;
                 Stats =
                     $"[{w:0}x{h:0}]\nTotal frame time: {counters.FrameTime.Average:0.00} ms\n - Render time: {counters.TotalRender.Average:0.00}\n  - Bounds: {counters.BoundsCalc.Average:0.00}ms\n  - Culling: {counters.Culling.Average:0.00}ms\n  - Drawing: {counters.Drawing.Average:0.00}ms\n  - Present time: {counters.PresentTime.Average:0.00} ms";
+
+                Stats += @"\nShaders: " + stats.ShaderSwitches + @"
+Materials: " + stats.MaterialActivations + @"
+Meshes: " + stats.MeshSwitches + @"
+Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws) + @"
+Batches saved by instancing: " + stats.InstancedDrawSaved + @"
+Tris: " + stats.TrianglesDrawn;
                 Dispatcher.UIThread.Post(()=> RaisePropertyChanged(nameof(Stats)), DispatcherPriority.Render);
             });
         }

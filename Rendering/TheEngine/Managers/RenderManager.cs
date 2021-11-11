@@ -307,25 +307,15 @@ namespace TheEngine.Managers
             SetZWrite(false);
             renderTexture.Activate(0);
             //outlineTexture.Activate(1);
-            engine.meshManager.GetMeshByHandle(planeMesh.Handle).Activate();
+            planeMesh.Activate();
+            SetBlending(false, Blending.One, Blending.Zero);
             engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
 
             inRenderingLoop = false;
+            engine.statsManager.RenderStats = Stats;
         }
 
-        public struct RenderStats
-        {
-            public int ShaderSwitches = 0;
-            public int MaterialActivations = 0;
-            public int MeshSwitches = 0;
-            public int InstancedDraws = 0;
-            public int NonInstancedDraws = 0;
-            public int InstancedDrawSaved = 0;
-            public int TrianglesDrawn = 0;
-            public int IndicesDrawn = 0;
-        }
-
-        public RenderStats Stats;
+        private RenderStats Stats;
         
         internal void RenderWorld(int dstFrameBuffer)
         {
@@ -349,7 +339,7 @@ namespace TheEngine.Managers
             dirtEntities.ParallelForEach<DirtyPosition>((itr, start, end, dirty) =>
             {
                 for (int i = start; i < end; ++i)
-                    dirty[i] = new DirtyPosition(false);
+                    dirty[i].Disable();
             });
         }
 
@@ -364,25 +354,14 @@ namespace TheEngine.Managers
             {
                 RenderRenderers(overrideMaterial, renderers, 500);
             }
-
-            /*tatsString = @"ShaderSwitches = " + Stats.ShaderSwitches + @"
-MaterialActivations = " + Stats.MaterialActivations + @"
-MeshSwitches = " + Stats.MeshSwitches + @"
-InstancedDraws = " + Stats.InstancedDraws + @"
-NonInstancedDraws = " + Stats.NonInstancedDraws + @"
-InstancedDrawSaved = " + Stats.InstancedDrawSaved + @"
-TrianglesDrawn = " + Stats.TrianglesDrawn + @"
-IndicesDrawn = " + Stats.IndicesDrawn;*/
         }
-
-        public string StatsString;
 
         private void EnableMaterial(Material material)
         {
             SetZWrite(material.Shader.ZWrite);
             SetDepthTest(material.Shader.DepthTest);
             SetCulling(material.Culling);
-            SetBlending(false, Blending.One, Blending.Zero);
+            SetBlending(material.BlendingEnabled, material.SourceBlending, material.DestinationBlending);
             material.ActivateUniforms();
             Stats.MaterialActivations++;
         }
@@ -466,7 +445,8 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
                     var pos = l2w[i].Position;
                     var boundingBoxSize = boundingBox.Size;
                     var size = boundingBoxSize.X + boundingBoxSize.Y + boundingBoxSize.Z;
-                    bool doRender = (pos - cameraPosition).LengthSquared() < (size * 7) * (size * 7);
+                    size = Math.Max(size, 40);
+                    bool doRender = (pos - cameraPosition).LengthSquared() < (size) * (size) * 4 * 4;
                     if (doRender)
                     {
                         bits[i] = (RenderEnabledBit)(frustum.Contains(ref boundingBox) != ContainmentType.Disjoint);
@@ -494,6 +474,7 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
 
                     if (currentShader != shader)
                     {
+                        Stats.ShaderSwitches++;
                         currentShader = shader;
                         //shadertimer.Start();
                         shader.Activate();
@@ -502,6 +483,7 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
 
                     if (currentMesh != mesh)
                     {
+                        Stats.MeshSwitches++;
                         currentMesh = mesh;
                         //meshtimer.Start();
                         mesh.Activate();
@@ -517,9 +499,15 @@ IndicesDrawn = " + Stats.IndicesDrawn;*/
                     objectData.InverseWorldMatrix = l2w[i].Inverse;
                     objectBuffer.UpdateBuffer(ref objectData);
                     //buffertimer.Stop();
+                    #if DEBUG
                     currentShader.Validate();
+                    #endif
                     //draw.Start();
-                    engine.Device.DrawIndexed(mesh.IndexCount(meshId), mesh.IndexStart(meshId), 0);
+                    var indicesCount = mesh.IndexCount(meshId);
+                    Stats.IndicesDrawn += indicesCount;
+                    Stats.TrianglesDrawn += indicesCount / 3;
+                    Stats.NonInstancedDraws++;
+                    engine.Device.DrawIndexed(indicesCount, mesh.IndexStart(meshId), 0);
                     //draw.Stop();
                 }
             });
