@@ -11,5 +11,6 @@ namespace TheEngine.Interfaces
         DynamicRenderHandle RegisterDynamicRenderer(MeshHandle mesh, Material material, int subMesh, Transform transform);
         void UnregisterDynamicRenderer(DynamicRenderHandle staticRenderHandle);
         void Render(IMesh mesh, Material material, int submesh, Transform transform);
+        void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count);
     }
 }

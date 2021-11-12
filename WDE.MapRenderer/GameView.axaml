@@ -24,8 +24,8 @@
                     <mapRenderer:MiniMapRenderer Context2="{Binding .}" PointerPressed="InputElement_OnPointerPressed"/>
                 </worldMap:WoWMapViewer>
             </Border>
-            <!--<TextBlock Text="{Binding #TheEnginePanel.FrameRate, StringFormat={}{0:0.##}}" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
-            <TextBlock Text="{Binding Stats}" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />-->
+            <TextBlock Text="{Binding #TheEnginePanel.FrameRate, StringFormat={}{0:0.##}}" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
+            <TextBlock Text="{Binding Stats}" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
         </Panel>
     </DockPanel>
 </UserControl>

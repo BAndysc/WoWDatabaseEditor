@@ -54,6 +54,9 @@ namespace TheEngine
         internal FontManager fontManager { get; }
         public IFontManager FontManager => fontManager;
         
+        internal UIManager uiManager { get; }
+        public IUIManager Ui => uiManager;
+        
         private Thread renderThread;
         
         private volatile bool isDisposing;
@@ -84,6 +87,7 @@ namespace TheEngine
 
             textureManager = new TextureManager(this);
             fontManager = new FontManager(this);
+            uiManager = new UIManager(this);
         }
 
         public void Render()
@@ -97,12 +101,14 @@ namespace TheEngine
         public void Dispose()
         {
             isDisposing = true;
-            renderManager.Dispose();
+            uiManager.Dispose();
+            fontManager.Dispose();
             lightManager.Dispose();
             cameraManger.Dispose();
             materialManager.Dispose();
             meshManager.Dispose();
             textureManager.Dispose();
+            renderManager.Dispose();
             shaderManager.Dispose();
             entityManager.Dispose();
             Device.Dispose();

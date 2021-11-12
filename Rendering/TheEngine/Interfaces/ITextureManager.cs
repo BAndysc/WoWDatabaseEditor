@@ -7,6 +7,7 @@ namespace TheEngine.Interfaces
 {
     public interface ITextureManager
     {
+        TextureHandle EmptyTexture { get; }
         TextureHandle LoadTexture(string path);
         //TextureHandle LoadTextureArray(params string[] path);
         TextureHandle CreateTextureArray(Rgba32[][][] pixels, int width, int height);

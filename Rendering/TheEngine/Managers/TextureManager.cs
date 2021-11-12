@@ -21,6 +21,8 @@ namespace TheEngine.Managers
         private Dictionary<ITexture, System.Diagnostics.StackTrace> createCallStack = new();
         #endif
         
+        public TextureHandle EmptyTexture { get; private set; }
+        
         private List<ITexture?> allTextures;
 
         internal TextureManager(Engine engine)
@@ -28,6 +30,8 @@ namespace TheEngine.Managers
             texturesByPath = new Dictionary<string, TextureHandle>();
             allTextures = new List<ITexture?>();
             this.engine = engine;
+
+            EmptyTexture = CreateTexture(new uint[] { 0xFFFFFFFF }, 1, 1);
         }
 
         internal ITexture? this[TextureHandle handle]
@@ -38,6 +42,7 @@ namespace TheEngine.Managers
         
         public void Dispose()
         {
+            DisposeTexture(EmptyTexture);
             foreach (var tex in allTextures)
             {
                 if (tex == null)

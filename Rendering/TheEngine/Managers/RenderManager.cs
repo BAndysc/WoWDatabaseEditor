@@ -642,7 +642,17 @@ namespace TheEngine.Managers
             var count = mesh.IndexCount(submesh);
             engine.Device.DrawIndexed(count, start, 0);
         }
-        
+
+        public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount)
+        {
+            material.Shader.Activate();
+            EnableMaterial(material);
+            mesh.Activate();
+            var start = mesh.IndexStart(submesh);
+            var count = mesh.IndexCount(submesh);
+            engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0);
+        }
+
         private void UpdateSceneBuffer()
         {
             var camera = cameraManager.MainCamera;
