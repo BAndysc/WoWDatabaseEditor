@@ -11,7 +11,7 @@
 
         internal InputManager(Engine engine)
         {
-            Mouse = mouse = new Mouse();
+            Mouse = mouse = new Mouse(engine);
             Keyboard = keyboard = new Keyboard();
         }
 

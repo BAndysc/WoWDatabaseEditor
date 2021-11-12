@@ -6,6 +6,7 @@ namespace TheEngine.Input
 {
     public class Mouse : IMouse
     {
+        private readonly Engine engine;
         private volatile bool leftDown;
         private volatile bool rightDown;
         
@@ -20,7 +21,20 @@ namespace TheEngine.Input
 
         public short WheelDelta => mouseWheelDelta;
         public Vector2 NormalizedPosition { get; private set; }
+        public Vector2 ScreenPoint
+        {
+            get
+            {
+                var zeroOne = new Vector2(NormalizedPosition.X, 1 - NormalizedPosition.Y);
+                return new Vector2(engine.WindowHost.WindowWidth * zeroOne.X, engine.WindowHost.WindowHeight * zeroOne.Y);
+            }
+        }
 
+        internal Mouse(Engine engine)
+        {
+            this.engine = engine;
+        }
+        
         internal void Update()
         {
             Delta = lastPosition - Position;

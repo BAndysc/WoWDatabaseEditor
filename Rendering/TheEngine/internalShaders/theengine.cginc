@@ -13,9 +13,12 @@ layout (std140) uniform SceneData
 	vec4 lightDir;
 	vec4 lightColor;
 	vec3 lightPosition;
-	float padding;
+	float padding; // implicit padding to align vec4
+	float screenWidth;
+	float screenHeight;
 	float time;
-	float padding2[3];
+	vec3 padding2;
+	float padding3[2];
 };
 
 layout (std140) uniform ObjectData
@@ -53,9 +56,12 @@ layout (std140) uniform SceneData
 	vec4 lightDir;
 	vec4 lightColor;
 	vec3 lightPosition;
-	float padding;
+	float padding; // implicit padding to align vec4
+	float screenWidth;
+	float screenHeight;
 	float time;
-	float padding2[3];
+	vec3 padding2;
+	float padding3[2];
 };
 
 #endif

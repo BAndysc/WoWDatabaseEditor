@@ -51,6 +51,9 @@ namespace TheEngine
         internal StatsManager statsManager { get; }
         public IStatsManager StatsManager => statsManager;
         
+        internal FontManager fontManager { get; }
+        public IFontManager FontManager => fontManager;
+        
         private Thread renderThread;
         
         private volatile bool isDisposing;
@@ -80,6 +83,7 @@ namespace TheEngine
             renderManager = new RenderManager(this);
 
             textureManager = new TextureManager(this);
+            fontManager = new FontManager(this);
         }
 
         public void Render()

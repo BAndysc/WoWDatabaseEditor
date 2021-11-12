@@ -1,0 +1,17 @@
+{
+  "Pixel": {
+    "Path": "internalShaders/sdf.frag"
+  },
+  "ZWrite": false,
+  "DepthTest": false,
+  "Vertex": {
+    "Path": "internalShaders/sdf.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

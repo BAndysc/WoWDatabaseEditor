@@ -657,6 +657,8 @@ namespace TheEngine.Managers
             sceneData.LightDirection = new Vector4(Vector3.ForwardLH * engine.lightManager.MainLight.LightRotation, 0);
             sceneData.LightColor = engine.lightManager.MainLight.LightColor;
             sceneData.Time = (float)engine.TotalTime;
+            sceneData.ScreenWidth = engine.WindowHost.WindowWidth;
+            sceneData.ScreenHeight = engine.WindowHost.WindowHeight;
 
             // scenePixelData.CameraPosition = sceneData.CameraPosition;
             // scenePixelData.LightDirection = new Vector4(Vector3.ForwardLH * engine.lightManager.MainLight.LightRotation, 0);

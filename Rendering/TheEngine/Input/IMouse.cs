@@ -10,5 +10,6 @@ namespace TheEngine.Input
         Vector2 Delta { get; }
         short WheelDelta { get; }
         Vector2 NormalizedPosition { get; }
+        Vector2 ScreenPoint { get; }
     }
 }
