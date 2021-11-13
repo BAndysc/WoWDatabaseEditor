@@ -1069,6 +1069,7 @@
       "Creature"
     ],
     "name": "SMART_EVENT_CHARMED_TARGET",
+    "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
     "description": "On creature charmed another unit",
     "name_readable": "On charmed target [DEPRECATED]"
   },
@@ -1372,6 +1373,7 @@
       "Creature"
     ],
     "name": "SMART_EVENT_WAYPOINT_START",
+    "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
     "parameters": [
       {
         "type": "Parameter",

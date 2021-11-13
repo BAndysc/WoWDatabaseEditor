@@ -1488,6 +1488,7 @@
     {
         "id": 61,
         "name": "SMART_ACTION_SET_SWIM",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -1815,6 +1816,7 @@
     },
     {
         "id": 76,
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "name": "SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT",
         "description": "SMART_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT (WARNING: CAN CRASH CORE)",
         "name_readable": "Override script base object",
@@ -1823,6 +1825,7 @@
     },
     {
         "id": 77,
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "name": "SMART_ACTION_RESET_SCRIPT_BASE_OBJECT",
         "description": "SMART_ACTION_RESET_SCRIPT_BASE_OBJECT",
         "name_readable": "Reset script base object",
@@ -2185,21 +2188,6 @@
         "description": "{source}: Play custom gameobject animation {pram1}",
         "name_readable": "Send gameobject custom animation",
         "target_types": ["GameObject"],
-        "target_is_source": true
-    },
-    {
-        "id": 94,
-        "name": "SMART_ACTION_SET_DYNAMIC_FLAG_HIDDEN",
-        "tags": ["TrinityWrath"],
-        "parameters": [
-            {
-                "type": "DynamicFlagsParameter",
-                "name": "Flags"
-            }
-        ],
-        "description": "{source}: Set dynamic flags to {pram1}",
-        "name_readable": "Set dynamic flag",
-        "target_types": ["GameObject", "Player", "Creature"],
         "target_is_source": true
     },
     {
@@ -2698,6 +2686,7 @@
     {
         "id": 119,
         "name": "SMART_ACTION_SET_CAN_FLY",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -2713,6 +2702,7 @@
     {
         "id": 120,
         "name": "SMART_ACTION_REMOVE_AURAS_BY_TYPE",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "AuraTypeParameter",
@@ -2727,6 +2717,7 @@
     {
         "id": 121,
         "name": "SMART_ACTION_SET_SIGHT_DIST",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2741,6 +2732,7 @@
     {
         "id": 122,
         "name": "SMART_ACTION_FLEE",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2811,6 +2803,7 @@
     {
         "id": 126,
         "name": "SMART_ACTION_REMOVE_ALL_GAMEOBJECTS",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "description": "{source}: Remove all gameobjects",
         "name_readable": "Remove all gameobjects",
         "target_types": ["Creature", "Player"],
