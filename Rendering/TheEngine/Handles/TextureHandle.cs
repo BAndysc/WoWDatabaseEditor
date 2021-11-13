@@ -33,7 +33,10 @@
         {
             Handle = id;
         }
-        
-        
+
+        public override string ToString()
+        {
+            return $"TextureHandle[{Handle}]";
+        }
     }
 }

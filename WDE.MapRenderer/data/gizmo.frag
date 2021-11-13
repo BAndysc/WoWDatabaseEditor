@@ -16,5 +16,5 @@ void main()
     vec3 ambient = vec3(1, 1, 1) * 0.4;
     vec4 color = vec4(objectColor.rgb, 1);
         
-    FragColor = vec4(color.rgb * (diffuse + ambient), 1);    
+    FragColor = vec4(color.rgb * (diffuse + ambient), objectColor.a);    
 }

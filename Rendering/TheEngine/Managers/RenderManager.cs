@@ -358,8 +358,8 @@ namespace TheEngine.Managers
 
         private void EnableMaterial(Material material)
         {
-            SetZWrite(material.Shader.ZWrite);
-            SetDepthTest(material.Shader.DepthTest);
+            SetZWrite(material.ZWrite);
+            SetDepthTest(material.DepthTesting);
             SetCulling(material.Culling);
             SetBlending(material.BlendingEnabled, material.SourceBlending, material.DestinationBlending);
             material.ActivateUniforms();

@@ -17,6 +17,7 @@ namespace TheEngine.Managers
     {
         private readonly Engine engine;
         private Dictionary<string, TextureHandle> texturesByPath;
+        private Dictionary<TextureHandle, int> byPathReferencesCount = new();
         #if DEBUG_CREATE_CALLSTACK
         private Dictionary<ITexture, System.Diagnostics.StackTrace> createCallStack = new();
         #endif
@@ -75,6 +76,18 @@ namespace TheEngine.Managers
         {
             if (handle.Handle == 0)
                 return;
+
+            if (byPathReferencesCount.TryGetValue(handle, out var refCount))
+            {
+                if (refCount == 1)
+                    byPathReferencesCount.Remove(handle);
+                else
+                {
+                    byPathReferencesCount[handle]--;
+                    return;
+                }
+            }
+            
             var tex = GetTextureByHandle(handle);
             tex.Dispose();
 #if DEBUG_CREATE_CALLSTACK
@@ -100,9 +113,14 @@ namespace TheEngine.Managers
             if (texturesByPath.TryGetValue(path, out var handle))
             {
                 if (this[handle] != null)
+                {
+                    byPathReferencesCount[handle]++;
                     return handle;
+                }
                 else
+                {
                     texturesByPath.Remove(path);
+                }
             }
 
             using Image<Rgba32> image = Image.Load<Rgba32>(path);
@@ -111,6 +129,7 @@ namespace TheEngine.Managers
                 
             var textureHandle = CreateTexture(new Rgba32[][]{span.ToArray()}, image.Width, image.Height, true);
             texturesByPath.Add(path, textureHandle);
+            byPathReferencesCount.Add(textureHandle, 1);
             return textureHandle;
         }
         

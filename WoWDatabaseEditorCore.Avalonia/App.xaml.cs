@@ -100,6 +100,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             var container = new UnityContainerExtension(unity);
             var mainScope = new ScopedContainer(container, unity);
             container.RegisterInstance<IScopedContainer>(mainScope);
+            ViewBind.ContainerProvider = container;
             return container;
         }
         

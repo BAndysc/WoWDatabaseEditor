@@ -10,6 +10,7 @@ namespace WDE.MapRenderer.Utils
 {
     public class Gizmo
     {
+        public readonly Transform position = new();
         private readonly IMesh arrowMesh;
         private readonly IMesh dragPlaneMesh;
         private readonly Material material;
@@ -42,7 +43,7 @@ namespace WDE.MapRenderer.Utils
             TranslateXZ
         }
 
-        public HitType HitTest(IGameContext context, Transform position, out Vector3 intersectionPoint)
+        public HitType HitTest(IGameContext context, out Vector3 intersectionPoint)
         {
             intersectionPoint = Vector3.Zero;
             t.Position = position.Position;
@@ -75,15 +76,36 @@ namespace WDE.MapRenderer.Utils
 
             return HitType.None;
         }
-        
-        public void Render(IGameContext context, Transform position)
+
+        public void Render(IGameContext context)
         {
+            InternalRender(context, 0.5f);
+            InternalRender(context, 1);
+        }
+
+        private void InternalRender(IGameContext context, float alpha)
+        {
+            if (alpha < 1)
+            {
+                material.BlendingEnabled = true;
+                material.SourceBlending = Blending.SrcAlpha;
+                material.DestinationBlending = Blending.OneMinusSrcAlpha;
+                material.DepthTesting = false;
+                material.ZWrite = false;
+            }
+            else
+            {
+                material.BlendingEnabled = false;
+                material.DepthTesting = true;
+                material.ZWrite = true;
+            }
+            
             var dist = (position.Position - context.Engine.CameraManager.MainCamera.Transform.Position).Length();
             t.Position = position.Position;
             t.Scale = Vector3.One * (float)Math.Sqrt(Math.Clamp(dist, 0.5f, 500) / 15);
             // +X (wow)
             t.Rotation = ArrowX;
-            material.SetUniform("objectColor", new Vector4(0, 0, 1, 1));
+            material.SetUniform("objectColor", new Vector4(0, 0, 1, alpha));
             context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneX;
             context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);
@@ -91,14 +113,14 @@ namespace WDE.MapRenderer.Utils
 
             // +Y (wow)
             t.Rotation = ArrowY;
-            material.SetUniform("objectColor", new Vector4(0, 1, 0, 1));
+            material.SetUniform("objectColor", new Vector4(0, 1, 0, alpha));
             context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneY;
             context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);
                 
             // +Z (wow)
             t.Rotation = ArrowZ;
-            material.SetUniform("objectColor", new Vector4(1, 0, 0, 1));
+            material.SetUniform("objectColor", new Vector4(1, 0, 0, alpha));
             context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneZ;
             context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);

@@ -13,6 +13,7 @@ using TheAvaloniaOpenGL;
 using TheEngine.Config;
 using MouseButton = TheEngine.Input.MouseButton;
 using OpenTK.Graphics.OpenGL;
+using TheEngine.Utils;
 using TheMaths;
 
 namespace TheEngine
@@ -27,16 +28,15 @@ namespace TheEngine
         private Stopwatch sw = new Stopwatch();
         private Stopwatch renderStopwatch = new Stopwatch();
 
-        public float FrameRate => 1000.0f / lastDeltas.Average();
+        public float FrameRate => 1000.0f / framerate.Average;
         
         public static readonly DirectProperty<TheEnginePanel, float> FrameRateProperty = AvaloniaProperty.RegisterDirect<TheEnginePanel, float>("FrameRate", o => o.FrameRate);
 
-        private float[] lastDeltas = new float[20];
-        private int lastDeltaIndex;
+        private RollingAverage framerate = new();
         private void Tick(float delta)
         {
-            lastDeltas[lastDeltaIndex++] = delta;
-            lastDeltaIndex %= lastDeltas.Length;
+            engine.TotalTime += delta;
+            framerate.Add(delta);
         }
         
         public TheEnginePanel() : base(new OpenGlControlSettings

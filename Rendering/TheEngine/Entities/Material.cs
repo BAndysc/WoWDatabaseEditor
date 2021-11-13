@@ -43,6 +43,8 @@ namespace TheEngine.Entities
         private readonly ShaderHandle shaderHandle;
 
         private Shader shader;
+        public bool ZWrite = true;
+        public bool DepthTesting = true;
         public CullingMode Culling = CullingMode.Back;
         public bool BlendingEnabled = false;
         public Blending SourceBlending = Blending.One;
@@ -63,13 +65,15 @@ namespace TheEngine.Entities
 
         internal int SlotCount => textureHandles.Count + structuredBuffers.Count + structuredPixelsBuffers.Count +
                                   structuredPixelsBuffers.Count;
-        
+
         internal Material(Engine engine, ShaderHandle shaderHandle, MaterialHandle materialHandle)
         {
             this.engine = engine;
             Handle = materialHandle;
             this.shaderHandle = shaderHandle;
             this.shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
+            ZWrite = shader.ZWrite;
+            DepthTesting = shader.DepthTest;
 
             structuredBuffers = new Dictionary<int, INativeBuffer>();
             structuredVertexBuffers = new Dictionary<int, INativeBuffer>();

@@ -3,7 +3,7 @@
     "Path": "data/gizmo.frag"
   },
   "ZWrite": true,
-  "DepthTest": true,
+  "DepthTest": false,
   "Instancing": false,
   "Vertex": {
     "Path": "data/gizmo.vert",
