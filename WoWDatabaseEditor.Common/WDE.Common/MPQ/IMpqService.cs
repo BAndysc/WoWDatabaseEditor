@@ -5,6 +5,7 @@ namespace WDE.Common.MPQ
     [UniqueProvider]
     public interface IMpqService
     {
+        bool IsConfigured();
         IMpqArchive Open();
     }
 }

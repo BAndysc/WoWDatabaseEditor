@@ -1,4 +1,4 @@
-namespace WDE.DbcStore.FastReader
+namespace WDE.Common.DBC
 {
     public interface IDbcIterator
     {

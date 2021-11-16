@@ -21,9 +21,8 @@ namespace WDE.MapRenderer.Managers
             this.gameContext = gameContext;
             
             Position = new Vector3(285.396f, -4746.17f, 9.48428f + 20).ToOpenGlPosition();
-            Rotation = Quaternion.LookAtRH(
-                Position,
-                new Vector3(223.698f, -4745.11f, 10.1022f + 20).ToOpenGlPosition(), new Vector3(0, 1, 0));
+            Rotation = Quaternion.LookRotation(
+                new Vector3(223.698f, -4745.11f, 10.1022f + 20).ToOpenGlPosition() - Position, Vector3.Up);
             gameContext.Engine.CameraManager.MainCamera.FOV = 75;
         }
 

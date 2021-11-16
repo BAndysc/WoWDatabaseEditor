@@ -208,6 +208,46 @@ namespace WDE.MpqReader.Structures
             b = reader.ReadByte();
             a = reader.ReadByte();
         }
+
+        public Vector4 ToRgbaVector()
+        {
+            return new Vector4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+        }
+
+        internal CArgb(byte r, byte g, byte b, byte a)
+        {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+        }
+        
+        public static CArgb FromRGB(uint bgra)
+        {
+            return new CArgb(
+                (byte)((bgra & 0xFF0000) >> 16),
+                (byte)((bgra & 0xFF00) >> 8),
+                (byte)((bgra & 0xFF)),
+                255);
+        }
+        
+        public static CArgb FromBGR(uint bgra)
+        {
+            return new CArgb(
+                (byte)((bgra & 0xFF)),
+                (byte)((bgra & 0xFF00) >> 8),
+                (byte)((bgra & 0xFF0000) >> 16),
+                255);
+        }
+        
+        public static CArgb FromBGRA(uint bgra)
+        {
+            return new CArgb(
+                (byte)((bgra & 0x0000FF00) >> 8),
+                (byte)((bgra & 0x00FF0000) >> 16),
+                (byte)((bgra & 0xFF000000) >> 24),
+                (byte)((bgra & 0x000000FF)));
+        }
     };
 
     public readonly struct CImVector

@@ -64,7 +64,7 @@ namespace TheMaths
         /// <summary>
         /// A <see cref="Vector3"/> with all of its components set to zero.
         /// </summary>
-        public static readonly Vector3 Zero = new Vector3();
+        public static readonly Vector3 Zero;
 
         /// <summary>
         /// The X unit <see cref="Vector3"/> (1, 0, 0).
@@ -314,7 +314,7 @@ namespace TheMaths
         /// <returns>A three-element array containing the components of the vector.</returns>
         public float[] ToArray()
         {
-            return new float[] { X, Y, Z };
+            return new[] { X, Y, Z };
         }
 
         /// <summary>
@@ -1164,7 +1164,7 @@ namespace TheMaths
 
                 for (int r = 0; r < i; ++r)
                 {
-                    newvector -= (Vector3.Dot(destination[r], newvector) / Vector3.Dot(destination[r], destination[r])) * destination[r];
+                    newvector -= (Dot(destination[r], newvector) / Dot(destination[r], destination[r])) * destination[r];
                 }
 
                 destination[i] = newvector;
@@ -1211,7 +1211,7 @@ namespace TheMaths
 
                 for (int r = 0; r < i; ++r)
                 {
-                    newvector -= Vector3.Dot(destination[r], newvector) * destination[r];
+                    newvector -= Dot(destination[r], newvector) * destination[r];
                 }
 
                 newvector.Normalize();
@@ -1245,27 +1245,50 @@ namespace TheMaths
                 ((vector.X * (xy + wz)) + (vector.Y * ((1.0f - xx) - zz))) + (vector.Z * (yz - wx)),
                 ((vector.X * (xz - wy)) + (vector.Y * (yz + wx))) + (vector.Z * ((1.0f - xx) - yy)));
         }
-        
-        public static Vector3 operator *(Vector3 vector, Quaternion rotation)
-        {
-            float x = rotation.X + rotation.X;
-            float y = rotation.Y + rotation.Y;
-            float z = rotation.Z + rotation.Z;
-            float wx = rotation.W * x;
-            float wy = rotation.W * y;
-            float wz = rotation.W * z;
-            float xx = rotation.X * x;
-            float xy = rotation.X * y;
-            float xz = rotation.X * z;
-            float yy = rotation.Y * y;
-            float yz = rotation.Y * z;
-            float zz = rotation.Z * z;
 
-            return new Vector3(
-                ((vector.X * ((1.0f - yy) - zz)) + (vector.Y * (xy - wz))) + (vector.Z * (xz + wy)),
-                ((vector.X * (xy + wz)) + (vector.Y * ((1.0f - xx) - zz))) + (vector.Z * (yz - wx)),
-                ((vector.X * (xz - wy)) + (vector.Y * (yz + wx))) + (vector.Z * ((1.0f - xx) - yy)));
+        public static Vector3 operator *(Vector3 point, Quaternion rotation) => rotation * point;
+            
+        public static Vector3 operator *(Quaternion rotation, Vector3 point)
+        {
+            float num1 = rotation.X * 2f;
+            float num2 = rotation.Y * 2f;
+            float num3 = rotation.Z * 2f;
+            float xx = rotation.X * num1;
+            float yy = rotation.Y * num2;
+            float zz = rotation.Z * num3;
+            float xy = rotation.X * num2;
+            float xz = rotation.X * num3;
+            float yz = rotation.Y * num3;
+            float wx = rotation.W * num1;
+            float wy = rotation.W * num2;
+            float wz = rotation.W * num3;
+            Vector3 vector3;
+            vector3.X = (float) ((1.0 - (yy + (double) zz)) * point.X + (xy - (double) wz) * point.Y + (xz + (double) wy) * point.Z);
+            vector3.Y = (float) ((xy + (double) wz) * point.X + (1.0 - (xx + (double) zz)) * point.Y + (yz - (double) wx) * point.Z);
+            vector3.Z = (float) ((xz - (double) wy) * point.X + (yz + (double) wx) * point.Y + (1.0 - (xx + (double) yy)) * point.Z);
+            return vector3;
         }
+        
+        // public static Vector3 operator *(Vector3 vector, Quaternion rotation)
+        // {
+        //     float x = rotation.X + rotation.X;
+        //     float y = rotation.Y + rotation.Y;
+        //     float z = rotation.Z + rotation.Z;
+        //     float wx = rotation.W * x;
+        //     float wy = rotation.W * y;
+        //     float wz = rotation.W * z;
+        //     float xx = rotation.X * x;
+        //     float xy = rotation.X * y;
+        //     float xz = rotation.X * z;
+        //     float yy = rotation.Y * y;
+        //     float yz = rotation.Y * z;
+        //     float zz = rotation.Z * z;
+        //
+        //     return new Vector3(
+        //         ((vector.X * ((1.0f - yy) - zz)) + (vector.Y * (xy - wz))) + (vector.Z * (xz + wy)),
+        //         ((vector.X * (xy + wz)) + (vector.Y * ((1.0f - xx) - zz))) + (vector.Z * (yz - wx)),
+        //         ((vector.X * (xz - wy)) + (vector.Y * (yz + wx))) + (vector.Z * ((1.0f - xx) - yy)));
+        // }
 
         /// <summary>
         /// Transforms a 3D vector by the given <see cref="Quaternion"/> rotation.

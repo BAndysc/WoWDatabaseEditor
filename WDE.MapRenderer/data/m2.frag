@@ -19,9 +19,6 @@ uniform vec4 mesh_color;
 
 void main()
 {
-    float diff = max(dot(Normal, -lightDir.xyz), 0.0);
-    vec3 diffuse = diff * lightColor.rgb;
-    vec3 ambient = vec3(1, 1, 1) * 0.4;
     vec4 tex1 = texture(texture1, TexCoord.xy);
     vec4 tex2 = texture(texture2, TexCoord2.xy);
 
@@ -143,7 +140,7 @@ void main()
     if (color.a < alphaTest) 
         discard;
         
-    FragColor = vec4(color.rgb * (diffuse + ambient), color.a);
+    FragColor = vec4(lighting(color.rgb, Normal.xyz), color.a);
     
     vec4 highglighted = FragColor + vec4(0.1, 0.1, 0.1, 0);
     FragColor = mix(FragColor, highglighted, highlight);

@@ -197,9 +197,9 @@ namespace WDE.MapRenderer.Managers
                             
                             var norm = chunksEnumerator2.Current.Normals[k_];
                             heightsNormal[k++] = new Vector4(
-                                norm.X,
+                                norm.Z,
                                 norm.Y,
-                                -norm.Z,
+                                -norm.X,
                                 chunksEnumerator2.Current.Heights[k_] +
                                 basePos.Z
                             );

@@ -16,7 +16,7 @@ namespace WDE.MapRenderer
         public IEnumerable<Func<IGameModule>> Modules => modules;
         public event Action<Func<IGameModule>>? ModuleRegistered;
         public event Action<Func<IGameModule>>? ModuleRemoved;
-
+        
         public IDisposable RegisterGameModule(Func<IGameModule> gameModule)
         {
             modules.Add(gameModule);

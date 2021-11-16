@@ -1536,5 +1536,9 @@ namespace TheMaths
         // {
         //     return *(Vector4*)&value;
         // }
+        public Vector4 WithW(float w)
+        {
+            return new Vector4(X, Y, Z, w);
+        }
     }
 }

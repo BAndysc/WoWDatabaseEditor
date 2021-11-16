@@ -15,8 +15,9 @@ namespace TheEngine.Managers
         {
             this.engine = engine;
             MainLight = new DirectionalLight();
-            MainLight.LightRotation = Quaternion.FromEuler(-30, 225, 115);
+            MainLight.LightRotation = Quaternion.FromEuler(90, 45, 115);
             MainLight.LightColor = new TheMaths.Vector4(1, 1, 1, 1);
+            MainLight.AmbientColor = new TheMaths.Vector4(0.2f, 0.2f, 0.2f, 1);
             MainLight.LightPosition = TheMaths.Vector3.Zero;
         }
 

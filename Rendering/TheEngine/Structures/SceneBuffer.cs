@@ -10,7 +10,9 @@ namespace TheEngine.Structures
         public Matrix ProjectionMatrix;
         public Vector4 CameraPosition;
         public Vector4 LightDirection;
-        public Vector4 LightColor;
+        public Vector3 LightColor;
+        public float LightIntensity;
+        public Vector4 AmbientColor;
         public Vector3 LightPosition;
         public float Align0;
         public float ScreenWidth;

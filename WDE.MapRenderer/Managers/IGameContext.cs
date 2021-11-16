@@ -10,6 +10,7 @@ namespace WDE.MapRenderer.Managers
     {
         Engine Engine { get; }
         Task<PooledArray<byte>?> ReadFile(string fileName);
+        byte[]? ReadFileSync(string fileName);
         
         WoWMeshManager MeshManager { get; }
         WoWTextureManager TextureManager { get; }
@@ -19,6 +20,9 @@ namespace WDE.MapRenderer.Managers
         CameraManager CameraManager { get; }
         UpdateManager UpdateLoop { get; }
         RaycastSystem RaycastSystem { get; }
+        DbcManager DbcManager { get; }
+        LightingManager LightingManager { get; }
+        TimeManager TimeManager { get; }
         string CurrentMap { get; }
         void StartCoroutine(IEnumerator coroutine);
     }

@@ -18,6 +18,11 @@ namespace WDE.MPQ.Services
             this.settings = settings;
         }
         
+        public bool IsConfigured()
+        {
+            return !string.IsNullOrEmpty(settings.Path);
+        }
+        
         public IMpqArchive Open()
         {
             if (settings.Path == null)

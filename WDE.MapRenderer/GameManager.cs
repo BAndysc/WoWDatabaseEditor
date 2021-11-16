@@ -10,6 +10,7 @@ using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.PhysicsSystem;
 using TheMaths;
+using WDE.Common.DBC;
 using WDE.Common.MPQ;
 using WDE.MapRenderer.Managers;
 using WDE.MpqReader;
@@ -20,13 +21,15 @@ namespace WDE.MapRenderer
     {
         private IMpqArchive mpq;
         private readonly IGameView gameView;
+        private readonly IDatabaseClientFileOpener databaseClientFileOpener;
         private AsyncMonitor monitor = new AsyncMonitor();
         private Engine engine;
 
-        public GameManager(IMpqArchive mpq, IGameView gameView)
+        public GameManager(IMpqArchive mpq, IGameView gameView, IDatabaseClientFileOpener databaseClientFileOpener)
         {
             this.mpq = mpq;
             this.gameView = gameView;
+            this.databaseClientFileOpener = databaseClientFileOpener;
             CurrentMap = "Kalimdor";
             UpdateLoop = new UpdateManager(this);
         }
@@ -34,13 +37,16 @@ namespace WDE.MapRenderer
         public void Initialize(Engine engine)
         {
             this.engine = engine;
+            TimeManager = new TimeManager(this);
             ModuleManager = new ModuleManager(this, gameView);
+            DbcManager = new DbcManager(this, databaseClientFileOpener);
             TextureManager = new WoWTextureManager(this);
             MeshManager = new WoWMeshManager(this);
             MdxManager = new MdxManager(this);
             WmoManager = new WmoManager(this);
             ChunkManager = new ChunkManager(this);
             CameraManager = new CameraManager(this);
+            LightingManager = new LightingManager(this);
             RaycastSystem = new RaycastSystem(engine);
         }
         
@@ -56,7 +62,10 @@ namespace WDE.MapRenderer
         {
             coroutineManager.Step();
 
+            TimeManager.Update(delta);
+            
             CameraManager.Update(delta);
+            LightingManager.Update(delta);
             
             UpdateLoop.Update(delta);
             ChunkManager.Update(delta);
@@ -66,6 +75,7 @@ namespace WDE.MapRenderer
         public void Render(float delta)
         {
             ModuleManager.Render();
+            LightingManager.Render();
         }
 
         public void SetMap(string mapPath)
@@ -86,6 +96,7 @@ namespace WDE.MapRenderer
 
         public Engine Engine => engine;
 
+        public TimeManager TimeManager { get; private set; }
         public WoWMeshManager MeshManager { get; private set; }
         public WoWTextureManager TextureManager { get; private set; }
         public ChunkManager ChunkManager { get; private set; }
@@ -94,6 +105,8 @@ namespace WDE.MapRenderer
         public WmoManager WmoManager { get; private set; }
         public CameraManager CameraManager { get; private set; }
         public RaycastSystem RaycastSystem { get; private set; }
+        public DbcManager DbcManager { get; private set; }
+        public LightingManager LightingManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
         public string CurrentMap { get; set; }
 
@@ -101,6 +114,15 @@ namespace WDE.MapRenderer
         {
             using var _ = await monitor.EnterAsync();
             var bytes = await Task.Run(() => mpq.ReadFilePool(fileName));
+            if (bytes == null)
+                Console.WriteLine("File " + fileName + " is unreadable");
+            return bytes;
+        }
+
+        public byte[]? ReadFileSync(string fileName)
+        {
+            using var _ = monitor.Enter();
+            var bytes = mpq.ReadFile(fileName);
             if (bytes == null)
                 Console.WriteLine("File " + fileName + " is unreadable");
             return bytes;

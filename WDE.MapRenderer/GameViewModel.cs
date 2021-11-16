@@ -17,6 +17,7 @@ using WDE.Common.Documents;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.MPQ;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
@@ -54,6 +55,8 @@ namespace WDE.MapRenderer
     [AutoRegister]
     public class GameViewModel : ObservableBase, ITool, IMapContext<GameCameraViewModel>
     {
+        private readonly IMpqService mpqService;
+        private readonly IMessageBoxService messageBoxService;
         public GameManager Game { get; }
         public event Action? RequestDispose;
 
@@ -77,15 +80,19 @@ namespace WDE.MapRenderer
         }
         
         public string Stats { get; private set; }
-
+        
         public GameViewModel(IMpqService mpqService,
             IDbcStore dbcStore, 
             IMapDataProvider mapData, 
             ITaskRunner taskRunner,
+            IMessageBoxService messageBoxService,
+            IDatabaseClientFileOpener databaseClientFileOpener,
             IGameView gameView)
         {
+            this.mpqService = mpqService;
+            this.messageBoxService = messageBoxService;
             MapData = mapData;
-            Game = new GameManager(mpqService.Open(), gameView);
+            Game = new GameManager(mpqService.Open(), gameView, databaseClientFileOpener);
             AutoDispose(new ActionDisposable(() =>
             {
                 RequestDispose?.Invoke();
@@ -131,13 +138,30 @@ namespace WDE.MapRenderer
                 Stats =
                     $"[{w:0}x{h:0}]\nTotal frame time: {counters.FrameTime.Average:0.00} ms\n - Render time: {counters.TotalRender.Average:0.00}\n  - Bounds: {counters.BoundsCalc.Average:0.00}ms\n  - Culling: {counters.Culling.Average:0.00}ms\n  - Drawing: {counters.Drawing.Average:0.00}ms\n  - Present time: {counters.PresentTime.Average:0.00} ms";
 
-                Stats += @"\nShaders: " + stats.ShaderSwitches + @"
+                Stats += "\n" + @"Shaders: " + stats.ShaderSwitches + @"
 Materials: " + stats.MaterialActivations + @"
 Meshes: " + stats.MeshSwitches + @"
 Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws) + @"
 Batches saved by instancing: " + stats.InstancedDrawSaved + @"
 Tris: " + stats.TrianglesDrawn;
                 Dispatcher.UIThread.Post(()=> RaisePropertyChanged(nameof(Stats)), DispatcherPriority.Render);
+            });
+
+            On(() => Visibility, @is =>
+            {
+                if (@is)
+                {
+                    if (!mpqService.IsConfigured())
+                    {
+                        messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Missing settings")
+                            .SetMainInstruction("Missing WoW folder configuration")
+                            .SetContent(
+                                "In order to use the game view, you need to configure WoW 3.3.5 folder path in the settings -> Client Data Files")
+                            .WithOkButton(true)
+                            .Build()).ListenErrors();
+                    }
+                }
             });
         }
 

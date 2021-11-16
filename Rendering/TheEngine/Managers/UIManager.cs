@@ -359,8 +359,15 @@ namespace TheEngine.Managers
             public void BeginHorizontalBox()
             {
                 var group = new HorizontalGroup();
-                if (parents.TryPeek(out var parent))
-                    parent.Add(group);
+                if (root == null)
+                {
+                    root = group;
+                }
+                else
+                {
+                    if (parents.TryPeek(out var parent))
+                        parent.Add(group);
+                }
                 parents.Push(group);
             }
 

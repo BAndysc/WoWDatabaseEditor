@@ -130,12 +130,22 @@ namespace TheAvaloniaOpenGL.Resources
 
             VertexShader = device.CreateShader(ShaderType.VertexShader);
             var vertexSource = ShaderSource.ParseShader(shaderData.Vertex.Path, true, defines.ToArray());
-            Console.WriteLine(device.CompileShaderAndGetError(VertexShader, vertexSource));
+            var result = device.CompileShaderAndGetError(VertexShader, vertexSource);
+            if (!string.IsNullOrEmpty(result))
+            {
+                Console.WriteLine("Error while compiling " + shaderData.Vertex.Path);
+                Console.WriteLine(result);
+            }
             
             PixelShader = device.CreateShader(ShaderType.FragmentShader);
             defines = new List<string>() { "PIXEL_SHADER" };
             var fragmentSource = ShaderSource.ParseShader(shaderData.Pixel.Path, true, defines.ToArray());
-            Console.WriteLine(device.CompileShaderAndGetError(PixelShader, fragmentSource));
+            result = device.CompileShaderAndGetError(PixelShader, fragmentSource);
+            if (!string.IsNullOrEmpty(result))
+            {
+                Console.WriteLine("Error while compiling " + shaderData.Pixel.Path);
+                Console.WriteLine(result);
+            }
 
             ProgramHandle = device.CreateProgram();
 

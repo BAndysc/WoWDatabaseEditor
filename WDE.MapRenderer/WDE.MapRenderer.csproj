@@ -38,14 +38,11 @@
         <None Update="meshes\*.obj">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="data\wmo.json">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <None Update="data\checker.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="data\wmo.vert">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="data\wmo.frag">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <None Update="textures\noise_512.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 

@@ -86,12 +86,9 @@ void main()
     }
     shadow /= 81;
     vec4 shadowed = vec4(FragColor.rgb * 0.5, 1);
-    FragColor = mix(FragColor, shadowed, shadow);
+    FragColor = mix(FragColor, shadowed, shadow * lightIntensity);
    
-    float diff = max(dot(Normal.xyz, -lightDir.xyz), 0.0);
-    vec3 diffuse = diff * lightColor.rgb;
-    vec3 ambient = vec3(1, 1, 1) * 0.4;
-    FragColor = vec4(FragColor.rgb * (diffuse + ambient), 1);
+    FragColor = vec4(lighting(FragColor.rgb, Normal.xyz), 1);
     
     float dist = distance(WorldPos, cameraPos);
     float fogFactor = (clamp(dist, FOG_START, FOG_END) - FOG_START) / (FOG_END - FOG_START);
@@ -101,4 +98,6 @@ void main()
         - min(0, sign(fract(WorldPos.z / 533.333) * 533.333 - 0.5));
     
     FragColor = mix(FragColor, FragColor + vec4(0.4, 0.4, 0.4, 0), clamp(isBorderOfChunk, 0, 1));
+    
+    //FragColor = FragColor * 0.000001 + vec4(Normal.xyz / 2 + 0.5, 1);
 }

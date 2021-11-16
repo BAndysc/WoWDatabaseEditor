@@ -101,7 +101,7 @@ namespace TheEngine
 #else
                 IDevice device;
                 var real = new RealDevice(gl);
-#if DEBUG
+#if DEBUG && DEBUG_OPENGL
                 device = new DebugDevice(real);
 #else
                 device = new RealDeviceWrapper(real);
