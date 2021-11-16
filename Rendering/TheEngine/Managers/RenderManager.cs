@@ -15,54 +15,6 @@ using TheMaths;
 
 namespace TheEngine.Managers
 {
-    public class SimpleGrid<T> where T : new()
-    {
-        private readonly int cellSize;
-        private Dictionary<(int, int), T> grid = new();
-        
-        public SimpleGrid(int cellSize)
-        {
-            this.cellSize = cellSize;
-        }
-
-        private (int, int) GetKey(float x, float z)
-        {
-            return (((int)(x + cellSize / 2)) / cellSize, ((int)(z + cellSize / 2)) / cellSize);
-        }
-        
-        public bool TryGet(float x, float z, out T? res)
-        {
-            return grid.TryGetValue(GetKey(x, z), out res);
-        }
-
-        public T Get(float x, float z)
-        {
-            if (grid.TryGetValue(GetKey(x, z), out var r))
-                return r;
-            return grid[(GetKey(x, z))] = new();
-        }
-
-        public IEnumerable<T> GetAround(float x, float z, int distance)
-        {
-            int minX = (int)(x - distance);
-            int maxX = (int)(x + distance);
-            int minZ = (int)(z - distance);
-            int maxZ = (int)(z + distance);
-
-            var minCell = GetKey(minX, minZ);
-            var maxCell = GetKey(maxX, maxZ);
-
-            for (int i = minCell.Item1; i < maxCell.Item1; ++i)
-            {
-                for (int j = minCell.Item2; j < maxCell.Item2; ++j)
-                {
-                    if (grid.TryGetValue((i, j), out var r))
-                        yield return r;
-                }
-            }
-        }
-    }
-    
     public class RenderManager : IRenderManager, IDisposable
     {
         private readonly Engine engine;
@@ -81,10 +33,6 @@ namespace TheEngine.Managers
 
         private ICameraManager cameraManager;
         
-        private Dictionary<ShaderHandle, Dictionary<Material, Dictionary<(Mesh mesh, int subMesh), List<Transform>>>> dynamicRenderers;
-        private SimpleGrid<Dictionary<ShaderHandle,
-            Dictionary<Material, Dictionary<(Mesh mesh, int subMesh), List<Transform>>>>> staticRenderers;
-
         private Sampler defaultSampler;
 
         private DepthStencil depthStencilZWrite;
@@ -114,6 +62,9 @@ namespace TheEngine.Managers
         private Archetype toRenderArchetype;
         private Archetype updateWorldBoundsArchetype;
         private Archetype dirtEntities;
+        
+        private Archetype staticRendererArchetype;
+        private Archetype dynamicRendererArchetype;
 
         internal RenderManager(Engine engine)
         {
@@ -123,6 +74,20 @@ namespace TheEngine.Managers
 
             dirtEntities = engine.entityManager.NewArchetype()
                 .WithComponentData<DirtyPosition>();
+            
+            staticRendererArchetype = engine.EntityManager.NewArchetype()
+                .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<LocalToWorld>()
+                .WithComponentData<WorldMeshBounds>()
+                .WithComponentData<MeshRenderer>();
+
+            dynamicRendererArchetype = engine.EntityManager.NewArchetype()
+                .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<LocalToWorld>()
+                .WithComponentData<MeshBounds>()
+                .WithComponentData<DirtyPosition>()
+                .WithComponentData<WorldMeshBounds>()
+                .WithComponentData<MeshRenderer>();
             
             updateWorldBoundsArchetype = engine.entityManager.NewArchetype()
                 .WithComponentData<LocalToWorld>()
@@ -145,11 +110,6 @@ namespace TheEngine.Managers
 
             instancesArray = new Matrix[1];
             inverseInstancesArray = new Matrix[1];
-
-            dynamicRenderers = new Dictionary<ShaderHandle, Dictionary<Material, Dictionary<(Mesh, int), List<Transform>>>>();
-            staticRenderers =
-                new SimpleGrid<Dictionary<ShaderHandle,
-                    Dictionary<Material, Dictionary<(Mesh mesh, int subMesh), List<Transform>>>>>(500);
 
             sceneData = new SceneBuffer();
 
@@ -260,6 +220,8 @@ namespace TheEngine.Managers
         public void BeginFrame()
         {
             // better not assume state was saved from the previous frame...
+            currentMesh = null;
+            currentShader = null;
             currentCulling = null;
             currentZwrite = null;
             currentDepthTest = null;
@@ -322,7 +284,6 @@ namespace TheEngine.Managers
             //defaultSampler.Activate(Constants.DEFAULT_SAMPLER);
 
             engine.Device.device.CheckError("Before render all");
-            RenderAll(null);
             RenderEntities();
             ClearDirtyEntityBit();
 
@@ -341,19 +302,6 @@ namespace TheEngine.Managers
                 for (int i = start; i < end; ++i)
                     dirty[i].Disable();
             });
-        }
-
-        private void RenderAll(Material overrideMaterial)
-        {
-            currentMesh = null;
-            currentShader = null;
-
-            RenderRenderers(overrideMaterial, dynamicRenderers, float.MaxValue);
-            var cameraPosition = cameraManager.MainCamera.Transform.Position;
-            foreach (var renderers in staticRenderers.GetAround(cameraPosition.X, cameraPosition.Z, 1500))
-            {
-                RenderRenderers(overrideMaterial, renderers, 500);
-            }
         }
 
         private void EnableMaterial(Material material)
@@ -515,120 +463,6 @@ namespace TheEngine.Managers
             engine.statsManager.Counters.Drawing.Add(sw.Elapsed.TotalMilliseconds);
         }
 
-        private void RenderRenderers(Material? overrideMaterial, 
-            Dictionary<ShaderHandle, Dictionary<Material, Dictionary<(Mesh mesh, int subMesh), List<Transform>>>> renderers,
-            float drawDistance)
-        {
-            objectBuffer.Activate(Constants.OBJECT_BUFFER_INDEX);
-
-            foreach (var shaderPair in renderers)
-            {
-                if (!engine.shaderManager.GetShaderByHandle(shaderPair.Key).WriteMask && overrideMaterial != null)
-                    continue;
-
-                if (overrideMaterial != null)
-                    currentShader = engine.shaderManager.GetShaderByHandle(overrideMaterial.ShaderHandle);
-                else
-                    currentShader = engine.shaderManager.GetShaderByHandle(shaderPair.Key);
-
-                Stats.ShaderSwitches++;
-                currentShader.Activate();
-
-                foreach (var materialPair in shaderPair.Value)
-                {
-                    bool materialIsSet = false;
-                    foreach (var meshPair in materialPair.Value)
-                    {
-                        if (currentShader.Instancing)
-                        {
-                            if (currentMesh != meshPair.Key.mesh)
-                            {
-                                Stats.MeshSwitches++;
-                                meshPair.Key.mesh.Activate();
-                                currentMesh = meshPair.Key.mesh;
-                            }
-                            if (!materialIsSet)
-                            {
-                                EnableMaterial(materialPair.Key);
-                                materialIsSet = true;
-                            }
-                            Stats.InstancedDraws++;
-                            Stats.InstancedDrawSaved += meshPair.Value.Count - 1;
-                            if (instancesArray.Length < meshPair.Value.Count)
-                            {
-                                instancesArray = new Matrix[meshPair.Value.Count];
-                                inverseInstancesArray = new Matrix[meshPair.Value.Count];
-                            }
-
-                            for (int i = 0; i < meshPair.Value.Count; ++i)
-                            {
-                                instancesArray[i] = meshPair.Value[i].LocalToWorldMatrix;
-                                inverseInstancesArray[i] = meshPair.Value[i].WorldToLocalMatrix;
-                            }
-
-                            instancesBuffer.UpdateBuffer(instancesArray);
-                            instancesInverseBuffer.UpdateBuffer(inverseInstancesArray);
-                            
-                            instancesBuffer.Activate(materialPair.Key.SlotCount);
-                            instancesInverseBuffer.Activate(materialPair.Key.SlotCount + 1);
-                            engine.Device.device.Uniform1I(currentShader.GetUniformLocation("InstancingModels"),
-                                materialPair.Key.SlotCount);
-                            engine.Device.device.Uniform1I(currentShader.GetUniformLocation("InstancingInverseModels"),
-                                materialPair.Key.SlotCount + 1);
-
-                            Stats.TrianglesDrawn += meshPair.Key.mesh.IndexCount(meshPair.Key.subMesh) / 3 * meshPair.Value.Count;
-                            Stats.IndicesDrawn += meshPair.Key.mesh.IndexCount(meshPair.Key.subMesh) * meshPair.Value.Count;
-                            
-                            engine.Device.DrawIndexedInstanced(meshPair.Key.mesh.IndexCount(meshPair.Key.subMesh),
-                                meshPair.Value.Count, meshPair.Key.mesh.IndexStart(meshPair.Key.subMesh), 0, 0);
-                        }
-                        else
-                        {
-                            foreach (var instance in meshPair.Value)
-                            {
-                                if ((cameraManager.MainCamera.Transform.Position - instance.Position).Length() > drawDistance)
-                                    continue;
-                                
-                                if (!materialIsSet)
-                                {
-                                    EnableMaterial(materialPair.Key);
-                                    materialIsSet = true;
-                                }
-                                if (currentMesh != meshPair.Key.mesh)
-                                {
-                                    Stats.MeshSwitches++;
-                                    meshPair.Key.mesh.Activate();
-                                    currentMesh = meshPair.Key.mesh;
-                                }
-                                
-                                Stats.NonInstancedDraws++;
-                                objectData.WorldMatrix = instance.LocalToWorldMatrix;
-                                objectData.InverseWorldMatrix = instance.WorldToLocalMatrix;
-                                objectBuffer.UpdateBuffer(ref objectData);
-                                engine.Device.device.CheckError("before draw");
-                                currentShader.Validate();
-                                var start = meshPair.Key.mesh.IndexStart(meshPair.Key.subMesh);
-                                var count = meshPair.Key.mesh.IndexCount(meshPair.Key.subMesh);
-                                if (start < 0 || start >= meshPair.Key.mesh.IndicesBuffer.Length ||
-                                    count <= 0 || start + count > meshPair.Key.mesh.IndicesBuffer.Length)
-                                {
-                                    Debug.Assert(start >= 0 && start < meshPair.Key.mesh.IndicesBuffer.Length);
-                                    Debug.Assert(count > 0 && start + count <= meshPair.Key.mesh.IndicesBuffer.Length);   
-                                }
-                                else
-                                    engine.Device.DrawIndexed(count, start, 0);
-
-                                Stats.TrianglesDrawn += meshPair.Key.mesh.IndexCount(meshPair.Key.subMesh) / 3;
-                                Stats.IndicesDrawn += meshPair.Key.mesh.IndexCount(meshPair.Key.subMesh);
-
-                                engine.Device.device.CheckError("After draw");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         public void Render(IMesh mesh, Material material, int submesh, Transform transform)
         {
             Debug.Assert(inRenderingLoop);
@@ -656,7 +490,6 @@ namespace TheEngine.Managers
         private void UpdateSceneBuffer()
         {
             var camera = cameraManager.MainCamera;
-            //var proj = Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(camera.FOV), engine.WindowHost.Aspect, camera.NearClip, camera.FarClip);
             var proj = camera.ProjectionMatrix;
             var vm = camera.Transform.WorldToLocalMatrix;
 
@@ -671,105 +504,29 @@ namespace TheEngine.Managers
             sceneData.Time = (float)engine.TotalTime;
             sceneData.ScreenWidth = engine.WindowHost.WindowWidth;
             sceneData.ScreenHeight = engine.WindowHost.WindowHeight;
-
-            // scenePixelData.CameraPosition = sceneData.CameraPosition;
-            // scenePixelData.LightDirection = new Vector4(Vector3.ForwardLH * engine.lightManager.MainLight.LightRotation, 0);
-            // scenePixelData.LightColor = engine.lightManager.MainLight.LightColor;
-            // scenePixelData.LightPosition = engine.lightManager.MainLight.LightPosition;
-            // scenePixelData.Time = (float)engine.TotalTime;
-            // scenePixelData.ScreenWidth = engine.WindowHost.WindowWidth;
-            // scenePixelData.ScreenHeight = engine.WindowHost.WindowHeight;
         }
 
-        public StaticRenderHandle RegisterStaticRenderer(MeshHandle meshHandle, Material material, int subMesh, Transform transform)
+        public StaticRenderHandle RegisterStaticRenderer(MeshHandle mesh, Material material, int subMesh, Transform t)
         {
+            return RegisterStaticRenderer(mesh, material, subMesh, t.LocalToWorldMatrix);
+        }
+
+        public StaticRenderHandle RegisterStaticRenderer(MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld)
+        {
+            var l2w = new LocalToWorld() { Matrix = localToWorld };
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
-            var shader = material.ShaderHandle;
-
-            var renderers = staticRenderers.Get(transform.Position.X, transform.Position.Z);
-            
-            AddRenderer(material, subMesh, transform, renderers, shader, mesh);
-
-            var handle = new StaticRenderHandle(staticHandles.Count + 1);
-            staticHandles.Add((material, meshHandle, subMesh, transform));
-            return handle;
-        }
-
-        private static void AddRenderer(Material material, int subMesh, Transform transform, Dictionary<ShaderHandle, Dictionary<Material, Dictionary<(Mesh mesh, int subMesh), List<Transform>>>> renderers,
-            ShaderHandle shader, Mesh mesh)
-        {
-            if (!renderers.ContainsKey(shader))
-                renderers[shader] = new Dictionary<Material, Dictionary<(Mesh, int), List<Transform>>>();
-
-            if (!renderers[shader].ContainsKey(material))
-                renderers[shader][material] = new Dictionary<(Mesh, int), List<Transform>>();
-
-            if (!renderers[shader][material].ContainsKey((mesh, subMesh)))
-                renderers[shader][material][(mesh, subMesh)] = new List<Transform>();
-
-            renderers[shader][material][(mesh, subMesh)].Add(transform);
+            var entity = engine.EntityManager.CreateEntity(staticRendererArchetype);
+            engine.EntityManager.GetComponent<LocalToWorld>(entity) = l2w;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = meshHandle;
+            engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = LocalToWorld((MeshBounds)mesh.Bounds, l2w);
+            return new StaticRenderHandle(entity);
         }
 
         public void UnregisterStaticRenderer(StaticRenderHandle handle)
         {
-            if (handle.Handle == 0)
-                return;
-            var data = staticHandles[handle.Handle - 1];
-
-            var mesh = engine.meshManager.GetMeshByHandle(data.Value.Item2);
-            var material = data.Value.Item1;
-            var shader = material.ShaderHandle;
-            var submesh = data.Value.submesh;
-            var transform = data.Value.transform;
-            var renderers = staticRenderers.Get(transform.Position.X, transform.Position.Z);
-            RemoveFromRenderers(renderers, shader, material, mesh, submesh, transform);
-
-            staticHandles[handle.Handle - 1] = null;
-        }
-
-        private static void RemoveFromRenderers(Dictionary<ShaderHandle, Dictionary<Material, Dictionary<(Mesh mesh, int subMesh), List<Transform>>>> renderers, ShaderHandle shader, Material material, Mesh mesh,
-            int submesh, Transform transform)
-        {
-            renderers[shader][material][(mesh, submesh)].Remove(transform);
-            if (renderers[shader][material][(mesh, submesh)].Count == 0)
-            {
-                renderers[shader][material].Remove((mesh, submesh));
-                if (renderers[shader][material].Count == 0)
-                {
-                    renderers[shader].Remove(material);
-                    if (renderers.Count == 0)
-                        renderers.Remove(shader);
-                }
-            }
-        }
-
-        private List<(Material, MeshHandle, int submesh, Transform transform)?> staticHandles = new();
-        private List<(Material, MeshHandle, int submesh, Transform transform)?> dynamicHandles = new();
-
-        public DynamicRenderHandle RegisterDynamicRenderer(MeshHandle meshHandle, Material material, int subMesh, Transform transform)
-        {
-            var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
-            var shader = material.ShaderHandle;
-            AddRenderer(material, subMesh, transform, dynamicRenderers, shader, mesh);
-            var handle = new DynamicRenderHandle(dynamicHandles.Count + 1);
-            dynamicHandles.Add((material, meshHandle, subMesh, transform));
-            return handle;
-        }
-
-        public void UnregisterDynamicRenderer(DynamicRenderHandle handle)
-        {
-            if (handle.Handle == 0)
-                return;
-            var data = dynamicHandles[handle.Handle - 1];
-
-            var mesh = engine.meshManager.GetMeshByHandle(data.Value.Item2);
-            var material = data.Value.Item1;
-            var shader = material.ShaderHandle;
-            var submesh = data.Value.submesh;
-            var transform = data.Value.transform;
-            RemoveFromRenderers(dynamicRenderers, shader, material, mesh, submesh, transform);
-
-            dynamicHandles[handle.Handle - 1] = null;
+            engine.EntityManager.DestroyEntity(handle.Handle);
         }
     }
 }

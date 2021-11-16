@@ -2,11 +2,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="WDE.MapRenderer.GameToolBar">
-    <controls:ToolbarPanel>
+             xmlns:mapRenderer="clr-namespace:WDE.MapRenderer"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" 
+             d:DataContext="{d:DesignInstance mapRenderer:GameViewModel, IsDesignTimeCreatable=False}"
+            x:Class="WDE.MapRenderer.GameToolBar">
+    <ToolbarPanel>
         <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Map:</TextBlock>
         <ComboBox Items="{Binding Maps}" SelectedItem="{Binding SelectedMap, Mode=TwoWay}" />
-    </controls:ToolbarPanel>
+        <ToolbarSpacer />
+        <ToggleButton ToolTip.Tip="Toggle map chunk visibility" IsChecked="{Binding ShowGrid, Mode=TwoWay}">
+            <WdeImage ImageUri="Icons/icon_grid.png" />
+        </ToggleButton>
+        <DropDownButton>
+            <DropDownButton.Button>
+                <WdeImage ImageUri="Icons/icon_day_night.png" />
+            </DropDownButton.Button>
+            <StackPanel Orientation="Vertical" Width="400">
+                <CheckBox Name="TimeFlow" IsChecked="{Binding DisableTimeFlow, Mode=TwoWay}">Disable time flow</CheckBox>
+                <DockPanel LastChildFill="True" IsEnabled="{Binding #TimeFlow.IsChecked, Converter={x:Static InverseBoolConverter.Instance}}">
+                    <TextBlock VerticalAlignment="Center">Time speed: </TextBlock>
+                    <Slider Minimum="0" Maximum="6" SmallChange="1" LargeChange="1" Value="{Binding TimeSpeedMultiplier}" />
+                </DockPanel>
+                <DockPanel LastChildFill="True">
+                    <TextBlock VerticalAlignment="Center">Time: </TextBlock>
+                    <Slider Minimum="0" Maximum="1439" Value="{Binding CurrentTime}" />
+                </DockPanel>
+                <CheckBox IsChecked="{Binding OverrideLightning, Mode=TwoWay}">Disable lightning</CheckBox>
+            </StackPanel>
+        </DropDownButton>
+    </ToolbarPanel>
 </UserControl>

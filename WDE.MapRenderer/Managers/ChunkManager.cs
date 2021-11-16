@@ -35,9 +35,8 @@ namespace WDE.MapRenderer.Managers
         public CancellationTokenSource? loading = new CancellationTokenSource();
         public Task? chunkLoading;
 
-        public DynamicRenderHandle terrainHandle;
-        public List<StaticRenderHandle> objectHandles = new();
-        public List<Entity> objectHandles2 = new();
+        public List<StaticRenderHandle> renderHandles = new();
+        public List<Entity> entities = new();
 
         public ChunkInstance(int x, int z)
         {
@@ -66,6 +65,18 @@ namespace WDE.MapRenderer.Managers
         private Archetype collisionOnlyArchetype;
         private Archetype renderEntityArchetype;
         private Archetype terrainEntityArchetype;
+        private bool renderGrid;
+
+        public bool RenderGrid
+        {
+            get => renderGrid;
+            set
+            {
+                renderGrid = value;
+                foreach (var chunk in chunks)
+                    chunk.material.SetUniformInt("showGrid", value ? 1 : 0);
+            }
+        }
 
         private void PosToChunkHeightCoords(Vector3 wowPosition, out (int, int) chunk, out int xIndex, out int yIndex)
         {
@@ -125,7 +136,7 @@ namespace WDE.MapRenderer.Managers
             chunks.Add(chunk);
             chunksXY[(x, y)] = chunk;
             
-            var file = gameContext.ReadFile($"World\\Maps\\{gameContext.CurrentMap}\\{gameContext.CurrentMap}_{y}_{x}.adt");
+            var file = gameContext.ReadFile($"World\\Maps\\{gameContext.CurrentMap.Directory}\\{gameContext.CurrentMap.Directory}_{y}_{x}.adt");
             yield return file;
             if (file.Result == null)
             {
@@ -290,6 +301,8 @@ namespace WDE.MapRenderer.Managers
             int chnk = 0;
             var shaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/lit.json");
             var material = gameContext.Engine.MaterialManager.CreateMaterial(shaderHandle);
+            chunk.material = material;
+            material.SetUniformInt("showGrid", RenderGrid ? 1 : 0);
 
             using var chunksEnumerator = ((IEnumerable<AdtChunk>)adt.Chunks).GetEnumerator();
             chunksEnumerator.MoveNext();
@@ -370,7 +383,7 @@ namespace WDE.MapRenderer.Managers
                 new Vector3(chunkMesh.Bounds.Minimum.X, minHeight, chunkMesh.Bounds.Minimum.Z),
                 new Vector3(chunkMesh.Bounds.Maximum.X, maxHeight, chunkMesh.Bounds.Maximum.Z));
             gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(terrainEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = t.LocalToWorldMatrix });
-            chunk.objectHandles2.Add(terrainEntity);
+            chunk.entities.Add(terrainEntity);
             
             if (cancelationToken.IsCancellationRequested)
             {
@@ -418,15 +431,17 @@ namespace WDE.MapRenderer.Managers
                 int j = 0;
                 foreach (var material in m.materials)
                 {
-                    var entity = gameContext.Engine.EntityManager.CreateEntity(renderEntityArchetype);
-                    gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = t.LocalToWorldMatrix;
-                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = j++;
-                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
-                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = m.mesh.Handle;
-                    gameContext.Engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)m.mesh.Bounds;
-                    gameContext.Engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
-                    chunk.objectHandles2.Add(entity);
-//                    chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(m.mesh.Handle, material, j++, t));
+                    //
+                    // var entity = gameContext.Engine.EntityManager.CreateEntity(renderEntityArchetype);
+                    // gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = t.LocalToWorldMatrix;
+                    // gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = j++;
+                    // gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
+                    // gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = m.mesh.Handle;
+                    // gameContext.Engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)m.mesh.Bounds;
+                    // gameContext.Engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
+                    // chunk.objectHandles2.Add(entity);
+                    //
+                    chunk.renderHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(m.mesh.Handle, material, j++, t));
                 }
 
                 index++;
@@ -461,22 +476,13 @@ namespace WDE.MapRenderer.Managers
                     int i = 0;
                     foreach (var material in mesh.Item2)
                     {
-                        var entity = gameContext.Engine.EntityManager.CreateEntity(renderEntityArchetype);
-                        gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
-                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i++;
-                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
-                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
-                        gameContext.Engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)mesh.Item1.Bounds;
-                        gameContext.Engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
-                        chunk.objectHandles2.Add(entity);
+                        chunk.renderHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
                         
-                        
-                        entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
+                        var entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
                         gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
                         gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
                         gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
                         gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });
-                        //chunk.objectHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
                     }
                 }
                 
@@ -539,10 +545,9 @@ namespace WDE.MapRenderer.Managers
                 await chunk.chunkLoading;
             }
             
-            gameContext.Engine.RenderManager.UnregisterDynamicRenderer(chunk.terrainHandle);
-            foreach (var obj in chunk.objectHandles)
+            foreach (var obj in chunk.renderHandles)
                 gameContext.Engine.RenderManager.UnregisterStaticRenderer(obj);
-            foreach (var entity in chunk.objectHandles2)
+            foreach (var entity in chunk.entities)
                 gameContext.Engine.EntityManager.DestroyEntity(entity);
             
             chunk.Dispose(gameContext);

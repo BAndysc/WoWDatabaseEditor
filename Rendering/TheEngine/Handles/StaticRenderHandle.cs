@@ -1,20 +1,12 @@
-﻿namespace TheEngine.Handles
+﻿using TheEngine.ECS;
+
+namespace TheEngine.Handles
 {
     public struct StaticRenderHandle
     {
-        internal int Handle { get; }
+        internal Entity Handle { get; }
 
-        internal StaticRenderHandle(int id)
-        {
-            Handle = id;
-        }
-    }
-    
-    public struct DynamicRenderHandle
-    {
-        internal int Handle { get; }
-
-        internal DynamicRenderHandle(int id)
+        internal StaticRenderHandle(Entity id)
         {
             Handle = id;
         }

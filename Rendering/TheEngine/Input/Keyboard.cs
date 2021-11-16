@@ -46,5 +46,11 @@ namespace TheEngine.Input
         {
             return axis * (IsDown(positive) ? 1 : 0) + axis * (IsDown(negative) ? -1 : 0);
         }
+
+        public void ReleaseAllKeys()
+        {
+            for (int i = 0; i < downKeys.Length; ++i)
+                downKeys[i] = false;
+        }
     }
 }

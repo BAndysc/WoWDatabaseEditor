@@ -25,13 +25,15 @@ uniform sampler2D _tex11;
 uniform sampler2D _tex12;
 uniform sampler2D _tex13;
 
+uniform int showGrid;
+
 const int FOG_START = 1400;
 const int FOG_END = 1800;
 const vec3 FOG_COLOR = vec3(1, 1, 1);
 
 vec4 sample(int idx)
 {
-    vec2 uv = TexCoord.xy * 8;
+    vec2 uv = TexCoord.xy * 5;
     if (idx == 1)
         return texture(_tex1, uv);
     if (idx == 2)
@@ -97,7 +99,7 @@ void main()
     float isBorderOfChunk = - min(0, sign(fract(WorldPos.x / 533.333) * 533.333 - 0.5)) + 
         - min(0, sign(fract(WorldPos.z / 533.333) * 533.333 - 0.5));
     
-    FragColor = mix(FragColor, FragColor + vec4(0.4, 0.4, 0.4, 0), clamp(isBorderOfChunk, 0, 1));
+    FragColor = mix(FragColor, FragColor + vec4(0.4, 0.4, 0.4, 0), clamp(isBorderOfChunk * showGrid, 0, 1));
     
     //FragColor = FragColor * 0.000001 + vec4(Normal.xyz / 2 + 0.5, 1);
 }

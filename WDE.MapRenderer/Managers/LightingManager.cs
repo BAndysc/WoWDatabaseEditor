@@ -25,6 +25,8 @@ namespace WDE.MapRenderer.Managers
             skyMaterial.SetTexture("cloudsTex", noiseTexture);
         }
 
+        public bool OverrideLightning { get; set; }
+
         public void Dispose()
         {
             gameContext.Engine.MeshManager.DisposeMesh(skySphereMesh);
@@ -38,7 +40,7 @@ namespace WDE.MapRenderer.Managers
             var bestDistance = float.MaxValue;
             foreach (var lightning in gameContext.DbcManager.LightStore)
             {
-                if (lightning.Continent != 1)
+                if (lightning.Continent != gameContext.CurrentMap.Id)
                     continue;
                 var pos = new Vector3(lightning.X, lightning.Y, lightning.Z);
                 var distance = (pos - position).Length();
@@ -52,7 +54,22 @@ namespace WDE.MapRenderer.Managers
                 }
             }
             
-            float timeOfDay = gameContext.TimeManager.Time.TotalMinutes / 1440.0f;
+            
+            if (OverrideLightning)
+            {
+                gameContext.Engine.LightManager.MainLight.LightColor = Vector4.One;
+                gameContext.Engine.LightManager.MainLight.AmbientColor = new Vector4(1, 1, 1, 0.4f);
+            }
+            else if (bestLight != null)
+            {
+                var lightColor = bestLight.NormalWeather.GetLightParameter(LightIntParamType.GeneralLightning).GetColorAtTime(gameContext.TimeManager.Time);
+                var ambientLight = bestLight.NormalWeather.GetLightParameter(LightIntParamType.AmbientLight).GetColorAtTime(gameContext.TimeManager.Time);
+
+                gameContext.Engine.LightManager.MainLight.LightColor = lightColor.ToRgbaVector();
+                gameContext.Engine.LightManager.MainLight.AmbientColor = ambientLight.ToRgbaVector();
+            }
+
+            float timeOfDay = (gameContext.TimeManager.Time.TotalMinutes + gameContext.TimeManager.MinuteFraction) / 1440.0f;
             float angle = timeOfDay * (float)Math.PI * 2;
             var sin = (float)Math.Sin(angle);
             var cos = (float)Math.Cos(angle);
@@ -67,15 +84,10 @@ namespace WDE.MapRenderer.Managers
 
             if (bestLight != null)
             {
-                var lightColor = bestLight.NormalWeather.GetLightParameter(LightIntParamType.GeneralLightning).GetColorAtTime(time);
-                var ambientLight = bestLight.NormalWeather.GetLightParameter(LightIntParamType.AmbientLight).GetColorAtTime(time);
-
-                gameContext.Engine.LightManager.MainLight.LightColor = lightColor.ToRgbaVector();
-                gameContext.Engine.LightManager.MainLight.AmbientColor = ambientLight.ToRgbaVector();
-                
                 //-30, 225
-                float timeOfDay = time.TotalMinutes / 1440.0f;
-                float timeOfDayHalf = ((time.TotalMinutes + 1440/2) % 1440) / 1440.0f;
+                float preciseMinutes = (gameContext.TimeManager.Time.TotalMinutes + gameContext.TimeManager.MinuteFraction);
+                float timeOfDay = preciseMinutes / 1440.0f;
+                float timeOfDayHalf = ((preciseMinutes + 1440/2.0f) % 1440) / 1440.0f;
                 
                 var top = bestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyTopMost).GetColorAtTime(time);
                 var middle = bestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyMiddle).GetColorAtTime(time);

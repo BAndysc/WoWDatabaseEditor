@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using TheEngine;
 using TheEngine.PhysicsSystem;
 using WDE.MpqReader;
+using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers
 {
@@ -23,7 +24,8 @@ namespace WDE.MapRenderer.Managers
         DbcManager DbcManager { get; }
         LightingManager LightingManager { get; }
         TimeManager TimeManager { get; }
-        string CurrentMap { get; }
+        Map CurrentMap { get; }
+        void SetMap(int id);
         void StartCoroutine(IEnumerator coroutine);
     }
 }

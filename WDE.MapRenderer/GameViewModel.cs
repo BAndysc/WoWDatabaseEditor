@@ -23,6 +23,7 @@ using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.MapRenderer.StaticData;
 using WDE.Module.Attributes;
+using WDE.MpqReader.Structures;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.WorldMap.Models;
@@ -115,7 +116,7 @@ namespace WDE.MapRenderer
                 .Where(map => map != null)
                 .SubscribeAction(map =>
                 {
-                    Game.SetMap(map.MapPath);
+                    Game.SetMap((int)map.Id);
                 }));
 
             ToggleMapVisibilityCommand = new DelegateCommand(() => IsMapVisible = !IsMapVisible);
@@ -144,7 +145,11 @@ Meshes: " + stats.MeshSwitches + @"
 Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws) + @"
 Batches saved by instancing: " + stats.InstancedDrawSaved + @"
 Tris: " + stats.TrianglesDrawn;
-                Dispatcher.UIThread.Post(()=> RaisePropertyChanged(nameof(Stats)), DispatcherPriority.Render);
+                Dispatcher.UIThread.Post(()=>
+                {
+                    RaisePropertyChanged(nameof(CurrentTime));
+                    RaisePropertyChanged(nameof(Stats));
+                }, DispatcherPriority.Render);
             });
 
             On(() => Visibility, @is =>
@@ -165,6 +170,56 @@ Tris: " + stats.TrianglesDrawn;
             });
         }
 
+        public bool OverrideLightning
+        {
+            get => Game.LightingManager.OverrideLightning;
+            set
+            {
+                Game.LightingManager.OverrideLightning = value;
+                RaisePropertyChanged(nameof(OverrideLightning));
+            }
+        }
+        
+        public bool DisableTimeFlow
+        {
+            get => Game.TimeManager.IsPaused;
+            set
+            {
+                Game.TimeManager.IsPaused = value;
+                RaisePropertyChanged(nameof(DisableTimeFlow));
+            }
+        }
+
+        public int TimeSpeedMultiplier
+        {
+            get => Game.TimeManager.TimeSpeedMultiplier;
+            set
+            {
+                Game.TimeManager.TimeSpeedMultiplier = value;
+                RaisePropertyChanged(nameof(TimeSpeedMultiplier));
+            }
+        }
+
+        public bool ShowGrid
+        {
+            get => Game.ChunkManager.RenderGrid;
+            set
+            {
+                Game.ChunkManager.RenderGrid = value;
+                RaisePropertyChanged(nameof(ShowGrid));
+            }
+        }
+
+        public int CurrentTime
+        {
+            get => Game.TimeManager.Time.TotalMinutes;
+            set
+            {
+                Game.TimeManager.SetTime(Time.FromMinutes(value));
+                RaisePropertyChanged(nameof(CurrentTime));
+            }
+        }
+        
         public bool IsMapVisible
         {
             get => isMapVisible;

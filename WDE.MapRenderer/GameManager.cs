@@ -14,6 +14,7 @@ using WDE.Common.DBC;
 using WDE.Common.MPQ;
 using WDE.MapRenderer.Managers;
 using WDE.MpqReader;
+using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer
 {
@@ -30,7 +31,6 @@ namespace WDE.MapRenderer
             this.mpq = mpq;
             this.gameView = gameView;
             this.databaseClientFileOpener = databaseClientFileOpener;
-            CurrentMap = "Kalimdor";
             UpdateLoop = new UpdateManager(this);
         }
         
@@ -40,6 +40,7 @@ namespace WDE.MapRenderer
             TimeManager = new TimeManager(this);
             ModuleManager = new ModuleManager(this, gameView);
             DbcManager = new DbcManager(this, databaseClientFileOpener);
+            CurrentMap = DbcManager.MapStore.FirstOrDefault() ?? Map.Empty;
             TextureManager = new WoWTextureManager(this);
             MeshManager = new WoWMeshManager(this);
             MdxManager = new MdxManager(this);
@@ -78,10 +79,13 @@ namespace WDE.MapRenderer
             LightingManager.Render();
         }
 
-        public void SetMap(string mapPath)
+        public void SetMap(int mapId)
         {
-            CurrentMap = mapPath;
-            ChunkManager?.UnloadAllNow();
+            if (DbcManager.MapStore.Contains(mapId) && CurrentMap.Id != mapId)
+            {
+                CurrentMap = DbcManager.MapStore[mapId];
+                ChunkManager?.UnloadAllNow();
+            }
         }
 
         public void Dispose()
@@ -108,7 +112,7 @@ namespace WDE.MapRenderer
         public DbcManager DbcManager { get; private set; }
         public LightingManager LightingManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
-        public string CurrentMap { get; set; }
+        public Map CurrentMap { get; set; }
 
         public async Task<PooledArray<byte>?> ReadFile(string fileName)
         {

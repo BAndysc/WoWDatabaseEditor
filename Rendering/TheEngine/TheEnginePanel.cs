@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.OpenTK;
@@ -48,6 +49,12 @@ namespace TheEngine
         static TheEnginePanel()
         {
             FocusableProperty.OverrideDefaultValue<TheEnginePanel>(true);
+        }
+
+        protected override void OnLostFocus(RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            engine?.inputManager.keyboard.ReleaseAllKeys();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

@@ -229,6 +229,34 @@ namespace WDE.MapRenderer.Managers
                     material.DestinationBlending = Blending.OneMinusSrcAlpha;
                     material.SetUniform("alphaTest", 1.0f / 255.0f);
                 }
+                else if (materialDef.blending_mode == M2Blend.M2BlendNoAlphaAdd)
+                {
+                    material.BlendingEnabled = true;
+                    material.SourceBlending = Blending.One;
+                    material.DestinationBlending = Blending.One;
+                    material.SetUniform("alphaTest", 1.0f / 255.0f);
+                }
+                else if (materialDef.blending_mode == M2Blend.M2BlendAdd)
+                {
+                    material.BlendingEnabled = true;
+                    material.SourceBlending = Blending.SrcAlpha;
+                    material.DestinationBlending = Blending.One;
+                    material.SetUniform("alphaTest", 1.0f / 255.0f);
+                }
+                else if (materialDef.blending_mode == M2Blend.M2BlendMod)
+                {
+                    material.BlendingEnabled = true;
+                    material.SourceBlending = Blending.DstColor;
+                    material.DestinationBlending = Blending.Zero;
+                    material.SetUniform("alphaTest", 1.0f / 255.0f);
+                }
+                else if (materialDef.blending_mode == M2Blend.M2BlendMod2X)
+                {
+                    material.BlendingEnabled = true;
+                    material.SourceBlending = Blending.DstColor;
+                    material.DestinationBlending = Blending.SrcColor;
+                    material.SetUniform("alphaTest", 1.0f / 255.0f);
+                }
                 else
                     material.SetUniform("notSupported", 1);
 
