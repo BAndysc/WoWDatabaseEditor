@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -191,6 +192,22 @@ namespace TheEngine
         {
             base.OnAttachedToVisualTree(e);
             sw.Restart();
+            ((IControl)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
+            ((IControl)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
+        }
+
+        private bool IsModifierKey(Key key) => key is Key.LeftShift or Key.LeftCtrl or Key.LeftAlt;
+        
+        private void GlobalKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (IsModifierKey(e.Key))
+                engine?.inputManager.keyboard.KeyDown(e.Key);
+        }
+
+        private void GlobalKeyUp(object? sender, KeyEventArgs e)
+        {
+            if (IsModifierKey(e.Key))
+                engine?.inputManager.keyboard.KeyUp(e.Key);
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

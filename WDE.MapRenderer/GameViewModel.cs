@@ -130,7 +130,7 @@ namespace WDE.MapRenderer
 
             AutoDispose(this
                 .ToObservable(i => i.SelectedMap)
-                .Where(map => map != null)
+                .Where(map => map != null && Game.IsInitialized)
                 .SubscribeAction(map =>
                 {
                     Game.SetMap((int)map.Id);

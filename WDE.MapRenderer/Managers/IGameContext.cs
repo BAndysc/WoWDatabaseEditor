@@ -24,6 +24,7 @@ namespace WDE.MapRenderer.Managers
         DbcManager DbcManager { get; }
         LightingManager LightingManager { get; }
         TimeManager TimeManager { get; }
+        ScreenSpaceSelector ScreenSpaceSelector { get; }
         Map CurrentMap { get; }
         void SetMap(int id);
         void StartCoroutine(IEnumerator coroutine);

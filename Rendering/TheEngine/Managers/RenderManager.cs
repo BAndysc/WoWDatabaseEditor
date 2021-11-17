@@ -503,18 +503,32 @@ namespace TheEngine.Managers
             engine.statsManager.Counters.Drawing.Add(sw.Elapsed.TotalMilliseconds);
         }
 
-        public void Render(IMesh mesh, Material material, int submesh, Transform transform)
+        public void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null)
         {
+            if (worldToLocal == null)
+                worldToLocal = Matrix.Invert(localToWorld);
+            
             Debug.Assert(inRenderingLoop);
             material.Shader.Activate();
             EnableMaterial(material);
             mesh.Activate();
-            objectData.WorldMatrix = transform.LocalToWorldMatrix;
-            objectData.InverseWorldMatrix = transform.WorldToLocalMatrix;
+            objectData.WorldMatrix = localToWorld;
+            objectData.InverseWorldMatrix = worldToLocal.Value;
             objectBuffer.UpdateBuffer(ref objectData);
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);
             engine.Device.DrawIndexed(count, start, 0);
+        }
+
+        public void Render(IMesh mesh, Material material, int submesh, Transform transform)
+        {
+            Render(mesh, material, submesh, transform.LocalToWorldMatrix, transform.WorldToLocalMatrix);
+        }
+
+        public void Render(IMesh mesh, Material material, int submesh, Vector3 position)
+        {
+            var matrix = Matrix.Translation(position);
+            Render(mesh, material, submesh, matrix);
         }
 
         public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount)

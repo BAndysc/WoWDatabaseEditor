@@ -41,6 +41,7 @@ namespace WDE.MapRenderer
             TimeManager = new TimeManager(this);
             ModuleManager = new ModuleManager(this, gameView);
             DbcManager = new DbcManager(this, databaseClientFileOpener);
+            ScreenSpaceSelector = new ScreenSpaceSelector(this);
             CurrentMap = DbcManager.MapStore.FirstOrDefault() ?? Map.Empty;
             TextureManager = new WoWTextureManager(this);
             MeshManager = new WoWMeshManager(this);
@@ -51,6 +52,7 @@ namespace WDE.MapRenderer
             LightingManager = new LightingManager(this);
             RaycastSystem = new RaycastSystem(engine);
             OnInitialized?.Invoke();
+            IsInitialized = true;
         }
         
         private CoroutineManager coroutineManager = new();
@@ -70,6 +72,7 @@ namespace WDE.MapRenderer
             CameraManager.Update(delta);
             LightingManager.Update(delta);
             
+            ScreenSpaceSelector.Update(delta);
             UpdateLoop.Update(delta);
             ChunkManager.Update(delta);
             ModuleManager.Update(delta);
@@ -79,6 +82,7 @@ namespace WDE.MapRenderer
         {
             ModuleManager.Render();
             LightingManager.Render();
+            ScreenSpaceSelector.Render();
         }
 
         public void SetMap(int mapId)
@@ -92,6 +96,7 @@ namespace WDE.MapRenderer
 
         public void Dispose()
         {
+            IsInitialized = false;
             ModuleManager.Dispose();
             ChunkManager.Dispose();
             WmoManager.Dispose();
@@ -103,6 +108,7 @@ namespace WDE.MapRenderer
         public Engine Engine => engine;
 
         public TimeManager TimeManager { get; private set; }
+        public ScreenSpaceSelector ScreenSpaceSelector { get; private set; }
         public WoWMeshManager MeshManager { get; private set; }
         public WoWTextureManager TextureManager { get; private set; }
         public ChunkManager ChunkManager { get; private set; }
@@ -115,6 +121,7 @@ namespace WDE.MapRenderer
         public LightingManager LightingManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
         public Map CurrentMap { get; private set; }
+        public bool IsInitialized { get; private set; }
 
         public async Task<PooledArray<byte>?> ReadFile(string fileName)
         {

@@ -72,8 +72,7 @@ namespace TheEngine.Entities
                 if (vertices.Length > indices[i] &&
                     vertices.Length > indices[i + 1] &&
                     vertices.Length > indices[i + 2])
-                yield return (vertices[indices[i]].position, vertices[indices[i + 1]].position,
-                    vertices[indices[i + 2]].position);
+                    yield return (vertices[indices[i]].position, vertices[indices[i + 1]].position, vertices[indices[i + 2]].position);
             }
         }
 
