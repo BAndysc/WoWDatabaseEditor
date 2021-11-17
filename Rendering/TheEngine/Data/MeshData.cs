@@ -8,6 +8,7 @@ namespace TheEngine.Data
         public readonly Vector3[]? Normals { get; }
         public readonly Vector2[]? UV { get; }
         public readonly Vector2[]? UV2 { get; }
+        public readonly Vector4[]? Colors { get; }
         public readonly int[] Indices { get; }
         public readonly int VerticesCount { get; }
         public readonly int IndicesCount { get; }
@@ -18,7 +19,8 @@ namespace TheEngine.Data
             int[] indices,
             int? verticesCount = null,
             int? indicesCount = null,
-            Vector2[]? uvs2 = null)
+            Vector2[]? uvs2 = null,
+            Vector4[]? colors = null)
         {
             Vertices = vertices;
             Normals = normals;
@@ -27,6 +29,7 @@ namespace TheEngine.Data
             Indices = indices;
             VerticesCount = verticesCount ?? vertices.Length;
             IndicesCount = indicesCount ?? indices.Length;
+            Colors = colors;
         }
     }
 }

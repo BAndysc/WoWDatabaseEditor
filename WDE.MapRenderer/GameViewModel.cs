@@ -58,6 +58,7 @@ namespace WDE.MapRenderer
     {
         private readonly IMpqService mpqService;
         private readonly IMessageBoxService messageBoxService;
+        private readonly GameViewSettings settings;
         public GameManager Game { get; }
         public event Action? RequestDispose;
 
@@ -88,12 +89,28 @@ namespace WDE.MapRenderer
             ITaskRunner taskRunner,
             IMessageBoxService messageBoxService,
             IDatabaseClientFileOpener databaseClientFileOpener,
-            IGameView gameView)
+            IGameView gameView,
+            GameViewSettings settings)
         {
             this.mpqService = mpqService;
             this.messageBoxService = messageBoxService;
+            this.settings = settings;
             MapData = mapData;
             Game = new GameManager(mpqService.Open(), gameView, databaseClientFileOpener);
+            Game.OnInitialized += () =>
+            {
+                Game.LightingManager.OverrideLighting = settings.OverrideLighting;
+                Game.TimeManager.IsPaused = settings.DisableTimeFlow;
+                Game.TimeManager.SetTime(Time.FromMinutes(settings.CurrentTime));
+                Game.TimeManager.TimeSpeedMultiplier = settings.TimeSpeedMultiplier;
+                Game.ChunkManager.RenderGrid = settings.ShowGrid;
+                
+                RaisePropertyChanged(nameof(OverrideLighting));
+                RaisePropertyChanged(nameof(DisableTimeFlow));
+                RaisePropertyChanged(nameof(TimeSpeedMultiplier));
+                RaisePropertyChanged(nameof(ShowGrid));
+                RaisePropertyChanged(nameof(CurrentTime));
+            };
             AutoDispose(new ActionDisposable(() =>
             {
                 RequestDispose?.Invoke();
@@ -170,52 +187,57 @@ Tris: " + stats.TrianglesDrawn;
             });
         }
 
-        public bool OverrideLightning
+        public bool OverrideLighting
         {
-            get => Game.LightingManager.OverrideLightning;
+            get => Game.LightingManager?.OverrideLighting ?? false;
             set
             {
-                Game.LightingManager.OverrideLightning = value;
-                RaisePropertyChanged(nameof(OverrideLightning));
+                Game.LightingManager.OverrideLighting = value;
+                settings.OverrideLighting = value;
+                RaisePropertyChanged(nameof(OverrideLighting));
             }
         }
         
         public bool DisableTimeFlow
         {
-            get => Game.TimeManager.IsPaused;
+            get => Game.TimeManager?.IsPaused ?? false;
             set
             {
                 Game.TimeManager.IsPaused = value;
+                settings.DisableTimeFlow = value;
                 RaisePropertyChanged(nameof(DisableTimeFlow));
             }
         }
 
         public int TimeSpeedMultiplier
         {
-            get => Game.TimeManager.TimeSpeedMultiplier;
+            get => Game.TimeManager?.TimeSpeedMultiplier ?? 0;
             set
             {
                 Game.TimeManager.TimeSpeedMultiplier = value;
+                settings.TimeSpeedMultiplier = value;
                 RaisePropertyChanged(nameof(TimeSpeedMultiplier));
             }
         }
 
         public bool ShowGrid
         {
-            get => Game.ChunkManager.RenderGrid;
+            get => Game.ChunkManager?.RenderGrid ?? false;
             set
             {
                 Game.ChunkManager.RenderGrid = value;
+                settings.ShowGrid = value;
                 RaisePropertyChanged(nameof(ShowGrid));
             }
         }
 
         public int CurrentTime
         {
-            get => Game.TimeManager.Time.TotalMinutes;
+            get => Game.TimeManager?.Time.TotalMinutes ?? 0;
             set
             {
                 Game.TimeManager.SetTime(Time.FromMinutes(value));
+                settings.CurrentTime = value;
                 RaisePropertyChanged(nameof(CurrentTime));
             }
         }

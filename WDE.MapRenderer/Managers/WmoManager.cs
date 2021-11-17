@@ -93,7 +93,7 @@ namespace WDE.MapRenderer.Managers
             {
                 var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs[0].AsArray(),
                     group.Indices.AsArray(), group.Vertices.Length, group.Indices.Length,
-                    group.UVs.Count >= 2 ? group.UVs[1].AsArray() : null);
+                    group.UVs.Count >= 2 ? group.UVs[1].AsArray() : null, group.VertexColors?.AsArray());
 
                 var wmoMesh = gameContext.Engine.MeshManager.CreateMesh(wmoMeshData);
                 wmoMesh.SetSubmeshCount(group.Batches.Length);
@@ -158,7 +158,11 @@ namespace WDE.MapRenderer.Managers
                         //mat.SetUniform("notSupported", 1);
                     }
 
+                    mat.ZWrite = !mat.BlendingEnabled;
                     mat.SetUniform("alphaTest", alphaTest);
+                    mat.SetUniformInt("unlit", materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0);
+                    mat.SetUniformInt("brightAtNight", materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0);
+                    mat.SetUniformInt("interior", (group.Header.flags & 0x2000) == 0x2000 && group.VertexColors != null ? 1 : 0);
 
                     if (materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.unculled))
                         mat.Culling = CullingMode.Off;

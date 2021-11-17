@@ -25,7 +25,7 @@ namespace WDE.MapRenderer.Managers
             skyMaterial.SetTexture("cloudsTex", noiseTexture);
         }
 
-        public bool OverrideLightning { get; set; }
+        public bool OverrideLighting { get; set; }
 
         public void Dispose()
         {
@@ -55,10 +55,14 @@ namespace WDE.MapRenderer.Managers
             }
             
             
-            if (OverrideLightning)
+            if (OverrideLighting)
             {
                 gameContext.Engine.LightManager.MainLight.LightColor = Vector4.One;
+                gameContext.Engine.LightManager.MainLight.LightIntensity = 0.8f;
                 gameContext.Engine.LightManager.MainLight.AmbientColor = new Vector4(1, 1, 1, 0.4f);
+                
+                gameContext.Engine.LightManager.SecondaryLight.LightColor = Vector4.One;
+                gameContext.Engine.LightManager.SecondaryLight.LightIntensity = 0;
             }
             else if (bestLight != null)
             {
@@ -67,15 +71,24 @@ namespace WDE.MapRenderer.Managers
 
                 gameContext.Engine.LightManager.MainLight.LightColor = lightColor.ToRgbaVector();
                 gameContext.Engine.LightManager.MainLight.AmbientColor = ambientLight.ToRgbaVector();
+                
+                gameContext.Engine.LightManager.SecondaryLight.LightColor = lightColor.ToRgbaVector();
             }
 
             float timeOfDay = (gameContext.TimeManager.Time.TotalMinutes + gameContext.TimeManager.MinuteFraction) / 1440.0f;
-            float angle = timeOfDay * (float)Math.PI * 2;
+            float angle = (timeOfDay - 2 / 24.0f) * (float)Math.PI * 2 ; // offset by 2 hours
             var sin = (float)Math.Sin(angle);
             var cos = (float)Math.Cos(angle);
             Vector3 sunPosition = new Vector3(sin * 20, cos * 20, -cos * 10);
+            var sunForward = (Vector3.Zero - sunPosition).Normalized;
+            var moonForward = -sunForward;
+            
             gameContext.Engine.LightManager.MainLight.LightPosition = sunPosition;
-            gameContext.Engine.LightManager.MainLight.LightRotation = Quaternion.LookRotation(Vector3.Zero - sunPosition, Vector3.Up);
+            gameContext.Engine.LightManager.MainLight.LightRotation = Quaternion.LookRotation(sunForward, Vector3.Up);
+            gameContext.Engine.LightManager.MainLight.LightIntensity = Math.Max(Vector3.Dot(Vector3.Up, sunForward), 0);
+            
+            gameContext.Engine.LightManager.SecondaryLight.LightRotation = Quaternion.LookRotation(moonForward, Vector3.Up);
+            gameContext.Engine.LightManager.SecondaryLight.LightIntensity = 0.5f * Math.Max(Vector3.Dot(Vector3.Up, moonForward), 0);
         }
 
         public void Render()

@@ -15,6 +15,9 @@ namespace TheEngine.Structures
         public Vector4 AmbientColor;
         public Vector3 LightPosition;
         public float Align0;
+        public Vector4 SecondaryLightDirection;
+        public Vector3 SecondaryLightColor;
+        public float SecondaryLightIntensity;
         public float ScreenWidth;
         public float ScreenHeight;
         public float Time;
@@ -25,21 +28,6 @@ namespace TheEngine.Structures
         
         public float Align4;
         public float Align5;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct PixelShaderSceneBuffer
-    {
-        public Vector4 CameraPosition;
-        public Vector4 LightDirection;
-        public Vector4 LightColor;
-        public Vector3 LightPosition;
-        public float Align0;
-        public float Time;
-
-        public float ScreenWidth;
-        public float ScreenHeight;
-        public float Align3;
     }
 
     [StructLayout(LayoutKind.Sequential)]

@@ -55,6 +55,7 @@ namespace TheAvaloniaOpenGL
         int GetUniformLocation(int program, string name);
         void Uniform1f(int location, float falue);
         void Uniform4f(int location, float a, float b, float c, float d);
+        void Uniform3f(int loc, float a, float b, float c);
         void TexImage2D(TextureTarget target, int level, PixelInternalFormat internalFormat, int width, int height, int border, PixelFormat format, PixelType type, IntPtr data);
         void CopyTexSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int x, int y, int width, int height);
         void TexParameteri(TextureTarget target, TextureParameterName name, int value);
@@ -82,5 +83,6 @@ namespace TheAvaloniaOpenGL
         void TexParameter(TextureTarget target, TextureParameterName name, int value);
         unsafe int GetProgramParameter(int program, GetProgramParameterName pname);
         unsafe string GetActiveUniform(int unit, int index, int maxLength, out int length, out int size, out ActiveUniformType type);
+        void DepthMask(bool on);
     }
 }

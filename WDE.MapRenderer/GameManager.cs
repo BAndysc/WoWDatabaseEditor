@@ -25,6 +25,7 @@ namespace WDE.MapRenderer
         private readonly IDatabaseClientFileOpener databaseClientFileOpener;
         private AsyncMonitor monitor = new AsyncMonitor();
         private Engine engine;
+        public event Action? OnInitialized;
 
         public GameManager(IMpqArchive mpq, IGameView gameView, IDatabaseClientFileOpener databaseClientFileOpener)
         {
@@ -49,6 +50,7 @@ namespace WDE.MapRenderer
             CameraManager = new CameraManager(this);
             LightingManager = new LightingManager(this);
             RaycastSystem = new RaycastSystem(engine);
+            OnInitialized?.Invoke();
         }
         
         private CoroutineManager coroutineManager = new();
@@ -112,7 +114,7 @@ namespace WDE.MapRenderer
         public DbcManager DbcManager { get; private set; }
         public LightingManager LightingManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
-        public Map CurrentMap { get; set; }
+        public Map CurrentMap { get; private set; }
 
         public async Task<PooledArray<byte>?> ReadFile(string fileName)
         {

@@ -13,9 +13,28 @@ uniform sampler2D texture2;
 uniform float alphaTest;
 uniform float notSupported;
 uniform int shader_id;
+uniform int unlit;
+uniform int brightAtNight;
+uniform int interior;
+
 /*uniform bool use_vertex_color;
 uniform bool unlit;
 uniform bool exterior_lit;*/
+
+int or(int a, int b)
+{
+    return min(1, a + b);
+}
+
+vec3 min3(vec3 a, vec3 b)
+{
+    return vec3(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
+}
+
+vec3 max3(vec3 a, vec3 b)
+{
+    return vec3(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
+}
 
 void main()
 {   
@@ -27,26 +46,35 @@ void main()
 
     //FragColor = vec4(tex.rgb * (diffuse + ambient), mix(1, tex.a, (sign(alphaTest) + 1) / 2));
     
+    vec3 diffuse;
+    
     // see: https://github.com/Deamon87/WebWowViewerCpp/blob/master/wowViewerLib/src/glsl/wmoShader.glsl
     if(shader_id == 3) // Env
     {
         vec3 env = tex_2.rgb * tex.rgb;
-        FragColor = vec4(lighting(tex.rgb, Normal.xyz) + env, 1.);
+        diffuse = tex.rgb + env;
     }
     else if(shader_id == 5) // EnvMetal
     {
         vec3 env = tex_2.rgb * tex.rgb * tex.a;
-        FragColor = vec4(lighting(tex.rgb, Normal.xyz) + env, 1.);
+        diffuse = tex.rgb + env;
     }
     else if(shader_id == 6) // TwoLayerDiffuse
     {
         vec3 layer2 = mix(tex.rgb, tex_2.rgb, tex_2.a);
-        FragColor = vec4(lighting(mix(layer2, tex.rgb, Color.a), Normal.xyz), 1.);
+        diffuse = mix(layer2, tex.rgb, Color.a);
     }
     else // default shader, used for shader_id 0,1,2,4 (Diffuse, Specular, Metal, Opaque)
     {
-        FragColor = vec4(lighting(tex.rgb, Normal.xyz), 1.);
-    }    
+        diffuse = tex.xyz;
+    }
     
+    vec3 lighted = lighting(diffuse, Normal.xyz);
+    vec3 interiorLight = diffuse * max3(Color.rgb, vec3(0.3));
+    vec3 finalColor = mix(lighted, interiorLight, interior);
+    finalColor = mix(finalColor, diffuse, or(brightAtNight, unlit));
+   
+    FragColor = vec4(finalColor, 1);
+  
     //FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), FragColor.a);
 }

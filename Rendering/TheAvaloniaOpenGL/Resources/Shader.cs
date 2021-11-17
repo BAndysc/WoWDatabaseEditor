@@ -230,11 +230,11 @@ namespace TheAvaloniaOpenGL.Resources
             return size;
         }
 
-        public int GetUniformLocation(string name)
+        public int? GetUniformLocation(string name)
         {
             if (uniformToLocation.TryGetValue(name, out var loc))
                 return loc;
-            return -1;
+            return null;
         }
 
         public void Validate()
@@ -276,6 +276,18 @@ namespace TheAvaloniaOpenGL.Resources
             {
                 device.Uniform1I(loc, val);
                 uniformIntValues[loc] = val;
+            }
+        }
+
+        public void SetUniform(int loc, float x, float y, float z)
+        {
+            if (!uniformVectorValues.TryGetValue(loc, out var curVal) || 
+                Math.Abs(curVal.X - x) > float.Epsilon ||
+                Math.Abs(curVal.Y - y) > float.Epsilon ||
+                Math.Abs(curVal.Z - z) > float.Epsilon)
+            {
+                device.Uniform3f(loc, x, y, z);
+                uniformVectorValues[loc] = new Vector4(x, y, z, 0);
             }
         }
 

@@ -50,7 +50,8 @@ namespace TheEngine.Managers
                     position = new Vector4(meshData.Vertices[i], 1),
                     normal = meshData.Normals == null ? Vector4.One : new Vector4(meshData.Normals[i], 0),
                     uv1 = meshData.UV == null ? Vector2.Zero : meshData.UV[i],
-                    uv2 = meshData.UV2 == null ? Vector2.Zero : meshData.UV2[i]
+                    uv2 = meshData.UV2 == null ? Vector2.Zero : meshData.UV2[i],
+                    color = meshData.Colors == null ? Vector4.Zero : meshData.Colors[i]
                 };
             }
             

@@ -60,6 +60,7 @@ namespace TheEngine.Entities
         internal Dictionary<int, int> intUniforms { get; } = new();
         internal Dictionary<int, float> floatUniforms { get; } = new();
         internal Dictionary<int, Vector4> vector4Uniforms { get; } = new();
+        internal Dictionary<int, Vector3> vector3Uniforms { get; } = new();
         internal Dictionary<int, INativeBuffer> structuredVertexBuffers { get; }
         internal Dictionary<int, INativeBuffer> structuredPixelsBuffers { get; }
 
@@ -107,34 +108,56 @@ namespace TheEngine.Entities
         public int GetUniformLocation(string name)
         {
             var loc = shader.GetUniformLocation(name);
-            if (loc == -1)
+            if (!loc.HasValue)
                 throw new Exception("Location " + name + " not found");
-            return loc;
+            return loc.Value;
         }
 
         public void SetBuffer<T>(string name, NativeBuffer<T> buffer) where T : unmanaged
         {
-            structuredBuffers[GetUniformLocation(name)] = buffer;
+            var loc = GetUniformLocation(name);
+            if (loc == -1)
+                return;
+            structuredBuffers[loc] = buffer;
         }
         
         public void SetUniformInt(string name, int value)
         {
-            intUniforms[GetUniformLocation(name)] = value;
+            var loc = GetUniformLocation(name);
+            if (loc == -1)
+                return;
+            intUniforms[loc] = value;
         }
 
         public void SetUniform(string name, float value)
         {
-            floatUniforms[GetUniformLocation(name)] = value;
+            var loc = GetUniformLocation(name);
+            if (loc == -1)
+                return;
+            floatUniforms[loc] = value;
+        }
+        
+        public void SetUniform(string name, Vector3 value)
+        {
+            var loc = GetUniformLocation(name);
+            if (loc == -1)
+                return;
+            vector3Uniforms[loc] = value;
         }
         
         public void SetUniform(string name, Vector4 value)
         {
-            vector4Uniforms[GetUniformLocation(name)] = value;
+            var loc = GetUniformLocation(name);
+            if (loc == -1)
+                return;
+            vector4Uniforms[loc] = value;
         }
         
         public void SetTexture(string name, TextureHandle texture)
         {
             var loc = GetUniformLocation(name);
+            if (loc == -1)
+                return;
             textureHandles[loc] = texture;
         }
 
@@ -176,6 +199,11 @@ namespace TheEngine.Entities
             foreach (var vector in vector4Uniforms)
             {
                 shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);
+            }
+            
+            foreach (var vector in vector3Uniforms)
+            {
+                shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
             }
         }
         

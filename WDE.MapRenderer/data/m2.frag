@@ -13,7 +13,7 @@ uniform sampler2D texture2;
 uniform float alphaTest;
 uniform float notSupported;
 uniform float highlight;
-
+uniform int unlit;
 uniform int pixel_shader;
 uniform vec4 mesh_color;
 
@@ -139,11 +139,12 @@ void main()
 
     if (color.a < alphaTest) 
         discard;
-        
-    FragColor = vec4(lighting(color.rgb, Normal.xyz), color.a);
+    
+    vec3 lighted = lighting(color.rgb, Normal.xyz);
+    FragColor = vec4(mix(lighted, color.rgb, unlit), color.a);
     
     vec4 highglighted = FragColor + vec4(0.1, 0.1, 0.1, 0);
     FragColor = mix(FragColor, highglighted, highlight);
     
-    FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), FragColor.a);
+    FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), color.a);
 }

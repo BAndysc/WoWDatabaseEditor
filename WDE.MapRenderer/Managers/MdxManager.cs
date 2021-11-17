@@ -151,6 +151,7 @@ namespace WDE.MapRenderer.Managers
                 }
 
                 var section = skin.SkinSections[batch.skinSectionIndex];
+                
 
                 using var indices = new PooledArray<int>(section.indexCount);
                 for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
@@ -202,8 +203,19 @@ namespace WDE.MapRenderer.Managers
                 material.SetTexture("texture1", th ?? gameContext.TextureManager.EmptyTexture);
                 material.SetTexture("texture2", th2 ?? gameContext.TextureManager.EmptyTexture);
 
-                Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+                var trans = 1.0f;
+                if (batch.colorIndex != -1)
+                {
+                    trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
+                }
+
+                if (batch.transparencyIndex != -1)
+                {
+                    trans *= m2.texture_weights[batch.transparencyIndex].weight.values[0][0].Value;
+                }
                 
+                Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
+    
                 material.SetUniform("mesh_color", mesh_color);
                 material.SetUniformInt("pixel_shader", (int)(M2GetPixelShaderID(batch.textureCount, batch.shader_id) ?? ModelPixelShader.Combiners_Opaque));
                 //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
@@ -260,8 +272,12 @@ namespace WDE.MapRenderer.Managers
                 else
                     material.SetUniform("notSupported", 1);
 
+                material.ZWrite = !material.BlendingEnabled;
+                //material.DepthTesting = materialDef.flags.HasFlag(M2MaterialFlags.DepthTest); // produces wrong results :thonk:
+
                 if (materialDef.flags.HasFlag(M2MaterialFlags.TwoSided))
                     material.Culling = CullingMode.Off;
+                material.SetUniformInt("unlit", materialDef.flags.HasFlag(M2MaterialFlags.Unlit) ? 1 : 0);
 
                 materials[j - 1] = material;
             }

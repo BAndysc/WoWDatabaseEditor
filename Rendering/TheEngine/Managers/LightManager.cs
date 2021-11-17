@@ -10,6 +10,7 @@ namespace TheEngine.Managers
         private readonly Engine engine;
 
         public DirectionalLight MainLight { get; set; }
+        public DirectionalLight SecondaryLight { get; set; }
 
         internal LightManager(Engine engine)
         {
@@ -19,6 +20,10 @@ namespace TheEngine.Managers
             MainLight.LightColor = new TheMaths.Vector4(1, 1, 1, 1);
             MainLight.AmbientColor = new TheMaths.Vector4(0.2f, 0.2f, 0.2f, 1);
             MainLight.LightPosition = TheMaths.Vector3.Zero;
+            
+            SecondaryLight = new DirectionalLight();
+            SecondaryLight.LightIntensity = 0;
+            SecondaryLight.AmbientColor = Vector4.Zero;
         }
 
         public void Dispose()

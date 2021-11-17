@@ -198,9 +198,9 @@ namespace TheEngine.Managers
             if (!currentZwrite.HasValue || currentZwrite.Value != zwrite)
             {
                 if (zwrite)
-                    depthStencilZWrite.Activate();
+                    engine.Device.device.DepthMask(true);
                 else
-                    depthStencilNoZWrite.Activate();
+                    engine.Device.device.DepthMask(false);
                 currentZwrite = zwrite;
             }
         }
@@ -266,7 +266,7 @@ namespace TheEngine.Managers
 
             engine.Device.device.CheckError("Blitz");
             blitMaterial.Shader.Activate();
-            SetZWrite(false);
+            SetZWrite(true);
             renderTexture.Activate(0);
             //outlineTexture.Activate(1);
             planeMesh.Activate();
@@ -405,60 +405,100 @@ namespace TheEngine.Managers
             });
             culler.Stop();
             engine.statsManager.Counters.Culling.Add(culler.Elapsed.TotalMilliseconds);
-            
-            sw.Restart();
+
+            ThreadLocal<(int opaque, int transparent)> count = new(true);
+            toRenderArchetype.ParallelForEach<RenderEnabledBit, MeshRenderer>((itr, start, end, renderBit, renderers) =>
+            {
+                int opaque = 0;
+                int transparent = 0;
+                for (int i = start; i < end; ++i)
+                {
+                    if (!renderBit[i])
+                        continue;
+                    
+                    if (renderers[i].Opaque)
+                        opaque++;
+                    else
+                        transparent++;
+                }
+                count.Value = (opaque, transparent);
+            });
+            var opaque = count.Values.Sum(i => i.opaque);
+            var transparent = count.Values.Sum(i => i.transparent);
+            int totalToDraw = opaque + transparent;
+            LocalToWorld[] localToWorlds = new LocalToWorld[opaque + transparent];
+            MeshRenderer[] renderers = new MeshRenderer[opaque + transparent];
+            int opaqueIndex = 0;
+            int transparentIndex = opaque;
             toRenderArchetype.ForEach<LocalToWorld, RenderEnabledBit, MeshRenderer>((itr, start, end, l2w, render, meshRenderer) =>
             {
                 for (int i = start; i < end; ++i)
                 {
                     if (!render[i])
                         continue;
-
-                    var mr = meshRenderer[i];
-                    var material = engine.materialManager.GetMaterialByHandle(mr.MaterialHandle);
-                    var shader = material.Shader;
-                    var mesh = engine.meshManager.GetMeshByHandle(mr.MeshHandle);
-                    var meshId = mr.SubMeshId;
-
-                    if (currentShader != shader)
-                    {
-                        Stats.ShaderSwitches++;
-                        currentShader = shader;
-                        //shadertimer.Start();
-                        shader.Activate();
-                        //shadertimer.Stop();
-                    }
-
-                    if (currentMesh != mesh)
-                    {
-                        Stats.MeshSwitches++;
-                        currentMesh = mesh;
-                        //meshtimer.Start();
-                        mesh.Activate();
-                        //meshtimer.Stop();
-                    }
                     
-                    //materialtimer.Start();
-                    EnableMaterial(material);
-                    //materialtimer.Stop();
+                    var renderer = meshRenderer[i];
 
-                    //buffertimer.Start();
-                    objectData.WorldMatrix = l2w[i];
-                    objectData.InverseWorldMatrix = l2w[i].Inverse;
-                    objectBuffer.UpdateBuffer(ref objectData);
-                    //buffertimer.Stop();
-                    #if DEBUG
-                    currentShader.Validate();
-                    #endif
-                    //draw.Start();
-                    var indicesCount = mesh.IndexCount(meshId);
-                    Stats.IndicesDrawn += indicesCount;
-                    Stats.TrianglesDrawn += indicesCount / 3;
-                    Stats.NonInstancedDraws++;
-                    engine.Device.DrawIndexed(indicesCount, mesh.IndexStart(meshId), 0);
-                    //draw.Stop();
+                    if (renderer.Opaque)
+                    {
+                        renderers[opaqueIndex] = renderer;
+                        localToWorlds[opaqueIndex++] = l2w[i];
+                    }
+                    else
+                    {
+                        renderers[transparentIndex] = renderer;
+                        localToWorlds[transparentIndex++] = l2w[i];
+                    }
                 }
             });
+
+            sw.Restart();
+            for (int i = 0; i < totalToDraw; ++i)
+            {
+                var mr = renderers[i];
+                var material = engine.materialManager.GetMaterialByHandle(mr.MaterialHandle);
+                var shader = material.Shader;
+                var mesh = engine.meshManager.GetMeshByHandle(mr.MeshHandle);
+                var meshId = mr.SubMeshId;
+
+                if (currentShader != shader)
+                {
+                    Stats.ShaderSwitches++;
+                    currentShader = shader;
+                    //shadertimer.Start();
+                    shader.Activate();
+                    //shadertimer.Stop();
+                }
+
+                if (currentMesh != mesh)
+                {
+                    Stats.MeshSwitches++;
+                    currentMesh = mesh;
+                    //meshtimer.Start();
+                    mesh.Activate();
+                    //meshtimer.Stop();
+                }
+                    
+                //materialtimer.Start();
+                EnableMaterial(material);
+                //materialtimer.Stop();
+
+                //buffertimer.Start();
+                objectData.WorldMatrix = localToWorlds[i];
+                objectData.InverseWorldMatrix = localToWorlds[i].Inverse;
+                objectBuffer.UpdateBuffer(ref objectData);
+                //buffertimer.Stop();
+#if DEBUG
+                    currentShader.Validate();
+#endif
+                //draw.Start();
+                var indicesCount = mesh.IndexCount(meshId);
+                Stats.IndicesDrawn += indicesCount;
+                Stats.TrianglesDrawn += indicesCount / 3;
+                Stats.NonInstancedDraws++;
+                engine.Device.DrawIndexed(indicesCount, mesh.IndexStart(meshId), 0);
+                //draw.Stop();
+            }
             sw.Stop();
             engine.statsManager.Counters.Drawing.Add(sw.Elapsed.TotalMilliseconds);
         }
@@ -499,7 +539,10 @@ namespace TheEngine.Managers
             sceneData.CameraPosition = new Vector4(engine.CameraManager.MainCamera.Transform.Position, 1);
             sceneData.LightDirection = new Vector4(Vector3.ForwardLH * engine.lightManager.MainLight.LightRotation, 0);
             sceneData.LightColor = engine.lightManager.MainLight.LightColor.XYZ;
-            sceneData.LightIntensity = Math.Max(Vector3.Dot(Vector3.Up, sceneData.LightDirection.XYZ), 0);
+            sceneData.LightIntensity = engine.lightManager.MainLight.LightIntensity;
+            sceneData.SecondaryLightDirection = new Vector4(Vector3.ForwardLH * engine.lightManager.SecondaryLight.LightRotation, 0);
+            sceneData.SecondaryLightColor = engine.lightManager.SecondaryLight.LightColor.XYZ;
+            sceneData.SecondaryLightIntensity = engine.lightManager.SecondaryLight.LightIntensity;
             sceneData.AmbientColor = engine.lightManager.MainLight.AmbientColor;
             sceneData.Time = (float)engine.TotalTime;
             sceneData.ScreenWidth = engine.WindowHost.WindowWidth;
@@ -520,6 +563,7 @@ namespace TheEngine.Managers
             engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = meshHandle;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
             engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = LocalToWorld((MeshBounds)mesh.Bounds, l2w);
             return new StaticRenderHandle(entity);
         }

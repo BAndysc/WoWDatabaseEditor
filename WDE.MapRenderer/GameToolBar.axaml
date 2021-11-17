@@ -27,7 +27,7 @@
                     <TextBlock VerticalAlignment="Center">Time: </TextBlock>
                     <Slider Minimum="0" Maximum="1439" Value="{Binding CurrentTime}" />
                 </DockPanel>
-                <CheckBox IsChecked="{Binding OverrideLightning, Mode=TwoWay}">Disable lightning</CheckBox>
+                <CheckBox IsChecked="{Binding OverrideLighting, Mode=TwoWay}">Disable lightning</CheckBox>
             </StackPanel>
         </DropDownButton>
     </ToolbarPanel>

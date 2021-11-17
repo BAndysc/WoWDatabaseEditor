@@ -11,6 +11,11 @@ layout (std140) uniform SceneData
 	vec4 ambientColor;
 	vec3 lightPosition;
 	float padding; // implicit padding to align vec4
+	
+	vec4 secondaryLightDir;
+	vec3 secondaryLightColor;
+	float secondaryLightIntensity;
+	
 	float screenWidth;
 	float screenHeight;
 	float time;
@@ -143,7 +148,8 @@ uniform samplerBuffer InstancingInverseModels;
 vec3 lighting(vec3 col, vec3 normal)
 {
 	float diff = max(dot(normal, lightDir.xyz), 0.0);
-	vec3 diffuse = diff * lightColor * lightIntensity;
+	float diff2 = max(dot(normal, secondaryLightDir.xyz), 0.0);
+	vec3 diffuse = diff * lightColor * lightIntensity + diff2 * secondaryLightColor * secondaryLightIntensity;
 	vec3 ambient = ambientColor.rgb;
 	return col * min(diffuse + ambient, vec3(1.2));
 }

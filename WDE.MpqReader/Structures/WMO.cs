@@ -146,7 +146,7 @@ namespace WDE.MpqReader.Structures
             unfogged = 2,
             unculled = 4,
             extllight = 8,
-            sidn = 16,
+            brightAtNight = 16,
             window = 32,
             clamp_s = 64,
             clamp_t = 128

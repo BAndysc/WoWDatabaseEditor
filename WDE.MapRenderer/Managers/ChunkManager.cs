@@ -135,8 +135,9 @@ namespace WDE.MapRenderer.Managers
             chunk.chunkLoading = tasksource.Task;
             chunks.Add(chunk);
             chunksXY[(x, y)] = chunk;
-            
-            var file = gameContext.ReadFile($"World\\Maps\\{gameContext.CurrentMap.Directory}\\{gameContext.CurrentMap.Directory}_{y}_{x}.adt");
+
+            var fullName = $"World\\Maps\\{gameContext.CurrentMap.Directory}\\{gameContext.CurrentMap.Directory}_{y}_{x}.adt";
+            var file = gameContext.ReadFile(fullName);
             yield return file;
             if (file.Result == null)
             {
@@ -155,14 +156,29 @@ namespace WDE.MapRenderer.Managers
             Dictionary<string, int> textureToSlot = null!;
             ADT adt = null!;
 
-       
-            heightsNormal = new Vector4[1 * Constants.VerticesInChunk * Constants.ChunksInBlock];
-            chunkToSplatIdx = new VectorByte4[Constants.ChunksInBlock];
-            textureToSlot = new();
+            yield return Task.Run(() =>
+            {
+                heightsNormal = new Vector4[1 * Constants.VerticesInChunk * Constants.ChunksInBlock];
+                chunkToSplatIdx = new VectorByte4[Constants.ChunksInBlock];
+                textureToSlot = new();
 
-            adt = new ADT(new MemoryBinaryReader(file.Result));
+                try
+                {
+                    adt = new ADT(new MemoryBinaryReader(file.Result));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception while loading ADT " + fullName);
+                    Console.WriteLine(e);
+                    adt = null;
+                    throw;
+                }
+            });
             file.Result.Dispose();
 
+            if (adt == null)
+                yield break;
+            
             float minHeight = float.MaxValue;
             float maxHeight = float.MaxValue;
             int k = 0;
@@ -379,6 +395,7 @@ namespace WDE.MapRenderer.Managers
             gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).SubMeshId = 0;
             gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).MaterialHandle = material.Handle;
             gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).MeshHandle = chunkMesh.Handle; 
+            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).Opaque = !material.BlendingEnabled; 
             var localBounds = new BoundingBox(
                 new Vector3(chunkMesh.Bounds.Minimum.X, minHeight, chunkMesh.Bounds.Minimum.Z),
                 new Vector3(chunkMesh.Bounds.Maximum.X, maxHeight, chunkMesh.Bounds.Maximum.Z));

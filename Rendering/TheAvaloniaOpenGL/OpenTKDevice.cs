@@ -291,6 +291,11 @@ namespace TheAvaloniaOpenGL
         {
              GL.Uniform4(location, a, b, c, d);
         }
+        
+        public void Uniform3f(int location, float a, float b, float c)
+        {
+            GL.Uniform3(location, a, b, c);
+        }
 
         public void TexImage2D(TextureTarget target, int level, PixelInternalFormat internalFormat, int width, int height, int border,
             PixelFormat format, PixelType type, IntPtr data)
@@ -455,6 +460,11 @@ namespace TheAvaloniaOpenGL
             GL.GetActiveUniform(unit, index, maxLength, out length, out size, out t, out var name);
             type = (ActiveUniformType)t;
             return name;
+        }
+
+        public void DepthMask(bool @on)
+        {
+            GL.DepthMask(@on);
         }
     }
 }

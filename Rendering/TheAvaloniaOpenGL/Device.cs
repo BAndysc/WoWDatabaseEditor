@@ -3,6 +3,25 @@ using System.Text;
 using Avalonia.OpenGL;
 using Avalonia.Platform.Interop;
 using OpenGLBindings;
+using OpenTK.Graphics.ES11;
+using ClearBufferMask = OpenGLBindings.ClearBufferMask;
+using CullFaceMode = OpenGLBindings.CullFaceMode;
+using DrawElementsType = OpenGLBindings.DrawElementsType;
+using EnableCap = OpenGLBindings.EnableCap;
+using ErrorCode = OpenGLBindings.ErrorCode;
+using FramebufferAttachment = OpenGLBindings.FramebufferAttachment;
+using FramebufferTarget = OpenGLBindings.FramebufferTarget;
+using GetPName = OpenGLBindings.GetPName;
+using InternalFormat = OpenGLBindings.InternalFormat;
+using PixelFormat = OpenGLBindings.PixelFormat;
+using PixelType = OpenGLBindings.PixelType;
+using PrimitiveType = OpenGLBindings.PrimitiveType;
+using RenderbufferTarget = OpenGLBindings.RenderbufferTarget;
+using ShaderType = OpenGLBindings.ShaderType;
+using TextureParameterName = OpenGLBindings.TextureParameterName;
+using TextureTarget = OpenGLBindings.TextureTarget;
+using TextureUnit = OpenGLBindings.TextureUnit;
+using VertexAttribPointerType = OpenGLBindings.VertexAttribPointerType;
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable InconsistentNaming
@@ -351,6 +370,11 @@ namespace TheAvaloniaOpenGL
         [GlEntryPoint("glUseProgram")]
         public GlUseProgram UseProgram { get; }
         
+
+        public delegate void GlDepthMask(int on);
+        [GlEntryPoint("glDepthMask")]
+        public GlDepthMask DepthMask { get; }
+        
         public delegate void GlDrawArrays(PrimitiveType mode, int first, IntPtr count);
         [GlEntryPoint("glDrawArrays")]
         public GlDrawArrays DrawArrays { get; }
@@ -377,6 +401,11 @@ namespace TheAvaloniaOpenGL
         [GlEntryPoint("glUniform4f")]
         public GlUniform4f Uniform4f { get; }
 
+
+        public delegate void GlUniform3f(int location, float a, float b, float c);
+        [GlEntryPoint("glUniform3f")]
+        public GlUniform3f Uniform3f { get; }
+        
         [GlEntryPoint("glUniformMatrix4fv")]
         public GlInterface.GlUniformMatrix4fv UniformMatrix4fv { get; }
         

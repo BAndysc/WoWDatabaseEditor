@@ -642,13 +642,13 @@ namespace WDE.MpqReader.Structures
         public ushort shader_id;                  // See below.
         public ushort skinSectionIndex;           // A duplicate entry of a submesh from the list above.
         public ushort geosetIndex;                // See below. New name: flags2. 0x2 - projected. 0x8 - EDGF chunk in m2 is mandatory and data from is applied to this mesh
-        public ushort colorIndex;                 // A Color out of the Colors-Block or -1 if none.
+        public short colorIndex;                 // A Color out of the Colors-Block or -1 if none.
         public ushort materialIndex;              // The renderflags used on this texture-unit.
         public ushort materialLayer;              // Capped at 7 (see CM2Scene::BeginDraw)
         public ushort textureCount;               // 1 to 4. See below. Also seems to be the number of textures to load, starting at the texture lookup in the next field (0x10).
         public ushort textureComboIndex;          // Index into Texture lookup table
         public ushort textureCoordComboIndex;     // Index into the texture unit lookup table.
-        public ushort transparencyIndex;         // Index into transparency lookup table.
+        public short transparencyIndex;         // Index into transparency lookup table.
         public ushort textureAnimIndex;          // Index into uvanimation lookup table. 
 
         private M2Batch(){}
@@ -662,13 +662,13 @@ namespace WDE.MpqReader.Structures
                 shader_id = binaryReader.ReadUInt16(),
                 skinSectionIndex = binaryReader.ReadUInt16(),
                 geosetIndex = binaryReader.ReadUInt16(),
-                colorIndex = binaryReader.ReadUInt16(),
+                colorIndex = binaryReader.ReadInt16(),
                 materialIndex = binaryReader.ReadUInt16(),
                 materialLayer = binaryReader.ReadUInt16(),
                 textureCount = binaryReader.ReadUInt16(),
                 textureComboIndex = binaryReader.ReadUInt16(),
                 textureCoordComboIndex = binaryReader.ReadUInt16(),
-                transparencyIndex = binaryReader.ReadUInt16(),
+                transparencyIndex = binaryReader.ReadInt16(),
                 textureAnimIndex = binaryReader.ReadUInt16()
             };
         }

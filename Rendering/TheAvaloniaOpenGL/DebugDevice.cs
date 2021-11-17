@@ -276,6 +276,11 @@ namespace TheAvaloniaOpenGL
             Report($"Uniform4f({location}, {a}, {b}, {c}, {d})");
             device.Uniform4f(location, a, b, c, d);
         }
+        public void Uniform3f(int location, float a, float b, float c)
+        {
+            Report($"Uniform3f({location}, {a}, {b}, {c})");
+            device.Uniform3f(location, a, b, c);
+        }
         public void TexImage2D(TextureTarget target, int level, PixelInternalFormat internalFormat, int width, int height, int border, PixelFormat format, PixelType type, IntPtr data)
         {
             Report($"TexImage2D({target}, {level}, {internalFormat}, {width}, {height}, {border}, {format}, {type}, {data})");
@@ -429,5 +434,10 @@ namespace TheAvaloniaOpenGL
             return device.GetActiveUniform(unit, index, maxLength, out length, out size, out type);
         }
 
+        public void DepthMask(bool @on)
+        {
+            Report($"DepthMask({@on})");
+            device.DepthMask(@on ? 1 : 0);
+        }
     }
 }
