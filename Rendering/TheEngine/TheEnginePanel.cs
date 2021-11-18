@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
-using Avalonia.OpenTK;
-using Avalonia.Threading;
-using OpenGLBindings;
 using TheAvaloniaOpenGL;
 using TheEngine.Config;
 using MouseButton = TheEngine.Input.MouseButton;
-using OpenTK.Graphics.OpenGL;
 using TheEngine.Utils;
 using TheMaths;
 
@@ -26,6 +23,12 @@ namespace TheEngine
     public class TheEnginePanel : OpenGlBase2, IWindowHost, IDisposable
 #endif
     {
+        public static KeyGesture Undo { get; } = AvaloniaLocator.Current
+            .GetService<PlatformHotkeyConfiguration>()?.Undo.FirstOrDefault() ?? new KeyGesture(Key.Z, KeyModifiers.Control);
+
+        public static KeyGesture Redo { get; } = AvaloniaLocator.Current
+            .GetService<PlatformHotkeyConfiguration>()?.Redo.FirstOrDefault() ?? new KeyGesture(Key.Y, KeyModifiers.Control);
+        
         protected Engine? engine;
         private Stopwatch sw = new Stopwatch();
         private Stopwatch renderStopwatch = new Stopwatch();
@@ -61,14 +64,16 @@ namespace TheEngine
         protected override void OnKeyDown(KeyEventArgs e)
         {
             engine?.inputManager.keyboard.KeyDown(e.Key);
-            e.Handled = true;
+            if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
+                e.Handled = true;
             base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
             engine?.inputManager.keyboard.KeyUp(e.Key);
-            e.Handled = true;
+            if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
+                e.Handled = true;
             base.OnKeyUp(e);
         }
 
@@ -196,7 +201,7 @@ namespace TheEngine
             ((IControl)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
         }
 
-        private bool IsModifierKey(Key key) => key is Key.LeftShift or Key.LeftCtrl or Key.LeftAlt;
+        private bool IsModifierKey(Key key) => key is Key.LeftShift or Key.LeftCtrl or Key.LeftAlt or Key.LWin;
         
         private void GlobalKeyDown(object? sender, KeyEventArgs e)
         {

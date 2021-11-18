@@ -92,7 +92,7 @@ namespace WDE.MapRenderer.Managers
             foreach (var group in groups)
             {
                 var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs[0].AsArray(),
-                    group.Indices.AsArray(), group.Vertices.Length, group.Indices.Length,
+                    group.Indices.AsSpan().ToArray(), group.Vertices.Length, group.Indices.Length,
                     group.UVs.Count >= 2 ? group.UVs[1].AsArray() : null, group.VertexColors?.AsArray());
 
                 var wmoMesh = gameContext.Engine.MeshManager.CreateMesh(wmoMeshData);

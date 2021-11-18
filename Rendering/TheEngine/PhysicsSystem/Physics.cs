@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading;
 using TheEngine.Components;
 using TheEngine.ECS;
@@ -80,7 +81,7 @@ namespace TheEngine.PhysicsSystem
                     if (intersects)
                     {
                         var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
-                        if (Physics.RayIntersectsObject(mesh, localToWorld[i], ray, out inter))
+                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, out inter))
                         {
                             var dist = (ray.Position - inter).LengthSquared();
                             if (dist < minDist)
@@ -117,46 +118,76 @@ namespace TheEngine.PhysicsSystem
 
             return (minEntity, intersectionPoint);
         }
+
+        public void DumpGeometry()
+        {
+            int index = 1;
+            StringBuilder vertices = new();
+            StringBuilder indices = new();
+            colliders.ForEach<Collider, MeshRenderer, LocalToWorld>((itr, start, end, colliders, renderer, localToWorld) =>
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
+                    int submesh = renderer[i].SubMeshId;
+                    var l2w = localToWorld[i].Matrix;
+
+                    foreach (var face in mesh.GetFaces(submesh))
+                    {
+                        var v1 = face.Item1;
+                        var v2 = face.Item2;
+                        var v3 = face.Item3;
+                        Vector4.Transform(ref v1, ref l2w, out var v1_w);
+                        Vector4.Transform(ref v2, ref l2w, out var v2_w);
+                        Vector4.Transform(ref v3, ref l2w, out var v3_w);
+
+                        vertices.AppendLine($"v {v1_w.X} {v1_w.Y} {v1_w.Z}");
+                        vertices.AppendLine($"v {v2_w.X} {v2_w.Y} {v2_w.Z}");
+                        vertices.AppendLine($"v {v3_w.X} {v3_w.Y} {v3_w.Z}");
+                        indices.AppendLine($"f {index}// {index + 1}// {index + 2}//");
+                        index += 3;
+                    }
+                }
+            });
+            File.WriteAllText("/Users/bartek/mesh.obj", vertices.ToString() + "\n" + indices.ToString());
+        }
     }
     
     public static class Physics
     {
-        public static bool RayIntersectsObject(IMesh mesh, Matrix localToWorld, Ray ray, out Vector3 outIntersectionPoint)
+        public static bool RayIntersectsObject(IMesh mesh, int submeshId, Matrix localToWorld, Ray ray, out Vector3 outIntersectionPoint)
         {
             outIntersectionPoint = Vector3.Zero;
             bool intersects = false;
             float minSqDist = Single.MaxValue;
-            for (int i = 0; i < mesh.SubmeshCount; ++i)
+            foreach (var triangle in mesh.GetFaces(submeshId))
             {
-                foreach (var triangle in mesh.GetFaces(i))
+                var v1 = triangle.Item1;
+                var v2 = triangle.Item2;
+                var v3 = triangle.Item3;
+
+                Vector4.Transform(ref v1, ref localToWorld, out var v1_w);
+                Vector4.Transform(ref v2, ref localToWorld, out var v2_w);
+                Vector4.Transform(ref v3, ref localToWorld, out var v3_w);
+
+                if (RayIntersectsTriangle(in ray, v1_w.XYZ, v2_w.XYZ, v3_w.XYZ, out var inte))
                 {
-                    var v1 = triangle.Item1;
-                    var v2 =  triangle.Item2;
-                    var v3 =  triangle.Item3;
-
-                    Vector4.Transform(ref v1, ref localToWorld, out var v1_w);
-                    Vector4.Transform(ref v2, ref localToWorld, out var v2_w);
-                    Vector4.Transform(ref v3, ref localToWorld, out var v3_w);
-
-                    if (RayIntersectsTriangle(in ray, v1_w.XYZ, v2_w.XYZ, v3_w.XYZ, out var inte))
+                    if (!intersects)
                     {
-                        if (!intersects)
+                        outIntersectionPoint = inte;
+                        minSqDist =  (ray.Position - inte).LengthSquared();
+                        intersects = true;
+                    }
+                    else
+                    {
+                        var distA = (ray.Position - inte).LengthSquared();
+                        if (distA < minSqDist)
                         {
+                            minSqDist = distA;
                             outIntersectionPoint = inte;
-                            minSqDist =  (ray.Position - inte).LengthSquared();
-                            intersects = true;
                         }
-                        else
-                        {
-                            var distA = (ray.Position - inte).LengthSquared();
-                            if (distA < minSqDist)
-                            {
-                                minSqDist = distA;
-                                outIntersectionPoint = inte;
-                            }
-                        }
-                    }   
-                }
+                    }
+                }   
             }
             return intersects;
         }

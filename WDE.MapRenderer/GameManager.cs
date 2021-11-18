@@ -1,15 +1,10 @@
 using System;
 using System.Collections;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using Nito.AsyncEx;
 using TheEngine;
-using TheEngine.Components;
 using TheEngine.Coroutines;
-using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.PhysicsSystem;
-using TheMaths;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 using WDE.MapRenderer.Managers;
@@ -39,9 +34,8 @@ namespace WDE.MapRenderer
         {
             this.engine = engine;
             TimeManager = new TimeManager(this);
-            ModuleManager = new ModuleManager(this, gameView);
-            DbcManager = new DbcManager(this, databaseClientFileOpener);
             ScreenSpaceSelector = new ScreenSpaceSelector(this);
+            DbcManager = new DbcManager(this, databaseClientFileOpener);
             CurrentMap = DbcManager.MapStore.FirstOrDefault() ?? Map.Empty;
             TextureManager = new WoWTextureManager(this);
             MeshManager = new WoWMeshManager(this);
@@ -51,6 +45,8 @@ namespace WDE.MapRenderer
             CameraManager = new CameraManager(this);
             LightingManager = new LightingManager(this);
             RaycastSystem = new RaycastSystem(engine);
+            ModuleManager = new ModuleManager(this, gameView); // must be last
+            
             OnInitialized?.Invoke();
             IsInitialized = true;
         }

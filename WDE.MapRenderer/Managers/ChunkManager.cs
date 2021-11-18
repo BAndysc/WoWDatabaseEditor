@@ -269,6 +269,7 @@ namespace WDE.MapRenderer.Managers
                     gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;
                     gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = subChunkMesh.Handle;
                     gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
+                    chunk.entities.Add(entity);
 
                     Rgba32[] holeMap = new Rgba32[4 * 4];
                     if (chunksEnumerator2.Current.Holes != null)
@@ -494,12 +495,16 @@ namespace WDE.MapRenderer.Managers
                     foreach (var material in mesh.Item2)
                     {
                         chunk.renderHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
-                        
-                        var entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
-                        gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
-                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
-                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
-                        gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });
+
+                        if (!material.BlendingEnabled)
+                        {
+                            var entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
+                            gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
+                            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
+                            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
+                            gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });   
+                            chunk.entities.Add(entity);
+                        }
                     }
                 }
                 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Managers;
@@ -41,13 +42,13 @@ namespace WoWDatabaseEditor.Services.SolutionService
             this.statusBar = statusBar;
         }
         
-        public void SaveSolutionToDatabaseTask(ISolutionItem item)
+        public Task SaveSolutionToDatabaseTask(ISolutionItem item)
         {
             if (!CanSaveToDatabase)
-                return;
+                return Task.CompletedTask;
             var itemName = solutionItemNameRegistry.GetName(item);
             
-            taskRunner.ScheduleTask($"Export {itemName} to database",
+            return taskRunner.ScheduleTask($"Export {itemName} to database",
                 async progress =>
                 {
                     progress.Report(0, 2, "Generate query");
@@ -66,11 +67,11 @@ namespace WoWDatabaseEditor.Services.SolutionService
                 });
         }
 
-        public void ReloadSolutionRemotelyTask(ISolutionItem item)
+        public Task ReloadSolutionRemotelyTask(ISolutionItem item)
         {
             var itemName = solutionItemNameRegistry.GetName(item);
             
-            taskRunner.ScheduleTask($"Reload {itemName} on server",
+            return taskRunner.ScheduleTask($"Reload {itemName} on server",
                 async progress =>
                 {
                     var commands = remoteCommandGenerator.GenerateCommand(item);
@@ -99,10 +100,10 @@ namespace WoWDatabaseEditor.Services.SolutionService
                 });
         }
 
-        public void SaveAndReloadSolutionTask(ISolutionItem item)
+        public Task SaveAndReloadSolutionTask(ISolutionItem item)
         {
             var itemName = solutionItemNameRegistry.GetName(item);
-            taskRunner.ScheduleTask($"Save and reload {itemName} on server",
+            return taskRunner.ScheduleTask($"Save and reload {itemName} on server",
                 async progress =>
                 {
                     progress.Report(0, 1, "Generate query");
