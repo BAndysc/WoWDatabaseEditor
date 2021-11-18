@@ -227,8 +227,7 @@ namespace TheAvaloniaOpenGL
 
         public void DrawElementsInstanced(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices, int instancesCount)
         {
-            throw new Exception();
-            //GL.DrawElementsInstanced((OpenTK.Graphics.OpenGL4.PrimitiveType)mode, count, (OpenTK.Graphics.OpenGL4.DrawElementsType)type, indices, indicesco);
+            GL.DrawElementsInstanced((OpenTK.Graphics.OpenGL4.PrimitiveType)mode, count, (OpenTK.Graphics.OpenGL4.DrawElementsType)type, indices, instancesCount);
         }
 
         public void ClampColor(ClampColorTarget target, ClampColorMode clamp)
