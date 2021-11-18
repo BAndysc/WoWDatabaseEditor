@@ -40,7 +40,7 @@
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj" SkipGetTargetFrameworkProperties="true" />
       <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
-      <ProjectReference Include="..\WoWDatabaseEditor\WDE.MapRenderer\WDE.MapRenderer.csproj" />
+      <ProjectReference Include="..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
 
       <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.BattleNet.V37165\WowPacketParserModule.BattleNet.V37165.csproj" />
       <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.Substructures\WowPacketParserModule.Substructures.csproj" />

@@ -247,7 +247,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.MpqReader", "WDE.MpqRea
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheEngine.Test", "Rendering\TheEngine.Test\TheEngine.Test.csproj", "{B6C2EDA7-665A-4CF1-97CF-356BB5141339}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.WorldMap", "WoWDatabaseEditor\WDE.WorldMap\WDE.WorldMap.csproj", "{7A409931-190E-44E5-B5AC-159FA1743F07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.WorldMap", "WDE.WorldMap\WDE.WorldMap.csproj", "{7A409931-190E-44E5-B5AC-159FA1743F07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

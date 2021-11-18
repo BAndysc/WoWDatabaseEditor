@@ -79,7 +79,6 @@ namespace WoWDatabaseEditorCore.Avalonia
             Console.WriteLine("Initializing OpenGL");
 
             configuration = SafeUseOpenTK(configuration, new List<GlVersion> { new GlVersion(GlProfileType.OpenGL, 4, 1, true) });
-//            configuration = configuration.UseOpenTK(new List<GlVersion> { new GlVersion(GlProfileType.OpenGL, 4, 1, true) });
 #endif
             if (GlobalApplication.Arguments.IsArgumentSet("wgl"))
             {
@@ -94,6 +93,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                         new GlVersion(GlProfileType.OpenGL, 4, 3),
                         new GlVersion(GlProfileType.OpenGL, 4, 2),
                         new GlVersion(GlProfileType.OpenGL, 4, 1),
+                        new GlVersion(GlProfileType.OpenGL, 3, 3),
                     }});
             }
 
