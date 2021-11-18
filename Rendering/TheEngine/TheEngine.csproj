@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DefineConstants Condition="$(UseOpenGl) == 'true'">$(DefineConstants);USE_OPENTK</DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(DefineConstants);USE_OPENTK</DefineConstants>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
+      <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="GUI" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Update="internalShaders\theengine.cginc">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\blit.frag">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\blit.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\blit.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="fonts\calibri.fnt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="fonts\calibri.png">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\sdf.frag">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\sdf.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="internalShaders\sdf.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+{
+  "Pixel": {
+    "Path": "data/lit.frag"
+  },
+  "ZWrite": true,
+  "Vertex": {
+    "Path": "data/lit.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

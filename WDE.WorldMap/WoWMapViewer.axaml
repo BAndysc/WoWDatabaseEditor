@@ -1,0 +1,37 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:worldMap="clr-namespace:WDE.WorldMap"
+        xmlns:panAndZoom="clr-namespace:WDE.WorldMap.PanAndZoom">
+    <Design.PreviewWith>
+        <worldMap:WoWMapViewer />
+    </Design.PreviewWith>
+
+    <Style Selector="worldMap|WoWMapViewer">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <panAndZoom:ExtendedZoomBorder Name="ZoomBorder" Stretch="None" ZoomSpeed="1.04"
+                                               EnablePan="True" PanButton="Left"
+                                               Background="#001D28"
+                                               Focusable="True"
+                                               VerticalAlignment="Stretch" 
+                                               EnableConstrains="True"
+                                               ZoomX="{TemplateBinding Zoom, Mode=OneWayToSource}"
+                                               MinOffsetX="{Binding #Map.TopLeftVirtual.X}"
+                                               MinOffsetY="{Binding #Map.TopLeftVirtual.Y}"
+                                               MaxOffsetX="{Binding #Map.BottomRightVirtual.X}"
+                                               MaxOffsetY="{Binding #Map.BottomRightVirtual.Y}"
+                                               TopLeft="{TemplateBinding TopLeftVirtual, Mode=OneWayToSource}"
+                                               BottomRight="{TemplateBinding BottomRightVirtual, Mode=OneWayToSource}"
+                                               HorizontalAlignment="Stretch">
+                    <Panel>
+                        <worldMap:WoWMapRenderer IsVisible="{TemplateBinding RenderBackground}" 
+                                                     CurrentZoom="{TemplateBinding Zoom}" 
+                                                     MapsPath="{TemplateBinding MapsPath}" 
+                                                     Map="{TemplateBinding Map}" Name="Map" />
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                    </Panel>
+                </panAndZoom:ExtendedZoomBorder>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

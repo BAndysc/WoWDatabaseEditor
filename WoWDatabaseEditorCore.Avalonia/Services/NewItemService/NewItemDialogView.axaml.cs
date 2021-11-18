@@ -27,7 +27,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.NewItemService
                 vm.Accept.Execute(null);
         }
 
-        private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
+        private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
         {
             if (DataContext is NewItemDialogViewModel vm)
                 vm.Accept.Execute(null);

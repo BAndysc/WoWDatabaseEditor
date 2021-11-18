@@ -14,6 +14,18 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
         public override IDocumentDock CreateDocumentDock() => new FocusAwareDocumentDock() {CanFloat = false};
         public override IToolDock CreateToolDock() => new FocusAwareToolDock() {CanFloat = false};
 
+        public void AddToolAsDocument(IDock layout, AvaloniaToolDockWrapper tool)
+        {
+            var documentsDock = FindDockable(layout, dockable => dockable is IDocumentDock) as IDocumentDock;
+            if (documentsDock == null)
+            {
+                documentsDock = CreateDocumentDock();
+                documentsDock.Proportion = 1;
+                AddDockable(layout, documentsDock);
+            }
+            AddDockable(documentsDock, tool);
+        }
+        
         public void AddDocument(IDock layout, AvaloniaDocumentDockWrapper document)
         {
             var documentsDock = FindDockable(layout, dockable => dockable is IDocumentDock) as IDocumentDock;

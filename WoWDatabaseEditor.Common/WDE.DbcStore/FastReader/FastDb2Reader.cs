@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using WDE.Common.DBC;
 
 namespace WDE.DbcStore.FastReader
 {

@@ -1,6 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Metadata;
+
+[assembly: XmlnsDefinition("https://github.com/avaloniaui", "AvaloniaStyles.Controls")]
 
 namespace AvaloniaStyles
 {

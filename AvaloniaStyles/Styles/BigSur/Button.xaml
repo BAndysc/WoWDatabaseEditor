@@ -10,7 +10,7 @@
     </Style>
     
     <Style Selector=":is(Button):not(:is(CheckBox))">
-        <Setter Property="CornerRadius" Value="6" />
+        <!--<Setter Property="CornerRadius" Value="6" />-->
     </Style>
 
     <Style Selector=":is(Button):not(:is(CheckBox)) /template/ ContentPresenter#PART_ContentPresenter">

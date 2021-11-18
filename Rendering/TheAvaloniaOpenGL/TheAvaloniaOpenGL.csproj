@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <RestoreAdditionalProjectSources>
+            https://nuget.avaloniaui.net/repository/avalonia-all/index.json
+        </RestoreAdditionalProjectSources>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OpenGLBindings\OpenGLBindings.csproj" />
+      <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
+      <PackageReference Include="Avalonia" Version="0.10.999-cibuild0015264-beta" />
+      <PackageReference Include="Avalonia.OpenTK" Version="0.10.999-cibuild0015264-beta" />
+    </ItemGroup>
+
+</Project>

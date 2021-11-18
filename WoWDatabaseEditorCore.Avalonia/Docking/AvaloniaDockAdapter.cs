@@ -2,6 +2,7 @@
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using WDE.Common.Managers;
+using WDE.Common.Windows;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Avalonia.Docking.Serialization;
@@ -110,7 +111,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     {
                         var dockable = new AvaloniaToolDockWrapper(documentManager, tool);
                         tools[tool] = dockable;
-                        factory.AddTool(currentLayout!, dockable);
+                        if (tool.PreferedPosition == ToolPreferedPosition.DocumentCenter)
+                            factory.AddToolAsDocument(currentLayout!, dockable);
+                        else
+                            factory.AddTool(currentLayout!, dockable);
+                        factory.SetActiveDockable(dockable);
+                    } else if (isVisible && tools.ContainsKey(tool))
+                    {
+                        factory.SetActiveDockable(tools[tool]);
                     }
                     else if (!isVisible)
                     {

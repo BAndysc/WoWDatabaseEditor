@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             IsEnabled="{Binding TaskInProgress, Converter={x:Static BoolConverters.Not}}"
+             IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorToolBar">
     <controls:ToolbarPanel>
         <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new key" Image="Icons/icon_add.png"/>

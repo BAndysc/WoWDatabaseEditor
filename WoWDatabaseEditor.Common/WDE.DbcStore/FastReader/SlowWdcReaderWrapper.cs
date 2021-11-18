@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using WDBXEditor.Reader;
 using WDBXEditor.Storage;
+using WDE.Common.DBC;
 
 namespace WDE.DbcStore.FastReader
 {

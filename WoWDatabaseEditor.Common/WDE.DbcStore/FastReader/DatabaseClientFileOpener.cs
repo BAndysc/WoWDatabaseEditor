@@ -1,11 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using WDE.Common.DBC;
+using WDE.Module.Attributes;
 
 namespace WDE.DbcStore.FastReader
 {
-    public class DatabaseClientFileOpener
+    [AutoRegister]
+    public class DatabaseClientFileOpener : IDatabaseClientFileOpener
     {
+        public IEnumerable<IDbcIterator> Open(byte[] data)
+        {
+            uint magic = BitConverter.ToUInt32(data);
+            if (magic == FastDbcReader.WDBC)
+                return new FastDbcReader(data);
+            
+            if (magic == FastDb2Reader.WDB2)
+                return new FastDb2Reader(data);
+
+            throw new Exception("Only dbc and db2 supported");
+        }
+        
         public IEnumerable<IDbcIterator> Open(string path)
         {
             byte[] buffer = new byte[4];

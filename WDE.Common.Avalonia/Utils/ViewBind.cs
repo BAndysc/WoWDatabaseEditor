@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Prism.Ioc;
 using WDE.Common.Windows;
 
 namespace WDE.Common.Avalonia.Utils
@@ -9,6 +10,12 @@ namespace WDE.Common.Avalonia.Utils
     public class ViewBind
     {
         public static IViewLocator? AppViewLocator { get; set; }
+        public static IContainerProvider? ContainerProvider { get; set; }
+
+        public static T ResolveViewModel<T>()
+        {
+            return ContainerProvider.Resolve<T>();
+        }
         
         public static readonly AvaloniaProperty ModelProperty = AvaloniaProperty.RegisterAttached<Control, object>("Model",
             typeof(ViewBind),coerce: OnModelChanged);

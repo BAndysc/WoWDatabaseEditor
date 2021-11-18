@@ -21,6 +21,6 @@ namespace WDE.Common.Windows
 
     public enum ToolPreferedPosition
     {
-        Left, Right, Bottom
+        Left, Right, Bottom, DocumentCenter
     }
 }

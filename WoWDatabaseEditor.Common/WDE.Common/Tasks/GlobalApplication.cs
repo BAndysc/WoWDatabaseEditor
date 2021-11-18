@@ -30,6 +30,7 @@ namespace WDE.Common.Tasks
         public static bool HighDpi { get; set; }
 
         public static bool IsRunning { get; set; } = true;
+        public static bool Supports3D { get; set; } = true;
 
         public static void InitializeApplication(IMainThread thread, AppBackend backend)
         {

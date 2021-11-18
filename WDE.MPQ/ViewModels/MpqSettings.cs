@@ -17,7 +17,7 @@ namespace WDE.MPQ.ViewModels
             this.verifier = verifier;
             var saved = userSettings.Get<Data>();
 
-            if (verifier.VerifyFolder(saved.Path))
+            if (verifier.VerifyFolder(saved.Path) != WoWFilesType.Invalid)
                 path = saved.Path;
         }
 

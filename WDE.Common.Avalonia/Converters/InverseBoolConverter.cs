@@ -6,6 +6,8 @@ namespace WDE.Common.Avalonia.Converters
 {
     public class InverseBoolConverter : IValueConverter
     {
+        public static readonly InverseBoolConverter Instance = new();
+        
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool b)
