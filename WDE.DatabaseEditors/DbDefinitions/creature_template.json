@@ -19,6 +19,10 @@
     {
       "table_name": "creature_template_addon",
       "foreign_key": ["entry"]
+    },
+    {
+      "table_name": "creature_template_movement",
+      "foreign_key": ["CreatureId"]
     }
   ],
   "groups": [
@@ -252,7 +256,56 @@
           "name": "Movement ID",
           "db_column_name": "movementId",
           "value_type": "uint"
-        }
+        },
+        {
+          "name": "Ground",
+          "db_column_name": "Ground",
+          "value_type": "MovementGroundStateParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Swim",
+          "db_column_name": "Swim",
+          "value_type": "BoolParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Flight",
+          "db_column_name": "Flight",
+          "value_type": "MovementFlightStateParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Rooted",
+          "db_column_name": "Rooted",
+          "value_type": "BoolParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Chase",
+          "db_column_name": "Chase",
+          "value_type": "MovementChaseStateParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Random",
+          "db_column_name": "Random",
+          "value_type": "MovementRandomMoveStateParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Interaction Pause Timer",
+          "db_column_name": "InteractionPauseTimer",
+          "value_type": "uint",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        }        
       ]
     },
     {

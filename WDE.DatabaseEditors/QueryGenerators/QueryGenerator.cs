@@ -316,7 +316,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         string primaryKeyColumn = tableData.TableDefinition.TablePrimaryKeyColumnName;
                         if (table.Key != tableData.TableDefinition.TableName)
                         {
-                            
+                            primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKeys[0];
                             query.Table(table.Key)
                                 .InsertIgnore(
                                     tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKeys

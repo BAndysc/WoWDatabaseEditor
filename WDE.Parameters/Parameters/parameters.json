@@ -2383,5 +2383,39 @@
 			"4": {"name": "world"},
 			"5": {"name": "personal"}
 		}
+	},
+	"MovementGroundStateParameter": {
+		"name": "Ground state",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "run"},
+			"2": {"name": "hover"}
+		}
+	},
+	"MovementFlightStateParameter": {
+		"name": "Flight state",
+		"values": {
+			"0": {"name": "none"},
+			"1": {"name": "disable gravity"},
+			"2": {"name": "can fly"}
+		}
+	},
+	"MovementChaseStateParameter": {
+		"name": "Chase state",
+		"values": {
+			"0": {"name": "run"},
+			"1": {"name": "can walk"},
+			"2": {"name": "always walk"}
+		}
+	},
+	"MovementRandomMoveStateParameter": {
+		"name": "Random movement state",
+		"values": {
+			"0": {"name": "walk"},
+			"1": {"name": "can run"},
+			"2": {"name": "always run"}
+		}
 	}
+
+	
 }
