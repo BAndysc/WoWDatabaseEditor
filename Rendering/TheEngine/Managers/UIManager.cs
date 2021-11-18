@@ -51,6 +51,7 @@ namespace TheEngine.Managers
 
         public void Dispose()
         {
+            engine.MeshManager.DisposeMesh(quad);
             glyphUVsBuffer.Dispose();
             glyphPositionsBuffer.Dispose();
         }

@@ -5,8 +5,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia.Utils;
+using WDE.Common.Disposables;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
+using WDE.MVVM;
 using WDE.MVVM.Observable;
 
 namespace WoWDatabaseEditorCore.Avalonia.Docking
@@ -54,6 +56,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                         children.Remove(view);
                     return view;
                 }
+
+                System.IDisposable? disposable = null;
+                disposable = toolDockWrapper.ViewModel.ToObservable(i => i.Visibility)
+                    .SubscribeAction(toolVisibility =>
+                    {
+                        if (!toolVisibility)
+                            tools.Remove(toolDockWrapper.ViewModel);
+                        disposable?.Dispose();
+                        disposable = null;
+                    });
                 
                 if (ViewBind.TryResolve(toolDockWrapper.ViewModel, out var documentView) && documentView is IControl control)
                 {

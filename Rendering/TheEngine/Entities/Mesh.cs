@@ -15,6 +15,7 @@ namespace TheEngine.Entities
     internal class Mesh : IMesh, IDisposable
     {
         private readonly Engine engine;
+        private readonly bool managedOnly;
 
         internal int VertexArrayObject { get; }
         internal NativeBuffer<UniversalVertex>? VerticesBuffer { get; private set; }
@@ -30,6 +31,7 @@ namespace TheEngine.Entities
         
         public void Activate()
         {
+            Debug.Assert(!managedOnly);
             engine.Device.device.BindVertexArray(VertexArrayObject);
             VerticesBuffer!.Activate(0);
             IndicesBuffer!.Activate(0);
@@ -76,71 +78,77 @@ namespace TheEngine.Entities
             }
         }
 
-        internal Mesh(Engine engine, MeshHandle handle)
+        internal Mesh(Engine engine, MeshHandle handle, bool managedOnly)
         {
             this.engine = engine;
+            this.managedOnly = managedOnly;
             Handle = handle;
-            VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
-            IndicesBuffer = engine.Device.CreateBuffer<int>(BufferTypeEnum.Index, 1);
             indicesCount = 0;
-            
-            VertexArrayObject = engine.Device.device.GenVertexArray();
-            engine.Device.device.BindVertexArray(VertexArrayObject);
-            VerticesBuffer.Activate(0);
-            IndicesBuffer.Activate(0);
-            int location = 0;
-            int accumulatedSize = 0;
-            int stride = 4 * 4 * 3 + 2 * 4 * 2;
-            engine.Device.device.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
-            engine.Device.device.EnableVertexAttribArray(0);
-            
-            engine.Device.device.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(16));
-            engine.Device.device.EnableVertexAttribArray(1);
-            
-            engine.Device.device.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(32));
-            engine.Device.device.EnableVertexAttribArray(2);
-            
-            engine.Device.device.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(48));
-            engine.Device.device.EnableVertexAttribArray(3);
-            
-            engine.Device.device.VertexAttribPointer(4, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(56));
-            engine.Device.device.EnableVertexAttribArray(4);
-            engine.Device.device.BindVertexArray(0);
+            if (!managedOnly)
+            {
+                VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
+                IndicesBuffer = engine.Device.CreateBuffer<int>(BufferTypeEnum.Index, 1);
+                VertexArrayObject = engine.Device.device.GenVertexArray();
+                engine.Device.device.BindVertexArray(VertexArrayObject);
+                VerticesBuffer.Activate(0);
+                IndicesBuffer.Activate(0);
+                int location = 0;
+                int accumulatedSize = 0;
+                int stride = 4 * 4 * 3 + 2 * 4 * 2;
+                engine.Device.device.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
+                engine.Device.device.EnableVertexAttribArray(0);
+                
+                engine.Device.device.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(16));
+                engine.Device.device.EnableVertexAttribArray(1);
+                
+                engine.Device.device.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(32));
+                engine.Device.device.EnableVertexAttribArray(2);
+                
+                engine.Device.device.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(48));
+                engine.Device.device.EnableVertexAttribArray(3);
+                
+                engine.Device.device.VertexAttribPointer(4, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(56));
+                engine.Device.device.EnableVertexAttribArray(4);
+                engine.Device.device.BindVertexArray(0);
+            }
         }
 
-        internal Mesh(Engine engine, MeshHandle handle, UniversalVertex[] vertices, int[] indices, int indicesCount, bool ownVerticesArray)
+        internal Mesh(Engine engine, MeshHandle handle, UniversalVertex[] vertices, int[] indices, int indicesCount, bool ownVerticesArray, bool managedOnly)
         {
             this.engine = engine;
             Handle = handle;
-            VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
-            IndicesBuffer = engine.Device.CreateBuffer<int>(BufferTypeEnum.Index, indices.AsSpan(0, indicesCount));
             this.vertices = ownVerticesArray ? vertices : vertices.ToArray();
             this.indices = indices;
             this.indicesCount = indicesCount;
+            this.managedOnly = managedOnly;
             BuildBoundingBox(vertices);
-
-            VertexArrayObject = engine.Device.device.GenVertexArray();
-            engine.Device.device.BindVertexArray(VertexArrayObject);
-            VerticesBuffer.Activate(0);
-            IndicesBuffer.Activate(0);
-            int location = 0;
-            int accumulatedSize = 0;
-            int stride = 4 * 4 * 3 + 2 * 4 * 2;
-            engine.Device.device.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
-            engine.Device.device.EnableVertexAttribArray(0);
+            if (!managedOnly)
+            {
+                VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
+                IndicesBuffer = engine.Device.CreateBuffer<int>(BufferTypeEnum.Index, indices.AsSpan(0, indicesCount));
+                VertexArrayObject = engine.Device.device.GenVertexArray();
+                engine.Device.device.BindVertexArray(VertexArrayObject);
+                VerticesBuffer.Activate(0);
+                IndicesBuffer.Activate(0);
+                int location = 0;
+                int accumulatedSize = 0;
+                int stride = 4 * 4 * 3 + 2 * 4 * 2;
+                engine.Device.device.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
+                engine.Device.device.EnableVertexAttribArray(0);
             
-            engine.Device.device.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(16));
-            engine.Device.device.EnableVertexAttribArray(1);
+                engine.Device.device.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(16));
+                engine.Device.device.EnableVertexAttribArray(1);
             
-            engine.Device.device.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(32));
-            engine.Device.device.EnableVertexAttribArray(2);
+                engine.Device.device.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(32));
+                engine.Device.device.EnableVertexAttribArray(2);
             
-            engine.Device.device.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(48));
-            engine.Device.device.EnableVertexAttribArray(3);
+                engine.Device.device.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(48));
+                engine.Device.device.EnableVertexAttribArray(3);
             
-            engine.Device.device.VertexAttribPointer(4, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(56));
-            engine.Device.device.EnableVertexAttribArray(4);
-            engine.Device.device.BindVertexArray(0);
+                engine.Device.device.VertexAttribPointer(4, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(56));
+                engine.Device.device.EnableVertexAttribArray(4);
+                engine.Device.device.BindVertexArray(0);
+            }
         }
 
         public void SetSubmeshCount(int count)
@@ -152,6 +160,7 @@ namespace TheEngine.Entities
         }
 
         public int SubmeshCount => submeshesRange?.Length ?? 1;
+        public bool IsManagedOnly => managedOnly;
 
         public void SetSubmeshIndicesRange(int submesh, int start, int length)
         {
@@ -212,6 +221,8 @@ namespace TheEngine.Entities
             this.vertices = vertices.Select(t => new UniversalVertex() { position = new Vector4(t, 1) }).ToArray();
         }
 
+        public void BuildBoundingBox() => BuildBoundingBox(vertices);
+
         private void BuildBoundingBox(UniversalVertex[] vertices)
         {
             Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
@@ -232,6 +243,7 @@ namespace TheEngine.Entities
         
         public void Rebuild()
         {
+            Debug.Assert(!managedOnly);
             Debug.Assert(vertices != null);
             Debug.Assert(indices != null);
             BuildBoundingBox(vertices);
@@ -246,9 +258,12 @@ namespace TheEngine.Entities
         public void Dispose()
         {
             disposed = true;
-            VerticesBuffer.Dispose();
-            IndicesBuffer.Dispose();
-
+            if (!IsManagedOnly)
+            {
+                VerticesBuffer.Dispose();
+                IndicesBuffer.Dispose();
+            }
+            
             VerticesBuffer = null;
             IndicesBuffer = null;
         }

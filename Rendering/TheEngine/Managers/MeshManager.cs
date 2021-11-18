@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define TRACK_ALLOCATIONS
+
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using TheEngine.Data;
@@ -15,6 +17,10 @@ namespace TheEngine.Managers
         private readonly Engine engine;
 
         private List<Mesh> meshes;
+        
+        #if TRACK_ALLOCATIONS
+        private List<System.Diagnostics.StackTrace> allocations = new();
+        #endif
 
         internal MeshManager(Engine engine)
         {
@@ -27,12 +33,15 @@ namespace TheEngine.Managers
         {
             var handle = new MeshHandle(meshes.Count);
 
-            var mesh = new Mesh(engine, handle);
+            var mesh = new Mesh(engine, handle, false);
             mesh.SetVertices(vertices);
             mesh.SetIndices(indices, 0);
             mesh.Rebuild();
 
             meshes.Add(mesh);
+            #if TRACK_ALLOCATIONS
+            allocations.Add(new System.Diagnostics.StackTrace(2));
+            #endif
 
             return mesh;
         }
@@ -55,26 +64,55 @@ namespace TheEngine.Managers
                 };
             }
             
-            var mesh = new Mesh(engine, handle, vertices, meshData.Indices, meshData.IndicesCount, true);
+            var mesh = new Mesh(engine, handle, vertices, meshData.Indices, meshData.IndicesCount, true, false);
             //ArrayPool<UniversalVertex>.Shared.Return(vertices);
             meshes.Add(mesh);
 
+#if TRACK_ALLOCATIONS
+            allocations.Add(new System.Diagnostics.StackTrace(2));
+#endif
             return mesh;
         }
         
         public void DisposeMesh(IMesh mesh)
         {
+            var index = meshes.IndexOf((Mesh)mesh);
             ((Mesh)mesh).Dispose();
-            meshes[meshes.IndexOf((Mesh)mesh)] = null!;
+            meshes[index] = null!;
+#if TRACK_ALLOCATIONS
+            allocations[index] = null!;
+#endif
+        }
+
+        public IMesh CreateManagedOnlyMesh(Vector3[] vertices, int[] indices)
+        {
+            var handle = new MeshHandle(meshes.Count);
+
+            var mesh = new Mesh(engine, handle, true);
+            mesh.SetVertices(vertices);
+            mesh.SetIndices(indices, 0);
+
+            meshes.Add(mesh);
+            #if TRACK_ALLOCATIONS
+            allocations.Add(null!);
+            #endif
+
+            return mesh;
         }
 
         public void Dispose()
         {
-            foreach (var mesh in meshes)
+            for (var index = 0; index < meshes.Count; index++)
             {
-                if (mesh == null)
+                var mesh = meshes[index];
+                if (mesh == null || mesh.IsManagedOnly)
                     continue;
+#if TRACK_ALLOCATIONS
+                Console.WriteLine("Mesh not disposed! Allocated here: ");                
+                Console.WriteLine(allocations[index]);
+#else
                 Console.WriteLine("Mesh not disposed!");
+#endif
                 mesh.Dispose();
             }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Diagnostics;
 using Nito.AsyncEx;
 using TheEngine;
 using TheEngine.Coroutines;
@@ -33,6 +34,7 @@ namespace WDE.MapRenderer
         public void Initialize(Engine engine)
         {
             this.engine = engine;
+            coroutineManager = new();
             TimeManager = new TimeManager(this);
             ScreenSpaceSelector = new ScreenSpaceSelector(this);
             DbcManager = new DbcManager(this, databaseClientFileOpener);
@@ -50,9 +52,7 @@ namespace WDE.MapRenderer
             OnInitialized?.Invoke();
             IsInitialized = true;
         }
-        
-        private CoroutineManager coroutineManager = new();
-        
+
         public void StartCoroutine(IEnumerator coroutine)
         {
             coroutineManager.Start(coroutine);
@@ -61,6 +61,11 @@ namespace WDE.MapRenderer
         private Material? prevMaterial;
         public void Update(float delta)
         {
+            if (!IsInitialized)
+            {
+                Console.WriteLine("GameManager not initialized (this is quite fatal)");
+                return;
+            }
             coroutineManager.Step();
 
             TimeManager.Update(delta);
@@ -76,10 +81,17 @@ namespace WDE.MapRenderer
 
         public void Render(float delta)
         {
+            if (!IsInitialized)
+            {
+                Console.WriteLine("GameManager not initialized (this is quite fatal)");
+                return;
+            }
             ModuleManager.Render();
             LightingManager.Render();
             ScreenSpaceSelector.Render();
         }
+
+        public event Action? RequestDispose;
 
         public void SetMap(int mapId)
         {
@@ -90,19 +102,43 @@ namespace WDE.MapRenderer
             }
         }
 
-        public void Dispose()
+        public void DoDispose()
         {
+            RequestDispose?.Invoke();
+            Debug.Assert(!IsInitialized);
+        }
+
+        public void DisposeGame()
+        {
+            if (!IsInitialized)
+                return;
             IsInitialized = false;
             ModuleManager.Dispose();
+            LightingManager.Dispose();
             ChunkManager.Dispose();
             WmoManager.Dispose();
             MdxManager.Dispose();
             TextureManager.Dispose();
             MeshManager.Dispose();
+            coroutineManager = null!;
+            TimeManager = null!;
+            ScreenSpaceSelector = null!;
+            DbcManager = null!;
+            CurrentMap = null!;
+            TextureManager = null!;
+            MeshManager = null!;
+            MdxManager = null!;
+            WmoManager = null!;
+            ChunkManager = null!;
+            CameraManager = null!;
+            LightingManager = null!;
+            RaycastSystem = null!;
+            ModuleManager = null!;
         }
 
         public Engine Engine => engine;
 
+        private CoroutineManager coroutineManager;
         public TimeManager TimeManager { get; private set; }
         public ScreenSpaceSelector ScreenSpaceSelector { get; private set; }
         public WoWMeshManager MeshManager { get; private set; }

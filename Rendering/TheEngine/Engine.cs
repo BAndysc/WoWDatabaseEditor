@@ -106,9 +106,9 @@ namespace TheEngine
             lightManager.Dispose();
             cameraManger.Dispose();
             materialManager.Dispose();
+            renderManager.Dispose();
             meshManager.Dispose();
             textureManager.Dispose();
-            renderManager.Dispose();
             shaderManager.Dispose();
             entityManager.Dispose();
             Device.Dispose();

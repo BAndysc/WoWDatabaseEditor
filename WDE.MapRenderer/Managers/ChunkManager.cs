@@ -263,7 +263,7 @@ namespace WDE.MapRenderer.Managers
                             indices[k__++] = br;
                         }
                     }
-                    var subChunkMesh = gameContext.Engine.MeshManager.CreateMesh(subVertices, indices);
+                    var subChunkMesh = gameContext.Engine.MeshManager.CreateManagedOnlyMesh(subVertices, indices);
                     var entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
                     gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
                     gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;

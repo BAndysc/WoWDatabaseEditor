@@ -184,6 +184,10 @@ Tris: " + stats.TrianglesDrawn;
                             .Build()).ListenErrors();
                     }
                 }
+                else
+                {
+                    Game.DoDispose();
+                }
             });
         }
 
@@ -254,7 +258,11 @@ Tris: " + stats.TrianglesDrawn;
         public bool Visibility
         {
             get => visibility;
-            set => SetProperty(ref visibility, value);
+            set
+            {
+                visibility = value;
+                RaisePropertyChanged(nameof(Visibility));
+            }
         }
 
         public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.DocumentCenter;

@@ -9,6 +9,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
+using Avalonia.Threading;
 using TheAvaloniaOpenGL;
 using TheEngine.Config;
 using MouseButton = TheEngine.Input.MouseButton;
@@ -47,7 +48,7 @@ namespace TheEngine
         public TheEnginePanel() : base(new OpenGlControlSettings
         {
             ContinuouslyRender = true,
-            DeInitializeOnVisualTreeDetachment = false,
+            //DeInitializeOnVisualTreeDetachment = false,
         }) { }
 
         static TheEnginePanel()
@@ -131,7 +132,7 @@ namespace TheEngine
 
         protected override void OnOpenGlDeinit(GlInterface gl, int fb)
         {
-            game?.Dispose();
+            game?.DisposeGame();
             engine.Dispose();
             engine = null!;
             base.OnOpenGlDeinit(gl, fb);
@@ -214,10 +215,12 @@ namespace TheEngine
             if (IsModifierKey(e.Key))
                 engine?.inputManager.keyboard.KeyUp(e.Key);
         }
-
+        
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
-            //base.OnDetachedFromVisualTree(e);
+            //if (delayedDispose)
+            //    base.OnDetachedFromVisualTree(e);
+            //delayedDispose = false;
             sw.Stop();
         }
 
@@ -226,9 +229,19 @@ namespace TheEngine
             if (!gameInitialized && game != null)
             {
                 gameInitialized = true;
+                game.RequestDispose += GameOnRequestDispose;
                 game.Initialize(engine!);
             }
             game?.Update(delta);
+        }
+
+        private bool delayedDispose;
+        private void GameOnRequestDispose()
+        {
+            if (game != null)
+                game.RequestDispose -= GameOnRequestDispose;
+            delayedDispose = true;
+            Cleanup();
         }
 
         protected virtual void Render(float delta)
@@ -244,6 +257,8 @@ namespace TheEngine
             get => game;
             set
             {
+                if (game != null)
+                    game.RequestDispose -= GameOnRequestDispose;
                 SetAndRaise(GameProperty, ref game, value);
                 gameInitialized = false;
             }
@@ -251,7 +266,7 @@ namespace TheEngine
 
         public void Dispose()
         {
-            //DoCleanup();
+            Cleanup();
         }
     }
 }

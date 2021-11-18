@@ -23,6 +23,7 @@ namespace Avalonia.OpenGL.Controls
         private readonly OpenGlControlSettings _settings;
         protected GlVersion GlVersion { get; private set; }
         // new
+        private bool _disposed;
         private Stopwatch sw = new();
         public float PresentTime { get; private set; }
         public (int, int) PixelSize => (_bitmap.PixelSize.Width, _bitmap.PixelSize.Height);
@@ -65,7 +66,15 @@ namespace Avalonia.OpenGL.Controls
 
             if (_settings.ContinuouslyRender)
                 // TODO: replace this once we have something like CompositionTargetRendering
-                Dispatcher.UIThread.Post(InvalidateVisual, DispatcherPriority.Background);
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    // new
+                    if (!_disposed)
+                    //end new
+                        InvalidateVisual();
+                }, DispatcherPriority.Render);
+            }
         }
         
         private void CheckError(GlInterface gl)
@@ -118,6 +127,9 @@ namespace Avalonia.OpenGL.Controls
         
         public void Cleanup()
         {
+            // new
+            _disposed = true;
+            // end new
             if (_context != null)
             {
                 using (_context.MakeCurrent())
@@ -266,6 +278,10 @@ namespace Avalonia.OpenGL.Controls
 
         private bool EnsureInitialized()
         {
+            // new
+            if (_disposed)
+                return false;
+            // end new
             if (_initialized)
                 return true;
             _glFailed = !(_initialized = EnsureInitializedCore());

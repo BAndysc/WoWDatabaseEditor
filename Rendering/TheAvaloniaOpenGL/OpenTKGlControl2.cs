@@ -3,6 +3,7 @@ using Avalonia.OpenTK;
 
 namespace TheAvaloniaOpenGL
 {
+    
     public abstract class OpenTKGlControl2 : OpenGlBase2
     {
         public OpenTKGlControl2() : this(new OpenGlControlSettings())

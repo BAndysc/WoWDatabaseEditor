@@ -1,4 +1,5 @@
-﻿using Dock.Model.ReactiveUI.Controls;
+﻿using System;
+using Dock.Model.ReactiveUI.Controls;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
 using ITool = WDE.Common.Windows.ITool;
