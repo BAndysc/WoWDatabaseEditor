@@ -366,6 +366,8 @@ namespace TheEngine.Managers
         Stopwatch materialtimer = new Stopwatch();
         Stopwatch buffertimer = new Stopwatch();
         Stopwatch draw = new Stopwatch();
+        private float viewDistanceModifier = 8;
+
         private void RenderEntities()
         {
             var cameraPosition = cameraManager.MainCamera.Transform.Position;
@@ -387,6 +389,7 @@ namespace TheEngine.Managers
             engine.statsManager.Counters.BoundsCalc.Add(boundsUpdate.Elapsed.TotalMilliseconds);
             
             culler.Restart();
+            float mod = viewDistanceModifier * viewDistanceModifier;
             toRenderArchetype.ParallelForEach<LocalToWorld, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, bits, worldMeshBounds) =>
             {
                 for (int i = start; i < end; ++i)
@@ -395,8 +398,8 @@ namespace TheEngine.Managers
                     var pos = l2w[i].Position;
                     var boundingBoxSize = boundingBox.Size;
                     var size = boundingBoxSize.X + boundingBoxSize.Y + boundingBoxSize.Z;
-                    size = Math.Max(size, 40);
-                    bool doRender = (pos - cameraPosition).LengthSquared() < (size) * (size) * 4 * 4;
+                    size = Math.Max(size, 60);
+                    bool doRender = (pos - cameraPosition).LengthSquared() < (size) * (size) * mod;
                     if (doRender)
                     {
                         bits[i] = (RenderEnabledBit)(frustum.Contains(ref boundingBox) != ContainmentType.Disjoint);
@@ -541,6 +544,16 @@ namespace TheEngine.Managers
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);
             engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0);
+        }
+
+        public float ViewDistanceModifier
+        {
+            get => viewDistanceModifier;
+            set
+            {
+                if (value > 0)
+                    viewDistanceModifier = value;
+            }
         }
 
         private void UpdateSceneBuffer()

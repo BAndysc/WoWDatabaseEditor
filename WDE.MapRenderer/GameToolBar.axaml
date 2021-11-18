@@ -21,13 +21,17 @@
                 <CheckBox Name="TimeFlow" IsChecked="{Binding DisableTimeFlow, Mode=TwoWay}">Disable time flow</CheckBox>
                 <DockPanel LastChildFill="True" IsEnabled="{Binding #TimeFlow.IsChecked, Converter={x:Static InverseBoolConverter.Instance}}">
                     <TextBlock VerticalAlignment="Center">Time speed: </TextBlock>
-                    <Slider Minimum="0" Maximum="6" SmallChange="1" LargeChange="1" Value="{Binding TimeSpeedMultiplier}" />
+                    <Slider Minimum="0" Maximum="6" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="1" Value="{Binding TimeSpeedMultiplier}" />
                 </DockPanel>
                 <DockPanel LastChildFill="True">
                     <TextBlock VerticalAlignment="Center">Time: </TextBlock>
                     <Slider Minimum="0" Maximum="1439" Value="{Binding CurrentTime}" />
                 </DockPanel>
                 <CheckBox IsChecked="{Binding OverrideLighting, Mode=TwoWay}">Disable lightning</CheckBox>
+                <DockPanel LastChildFill="True">
+                    <TextBlock VerticalAlignment="Center">View distance: </TextBlock>
+                    <Slider Minimum="1" Maximum="32" SmallChange="1" LargeChange="1" Value="{Binding ViewDistance}" />
+                </DockPanel>
             </StackPanel>
         </DropDownButton>
     </ToolbarPanel>

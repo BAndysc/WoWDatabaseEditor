@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -57,16 +58,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     return view;
                 }
 
-                System.IDisposable? disposable = null;
-                disposable = toolDockWrapper.ViewModel.ToObservable(i => i.Visibility)
-                    .SubscribeAction(toolVisibility =>
-                    {
-                        if (!toolVisibility)
-                            tools.Remove(toolDockWrapper.ViewModel);
-                        disposable?.Dispose();
-                        disposable = null;
-                    });
-                
                 if (ViewBind.TryResolve(toolDockWrapper.ViewModel, out var documentView) && documentView is IControl control)
                 {
                     tools[toolDockWrapper.ViewModel] = control;
@@ -94,6 +85,15 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     {
                         documents.Remove(item.Item);
                     });
+                foreach (var tool in DocumentManager.AllTools)
+                {
+                    tool.ToObservable(i => i.Visibility)
+                        .SubscribeAction(toolVisibility =>
+                        {
+                            if (!toolVisibility)
+                                tools.Remove(tool);
+                        });
+                }
             }
         }
     }

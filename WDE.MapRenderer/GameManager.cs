@@ -38,7 +38,7 @@ namespace WDE.MapRenderer
             TimeManager = new TimeManager(this);
             ScreenSpaceSelector = new ScreenSpaceSelector(this);
             DbcManager = new DbcManager(this, databaseClientFileOpener);
-            CurrentMap = DbcManager.MapStore.FirstOrDefault() ?? Map.Empty;
+            CurrentMap = DbcManager.MapStore.FirstOrDefault(m => m.Id == 1) ?? Map.Empty;
             TextureManager = new WoWTextureManager(this);
             MeshManager = new WoWMeshManager(this);
             MdxManager = new MdxManager(this);
@@ -51,12 +51,16 @@ namespace WDE.MapRenderer
             
             OnInitialized?.Invoke();
             IsInitialized = true;
+            waitForInitialized.SetResult();
         }
 
         public void StartCoroutine(IEnumerator coroutine)
         {
             coroutineManager.Start(coroutine);
         }
+
+        private TaskCompletionSource waitForInitialized = new();
+        public Task WaitForInitialized => waitForInitialized.Task;
 
         private Material? prevMaterial;
         public void Update(float delta)
@@ -112,6 +116,7 @@ namespace WDE.MapRenderer
         {
             if (!IsInitialized)
                 return;
+            waitForInitialized = new();
             IsInitialized = false;
             ModuleManager.Dispose();
             LightingManager.Dispose();

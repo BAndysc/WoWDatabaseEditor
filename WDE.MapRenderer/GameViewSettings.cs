@@ -19,7 +19,8 @@ namespace WDE.MapRenderer
                 DisableTimeFlow = false,
                 TimeSpeedMultiplier = 3,
                 ShowGrid = true,
-                CurrentTime = 360
+                CurrentTime = 360,
+                ViewDistanceModifier = 6
             });
         }
         
@@ -73,6 +74,16 @@ namespace WDE.MapRenderer
             }
         }
         
+        public float ViewDistanceModifier
+        {
+            get => current.ViewDistanceModifier;
+            set
+            {
+                current.ViewDistanceModifier = value;
+                settings.Update(current);
+            }
+        }
+        
         public struct Data : ISettings
         {
             public bool OverrideLighting;
@@ -80,6 +91,7 @@ namespace WDE.MapRenderer
             public int TimeSpeedMultiplier;
             public bool ShowGrid;
             public int CurrentTime;
+            public float ViewDistanceModifier;
         }
     }
 }

@@ -154,7 +154,7 @@ namespace TheEngine
                 Tick(delta);
                 engine.statsManager.Counters.FrameTime.Add(delta);
                 sw.Restart();
-                RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, FrameRate);
+                Dispatcher.UIThread.Post(() => RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, FrameRate), DispatcherPriority.Render);
 
                 Update(delta);
 

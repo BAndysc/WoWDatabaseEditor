@@ -104,12 +104,14 @@ namespace WDE.MapRenderer
                 Game.TimeManager.SetTime(Time.FromMinutes(settings.CurrentTime));
                 Game.TimeManager.TimeSpeedMultiplier = settings.TimeSpeedMultiplier;
                 Game.ChunkManager.RenderGrid = settings.ShowGrid;
+                Game.Engine.RenderManager.ViewDistanceModifier = settings.ViewDistanceModifier;
                 
                 RaisePropertyChanged(nameof(OverrideLighting));
                 RaisePropertyChanged(nameof(DisableTimeFlow));
                 RaisePropertyChanged(nameof(TimeSpeedMultiplier));
                 RaisePropertyChanged(nameof(ShowGrid));
                 RaisePropertyChanged(nameof(CurrentTime));
+                RaisePropertyChanged(nameof(ViewDistance));
             };
             AutoDispose(new ActionDisposable(() =>
             {
@@ -137,7 +139,8 @@ namespace WDE.MapRenderer
                 }));
 
             ToggleMapVisibilityCommand = new DelegateCommand(() => IsMapVisible = !IsMapVisible);
-
+            ToggleStatsVisibilityCommand = new DelegateCommand(() => DisplayStats = !DisplayStats);
+            
             cameraViewModel = new GameCameraViewModel(this);
             Items.Add(cameraViewModel);
             
@@ -149,6 +152,9 @@ namespace WDE.MapRenderer
             
             Game.UpdateLoop.Register(d =>
             {
+                if (!DisplayStats)
+                    return;
+                
                 ref var counters = ref Game.Engine.StatsManager.Counters;
                 ref var stats = ref Game.Engine.StatsManager.RenderStats;
                 float w = Game.Engine.StatsManager.PixelSize.X;
@@ -235,6 +241,16 @@ Tris: " + stats.TrianglesDrawn;
             }
         }
 
+        public float ViewDistance
+        {
+            get => Game.Engine.RenderManager.ViewDistanceModifier;
+            set
+            {
+                Game.Engine.RenderManager.ViewDistanceModifier = value;
+                RaisePropertyChanged(nameof(ViewDistance));
+            }
+        }
+        
         public int CurrentTime
         {
             get => Game.TimeManager?.Time.TotalMinutes ?? 0;
@@ -245,13 +261,22 @@ Tris: " + stats.TrianglesDrawn;
                 RaisePropertyChanged(nameof(CurrentTime));
             }
         }
-        
+
+        public bool DisplayStats
+        {
+            get => displayStats;
+            set => SetProperty(ref displayStats, value);
+        }
+
         public bool IsMapVisible
         {
             get => isMapVisible;
             set => SetProperty(ref isMapVisible, value);
         }
+        
         public ICommand ToggleMapVisibilityCommand { get; }
+        public ICommand ToggleStatsVisibilityCommand { get; }
+        
 
         public string UniqueId => "game_view";
 
@@ -282,6 +307,7 @@ Tris: " + stats.TrianglesDrawn;
 
         private GameCameraViewModel cameraViewModel;
         private bool visibility;
+        private bool displayStats;
         public ObservableCollection<GameCameraViewModel> Items { get; } = new();
         public IEnumerable<GameCameraViewModel> VisibleItems => Items;
         public GameCameraViewModel? SelectedItem { get; set; }

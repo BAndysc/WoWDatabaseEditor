@@ -28,5 +28,6 @@ namespace WDE.MapRenderer.Managers
         Map CurrentMap { get; }
         void SetMap(int id);
         void StartCoroutine(IEnumerator coroutine);
+        Task WaitForInitialized { get; }
     }
 }
