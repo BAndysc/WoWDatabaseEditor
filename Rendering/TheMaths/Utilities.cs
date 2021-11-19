@@ -16,5 +16,10 @@ namespace TheMaths
             if (f > max)
                 max = f;
         }
+
+        public static float Lerp(float a, float b, float t)
+        {
+            return a + (b - a) * t;
+        }
     }
 }

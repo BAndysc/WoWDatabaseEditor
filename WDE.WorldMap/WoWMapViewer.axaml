@@ -10,25 +10,27 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <panAndZoom:ExtendedZoomBorder Name="ZoomBorder" Stretch="None" ZoomSpeed="1.04"
+                                               MinWidth="10" MinHeight="10" 
                                                EnablePan="True" PanButton="Left"
                                                Background="#001D28"
                                                Focusable="True"
                                                VerticalAlignment="Stretch" 
                                                EnableConstrains="True"
-                                               ZoomX="{TemplateBinding Zoom, Mode=OneWayToSource}"
                                                MinOffsetX="{Binding #Map.TopLeftVirtual.X}"
                                                MinOffsetY="{Binding #Map.TopLeftVirtual.Y}"
                                                MaxOffsetX="{Binding #Map.BottomRightVirtual.X}"
                                                MaxOffsetY="{Binding #Map.BottomRightVirtual.Y}"
                                                TopLeft="{TemplateBinding TopLeftVirtual, Mode=OneWayToSource}"
                                                BottomRight="{TemplateBinding BottomRightVirtual, Mode=OneWayToSource}"
+                                               ZoomX="{TemplateBinding Zoom, Mode=OneWayToSource}"
                                                HorizontalAlignment="Stretch">
-                    <Panel>
+                    <Panel MinWidth="10" MinHeight="10" >
                         <worldMap:WoWMapRenderer IsVisible="{TemplateBinding RenderBackground}" 
+                                                 MinWidth="10" MinHeight="10" 
                                                      CurrentZoom="{TemplateBinding Zoom}" 
                                                      MapsPath="{TemplateBinding MapsPath}" 
                                                      Map="{TemplateBinding Map}" Name="Map" />
-                        <ContentPresenter Content="{TemplateBinding Content}" />
+                        <ContentPresenter MinWidth="10" MinHeight="10" Content="{TemplateBinding Content}" />
                     </Panel>
                 </panAndZoom:ExtendedZoomBorder>
             </ControlTemplate>
