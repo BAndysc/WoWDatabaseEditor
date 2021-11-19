@@ -172,6 +172,25 @@ namespace AvaloniaStyles.Controls
                 header.Children.Add(splitter);
             }
 
+            BindFixMultiSelect();
+            
+            void ExecuteScrollWhenLayoutUpdated(object? sender, EventArgs e)
+            {
+                LayoutUpdated -= ExecuteScrollWhenLayoutUpdated;
+                Dispatcher.UIThread.Post(AutoScrollToSelectedItemIfNecessary);
+            }
+
+            if (AutoScrollToSelectedItem)
+            {
+                LayoutUpdated += ExecuteScrollWhenLayoutUpdated;
+            }
+        }
+
+        private void BindFixMultiSelect()
+        {
+            if (listBox == null)
+                return;
+            
             handlersDisposable?.Dispose();
             handlersDisposable = null;
             /*
@@ -242,17 +261,6 @@ namespace AvaloniaStyles.Controls
                     }
                 }, RoutingStrategies.Tunnel));   
             }
-            
-            void ExecuteScrollWhenLayoutUpdated(object? sender, EventArgs e)
-            {
-                LayoutUpdated -= ExecuteScrollWhenLayoutUpdated;
-                Dispatcher.UIThread.Post(AutoScrollToSelectedItemIfNecessary);
-            }
-
-            if (AutoScrollToSelectedItem)
-            {
-                LayoutUpdated += ExecuteScrollWhenLayoutUpdated;
-            }
         }
 
         private IDisposable? handlersDisposable;
@@ -261,6 +269,7 @@ namespace AvaloniaStyles.Controls
         {
             base.OnAttachedToVisualTree(e);
             AutoScrollToSelectedItemIfNecessary();
+            BindFixMultiSelect();
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
