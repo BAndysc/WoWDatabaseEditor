@@ -1922,5 +1922,9 @@ namespace TheMaths
         // {
         //     return *(Vector3*)&value;
         // }
+        public Vector3 WithY(float y)
+        {
+            return new Vector3(X, y, Z);
+        }
     }
 }

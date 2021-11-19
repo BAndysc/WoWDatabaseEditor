@@ -204,14 +204,18 @@ namespace WDE.MapRenderer.Managers
                 material.SetTexture("texture2", th2 ?? gameContext.TextureManager.EmptyTexture);
 
                 var trans = 1.0f;
-                if (batch.colorIndex != -1)
+                if (batch.colorIndex != -1 && m2.colors.Length < batch.colorIndex)
                 {
-                    trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
+                    if (m2.colors[batch.colorIndex].alpha.values.Length == 0 || m2.colors[batch.colorIndex].alpha.values[0].Length == 0)
+                        trans = 1;
+                    else
+                        trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
                 }
 
-                if (batch.transparencyIndex != -1)
+                if (batch.transparencyIndex != -1 && m2.texture_weights.Length < batch.transparencyIndex)
                 {
-                    trans *= m2.texture_weights[batch.transparencyIndex].weight.values[0][0].Value;
+                    if (m2.texture_weights[batch.transparencyIndex].weight.values.Length > 0 && m2.texture_weights[batch.transparencyIndex].weight.values[0].Length > 0)
+                        trans *= m2.texture_weights[batch.transparencyIndex].weight.values[0][0].Value;
                 }
                 
                 Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);

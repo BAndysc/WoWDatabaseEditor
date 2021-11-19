@@ -90,13 +90,18 @@ namespace WDE.MapRenderer
             IMessageBoxService messageBoxService,
             IDatabaseClientFileOpener databaseClientFileOpener,
             IGameView gameView,
+            GameManager gameManager,
             GameViewSettings settings)
         {
             this.mpqService = mpqService;
             this.messageBoxService = messageBoxService;
             this.settings = settings;
             MapData = mapData;
-            Game = new GameManager(mpqService.Open(), gameView, databaseClientFileOpener);
+            Game = gameManager;
+            Game.OnFailedInitialize += () =>
+            {
+                Dispatcher.UIThread.Post(() => Visibility = false, DispatcherPriority.Background);
+            };
             Game.OnInitialized += () =>
             {
                 Game.LightingManager.OverrideLighting = settings.OverrideLighting;

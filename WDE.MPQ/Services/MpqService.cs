@@ -28,7 +28,20 @@ namespace WDE.MPQ.Services
             if (settings.Path == null)
                 return new EmptyMpqArchive();
             var files = Directory.EnumerateFiles(Path.Join(settings.Path, "Data"), "*.mpq", SearchOption.AllDirectories).ToList();
-            return new MpqArchiveSet(files.Select(MpqArchive.Open).ToArray());
+            List<IMpqArchive> archives = new();
+            foreach (var file in files)
+            {
+                try
+                {
+                    var archive = MpqArchive.Open(file);
+                    archives.Add(archive);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Couldn't open MPQ file " + Path.GetFileName(file) + ": " + e.Message, e);
+                }
+            }
+            return new MpqArchiveSet(archives.ToArray());
         }
 
         private class EmptyMpqArchive : IMpqArchive

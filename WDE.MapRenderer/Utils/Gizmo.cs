@@ -79,13 +79,13 @@ namespace WDE.MapRenderer.Utils
 
         public void Render(IGameContext context)
         {
-            InternalRender(context, 0.5f);
-            InternalRender(context, 1);
+            InternalRender(context, true);
+            InternalRender(context, false);
         }
 
-        private void InternalRender(IGameContext context, float alpha)
+        private void InternalRender(IGameContext context, bool transparent)
         {
-            if (alpha < 1)
+            if (transparent)
             {
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.SrcAlpha;
@@ -105,7 +105,7 @@ namespace WDE.MapRenderer.Utils
             t.Scale = Vector3.One * (float)Math.Sqrt(Math.Clamp(dist, 0.5f, 500) / 15);
             // +X (wow)
             t.Rotation = ArrowX;
-            material.SetUniform("objectColor", new Vector4(0, 0, 1, alpha));
+            material.SetUniform("objectColor", new Vector4(0, 0, 1, transparent ? 0.5f : 1f));
             context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneX;
             context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);
@@ -113,14 +113,14 @@ namespace WDE.MapRenderer.Utils
 
             // +Y (wow)
             t.Rotation = ArrowY;
-            material.SetUniform("objectColor", new Vector4(0, 1, 0, alpha));
+            material.SetUniform("objectColor", new Vector4(0, 1, 0, transparent ? 0.5f : 1f));
             context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneY;
             context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);
                 
             // +Z (wow)
             t.Rotation = ArrowZ;
-            material.SetUniform("objectColor", new Vector4(1, 0, 0, alpha));
+            material.SetUniform("objectColor", new Vector4(1, 0, 0, transparent ? 0.5f : 1f));
             context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneZ;
             context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);

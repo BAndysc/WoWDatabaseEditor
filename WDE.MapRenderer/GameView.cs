@@ -45,12 +45,4 @@ namespace WDE.MapRenderer
             return tool.Game;
         }
     }
-
-    public class GemView : OpenGlControlBase
-    {
-        protected override void OnOpenGlRender(GlInterface gl, int fb)
-        {
-            
-        }
-    }
 }

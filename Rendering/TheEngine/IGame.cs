@@ -2,7 +2,7 @@ namespace TheEngine
 {
     public interface IGame
     {
-        public void Initialize(Engine engine);
+        public bool Initialize(Engine engine);
         public void Update(float diff);
         public void Render(float delta);
         public event Action RequestDispose;

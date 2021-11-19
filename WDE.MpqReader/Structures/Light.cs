@@ -126,6 +126,8 @@ namespace WDE.MpqReader.Structures
         {
             if (Count == 1)
                 return Values[0];
+            if (Count == 0)
+                return default;
 
             int higherThan = -1;
             int lowerThan = -1;

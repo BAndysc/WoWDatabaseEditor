@@ -162,8 +162,10 @@ namespace WDE.WorldMap
                 ++i;
             }
 
-            TopLeftVirtual = new Point(minX, minY);
-            BottomRightVirtual = new Point(maxX, maxY);
+            (minX, minY) = CoordsUtils.WorldToEditor(CoordsUtils.MinCoord, CoordsUtils.MinCoord);
+            (maxX, maxY) = CoordsUtils.WorldToEditor(CoordsUtils.MaxCoord, CoordsUtils.MaxCoord);
+            TopLeftVirtual = new Point(Math.Min(minX, maxX), Math.Min(minY, maxY));
+            BottomRightVirtual = new Point(Math.Max(minX, maxX), Math.Max(minY, maxY));
         }
     }
 }

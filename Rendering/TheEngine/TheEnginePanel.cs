@@ -140,6 +140,9 @@ namespace TheEngine
 
         protected override void OnOpenGlRender(GlInterface gl, int fb)
         {
+            if (engine == null || delayedDispose)
+                return;
+            
             engine.statsManager.PixelSize = new Vector2(PixelSize.Item1, PixelSize.Item2);
             engine.statsManager.Counters.PresentTime.Add(PresentTime);
             renderStopwatch.Restart();
@@ -194,12 +197,14 @@ namespace TheEngine
         private bool gameInitialized;
         public static readonly DirectProperty<TheEnginePanel, IGame?> GameProperty = AvaloniaProperty.RegisterDirect<TheEnginePanel, IGame?>(nameof(Game), o => o.Game, (o, v) => o.Game = v);
 
+        private System.IDisposable? globalKeyDownDisposable;
+        private System.IDisposable? globalKeyUpDisposable;
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
             sw.Restart();
-            ((IControl)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
-            ((IControl)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
+            globalKeyDownDisposable = ((IControl)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
+            globalKeyUpDisposable = ((IControl)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
         }
 
         private bool IsModifierKey(Key key) => key is Key.LeftShift or Key.LeftCtrl or Key.LeftAlt or Key.LWin;
@@ -221,6 +226,10 @@ namespace TheEngine
             //if (delayedDispose)
             //    base.OnDetachedFromVisualTree(e);
             //delayedDispose = false;
+            globalKeyUpDisposable?.Dispose();
+            globalKeyDownDisposable?.Dispose();
+            globalKeyUpDisposable = null;
+            globalKeyDownDisposable = null;
             sw.Stop();
         }
 
@@ -230,7 +239,11 @@ namespace TheEngine
             {
                 gameInitialized = true;
                 game.RequestDispose += GameOnRequestDispose;
-                game.Initialize(engine!);
+                if (!game.Initialize(engine!))
+                {
+                    GameOnRequestDispose();
+                    game = null;
+                }
             }
             game?.Update(delta);
         }

@@ -91,6 +91,7 @@ namespace TheEngine.Managers
             var mesh = new Mesh(engine, handle, true);
             mesh.SetVertices(vertices);
             mesh.SetIndices(indices, 0);
+            mesh.BuildBoundingBox();
 
             meshes.Add(mesh);
             #if TRACK_ALLOCATIONS

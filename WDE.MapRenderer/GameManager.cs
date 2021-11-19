@@ -8,32 +8,68 @@ using TheEngine.Entities;
 using TheEngine.PhysicsSystem;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
+using WDE.Common.Services.MessageBox;
 using WDE.MapRenderer.Managers;
+using WDE.Module.Attributes;
 using WDE.MpqReader;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer
 {
+    [AutoRegister]
     public class GameManager : IGame, IGameContext
     {
-        private IMpqArchive mpq;
+        private readonly IMpqService mpqService;
         private readonly IGameView gameView;
+        private readonly IMessageBoxService messageBoxService;
         private readonly IDatabaseClientFileOpener databaseClientFileOpener;
         private AsyncMonitor monitor = new AsyncMonitor();
         private Engine engine;
         public event Action? OnInitialized;
+        public event Action? OnFailedInitialize;
 
-        public GameManager(IMpqArchive mpq, IGameView gameView, IDatabaseClientFileOpener databaseClientFileOpener)
+        public GameManager(IMpqService mpqService, 
+            IGameView gameView,
+            IMessageBoxService messageBoxService,
+            IDatabaseClientFileOpener databaseClientFileOpener)
         {
-            this.mpq = mpq;
+            this.mpqService = mpqService;
             this.gameView = gameView;
+            this.messageBoxService = messageBoxService;
             this.databaseClientFileOpener = databaseClientFileOpener;
             UpdateLoop = new UpdateManager(this);
         }
         
-        public void Initialize(Engine engine)
+        private bool TryOpenMpq(out IMpqArchive m)
+        {
+            try
+            {
+                m = mpqService.Open();
+                return true;
+            }
+            catch (Exception e)
+            {
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Invalid MPQ")
+                    .SetMainInstruction("Couldn't parse game MPQ.")
+                    .SetContent(e.Message + "\n\nAre you using modified game files?")
+                    .WithButton("Ok", false)
+                    .Build());
+                m = null;
+                return false;
+            }
+        }
+        
+        public bool Initialize(Engine engine)
         {
             this.engine = engine;
+            if (!TryOpenMpq(out mpq))
+            {
+                OnFailedInitialize?.Invoke();
+                waitForInitialized.SetResult(false);
+                waitForInitialized = new();
+                return false;
+            }
             coroutineManager = new();
             TimeManager = new TimeManager(this);
             ScreenSpaceSelector = new ScreenSpaceSelector(this);
@@ -51,7 +87,8 @@ namespace WDE.MapRenderer
             
             OnInitialized?.Invoke();
             IsInitialized = true;
-            waitForInitialized.SetResult();
+            waitForInitialized.SetResult(true);
+            return true;
         }
 
         public void StartCoroutine(IEnumerator coroutine)
@@ -59,8 +96,8 @@ namespace WDE.MapRenderer
             coroutineManager.Start(coroutine);
         }
 
-        private TaskCompletionSource waitForInitialized = new();
-        public Task WaitForInitialized => waitForInitialized.Task;
+        private TaskCompletionSource<bool> waitForInitialized = new();
+        public Task<bool> WaitForInitialized => waitForInitialized.Task;
 
         private Material? prevMaterial;
         public void Update(float delta)
@@ -108,7 +145,8 @@ namespace WDE.MapRenderer
 
         public void DoDispose()
         {
-            RequestDispose?.Invoke();
+            if (IsInitialized)
+                RequestDispose?.Invoke();
             Debug.Assert(!IsInitialized);
         }
 
@@ -125,6 +163,8 @@ namespace WDE.MapRenderer
             MdxManager.Dispose();
             TextureManager.Dispose();
             MeshManager.Dispose();
+            mpq.Dispose();
+            mpq = null!;
             coroutineManager = null!;
             TimeManager = null!;
             ScreenSpaceSelector = null!;
@@ -143,6 +183,7 @@ namespace WDE.MapRenderer
 
         public Engine Engine => engine;
 
+        private IMpqArchive mpq;
         private CoroutineManager coroutineManager;
         public TimeManager TimeManager { get; private set; }
         public ScreenSpaceSelector ScreenSpaceSelector { get; private set; }
