@@ -39,7 +39,7 @@ namespace TheEngine.Data
                     var x = float.Parse(splitted[1], CultureInfo.InvariantCulture);
                     var y = float.Parse(splitted[2], CultureInfo.InvariantCulture);
                     var z = float.Parse(splitted[3], CultureInfo.InvariantCulture);
-                    normals.Add(new Vector3(x, y, z));
+                    normals.Add(-new Vector3(x, y, z));
                 }
                 else if (line.StartsWith("f "))
                 {
