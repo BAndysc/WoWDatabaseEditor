@@ -37,7 +37,41 @@ namespace TheEngine.PhysicsSystem
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<WorldMeshBounds>();
         }
+        
+        public List<(Entity, Vector3)>? RaycastAll(Ray ray)
+        {
+            ThreadLocal<List<(Entity, Vector3)>?> localEntities = new ThreadLocal<List<(Entity, Vector3)>?>(true);
+            colliders.ParallelForEach<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld>((itr, start, end, colliders, meshBounds, renderer, localToWorld) =>
+            {
+                List<(Entity, Vector3)>? result = null;
 
+                for (int i = start; i < end; ++i)
+                {
+                    //if (!doRender[i])
+                    //    continue;
+                    var intersects = IntersectsBoundingBox(in ray, ref meshBounds[i]);
+                    if (intersects)
+                    {
+                        var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
+                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, out var inter))
+                        {
+                            result ??= new();
+                            result.Add((itr[i], inter));
+                        }
+                    }
+                }
+
+                if (result != null)
+                    localEntities.Value = result;
+            });
+
+            if (localEntities.Values.Count == 0)
+                return null;
+
+            var resultList = localEntities.Values.Where(p => p != null).SelectMany(p => p!).ToList();
+            return resultList;
+        }
+        
         public (Entity, Vector3)? Raycast(Ray ray)
         {
             ThreadLocal<(Entity, float, Vector3)> localEntities = new ThreadLocal<(Entity, float, Vector3)>(true);
@@ -50,38 +84,11 @@ namespace TheEngine.PhysicsSystem
                 {
                     //if (!doRender[i])
                     //    continue;
-                    var bounds = meshBounds[i].box;
-                    /*
-                     *   a ---- b
-                     *   | \    | \
-                     *   c------d  \       ^
-                     *   \   e--\---f     /
-                     *    \ /    \ /     z
-                     *     g-----h/     
-                     *                
-                     *        x ->
-                     */
-                    var min = bounds.Minimum;
-                    var max = bounds.Maximum;
-                    var a = new Vector3(min.X, max.Y, max.Z);
-                    var b = new Vector3(max.X, max.Y, max.Z);
-                    var c = new Vector3(min.X, max.Y, min.Z);
-                    var d = new Vector3(max.X, max.Y, min.Z);
-                    
-                    var e = new Vector3(min.X, min.Y, max.Z);
-                    var f = new Vector3(max.X, min.Y, max.Z);
-                    var g = new Vector3(min.X, min.Y, min.Z);
-                    var h = new Vector3(max.X, min.Y, min.Z);
-                    bool intersects = Physics.RayIntersectsQuad(in ray, in a, in b, in d, in c, out var inter) ||
-                                      Physics.RayIntersectsQuad(in ray, in e, in f, in h, in g, out inter) ||
-                                      Physics.RayIntersectsQuad(in ray, in d, in b, in f, in h, out inter) ||
-                                      Physics.RayIntersectsQuad(in ray, in c, in a, in e, in g, out inter) ||
-                                      Physics.RayIntersectsQuad(in ray, in a, in b, in f, in e, out inter) ||
-                                      Physics.RayIntersectsQuad(in ray, in c, in d, in h, in g, out inter);
+                    var intersects = IntersectsBoundingBox(in ray, ref meshBounds[i]);
                     if (intersects)
                     {
                         var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
-                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, out inter))
+                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, out var inter))
                         {
                             var dist = (ray.Position - inter).LengthSquared();
                             if (dist < minDist)
@@ -117,6 +124,39 @@ namespace TheEngine.PhysicsSystem
             }
 
             return (minEntity, intersectionPoint);
+        }
+
+        private static bool IntersectsBoundingBox(in Ray ray, ref WorldMeshBounds worldMeshBounds)
+        {
+            ref var bounds = ref worldMeshBounds.box;
+            /*
+                     *   a ---- b
+                     *   | \    | \
+                     *   c------d  \       ^
+                     *   \   e--\---f     /
+                     *    \ /    \ /     z
+                     *     g-----h/     
+                     *                
+                     *        x ->
+                     */
+            var min = bounds.Minimum;
+            var max = bounds.Maximum;
+            var a = new Vector3(min.X, max.Y, max.Z);
+            var b = new Vector3(max.X, max.Y, max.Z);
+            var c = new Vector3(min.X, max.Y, min.Z);
+            var d = new Vector3(max.X, max.Y, min.Z);
+
+            var e = new Vector3(min.X, min.Y, max.Z);
+            var f = new Vector3(max.X, min.Y, max.Z);
+            var g = new Vector3(min.X, min.Y, min.Z);
+            var h = new Vector3(max.X, min.Y, min.Z);
+            bool intersects = Physics.RayIntersectsQuad(in ray, in a, in b, in d, in c, out var inter) ||
+                              Physics.RayIntersectsQuad(in ray, in e, in f, in h, in g, out inter) ||
+                              Physics.RayIntersectsQuad(in ray, in d, in b, in f, in h, out inter) ||
+                              Physics.RayIntersectsQuad(in ray, in c, in a, in e, in g, out inter) ||
+                              Physics.RayIntersectsQuad(in ray, in a, in b, in f, in e, out inter) ||
+                              Physics.RayIntersectsQuad(in ray, in c, in d, in h, in g, out inter);
+            return intersects;
         }
 
         public void DumpGeometry()
