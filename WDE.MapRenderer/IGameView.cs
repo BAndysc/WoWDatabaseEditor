@@ -12,14 +12,15 @@ namespace WDE.MapRenderer
         public event Action<Func<IGameModule>> ModuleRegistered;
         public event Action<Func<IGameModule>> ModuleRemoved; 
         public System.IDisposable RegisterGameModule(Func<IGameModule> gameModule);
-
         public Task<IGameContext> Open();
     }
 
     public interface IGameModule : System.IDisposable
     {
+        object? ViewModel { get; }
         void Initialize(IGameContext gameContext);
         void Update(float delta);
         void Render();
+        void RenderGUI();
     }
 }

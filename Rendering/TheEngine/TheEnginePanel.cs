@@ -33,7 +33,7 @@ namespace TheEngine
         protected Engine? engine;
         private Stopwatch sw = new Stopwatch();
         private Stopwatch renderStopwatch = new Stopwatch();
-
+        private int frame = 0;
         public float FrameRate => 1000.0f / framerate.Average;
         
         public static readonly DirectProperty<TheEnginePanel, float> FrameRateProperty = AvaloniaProperty.RegisterDirect<TheEnginePanel, float>("FrameRate", o => o.FrameRate);
@@ -78,8 +78,18 @@ namespace TheEngine
             base.OnKeyUp(e);
         }
 
+        private int lastGotFocusFrame;
+        protected override void OnGotFocus(GotFocusEventArgs e)
+        {
+            lastGotFocusFrame = frame;
+            base.OnGotFocus(e);
+        }
+
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
+            // in the same frame got focus and pressed button, ignore the event
+            if (lastGotFocusFrame == frame)
+                return;
             var left = e.GetCurrentPoint(this).Properties.IsLeftButtonPressed;
             var right = e.GetCurrentPoint(this).Properties.IsRightButtonPressed;
             engine?.inputManager.mouse.MouseDown((left ? MouseButton.Left : MouseButton.None) | (right ? MouseButton.Right : MouseButton.None));
@@ -191,6 +201,7 @@ namespace TheEngine
             }
             renderStopwatch.Stop();
             engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
+            frame++;
         }
 
         private IGame? game;
@@ -260,6 +271,7 @@ namespace TheEngine
         protected virtual void Render(float delta)
         {
             game?.Render(delta);
+            game?.RenderGUI(delta);
         }
 
         public float WindowWidth => PixelSize.Item1;

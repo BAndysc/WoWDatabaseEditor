@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -58,9 +59,11 @@ namespace WDE.MapRenderer
     {
         private readonly IMpqService mpqService;
         private readonly IMessageBoxService messageBoxService;
+        private readonly Lazy<IDocumentManager> documentManager;
         private readonly GameViewSettings settings;
         public GameManager Game { get; }
         public event Action? RequestDispose;
+
 
         private MapViewModel? selectedMap;
         
@@ -91,10 +94,12 @@ namespace WDE.MapRenderer
             IDatabaseClientFileOpener databaseClientFileOpener,
             IGameView gameView,
             GameManager gameManager,
+            Lazy<IDocumentManager> documentManager,
             GameViewSettings settings)
         {
             this.mpqService = mpqService;
             this.messageBoxService = messageBoxService;
+            this.documentManager = documentManager;
             this.settings = settings;
             MapData = mapData;
             Game = gameManager;
@@ -110,6 +115,8 @@ namespace WDE.MapRenderer
                 Game.TimeManager.TimeSpeedMultiplier = settings.TimeSpeedMultiplier;
                 Game.ChunkManager.RenderGrid = settings.ShowGrid;
                 Game.Engine.RenderManager.ViewDistanceModifier = settings.ViewDistanceModifier;
+                RegisteredViewModels = Game.ModuleManager.ViewModels;
+                RegisteredViewModels.CollectionChanged += RegisteredViewModelsOnCollectionChanged;
                 
                 RaisePropertyChanged(nameof(OverrideLighting));
                 RaisePropertyChanged(nameof(DisableTimeFlow));
@@ -180,6 +187,17 @@ Tris: " + stats.TrianglesDrawn;
                 }, DispatcherPriority.Render);
             });
 
+            On(() => IsSelected, @is =>
+            {
+                if (@is)
+                {
+                    if (Game.IsInitialized && Game.ModuleManager.ViewModels.Count > 0)
+                    {
+                        documentManager.Value.ActivateDocumentInTheBackground((IDocument)Game.ModuleManager.ViewModels[0]);
+                    }
+                }
+            });
+
             On(() => Visibility, @is =>
             {
                 if (@is)
@@ -200,6 +218,25 @@ Tris: " + stats.TrianglesDrawn;
                     Game.DoDispose();
                 }
             });
+        }
+
+        private void RegisteredViewModelsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (IsSelected)
+            {
+                if (Game.IsInitialized && Game.ModuleManager.ViewModels.Count > 0)
+                {
+                    documentManager.Value.ActivateDocumentInTheBackground((IDocument)Game.ModuleManager.ViewModels[0]);
+                }
+                else if (Game.IsInitialized && Game.ModuleManager.ViewModels.Count == 0)
+                    documentManager.Value.ActiveDocument = null;
+            }
+        }
+
+        public ObservableCollection<object> RegisteredViewModels
+        {
+            get => registeredViewModels;
+            set => SetProperty(ref registeredViewModels, value);
         }
 
         public bool OverrideLighting
@@ -248,7 +285,7 @@ Tris: " + stats.TrianglesDrawn;
 
         public float ViewDistance
         {
-            get => Game.Engine.RenderManager.ViewDistanceModifier;
+            get => Game?.Engine?.RenderManager?.ViewDistanceModifier ?? 0;
             set
             {
                 Game.Engine.RenderManager.ViewDistanceModifier = value;
@@ -297,7 +334,12 @@ Tris: " + stats.TrianglesDrawn;
 
         public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.DocumentCenter;
         public bool OpenOnStart => false;
-        public bool IsSelected { get; set; }
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
+        }
+
         public string Title => "Game view";
         public void Center(double x, double y)
         {
@@ -313,6 +355,8 @@ Tris: " + stats.TrianglesDrawn;
         private GameCameraViewModel cameraViewModel;
         private bool visibility;
         private bool displayStats;
+        private ObservableCollection<object> registeredViewModels = new();
+        private bool isSelected;
         public ObservableCollection<GameCameraViewModel> Items { get; } = new();
         public IEnumerable<GameCameraViewModel> VisibleItems => Items;
         public GameCameraViewModel? SelectedItem { get; set; }

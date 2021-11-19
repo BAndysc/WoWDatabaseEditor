@@ -13,6 +13,7 @@ namespace WDE.MapRenderer.Managers
         Task<PooledArray<byte>?> ReadFile(string fileName);
         byte[]? ReadFileSync(string fileName);
         
+        NotificationsCenter NotificationsCenter { get; }
         WoWMeshManager MeshManager { get; }
         WoWTextureManager TextureManager { get; }
         ChunkManager ChunkManager { get; }

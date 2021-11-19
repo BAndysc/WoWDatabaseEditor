@@ -80,7 +80,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             
             documentManager.ToObservable(d => d.ActiveDocument).SubscribeAction(active =>
             {
-                if (active != null)
+                if (active != null && !documentManager.BackgroundMode)
                     ActivateDocument(active);
             });
             

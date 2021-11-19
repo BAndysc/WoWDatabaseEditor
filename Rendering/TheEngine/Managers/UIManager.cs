@@ -70,10 +70,10 @@ namespace TheEngine.Managers
             engine.RenderManager.RenderInstancedIndirect(quad, material, 0, 1);
         }
         
-        public void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth)
+        public void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth, Vector4 color)
         {
             var fontDef = engine.fontManager.GetFont(font);
-            material.SetUniform("fillColor", new Vector4(1, 1, 1, 1));
+            material.SetUniform("fillColor", color);
             material.SetUniformInt("mode", 0);
             material.SetTexture("font", engine.fontManager.GetTexture(font));
 
@@ -184,7 +184,7 @@ namespace TheEngine.Managers
 
             public Vector2 Draw(float x, float y, float w, float h)
             {
-                uiManager.DrawText(font, str, size, x, y, null);
+                uiManager.DrawText(font, str, size, x, y, null, color);
                 return Measure();
             }
         }

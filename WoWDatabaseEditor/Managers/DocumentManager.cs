@@ -24,6 +24,7 @@ namespace WoWDatabaseEditorCore.Managers
         private ISolutionItemDocument? activeSolutionItemDocument;
         private IDocument? activeDocument;
         private IFocusableTool? activeTool;
+        private ITool? selectedTool;
         private IUndoRedoWindow? activeUndoRedo;
         private Dictionary<Type, ITool> typeToToolInstance = new();
         private List<ITool> allTools = new ();
@@ -72,10 +73,20 @@ namespace WoWDatabaseEditorCore.Managers
                 activeSolutionItemDocument = value as ISolutionItemDocument;
                 SetProperty(ref activeDocument, value);
                 RaisePropertyChanged(nameof(ActiveSolutionItemDocument));
+                SelectedTool = null;
                 eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
             }
         }
         
+        public bool BackgroundMode { get; private set; }
+        
+        public void ActivateDocumentInTheBackground(IDocument document)
+        {
+            BackgroundMode = true;
+            ActiveDocument = document;
+            BackgroundMode = false;
+        }
+
         public IFocusableTool? ActiveTool
         {
             get => activeTool;
@@ -91,6 +102,22 @@ namespace WoWDatabaseEditorCore.Managers
                 } else if (ActiveUndoRedo == oldActiveTool && oldActiveTool != null)
                     ActiveUndoRedo = null;
                 RaisePropertyChanged(nameof(ActiveTool));
+            }
+        }
+
+        public ITool? SelectedTool
+        {
+            get => selectedTool;
+            set
+            {
+                if (selectedTool == value)
+                    return;
+                if (selectedTool != null)
+                    selectedTool.IsSelected = false;
+                selectedTool = value;
+                if (value != null)
+                    value.IsSelected = true;
+                RaisePropertyChanged(nameof(SelectedTool));
             }
         }
 

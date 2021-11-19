@@ -17,25 +17,25 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             this.windowManager = windowManager;
         }
         
-        public async Task<long?> GetItemFromList(Dictionary<long, SelectOption>? items, bool flags, long? current = null)
+        public async Task<long?> GetItemFromList(Dictionary<long, SelectOption>? items, bool flags, long? current = null, string? title = null)
         {
-            using LongItemFromListProviderViewModel vm = new(items, flags, current);
+            using LongItemFromListProviderViewModel vm = new(items, flags, current, title);
             if (await windowManager.ShowDialog(vm))
                 return vm.GetEntry();
             return null;
         }
         
-        public async Task<string?> GetItemFromList(Dictionary<string, SelectOption>? items, bool multiSelect, string? current = null)
+        public async Task<string?> GetItemFromList(Dictionary<string, SelectOption>? items, bool multiSelect, string? current = null, string? title = null)
         {
-            using StringItemFromListProviderViewModel vm = new(items, multiSelect, current);
+            using StringItemFromListProviderViewModel vm = new(items, multiSelect, current, title);
             if (await windowManager.ShowDialog(vm))
                 return vm.GetEntry();
             return null;
         }
         
-        public async Task<float?> GetItemFromList(Dictionary<float, SelectOption>? items)
+        public async Task<float?> GetItemFromList(Dictionary<float, SelectOption>? items, string? title = null)
         {
-            using FloatItemFromListProviderViewModel vm = new(items);
+            using FloatItemFromListProviderViewModel vm = new(items, 0, title);
             if (await windowManager.ShowDialog(vm))
                 return vm.GetEntry();
             return null;

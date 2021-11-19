@@ -34,6 +34,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
         {
             if (ViewModel is IFocusableTool focusable)
                 documentManager.ActiveTool = focusable;
+            documentManager.SelectedTool = ViewModel;
         }
 
         public void OnFocus()

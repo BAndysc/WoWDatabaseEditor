@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WDE.MVVM.Observable;
 
 namespace WDE.MapRenderer.Managers
 {
@@ -10,8 +12,9 @@ namespace WDE.MapRenderer.Managers
 
         private HashSet<Func<IGameModule>> modulesToAdd = new();
         private HashSet<Func<IGameModule>> modulesToRemove = new();
-        private List<(Func<IGameModule>, IGameModule)> modules = new();
-        
+        private List<(Func<IGameModule>, IGameModule, object?)> modules = new();
+        public ObservableCollection<object> ViewModels { get; } = new();
+
         public ModuleManager(IGameContext gameContext, IGameView gameView)
         {
             this.gameContext = gameContext;
@@ -21,7 +24,9 @@ namespace WDE.MapRenderer.Managers
             {
                 var moduleInstance = m();
                 moduleInstance.Initialize(gameContext);
-                modules.Add((m, moduleInstance));
+                modules.Add((m, moduleInstance, moduleInstance.ViewModel));
+                if (moduleInstance.ViewModel != null)
+                    ViewModels.Add(moduleInstance.ViewModel);
             }
 
             gameView.ModuleRegistered += GameViewOnModuleRegistered;
@@ -34,7 +39,9 @@ namespace WDE.MapRenderer.Managers
             {
                 var moduleInstance = m();
                 moduleInstance.Initialize(gameContext);
-                modules.Add((m, moduleInstance));
+                modules.Add((m, moduleInstance, moduleInstance.ViewModel));
+                if (moduleInstance.ViewModel != null)
+                    ViewModels.Add(moduleInstance.ViewModel);
             }
             modulesToAdd.Clear();
             foreach (var toRemove in modulesToRemove)
@@ -44,6 +51,8 @@ namespace WDE.MapRenderer.Managers
                     if (modules[i].Item1 == toRemove)
                     {
                         modules[i].Item2.Dispose();
+                        if (modules[i].Item3 != null)
+                            ViewModels.Remove(modules[i].Item3);
                         modules.RemoveAt(i);
                         break;
                     }
@@ -70,6 +79,7 @@ namespace WDE.MapRenderer.Managers
             gameView.ModuleRemoved -= GameViewOnModuleRemoved;
             foreach (var module in modules)
                 module.Item2.Dispose();
+            ViewModels.RemoveAll();
             modules.Clear();
         }
 
@@ -77,6 +87,12 @@ namespace WDE.MapRenderer.Managers
         {
             foreach (var module in modules)
                 module.Item2.Render();
+        }
+
+        public void RenderGUI()
+        {
+            foreach (var module in modules)
+                module.Item2.RenderGUI();
         }
     }
 }

@@ -29,9 +29,11 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             IComparer<CheckableSelectOption<T>> comparer, 
             Func<T, bool> shouldBeSelected,
             bool asFlags, 
-            T? current = default)
+            T? current = default, 
+            string? title = null)
         {
             Items = items;
+            Title = title ?? "Picker";
             this.asFlags = asFlags;
             
             this.items = AutoDispose(new SourceList<CheckableSelectOption<T>>());
@@ -145,7 +147,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         public ICommand Cancel { get; }
         public int DesiredWidth { get; }
         public int DesiredHeight { get; }
-        public string Title => "Picker";
+        public string Title { get; }
         public bool Resizeable => true;
         public event Action? CloseCancel;
         public event Action? CloseOk;
@@ -187,11 +189,11 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             return long.TryParse(str, out result);
         }
 
-        public LongItemFromListProviderViewModel(Dictionary<long, SelectOption>? items, bool asFlags, long? current = default) 
+        public LongItemFromListProviderViewModel(Dictionary<long, SelectOption>? items, bool asFlags, long? current = default, string? title = null) 
             : base(items, 
                 Comparer<CheckableSelectOption<long>>.Create((x, y) => x.Entry.CompareTo(y.Entry)), 
                 key => (current != null) && ((current == 0 && key == 0) || (key > 0) && (current & key) == key), 
-                asFlags, current ?? 0)
+                asFlags, current ?? 0, title)
         {
         }
     }
@@ -216,7 +218,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         }
 
         public StringItemFromListProviderViewModel(Dictionary<string, SelectOption>? items, bool multiSelect,
-            string? current = default)
+            string? current = default, string? title = null)
             : base(items,
                 Comparer<CheckableSelectOption<string>>.Create((x, y) =>
                 {
@@ -225,7 +227,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                     return x.Entry.CompareTo(y.Entry);
                 }),
                 GenerateSelector(multiSelect, current), 
-                multiSelect, current)
+                multiSelect, current, title)
         {
         }
 
@@ -243,9 +245,9 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 
     public class FloatItemFromListProviderViewModel : ItemFromListProviderViewModel<float>
     {
-        public FloatItemFromListProviderViewModel(Dictionary<float, SelectOption>? items, float current = default) : 
+        public FloatItemFromListProviderViewModel(Dictionary<float, SelectOption>? items, float current = default, string? title = null) : 
             base(items, Comparer<CheckableSelectOption<float>>.Create((x, y) => x.Entry.CompareTo(y.Entry))
-                , _ => false, false, current)
+                , _ => false, false, current, title)
         {
         }
 

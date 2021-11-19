@@ -59,7 +59,7 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
                 {
                     bool any = false;
                     var split = resp.Split("\n");
-                    mainThread.Dispatch(() => windowManager.Value.Activate());
+                    bool broughtEditorToFront = false;
                     foreach (var line in split)
                     {
                         bool anyCmd = false;
@@ -70,6 +70,11 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
                                 if (line.Length == cmd.Name.Length || line[cmd.Name.Length] == ' ')
                                 {
                                     var args = line.Substring(cmd.Name.Length).Trim();
+                                    if (cmd.Command.BringEditorToFront && !broughtEditorToFront)
+                                    {
+                                        mainThread.Dispatch(() => windowManager.Value.Activate());
+                                        broughtEditorToFront = true;
+                                    }
                                     mainThread.Dispatch(() => cmd.Command.Invoke(new CommandArguments(args))).Wait();
                                     any = true;
                                     anyCmd = true;

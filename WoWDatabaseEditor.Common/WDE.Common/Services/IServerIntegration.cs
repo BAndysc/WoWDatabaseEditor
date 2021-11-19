@@ -27,6 +27,7 @@ namespace WDE.Common.Services
     public interface IReverseRemoteCommand
     {
         Task Invoke(ICommandArguments arguments);
+        bool BringEditorToFront { get; }
     }
 
     public interface ICommandArguments

@@ -17,7 +17,11 @@ namespace TheEngine.Input
         internal void KeyDown(Key key)
         {
             if (key >= 0 && (int)key <= 255)
+            {
+                if (downKeys[(int)key])
+                    return;
                 downKeys[(int)key] = true;
+            }
             
             if (justPressedKeysIndex < justPressedKeys.Length)
                 justPressedKeys[justPressedKeysIndex++] = key;

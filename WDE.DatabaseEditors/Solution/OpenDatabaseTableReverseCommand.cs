@@ -29,5 +29,7 @@ namespace WDE.DatabaseEditors.Solution
             eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(entry, true, tableName));
             return Task.CompletedTask;
         }
+
+        public bool BringEditorToFront => true;
     }
 }

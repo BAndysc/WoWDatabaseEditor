@@ -71,6 +71,7 @@ namespace WDE.MapRenderer
                 return false;
             }
             coroutineManager = new();
+            NotificationsCenter = new NotificationsCenter(this);
             TimeManager = new TimeManager(this);
             ScreenSpaceSelector = new ScreenSpaceSelector(this);
             DbcManager = new DbcManager(this, databaseClientFileOpener);
@@ -129,6 +130,12 @@ namespace WDE.MapRenderer
             }
             ModuleManager.Render();
             LightingManager.Render();
+        }
+
+        public void RenderGUI(float delta)
+        {
+            ModuleManager.RenderGUI();
+            NotificationsCenter.RenderGUI(delta);
             ScreenSpaceSelector.Render();
         }
 
@@ -157,6 +164,7 @@ namespace WDE.MapRenderer
             waitForInitialized = new();
             IsInitialized = false;
             ModuleManager.Dispose();
+            NotificationsCenter.Dispose();
             LightingManager.Dispose();
             ChunkManager.Dispose();
             WmoManager.Dispose();
@@ -164,6 +172,7 @@ namespace WDE.MapRenderer
             TextureManager.Dispose();
             MeshManager.Dispose();
             mpq.Dispose();
+            NotificationsCenter = null!;
             mpq = null!;
             coroutineManager = null!;
             TimeManager = null!;
@@ -185,6 +194,7 @@ namespace WDE.MapRenderer
 
         private IMpqArchive mpq;
         private CoroutineManager coroutineManager;
+        public NotificationsCenter NotificationsCenter { get; private set; }
         public TimeManager TimeManager { get; private set; }
         public ScreenSpaceSelector ScreenSpaceSelector { get; private set; }
         public WoWMeshManager MeshManager { get; private set; }
@@ -218,5 +228,6 @@ namespace WDE.MapRenderer
                 Console.WriteLine("File " + fileName + " is unreadable");
             return bytes;
         }
+
     }
 }

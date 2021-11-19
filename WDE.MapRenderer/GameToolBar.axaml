@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mapRenderer="clr-namespace:WDE.MapRenderer"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" 
              d:DataContext="{d:DesignInstance mapRenderer:GameViewModel, IsDesignTimeCreatable=False}"
             x:Class="WDE.MapRenderer.GameToolBar">
