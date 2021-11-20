@@ -140,6 +140,7 @@ namespace WDE.MapRenderer
         }
 
         public event Action? RequestDispose;
+        public event Action<int>? ChangedMap;
 
         public void SetMap(int mapId)
         {
@@ -147,6 +148,7 @@ namespace WDE.MapRenderer
             {
                 CurrentMap = DbcManager.MapStore[mapId];
                 ChunkManager?.UnloadAllNow();
+                ChangedMap?.Invoke(mapId);
             }
         }
 

@@ -125,6 +125,10 @@ namespace WDE.MapRenderer
                 RaisePropertyChanged(nameof(CurrentTime));
                 RaisePropertyChanged(nameof(ViewDistance));
             };
+            Game.ChangedMap += newMapId =>
+            {
+                Dispatcher.UIThread.Post(() => SelectedMap = Maps.FirstOrDefault(x => x.Id == newMapId), DispatcherPriority.Background);
+            };
             AutoDispose(new ActionDisposable(() =>
             {
                 RequestDispose?.Invoke();
