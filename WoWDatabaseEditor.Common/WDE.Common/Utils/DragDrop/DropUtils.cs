@@ -46,7 +46,7 @@ namespace WDE.Common.Utils.DragDrop
         {
             for (int i = 0; i < itemsToDrop.Count; ++i)
             {
-                Debug.Assert(EqualityComparer<T>.Default.Equals(itemsToDrop[i], list[dropIndex]));
+                Debug.Assert(EqualityComparer<T>.Default.Equals(itemsToDrop[i], list[realDropIndex]));
                 list.RemoveAt(realDropIndex);
             }
             
