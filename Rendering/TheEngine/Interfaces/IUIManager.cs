@@ -16,7 +16,8 @@ namespace TheEngine.Interfaces
         void DrawBox(float x, float y, float w, float h, Vector4 color);
         Vector2 MeasureText(string font, ReadOnlySpan<char> text, float fontSize);
 
-        IImGui BeginImmediateDraw(float x, float y);
+        IImGui BeginImmediateDrawAbs(float x, float y);
+        IImGui BeginImmediateDrawRel(float x, float y, float pivotX, float pivotY);
     }
 
     public interface IImGui : System.IDisposable

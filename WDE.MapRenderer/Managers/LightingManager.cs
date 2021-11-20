@@ -129,7 +129,7 @@ namespace WDE.MapRenderer.Managers
                 gameContext.Engine.RenderManager.Render(skySphereMesh, skyMaterial, 0, t);
             }
             
-            using var ui = gameContext.Engine.Ui.BeginImmediateDraw(0, 0);
+            using var ui = gameContext.Engine.Ui.BeginImmediateDrawAbs(0, 0);
             ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.7f), 5);
             ui.Text("calibri", $"{time.Hour:00}:{time.Minute:00}", 16, Vector4.One);
             ui.EndBox();

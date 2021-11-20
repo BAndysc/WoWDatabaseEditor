@@ -35,7 +35,7 @@ namespace WDE.MapRenderer.Managers
                 
                 float x = gameContext.Engine.WindowHost.WindowWidth / 2 - boxSize.X / 2;
                 float y = gameContext.Engine.WindowHost.WindowHeight / 2 - boxSize.Y / 2;
-                using var ui = gameContext.Engine.Ui.BeginImmediateDraw(x, y);
+                using var ui = gameContext.Engine.Ui.BeginImmediateDrawAbs(x, y);
                 
                 ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f).WithW(0.4f * t), Padding / 2);
                 ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.7f).WithW(0.6f * t), Padding / 2);

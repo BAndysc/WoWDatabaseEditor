@@ -325,22 +325,31 @@ namespace TheEngine.Managers
             }
         }
         
-        public IImGui BeginImmediateDraw(float x, float y)
+        public IImGui BeginImmediateDrawAbs(float x, float y)
         {
-            return new ImGui(this, new Vector2(x, y));
+            return new ImGui(this, new Vector2(x, y), false, Vector2.Zero);
+        }
+
+        public IImGui BeginImmediateDrawRel(float x, float y, float pivotX, float pivotY)
+        {
+            return new ImGui(this, new Vector2(x, y), true, new Vector2(pivotX, pivotY));
         }
 
         internal class ImGui : IImGui
         {
             private readonly UIManager uiManager;
             private readonly Vector2 position;
+            private readonly bool relative;
+            private readonly Vector2 pivot;
             private IDrawingCommand? root;
             private Stack<IChildContainer> parents = new();
 
-            public ImGui(UIManager uiManager, Vector2 position)
+            public ImGui(UIManager uiManager, Vector2 position, bool relative, Vector2 pivot)
             {
                 this.uiManager = uiManager;
                 this.position = position;
+                this.relative = relative;
+                this.pivot = pivot;
             }
 
             public void BeginVerticalBox(Vector4 color, float padding)
@@ -403,7 +412,16 @@ namespace TheEngine.Managers
             public void Dispose()
             {
                 var measure = root.Measure();
-                root.Draw(position.X, position.Y, measure.X, measure.Y);
+                float posX = position.X;
+                float posY = position.Y;
+                if (relative)
+                {
+                    posY = position.Y * uiManager.engine.WindowHost.WindowHeight;
+                    posX = position.X * uiManager.engine.WindowHost.WindowWidth;
+                }
+                posX -= pivot.X * measure.X;
+                posY -= pivot.Y * measure.Y;
+                root.Draw(posX, posY, measure.X, measure.Y);
             }
         }
 
