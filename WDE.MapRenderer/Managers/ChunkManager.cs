@@ -348,6 +348,18 @@ namespace WDE.MapRenderer.Managers
                     int? a = null;
                     foreach (var splat in chunksEnumerator.Current.Splats)
                     {
+                        if (splat.TextureId >= adt.Textures.Length)
+                        {
+                            if (r == null)
+                                r = 0;
+                            else if (g == null)
+                                g = 0;
+                            else if (b == null)
+                                b = 0;
+                            else if (a == null)
+                                a = 0;
+                            continue;
+                        }
                         var texturePath = adt.Textures[(int)splat.TextureId];
                         if (!textureToSlot.ContainsKey(texturePath))
                         {
