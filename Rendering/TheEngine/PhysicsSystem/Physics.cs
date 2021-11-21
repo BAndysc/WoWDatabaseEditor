@@ -37,14 +37,22 @@ namespace TheEngine.PhysicsSystem
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<WorldMeshBounds>();
         }
+
+        public List<(Entity, Vector3)>? RaycastAll(Ray ray, Vector3? customOrigin)
+        {
+            List<(Entity, Vector3)> destinationList = new();
+            RaycastAll(ray, customOrigin, destinationList);
+            if (destinationList.Count == 0)
+                return null;
+            return destinationList;
+        }
         
-        public List<(Entity, Vector3)>? RaycastAll(Ray ray)
+        public void RaycastAll(Ray ray, Vector3? customOrigin, List<(Entity, Vector3)> destinationList)
         {
             ThreadLocal<List<(Entity, Vector3)>?> localEntities = new ThreadLocal<List<(Entity, Vector3)>?>(true);
             colliders.ParallelForEach<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld>((itr, start, end, colliders, meshBounds, renderer, localToWorld) =>
             {
                 List<(Entity, Vector3)>? result = null;
-
                 for (int i = start; i < end; ++i)
                 {
                     //if (!doRender[i])
@@ -53,7 +61,7 @@ namespace TheEngine.PhysicsSystem
                     if (intersects)
                     {
                         var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
-                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, out var inter))
+                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, customOrigin, out var inter))
                         {
                             result ??= new();
                             result.Add((itr[i], inter));
@@ -66,13 +74,16 @@ namespace TheEngine.PhysicsSystem
             });
 
             if (localEntities.Values.Count == 0)
-                return null;
+                return;
 
-            var resultList = localEntities.Values.Where(p => p != null).SelectMany(p => p!).ToList();
-            return resultList;
+            for (int i = 0; i < localEntities.Values.Count; ++i)
+            {
+                if (localEntities.Values[i] != null)
+                    destinationList.AddRange(localEntities.Values[i]);
+            }
         }
         
-        public (Entity, Vector3)? Raycast(Ray ray)
+        public (Entity, Vector3)? Raycast(Ray ray, Vector3? customOrigin)
         {
             ThreadLocal<(Entity, float, Vector3)> localEntities = new ThreadLocal<(Entity, float, Vector3)>(true);
             colliders.ParallelForEach<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld>((itr, start, end, colliders, meshBounds, renderer, localToWorld) =>
@@ -88,7 +99,7 @@ namespace TheEngine.PhysicsSystem
                     if (intersects)
                     {
                         var mesh = meshManager.GetMeshByHandle(renderer[i].MeshHandle);
-                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, out var inter))
+                        if (Physics.RayIntersectsObject(mesh, renderer[i].SubMeshId, localToWorld[i], ray, customOrigin, out var inter))
                         {
                             var dist = (ray.Position - inter).LengthSquared();
                             if (dist < minDist)
@@ -195,11 +206,12 @@ namespace TheEngine.PhysicsSystem
     
     public static class Physics
     {
-        public static bool RayIntersectsObject(IMesh mesh, int submeshId, Matrix localToWorld, Ray ray, out Vector3 outIntersectionPoint)
+        public static bool RayIntersectsObject(IMesh mesh, int submeshId, Matrix localToWorld, Ray ray, Vector3? compareOrigin, out Vector3 outIntersectionPoint)
         {
             outIntersectionPoint = Vector3.Zero;
             bool intersects = false;
             float minSqDist = Single.MaxValue;
+            var origin = compareOrigin ?? ray.Position;
             foreach (var triangle in mesh.GetFaces(submeshId))
             {
                 var v1 = triangle.Item1;
@@ -210,17 +222,17 @@ namespace TheEngine.PhysicsSystem
                 Vector4.Transform(ref v2, ref localToWorld, out var v2_w);
                 Vector4.Transform(ref v3, ref localToWorld, out var v3_w);
 
-                if (RayIntersectsTriangle(in ray, v1_w.XYZ, v2_w.XYZ, v3_w.XYZ, out var inte))
+                if (RayIntersectsTriangleOnlyFront(in ray, v1_w.XYZ, v2_w.XYZ, v3_w.XYZ, out var inte))
                 {
                     if (!intersects)
                     {
                         outIntersectionPoint = inte;
-                        minSqDist =  (ray.Position - inte).LengthSquared();
+                        minSqDist =  (origin - inte).LengthSquared();
                         intersects = true;
                     }
                     else
                     {
-                        var distA = (ray.Position - inte).LengthSquared();
+                        var distA = (origin - inte).LengthSquared();
                         if (distA < minSqDist)
                         {
                             minSqDist = distA;
@@ -248,25 +260,66 @@ namespace TheEngine.PhysicsSystem
         {
             outIntersectionPoint = default;
             const float EPSILON = 0.0000001f;
-            Vector3 edge1, edge2, h, s, q;
-            float a,f,u,v;
+            Vector3 edge1, edge2, pvec, tVec, qVec;
+            float det,invDet,u,v;
             edge1 = vertex1 - vertex0;
             edge2 = vertex2 - vertex0;
-            h = Vector3.Cross(ray.Direction, edge2);
-            a = Vector3.Dot(edge1, h);
-            if (a > -EPSILON && a < EPSILON)
+            pvec = Vector3.Cross(ray.Direction, edge2);
+            det = Vector3.Dot(edge1, pvec);
+            if (det > -EPSILON && det < EPSILON)
                 return false;    // This ray is parallel to this triangle.
-            f = 1.0f/a;
-            s = ray.Position - vertex0;
-            u = f * Vector3.Dot(s, h);
+            invDet = 1.0f/det;
+            tVec = ray.Position - vertex0;
+            u = invDet * Vector3.Dot(tVec, pvec);
             if (u < 0.0 || u > 1.0)
                 return false;
-            q = Vector3.Cross(s, edge1);
-            v = f * Vector3.Dot(ray.Direction, q);
+            qVec = Vector3.Cross(tVec, edge1);
+            v = invDet * Vector3.Dot(ray.Direction, qVec);
             if (v < 0.0 || u + v > 1.0)
                 return false;
             // At this stage we can compute t to find out where the intersection point is on the line.
-            float t = f * Vector3.Dot(edge2, q);
+            float t = invDet * Vector3.Dot(edge2, qVec);
+            if (t > EPSILON) // ray intersection
+            {
+                outIntersectionPoint = ray.Position + ray.Direction * t;
+                return true;
+            }
+            else // This means that there is a line intersection but not a ray intersection.
+                return false;
+        }
+        
+        public static bool RayIntersectsTriangleOnlyFront(in Ray ray,  
+            in Vector3 vertex0, 
+            in Vector3 vertex2, // change vertex order to get back face culling
+            in Vector3 vertex1,
+            out Vector3 outIntersectionPoint)
+        {
+            outIntersectionPoint = default;
+            const float EPSILON = 0.0000001f;
+            Vector3 edge1, edge2, pvec, tvec, qVec;
+            float det,u,v;
+            edge1 = vertex1 - vertex0;
+            edge2 = vertex2 - vertex0;
+            pvec = Vector3.Cross(ray.Direction, edge2);
+            det = Vector3.Dot(edge1, pvec);
+            if (det < EPSILON)
+                return false;    // This ray is parallel to this triangle.
+            tvec = ray.Position - vertex0;
+            u = Vector3.Dot(tvec, pvec);
+            if (u < 0.0 || u > det)
+                return false;
+            qVec = Vector3.Cross(tvec, edge1);
+            v = Vector3.Dot(ray.Direction, qVec);
+            if (v < 0.0 || u + v > det)
+                return false;
+            // At this stage we can compute t to find out where the intersection point is on the line.
+            float t = Vector3.Dot(edge2, qVec);
+            float invDet = 1.0f / det;
+            t *= invDet;
+            u *= invDet;
+            v *= invDet;
+            //outIntersectionPoint = ray.Position + ray.Direction * t;
+            //return true;
             if (t > EPSILON) // ray intersection
             {
                 outIntersectionPoint = ray.Position + ray.Direction * t;

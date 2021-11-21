@@ -51,27 +51,27 @@ namespace WDE.MapRenderer.Utils
             var ray = context.Engine.CameraManager.MainCamera.NormalizedScreenPointToRay(context.Engine.InputManager.Mouse.NormalizedPosition);
 
             t.Rotation = PlaneX;
-            if (Physics.RayIntersectsObject(dragPlaneMesh, 0,  t.LocalToWorldMatrix, ray, out intersectionPoint))
+            if (Physics.RayIntersectsObject(dragPlaneMesh, 0,  t.LocalToWorldMatrix, ray, null, out intersectionPoint))
                 return HitType.TranslateZY;
             
             t.Rotation = PlaneY;
-            if (Physics.RayIntersectsObject(dragPlaneMesh, 0, t.LocalToWorldMatrix, ray, out intersectionPoint))
+            if (Physics.RayIntersectsObject(dragPlaneMesh, 0, t.LocalToWorldMatrix, ray, null, out intersectionPoint))
                 return HitType.TranslateXZ;
             
             t.Rotation = PlaneZ;
-            if (Physics.RayIntersectsObject(dragPlaneMesh, 0, t.LocalToWorldMatrix, ray, out intersectionPoint))
+            if (Physics.RayIntersectsObject(dragPlaneMesh, 0, t.LocalToWorldMatrix, ray, null, out intersectionPoint))
                 return HitType.TranslateXY;
             
             t.Rotation = ArrowX;
-            if (Physics.RayIntersectsObject(arrowMesh, 0, t.LocalToWorldMatrix, ray, out intersectionPoint))
+            if (Physics.RayIntersectsObject(arrowMesh, 0, t.LocalToWorldMatrix, ray, null, out intersectionPoint))
                 return HitType.TranslateX;
             
             t.Rotation = ArrowY;
-            if (Physics.RayIntersectsObject(arrowMesh, 0, t.LocalToWorldMatrix, ray, out intersectionPoint))
+            if (Physics.RayIntersectsObject(arrowMesh, 0, t.LocalToWorldMatrix, ray, null, out intersectionPoint))
                 return HitType.TranslateY;
 
             t.Rotation = ArrowZ;
-            if (Physics.RayIntersectsObject(arrowMesh, 0, t.LocalToWorldMatrix, ray, out intersectionPoint))
+            if (Physics.RayIntersectsObject(arrowMesh, 0, t.LocalToWorldMatrix, ray, null, out intersectionPoint))
                 return HitType.TranslateZ;
 
             return HitType.None;

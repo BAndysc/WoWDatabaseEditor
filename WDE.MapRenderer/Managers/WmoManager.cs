@@ -91,12 +91,15 @@ namespace WDE.MapRenderer.Managers
 
             foreach (var group in groups)
             {
+                int[] indices = new int[group.Indices.Length + group.CollisionOnlyIndices.Length];
+                Array.Copy(group.Indices.AsArray(), indices, group.Indices.Length);
+                Array.Copy(group.CollisionOnlyIndices, 0, indices, group.Indices.Length, group.CollisionOnlyIndices.Length);
                 var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs[0].AsArray(),
-                    group.Indices.AsSpan().ToArray(), group.Vertices.Length, group.Indices.Length,
+                    indices, group.Vertices.Length, group.Indices.Length,
                     group.UVs.Count >= 2 ? group.UVs[1].AsArray() : null, group.VertexColors?.AsArray());
-
+                
                 var wmoMesh = gameContext.Engine.MeshManager.CreateMesh(wmoMeshData);
-                wmoMesh.SetSubmeshCount(group.Batches.Length);
+                wmoMesh.SetSubmeshCount(group.Batches.Length + 1); // + 1 for collision only submesh
                 int j = 0;
                 Material[] materials = new Material[group.Batches.Length];
                 foreach (var batch in group.Batches)
@@ -187,6 +190,9 @@ namespace WDE.MapRenderer.Managers
 
                     materials[j - 1] = mat;
                 }
+
+                if (group.CollisionOnlyIndices.Length > 0)
+                    wmoMesh.SetSubmeshIndicesRange(j++, group.Indices.Length, group.CollisionOnlyIndices.Length);
 
                 wmoMesh.Rebuild();
                 wmoInstance.meshes.Add((wmoMesh, materials));
