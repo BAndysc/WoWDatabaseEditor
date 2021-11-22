@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using WDE.Common.CoreVersion;
 using WDE.Module.Attributes;
 
 namespace WDE.Conditions.Data
@@ -14,12 +16,19 @@ namespace WDE.Conditions.Data
         private readonly IConditionDataJsonProvider provider;
         private readonly IConditionDataSerializationProvider serializationProvider;
 
-        public ConditionDataProvider(IConditionDataJsonProvider provider, IConditionDataSerializationProvider serializationProvider)
+        public ConditionDataProvider(IConditionDataJsonProvider provider, 
+            IConditionDataSerializationProvider serializationProvider,
+            ICurrentCoreVersion currentCoreVersion)
         {
             this.provider = provider;
             this.serializationProvider = serializationProvider;
-            
-            conditions = serializationProvider.DeserializeConditionData<ConditionJsonData>(provider.GetConditionsJson());
+
+            var currentTag = currentCoreVersion.Current.Tag;
+
+            conditions = serializationProvider
+                .DeserializeConditionData<ConditionJsonData>(provider.GetConditionsJson())
+                .Where(c => c.Tags == null || c.Tags.Contains(currentTag))
+                .ToList();
             conditionSources = serializationProvider.DeserializeConditionData<ConditionSourcesJsonData>(provider.GetConditionSourcesJson());
             conditionGroups = serializationProvider.DeserializeConditionData<ConditionGroupsJsonData>(provider.GetConditionGroupsJson());
         }
@@ -27,23 +36,5 @@ namespace WDE.Conditions.Data
         public IEnumerable<ConditionJsonData> GetConditions() => conditions;
         public IEnumerable<ConditionSourcesJsonData> GetConditionSources() => conditionSources;
         public IEnumerable<ConditionGroupsJsonData> GetConditionGroups() => conditionGroups;
-
-        public async Task SaveConditions(List<ConditionJsonData> collection)
-        {
-            await provider.SaveConditionsAsync(serializationProvider.SerializeConditionData(collection));
-            conditions = collection;
-        }
-
-        public async Task SaveConditionSources(List<ConditionSourcesJsonData> collection)
-        {
-            await provider.SaveConditionSourcesAsync(serializationProvider.SerializeConditionData(collection));
-            conditionSources = collection;
-        }
-
-        public async Task SaveConditionGroups(List<ConditionGroupsJsonData> collection)
-        {
-            await provider.SaveConditionSourcesAsync(serializationProvider.SerializeConditionData(collection));
-            conditionGroups = collection;
-        }
     }
 }

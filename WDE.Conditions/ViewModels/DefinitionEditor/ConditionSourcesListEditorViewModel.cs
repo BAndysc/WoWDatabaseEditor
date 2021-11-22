@@ -99,7 +99,7 @@ namespace WDE.Conditions.ViewModels
         
         private async Task SaveSources()
         {
-            await conditionDataProvider.SaveConditionSources(SourceItems.ToList());
+            //await conditionDataProvider.SaveConditionSources(SourceItems.ToList());
             History.MarkAsSaved();
         }
         

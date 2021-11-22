@@ -121,7 +121,7 @@ namespace WDE.Conditions.ViewModels
 
         private async Task SaveGroupsToFile()
         {
-            await conditionDataProvider.SaveConditionGroups(SourceItems.Select(x => x.ToConditionGroupsJsonData()).ToList());
+            //await conditionDataProvider.SaveConditionGroups(SourceItems.Select(x => x.ToConditionGroupsJsonData()).ToList());
             History.MarkAsSaved();
         }
 

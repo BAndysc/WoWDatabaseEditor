@@ -771,6 +771,7 @@
 
 	{
 		"id": 48,
+		"tags": ["Azeroth", "TrinityWrath"],
 		"name": "CONDITION_QUEST_OBJECTIVE_PROGRESS",
 		"name_readable": "Has quest objective progress",
 		"parameters": [
@@ -790,7 +791,20 @@
 		"help": "Condition is met if target player has reached the specified objectiveCount quest progress for the objectiveIndex for the specified quest",
 		"description": "{target} {pram2} quest {pram1} objective {negate:==|!=} {pram3}"
 	},
-
+	{
+		"id": 48,
+		"tags": ["TrinityMaster"],
+		"name": "CONDITION_QUEST_OBJECTIVE_COMPLETE",
+		"name_readable": "Has quest objective completed",
+		"parameters": [
+			{
+				"type": "Parameter",
+				"name": "Objective ID"
+			}
+		],
+		"help": "Condition is met if target player has completed quest objective",
+		"description": "{target} {negate:has completed objective {pram1} (but hasn't rewarded quest yet)|hasn't completed objective {pram1} or has rewarded the quest}"
+	},
 	{
 		"id": 49,
 		"name": "CONDITION_DIFFICULTY_ID",
@@ -807,6 +821,7 @@
 
 	{
 		"id": 50,
+		"tags": ["TrinityWrath"],
 		"name": "CONDITION_GAMEMASTER",
 		"name_readable": "Is gamemaster",
 		"parameters": [
@@ -825,8 +840,9 @@
 
 	{
 		"id": 51,
+		"tags": ["TrinityMaster"],
 		"name": "CONDITION_OBJECT_ENTRY_GUID_MASTER",
-		"name_readable": "[TC 9.x] Is entry/guid/type",
+		"name_readable": "Is entry/guid/type",
 		"help": "[TC 9.x] Condition is met if target has given entry, given guid or is given type",
 		"parameters": [
 			{
@@ -859,8 +875,9 @@
 
 	{
 		"id": 52,
+		"tags": ["TrinityMaster"],
 		"name": "CONDITION_TYPE_MASK_MASTER",
-		"name_readable": "[TC 9.x] Has typemask",
+		"name_readable": "Has typemask",
 		"help": "[TC 9.x] Condition is met if target is in given typemask",
 		"parameters": [
 			{

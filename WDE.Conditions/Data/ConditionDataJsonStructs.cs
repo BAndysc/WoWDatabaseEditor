@@ -90,6 +90,9 @@ namespace WDE.Conditions.Data
         [JsonProperty(PropertyName = "name_readable")]
         public string NameReadable { get; set; } = "Missing name";
 
+        [JsonProperty(PropertyName = "tags")]
+        public IList<string>? Tags { get; set; }
+        
         public override string ToString()
         {
             return $"{NameReadable} {Id}";
