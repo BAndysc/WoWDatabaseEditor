@@ -24,9 +24,7 @@ Application has a built-in auto updater, so you do **not** have to redownload a 
 
 ## Mac OS / Linux / Windows version
 
-**To run the editor, you need [.NET 5 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0) for your OS**.
-
-**Future versions will require [.NET 6 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0), we recommend to install it now already**.
+**To run the editor, you need [.NET 6 Runtime](https://dotnet.microsoft.com/download/dotnet/6.0) for your OS**.
 
 WoW Database Editor is compatibile with both MacOS, Linux and Windows.
 
@@ -50,19 +48,19 @@ WoW Database Editor is using [git submodules](https://git-scm.com/book/en/v2/Git
 git submodule update --init --recursive
 ```
 
-Now you can open the solution in Visual Studio or other C#/.NET IDE and build. Start "WoWDatabaseCore.Avalonia" project
+Now you can open the solution in Visual Studio or other C#/.NET IDE and build. Start **LoaderAvalonia** project (this part is important!)
 
 **To build a version to distribute:**
 
 ```
 -- Windows version
-dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
+dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
 
 -- MacOS version
-dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
+dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
 
 -- Linux version
-dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
+dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
 ```
 
 

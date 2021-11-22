@@ -4,6 +4,7 @@ namespace LoaderAvalonia
     {
         public static void Main(string[] args)
         {
+            WoWDatabaseEditorCore.Avalonia.Program.Main(args);
         }
     }
 }

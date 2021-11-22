@@ -14,11 +14,11 @@ build_script:
 - cmd: >-
     Rem Building WDE
     
-    dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
+    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
 
-    dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
+    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
 
-    dotnet publish -c Release --self-contained false -f net5.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
+    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
     
     rename bin\wowdatabaseeditor-avalonia-mac\Updater _Updater
     
