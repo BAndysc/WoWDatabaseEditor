@@ -6,7 +6,9 @@
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
-
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\Updater\Updater.csproj" SkipGetTargetFrameworkProperties="true" />
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
