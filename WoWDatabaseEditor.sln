@@ -56,6 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "Solution
 		appveyor.yml = appveyor.yml
 		Directory.Build.props = Directory.Build.props
 		Avalonia.props = Avalonia.props
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWDatabaseEditorCore.Avalonia", "WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj", "{D38826BA-F862-4895-80DB-32CB5821ED67}"

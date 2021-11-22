@@ -48,7 +48,7 @@ WoW Database Editor is using [git submodules](https://git-scm.com/book/en/v2/Git
 git submodule update --init --recursive
 ```
 
-Now you can open the solution in Visual Studio or other C#/.NET IDE and build. Start "WoWDatabaseCore.Avalonia" project
+Now you can open the solution in Visual Studio or other C#/.NET IDE and build. Start **LoaderAvalonia** project (this part is important!)
 
 **To build a version to distribute:**
 
