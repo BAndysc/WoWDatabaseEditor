@@ -59,7 +59,7 @@
       <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V7_0_3_22248\WowPacketParserModule.V7_0_3_22248.csproj" />
       <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V8_0_1_27101\WowPacketParserModule.V8_0_1_27101.csproj" />
       <ProjectReference Include="..\WowPacketParser\WowPacketParserModule.V9_0_1_36216\WowPacketParserModule.V9_0_1_36216.csproj" />
-      <ProjectReference Include="..\WowPacketParser\WowPacketParser\WowPacketParser.csproj" SkipGetTargetFrameworkProperties="true" />
+      <ProjectReference Include="..\WowPacketParser\WowPacketParser\WowPacketParser.csproj" />
     </ItemGroup>
 
 </Project>
