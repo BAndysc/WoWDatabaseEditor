@@ -17,6 +17,7 @@ namespace WoWDatabaseEditorCore.Avalonia
 {
     public class Program
     {
+        public static Type[] PreloadedModules = new Type[]{};
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.
@@ -41,7 +42,10 @@ namespace WoWDatabaseEditorCore.Avalonia
 
         private static void FixCurrentDirectory()
         {
-            var exePath = new FileInfo(Assembly.GetExecutingAssembly().Location);
+            var path = Assembly.GetExecutingAssembly().Location;
+            if (string.IsNullOrEmpty(path))
+                path = System.AppContext.BaseDirectory;
+            var exePath = new FileInfo(path);
             if (exePath.Directory != null)
                 Directory.SetCurrentDirectory(exePath.Directory.FullName);
         }

@@ -47,6 +47,12 @@ namespace WoWDatabaseEditorCore.Managers
                 var assemblyName = viewModel.Assembly.GetName().Name;
                 view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend))!;
             }
+            
+            if (view == null) // try backend version + .GUI for main assembly
+            {
+                var assemblyName = viewModel.Assembly.GetName().Name;
+                view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend).Replace(", Version=", ".GUI, Version="))!;
+            }
 
             if (view != null)
                 staticBinding[viewModel] = view;
@@ -82,6 +88,12 @@ namespace WoWDatabaseEditorCore.Managers
             {
                 var assemblyName = viewModel.Assembly.GetName().Name;
                 toolBar = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend))!;
+            }
+
+            if (toolBar == null) // try backend version + .GUI
+            {
+                var assemblyName = viewModel.Assembly.GetName().Name;
+                toolBar = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend).Replace(", Version=", ".GUI, Version="))!;
             }
 
             if (toolBar != null)

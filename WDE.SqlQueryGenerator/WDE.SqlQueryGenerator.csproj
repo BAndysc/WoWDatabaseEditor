@@ -10,6 +10,7 @@
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     <PropertyGroup>
-        <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
+    <Import Project="..\Module.props" />
 </Project>

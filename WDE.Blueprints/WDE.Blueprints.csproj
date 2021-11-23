@@ -10,6 +10,7 @@
   <PropertyGroup>
       <OutputPath>..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
+  <Import Project="..\Module.props" />
   <ItemGroup>
     <ProjectReference Include="..\GeminiGraphEditor\GeminiGraphEditor.csproj" />
     <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />

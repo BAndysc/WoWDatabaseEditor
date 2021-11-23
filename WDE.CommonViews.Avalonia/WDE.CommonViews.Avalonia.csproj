@@ -10,6 +10,7 @@
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
+    <Import Project="..\Module.props" />    
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />

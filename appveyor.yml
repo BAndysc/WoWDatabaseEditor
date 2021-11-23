@@ -14,11 +14,17 @@ build_script:
 - cmd: >-
     Rem Building WDE
     
-    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win7-x64
+    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
 
     dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
 
     dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
+      
+    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/parser WoWPacketParserLoader -r win8-x64
+      
+    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-mac/parser WoWPacketParserLoader -r osx-x64
+      
+    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-linux/parser WoWPacketParserLoader -r linux-x64
     
     rename bin\wowdatabaseeditor-avalonia-mac\Updater _Updater
     
@@ -26,9 +32,15 @@ build_script:
 
     rename bin\wowdatabaseeditor-avalonia-win\Updater.exe _Updater.exe
 
+    cd bin\wowdatabaseeditor-avalonia-win\
+
+    del /f AvaloniaStyles.exe AvaloniaStyles.deps.json AvaloniaStyles.runtimeconfig.json *.pdb Dock.* WoWDatabaseEditorCore.Avalonia.GUI.exe WoWDatabaseEditorCore.Avalonia.GUI.exe.runtimeconfig.json WoWPacketParserLoader.exe WoWPacketParserLoader.deps.json
+
+    cd ..\..\
+
     FOR %%A IN (bin\wowdatabaseeditor-avalonia-win\app.ini,bin\wowdatabaseeditor-avalonia-mac\app.ini,bin\wowdatabaseeditor-avalonia-linux\app.ini) DO (echo COMMIT=%APPVEYOR_REPO_COMMIT% >> %%A & echo BRANCH=%APPVEYOR_REPO_BRANCH% >> %%A & echo VERSION=%APPVEYOR_BUILD_VERSION% >> %%A & echo BUILD_VERSION=%APPVEYOR_BUILD_NUMBER% >> %%A & echo UPDATE_SERVER=%DEPLOY_URL% >> %%A & echo MARKETPLACE=default >> %%A)
 
-    FOR %%A IN (bin\wowdatabaseeditor-avalonia-win,bin\wowdatabaseeditor-avalonia-mac,bin\wowdatabaseeditor-avalonia-linux) DO ( mkdir %%A\Parsers & cd %%A & FOR %%X in (WowPacketParserModule.*) DO (cd %%A & move %%X Parsers\%%X ) & cd .. )
+    FOR %%A IN (bin\wowdatabaseeditor-avalonia-win\parser,bin\wowdatabaseeditor-avalonia-mac\parser,bin\wowdatabaseeditor-avalonia-linux\parser) DO ( mkdir %%A\Parsers & cd %%A & FOR %%X in (WowPacketParserModule.*) DO (cd %%A & move %%X Parsers\%%X ) & cd .. )
 
     echo PLATFORM=Windows >> bin/wowdatabaseeditor-avalonia-win/app.ini
 
@@ -90,8 +102,6 @@ artifacts:
 deploy_script:
 - cmd: >-
     IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windows" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindows.zip;type=application/zip"
-
-    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windows7" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindows.zip;type=application/zip"
     
     IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=macos" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorMacOs.zip;type=application/zip" -F "make_exec=WoW Database Editor.app/Contents/MacOS/WoWDatabaseEditorCore.Avalonia"
     

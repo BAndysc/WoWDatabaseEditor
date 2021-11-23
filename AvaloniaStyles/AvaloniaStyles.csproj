@@ -11,6 +11,7 @@
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
+    <Import Project="..\Module.props" />    
     
     <Import Project="..\Avalonia.props" />
     <ItemGroup>

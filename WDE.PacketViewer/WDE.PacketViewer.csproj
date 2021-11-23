@@ -13,6 +13,7 @@
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
+    <Import Project="..\Module.props" />    
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard">
             <Version>4.9.2</Version>

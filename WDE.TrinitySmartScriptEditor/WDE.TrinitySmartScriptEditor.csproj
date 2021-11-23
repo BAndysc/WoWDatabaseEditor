@@ -9,6 +9,7 @@
   <PropertyGroup>
       <OutputPath>..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
+  <Import Project="..\Module.props" />
   <ItemGroup>
     <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
     <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />

@@ -55,7 +55,7 @@ namespace WoWDatabaseEditorCore.Avalonia
              * there would be no problem with for instance different versions of a package.
              */
             Dictionary<string, string> assemblyToRequesting = new();
-            string? executingAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string? executingAssemblyLocation = System.AppContext.BaseDirectory;// Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 if (args.Name.EndsWith("resources") || args.RequestingAssembly == null)
@@ -137,8 +137,16 @@ namespace WoWDatabaseEditorCore.Avalonia
             moduleCatalog.AddModule(typeof(MainModuleAvalonia));
             moduleCatalog.AddModule(typeof(CommonAvaloniaModule));
             
-            List<Assembly> allAssemblies = GetPluginDlls()
+            List<Assembly> externalAssemblies = GetPluginDlls()
                 .Select(AssemblyLoadContext.Default.LoadFromAssemblyPath)
+                .ToList();
+
+            var allAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a =>
+                {
+                    var name = a.GetName().Name!;
+                    return name.Contains("WDE") && !name.Contains("Test") && !name.Contains("WDE.Common.Avalonia");
+                })
                 .ToList();
             
             allAssemblies.Sort(Comparer<Assembly>.Create((a, b) =>
@@ -148,7 +156,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                 return bRequires.Length.CompareTo(aRequires.Length);
             }));
             
-            List<Assembly> loadAssemblies = allAssemblies
+            List<Assembly> loadAssemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(modulesManager!.ShouldLoad)
                 .ToList();
 
@@ -165,10 +173,12 @@ namespace WoWDatabaseEditorCore.Avalonia
 
         private IEnumerable<string> GetPluginDlls()
         {
-            string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (path == null)
-                return ArraySegment<string>.Empty;
-            return Directory.GetFiles(path, "WDE*.dll").Where(path => !path.Contains("Test.dll") && !path.Contains("WPF") && !path.Contains("WDE.Common.Avalonia.dll"));
+            //string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //if (path == null)
+            //    return ArraySegment<string>.Empty;
+            return Directory.GetFiles(".", "WDE*.dll")
+                .Where(path => !path.Contains("Test.dll") && !path.Contains("WPF") && !path.Contains("WDE.Common.Avalonia.dll"))
+                .Select(Path.GetFullPath);
         }
 
         private IList<Conflict> DetectConflicts(List<Assembly> allAssemblies)
