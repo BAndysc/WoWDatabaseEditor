@@ -90,6 +90,8 @@ artifacts:
 deploy_script:
 - cmd: >-
     IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windows" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindows.zip;type=application/zip"
+
+    IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=windows7" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorWindows.zip;type=application/zip"
     
     IF NOT "%DEPLOY_KEY%" == "" curl -X POST "%DEPLOY_URL%/Upload" -H "accept: */*" -H "Content-Type: multipart/form-data" -F "branch=%APPVEYOR_REPO_BRANCH%" -F "marketplace=default" -F "platform=macos" -F "version=%APPVEYOR_BUILD_NUMBER%" -F "versionName=Build %APPVEYOR_BUILD_VERSION%" -F "user=%DEPLOY_USER%" -F "key=%DEPLOY_KEY%" -F "files=@WoWDatabaseEditorMacOs.zip;type=application/zip" -F "make_exec=WoW Database Editor.app/Contents/MacOS/WoWDatabaseEditorCore.Avalonia"
     

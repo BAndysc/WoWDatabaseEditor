@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -27,7 +28,8 @@ namespace WoWDatabaseEditorCore.Services.Http
             var buildVersion = applicationVersion.VersionKnown ? applicationVersion.BuildVersion : -1;
             var branch = applicationVersion.VersionKnown ? applicationVersion.Branch! : "(unknown)";
             var other = string.Join(", ", parts.Select(p => p.Part));
-            httpClient.DefaultRequestHeaders.Add("User-Agent", $"WoWDatabaseEditor/{buildVersion} (branch: {branch}, {other})");
+            var os = $"{Environment.OSVersion.Platform} {Environment.OSVersion.Version.Major}.{Environment.OSVersion.Version.Minor}";
+            httpClient.DefaultRequestHeaders.Add("User-Agent", $"WoWDatabaseEditor/{buildVersion} (branch: {branch}, {other}, OS: {os})");
             return httpClient;
         }
     }
