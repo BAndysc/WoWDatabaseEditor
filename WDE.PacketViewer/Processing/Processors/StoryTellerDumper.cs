@@ -515,6 +515,12 @@ namespace WDE.PacketViewer.Processing.Processors
             return base.Process(basePacket, packet);
         }
 
+        protected override bool Process(PacketBase basePacket, PacketGameObjectCustomAnim packet)
+        {
+            AppendLine(basePacket, packet.GameObject, NiceGuid(packet.GameObject) + " plays custom anim " + packet.Anim);
+            return base.Process(basePacket, packet);
+        }
+
         protected override bool Process(PacketBase basePacket, PacketClientAreaTrigger packet)
         {
             AppendLine(basePacket, null, "Player " + (packet.Enter ? "enters" : "leaves") + " clientside area trigger " + packet.AreaTrigger);
