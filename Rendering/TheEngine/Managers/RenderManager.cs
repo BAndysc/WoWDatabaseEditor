@@ -368,6 +368,8 @@ namespace TheEngine.Managers
         Stopwatch draw = new Stopwatch();
         private float viewDistanceModifier = 8;
 
+        private LocalToWorld[] localToWorlds = new LocalToWorld[10000];
+        private MeshRenderer[] renderers = new MeshRenderer[10000];
         private void RenderEntities()
         {
             var cameraPosition = cameraManager.MainCamera.Transform.Position;
@@ -431,8 +433,11 @@ namespace TheEngine.Managers
             var opaque = count.Values.Sum(i => i.opaque);
             var transparent = count.Values.Sum(i => i.transparent);
             int totalToDraw = opaque + transparent;
-            LocalToWorld[] localToWorlds = new LocalToWorld[opaque + transparent];
-            MeshRenderer[] renderers = new MeshRenderer[opaque + transparent];
+            if (localToWorlds.Length < totalToDraw)
+            {
+                localToWorlds = new LocalToWorld[totalToDraw];
+                renderers = new MeshRenderer[totalToDraw];
+            }
             int opaqueIndex = 0;
             int transparentIndex = opaque;
             toRenderArchetype.ForEach<LocalToWorld, RenderEnabledBit, MeshRenderer>((itr, start, end, l2w, render, meshRenderer) =>
