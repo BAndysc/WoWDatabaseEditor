@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -49,6 +50,15 @@ namespace WoWDatabaseEditorCore.ViewModels
         {
             get => showGiveStarBox;
             set => SetProperty(ref showGiveStarBox, value);
+        }
+
+        public bool IsWindows7
+        {
+            get
+            {
+                var os = System.Environment.OSVersion;
+                return os.Platform == PlatformID.Win32NT && os.Version.Major <= 6 && os.Version.Minor <= 1;
+            }
         }
 
         public QuickStartViewModel(ISolutionItemProvideService solutionItemProvideService, 

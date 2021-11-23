@@ -25,8 +25,19 @@ namespace WDE.Updater.Client
             this.key = key;
             this.platform = platform;
             this.client = client;
+            if (IsUnsupportedOS())
+                this.platform = Platforms.Windows7;
         }
 
+        /**
+         * returns true on windows 7 and older
+         */
+        private bool IsUnsupportedOS()
+        {
+            var os = Environment.OSVersion;
+            return os.Platform == PlatformID.Win32NT && os.Version.Major <= 6 && os.Version.Minor <= 1;
+        }
+        
         public async Task<CheckVersionResponse> CheckForUpdates(string branch, long version)
         {
             var request = new CheckVersionRequest(version, marketplace, branch, platform, key);

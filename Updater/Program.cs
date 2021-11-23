@@ -12,6 +12,10 @@ namespace Updater
     {
         static void Main(string[] args)
         {
+            Console.WriteLine();
+            Console.WriteLine(" --- WoW Database Editor Updater ---");
+            Console.WriteLine("    (sorry it is that ugly)");
+            Console.WriteLine();
             var excludeFiles = new HashSet<string>()
             {
                 new FileInfo("Updater").FullName,
@@ -44,7 +48,25 @@ namespace Updater
             temporaryFolder.Create();
             
             var dir = new DirectoryInfo(".");
-            ZipFile.ExtractToDirectory(updateFile.FullName, temporaryFolder.FullName, true);
+            try
+            {
+                ZipFile.ExtractToDirectory(updateFile.FullName, temporaryFolder.FullName, true);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("@@@@@@@@@@@@@@@@@");
+                Console.WriteLine("@");
+                Console.WriteLine("@");
+                Console.WriteLine("@    ERROR WHILE INSTALLING THE WoW Database Editor UPDATE");
+                Console.WriteLine("@");
+                Console.WriteLine("@         will rollback to the previous version, please try to download the update again");
+                Console.WriteLine("@");
+                Console.WriteLine("@@@@@@@@@@@@@@@@@");
+                Thread.Sleep(4000);
+                File.Delete("update.zip");
+                return;
+            }
             
             var diff = new DirectoryDiffer().GenerateDiff(dir, temporaryFolder).Where(f => !excludeFiles.Contains(f.FullName)).ToList();
             foreach (var fileDir in diff)

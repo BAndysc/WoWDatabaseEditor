@@ -70,6 +70,14 @@
         <Style Selector="Button.FlattyButton:pointerover /template/ Border#Bg">
             <Setter Property="Opacity" Value="0.2" />
         </Style>
+        <Style Selector="Border.infoBox">
+            <Setter Property="Background" Value="{DynamicResource SlightlyHighlightedBackground}" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="0, 10" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="Gray" />
+        </Style>
     </UserControl.Styles>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="20">
         <StackPanel>
@@ -80,13 +88,7 @@
                 </StackPanel>
             </Border>
             
-            <Border Background="{DynamicResource SlightlyHighlightedBackground}" 
-                    CornerRadius="5" 
-                    Padding="10" 
-                    Margin="0,10" 
-                    BorderThickness="1" 
-                    IsVisible="{Binding IsDotNet6Installed, Converter={StaticResource InversedBoolConverter}}"
-                    BorderBrush="Gray">
+            <Border Classes="infoBox" IsVisible="{Binding IsDotNet6Installed, Converter={StaticResource InversedBoolConverter}}">
                 <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
                     <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">You need to install .NET 6</TextBlock>
                     <TextBlock TextWrapping="WrapWithOverflow">In the near future the editor will require new .NET 6. You need to install it in order to continue using the editor. Why not do it now so that you are prepared?</TextBlock>
@@ -96,13 +98,14 @@
                 </StackPanel>
             </Border>
             
-            <Border Background="{DynamicResource SlightlyHighlightedBackground}" 
-                    CornerRadius="5" 
-                    Padding="10" 
-                    Margin="0,10" 
-                    BorderThickness="1" 
-                    IsVisible="{Binding ShowGiveStarBox}"
-                    BorderBrush="Gray">
+            <Border Classes="infoBox" IsVisible="{Binding IsWindows7}">
+                <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
+                    <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">Windows 7 is no longer supported</TextBlock>
+                    <TextBlock TextWrapping="WrapWithOverflow">You are using unsupported operating system. Windows 7 has been released over 12 years ago and its support has ended over 6 years ago. WoW Database Editor will not be updated for this OS anymore. Please update to anything newer to keep using the editor.</TextBlock>
+                </StackPanel>
+            </Border>
+            
+            <Border Classes="infoBox" IsVisible="{Binding ShowGiveStarBox}">
                 <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
                     <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">It looks like you are using Wow Database Editor for quite some time already.</TextBlock>
                     <TextBlock TextWrapping="WrapWithOverflow">How about you leave a star on github for this project? It costs you nothing, but gives authors of this app power for further development 💪! To leave a star, you need an account on github, the 'star' button can be found in the top right corner.</TextBlock>

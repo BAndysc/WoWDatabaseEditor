@@ -5,6 +5,7 @@ namespace WDE.Updater.Models
         Windows = 0,
         MacOs = 1,
         Linux = 2,
-        WindowsWpf = 3
+        WindowsWpf = 3,
+        Windows7 = 4
     }
 }
