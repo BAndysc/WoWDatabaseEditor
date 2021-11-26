@@ -36,6 +36,9 @@
         <None Update="data\*.vert">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="data\*.hull">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="meshes\*.obj">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
