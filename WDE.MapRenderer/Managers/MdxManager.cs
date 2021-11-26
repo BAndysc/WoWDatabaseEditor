@@ -107,6 +107,8 @@ namespace WDE.MapRenderer.Managers
             M2 m2 = null!;
             M2Skin skin = null!;
             Vector3[] vertices = null!;
+            // byte[][] bone_weights = null!; // titi test
+            // byte[][] bone_indices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
             Vector2[] uv2 = null!;
@@ -127,6 +129,8 @@ namespace WDE.MapRenderer.Managers
                 {
                     var vert = m2.vertices[i];
                     vertices[i] = vert.pos;
+                    // bone_weights[i] = vert.bone_weights;
+                    // bone_indices[i] = vert.bone_indices;
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coords[0];
                     uv2[i] = vert.tex_coords[1];

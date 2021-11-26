@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -10,6 +10,7 @@
     <Import Project="..\Avalonia.props" />
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
     <Import Project="..\Module.props" />    
 

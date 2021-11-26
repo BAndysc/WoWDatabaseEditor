@@ -613,7 +613,7 @@ namespace WDE.MpqReader.Structures
     {
         public M2Array<ushort> Vertices { get; init; }
         public M2Array<ushort> Indices{ get; init; }
-        public M2Array<uint> Bones { get; init; }  // note: in fact those are 4 bytes
+        public M2Array<byte> Bones { get; init; }  // note: in fact those are 4 bytes
         public M2Array<M2SkinSection> SkinSections { get; init; }
         public M2Array<M2Batch> Batches { get; init; }
         public uint BonesMaxCount { get; init; }
@@ -627,10 +627,10 @@ namespace WDE.MpqReader.Structures
             {
                 Vertices = reader.ReadArrayUInt16(),
                 Indices = reader.ReadArrayUInt16(),
-                Bones = reader.ReadArrayUInt32(),
+                Bones = reader.ReadArraybyte(),
                 SkinSections = reader.ReadArray(M2SkinSection.Read),
                 Batches = reader.ReadArray(M2Batch.Read),
-                BonesMaxCount = reader.ReadUInt32(),
+                BonesMaxCount = reader.ReadUInt32()
             };
         }
     }
@@ -775,7 +775,12 @@ namespace WDE.MpqReader.Structures
         {
             return new Vector2(reader.ReadFloat(), reader.ReadFloat());
         }
-    
+
+        public static M2Array<byte> ReadArraybyte(this IBinaryReader binaryReader)
+        {
+            return binaryReader.ReadArray(br => br.ReadByte());
+        }
+
         public static M2Array<ushort> ReadArrayUInt16(this IBinaryReader binaryReader)
         {
             return binaryReader.ReadArray(br => br.ReadUInt16());

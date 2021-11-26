@@ -435,6 +435,76 @@ namespace WDE.MapRenderer.Managers
             yield return LoadM2(adt, chunk, cancellationToken);
         }
 
+        private IEnumerator LoadWDT()
+        {
+            var tasksource = new TaskCompletionSource();
+            var fullName = $"World\\Maps\\{gameContext.CurrentMap.Directory}\\{gameContext.CurrentMap.Directory}.wdt";
+            var file = gameContext.ReadFile(fullName);
+            yield return file;
+            if (file.Result == null)
+            {
+                tasksource.SetResult();
+                yield break;
+            }
+
+            WDT wdt = null!;
+
+            yield return Task.Run(() =>
+            {
+                try
+                {
+                    wdt = new WDT(new MemoryBinaryReader(file.Result));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception while loading WDT " + fullName);
+                    Console.WriteLine(e);
+                    wdt = null;
+                    throw;
+                }
+            });
+            file.Result.Dispose();
+
+            if ( wdt.Header.flags.HasFlag(WDTFlags.wdt_uses_global_map_obj) )
+                yield return LoadWDTWorldMapObject(wdt);
+
+            tasksource.SetResult();
+
+            Console.WriteLine(" WDT flags : " + wdt.Header.flags.ToString());
+
+        }
+
+        private IEnumerator LoadWDTWorldMapObject(WDT wdt)
+        {
+            var wmoTransform = new Transform();
+            wmoTransform.Position = new Vector3((32 * Constants.BlockSize - wdt.Modf.pos.X),
+                wdt.Modf.pos.Y, -(32 * Constants.BlockSize - wdt.Modf.pos.Z));
+            wmoTransform.Rotation = Quaternion.FromEuler(wdt.Modf.rot.X, -wdt.Modf.rot.Y + 180,
+                wdt.Modf.rot.Z);
+
+            var tcs = new TaskCompletionSource<WmoManager.WmoInstance?>();
+            yield return gameContext.WmoManager.LoadWorldMapObject(wdt.Mwmo, tcs);
+
+            foreach (var mesh in tcs.Task.Result.Meshes)
+            {
+                int i = 0;
+                foreach (var material in mesh.Item2)
+                {
+                    // chunk.renderHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
+
+                    if (!material.BlendingEnabled)
+                    {
+                        var entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
+                        gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
+                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
+                        gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
+                        gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });
+                        // chunk.entities.Add(entity);
+                    }
+                }
+            }
+        }
+
         private IEnumerator LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
         {
             int index = 0;
@@ -456,7 +526,8 @@ namespace WDE.MapRenderer.Managers
                 var t = new Transform();
                 t.Position = new Vector3(32 * Constants.BlockSize - m2.AbsolutePosition.X, m2.AbsolutePosition.Y, -(32 * Constants.BlockSize - m2.AbsolutePosition.Z));
                 t.Scale = Vector3.One * m2.Scale;
-                t.Rotation = Quaternion.FromEuler(m2.Rotation.X, -m2.Rotation.Y + 180, m2.Rotation.Z);
+                // t.Rotation = Quaternion.FromEuler(m2.Rotation.X, -m2.Rotation.Y + 180, m2.Rotation.Z);
+                t.Rotation = Quaternion.FromEuler( - m2.Rotation.X, -m2.Rotation.Y + 180, m2.Rotation.Z);
 
                 int j = 0;
                 foreach (var material in m.materials)
@@ -543,6 +614,7 @@ namespace WDE.MapRenderer.Managers
                     gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
             }
 
+            LoadWDT(); // titi test
             UnloadChunks();
         }
 

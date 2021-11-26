@@ -83,6 +83,7 @@ namespace WDE.MapRenderer
             ChunkManager = new ChunkManager(this);
             CameraManager = new CameraManager(this);
             LightingManager = new LightingManager(this);
+            AreaTriggerManager = new AreaTriggerManager(this);
             RaycastSystem = new RaycastSystem(engine);
             ModuleManager = new ModuleManager(this, gameView); // must be last
             
@@ -114,7 +115,9 @@ namespace WDE.MapRenderer
             
             CameraManager.Update(delta);
             LightingManager.Update(delta);
-            
+            // AreaTriggerManager.Update(delta);
+
+
             ScreenSpaceSelector.Update(delta);
             UpdateLoop.Update(delta);
             ChunkManager.Update(delta);
@@ -130,6 +133,7 @@ namespace WDE.MapRenderer
             }
             ModuleManager.Render();
             LightingManager.Render();
+            AreaTriggerManager.Render();
         }
 
         public void RenderGUI(float delta)
@@ -168,6 +172,7 @@ namespace WDE.MapRenderer
             ModuleManager.Dispose();
             NotificationsCenter.Dispose();
             LightingManager.Dispose();
+            AreaTriggerManager.Dispose();
             ChunkManager.Dispose();
             WmoManager.Dispose();
             MdxManager.Dispose();
@@ -188,6 +193,7 @@ namespace WDE.MapRenderer
             ChunkManager = null!;
             CameraManager = null!;
             LightingManager = null!;
+            AreaTriggerManager = null;
             RaycastSystem = null!;
             ModuleManager = null!;
         }
@@ -209,6 +215,7 @@ namespace WDE.MapRenderer
         public RaycastSystem RaycastSystem { get; private set; }
         public DbcManager DbcManager { get; private set; }
         public LightingManager LightingManager { get; private set; }
+        public AreaTriggerManager AreaTriggerManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
         public Map CurrentMap { get; private set; }
         public bool IsInitialized { get; private set; }

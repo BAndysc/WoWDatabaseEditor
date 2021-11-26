@@ -103,7 +103,7 @@ namespace WDE.DbcStore
             private readonly IParameterFactory parameterFactory;
             private readonly DbcStore store;
 
-            private Dictionary<long, string> AreaTriggerStore { get; } = new();
+            public Dictionary<long, string> AreaTriggerStore { get; } = new();
             private Dictionary<long, long> FactionTemplateStore { get; } = new();
             private Dictionary<long, string> FactionStore { get; } = new();
             private Dictionary<long, string> SpellStore { get; } = new();
