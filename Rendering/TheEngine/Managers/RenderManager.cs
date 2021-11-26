@@ -40,8 +40,9 @@ namespace TheEngine.Managers
         private DepthStencil depthStencilZWrite;
         private DepthStencil depthStencilNoZWrite;
 
-        private bool? currentDepthTest;
+        private DepthCompare? currentDepthTest;
         private bool? currentZwrite;
+        private bool? currentDepthTestEnabled;
         private CullingMode? currentCulling;
         private (bool enabled, Blending? source, Blending? dest)? currentBlending;
 
@@ -195,27 +196,40 @@ namespace TheEngine.Managers
             }
         }
         
-        private void SetZWrite(bool zwrite)
+        private void SetDepth(bool zwrite, DepthCompare depthCompare)
         {
-            if (!currentZwrite.HasValue || currentZwrite.Value != zwrite)
+            if (zwrite == false && depthCompare == DepthCompare.Always)
             {
-                if (zwrite)
-                    engine.Device.device.DepthMask(true);
-                else
-                    engine.Device.device.DepthMask(false);
-                currentZwrite = zwrite;
-            }
-        }
-
-        private void SetDepthTest(bool depthTest)
-        {
-            if (!currentDepthTest.HasValue || currentDepthTest.Value != depthTest)
-            {
-                if (depthTest)
-                    engine.Device.device.Enable(EnableCap.DepthTest);
-                else
+                if (!currentDepthTestEnabled.HasValue || currentDepthTestEnabled.Value)
+                {
                     engine.Device.device.Disable(EnableCap.DepthTest);
-                currentDepthTest = depthTest;
+                    currentDepthTestEnabled = false;
+                    currentZwrite = null;
+                    currentDepthTest = null;
+                }
+            }
+            else
+            {
+                if (!currentDepthTestEnabled.HasValue || !currentDepthTestEnabled.Value)
+                {
+                    engine.Device.device.Enable(EnableCap.DepthTest);
+                    currentDepthTestEnabled = true;
+                }
+                
+                if (!currentZwrite.HasValue || currentZwrite.Value != zwrite)
+                {
+                    if (zwrite)
+                        engine.Device.device.DepthMask(true);
+                    else
+                        engine.Device.device.DepthMask(false);
+                    currentZwrite = zwrite;
+                }
+                
+                if (!currentDepthTest.HasValue || currentDepthTest.Value != depthCompare)
+                {
+                    engine.Device.device.DepthFunction((DepthFunction)depthCompare);
+                    currentDepthTest = depthCompare;
+                }
             }
         }
 
@@ -226,6 +240,7 @@ namespace TheEngine.Managers
             currentShader = null;
             currentCulling = null;
             currentZwrite = null;
+            currentDepthTest = null;
             currentDepthTest = null;
             currentBlending = null;
             cameraManager.MainCamera.Aspect = engine.WindowHost.Aspect;
@@ -268,7 +283,7 @@ namespace TheEngine.Managers
 
             engine.Device.device.CheckError("Blitz");
             blitMaterial.Shader.Activate();
-            SetZWrite(true);
+            SetDepth(true, DepthCompare.Always);
             renderTexture.Activate(0);
             //outlineTexture.Activate(1);
             planeMesh.Activate();
@@ -308,8 +323,7 @@ namespace TheEngine.Managers
 
         private void EnableMaterial(Material material)
         {
-            SetZWrite(material.ZWrite);
-            SetDepthTest(material.DepthTesting);
+            SetDepth(material.ZWrite, material.DepthTesting);
             SetCulling(material.Culling);
             SetBlending(material.BlendingEnabled, material.SourceBlending, material.DestinationBlending);
             material.ActivateUniforms();

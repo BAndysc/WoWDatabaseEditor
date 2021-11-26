@@ -90,13 +90,13 @@ namespace WDE.MapRenderer.Utils
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.SrcAlpha;
                 material.DestinationBlending = Blending.OneMinusSrcAlpha;
-                material.DepthTesting = false;
+                material.DepthTesting = DepthCompare.Always;
                 material.ZWrite = false;
             }
             else
             {
                 material.BlendingEnabled = false;
-                material.DepthTesting = true;
+                material.DepthTesting = DepthCompare.Lequal;
                 material.ZWrite = true;
             }
             

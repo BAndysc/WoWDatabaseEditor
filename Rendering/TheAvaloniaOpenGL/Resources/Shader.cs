@@ -71,7 +71,7 @@ namespace TheAvaloniaOpenGL.Resources
 
         public bool ZWrite { get; }
         
-        public bool DepthTest { get; }
+        public DepthFunction DepthTest { get; }
 
         public bool WriteMask { get; }
 
@@ -121,7 +121,7 @@ namespace TheAvaloniaOpenGL.Resources
             var shaderDir = Path.GetDirectoryName(shaderFile);
 
             ZWrite = shaderData.ZWrite;
-            DepthTest = shaderData.DepthTest ?? true;
+            DepthTest = shaderData.DepthTest ?? DepthFunction.Lequal;
             Instancing = shaderData.Instancing;
             var defines = new List<string>() { "VERTEX_SHADER" };
             if (Instancing)
@@ -357,7 +357,8 @@ namespace TheAvaloniaOpenGL.Resources
         public bool Instancing { get; set; }
 
         public bool ZWrite { get; set; }
-        public bool? DepthTest { get; set; } = true;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DepthFunction? DepthTest { get; set; } = DepthFunction.Lequal;
 
         public bool WriteMask { get; set; }
     }
