@@ -14,6 +14,11 @@ namespace WDE.MapRenderer.Managers
         private IMesh Mesh;
         private Material Material;
         private TextureHandle Texture;
+        private Material translucent;
+        private Material opaque;
+        private IMesh Mesh2;
+        private Material translucent2;
+        private Material opaque2;
 
         public AreaTriggerManager(IGameContext gameContext)
         {
@@ -22,6 +27,11 @@ namespace WDE.MapRenderer.Managers
             Material = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
             // Texture = gameContext.Engine.TextureManager.LoadTexture("textures/noise_512.png");
 
+            translucent = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+            opaque = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+            Mesh2 = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
+            translucent2 = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+            opaque2 = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
             // skyMaterial.SetTexture("cloudsTex", noiseTexture);
         }
 
@@ -56,8 +66,6 @@ namespace WDE.MapRenderer.Managers
                 // if (areatrigger.Id == 2230)
                 //     System.Diagnostics.Debug.WriteLine(" X:" + pos.X + ", Y:" + pos.Y + ", Z:" + pos.Z);
 
-                
-
                 var distance = areatrigger.Radius;
 
                 var t = new Transform();
@@ -70,7 +78,7 @@ namespace WDE.MapRenderer.Managers
 
                     Mesh = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
 
-                    var translucent = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+                    
                     translucent.BlendingEnabled = true;
                     translucent.SourceBlending = Blending.SrcAlpha;
                     translucent.DestinationBlending = Blending.OneMinusSrcAlpha;
@@ -78,7 +86,7 @@ namespace WDE.MapRenderer.Managers
                     translucent.ZWrite = false;
                     translucent.SetUniform("objectColor", new Vector4(0.2f, 0.4f, 1f, 0.5f));
 
-                    var opaque = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+                    
                     opaque.DepthTesting = true;
                     opaque.ZWrite = false;
                     opaque.SetUniform("objectColor", new Vector4(0.2f, 0.4f, 1f, 1f));
@@ -87,7 +95,7 @@ namespace WDE.MapRenderer.Managers
                     gameContext.Engine.RenderManager.Render(Mesh, translucent, 0, t);
                     // gameContext.Engine.RenderManager.Render(Mesh, opaque, 0, t);
 
-                    IMesh Mesh2 = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
+                    
 
                     // Material.SetUniform("objectColor", new Vector4(0.5f, 0.5f, 0.5f, 0.4f)); // values from 0 to 1
                     // Material.BlendingEnabled = true;
@@ -97,7 +105,7 @@ namespace WDE.MapRenderer.Managers
 
                     // gameContext.Engine.RenderManager.Render(Mesh2, Material, 0, t);
 
-                    var translucent2 = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+                    
                     translucent2.BlendingEnabled = true;
                     translucent2.SourceBlending = Blending.SrcAlpha;
                     translucent2.DestinationBlending = Blending.OneMinusSrcAlpha;
@@ -105,7 +113,7 @@ namespace WDE.MapRenderer.Managers
                     translucent2.ZWrite = false;
                     translucent2.SetUniform("objectColor", new Vector4(0.2f, 0.4f, 1f, 0.2f));
 
-                    var opaque2 = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+                    
                     opaque2.BlendingEnabled = true;
                     opaque2.SourceBlending = Blending.SrcAlpha;
                     opaque2.DestinationBlending = Blending.OneMinusSrcAlpha;
