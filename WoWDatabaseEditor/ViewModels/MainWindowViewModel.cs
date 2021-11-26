@@ -11,7 +11,9 @@ using WDE.Common.Windows;
 using WDE.Common.Menu;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
+using WDE.Common.Solution;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -43,6 +45,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             Func<QuickStartViewModel> quickStartCreator,
             Func<TextDocumentViewModel> textDocumentCreator,
             ISolutionTasksService solutionTasksService,
+            ISolutionItemSqlGeneratorRegistry queryGeneratorRegistry,
+            IClipboardService clipboardService,
             ISessionService sessionService,
             ITaskRunner taskRunner,
             IEventAggregator eventAggregator,
@@ -81,6 +85,20 @@ namespace WoWDatabaseEditorCore.ViewModels
             }, () => DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase));
 
+            CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
+            {
+                if (DocumentManager.ActiveDocument is ISolutionItemDocument { SolutionItem: { } } sid)
+                {
+                    await taskRunner.ScheduleTask("Generating SQL",
+                        async () =>
+                        {
+                            var sql = await queryGeneratorRegistry.GenerateSql(sid.SolutionItem);
+                            clipboardService.SetText(sql);
+                            statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "SQL copied!"));
+                        });
+                }
+            }, _ => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+            
             GenerateCurrentSqlCommand = new DelegateCommand(() =>
             {
                 if (DocumentManager.ActiveDocument is ISolutionItemDocument {SolutionItem: { }} sid)
@@ -92,6 +110,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 {
                     GenerateCurrentSqlCommand.RaiseCanExecuteChanged();
                     ExecuteChangedCommand.RaiseCanExecuteChanged();
+                    CopyCurrentSqlCommand.RaiseCanExecuteChanged();
                 });
             
             TasksViewModel = tasksViewModel;
@@ -155,6 +174,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         public bool ShowExportButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? true;
         
         public DelegateCommand ExecuteChangedCommand { get; }
+        
+        public AsyncAutoCommand CopyCurrentSqlCommand { get; }
         
         public DelegateCommand GenerateCurrentSqlCommand { get; }
         

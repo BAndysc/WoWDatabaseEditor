@@ -75,6 +75,10 @@
                         </ItemsPresenter.ItemsPanel>
                     </ItemsPresenter>
                     <components:ButtonImage IsVisible="{Binding ShowExportButtons}" Command="{Binding GenerateCurrentSqlCommand}" Text="SQL" />
+                    <components:ButtonImage Command="{Binding CopyCurrentSqlCommand}"
+                                            IsVisible="{Binding ShowExportButtons}"
+                                            ToolTip.Tip="Copy SQL" 
+                                            Image="Icons/icon_copy_sql.png" />
                 </controls:ToolbarPanel>
             </controls:ToolBar.RightContent>
         </controls:ToolBar>
