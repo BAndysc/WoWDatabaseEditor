@@ -35,8 +35,18 @@ namespace WoWDatabaseEditorCore.Providers
             SubItems.Add(new ModuleMenuItem("Send feedback", new DelegateCommand(reportBugService.SendFeedback)));
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("Open debug console", new DelegateCommand(OpenDebugConsole)));
+            SubItems.Add(new ModuleMenuItem("Debug clear unused memory", new DelegateCommand(CallGC)));
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("About", new DelegateCommand(OpenAbout)));
+        }
+
+        private void CallGC()
+        {
+            for (int i = 0; i < 100; ++i)
+            {
+                GC.Collect(2, GCCollectionMode.Forced);
+                GC.WaitForPendingFinalizers();
+            }
         }
 
         private void OpenAbout() => DocumentManager.OpenDocument(aboutViewModelCreator());
