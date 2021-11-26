@@ -4,4 +4,9 @@ namespace TheEngine.ECS
     {
         
     }
+    
+    public interface IManagedComponentData
+    {
+        
+    }
 }

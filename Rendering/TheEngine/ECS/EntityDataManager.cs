@@ -4,23 +4,24 @@ namespace TheEngine.ECS
 {
     internal class EntityDataManager : System.IDisposable
     {
-        private readonly Dictionary<int, ChunkDataManager> archetypeToData = new();
+        private readonly Dictionary<ulong, ChunkDataManager> archetypeToData = new();
 
         internal void AddEntity(Entity entity, Archetype archetype)
         {
-            if (!archetypeToData.TryGetValue(archetype.ComponentBitMask, out var data))
-                data = archetypeToData[archetype.ComponentBitMask] = new(archetype);
+            var hash = archetype.Hash;
+            if (!archetypeToData.TryGetValue(hash, out var data))
+                data = archetypeToData[hash] = new(archetype);
             data.AddEntity(entity);
         }
 
-        internal void RemoveEntity(Entity entity, int archetypeBitMask)
+        internal void RemoveEntity(Entity entity, ulong archetypeBitMask)
         {
             archetypeToData[archetypeBitMask].RemoveEntity(entity);
         }
 
         internal IEnumerable<ChunkDataManager> Archetypes => archetypeToData.Values;
         
-        internal ChunkDataManager this[int archetypeBitMask] => archetypeToData[archetypeBitMask];
+        internal ChunkDataManager this[ulong archetypeBitMask] => archetypeToData[archetypeBitMask];
 
         public void Dispose()
         {

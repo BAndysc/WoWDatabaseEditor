@@ -8,4 +8,10 @@ namespace TheEngine.ECS
         int SizeBytes { get; }
         int Index { get; }
     }
+    
+    public interface IManagedComponentTypeData
+    {
+        Type DataType { get; }
+        int Index { get; }
+    }
 }

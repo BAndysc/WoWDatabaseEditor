@@ -37,4 +37,40 @@ namespace TheEngine.ECS
             }
         }
     }
+    
+    public sealed class ManagedComponentDataAccess<T> where T : IManagedComponentData
+    {
+        private readonly object?[] data;
+        private readonly int[] sparseReverseEntityMapping;
+
+        public unsafe ManagedComponentDataAccess(object?[] data, int[] sparseReverseEntityMapping)
+        {
+            this.data = data;
+            this.sparseReverseEntityMapping = sparseReverseEntityMapping;
+        }
+        
+        public T this[int index]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => (T)data[index]!;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => data[index] = value;
+        }
+
+        public T this[Entity index]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                var indexInArray = sparseReverseEntityMapping[index.Id] - 1;
+                return (T)data[indexInArray]!;
+            }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set
+            {
+                var indexInArray = sparseReverseEntityMapping[index.Id] - 1;
+                data[indexInArray] = value;
+            }
+        }
+    }
 }
