@@ -19,6 +19,7 @@ using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WoWDatabaseEditor.Providers;
 using WoWDatabaseEditorCore.Managers;
+using WoWDatabaseEditorCore.Services;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
@@ -31,7 +32,6 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<QuickStartViewModel> quickStartCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
 
-        private string title = "WoW Database Editor 2021.3";
         private readonly Dictionary<string, ITool> toolById = new();
 
         public MainWindowViewModel(IDocumentManager documentManager,
@@ -50,6 +50,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             ISessionService sessionService,
             ITaskRunner taskRunner,
             IEventAggregator eventAggregator,
+            IProgramNameService programNameService,
             IMainThread mainThread)
         {
             DocumentManager = documentManager;
@@ -58,6 +59,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
+            Title = programNameService.Title;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
             ExecuteChangedCommand = new DelegateCommand(() =>
             {
@@ -160,11 +162,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
-        public string Title
-        {
-            get => title;
-            set => SetProperty(ref title, value);
-        }
+        public string Title { get; }
 
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
 
