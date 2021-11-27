@@ -73,7 +73,7 @@ namespace WDE.MapRenderer.Managers
 
                 if (areatrigger.Radius == 0) // if radius = 0, is box
                 {
-                    t.Scale = new Vector3(areatrigger.Box_Length/2, areatrigger.Box_Width / 2, areatrigger.Box_Height / 2);
+                    t.Scale = new Vector3( areatrigger.Box_Width / 2, areatrigger.Box_Height/2, areatrigger.Box_Length / 2);
                     t.Rotation = Quaternion.FromEuler(areatrigger.Box_Yaw, 0.0f, 0.0f);
 
                     Mesh = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
