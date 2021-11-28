@@ -9,10 +9,12 @@ namespace TheEngine.ECS
         private bool disposed;
         //private readonly byte[][] componentData;
         private readonly unsafe byte*[] componentData;
+        private readonly object?[][] managedComponentData;
         public readonly Archetype Archetype;
         private int capacity;
         private int used;
         private readonly int componentsCount;
+        private readonly int managedComponentsCount;
 
         private Entity[] entityMapping;
         private int[] sparseReverseEntityMapping = new int[1];
@@ -21,8 +23,10 @@ namespace TheEngine.ECS
         {
             Archetype = archetype;
             componentsCount = archetype.Components.Count;
+            managedComponentsCount = archetype.ManagedComponents.Count;
             //componentData = new byte[archetype.Components.Count][];
-            componentData = new byte*[archetype.Components.Count];
+            componentData = new byte*[componentsCount];
+            managedComponentData = new object?[managedComponentsCount][];
         }
 
         ~ChunkDataManager()
@@ -46,6 +50,18 @@ namespace TheEngine.ECS
             get => entityMapping[index];
         }
 
+        public ManagedComponentDataAccess<T> ManagedDataAccess<T>() where T : IManagedComponentData
+        {
+            int i = 0;
+            foreach (var c in Archetype.ManagedComponents)
+            {
+                if (c.DataType == typeof(T))
+                    return new ManagedComponentDataAccess<T>(managedComponentData[i], sparseReverseEntityMapping);
+                i++;
+            }
+            throw new Exception("There is no component data + " + typeof(T) + " in this archetype");
+        }
+        
         public unsafe ComponentDataAccess<T> DataAccess<T>() where T : unmanaged, IComponentData
         {
             int i = 0;
@@ -82,6 +98,10 @@ namespace TheEngine.ECS
                     AllocOrRealloc(ref componentData[i], (ulong)capacity * (ulong)Archetype.Components[i].SizeBytes);
                     //Array.Resize(ref componentData[i], capacity * Archetype.Components[i].SizeBytes);
                 }
+                for (int i = 0; i < managedComponentsCount; ++i)
+                {
+                    Array.Resize(ref managedComponentData[i], capacity);
+                }
             }
             if (sparseReverseEntityMapping.Length <= entity.Id)
                 Array.Resize(ref sparseReverseEntityMapping, Math.Max((int)entity.Id + 1, sparseReverseEntityMapping.Length * 2 + 1));
@@ -92,13 +112,19 @@ namespace TheEngine.ECS
             ResizeIfNeeded(entity);
             entityMapping[used] = entity;
             sparseReverseEntityMapping[entity.Id] = used + 1;
-            for (var index = 0; index < Archetype.Components.Count; index++)
+            for (var index = 0; index < componentsCount; index++)
             {
                 var c = Archetype.Components[index];
                 var array = componentData[index];
                 // zero array
                 for (int j = 0; j < c.SizeBytes; ++j)
                     array[used * c.SizeBytes + j] = 0;
+            }
+            for (var index = 0; index < managedComponentsCount; index++)
+            {
+                var c = Archetype.ManagedComponents[index];
+                var array = managedComponentData[index];
+                array[used] = null;
             }
 
             used++;
@@ -119,6 +145,14 @@ namespace TheEngine.ECS
                 var array = componentData[i];
                 for (int j = 0; j < c.SizeBytes; ++j)
                     array[index * c.SizeBytes + j] = array[swapWith * c.SizeBytes + j];
+                i++;
+            }
+            
+            i = 0;
+            foreach (var c in Archetype.ManagedComponents)
+            {
+                var array = managedComponentData[i];
+                array[index] = array[swapWith];
                 i++;
             }
             

@@ -1,11 +1,14 @@
 {
   "Pixel": {
-    "Path": "data/gizmo.frag"
+    "Path": "data/wireframe.frag"
+  },
+  "Geometry": {
+    "Path": "data/wireframe.hull"
   },
   "ZWrite": true,
   "Instancing": false,
   "Vertex": {
-    "Path": "data/gizmo.vert",
+    "Path": "data/wireframe.vert",
     "Input": [
       {"Type": "Float4"},
       {"Type": "Float4"},

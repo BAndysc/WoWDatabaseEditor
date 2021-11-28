@@ -145,6 +145,9 @@ uniform samplerBuffer InstancingInverseModels;
 
 #ifdef PIXEL_SHADER
 
+#define ddx(v) dFdx(v)
+#define ddy(v) dFdy(v)
+
 vec3 lighting(vec3 col, vec3 normal)
 {
 	float diff = max(dot(normal, lightDir.xyz), 0.0);

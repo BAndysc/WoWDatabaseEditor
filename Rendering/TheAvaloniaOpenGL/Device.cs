@@ -6,6 +6,7 @@ using OpenGLBindings;
 using OpenTK.Graphics.ES11;
 using ClearBufferMask = OpenGLBindings.ClearBufferMask;
 using CullFaceMode = OpenGLBindings.CullFaceMode;
+using DepthFunction = OpenGLBindings.DepthFunction;
 using DrawElementsType = OpenGLBindings.DrawElementsType;
 using EnableCap = OpenGLBindings.EnableCap;
 using ErrorCode = OpenGLBindings.ErrorCode;
@@ -477,6 +478,10 @@ namespace TheAvaloniaOpenGL
         [GlMinVersionEntryPoint("glBlendFunc", 2, 0)]
         public GlBlendFunc BlendFunc { get; }
 
+        public delegate void GlDepthFunc(DepthFunction func);
+        [GlMinVersionEntryPoint("glDepthFunc", 2, 0)]
+        public GlDepthFunc DepthFunc { get; }
+        
         public void CheckError(string what)
         {
             int err;

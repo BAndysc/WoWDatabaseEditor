@@ -16,4 +16,16 @@ namespace TheEngine.ECS
         public Type DataType { get; }
         public int SizeBytes { get; }
     }
+    
+    public class ManagedComponentTypeData<T> : IManagedComponentTypeData<T> where T : class, IManagedComponentData
+    {
+        public unsafe ManagedComponentTypeData(int index)
+        {
+            Index = index;
+            DataType = typeof(T);
+        }
+
+        public int Index { get; }
+        public Type DataType { get; }
+    }
 }

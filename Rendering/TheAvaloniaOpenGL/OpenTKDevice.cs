@@ -10,6 +10,7 @@ using ClampColorMode = OpenGLBindings.ClampColorMode;
 using ClampColorTarget = OpenGLBindings.ClampColorTarget;
 using ClearBufferMask = OpenGLBindings.ClearBufferMask;
 using CullFaceMode = OpenGLBindings.CullFaceMode;
+using DepthFunction = OpenGLBindings.DepthFunction;
 using DrawElementsType = OpenGLBindings.DrawElementsType;
 using EnableCap = OpenGLBindings.EnableCap;
 using FramebufferAttachment = OpenGLBindings.FramebufferAttachment;
@@ -464,6 +465,11 @@ namespace TheAvaloniaOpenGL
         public void DepthMask(bool @on)
         {
             GL.DepthMask(@on);
+        }
+
+        public void DepthFunction(DepthFunction func)
+        {
+            GL.DepthFunc((OpenTK.Graphics.OpenGL4.DepthFunction)func);
         }
     }
 }

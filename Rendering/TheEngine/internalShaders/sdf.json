@@ -3,7 +3,6 @@
     "Path": "internalShaders/sdf.frag"
   },
   "ZWrite": false,
-  "DepthTest": false,
   "Vertex": {
     "Path": "internalShaders/sdf.vert",
     "Input": [

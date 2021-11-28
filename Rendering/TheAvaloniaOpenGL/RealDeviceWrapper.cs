@@ -357,5 +357,10 @@ namespace TheAvaloniaOpenGL
         {
             device.DepthMask(@on ? 1 : 0);
         }
+
+        public void DepthFunction(DepthFunction func)
+        {
+            device.DepthFunc(func);
+        }
     }
 }

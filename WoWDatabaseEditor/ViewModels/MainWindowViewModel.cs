@@ -11,12 +11,15 @@ using WDE.Common.Windows;
 using WDE.Common.Menu;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
+using WDE.Common.Solution;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WoWDatabaseEditor.Providers;
 using WoWDatabaseEditorCore.Managers;
+using WoWDatabaseEditorCore.Services;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
@@ -29,7 +32,6 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<QuickStartViewModel> quickStartCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
 
-        private string title = "WoW Database Editor 2021.3";
         private readonly Dictionary<string, ITool> toolById = new();
 
         public MainWindowViewModel(IDocumentManager documentManager,
@@ -43,9 +45,12 @@ namespace WoWDatabaseEditorCore.ViewModels
             Func<QuickStartViewModel> quickStartCreator,
             Func<TextDocumentViewModel> textDocumentCreator,
             ISolutionTasksService solutionTasksService,
+            ISolutionItemSqlGeneratorRegistry queryGeneratorRegistry,
+            IClipboardService clipboardService,
             ISessionService sessionService,
             ITaskRunner taskRunner,
             IEventAggregator eventAggregator,
+            IProgramNameService programNameService,
             IMainThread mainThread)
         {
             DocumentManager = documentManager;
@@ -54,6 +59,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
+            Title = programNameService.Title;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
             ExecuteChangedCommand = new DelegateCommand(() =>
             {
@@ -81,6 +87,20 @@ namespace WoWDatabaseEditorCore.ViewModels
             }, () => DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase));
 
+            CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
+            {
+                if (DocumentManager.ActiveDocument is ISolutionItemDocument { SolutionItem: { } } sid)
+                {
+                    await taskRunner.ScheduleTask("Generating SQL",
+                        async () =>
+                        {
+                            var sql = await queryGeneratorRegistry.GenerateSql(sid.SolutionItem);
+                            clipboardService.SetText(sql);
+                            statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "SQL copied!"));
+                        });
+                }
+            }, _ => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+            
             GenerateCurrentSqlCommand = new DelegateCommand(() =>
             {
                 if (DocumentManager.ActiveDocument is ISolutionItemDocument {SolutionItem: { }} sid)
@@ -92,6 +112,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 {
                     GenerateCurrentSqlCommand.RaiseCanExecuteChanged();
                     ExecuteChangedCommand.RaiseCanExecuteChanged();
+                    CopyCurrentSqlCommand.RaiseCanExecuteChanged();
                 });
             
             TasksViewModel = tasksViewModel;
@@ -141,11 +162,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
-        public string Title
-        {
-            get => title;
-            set => SetProperty(ref title, value);
-        }
+        public string Title { get; }
 
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
 
@@ -155,6 +172,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         public bool ShowExportButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? true;
         
         public DelegateCommand ExecuteChangedCommand { get; }
+        
+        public AsyncAutoCommand CopyCurrentSqlCommand { get; }
         
         public DelegateCommand GenerateCurrentSqlCommand { get; }
         

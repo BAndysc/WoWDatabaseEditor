@@ -21,12 +21,19 @@ namespace TheEngine.Test.ECS
         private struct ComponentC : IComponentData
         {
         }
+
+        private class ManagedData : IManagedComponentData
+        {
+            public string str;
+        }
         
         private IEntityManager entityManager = null!;
         private Archetype archetype;
         private Archetype archetypeOnlyA;
         private Archetype archetypeOnlyB;
         private Archetype archetypeOnlyC;
+        private Archetype archetypeOnlyManaged;
+        private Archetype archetypeAAndManaged;
         
         [SetUp]
         public void Setup()
@@ -44,6 +51,13 @@ namespace TheEngine.Test.ECS
             archetypeOnlyC = entityManager
                 .NewArchetype()
                 .WithComponentData<ComponentC>();
+            archetypeOnlyManaged = entityManager
+                .NewArchetype()
+                .WithManagedComponentData<ManagedData>();
+            archetypeAAndManaged = entityManager
+                .NewArchetype()
+                .WithComponentData<ComponentA>()
+                .WithManagedComponentData<ManagedData>();
         }
 
         [Test]
@@ -161,6 +175,36 @@ namespace TheEngine.Test.ECS
             });
             CollectionAssert.AreEquivalent(new[]{entities[0], entities[1]}, foundEntities);
             CollectionAssert.AreEquivalent(new[]{1, 2}, foundValues);
+        }
+        
+        [Test]
+        public void BasicManagedData()
+        {
+            var entity = entityManager.CreateEntity(archetypeOnlyManaged);
+            var data = new ManagedData() { str = "abc" };
+            entityManager.SetManagedComponent<ManagedData>(entity, data);
+            Assert.AreEqual("abc", entityManager.GetManagedComponent<ManagedData>(entity).str);
+            Assert.AreSame(data, entityManager.GetManagedComponent<ManagedData>(entity));
+        }
+        
+        [Test]
+        public void MixedManagedAndNative()
+        {
+            var entityManaged = entityManager.CreateEntity(archetypeOnlyManaged);
+            var entityNative = entityManager.CreateEntity(archetypeOnlyA);
+            var entityMixed = entityManager.CreateEntity(archetypeAAndManaged);
+            
+            Assert.IsTrue(entityManager.Is(entityManaged, archetypeOnlyManaged));
+            Assert.IsFalse(entityManager.Is(entityManaged, archetypeOnlyA));
+            Assert.IsFalse(entityManager.Is(entityManaged, archetypeAAndManaged));
+            
+            Assert.IsFalse(entityManager.Is(entityNative, archetypeOnlyManaged));
+            Assert.IsTrue(entityManager.Is(entityNative, archetypeOnlyA));
+            Assert.IsFalse(entityManager.Is(entityNative, archetypeAAndManaged));
+            
+            Assert.IsTrue(entityManager.Is(entityMixed, archetypeOnlyManaged));
+            Assert.IsTrue(entityManager.Is(entityMixed, archetypeOnlyA));
+            Assert.IsTrue(entityManager.Is(entityMixed, archetypeAAndManaged));
         }
     }
 }

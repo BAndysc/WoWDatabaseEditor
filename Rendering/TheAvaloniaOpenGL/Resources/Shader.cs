@@ -64,13 +64,14 @@ namespace TheAvaloniaOpenGL.Resources
 
         internal int VertexShader { get; }
         internal int PixelShader { get; }
+        internal int GeometryShader { get; }
         internal int ProgramHandle { get; }
         
         public bool Instancing { get; }
 
         public bool ZWrite { get; }
         
-        public bool DepthTest { get; }
+        public DepthFunction DepthTest { get; }
 
         public bool WriteMask { get; }
 
@@ -120,7 +121,7 @@ namespace TheAvaloniaOpenGL.Resources
             var shaderDir = Path.GetDirectoryName(shaderFile);
 
             ZWrite = shaderData.ZWrite;
-            DepthTest = shaderData.DepthTest ?? true;
+            DepthTest = shaderData.DepthTest ?? DepthFunction.Lequal;
             Instancing = shaderData.Instancing;
             var defines = new List<string>() { "VERTEX_SHADER" };
             if (Instancing)
@@ -147,10 +148,25 @@ namespace TheAvaloniaOpenGL.Resources
                 Console.WriteLine(result);
             }
 
+            if (shaderData.Geometry != null)
+            {
+                GeometryShader = device.CreateShader(ShaderType.GeometryShader);
+                defines = new List<string>() { "GEOMETRY_SHADER" };
+                var geometrySource = ShaderSource.ParseShader(shaderData.Geometry.Path, true, defines.ToArray());
+                result = device.CompileShaderAndGetError(GeometryShader, geometrySource);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    Console.WriteLine("Error while compiling " + shaderData.Geometry.Path);
+                    Console.WriteLine(result);
+                }
+            }
+
             ProgramHandle = device.CreateProgram();
 
             device.AttachShader(ProgramHandle, VertexShader);
             device.AttachShader(ProgramHandle, PixelShader);
+            if (GeometryShader > 0)
+                device.AttachShader(ProgramHandle, GeometryShader);
 
             var error = device.LinkProgramAndGetError(ProgramHandle);
             if (error != null && error.Trim().Length > 0)
@@ -329,13 +345,20 @@ namespace TheAvaloniaOpenGL.Resources
             public List<ShaderInput> Input { get; set; }
         }
 
+        public class GeometryShaderData
+        {
+            public string Path { get; set; }
+        }
+
         public PixelVertexData Pixel { get; set; }
         public PixelVertexData Vertex { get; set; }
+        public GeometryShaderData? Geometry { get; set; }
         public int Textures { get; set; }
         public bool Instancing { get; set; }
 
         public bool ZWrite { get; set; }
-        public bool? DepthTest { get; set; } = true;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DepthFunction? DepthTest { get; set; } = DepthFunction.Lequal;
 
         public bool WriteMask { get; set; }
     }

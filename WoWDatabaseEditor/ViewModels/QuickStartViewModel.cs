@@ -23,6 +23,7 @@ using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.CoreVersion;
 using WoWDatabaseEditorCore.Extensions;
+using WoWDatabaseEditorCore.Services;
 using WoWDatabaseEditorCore.Services.DotNetUtils;
 using WoWDatabaseEditorCore.Services.Http;
 using WoWDatabaseEditorCore.Services.NewItemService;
@@ -61,6 +62,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
         }
 
+        public string ProgramTitle { get; }
+        
         public QuickStartViewModel(ISolutionItemProvideService solutionItemProvideService, 
             IEnumerable<IWizardProvider> wizards,
             IEventAggregator eventAggregator,
@@ -77,12 +80,14 @@ namespace WoWDatabaseEditorCore.ViewModels
             IUrlOpenService urlOpenService,
             IDotNetService dotNetService,
             IWindowManager windowManager,
+            IProgramNameService programNameService,
             AboutViewModel aboutViewModel)
         {
             this.iconRegistry = iconRegistry;
             this.nameRegistry = nameRegistry;
             this.mostRecentlyUsedService = mostRecentlyUsedService;
             this.dotNetService = dotNetService;
+            ProgramTitle = programNameService.Title;
             Wizards.AddRange(wizards.Where(w => w.IsCompatibleWithCore(currentCoreVersion.Current)));
             HasWizards = Wizards.Count > 0;
             AboutViewModel = aboutViewModel;

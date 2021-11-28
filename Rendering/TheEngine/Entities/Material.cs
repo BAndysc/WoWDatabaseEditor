@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OpenGLBindings;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Handles;
 using TheMaths;
@@ -12,6 +13,20 @@ namespace TheEngine.Entities
         Back,
         Off
     }
+    
+    // openGL values on purpose
+    public enum DepthCompare
+    {
+        Never = 0x200,
+        Less,
+        Equal,
+        Lequal,
+        Greater,
+        Notequal,
+        Gequal,
+        Always
+    }
+    
     
     // openGL values on purpose
     public enum Blending
@@ -44,7 +59,7 @@ namespace TheEngine.Entities
 
         private Shader shader;
         public bool ZWrite = true;
-        public bool DepthTesting = true;
+        public DepthCompare DepthTesting = DepthCompare.Lequal;
         public CullingMode Culling = CullingMode.Back;
         public bool BlendingEnabled = false;
         public Blending SourceBlending = Blending.One;
@@ -74,7 +89,7 @@ namespace TheEngine.Entities
             this.shaderHandle = shaderHandle;
             this.shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
             ZWrite = shader.ZWrite;
-            DepthTesting = shader.DepthTest;
+            DepthTesting = (DepthCompare)shader.DepthTest;
 
             structuredBuffers = new Dictionary<int, INativeBuffer>();
             structuredVertexBuffers = new Dictionary<int, INativeBuffer>();

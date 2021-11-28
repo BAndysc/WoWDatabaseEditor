@@ -30,6 +30,8 @@ namespace TheEngine.Managers
             material.SourceBlending = Blending.SrcAlpha;
             material.DestinationBlending = Blending.OneMinusSrcAlpha;
             material.Culling = CullingMode.Off;
+            material.ZWrite = false;
+            material.DepthTesting = DepthCompare.Always;
             quad = engine.MeshManager.CreateMesh(new MeshData(new Vector3[]
             {
                 new(0, 0, 0),
