@@ -13,6 +13,7 @@ using WDE.MapRenderer.Managers;
 using WDE.Module.Attributes;
 using WDE.MpqReader;
 using WDE.MpqReader.Structures;
+using WDE.Common.Database;
 
 namespace WDE.MapRenderer
 {
@@ -27,17 +28,20 @@ namespace WDE.MapRenderer
         private Engine engine;
         public event Action? OnInitialized;
         public event Action? OnFailedInitialize;
+        public IDatabaseProvider database;
 
         public GameManager(IMpqService mpqService, 
             IGameView gameView,
             IMessageBoxService messageBoxService,
-            IDatabaseClientFileOpener databaseClientFileOpener)
+            IDatabaseClientFileOpener databaseClientFileOpener,
+            IDatabaseProvider database)
         {
             this.mpqService = mpqService;
             this.gameView = gameView;
             this.messageBoxService = messageBoxService;
             this.databaseClientFileOpener = databaseClientFileOpener;
             UpdateLoop = new UpdateManager(this);
+            this.database = database;
         }
         
         private bool TryOpenMpq(out IMpqArchive m)
@@ -84,6 +88,7 @@ namespace WDE.MapRenderer
             CameraManager = new CameraManager(this);
             LightingManager = new LightingManager(this);
             AreaTriggerManager = new AreaTriggerManager(this);
+            CreatureManager = new CreatureManager(this, database);
             RaycastSystem = new RaycastSystem(engine);
             ModuleManager = new ModuleManager(this, gameView); // must be last
             
@@ -134,6 +139,7 @@ namespace WDE.MapRenderer
             ModuleManager.Render();
             LightingManager.Render();
             AreaTriggerManager.Render();
+            CreatureManager.Render();
         }
 
         public void RenderGUI(float delta)
@@ -173,6 +179,7 @@ namespace WDE.MapRenderer
             NotificationsCenter.Dispose();
             LightingManager.Dispose();
             AreaTriggerManager.Dispose();
+            CreatureManager.Dispose();
             ChunkManager.Dispose();
             WmoManager.Dispose();
             MdxManager.Dispose();
@@ -194,6 +201,7 @@ namespace WDE.MapRenderer
             CameraManager = null!;
             LightingManager = null!;
             AreaTriggerManager = null;
+            CreatureManager = null!;
             RaycastSystem = null!;
             ModuleManager = null!;
         }
@@ -216,6 +224,7 @@ namespace WDE.MapRenderer
         public DbcManager DbcManager { get; private set; }
         public LightingManager LightingManager { get; private set; }
         public AreaTriggerManager AreaTriggerManager { get; private set; }
+        public CreatureManager CreatureManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
         public Map CurrentMap { get; private set; }
         public bool IsInitialized { get; private set; }

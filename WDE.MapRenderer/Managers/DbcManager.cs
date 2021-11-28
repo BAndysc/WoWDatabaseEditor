@@ -9,6 +9,9 @@ namespace WDE.MapRenderer.Managers
         private readonly IDatabaseClientFileOpener opener;
 
         public AreaTriggerStore AreaTriggerStore { get; }
+        public CreatureDisplayInfoStore CreatureDisplayInfoStore { get; }
+        // public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
+        public CreatureModelDataStore CreatureModelDataStore { get; }
         public MapStore MapStore { get; }
         public LightIntParamStore LightIntParamStore { get; }
         public LightFloatParamStore LightFloatParamStore { get; }
@@ -25,6 +28,9 @@ namespace WDE.MapRenderer.Managers
             this.gameContext = gameContext;
             this.opener = opener;
             AreaTriggerStore = new(OpenDbc("AreaTrigger"));
+            CreatureDisplayInfoStore = new(OpenDbc("CreatureDisplayInfo"));
+            // CreatureDisplayInfoExtraStore = new(OpenDbc("CreatureDisplayInfoExtra")); // for humanoids
+            CreatureModelDataStore = new(OpenDbc("CreatureModelData"));
             MapStore = new (OpenDbc("Map"));
             LightIntParamStore = new (OpenDbc("LightIntBand"));
             LightFloatParamStore = new (OpenDbc("LightFloatBand"));

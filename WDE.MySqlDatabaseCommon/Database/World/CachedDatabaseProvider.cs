@@ -19,6 +19,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         private List<ICreatureTemplate>? creatureTemplateCache;
         private Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
 
+        private List<ICreature>? creatureCache;
+        // private Dictionary<uint, ICreature> creatureByEntry = new();
+
         private List<IGameObjectTemplate>? gameObjectTemplateCache;
         private Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
 
@@ -96,6 +99,15 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreatureTemplate);
         }
 
+        private async Task<Type> RefreshCreature()
+        {
+            var templates = await nonCachedDatabase.GetCreaturesAsync().ConfigureAwait(false);
+            Dictionary<uint, ICreature> tempDict = templates.ToDictionary(t => t.Entry);
+            creatureCache = templates;
+            // creatureByEntry = tempDict;
+            return typeof(ICreature);
+        }
+
         public Task TryConnect()
         {
             return taskRunner.ScheduleTask(new DatabaseCacheTask(this));
@@ -141,6 +153,14 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                 return creatureTemplateCache;
 
             return nonCachedDatabase.GetCreatureTemplates();
+        }
+
+        public IEnumerable<ICreature> GetCreatures()
+        {
+            if (creatureCache != null)
+                return creatureCache;
+
+            return nonCachedDatabase.GetCreatures();
         }
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates()
@@ -283,6 +303,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
                     progress.Report(0, steps, "Loading creatures");
                     cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
+                    cache.creatureCache = await cache.nonCachedDatabase.GetCreaturesAsync();
 
                     progress.Report(1, steps, "Loading gameobjects");
                     cache.gameObjectTemplateCache = await cache.nonCachedDatabase.GetGameObjectTemplatesAsync();
@@ -343,6 +364,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                         questTemplateByEntry[entity.Entry] = entity;
 
                     cache.creatureTemplateByEntry = creatureTemplateByEntry;
+                    // cache.creatureByEntry = creatureByEntry;
                     cache.gameObjectTemplateByEntry = gameObjectTemplateByEntry;
                     cache.questTemplateByEntry = questTemplateByEntry;
                 }
