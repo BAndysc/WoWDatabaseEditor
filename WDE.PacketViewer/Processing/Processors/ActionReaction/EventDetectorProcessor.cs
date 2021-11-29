@@ -471,7 +471,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             //if (movementDetector.IsRandomMovementPacket(basePacket))
             //    return false;
 
-            if (movementDetector.RandomMovementPacketRatio(packet.Mover) > 0.75f)
+            if (movementDetector.RandomMovementPacketRatio(packet.Mover) > 0.55f)
                 return false;
             
             var originalSpline = waypointsProcessor.GetOriginalSpline(basePacket.Number);

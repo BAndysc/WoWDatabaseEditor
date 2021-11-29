@@ -14,13 +14,12 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
         public ActionReactionToTextProcessor(ActionGenerator actionGenerator,
             EventDetectorProcessor eventDetectorProcessor, 
-            IRandomMovementDetector randomMovementDetector, 
             IChatEmoteSoundProcessor chatEmoteSoundProcessor, 
             IWaypointProcessor waypointsProcessor, 
             IUnitPositionFollower unitPositionFollower,
             IUpdateObjectFollower updateObjectFollower,
             IPlayerGuidFollower playerGuidFollower,
-            IAuraSlotTracker auraSlotTracker) : base(actionGenerator, eventDetectorProcessor, randomMovementDetector, chatEmoteSoundProcessor, waypointsProcessor, unitPositionFollower, updateObjectFollower, playerGuidFollower, auraSlotTracker)
+            IAuraSlotTracker auraSlotTracker) : base(actionGenerator, eventDetectorProcessor, chatEmoteSoundProcessor, waypointsProcessor, unitPositionFollower, updateObjectFollower, playerGuidFollower, auraSlotTracker)
         {
         }
 

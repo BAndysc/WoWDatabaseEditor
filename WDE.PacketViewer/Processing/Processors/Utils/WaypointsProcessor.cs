@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TheMaths;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Utils;
 using WowPacketParser.Proto;
@@ -12,7 +11,7 @@ using WowPacketParser.Proto.Processing;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [UniqueProvider]
-    public interface IWaypointProcessor : IPacketProcessor<bool>
+    public interface IWaypointProcessor : IPacketProcessor<bool>, IRandomMovementDetector
     {
         Dictionary<UniversalGuid, UnitMovementState> State { get; }
         int? GetOriginalSpline(int packetNumber);
@@ -22,6 +21,8 @@ namespace WDE.PacketViewer.Processing.Processors
             public bool InCombat { get; set; }
             public DateTime LastMovement { get; set; }
             public uint LastMoveTime { get; set; }
+            public int LastDestroyed { get; set; }
+            public int LastMovementNumber { get; set; }
 
             public List<Path> Paths { get; } = new();
             public Segment? LastSegment { get; set; }
@@ -32,6 +33,7 @@ namespace WDE.PacketViewer.Processing.Processors
             public int FirstPacketNumber;
             public List<Segment> Segments { get; } = new();
 
+            public bool IsContinuationAfterPause;
             public uint TotalMoveTime => (uint)Segments.Sum(s => s.MoveTime);
         }
 
@@ -67,48 +69,6 @@ namespace WDE.PacketViewer.Processing.Processors
         }
     }
 
-    public class WaypointsToTextProcessor : IPacketProcessor<bool>, IPacketTextDumper
-    {
-        private readonly IWaypointProcessor waypointProcessor;
-
-        public WaypointsToTextProcessor(IWaypointProcessor waypointProcessor)
-        {
-            this.waypointProcessor = waypointProcessor;
-        }
-
-        public bool Process(PacketHolder packet) => waypointProcessor.Process(packet);
-
-        public async Task<string> Generate()
-        {
-            StringBuilder sb = new();
-            foreach (var unit in waypointProcessor.State)
-            {
-                if (unit.Value.Paths.Count == 0)
-                    continue;
-
-                sb.AppendLine("Creature " + unit.Key.ToWowParserString() + $" (entry: {unit.Key.Entry})");
-                int i = 0;
-                foreach (var path in unit.Value.Paths)
-                {
-                    sb.AppendLine("  Path " + i++);
-                    int j = 0;
-                    foreach (var segment in path.Segments)
-                    {
-                        sb.AppendLine("  Segment " + j++);
-                        foreach (var p in segment.Waypoints)
-                        {
-                            sb.AppendLine($"    ({p.X}, {p.Y}, {p.Z})");
-                        }
-                    }
-
-                    sb.AppendLine("");
-                }
-            }
-
-            return sb.ToString();
-        }
-    }
-
     [AutoRegister]
     public class WaypointsProcessor : PacketProcessor<bool>, IWaypointProcessor
     {
@@ -122,7 +82,7 @@ namespace WDE.PacketViewer.Processing.Processors
             
             return State[guid] = new IWaypointProcessor.UnitMovementState();
         }
-        
+
         protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
         {
             var state = Get(packet.Mover);
@@ -141,12 +101,16 @@ namespace WDE.PacketViewer.Processing.Processors
 
             var timeSinceLastMovement = basePacket.Time.ToDateTime() - state.LastMovement;
 
-            if (state.LastMoveTime == 0 || timeSinceLastMovement.TotalMilliseconds > state.LastMoveTime)
+            bool resumeAfterPause = timeSinceLastMovement.TotalMilliseconds >= state.LastMoveTime;
+            bool firstMovementAfterSpawn = state.LastDestroyed > 0;
+            state.LastDestroyed = 0;
+            
+            if (state.LastMoveTime == 0 || resumeAfterPause)
             {
-                state.Paths.Add(new IWaypointProcessor.Path(){FirstPacketNumber = basePacket.Number});
+                state.Paths.Add(new IWaypointProcessor.Path(){FirstPacketNumber = basePacket.Number, IsContinuationAfterPause = !firstMovementAfterSpawn && resumeAfterPause});
                 state.LastSegment = null;
             }
-            else if (state.Paths.Count > 0 && timeSinceLastMovement.TotalMilliseconds < state.LastMoveTime)
+            else if (state.Paths.Count > 0 && !resumeAfterPause)
             {
                 Debug.Assert(state.LastSegment != null);
                 PacketToOriginalSplinePacket[basePacket.Number] = state.Paths[^1].FirstPacketNumber;
@@ -213,6 +177,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
             state.LastMovement = basePacket.Time.ToDateTime();
             state.LastMoveTime = packet.MoveTime;
+            state.LastMovementNumber = basePacket.Number;
             
             return true;
         }
@@ -231,6 +196,16 @@ namespace WDE.PacketViewer.Processing.Processors
                     Get(update.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
             }
 
+            foreach (var destroyed in packet.Destroyed)
+            {
+                Get(destroyed.Guid).LastDestroyed = basePacket.Number;
+            }
+
+            foreach (var outOfRange in packet.OutOfRange)
+            {
+                Get(outOfRange.Guid).LastDestroyed = basePacket.Number;
+            }
+
             return true;
         }
         
@@ -239,6 +214,53 @@ namespace WDE.PacketViewer.Processing.Processors
             if (PacketToOriginalSplinePacket.TryGetValue(packetNumber, out var original))
                 return original;
             return null;
+        }
+
+        public float RandomMovementPacketRatio(UniversalGuid guid)
+        {
+            if (!State.TryGetValue(guid, out var state))
+                return -1;
+
+            Vector2 prevPoint = Vector2.Zero;
+            Vector2 thisPoint = Vector2.Zero;
+            Vector2 prevForward = Vector2.Zero;
+            float anglesSum = 0;
+            int anglesCount = 0;
+
+            int i = 0;
+            foreach (var path in state.Paths)
+            {
+                bool pathAfterDespawn = !path.IsContinuationAfterPause;
+                if (path.IsContinuationAfterPause)
+                {
+                    anglesSum += -1; // each pause means higher chance of random movement
+                    anglesCount += 1;
+                }
+                foreach (var s in path.Segments)
+                {
+                    foreach (var w in s.Waypoints)
+                    {
+                        thisPoint = new Vector2(w.X, w.Y);
+                        var thisForward = (thisPoint - prevPoint).Normalized;
+                        var dotProduct = Vector2.Dot(prevForward, thisForward);
+
+                        if (i >= 2 && !pathAfterDespawn)
+                        {
+                            anglesSum += dotProduct;
+                            anglesCount += 1;
+                        }
+                
+                        prevPoint = thisPoint;
+                        prevForward = thisForward;
+                        i++;
+                        pathAfterDespawn = false;
+                    }
+                }   
+            }
+
+            if (anglesCount == 0)
+                return 0.5f;
+            return 1 - ((anglesSum / anglesCount) / 2 + 0.5f);
         }
     }
 }

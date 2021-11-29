@@ -16,7 +16,6 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
     public class ActionReactionProcessorCreator : IActionReactionProcessorCreator
     {
         private readonly ISpellService spellService;
-        private readonly Func<RandomMovementDetector> random;
         private readonly Func<IUnitPositionFollower> unitFollower;
         private readonly Func<IChatEmoteSoundProcessor> chatEmote;
         private readonly Func<IWaypointProcessor> waypointProcessor;
@@ -27,7 +26,6 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
         public ActionReactionProcessorCreator(
             ISpellService spellService,
-            Func<RandomMovementDetector> random,
             Func<IUnitPositionFollower> unitFollower,
             Func<IChatEmoteSoundProcessor> chatEmote,
             Func<IWaypointProcessor> waypointProcessor,
@@ -37,7 +35,6 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             Func<IDatabaseProvider> databaseProvider)
         {
             this.spellService = spellService;
-            this.random = random;
             this.unitFollower = unitFollower;
             this.chatEmote = chatEmote;
             this.waypointProcessor = waypointProcessor;
@@ -51,16 +48,14 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         {
             var unitFollower = this.unitFollower();
             var chatEmote = this.chatEmote();
-            var random = this.random();
             var waypointProcessor = this.waypointProcessor();
             var update = this.update();
             var player = this.player();
             var auraSlotTracker = this.auraSlotTracker();
             return new ActionReactionProcessor(
                 new ActionGenerator(spellService, unitFollower, chatEmote, update, player, waypointProcessor, auraSlotTracker),
-                new EventDetectorProcessor(spellService, unitFollower, random, chatEmote, waypointProcessor, update,
+                new EventDetectorProcessor(spellService, unitFollower, waypointProcessor, chatEmote, waypointProcessor, update,
                     player, auraSlotTracker, databaseProvider()),
-                random,
                 chatEmote,
                 waypointProcessor,
                 unitFollower,
@@ -71,16 +66,14 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         {
             var unitFollower = this.unitFollower();
             var chatEmote = this.chatEmote();
-            var random = this.random();
             var waypointProcessor = this.waypointProcessor();
             var update = this.update();
             var player = this.player();
             var auraSlotTracker = this.auraSlotTracker();
             return new ActionReactionToTextProcessor(
                 new ActionGenerator(spellService, unitFollower, chatEmote, update, player, waypointProcessor, auraSlotTracker),
-                new EventDetectorProcessor(spellService, unitFollower, random, chatEmote, waypointProcessor, update,
+                new EventDetectorProcessor(spellService, unitFollower, waypointProcessor, chatEmote, waypointProcessor, update,
                     player, auraSlotTracker, databaseProvider()),
-                random,
                 chatEmote,
                 waypointProcessor,
                 unitFollower,

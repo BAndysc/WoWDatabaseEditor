@@ -12,7 +12,6 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
     {
         private readonly ActionGenerator actionGenerator;
         private readonly EventDetectorProcessor eventDetectorProcessor;
-        private readonly IRandomMovementDetector randomMovementDetector;
         private readonly IChatEmoteSoundProcessor chatEmoteSoundProcessor;
         private readonly IWaypointProcessor waypointsProcessor;
         private readonly IUnitPositionFollower unitPositionFollower;
@@ -23,7 +22,6 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         public ActionReactionProcessor(
             ActionGenerator actionGenerator,
             EventDetectorProcessor eventDetectorProcessor,
-            IRandomMovementDetector randomMovementDetector, 
             IChatEmoteSoundProcessor chatEmoteSoundProcessor, 
             IWaypointProcessor waypointsProcessor,
             IUnitPositionFollower unitPositionFollower,
@@ -33,7 +31,6 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         {
             this.actionGenerator = actionGenerator;
             this.eventDetectorProcessor = eventDetectorProcessor;
-            this.randomMovementDetector = randomMovementDetector;
             this.chatEmoteSoundProcessor = chatEmoteSoundProcessor;
             this.waypointsProcessor = waypointsProcessor;
             this.unitPositionFollower = unitPositionFollower;
@@ -353,7 +350,6 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
         public bool PreProcess(PacketHolder packet)
         {
-            randomMovementDetector.Process(packet);
             chatEmoteSoundProcessor.Process(packet);
             waypointsProcessor.Process(packet);
             return true;

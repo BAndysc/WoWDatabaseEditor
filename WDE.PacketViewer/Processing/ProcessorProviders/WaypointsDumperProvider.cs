@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Processing.Processors;
+using WDE.PacketViewer.Processing.Processors.Utils;
 
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
