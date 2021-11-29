@@ -11,16 +11,22 @@ namespace WDE.TrinityMySqlDatabase.Models
     {
         private readonly bool alternateNames;
         private readonly bool master;
+        private readonly bool azeroth;
+        private readonly bool cata;
+        private readonly bool wrath;
 
         public TrinityDatabase(ICoreVersion coreVersion) : base("Trinity")
         {
             this.alternateNames = coreVersion.DatabaseFeatures.AlternativeTrinityDatabase;
+            wrath = coreVersion.Tag == "TrinityWrath";
+            cata = coreVersion.Tag == "TrinityCata";
+            azeroth = coreVersion.Tag == "Azeroth";
             master = coreVersion.Tag == "TrinityMaster";
         }
 
         public ITable<MySqlAreaTriggerScript> AreaTriggerScript => GetTable<MySqlAreaTriggerScript>();
         public ITable<MySqlCreatureTemplate> CreatureTemplate => GetTable<MySqlCreatureTemplate>();
-        public ITable<MySqlCreature> Creature => GetTable<MySqlCreature>();
+        public ITable<ICreature> Creature => GetTable<MySqlCreatureWrath, MySqlCreatureWrath, MySqlCreatureCata, ICreature>(() => wrath || azeroth, () => cata || master);
         public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
         public ITable<MySqlGameObjectTemplate> GameObjectTemplate => GetTable<MySqlGameObjectTemplate>();
         public ITable<MySqlGameObject> GameObject => GetTable<MySqlGameObject>();

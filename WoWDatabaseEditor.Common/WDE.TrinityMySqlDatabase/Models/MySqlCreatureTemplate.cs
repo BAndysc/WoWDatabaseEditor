@@ -1,4 +1,5 @@
-﻿using LinqToDB.Mapping;
+﻿using System;
+using LinqToDB.Mapping;
 using WDE.Common.Database;
 
 namespace WDE.TrinityMySqlDatabase.Models
@@ -11,6 +12,21 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "entry")]
         public uint Entry { get; set; }
 
+        [Column(Name = "modelid1")]
+        public uint ModelId1 { get; set; }
+
+        [Column(Name = "modelid2")]
+        public uint ModelId2 { get; set; }
+
+        [Column(Name = "modelid3")]
+        public uint ModelId3 { get; set; }
+
+        [Column(Name = "modelid4")]
+        public uint ModelId4 { get; set; }
+
+        [Column(Name = "scale")]
+        public uint Scale { get; set; }
+
         [Column(Name = "gossip_menu_id")] 
         public uint GossipMenuId { get; set; }
 
@@ -22,5 +38,23 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ScriptName")]
         public string ScriptName { get; set; } = "";
+
+        public int ModelsCount => 4;
+        public uint GetModel(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return ModelId1;
+                case 1:
+                    return ModelId2;
+                case 2:
+                    return ModelId3;
+                case 3:
+                    return ModelId4;
+            }
+
+            throw new Exception("Model out of range");
+        }
     }
 }

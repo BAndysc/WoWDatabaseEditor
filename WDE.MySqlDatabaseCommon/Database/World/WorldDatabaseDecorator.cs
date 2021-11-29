@@ -67,6 +67,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IGameObject? GetGameObjectByGuid(uint guid) => impl.GetGameObjectByGuid(guid);
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => impl.GetCreaturesByEntry(entry);
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => impl.GetGameObjectsByEntry(entry);
+        public IEnumerable<ICreature> GetCreatures() => impl.GetCreatures();
 
         public IEnumerable<ICoreCommandHelp> GetCommands() => impl.GetCommands();
         public Task<IList<ITrinityString>> GetStringsAsync() => impl.GetStringsAsync();

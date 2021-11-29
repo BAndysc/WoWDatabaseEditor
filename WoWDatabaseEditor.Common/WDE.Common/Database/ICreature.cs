@@ -6,6 +6,7 @@ namespace WDE.Common.Database
         uint Entry { get; }
         
         uint Map { get; }
+        uint? PhaseMask { get; }
         float X { get; }
         float Y { get; }
         float Z { get; }

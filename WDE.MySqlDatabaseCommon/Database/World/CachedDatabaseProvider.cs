@@ -19,6 +19,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         private List<ICreatureTemplate>? creatureTemplateCache;
         private Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
 
+        private List<ICreature>? creatureCache;
+       
         private List<IGameObjectTemplate>? gameObjectTemplateCache;
         private Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
 
@@ -58,6 +60,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             {
                 if (tableName == "creature_template")
                     Refresh(RefreshCreatureTemplate);
+                if (tableName == "creature")
+                    Refresh(RefreshCreature);
                 else if (tableName == "gossip_menu")
                     Refresh(RefreshGossipMenu);
                 else if (tableName == "npc_text")
@@ -96,6 +100,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreatureTemplate);
         }
 
+        private async Task<Type> RefreshCreature()
+        {
+            var templates = await nonCachedDatabase.GetCreaturesAsync().ConfigureAwait(false);
+            creatureCache = templates;
+            return typeof(ICreature);
+        }
+
         public Task TryConnect()
         {
             return taskRunner.ScheduleTask(new DatabaseCacheTask(this));
@@ -108,7 +119,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (creatureTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return null;//nonCachedDatabase.GetCreatureTemplate(entry);
+            return nonCachedDatabase.GetCreatureTemplate(entry);
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
@@ -116,7 +127,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (gameObjectTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return null;//nonCachedDatabase.GetGameObjectTemplate(entry);
+            return nonCachedDatabase.GetGameObjectTemplate(entry);
         }
 
         public IQuestTemplate? GetQuestTemplate(uint entry)
@@ -124,7 +135,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (questTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return null;//nonCachedDatabase.GetQuestTemplate(entry);
+            return nonCachedDatabase.GetQuestTemplate(entry);
         }
 
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
@@ -141,6 +152,14 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                 return creatureTemplateCache;
 
             return nonCachedDatabase.GetCreatureTemplates();
+        }
+
+        public IEnumerable<ICreature> GetCreatures()
+        {
+            if (creatureCache != null)
+                return creatureCache;
+
+            return nonCachedDatabase.GetCreatures();
         }
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates()
@@ -283,6 +302,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
                     progress.Report(0, steps, "Loading creatures");
                     cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
+                    
+                    // disabled caching for now, because it may be not needed yet
+                    // cache.creatureCache = await cache.nonCachedDatabase.GetCreaturesAsync();
 
                     progress.Report(1, steps, "Loading gameobjects");
                     cache.gameObjectTemplateCache = await cache.nonCachedDatabase.GetGameObjectTemplatesAsync();

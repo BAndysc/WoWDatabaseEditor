@@ -486,6 +486,18 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.GameObject.Where(g => g.Entry == entry).ToList();
         }
 
+        public IEnumerable<ICreature> GetCreatures()
+        {
+            using var model = Database();
+            return model.Creature.OrderBy(t => t.Entry).ToList<ICreature>();
+        }
+
+        public async Task<List<ICreature>> GetCreaturesAsync()
+        {
+            await using var model = Database();
+            return await model.Creature.OrderBy(t => t.Entry).ToListAsync<ICreature>();
+        }
+
         public IEnumerable<ICoreCommandHelp> GetCommands()
         {
             using var model = Database();

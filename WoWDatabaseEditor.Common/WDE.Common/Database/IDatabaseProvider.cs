@@ -59,6 +59,7 @@ namespace WDE.Common.Database
         IGameObject? GetGameObjectByGuid(uint guid);
         IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
         IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
+        IEnumerable<ICreature> GetCreatures();
 
         IEnumerable<ICoreCommandHelp> GetCommands();
         Task<IList<ITrinityString>> GetStringsAsync();

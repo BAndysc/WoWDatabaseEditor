@@ -71,6 +71,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => Enumerable.Empty<ICreature>();
 
+        public IEnumerable<ICreature> GetCreatures() => Enumerable.Empty<ICreature>();
+
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => Enumerable.Empty<IGameObject>();
 
         public IEnumerable<ICoreCommandHelp> GetCommands() => Enumerable.Empty<ICoreCommandHelp>();
@@ -80,6 +82,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync() => Task.FromResult<IList<IDatabaseSpellDbc>>(new List<IDatabaseSpellDbc>());
         
         public Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult(new List<ICreatureTemplate>());
+
+        public Task<List<ICreature>> GetCreaturesAsync() => Task.FromResult(new List<ICreature>());
 
         public Task<List<IConversationTemplate>> GetConversationTemplatesAsync() => Task.FromResult(new List<IConversationTemplate>());
         
