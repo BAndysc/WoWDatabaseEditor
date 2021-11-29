@@ -8,6 +8,7 @@ namespace WDE.MapRenderer.Managers
         private readonly IGameContext gameContext;
         private readonly IDatabaseClientFileOpener opener;
 
+        public AreaTriggerStore AreaTriggerStore { get; }
         public MapStore MapStore { get; }
         public LightIntParamStore LightIntParamStore { get; }
         public LightFloatParamStore LightFloatParamStore { get; }
@@ -23,6 +24,7 @@ namespace WDE.MapRenderer.Managers
         {
             this.gameContext = gameContext;
             this.opener = opener;
+            AreaTriggerStore = new(OpenDbc("AreaTrigger"));
             MapStore = new (OpenDbc("Map"));
             LightIntParamStore = new (OpenDbc("LightIntBand"));
             LightFloatParamStore = new (OpenDbc("LightFloatBand"));
