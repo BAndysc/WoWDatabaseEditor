@@ -22,28 +22,19 @@
       <None Update="internalShaders\theengine.cginc">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="internalShaders\blit.frag">
+      <None Update="internalShaders\*.frag">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="internalShaders\blit.json">
+      <None Update="internalShaders\*.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="internalShaders\blit.vert">
+      <None Update="internalShaders\*.vert">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="fonts\calibri.fnt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="fonts\calibri.png">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="internalShaders\sdf.frag">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="internalShaders\sdf.vert">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="internalShaders\sdf.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

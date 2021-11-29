@@ -15,6 +15,7 @@ namespace TheEngine.Managers
         private readonly Engine engine;
         private readonly ShaderHandle textShader;
         private readonly Material material;
+        private readonly Material worldMaterial;
         private readonly IMesh quad;
         private readonly NativeBuffer<Vector4> glyphUVsBuffer;
         private readonly NativeBuffer<Vector4> glyphPositionsBuffer;
@@ -25,6 +26,14 @@ namespace TheEngine.Managers
         {
             this.engine = engine;
             textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json");
+            worldMaterial = engine.MaterialManager.CreateMaterial("internalShaders/world_text.json");
+            worldMaterial.BlendingEnabled = true;
+            worldMaterial.SourceBlending = Blending.SrcAlpha;
+            worldMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
+            worldMaterial.Culling = CullingMode.Off;
+            worldMaterial.ZWrite = false;
+            worldMaterial.DepthTesting = DepthCompare.Always;
+
             material = engine.MaterialManager.CreateMaterial(textShader);
             material.BlendingEnabled = true;
             material.SourceBlending = Blending.SrcAlpha;
@@ -49,6 +58,9 @@ namespace TheEngine.Managers
             glyphUVsBuffer = engine.Device.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             material.SetBuffer("glpyhUVs", glyphUVsBuffer);
             material.SetBuffer("glyphPositions", glyphPositionsBuffer);
+            
+            worldMaterial.SetBuffer("glpyhUVs", glyphUVsBuffer);
+            worldMaterial.SetBuffer("glyphPositions", glyphPositionsBuffer);
         }
 
         public void Dispose()
@@ -71,7 +83,56 @@ namespace TheEngine.Managers
             glyphUVsBuffer.UpdateBuffer(glyphUVs);
             engine.RenderManager.RenderInstancedIndirect(quad, material, 0, 1);
         }
-        
+
+        public void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld)
+        {
+            var fontDef = engine.fontManager.GetFont(font);
+            worldMaterial.SetUniform("fillColor", Vector4.One);
+            worldMaterial.SetUniformInt("mode", 0);
+            worldMaterial.SetTexture("font", engine.fontManager.GetTexture(font));
+
+            var measurement = MeasureText(font, text, fontSize);
+            
+            fontSize = fontSize / fontDef.BaseSize;
+
+            int glyphsCount = 0;
+            if (glyphPositions.Length < text.Length)
+            {
+                glyphPositions = new Vector4[text.Length];
+                glyphUVs = new Vector4[text.Length];
+            }
+            
+            float xPixel = -measurement.X * pivot.X;
+            float yPixel = -measurement.Y * pivot.Y;
+            foreach (var chr in text)
+            {
+                if (chr == '\n')
+                {
+                    yPixel += fontDef.LineHeight * fontSize;
+                    xPixel = -measurement.X * pivot.Y;
+                    continue;
+                }
+                
+                ref var charDef = ref fontDef.GetChar(chr);
+
+                Vector4 glyphUv = new Vector4(1.0f * charDef.x / fontDef.Width,
+                    1.0f * charDef.y / fontDef.Height,
+                    1.0f * charDef.w / fontDef.Width,
+                    1.0f * charDef.h / fontDef.Height);
+
+                Vector4 glyphPosition = new Vector4(xPixel + charDef.xOff * fontSize, yPixel  + charDef.h * fontSize + charDef.yOff * fontSize, charDef.w * fontSize, charDef.h * fontSize);
+                
+                glyphUVs[glyphsCount] = glyphUv;
+                glyphPositions[glyphsCount++]  = glyphPosition;
+                
+                xPixel += charDef.xAdv * fontSize;
+            }
+            
+            glyphPositionsBuffer.UpdateBuffer(glyphPositions);
+            glyphUVsBuffer.UpdateBuffer(glyphUVs);
+            engine.RenderManager.RenderInstancedIndirect(quad, worldMaterial, 0, glyphsCount, localToWorld);
+        }
+
         public void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth, Vector4 color)
         {
             var fontDef = engine.fontManager.GetFont(font);

@@ -555,6 +555,22 @@ namespace TheEngine.Managers
             Render(mesh, material, submesh, matrix);
         }
 
+        public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount, Matrix localToWorld, Matrix? worldToLocal = null)
+        {
+            if (!worldToLocal.HasValue)
+                worldToLocal = Matrix.Invert(localToWorld);
+            material.Shader.Activate();
+            EnableMaterial(material);
+            objectData.WorldMatrix = localToWorld;
+            objectData.InverseWorldMatrix = worldToLocal.Value;
+            objectBuffer.UpdateBuffer(ref objectData);
+            
+            mesh.Activate();
+            var start = mesh.IndexStart(submesh);
+            var count = mesh.IndexCount(submesh);
+            engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0);
+        }
+
         public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount)
         {
             material.Shader.Activate();

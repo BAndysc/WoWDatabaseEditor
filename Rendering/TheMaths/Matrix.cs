@@ -2920,7 +2920,7 @@ namespace TheMaths
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
         /// <param name="result">When the method completes, contains the created transformation matrix.</param>
-        public static void Transformation(ref Vector3 scalingCenter, ref Quaternion scalingRotation, ref Vector3 scaling, ref Vector3 rotationCenter, ref Quaternion rotation, ref Vector3 translation, out Matrix result)
+        public static void Transformation(in Vector3 scalingCenter, in Quaternion scalingRotation, in Vector3 scaling, in Vector3 rotationCenter, in Quaternion rotation, in Vector3 translation, out Matrix result)
         {
             Matrix sr = RotationQuaternion(scalingRotation);
 
@@ -2938,11 +2938,16 @@ namespace TheMaths
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
         /// <returns>The created transformation matrix.</returns>
-        public static Matrix Transformation(Vector3 scalingCenter, Quaternion scalingRotation, Vector3 scaling, Vector3 rotationCenter, Quaternion rotation, Vector3 translation)
+        public static Matrix Transformation(in Vector3 scalingCenter, in Quaternion scalingRotation, in Vector3 scaling, in Vector3 rotationCenter, in Quaternion rotation, in Vector3 translation)
         {
             Matrix result;
-            Transformation(ref scalingCenter, ref scalingRotation, ref scaling, ref rotationCenter, ref rotation, ref translation, out result);
+            Transformation(in scalingCenter, in scalingRotation, in scaling, in rotationCenter, in rotation, in translation, out result);
             return result;
+        }
+
+        public static Matrix TRS(in Vector3 position, in Quaternion rotation, in Vector3 scale)
+        {
+            return Transformation(in Vector3.Zero, in Quaternion.Identity, in scale, in Vector3.Zero, in rotation, in position);
         }
 
         /// <summary>

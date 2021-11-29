@@ -12,6 +12,7 @@ namespace TheEngine.Interfaces
         void Render(IMesh mesh, Material material, int submesh, Transform transform);
         void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null);
         void Render(IMesh mesh, Material material, int submesh, Vector3 position);
+        void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count, Matrix localToWorld, Matrix? worldToLocal = null);
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count);
         float ViewDistanceModifier { get; set; }
     }
