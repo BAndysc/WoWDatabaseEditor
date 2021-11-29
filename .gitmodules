@@ -10,3 +10,6 @@
 [submodule "Prism.Avalonia"]
 	path = Prism.Avalonia
 	url = https://github.com/BAndysc/Prism.Avalonia
+[submodule "DBCD"]
+	path = DBCD
+	url = https://github.com/wowdev/DBCD

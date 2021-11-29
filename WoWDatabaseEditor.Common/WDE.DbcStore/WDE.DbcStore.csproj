@@ -10,6 +10,7 @@
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DBCD\DBCD\DBCD.csproj" />
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
