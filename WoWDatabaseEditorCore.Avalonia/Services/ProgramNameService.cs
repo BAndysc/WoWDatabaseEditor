@@ -8,5 +8,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Services
     public class ProgramNameService : IProgramNameService
     {
         public string Title => Program.ApplicationName;
+        public string Subtitle => "";
     }
 }

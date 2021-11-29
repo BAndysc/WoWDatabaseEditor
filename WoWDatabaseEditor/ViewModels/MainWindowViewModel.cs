@@ -60,6 +60,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
             Title = programNameService.Title;
+            Subtitle = programNameService.Subtitle;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
             ExecuteChangedCommand = new DelegateCommand(() =>
             {
@@ -163,6 +164,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         public List<IMainMenuItem> MenuItemProviders { get; }
 
         public string Title { get; }
+        
+        public string Subtitle { get; }
 
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
 

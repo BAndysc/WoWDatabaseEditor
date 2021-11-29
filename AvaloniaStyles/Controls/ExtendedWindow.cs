@@ -36,6 +36,9 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<IControl> OverlayProperty =
             AvaloniaProperty.Register<ExtendedWindow, IControl>(nameof(Overlay));
         
+        public static readonly StyledProperty<string> SubTitleProperty =
+                AvaloniaProperty.Register<ExtendedWindow, string>(nameof(SubTitle));
+        
         public IImage ManagedIcon
         {
             get => GetValue(ManagedIconProperty);
@@ -70,6 +73,12 @@ namespace AvaloniaStyles.Controls
         {
             get => GetValue(OverlayProperty);
             set => SetValue(OverlayProperty, value);
+        }
+
+        public string SubTitle
+        {
+            get => GetValue(SubTitleProperty);
+            set => SetValue(SubTitleProperty, value);
         }
         
         public TabStrip TabStrip

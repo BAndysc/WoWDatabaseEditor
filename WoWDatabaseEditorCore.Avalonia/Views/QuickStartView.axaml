@@ -85,6 +85,7 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                     <Image Source="../Icon.png" Width="56" Height="56" />
                     <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow" Text="{Binding ProgramTitle}" />
+                    <TextBlock VerticalAlignment="Bottom" FontSize="20" Opacity="0.7" Margin="10,0,0,0" TextWrapping="WrapWithOverflow" Text="{Binding ProgramSubtitle}" />
                 </StackPanel>
             </Border>
             

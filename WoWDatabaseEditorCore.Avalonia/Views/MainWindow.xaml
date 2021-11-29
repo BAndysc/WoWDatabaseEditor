@@ -18,6 +18,7 @@
           ExtendClientAreaTitleBarHeightHint="38"
           ExtendClientAreaToDecorationsHint="True"
           utils:MenuBind.MenuItemsGestures="{Binding MenuItemProviders}"
+          SubTitle="{Binding Subtitle}"
           Title="{Binding Title}">
 
     <NativeMenu.Menu>

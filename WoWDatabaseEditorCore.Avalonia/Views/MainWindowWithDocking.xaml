@@ -18,6 +18,7 @@
           Icon="../Icon.png"
           ManagedIcon="../Icon.png"
           Name="Root"
+          SubTitle="{Binding Subtitle}"
           Classes="MainWindow"
           utils:MenuBind.MenuItemsGestures="{Binding MenuItemProviders}"
           Title="{Binding Title}">

@@ -6,5 +6,6 @@ namespace WoWDatabaseEditorCore.Services
     public interface IProgramNameService
     {
         string Title { get; }
+        string Subtitle { get; }
     }
 }

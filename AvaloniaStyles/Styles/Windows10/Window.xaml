@@ -35,12 +35,21 @@
                                         <Image Source="{TemplateBinding ManagedIcon}" DockPanel.Dock="Left" Width="24"/>
                                         <NativeMenuBar DockPanel.Dock="Left" />
                                         <controls1:WindowControlButtons DockPanel.Dock="Right"/>
-                                        <TextBlock 
-                                            IsHitTestVisible="False" 
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center" 
-                                            Foreground="{DynamicResource TitleBarForeground}"
-                                            Text="{TemplateBinding Title}" />
+                                        <StackPanel ClipToBounds="True" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock 
+                                                IsHitTestVisible="False" 
+                                                VerticalAlignment="Center" 
+                                                Opacity="0.9"
+                                                Foreground="{DynamicResource TitleBarForeground}"
+                                                Text="{TemplateBinding Title}" />
+                                            <TextBlock 
+                                                IsHitTestVisible="False" 
+                                                VerticalAlignment="Center" 
+                                                Margin="10,0,0,0"
+                                                Opacity="0.5"
+                                                Foreground="{DynamicResource TitleBarForeground}"
+                                                Text="{TemplateBinding SubTitle}" />
+                                        </StackPanel>
                                     </DockPanel>
                                     <controls1:ToolbarPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="5,2,2,2">
                                         <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />

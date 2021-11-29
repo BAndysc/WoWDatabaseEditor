@@ -10,6 +10,8 @@ environment:
     secure: SXvCUsowLsFFH1P7e3IsqldBlcPD0gQ8qpsSM8s73VUImWk+NW0dbnLjbytCriqD6O3+FiBLKWkE/v0bNckEJkwFDU8y2ZuNjmB2NIyAQViPyi72/a3vRPM7ruJH+BY0
 install:
 - cmd: git submodule update --init --recursive
+before_build:
+- ps: (Get-Content WoWDatabaseEditorCore.Avalonia/Services/ProgramNameService.cs) -replace 'Subtitle => ""', 'Subtitle => "for open source emulator use"' | Out-File -encoding UTF8 WoWDatabaseEditorCore.Avalonia/Services/ProgramNameService.cs
 build_script:
 - cmd: >-
     Rem Building WDE

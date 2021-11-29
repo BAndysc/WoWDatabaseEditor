@@ -64,6 +64,8 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public string ProgramTitle { get; }
         
+        public string ProgramSubtitle { get; }
+        
         public QuickStartViewModel(ISolutionItemProvideService solutionItemProvideService, 
             IEnumerable<IWizardProvider> wizards,
             IEventAggregator eventAggregator,
@@ -88,6 +90,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.mostRecentlyUsedService = mostRecentlyUsedService;
             this.dotNetService = dotNetService;
             ProgramTitle = programNameService.Title;
+            ProgramSubtitle = programNameService.Subtitle;
             Wizards.AddRange(wizards.Where(w => w.IsCompatibleWithCore(currentCoreVersion.Current)));
             HasWizards = Wizards.Count > 0;
             AboutViewModel = aboutViewModel;
