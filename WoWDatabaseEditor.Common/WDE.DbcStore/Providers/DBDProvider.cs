@@ -2,46 +2,58 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Text;
+using WDE.Common.Services;
+using WDE.Module.Attributes;
 
 namespace WDE.DbcStore.Providers
 {
+    [AutoRegister]
     public class DBDProvider : IDBDProvider
     {
         private static Uri BaseURI = new Uri("https://raw.githubusercontent.com/wowdev/WoWDBDefs/master/definitions/");
-        private static string CachePath = "dbdCache/";
-        private HttpClient client = new HttpClient();
+        private static string CachePath = "~/dbdCache/";
+        private HttpClient client;
+        readonly IFileSystem fileSystem;
 
-        public DBDProvider()
+        public DBDProvider(HttpClient client, IFileSystem fileSystem)
         {
-            if (!Directory.Exists(CachePath))
-                Directory.CreateDirectory(CachePath);
+            this.client = client;
+            this.fileSystem = fileSystem;
 
-            client.BaseAddress = BaseURI;
+            this.client.BaseAddress = BaseURI;
         }
 
         public Stream StreamForTableName(string tableName, string build = null)
         {
             string dbdName = Path.GetFileName(tableName).Replace(".db2", ".dbd");
 
-            if (!File.Exists($"{CachePath}/{dbdName}") || (DateTime.Now - File.GetLastWriteTime($"{CachePath}/{dbdName}")).TotalHours > 24)
+            if (!fileSystem.Exists($"{CachePath}/{dbdName}") || (DateTime.Now - fileSystem.GetLastWriteTime($"{CachePath}/{dbdName}")).TotalHours > 24)
             {
                 try
                 {
-                    var bytes = client.GetByteArrayAsync(dbdName).Result;
-                    File.WriteAllBytes($"{CachePath}/{dbdName}", bytes);
+                    var webRequest = new HttpRequestMessage(HttpMethod.Get, "https://raw.githubusercontent.com/wowdev/WoWDBDefs/master/definitions/" + dbdName);                   
+                    var response = client.Send(webRequest);
+
+                    using var reader = new StreamReader(response.Content.ReadAsStream());
+                    var bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
+
+                    var f = fileSystem.OpenWrite($"{CachePath}/{dbdName}");
+                    f.Write(bytes);
+                    f.Close();
 
                     return new MemoryStream(bytes);
                 }
                 catch (HttpRequestException /*requestException*/)
                 {
-                    if (File.Exists($"{CachePath}/{dbdName}"))
-                        return new MemoryStream(File.ReadAllBytes($"{CachePath}/{dbdName}"));
+                    if (fileSystem.Exists($"{CachePath}/{dbdName}"))
+                        return new MemoryStream(fileSystem.ReadAllBytes($"{CachePath}/{dbdName}"));
                     else
                         return null;
                 }
             }
             else
-                return new MemoryStream(File.ReadAllBytes($"{CachePath}/{dbdName}"));
+                return new MemoryStream(fileSystem.ReadAllBytes($"{CachePath}/{dbdName}"));
         }
     }
 }
