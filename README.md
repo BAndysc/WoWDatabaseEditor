@@ -8,9 +8,7 @@ This project is a continuation of [Visual SAI Studio](https://github.com/Bandysc
 # Supported server versions
 
  * Supported database: TC 3.3.5, TC 4.3.4 ("preservation project"), TC master (9.0.x), AzerothCore (3.3.5)
- * Supported DBC: 3.3.5, 4.3.4 
- 
- (9.0.x dbc support in progress)
+ * Supported DBC: 3.3.5, 4.3.4, 9.0.1 - 9.1.5
 
 # Sponsors
 
