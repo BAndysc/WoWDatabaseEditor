@@ -387,7 +387,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
         {
-            if (randomMovementDetector.RandomMovementPacketRatio(packet.Mover) > 0.90f)
+            if (randomMovementDetector.RandomMovementPacketRatio(packet.Mover) > 0.65f)
                 return false;
 
             bool lastPathSegmentHadOrientation = false;
@@ -576,7 +576,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (updated.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var unitFlags))
                 {
                     long old = 0;
-                    updateObjectFollower.TryGetIntOrDefault(updated.Guid, "updateObjectFollower", out old);
+                    updateObjectFollower.TryGetIntOrDefault(updated.Guid, "UNIT_FIELD_FLAGS", out old);
 
                     var inCombat = (unitFlags & (long)GameDefines.UnitFlags.InCombat) > 0;
                     var wasInCombat = (old & (long)GameDefines.UnitFlags.InCombat) > 0;
