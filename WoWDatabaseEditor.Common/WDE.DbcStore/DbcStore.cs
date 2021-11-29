@@ -39,6 +39,7 @@ namespace WDE.DbcStore
         private readonly WrathSpellService wrathSpellService;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
+        private readonly DBCD.DBCD dbcd;
 
         public DbcStore(IParameterFactory parameterFactory, 
             ITaskRunner taskRunner,
@@ -47,7 +48,8 @@ namespace WDE.DbcStore
             IEventAggregator eventAggregator,
             NullSpellService nullSpellService,
             CataSpellService cataSpellService,
-            WrathSpellService wrathSpellService)
+            WrathSpellService wrathSpellService,
+            DBCD.DBCD dbcd)
         {
             this.parameterFactory = parameterFactory;
             this.taskRunner = taskRunner;
@@ -57,6 +59,7 @@ namespace WDE.DbcStore
             this.nullSpellService = nullSpellService;
             this.cataSpellService = cataSpellService;
             this.wrathSpellService = wrathSpellService;
+            this.dbcd = dbcd;
 
             spellServiceImpl = nullSpellService;
             Load();
@@ -142,8 +145,6 @@ namespace WDE.DbcStore
                 this.store = store;
                 opener = new DatabaseClientFileOpener();
                 dbcSettingsProvider = settingsProvider;
-                dbdProvider = new DBDProvider();
-                dbcProvider = new DBCProvider();
             }
 
             private void Load(string filename, Action<IDbcIterator> foreachRow)
@@ -170,8 +171,7 @@ namespace WDE.DbcStore
 
             private void Load(string filename, string fieldName, Dictionary<long, string> dictionary)
             {
-                var dbcd = new DBCD.DBCD(dbcProvider, dbdProvider);
-                var storage = dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+                var storage = store.dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
 
                 if (fieldName == String.Empty)
                 {
@@ -192,8 +192,7 @@ namespace WDE.DbcStore
 
             private void Load(string filename, string fieldName, Dictionary<long, long> dictionary)
             {
-                var dbcd = new DBCD.DBCD(dbcProvider, dbdProvider);
-                var storage = dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+                var storage = store.dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
 
                 if (fieldName == String.Empty)
                 {

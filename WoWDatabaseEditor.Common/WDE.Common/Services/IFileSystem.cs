@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -30,6 +31,14 @@ namespace WDE.Common.Services
         public static Task<string[]> ReadAllLinesAsync(this IFileSystem fs, string virtualPath)
         {
             return File.ReadAllLinesAsync(fs.ResolvePhysicalPath(virtualPath).FullName);
+        }
+        public static DateTime GetLastWriteTime(this IFileSystem fs, string virtualPath)
+        {
+            return File.GetLastWriteTime(fs.ResolvePhysicalPath(virtualPath).FullName);
+        }
+        public static byte[] ReadAllBytes(this IFileSystem fs, string virtualPath)
+        {
+            return File.ReadAllBytes(fs.ResolvePhysicalPath(virtualPath).FullName);
         }
     }
 }
