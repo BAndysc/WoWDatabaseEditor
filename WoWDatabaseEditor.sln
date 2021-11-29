@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29728.190
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoaderAvalonia", "LoaderAvalonia\LoaderAvalonia.csproj", "{8B25EEAE-2DDD-4D62-A426-619FE21D2711}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 17.0.31903.59
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoaderAvalonia", "LoaderAvalonia\LoaderAvalonia.csproj", "{8B25EEAE-2DDD-4D62-A426-619FE21D2711}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoWDatabaseEditorCore", "WoWDatabaseEditor\WoWDatabaseEditorCore.csproj", "{99C9E82C-C594-446D-AA59-8FFBC43AD226}"
 EndProject
