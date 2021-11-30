@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
+      <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NSubstitute" Version="4.2.2" />
+    </ItemGroup>
+
+</Project>

@@ -8,6 +8,8 @@ environment:
     secure: IZcgg6msojQGCM0rLsUNTA==
   DEPLOY_KEY:
     secure: SXvCUsowLsFFH1P7e3IsqldBlcPD0gQ8qpsSM8s73VUImWk+NW0dbnLjbytCriqD6O3+FiBLKWkE/v0bNckEJkwFDU8y2ZuNjmB2NIyAQViPyi72/a3vRPM7ruJH+BY0
+services:
+  - mysql
 install:
 - cmd: git submodule update --init --recursive
 before_build:
@@ -91,9 +93,15 @@ test_script:
 
     dotnet test WDE.Common.Test/WDE.Common.Test.csproj
 
+    dotnet test Rendering/TheEngine.Test/TheEngine.Test.csproj
+
     dotnet test WDE.WoWHeadConnector.Test/WDE.WoWHeadConnector.Test.csproj
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
+
+    cd test
+    
+    bash database_test.sh localhost 3306 root 'Password12!' 'C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql'
 artifacts:
 - path: WoWDatabaseEditorMacOs.zip
   name: WoWDatabaseEditorMacOs.zip
