@@ -12,6 +12,7 @@ namespace WDE.MapRenderer.Managers
         public CreatureDisplayInfoStore CreatureDisplayInfoStore { get; }
         // public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
         public CreatureModelDataStore CreatureModelDataStore { get; }
+        public GameObjectDisplayInfoStore GameObjectDisplayInfoStore { get; }
         public MapStore MapStore { get; }
         public LightIntParamStore LightIntParamStore { get; }
         public LightFloatParamStore LightFloatParamStore { get; }
@@ -31,6 +32,7 @@ namespace WDE.MapRenderer.Managers
             CreatureDisplayInfoStore = new(OpenDbc("CreatureDisplayInfo"));
             // CreatureDisplayInfoExtraStore = new(OpenDbc("CreatureDisplayInfoExtra")); // for humanoids
             CreatureModelDataStore = new(OpenDbc("CreatureModelData"));
+            GameObjectDisplayInfoStore = new(OpenDbc("GameObjectDisplayInfo"));
             MapStore = new (OpenDbc("Map"));
             LightIntParamStore = new (OpenDbc("LightIntBand"));
             LightFloatParamStore = new (OpenDbc("LightFloatBand"));
