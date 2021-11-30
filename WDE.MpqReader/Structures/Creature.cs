@@ -115,33 +115,33 @@ namespace WDE.MpqReader.Structures
         public CreatureModelData(IDbcIterator dbcIterator)
         {
             Id = dbcIterator.GetInt(0);
-            Flags = dbcIterator.GetInt(0);
-            ModelName = dbcIterator.GetString(0);
-            SizeClass = dbcIterator.GetInt(0);
-            ModelScale = dbcIterator.GetFloat(0);
-            BloodID = dbcIterator.GetInt(0);
-            FootprintTextureID = dbcIterator.GetInt(0);
-            FootprintTextureLength = dbcIterator.GetFloat(0);
-            FootprintTextureWidth = dbcIterator.GetFloat(0);
-            FootprintParticleScale = dbcIterator.GetFloat(0);
-            FoleyMaterialID = dbcIterator.GetInt(0);
-            FootstepShakeSize = dbcIterator.GetInt(0);
-            DeathThudShakeSize = dbcIterator.GetInt(0);
-            SoundID = dbcIterator.GetInt(0);
-            CollisionWidth = dbcIterator.GetFloat(0);
-            CollisionHeight = dbcIterator.GetFloat(0);
-            MountHeight = dbcIterator.GetFloat(0);
-            GeoBoxMinX = dbcIterator.GetFloat(0);
-            GeoBoxMinY = dbcIterator.GetFloat(0);
-            GeoBoxMinZ = dbcIterator.GetFloat(0);
-            GeoBoxMaxX = dbcIterator.GetFloat(0);
-            GeoBoxMaxY = dbcIterator.GetFloat(0);
-            GeoBoxMaxZ = dbcIterator.GetFloat(0);
-            WorldEffectScale = dbcIterator.GetFloat(0);
-            AttachedEffectScale = dbcIterator.GetFloat(0);
-            MissileCollisionRadius = dbcIterator.GetFloat(0);
-            MissileCollisionPush = dbcIterator.GetFloat(0);
-            MissileCollisionRaise = dbcIterator.GetFloat(0);
+            Flags = dbcIterator.GetInt(1);
+            ModelName = dbcIterator.GetString(2);
+            SizeClass = dbcIterator.GetInt(3);
+            ModelScale = dbcIterator.GetFloat(4);
+            BloodID = dbcIterator.GetInt(5);
+            FootprintTextureID = dbcIterator.GetInt(6);
+            FootprintTextureLength = dbcIterator.GetFloat(7);
+            FootprintTextureWidth = dbcIterator.GetFloat(8);
+            FootprintParticleScale = dbcIterator.GetFloat(9);
+            FoleyMaterialID = dbcIterator.GetInt(10);
+            FootstepShakeSize = dbcIterator.GetInt(11);
+            DeathThudShakeSize = dbcIterator.GetInt(12);
+            SoundID = dbcIterator.GetInt(13);
+            CollisionWidth = dbcIterator.GetFloat(14);
+            CollisionHeight = dbcIterator.GetFloat(15);
+            MountHeight = dbcIterator.GetFloat(16);
+            GeoBoxMinX = dbcIterator.GetFloat(17);
+            GeoBoxMinY = dbcIterator.GetFloat(18);
+            GeoBoxMinZ = dbcIterator.GetFloat(19);
+            GeoBoxMaxX = dbcIterator.GetFloat(20);
+            GeoBoxMaxY = dbcIterator.GetFloat(21);
+            GeoBoxMaxZ = dbcIterator.GetFloat(22);
+            WorldEffectScale = dbcIterator.GetFloat(23);
+            AttachedEffectScale = dbcIterator.GetFloat(24);
+            MissileCollisionRadius = dbcIterator.GetFloat(25);
+            MissileCollisionPush = dbcIterator.GetFloat(26);
+            MissileCollisionRaise = dbcIterator.GetFloat(27);
         }
 
         private CreatureModelData()
