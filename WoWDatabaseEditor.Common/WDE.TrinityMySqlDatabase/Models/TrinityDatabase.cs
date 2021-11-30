@@ -39,16 +39,30 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlConditionLine> Conditions => GetTable<MySqlConditionLine>();
         public ITable<MySqlSpellScriptName> SpellScriptNames => GetTable<MySqlSpellScriptName>();
         public ITable<MySqlGossipMenuLine> GossipMenus => GetTable<MySqlGossipMenuLine>();
-        public ITable<MySqlGossipMenuOption> GossipMenuOptions => GetTable<MySqlGossipMenuOption>();
+        public ITable<MySqlGossipMenuOptionWrath> GossipMenuOptions => GetTable<MySqlGossipMenuOptionWrath>();
+        public ITable<MySqlGossipMenuOptionCata> SplitGossipMenuOptions => GetTable<MySqlGossipMenuOptionCata>();
+        public ITable<MySqlGossipMenuOptionAction> SplitGossipMenuOptionActions => GetTable<MySqlGossipMenuOptionAction>();
+        public ITable<MySqlGossipMenuOptionBox> SplitGossipMenuOptionBoxes => GetTable<MySqlGossipMenuOptionBox>();
         public ITable<MySqlNpcText> NpcTexts => GetTable<MySqlNpcText>();
         public ITable<MySqlCreatureClassLevelStat> CreatureClassLevelStats => GetTable<MySqlCreatureClassLevelStat>();
-        public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
+        public ITable<IBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText, MySqlBroadcastTextAzeroth, IBroadcastText>(() => azeroth);
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
         public ITable<ITrinityString> Strings => GetTable<TrinityString, ACoreString, ITrinityString>();
         public ITable<IDatabaseSpellDbc> SpellDbc => GetTable<TrinityMySqlSpellDbc, TrinityMasterMySqlServersideSpell, AzerothMySqlSpellDbc, IDatabaseSpellDbc>(() => master, () => alternateNames);
         public ITable<MySqlPointOfInterest> PointsOfInterest => GetTable<MySqlPointOfInterest>();
         public ITable<MySqlCreatureText> CreatureTexts => GetTable<MySqlCreatureText>();
 
+        public bool UseSplitGossipOptions => cata || master;
+        
+        private ITable<T> GetTable<R, S, T>(Func<bool> sCond) where T : class
+            where S : class, T
+            where R : class, T
+        {
+            if (sCond())
+                return GetTable<S>();
+            return GetTable<R>();
+        }
+        
         private ITable<T> GetTable<R, S, U, T>(Func<bool> sCond, Func<bool> uCond) where T : class
             where S : class, T
             where R : class, T

@@ -157,7 +157,18 @@ namespace WDE.TrinityMySqlDatabase.Database
         public async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
         {
             await using var model = Database();
-            return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
+            if (model.UseSplitGossipOptions)
+            {
+                return await (from t in model.SplitGossipMenuOptions
+                    join actions in model.SplitGossipMenuOptionActions on t.MenuId equals actions.MenuId into adn
+                    from subaddon in adn.DefaultIfEmpty()
+                    join boxes in model.SplitGossipMenuOptionBoxes on t.MenuId equals boxes.MenuId into box
+                    from subaddon2 in box.DefaultIfEmpty()
+                    orderby t.MenuId
+                    select t.SetAction(subaddon).SetBox(subaddon2)).ToListAsync<IGossipMenuOption>();
+            }
+            else
+                return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
         }
 
         public INpcText? GetNpcText(uint entry)
