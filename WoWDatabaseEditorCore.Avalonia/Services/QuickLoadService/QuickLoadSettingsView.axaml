@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
+             xmlns:quickLoadService="clr-namespace:WoWDatabaseEditorCore.Services.QuickLoadService;assembly=WoWDatabaseEditorCore"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             d:DataContext="{d:DesignInstance quickLoadService:QuickLoadSettingsViewModel, IsDesignTimeCreatable=False}"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.QuickLoadService.QuickLoadSettingsView">
+    <DockPanel LastChildFill="True">
+        <ToolbarPanel DockPanel.Dock="Top">
+            <ButtonImage Image="Icons/icon_add.png" Text="Add a divider" Command="{Binding AddDivider}" />
+            <ButtonImage Image="Icons/icon_delete.png" Text="Remove the selected divider" Command="{Binding RemoveDivider}" />
+            <ToolbarSpacer />
+            <Button Command="{Binding SetVisibleAll}">All visible</Button>
+            <Button Command="{Binding SetVisibleNone}">None visible</Button>
+        </ToolbarPanel>
+        <TextBlock Opacity="0.8" DockPanel.Dock="Top">Drag and drop items to reorder them. Use the checkbox to hide them from the quick start panel.</TextBlock>
+        <ListBox Items="{Binding QuickLoadItems}"
+                 VirtualizationMode="None"
+                 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                 dnD:DragAndDrop.IsDropTarget="True" 
+                 dnD:DragAndDrop.DropHandler="{Binding }" 
+                 dnD:DragAndDrop.IsDragSource="True">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsVisible}" />
+                        <WdeImage Image="{Binding Icon}" Width="20" Height="20" VerticalAlignment="Center" Margin="5,0,0,0" />
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</UserControl>

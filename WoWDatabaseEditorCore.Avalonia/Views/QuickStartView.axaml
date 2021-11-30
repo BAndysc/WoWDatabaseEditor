@@ -6,9 +6,12 @@
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:mvvm="http://prismlibrary.com/"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:controls1="clr-namespace:Avalonia.Controls"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
+             d:DataContext="{d:DesignInstance viewModels:QuickStartViewModel, IsDesignTimeCreatable=False}"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.QuickStartView">
     <UserControl.Resources>
         <converters:BoolToDoubleConverter x:Key="OpacityConverter" WhenTrue="1" WhenFalse="0.3" />
@@ -126,9 +129,14 @@
                 <StackPanel Margin="30,0,0,0">
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Quick load</TextBlock>
                     <ItemsControl Margin="20,0,0,0" Items="{Binding FlatItemPrototypes, Mode=OneTime}">
+                        <ItemsControl.Styles>
+                            <Style Selector="ItemsControl > ContentPresenter">
+                                <Setter Property="(controls1:WrapPanelWithDivider.ForceNewLine)" Value="{Binding ForceNewLine}" />
+                            </Style>
+                        </ItemsControl.Styles>
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel></WrapPanel>
+                                <controls1:WrapPanelWithDivider></controls1:WrapPanelWithDivider>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
