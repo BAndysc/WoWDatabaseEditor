@@ -39,10 +39,8 @@ namespace WDE.MapRenderer.Managers
             this.gameContext = gameContext;
             gameobjects = db.GetGameObjects().ToList();
             gameobjectstemplates = db.GetGameObjectTemplates().ToList();
-            gameContext.StartCoroutine(LoadGameObjects());
 
             BoxMesh = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
-
             transcluentMaterial = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
             transcluentMaterial.BlendingEnabled = true;
             transcluentMaterial.SourceBlending = Blending.SrcAlpha;
@@ -50,6 +48,8 @@ namespace WDE.MapRenderer.Managers
             transcluentMaterial.DepthTesting = DepthCompare.Lequal;
             transcluentMaterial.ZWrite = false;
             transcluentMaterial.SetUniform("objectColor", new Vector4(0.2f, 0.8f, 0.2f, 0.2f));
+
+            gameContext.StartCoroutine(LoadGameObjects());
         }
 
         public void Render()
@@ -127,9 +127,9 @@ namespace WDE.MapRenderer.Managers
 
                 if (gameContext.DbcManager.GameObjectDisplayInfoStore.Contains((int)gotemplate.DisplayId))
                 {
-                    M2Path = gameContext.DbcManager.GameObjectDisplayInfoStore.First(x => x.Id == gotemplate.DisplayId).ModelName;
+                    M2Path = gameContext.DbcManager.GameObjectDisplayInfoStore[(int)gotemplate.DisplayId].ModelName;
 
-                
+
                     // System.Diagnostics.Debug.WriteLine($"M2path :  {M2Path}");
 
                     TaskCompletionSource<MdxManager.MdxInstance?> mdx = new();
@@ -149,6 +149,7 @@ namespace WDE.MapRenderer.Managers
                             gameContext.Engine.RenderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, t);
 
                         t.Scale = instance.mesh.Bounds.Size;
+                        // t.Scale = new Vector3(instance.mesh.Bounds.Width, instance.mesh.Bounds.Depth, instance.mesh.Bounds.Height); 
                         gameContext.Engine.RenderManager.RegisterStaticRenderer(BoxMesh.Handle, transcluentMaterial, 0, t);
 
                         // gameContext.Engine.Ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), gotemplate.Name, 2.5f, Matrix.TRS(t.Position + Vector3.Up * height, in Quaternion.Identity, in Vector3.One));

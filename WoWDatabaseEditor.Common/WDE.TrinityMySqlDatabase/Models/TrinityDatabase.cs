@@ -26,7 +26,8 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         public ITable<MySqlAreaTriggerScript> AreaTriggerScript => GetTable<MySqlAreaTriggerScript>();
         public ITable<MySqlCreatureTemplate> CreatureTemplate => GetTable<MySqlCreatureTemplate>();
-        public ITable<ICreature> Creature => GetTable<MySqlCreatureWrath, MySqlCreatureWrath, MySqlCreatureCata, ICreature>(() => wrath || azeroth, () => cata || master);
+        // public ITable<ICreature> Creature => GetTable<MySqlCreatureWrath, MySqlCreatureWrath, MySqlCreatureCata, ICreature>(() => wrath || azeroth, () => cata || master);
+        public ITable<MySqlCreatureWrath> Creature => GetTable<MySqlCreatureWrath>();
         public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
         public ITable<MySqlGameObjectTemplate> GameObjectTemplate => GetTable<MySqlGameObjectTemplate>();
         public ITable<MySqlGameObject> GameObject => GetTable<MySqlGameObject>();

@@ -88,6 +88,7 @@ namespace WDE.MapRenderer
             CameraManager = new CameraManager(this);
             LightingManager = new LightingManager(this);
             AreaTriggerManager = new AreaTriggerManager(this);
+            CreatureManager = new CreatureManager(this, database);
             GameObjectManager = new GameObjectManager(this, database);
             RaycastSystem = new RaycastSystem(engine);
             ModuleManager = new ModuleManager(this, gameView); // must be last
@@ -138,6 +139,7 @@ namespace WDE.MapRenderer
             LightingManager.Render();
             AreaTriggerManager.Render();
             // GameObjectManager.Render();
+            // CreatureManager.Render();
         }
 
         public void RenderGUI(float delta)
@@ -221,6 +223,7 @@ namespace WDE.MapRenderer
         public DbcManager DbcManager { get; private set; }
         public LightingManager LightingManager { get; private set; }
         public AreaTriggerManager AreaTriggerManager { get; private set; }
+        public CreatureManager CreatureManager { get; private set; }
         public GameObjectManager GameObjectManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
         public Map CurrentMap { get; private set; }
