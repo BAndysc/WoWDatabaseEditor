@@ -10,6 +10,12 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "entry")]
         public uint Entry { get; set; }
 
+        [Column(Name = "displayId")]
+        public uint DisplayId { get; set; }
+
+        [Column(Name = "size")]
+        public float Size { get; set; }
+
         [Column(Name = "name")]
         public string Name { get; set; } = "";
 

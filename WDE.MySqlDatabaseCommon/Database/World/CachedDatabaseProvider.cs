@@ -24,6 +24,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         private List<IGameObjectTemplate>? gameObjectTemplateCache;
         private Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
 
+        private List<IGameObject>? gameObjectCache;
+
         private List<IQuestTemplate>? questTemplateCache;
         private Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
 
@@ -107,6 +109,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreature);
         }
 
+        private async Task<Type> RefreshGameObjects()
+        {
+            var templates = await nonCachedDatabase.GetGameObjectsAsync().ConfigureAwait(false);
+            gameObjectCache = templates;
+            return typeof(IGameObject);
+        }
+
         public Task TryConnect()
         {
             return taskRunner.ScheduleTask(new DatabaseCacheTask(this));
@@ -160,6 +169,14 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                 return creatureCache;
 
             return nonCachedDatabase.GetCreatures();
+        }
+
+        public IEnumerable<IGameObject> GetGameObjects()
+        {
+            if (gameObjectCache != null)
+                return gameObjectCache;
+
+            return nonCachedDatabase.GetGameObjects();
         }
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates()
@@ -305,6 +322,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     
                     // disabled caching for now, because it may be not needed yet
                     // cache.creatureCache = await cache.nonCachedDatabase.GetCreaturesAsync();
+                    // cache.gameObjectCache = await cache.nonCachedDatabase.GetGameObjectsAsync();
 
                     progress.Report(1, steps, "Loading gameobjects");
                     cache.gameObjectTemplateCache = await cache.nonCachedDatabase.GetGameObjectTemplatesAsync();

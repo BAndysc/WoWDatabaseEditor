@@ -13,6 +13,7 @@ using WDE.MapRenderer.Managers;
 using WDE.Module.Attributes;
 using WDE.MpqReader;
 using WDE.MpqReader.Structures;
+using WDE.Common.Database;
 
 namespace WDE.MapRenderer
 {
@@ -27,14 +28,17 @@ namespace WDE.MapRenderer
         private Engine engine;
         public event Action? OnInitialized;
         public event Action? OnFailedInitialize;
+        public IDatabaseProvider database;
 
         public GameManager(IMpqService mpqService, 
             IGameView gameView,
             IMessageBoxService messageBoxService,
-            IDatabaseClientFileOpener databaseClientFileOpener)
+            IDatabaseClientFileOpener databaseClientFileOpener,
+            IDatabaseProvider database)
         {
             this.mpqService = mpqService;
             this.gameView = gameView;
+            this.database = database;
             this.messageBoxService = messageBoxService;
             this.databaseClientFileOpener = databaseClientFileOpener;
             UpdateLoop = new UpdateManager(this);
@@ -84,6 +88,7 @@ namespace WDE.MapRenderer
             CameraManager = new CameraManager(this);
             LightingManager = new LightingManager(this);
             AreaTriggerManager = new AreaTriggerManager(this);
+            GameObjectManager = new GameObjectManager(this, database);
             RaycastSystem = new RaycastSystem(engine);
             ModuleManager = new ModuleManager(this, gameView); // must be last
             
@@ -132,6 +137,7 @@ namespace WDE.MapRenderer
             ModuleManager.Render();
             LightingManager.Render();
             AreaTriggerManager.Render();
+            // GameObjectManager.Render();
         }
 
         public void RenderGUI(float delta)
@@ -191,7 +197,8 @@ namespace WDE.MapRenderer
             ChunkManager = null!;
             CameraManager = null!;
             LightingManager = null!;
-            AreaTriggerManager = null;
+            // AreaTriggerManager = null;
+            GameObjectManager = null;
             RaycastSystem = null!;
             ModuleManager = null!;
         }
@@ -214,6 +221,7 @@ namespace WDE.MapRenderer
         public DbcManager DbcManager { get; private set; }
         public LightingManager LightingManager { get; private set; }
         public AreaTriggerManager AreaTriggerManager { get; private set; }
+        public GameObjectManager GameObjectManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
         public Map CurrentMap { get; private set; }
         public bool IsInitialized { get; private set; }

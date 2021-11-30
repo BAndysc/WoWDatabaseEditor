@@ -75,6 +75,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => Enumerable.Empty<IGameObject>();
 
+        public IEnumerable<IGameObject> GetGameObjects() => Enumerable.Empty<IGameObject>();
+
         public IEnumerable<ICoreCommandHelp> GetCommands() => Enumerable.Empty<ICoreCommandHelp>();
 
         public Task<IList<ITrinityString>> GetStringsAsync() => Task.FromResult<IList<ITrinityString>>(new List<ITrinityString>());
@@ -84,6 +86,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult(new List<ICreatureTemplate>());
 
         public Task<List<ICreature>> GetCreaturesAsync() => Task.FromResult(new List<ICreature>());
+
+        public Task<List<IGameObject>> GetGameObjectsAsync() => Task.FromResult(new List<IGameObject>());
 
         public Task<List<IConversationTemplate>> GetConversationTemplatesAsync() => Task.FromResult(new List<IConversationTemplate>());
         
