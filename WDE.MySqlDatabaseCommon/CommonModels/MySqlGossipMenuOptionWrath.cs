@@ -48,14 +48,14 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
         public int BoxBroadcastTextId { get; set; }
         
         [Column(Name = "VerifiedBuild")]
-        public ushort VerifiedBuild { get; set; }
+        public short VerifiedBuild { get; set; }
     }
     
     [Table(Name = "gossip_menu_option")]
     public class MySqlGossipMenuOptionCata : IGossipMenuOption
     {
         [PrimaryKey]
-        [Column(Name = "MenuID")]
+        [Column(Name = "MenuId")]
         public uint MenuId { get; set; }
         
         [PrimaryKey]
@@ -85,7 +85,7 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
         public int BoxBroadcastTextId => Box?.BoxBroadcastTextId ?? 0;
 
         [Column(Name = "VerifiedBuild")]
-        public ushort VerifiedBuild { get; set; }
+        public short VerifiedBuild { get; set; }
 
         public MySqlGossipMenuOptionAction? Action;
         public MySqlGossipMenuOptionBox? Box;
