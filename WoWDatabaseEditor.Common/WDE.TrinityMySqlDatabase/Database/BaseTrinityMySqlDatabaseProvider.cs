@@ -15,13 +15,15 @@ using WDE.TrinityMySqlDatabase.Models;
 
 namespace WDE.TrinityMySqlDatabase.Database
 {
-    public class TrinityMySqlDatabaseProvider : IAsyncDatabaseProvider, IAuthDatabaseProvider
+    public abstract class BaseTrinityMySqlDatabaseProvider<T> : IAsyncDatabaseProvider, IAuthDatabaseProvider where T : BaseTrinityDatabase, new()
     {
         public bool IsConnected => true;
+        public abstract ICreatureTemplate? GetCreatureTemplate(uint entry);
+        public abstract IEnumerable<ICreatureTemplate> GetCreatureTemplates();
 
         private readonly ICurrentCoreVersion currentCoreVersion;
 
-        public TrinityMySqlDatabaseProvider(IWorldDatabaseSettingsProvider settings,
+        public BaseTrinityMySqlDatabaseProvider(IWorldDatabaseSettingsProvider settings,
             IAuthDatabaseSettingsProvider authSettings,
             DatabaseLogger databaseLogger,
             ICurrentCoreVersion currentCoreVersion)
@@ -32,29 +34,8 @@ namespace WDE.TrinityMySqlDatabase.Database
             DataConnection.DefaultSettings = new MySqlWorldSettings(settings.Settings, authSettings.Settings);
         }
 
-        private TrinityDatabase Database()
-        {
-            return new TrinityDatabase(currentCoreVersion.Current);
-        }
+        protected T Database() => new();
         
-        public ICreatureTemplate? GetCreatureTemplate(uint entry)
-        {
-            using var model = Database();
-            return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
-        }
-
-        public IEnumerable<ICreatureTemplate> GetCreatureTemplates()
-        {
-            using var model = Database();
-            return model.CreatureTemplate.OrderBy(t => t.Entry).ToList<ICreatureTemplate>();
-        }
-        
-        public async Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync()
-        {
-            await using var model = Database();
-            return await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync<ICreatureTemplate>();
-        }
-
         public async Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry)
         {
             await using var model = Database();
@@ -100,7 +81,10 @@ namespace WDE.TrinityMySqlDatabase.Database
             using var model = Database();
             return (from t in model.ConversationTemplate orderby t.Id select t).ToList<IConversationTemplate>();
         }
-        
+
+        public abstract Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync();
+        public abstract Task<List<ICreature>> GetCreaturesAsync();
+
         public async Task<List<IConversationTemplate>> GetConversationTemplatesAsync()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
@@ -154,22 +138,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToList<IGossipMenu>();
         }
 
-        public async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
-        {
-            await using var model = Database();
-            if (model.UseSplitGossipOptions)
-            {
-                return await (from t in model.SplitGossipMenuOptions
-                    join actions in model.SplitGossipMenuOptionActions on t.MenuId equals actions.MenuId into adn
-                    from subaddon in adn.DefaultIfEmpty()
-                    join boxes in model.SplitGossipMenuOptionBoxes on t.MenuId equals boxes.MenuId into box
-                    from subaddon2 in box.DefaultIfEmpty()
-                    orderby t.MenuId
-                    select t.SetAction(subaddon).SetBox(subaddon2)).ToListAsync<IGossipMenuOption>();
-            }
-            else
-                return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
-        }
+        public abstract Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
 
         public INpcText? GetNpcText(uint entry)
         {
@@ -215,7 +184,9 @@ namespace WDE.TrinityMySqlDatabase.Database
             await using var model = Database();
             return await (from t in model.CreatureClassLevelStats select t).ToListAsync<ICreatureClassLevelStat>();
         }
-        
+
+        public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
+
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
@@ -246,7 +217,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await (from t in model.GameObjectTemplate orderby t.Entry select t).ToListAsync<IGameObjectTemplate>();
         }
         
-        private IQueryable<MySqlQuestTemplate> GetQuestsQuery(TrinityDatabase model)
+        private IQueryable<MySqlQuestTemplate> GetQuestsQuery(BaseTrinityDatabase model)
         {
             return (from t in model.QuestTemplate
                 join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
@@ -300,7 +271,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                     uint entry = 0;
                     if (entryOrGuid < 0)
                     {
-                        var template = await model.Creature.Where(p => p.Guid == (uint)-entryOrGuid).FirstOrDefaultAsync();
+                        var template = await GetCreatureByGuid(model, (uint)-entryOrGuid);
                         if (template == null)
                             throw new Exception(
                                 $"Trying to install creature script for guid {-entryOrGuid}, but this guid doesn't exist in creature table, so entry cannot be determined.");
@@ -308,10 +279,8 @@ namespace WDE.TrinityMySqlDatabase.Database
                     }
                     else
                         entry = (uint)entryOrGuid;
-                    await model.CreatureTemplate.Where(p => p.Entry == entry)
-                        .Set(p => p.AIName, currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName)
-                        .Set(p => p.ScriptName, "")
-                        .UpdateAsync();
+
+                    await SetCreatureTemplateAI(model, entry, currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName, "");
                     break;
                 }
                 case SmartScriptType.GameObject:
@@ -363,6 +332,9 @@ namespace WDE.TrinityMySqlDatabase.Database
 
             await model.CommitTransactionAsync();
         }
+
+        protected abstract Task<ICreature?> GetCreatureByGuid(T model, uint guid);
+        protected abstract Task SetCreatureTemplateAI(T model, uint entry, string ainame, string scriptname);
 
         public async Task InstallConditions(IEnumerable<IConditionLine> conditionLines,
             IDatabaseProvider.ConditionKeyMask keyMask,
@@ -437,47 +409,8 @@ namespace WDE.TrinityMySqlDatabase.Database
             using var model = Database();
             return model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToList();
         }
-        
-        public async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
-        {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
-                return await Task.FromResult(new List<IBroadcastText>());
-            
-            await using var model = Database();
-            return await (from t in model.BroadcastTexts select t).ToListAsync<IBroadcastText>();
-        }
-        
-        public IBroadcastText? GetBroadcastTextByText(string text)
-        {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
-                return null;
-            
-            using var model = Database();
-            return (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefault();
-        }
 
-        public async Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text)
-        {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
-                return null;
-            
-            await using var model = Database();
-            return await (from t in model.BroadcastTexts where t.Text == text || t.Text1 == text select t).FirstOrDefaultAsync();
-        }
-        
-        public async Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id)
-        {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IBroadcastText)))
-                return null;
-            await using var model = Database();
-            return await (from t in model.BroadcastTexts where t.Id == id select t).FirstOrDefaultAsync();
-        }
-
-        public ICreature? GetCreatureByGuid(uint guid)
-        {
-            using var model = Database();
-            return model.Creature.FirstOrDefault(c => c.Guid == guid);
-        }
+        public abstract ICreature? GetCreatureByGuid(uint guid);
 
         public IGameObject? GetGameObjectByGuid(uint guid)
         {
@@ -485,11 +418,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.GameObject.FirstOrDefault(g => g.Guid == guid);
         }
 
-        public IEnumerable<ICreature> GetCreaturesByEntry(uint entry)
-        {
-            using var model = Database();
-            return model.Creature.Where(g => g.Entry == entry).ToList();
-        }
+        public abstract IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
 
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry)
         {
@@ -497,17 +426,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.GameObject.Where(g => g.Entry == entry).ToList();
         }
 
-        public IEnumerable<ICreature> GetCreatures()
-        {
-            using var model = Database();
-            return model.Creature.OrderBy(t => t.Entry).ToList<ICreature>();
-        }
-
-        public async Task<List<ICreature>> GetCreaturesAsync()
-        {
-            await using var model = Database();
-            return await model.Creature.OrderBy(t => t.Entry).ToListAsync<ICreature>();
-        }
+        public abstract IEnumerable<ICreature> GetCreatures();
 
         public IEnumerable<ICoreCommandHelp> GetCommands()
         {
@@ -515,18 +434,9 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.Commands.ToList();
         }
 
-        public async Task<IList<ITrinityString>> GetStringsAsync()
-        {
-            await using var model = Database();
-            return await model.Strings.ToListAsync();
-        }
+        public abstract Task<IList<ITrinityString>> GetStringsAsync();
+        public abstract Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync();
 
-        public async Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
-        {
-            await using var model = Database();
-            return await model.SpellDbc.ToListAsync();
-        }
-        
         public async Task<List<IPointOfInterest>> GetPointsOfInterestsAsync()
         {
             if (!Supports<IPointOfInterest>())
@@ -538,7 +448,10 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
         public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
-        
+        public abstract IBroadcastText? GetBroadcastTextByText(string text);
+        public abstract Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
+        public abstract Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
+
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
             if (!Supports<IAuthRbacPermission>())
@@ -557,9 +470,9 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.RbacLinkedPermissions.ToListAsync<IAuthRbacLinkedPermission>();
         }
 
-        private bool Supports<T>()
+        private bool Supports<R>()
         {
-            return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(T));
+            return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(R));
         }
     }
 }

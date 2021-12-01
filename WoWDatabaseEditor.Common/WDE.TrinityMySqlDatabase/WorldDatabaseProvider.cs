@@ -8,7 +8,6 @@ using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
-using WDE.TrinityMySqlDatabase.Database;
 
 namespace WDE.TrinityMySqlDatabase
 {
@@ -16,7 +15,7 @@ namespace WDE.TrinityMySqlDatabase
     [SingleInstance]
     public class WorldDatabaseProvider : WorldDatabaseDecorator
     {
-        public WorldDatabaseProvider(TrinityMySqlDatabaseProvider trinityDatabase,
+        public WorldDatabaseProvider(DatabaseResolver databaseResolver,
             NullWorldDatabaseProvider nullWorldDatabaseProvider,
             IWorldDatabaseSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
@@ -32,7 +31,7 @@ namespace WDE.TrinityMySqlDatabase
 
             try
             {
-                var cachedDatabase = containerProvider.Resolve<CachedDatabaseProvider>((typeof(IAsyncDatabaseProvider), trinityDatabase));
+                var cachedDatabase = containerProvider.Resolve<CachedDatabaseProvider>((typeof(IAsyncDatabaseProvider), databaseResolver.ResolveWorld()));
                 cachedDatabase.TryConnect();
                 impl = cachedDatabase;
             }

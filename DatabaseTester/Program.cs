@@ -58,7 +58,7 @@ public class Program
 
         var worldDb = ioc.Resolve<T>();
 
-        var allMethods = typeof(IDatabaseProvider).GetMethods();
+        var allMethods = typeof(T).GetMethods();
         foreach (var method in allMethods)
         {
             var p = method.GetParameters();
