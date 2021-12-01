@@ -31,26 +31,26 @@ for index in ${!URLs[*]}; do
     git sparse-checkout add data/sql/base/db_world/
     git sparse-checkout add data/sql/updates/db_world/
 
-    mysql -u ${USER} -p${PASSWORD} -e 'DROP DATABASE IF EXISTS temp_CI'
-    mysql -u ${USER} -p${PASSWORD} -e 'CREATE DATABASE temp_CI'
+    "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} -e 'DROP DATABASE IF EXISTS temp_CI'
+    "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} -e 'CREATE DATABASE temp_CI'
 
     if [ -f "sql/base/dev/world_database.sql" ]; 
     then
-        mysql -u ${USER} -p${PASSWORD} temp_CI < sql/base/dev/world_database.sql
+        "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < sql/base/dev/world_database.sql
 
         for i in sql/updates/world/${UPDATEs[$index]}/*.sql
         do
-            mysql -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
         done
     else
         for i in data/sql/base/db_world/*.sql
         do
-            mysql -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
         done
 
         for i in data/sql/updates/db_world/*.sql
         do
-            mysql -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
         done
     fi
 
@@ -58,7 +58,7 @@ for index in ${!URLs[*]}; do
 
     dotnet run --project ../DatabaseTester/DatabaseTester.csproj $HOST $PORT $USER $PASSWORD temp_CI ${COREs[$index]}
 
-    ${MYSQL_PATH} -u ${USER} -p${PASSWORD} -e 'DROP DATABASE temp_CI'
+    "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} -e 'DROP DATABASE temp_CI'
 
     rm -rf Repo
 

@@ -17,8 +17,6 @@
     <ItemGroup>
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="HarfBuzzSharp" Version="2.8.2-preview.127" />
-        <PackageReference Include="SkiaSharp" Version="2.88.0-preview.127" />
         <PackageReference Include="FuzzySharp" Version="2.0.2" />
     </ItemGroup>
     <ItemGroup>
