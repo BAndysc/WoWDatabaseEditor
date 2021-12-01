@@ -5,7 +5,7 @@ namespace WDE.MpqReader.Structures
 {
     public class CreatureDisplayInfo
     {
-        public readonly int Id;
+        public readonly uint Id;
         public readonly int ModelId;
         public readonly int SoundId;
         public readonly int ExtendedDisplayInfoID;
@@ -23,7 +23,7 @@ namespace WDE.MpqReader.Structures
 
         public CreatureDisplayInfo(IDbcIterator dbcIterator)
         {
-            Id = dbcIterator.GetInt(0);
+            Id = dbcIterator.GetUInt(0);
             ModelId = dbcIterator.GetInt(1);
             SoundId = dbcIterator.GetInt(2);
             ExtendedDisplayInfoID = dbcIterator.GetInt(3);
@@ -43,7 +43,7 @@ namespace WDE.MpqReader.Structures
 
         private CreatureDisplayInfo()
         {
-            Id = -1;
+            Id = 0;
             ModelId = 0;
             SoundId = 0;
             ExtendedDisplayInfoID = 0;
@@ -65,7 +65,7 @@ namespace WDE.MpqReader.Structures
 
     public class CreatureDisplayInfoStore : IEnumerable<CreatureDisplayInfo>
     {
-        private Dictionary<int, CreatureDisplayInfo> store = new();
+        private Dictionary<uint, CreatureDisplayInfo> store = new();
         public CreatureDisplayInfoStore(IEnumerable<IDbcIterator> rows)
         {
             foreach (var row in rows)
@@ -75,8 +75,8 @@ namespace WDE.MpqReader.Structures
             }
         }
 
-        public bool Contains(int id) => store.ContainsKey(id);
-        public CreatureDisplayInfo this[int id] => store[id];
+        public bool Contains(uint id) => store.ContainsKey(id);
+        public CreatureDisplayInfo this[uint id] => store[id];
         public IEnumerator<CreatureDisplayInfo> GetEnumerator() => store.Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
     }

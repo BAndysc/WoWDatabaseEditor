@@ -13,7 +13,6 @@ using WDE.MapRenderer.StaticData;
 using WDE.MpqReader.Structures;
 using WDE.Common.Database;
 using WDE.MapRenderer;
-using WDE.MapRenderer.Managers;
 
 namespace WDE.MapRenderer.Managers
 {
@@ -93,21 +92,34 @@ namespace WDE.MapRenderer.Managers
 
                 // t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(-areaTrigger.BoxYaw), 0.0f);
 
-                if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains((int)creaturetemplate.ModelId1))
+                if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(creaturetemplate.ModelId1))
                 {
 
                     // System.Diagnostics.Debug.WriteLine($"Cr Y :  {creature.Y}");
 
-                    CreatureDisplayInfo crdisplayinfo = gameContext.DbcManager.CreatureDisplayInfoStore[(int)creaturetemplate.ModelId1];
+                    // randomly select one of the display ids of the creature
+                    var displayslist = new List<uint>{ creaturetemplate.ModelId1};
+
+                    if (creaturetemplate.ModelId2 > 0)
+                        displayslist.Add(creaturetemplate.ModelId2);
+
+                    if (creaturetemplate.ModelId3 > 0)
+                        displayslist.Add(creaturetemplate.ModelId3);
+
+                    if (creaturetemplate.ModelId4 > 0)
+                        displayslist.Add(creaturetemplate.ModelId4);
+
+                    var randomid = new Random().Next(displayslist.Count);
+
+                    CreatureDisplayInfo crdisplayinfo = gameContext.DbcManager.CreatureDisplayInfoStore[displayslist[randomid]];
 
                     string M2Path = gameContext.DbcManager.CreatureModelDataStore[crdisplayinfo.ModelId].ModelName;
 
                     transform.Scale = new Vector3(crdisplayinfo.CreatureModelScale * creaturetemplate.Scale);
 
-                    //System.Diagnostics.Debug.WriteLine($"M2path :  {M2Path}");
 
                     TaskCompletionSource<MdxManager.MdxInstance?> mdx = new();
-                    yield return gameContext.MdxManager.LoadM2Mesh(M2Path, mdx);
+                    yield return gameContext.MdxManager.LoadM2Mesh(M2Path, mdx, crdisplayinfo.Id);
                     if (mdx.Task.Result == null)
                     {
                         System.Diagnostics.Debug.WriteLine($"Can't load {M2Path}"); //could not load mdx

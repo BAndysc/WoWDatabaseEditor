@@ -11,6 +11,7 @@ using TheMaths;
 using WDE.MpqReader;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
+using WDE.MapRenderer.Managers;
 
 namespace WDE.MapRenderer.Managers
 {
@@ -64,7 +65,7 @@ namespace WDE.MapRenderer.Managers
             this.gameContext = gameContext;
         }
 
-        public IEnumerator LoadM2Mesh(string path, TaskCompletionSource<MdxInstance?> result)
+        public IEnumerator LoadM2Mesh(string path, TaskCompletionSource<MdxInstance?> result, uint displayid = 0)
         {
             if (meshes.ContainsKey(path))
             {
@@ -185,7 +186,56 @@ namespace WDE.MapRenderer.Managers
                     else
                     {
                         var textureDef = m2.textures[texId];
-                        var texFile = textureDef.filename.AsString();
+                        string texFile = "";
+                        
+                        if (textureDef.type == 0) // if tetx is hardcoded
+                            texFile = textureDef.filename.AsString();
+
+                        // TITI, set creature texture
+                        else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_1) // creature skin
+                        {
+                            if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(displayid))
+                            {
+                                // string crfilename = m2FilePath.Split('\\').Last();
+                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), gameContext.DbcManager.CreatureDisplayInfoStore[displayid].TextureVariation1 + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                            }
+                            else
+                            {
+                                Console.WriteLine("display id + displayid + not found in CreatureDisplayInfo.dbc ");
+                                continue;
+                            }
+                        }
+
+                        else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_2) // creature skin
+                        {
+                            if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(displayid))
+                            {
+                                string crfilename = m2FilePath.Split('\\').Last();
+                                texFile = m2FilePath.Replace(crfilename, gameContext.DbcManager.CreatureDisplayInfoStore[displayid].TextureVariation2 + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                            }
+                            else
+                            {
+                                Console.WriteLine("display id + displayid + not found in CreatureDisplayInfo.dbc ");
+                                continue;
+                            }
+                        }
+
+                        else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_3) // creature skin
+                        {
+                            if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(displayid))
+                            {
+                                string crfilename = m2FilePath.Split('\\').Last();
+                                texFile = m2FilePath.Replace(crfilename, gameContext.DbcManager.CreatureDisplayInfoStore[displayid].TextureVariation3 + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                            }
+                            else
+                            {
+                                Console.WriteLine("display id + displayid + not found in CreatureDisplayInfo.dbc ");
+                                continue;
+                            }
+                        }
+
+                        // System.Diagnostics.Debug.WriteLine($"M2 texture path :  {texFile}");
+                        // var texFile = textureDef.filename.AsString();
                         var tcs = new TaskCompletionSource<TextureHandle>();
                         yield return gameContext.TextureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
