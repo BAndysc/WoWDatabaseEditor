@@ -51,7 +51,12 @@ public class DatabaseResolver
                 break;
             }
             default:
-                throw new Exception("Unknown core version");
+            {
+                var db= tcWrath.Value;
+                auth = db;
+                world = db;
+                return;
+            }
         }
     }
 
