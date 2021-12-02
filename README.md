@@ -12,9 +12,9 @@ This project is a continuation of [Visual SAI Studio](https://github.com/Bandysc
 
 # Sponsors
 
-WoW Database Editor is sponsored by [Atlantiss](https://atlantiss.org/) and [Tauri](https://tauriwow.com/).
+WoW Database Editor is sponsored by [Stormforge](https://stormforge.gg). Project by [Atlantiss](https://atlantiss.org/) and [Tauri](https://tauriwow.com/).
 
-![Atlantiss & Tauri](https://i.imgur.com/gj0HPAk.png)
+![Stormforge](https://i.imgur.com/QOsJD6Q.png)
 
 # Download latest version
 
