@@ -8,6 +8,8 @@
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <EnablePreviewFeatures>true</EnablePreviewFeatures>
+        <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
         <Antlr4UseCSharpGenerator>True</Antlr4UseCSharpGenerator>
     </PropertyGroup>
     <PropertyGroup>
@@ -15,6 +17,8 @@
     </PropertyGroup>
     <Import Project="..\Module.props" />    
     <ItemGroup>
+        <PackageReference Include="System.Runtime.Experimental" Version="6.0.0" />
+
         <PackageReference Include="Antlr4.Runtime.Standard">
             <Version>4.9.2</Version>
         </PackageReference>

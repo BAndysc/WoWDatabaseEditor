@@ -104,6 +104,8 @@ test_script:
     dotnet test WDE.WoWHeadConnector.Test/WDE.WoWHeadConnector.Test.csproj
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
+
+    dotnet test Modules/WDE.PacketViewer.Test/WDE.PacketViewer.Test.csproj
 artifacts:
 - path: WoWDatabaseEditorMacOs.zip
   name: WoWDatabaseEditorMacOs.zip
