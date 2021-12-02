@@ -14,10 +14,10 @@ public class OptimizedIntervalTreeTests
         
         Assert.AreEqual(null, tree.Query(-2));
         Assert.AreEqual(null, tree.Query(-1));
-        Assert.AreEqual(1, tree.Query(0).Value);
-        Assert.AreEqual(1, tree.Query(1).Value);
-        Assert.AreEqual(1, tree.Query(2).Value);
-        Assert.AreEqual(1, tree.Query(3).Value);
+        Assert.AreEqual(1, tree.Query(0).Value.value);
+        Assert.AreEqual(1, tree.Query(1).Value.value);
+        Assert.AreEqual(1, tree.Query(2).Value.value);
+        Assert.AreEqual(1, tree.Query(3).Value.value);
         Assert.AreEqual(null, tree.Query(4));
     }
     

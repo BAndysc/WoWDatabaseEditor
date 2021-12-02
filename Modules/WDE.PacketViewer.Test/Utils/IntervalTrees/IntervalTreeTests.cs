@@ -17,19 +17,19 @@ public class IntervalTreeTests
         
         Assert.AreEqual(null, tree.Query(-2));
         Assert.AreEqual(null, tree.Query(-1));
-        Assert.AreEqual(0, tree.Query(0).Value);
-        Assert.AreEqual(0, tree.Query(1).Value);
-        Assert.AreEqual(0, tree.Query(2).Value);
-        Assert.AreEqual(0, tree.Query(3).Value);
+        Assert.AreEqual(0, tree.Query(0).Value.value);
+        Assert.AreEqual(0, tree.Query(1).Value.value);
+        Assert.AreEqual(0, tree.Query(2).Value.value);
+        Assert.AreEqual(0, tree.Query(3).Value.value);
         Assert.AreEqual(null, tree.Query(4));
-        Assert.AreEqual(1, tree.Query(5).Value);
-        Assert.AreEqual(1, tree.Query(6).Value);
-        Assert.AreEqual(1, tree.Query(7).Value);
+        Assert.AreEqual(1, tree.Query(5).Value.value);
+        Assert.AreEqual(1, tree.Query(6).Value.value);
+        Assert.AreEqual(1, tree.Query(7).Value.value);
         Assert.AreEqual(null, tree.Query(8));
-        Assert.AreEqual(2, tree.Query(9).Value);
-        Assert.AreEqual(2, tree.Query(10).Value);
-        Assert.AreEqual(2, tree.Query(11).Value);
-        Assert.AreEqual(2, tree.Query(12));
+        Assert.AreEqual(2, tree.Query(9).Value.value);
+        Assert.AreEqual(2, tree.Query(10).Value.value);
+        Assert.AreEqual(2, tree.Query(11).Value.value);
+        Assert.AreEqual(2, tree.Query(12).Value.value);
         Assert.AreEqual(null, tree.Query(13));
     }
     
