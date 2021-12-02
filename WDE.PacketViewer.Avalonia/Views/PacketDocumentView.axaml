@@ -205,11 +205,17 @@
                         Name="PacketPreview"
                         FontFamily="Consolas,Menlo,Courier,Courier New" />
                     
-                    <GridSplitter Grid.Row="1" IsVisible="{Binding ReasonPanelVisibility}" />
+                    <GridSplitter Grid.Row="1" />
 
                     <!-- packet details -->
-                    <TabControl Grid.Row="2" IsVisible="{Binding ReasonPanelVisibility}">
-                        <TabItem Header="Reason predictions">
+                    <TabControl Name="PacketDetailsTab" Grid.Row="2">
+                        <TabItem Header="Update values">
+                            <DockPanel LastChildFill="True">
+                                <controls:GroupingHeader GroupName="Objects current values" DockPanel.Dock="Top" />
+                                <views:UpdateHistoryView DataContext="{Binding UpdateHistoryViewModel}" />
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="Reason predictions" IsEnabled="{Binding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What are the possible reasons for sending the packet" DockPanel.Dock="Top" />
                                 <ListBox Items="{Binding Predictions}"
@@ -239,7 +245,7 @@
                                 </ListBox>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Possible actions">
+                        <TabItem Header="Possible actions" IsEnabled="{Binding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What other packets may have been sent because of this packet" DockPanel.Dock="Top" />
                                 <ListBox Items="{Binding PossibleActions}"
@@ -269,7 +275,7 @@
                                 </ListBox>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Detected actions">
+                        <TabItem Header="Detected actions" IsEnabled="{Binding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What actions have been detected in this packet" DockPanel.Dock="Top" />
                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled">
@@ -304,7 +310,7 @@
                                 </ScrollViewer>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Detected events">
+                        <TabItem Header="Detected events" IsEnabled="{Binding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What events (reasons) have been detected in this packet" DockPanel.Dock="Top" />
                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled">
