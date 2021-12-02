@@ -70,13 +70,13 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
         public ActionHappened? GetAction(PacketBase packet) => GetAction(packet.Number);
 
-        public IEnumerable<(IEvaluation rate, EventHappened @event)> GetPossibleEventsForAction(PacketBase packet) => GetPossibleEventsForAction(packet.Number);
+        public IEnumerable<(FinalEvaluation rate, EventHappened @event)> GetPossibleEventsForAction(PacketBase packet) => GetPossibleEventsForAction(packet.Number);
 
-        public IEnumerable<(IEvaluation rate, EventHappened @event)> GetPossibleEventsForAction(int number)
+        public IEnumerable<(FinalEvaluation rate, EventHappened @event)> GetPossibleEventsForAction(int number)
         {
             if (chatEmoteSoundProcessor.IsEmoteForChat(number))
             {
-                yield return (Const.One, new EventHappened()
+                yield return (FinalEvaluation.From(Const.One), new EventHappened()
                 {
                     Description = "Emote for the next SMSG_CHAT",
                     PacketNumber = chatEmoteSoundProcessor.GetChatPacketForEmote(number)!.Value
@@ -99,7 +99,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
             var action = state.Item2[0];
             
-            List<(IEvaluation, EventHappened)> reasons = new();
+            List<(FinalEvaluation, EventHappened)> reasons = new();
             int i = state.Item1;
             while (i >= 0 && reasons.Count < 50)
             {
@@ -207,16 +207,14 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     action.CustomEntry.Value == @event.MainActor?.Entry)
                     actorsRating = new Const(0.8f);
 
-                var distRating = new OneMinus(new Power(new Remap(new Const(distToEvent ?? 33.5f), 0, 75, 0, 1), 1));
+                OneMinus distRating = OneMinus.From(Power.From(Remap.From(new Const(distToEvent ?? 33.5f), 0, 75, 0, 1), 1));
 
-                var timeRating =
-                    new OneMinus(
-                        new Power(new Remap(new Const((float)timePassed.TotalMilliseconds), 0, 10000 * (@event.TimeFactor ?? 1) * (action.TimeFactor ?? 1), 0, 1),  4));
+                OneMinus timeRating = OneMinus.From(Power.From(Remap.From(new Const((float)timePassed.TotalMilliseconds), 0, 10000 * (@event.TimeFactor ?? 1) * (action.TimeFactor ?? 1), 0, 1),  4));
 
-                IEvaluation? bonus = action.CustomEntry.HasValue && @event.CustomEntry.HasValue &&
-                                    action.CustomEntry.Value == @event.CustomEntry.Value ? Const.One : null;
+                Const bonus = action.CustomEntry.HasValue && @event.CustomEntry.HasValue &&
+                               action.CustomEntry.Value == @event.CustomEntry.Value ? Const.One : Const.Zero;
                 
-                var rating = new Weighted((actorsRating, 0.4f), (timeRating, 0.35f), (distRating, 0.25f), (bonus, 0.2f));
+                var rating = Weighted.From((actorsRating, 0.4f), (timeRating, 0.35f), (distRating, 0.25f), (bonus, 0.2f));
 
                 float bonusMult = (@event.Kind == EventType.ChatOver && action.Kind == ActionType.Chat) ? 1.3f : 1.0f;
 
@@ -248,10 +246,10 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 if (mainActorMatches)
                     bonusMult += 0.2f * (float)(1 - Math.Clamp(timePassed.TotalSeconds / 4, 0, 1));
                 
-                var ratingBonused = new Multiply(rating, bonusMult);
+                var ratingBonused = Multiply.From(rating, bonusMult);
 
                 if (ratingBonused.Value > 0.5f || ratingBonused.Value > 0.25f && actorsRating.Value > 0.5f)
-                    reasons.Add((ratingBonused, @event));
+                    reasons.Add((FinalEvaluation.From(ratingBonused), @event));
             }
 
             if (reasons.Count > 0)
