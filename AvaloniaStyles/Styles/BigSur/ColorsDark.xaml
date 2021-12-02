@@ -123,5 +123,8 @@
         <SolidColorBrush x:Key="NumberIndicatorBackground" Color="#34495e" />
         <SolidColorBrush x:Key="NumberIndicatorBackgroundActive" Color="#17632E" />
         <SolidColorBrush x:Key="NumberIndicatorForeground" Color="#bdc3c7" />
+        
+        <!-- universal colors -->
+        <SolidColorBrush x:Key="BluishColor" Color="#2AA0C4" />
     </Style.Resources>
 </Style>

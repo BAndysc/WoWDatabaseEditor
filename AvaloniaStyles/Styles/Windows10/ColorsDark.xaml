@@ -72,13 +72,18 @@
         
         <!-- tabs -->
         <SolidColorBrush x:Key="TabControlBorder" Color="#333333" />
+        <SolidColorBrush x:Key="TabControlBorderDisabled" Color="#262626" />
         <SolidColorBrush x:Key="TabItemHeaderForegroundUnselected" Color="#CCCCCC" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundSelected" Color="#161617" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundSelectedPointerOver" Color="#202021" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="#202021" />
+        <SolidColorBrush x:Key="TabItemHeaderBackgroundDisabled" Color="#343436" />
         
         <!-- -->
         <SolidColorBrush x:Key="GroupingHeaderColor" Color="#2AA0C4" />
+        
+        <!-- universal colors -->
+        <SolidColorBrush x:Key="BluishColor" Color="#2AA0C4" />
     </Styles.Resources>
     
     <Style Selector="GridSplitter">
