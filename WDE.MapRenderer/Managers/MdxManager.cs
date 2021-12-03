@@ -223,19 +223,23 @@ namespace WDE.MapRenderer.Managers
                             // TODO : SKIN SECTIONS !!!!!!!
 
                             // TODO :  CharHairGeosets.dbc
-                            int hairstyle = gameContext.DbcManager.CharHairGeosetsStore.First(x => x.RaceID == displayinfoextra.Race
-                                && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.HairStyle).GeosetId; // maybe +1 like beards ?
 
-                            geosetHair += hairstyle;
-                            // use CharHairGeosetsStore.ShowScalp (bald) or is it only some client stuff ?
+                            // hair
+                            if (displayinfoextra.HairStyle > 0)
+                            {
+                                int hairstyle = gameContext.DbcManager.CharHairGeosetsStore.First(x => x.RaceID == displayinfoextra.Race
+                                && x.SexId == displayinfoextra.Gender && x.VariationId + 1 == displayinfoextra.HairStyle).GeosetId; // maybe +1 like beards ?
+                                
+                                geosetHair += hairstyle;
+                                // use CharHairGeosetsStore.ShowScalp (bald) or is it only some client stuff ?
+                            }
 
                             // facial hair
-                            CharacterFacialHairStyles facialhairstyle;
                             if (displayinfoextra.BeardStyle > 0)
-                            { 
-                            // System.Diagnostics.Debug.WriteLine($"facial hair stylrs count  :  {gameContext.DbcManager.CharacterFacialHairStylesStore.Count}");
+                            {
+                                // System.Diagnostics.Debug.WriteLine($"facial hair stylrs count  :  {gameContext.DbcManager.CharacterFacialHairStylesStore.Count}");
 
-                                facialhairstyle = gameContext.DbcManager.CharacterFacialHairStylesStore.First(x => x.RaceID == displayinfoextra.Race
+                                CharacterFacialHairStyles facialhairstyle = gameContext.DbcManager.CharacterFacialHairStylesStore.First(x => x.RaceID == displayinfoextra.Race
                                 && x.SexId == displayinfoextra.Gender && x.VariationId +1 == displayinfoextra.BeardStyle );
                                 
                                 geosetFacial1 += facialhairstyle.Geoset1;
@@ -247,7 +251,7 @@ namespace WDE.MapRenderer.Managers
 
                             if (displayinfoextra.Helm > 0)
                                 geosetHelm = 2702 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Helm].geosetGroup1;
-                            // geoset group 2 ? some enable/disable 2100 (head) ?
+                                // geoset group 2 ? some enable/disable 2100 (head) ?
 
                             if (displayinfoextra.Shoulder > 0)
                                 geosetShoulders = 2601 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Shoulder].geosetGroup1;
@@ -397,8 +401,6 @@ namespace WDE.MapRenderer.Managers
                                 // 2nd way : 
                                 texFile = gameContext.DbcManager.CharSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
                                     &&  x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.HairStyle && x.BaseSection == 3).TextureName1;
-
-                                System.Diagnostics.Debug.WriteLine(texFile);
                             }
                         }
 
