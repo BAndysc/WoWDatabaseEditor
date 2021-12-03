@@ -10,8 +10,14 @@ namespace WDE.MapRenderer.Managers
 
         public AreaTriggerStore AreaTriggerStore { get; }
         public CreatureDisplayInfoStore CreatureDisplayInfoStore { get; }
-        // public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
+        public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
+        public ItemDisplayInfoStore ItemDisplayInfoStore { get; }
         public CreatureModelDataStore CreatureModelDataStore { get; }
+        public GameObjectDisplayInfoStore GameObjectDisplayInfoStore { get; }
+        public CharSectionsStore CharSectionsStore { get; }
+        // public ChrRacesStore ChrRacesStore { get; }
+        public CharacterFacialHairStylesStore CharacterFacialHairStylesStore { get; }
+        public CharHairGeosetsStore CharHairGeosetsStore { get; }
         public MapStore MapStore { get; }
         public LightIntParamStore LightIntParamStore { get; }
         public LightFloatParamStore LightFloatParamStore { get; }
@@ -29,8 +35,14 @@ namespace WDE.MapRenderer.Managers
             this.opener = opener;
             AreaTriggerStore = new(OpenDbc("AreaTrigger"));
             CreatureDisplayInfoStore = new(OpenDbc("CreatureDisplayInfo"));
-            // CreatureDisplayInfoExtraStore = new(OpenDbc("CreatureDisplayInfoExtra")); // for humanoids
+            CreatureDisplayInfoExtraStore = new(OpenDbc("CreatureDisplayInfoExtra")); // for humanoids
             CreatureModelDataStore = new(OpenDbc("CreatureModelData"));
+            GameObjectDisplayInfoStore = new(OpenDbc("GameObjectDisplayInfo"));
+            ItemDisplayInfoStore = new(OpenDbc("ItemDisplayInfo"));
+            CharSectionsStore = new(OpenDbc("CharSections"));
+            // ChrRacesStore = new(OpenDbc("ChrRaces"));
+            CharacterFacialHairStylesStore = new(OpenDbc("CharacterFacialHairStyles"));
+            CharHairGeosetsStore = new(OpenDbc("CharHairGeosets"));
             MapStore = new (OpenDbc("Map"));
             LightIntParamStore = new (OpenDbc("LightIntBand"));
             LightFloatParamStore = new (OpenDbc("LightFloatBand"));
