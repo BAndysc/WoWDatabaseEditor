@@ -48,6 +48,8 @@ namespace WDE.MapRenderer.Managers
             transcluentMaterial.SetUniform("objectColor", new Vector4(0.2f, 0.4f, 1f, 0.3f));
         }
 
+        public bool RenderAreaTriggers { get; set; } = true;
+
         public void Dispose()
         {
             gameContext.Engine.MeshManager.DisposeMesh(boxMesh);
@@ -56,6 +58,9 @@ namespace WDE.MapRenderer.Managers
         
         public void Render()
         {
+            if (!RenderAreaTriggers)
+                return;
+            
             foreach (var areaTrigger in gameContext.DbcManager.AreaTriggerStore)
             {
                 if (areaTrigger.ContinentId != gameContext.CurrentMap.Id)

@@ -115,15 +115,20 @@ namespace WDE.MapRenderer
                 Game.TimeManager.TimeSpeedMultiplier = settings.TimeSpeedMultiplier;
                 Game.ChunkManager.RenderGrid = settings.ShowGrid;
                 Game.Engine.RenderManager.ViewDistanceModifier = settings.ViewDistanceModifier;
+                Game.AreaTriggerManager.RenderAreaTriggers = settings.ShowAreaTriggers;
                 RegisteredViewModels = Game.ModuleManager.ViewModels;
                 RegisteredViewModels.CollectionChanged += RegisteredViewModelsOnCollectionChanged;
                 
-                RaisePropertyChanged(nameof(OverrideLighting));
-                RaisePropertyChanged(nameof(DisableTimeFlow));
-                RaisePropertyChanged(nameof(TimeSpeedMultiplier));
-                RaisePropertyChanged(nameof(ShowGrid));
-                RaisePropertyChanged(nameof(CurrentTime));
-                RaisePropertyChanged(nameof(ViewDistance));
+                Dispatcher.UIThread.Post(() =>
+                {
+                    RaisePropertyChanged(nameof(OverrideLighting));
+                    RaisePropertyChanged(nameof(DisableTimeFlow));
+                    RaisePropertyChanged(nameof(TimeSpeedMultiplier));
+                    RaisePropertyChanged(nameof(ShowGrid));
+                    RaisePropertyChanged(nameof(CurrentTime));
+                    RaisePropertyChanged(nameof(ViewDistance));
+                    RaisePropertyChanged(nameof(ShowAreaTriggers));
+                });
             };
             Game.ChangedMap += newMapId =>
             {
@@ -276,6 +281,17 @@ Tris: " + stats.TrianglesDrawn;
             }
         }
 
+        public bool ShowAreaTriggers
+        {
+            get => Game.AreaTriggerManager?.RenderAreaTriggers ?? false;
+            set
+            {
+                Game.AreaTriggerManager.RenderAreaTriggers = value;
+                settings.ShowAreaTriggers = value;
+                RaisePropertyChanged(nameof(ShowAreaTriggers));
+            }
+        }
+        
         public bool ShowGrid
         {
             get => Game.ChunkManager?.RenderGrid ?? false;

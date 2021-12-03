@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using Newtonsoft.Json;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 
@@ -40,6 +42,16 @@ namespace WDE.MapRenderer
             set
             {
                 current.DisableTimeFlow = value;
+                settings.Update(current);
+            }
+        }
+
+        public bool ShowAreaTriggers
+        {
+            get => current.ShowAreaTriggers;
+            set
+            {
+                current.ShowAreaTriggers = value;
                 settings.Update(current);
             }
         }
@@ -92,6 +104,10 @@ namespace WDE.MapRenderer
             public bool ShowGrid;
             public int CurrentTime;
             public float ViewDistanceModifier;
+            
+            [DefaultValue(true)]            
+            [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+            public bool ShowAreaTriggers;
         }
     }
 }
