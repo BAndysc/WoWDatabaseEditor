@@ -122,15 +122,16 @@ namespace WDE.MapRenderer.Managers
                 IGameObjectTemplate gotemplate = gameobjectstemplates.First(x => x.Entry == gameobject.Entry);
 
                 t.Scale = new Vector3(gotemplate.Size);
-                // t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(-areaTrigger.BoxYaw), 0.0f);
+                // TODO : apply rotation +  orientation
+                t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(-gameobject.Orientation), 0.0f);
+
+                // t.Rotation = new Quaternion(gameobject.Rotation0, gameobject.Rotation1, gameobject.Rotation2, gameobject.Rotation3);
+                
                 string M2Path = "";
 
                 if (gameContext.DbcManager.GameObjectDisplayInfoStore.Contains((int)gotemplate.DisplayId))
                 {
                     M2Path = gameContext.DbcManager.GameObjectDisplayInfoStore[(int)gotemplate.DisplayId].ModelName;
-
-
-                    // System.Diagnostics.Debug.WriteLine($"M2path :  {M2Path}");
 
                     TaskCompletionSource<MdxManager.MdxInstance?> mdx = new();
                     yield return gameContext.MdxManager.LoadM2Mesh(M2Path, mdx);
@@ -142,13 +143,13 @@ namespace WDE.MapRenderer.Managers
                     {
                         int i = 0;
                         var instance = mdx.Task.Result;
-                        var transform = new Transform();
                         height = instance.mesh.Bounds.Height / 2;
                         // position, rotation
                         foreach (var material in instance.materials)
                             gameContext.Engine.RenderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, t);
 
-                        t.Scale = instance.mesh.Bounds.Size;
+                        t.Scale = instance.mesh.Bounds.Size /2 ;
+                        t.Position += instance.mesh.Bounds.Center;
                         // t.Scale = new Vector3(instance.mesh.Bounds.Width, instance.mesh.Bounds.Depth, instance.mesh.Bounds.Height); 
                         gameContext.Engine.RenderManager.RegisterStaticRenderer(BoxMesh.Handle, transcluentMaterial, 0, t);
 

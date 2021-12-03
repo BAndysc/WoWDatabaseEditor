@@ -57,44 +57,28 @@ namespace WDE.MapRenderer.Managers
 
         public IEnumerator LoadCeatures()
         {
-
-            // if (gameobjects == null)
-            //     return;
-
-            System.Diagnostics.Debug.WriteLine($"Cr pos  X :  {CreatureData.Count}");
+            System.Diagnostics.Debug.WriteLine($"{CreatureData.Count} creature spawns");
 
             foreach (var creature in CreatureData)
             {
                 // check map id
-
-
-
                 if (creature.Map != gameContext.CurrentMap.Id)
                     continue;
 
-
                 // check phasemask
-                // if ((creature.PhaseMask & 1) != 1)
-                //     continue;
+                if ((creature.PhaseMask & 1) != 1)
+                    continue;
 
                 var creaturePosition = new Vector3(creature.X, creature.Y, creature.Z);
 
                 transform.Position = creaturePosition.ToOpenGlPosition();
+                transform.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(-creature.O), 0.0f);
                 float height = 0;
-
-                // if ((gameContext.CameraManager.Position - t.Position).LengthSquared() > GameObjectVisibilityDistanceSquare)
-                //     continue;
 
                 ICreatureTemplate creaturetemplate = CreatureTemplateData.First(x => x.Entry == creature.Entry);
 
-                // System.Diagnostics.Debug.WriteLine($"Cr name  :  {creaturetemplate.Name}");
-
-
-                // t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(-areaTrigger.BoxYaw), 0.0f);
-
                 if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(creaturetemplate.ModelId1))
                 {
-
                     // System.Diagnostics.Debug.WriteLine($"Cr Y :  {creature.Y}");
 
                     // randomly select one of the display ids of the creature
@@ -117,7 +101,6 @@ namespace WDE.MapRenderer.Managers
 
                     transform.Scale = new Vector3(crdisplayinfo.CreatureModelScale * creaturetemplate.Scale);
 
-
                     TaskCompletionSource<MdxManager.MdxInstance?> mdx = new();
                     yield return gameContext.MdxManager.LoadM2Mesh(M2Path, mdx, crdisplayinfo.Id);
                     if (mdx.Task.Result == null)
@@ -133,7 +116,8 @@ namespace WDE.MapRenderer.Managers
                         foreach (var material in instance.materials)
                             gameContext.Engine.RenderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, transform);
 
-                        transform.Scale = instance.mesh.Bounds.Size;
+                        transform.Scale = instance.mesh.Bounds.Size / 2 ;
+                        transform.Position  += instance.mesh.Bounds.Center;
                         gameContext.Engine.RenderManager.RegisterStaticRenderer(Mesh.Handle, Material, 0, transform);
 
                         // gameContext.Engine.Ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), creaturetemplate.Name, 2.5f, Matrix.TRS(t.Position + Vector3.Up * height, in Quaternion.Identity, in Vector3.One));
