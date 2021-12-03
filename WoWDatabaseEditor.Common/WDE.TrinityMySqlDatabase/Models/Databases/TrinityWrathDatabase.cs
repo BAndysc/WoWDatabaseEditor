@@ -10,4 +10,5 @@ public class TrinityWrathDatabase : BaseTrinityDatabase
     public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
     public ITable<TrinityString> Strings => GetTable<TrinityString>();
     public ITable<TrinityMySqlSpellDbc> SpellDbc => GetTable<TrinityMySqlSpellDbc>();
+    public ITable<MySqlGameObjectWrath> GameObject => GetTable<MySqlGameObjectWrath>();
 }

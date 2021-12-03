@@ -9,4 +9,5 @@ public class AzerothDatabase : BaseTrinityDatabase
     public ITable<MySqlBroadcastTextAzeroth> BroadcastTexts => GetTable<MySqlBroadcastTextAzeroth>();
     public ITable<ACoreString> Strings => GetTable<ACoreString>();
     public ITable<AzerothMySqlSpellDbc> SpellDbc => GetTable<AzerothMySqlSpellDbc>();
+    public ITable<MySqlGameObjectWrath> GameObject => GetTable<MySqlGameObjectWrath>();
 }

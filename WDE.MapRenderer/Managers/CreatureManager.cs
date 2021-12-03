@@ -18,6 +18,7 @@ namespace WDE.MapRenderer.Managers
 {
     public class CreatureManager : System.IDisposable
     {
+        private Random rng = new Random();
         private readonly IGameContext gameContext;
         private IList<ICreature> CreatureData;
         private IList<ICreatureTemplate> CreatureTemplateData;
@@ -77,25 +78,23 @@ namespace WDE.MapRenderer.Managers
 
                 ICreatureTemplate creaturetemplate = CreatureTemplateData.First(x => x.Entry == creature.Entry);
 
-                if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(creaturetemplate.ModelId1))
+                if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(creaturetemplate.GetModel(0)))
                 {
                     // System.Diagnostics.Debug.WriteLine($"Cr Y :  {creature.Y}");
 
                     // randomly select one of the display ids of the creature
-                    var displayslist = new List<uint>{ creaturetemplate.ModelId1};
+                    int numberOfModels = 0;
+                    for (int i = 0; i < creaturetemplate.ModelsCount; ++i)
+                    {
+                        if (creaturetemplate.GetModel(i) > 0)
+                            numberOfModels++;
+                        else
+                            break;
+                    }
 
-                    if (creaturetemplate.ModelId2 > 0)
-                        displayslist.Add(creaturetemplate.ModelId2);
+                    var randomModel = creaturetemplate.GetModel(rng.Next(numberOfModels));
 
-                    if (creaturetemplate.ModelId3 > 0)
-                        displayslist.Add(creaturetemplate.ModelId3);
-
-                    if (creaturetemplate.ModelId4 > 0)
-                        displayslist.Add(creaturetemplate.ModelId4);
-
-                    var randomid = new Random().Next(displayslist.Count);
-
-                    CreatureDisplayInfo crdisplayinfo = gameContext.DbcManager.CreatureDisplayInfoStore[displayslist[randomid]];
+                    CreatureDisplayInfo crdisplayinfo = gameContext.DbcManager.CreatureDisplayInfoStore[randomModel];
 
                     string M2Path = gameContext.DbcManager.CreatureModelDataStore[crdisplayinfo.ModelId].ModelName;
 
