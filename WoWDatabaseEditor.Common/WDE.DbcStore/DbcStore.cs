@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDBXEditor.Storage;
+using DBCD;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
@@ -22,7 +23,8 @@ namespace WDE.DbcStore
     {
         WOTLK_12340 = 12340,
         CATA_15595 = 15595,
-        LEGION_26972 = 26972
+        LEGION_26972 = 26972,
+        SHADOWLANDS_41079 = 41079
     }
 
     [AutoRegister]
@@ -37,6 +39,7 @@ namespace WDE.DbcStore
         private readonly WrathSpellService wrathSpellService;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
+        private readonly DBCD.DBCD dbcd;
 
         public DbcStore(IParameterFactory parameterFactory, 
             ITaskRunner taskRunner,
@@ -45,7 +48,8 @@ namespace WDE.DbcStore
             IEventAggregator eventAggregator,
             NullSpellService nullSpellService,
             CataSpellService cataSpellService,
-            WrathSpellService wrathSpellService)
+            WrathSpellService wrathSpellService,
+            DBCD.DBCD dbcd)
         {
             this.parameterFactory = parameterFactory;
             this.taskRunner = taskRunner;
@@ -55,6 +59,7 @@ namespace WDE.DbcStore
             this.nullSpellService = nullSpellService;
             this.cataSpellService = cataSpellService;
             this.wrathSpellService = wrathSpellService;
+            this.dbcd = dbcd;
 
             spellServiceImpl = nullSpellService;
             Load();
@@ -102,6 +107,8 @@ namespace WDE.DbcStore
             private readonly IDbcSettingsProvider dbcSettingsProvider;
             private readonly IParameterFactory parameterFactory;
             private readonly DbcStore store;
+            private readonly DBDProvider dbdProvider;
+            private readonly DBCProvider dbcProvider;
 
             private Dictionary<long, string> AreaTriggerStore { get; } = new();
             private Dictionary<long, long> FactionTemplateStore { get; } = new();
@@ -161,7 +168,49 @@ namespace WDE.DbcStore
             {
                 Load(filename, row => dictionary.Add(row.GetInt(id), row.GetInt(nameIndex)));
             }
-            
+
+            private void Load(string filename, string fieldName, Dictionary<long, string> dictionary)
+            {
+                var storage = store.dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+
+                if (fieldName == String.Empty)
+                {
+                    foreach (DBCDRow item in storage.Values)
+                        dictionary.Add(item.ID, String.Empty);
+                }
+                else
+                {
+                    foreach (DBCDRow item in storage.Values)
+                    {
+                        if (item[fieldName] == null)
+                            return;
+
+                        dictionary.Add(item.ID, item[fieldName].ToString());
+                    }
+                }
+            }
+
+            private void Load(string filename, string fieldName, Dictionary<long, long> dictionary)
+            {
+                var storage = store.dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+
+                if (fieldName == String.Empty)
+                {
+                    foreach (DBCDRow item in storage.Values)
+                        dictionary.Add(item.ID, 0);
+                }
+                else
+                {
+                    foreach (DBCDRow item in storage.Values)
+                    {
+                        if (item[fieldName] == null)
+                            return;
+
+                        dictionary.Add(item.ID, Convert.ToInt64(item[fieldName]));
+                    }
+                }
+            }
+
             public void FinishMainThread()
             {
                 store.AreaTriggerStore = AreaTriggerStore;
@@ -296,7 +345,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.LEGION_26972:
                     {
-                        max = 17;
+                        max = 18;
                         Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(16), $"Area trigger at {row.GetFloat(0)}, {row.GetFloat(1)}, {row.GetFloat(2)}"));
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
@@ -316,6 +365,27 @@ namespace WDE.DbcStore
                         Load("QuestInfo.db2", 0, 1, QuestInfoStore);
                         Load("CharTitles.db2", 0, 1, CharTitleStore);
                         Load("CreatureDisplayInfo.db2", 0, 2, CreatureDisplayInfoStore);
+                        break;
+                    }
+                    case DBCVersions.SHADOWLANDS_41079:
+                    {
+                        max = 16;
+                        Load("AreaTrigger.db2", string.Empty, AreaTriggerStore);
+                        Load("SpellName.db2", "Name_lang", SpellStore);
+                        Load("Achievement.db2", "Title_lang", AchievementStore);
+                        Load("AreaTable.db2", "AreaName_lang", AreaStore);
+                        Load("ChrClasses.db2", "Name_lang", ClassStore);
+                        Load("ChrRaces.db2", "Name_lang", RaceStore);
+                        Load("Emotes.db2", "EmoteSlashCommand", EmoteStore);
+                        Load("EmotesText.db2", "Name", TextEmoteStore);
+                        Load("ItemSparse.db2", "Display_lang", ItemStore);
+                        Load("Languages.db2", "Name_lang", LanguageStore);
+                        Load("Map.db2", "MapName_lang", MapDirectoryStore);
+                        Load("Faction.db2", "Name_lang", FactionStore);
+                        Load("FactionTemplate.db2", "Faction", FactionTemplateStore);
+                        Load("SpellFocusObject.db2", "Name_lang", SpellFocusObjectStore);
+                        Load("QuestInfo.db2", "InfoName_lang", QuestInfoStore);
+                        Load("CharTitles.db2", "Name_lang", CharTitleStore);
                         break;
                     }
                     default:

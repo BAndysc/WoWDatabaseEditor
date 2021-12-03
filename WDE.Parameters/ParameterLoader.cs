@@ -61,6 +61,7 @@ namespace WDE.Parameters
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)));
             factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, serverIntegration)));
+            factory.Register("CreatureGameobjectNameParameter", AddDatabaseParameter(new CreatureGameobjectNameParameter(database)));
             factory.Register("CreatureGameobjectParameter", AddDatabaseParameter(new CreatureGameobjectParameter(database)));
             factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database)));
             factory.Register("PrevQuestParameter", AddDatabaseParameter(new PrevQuestParameter(database)));
@@ -186,6 +187,25 @@ namespace WDE.Parameters
         }
     }
 
+    public class CreatureGameobjectNameParameter : LateLoadParameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public CreatureGameobjectNameParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+
+        public override void LateLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
+                Items[item.Entry] = new SelectOption(item.Name);
+            foreach (ICreatureTemplate item in database.GetCreatureTemplates())
+                Items[item.Entry] = new SelectOption(item.Name);
+        }
+    }
+    
     public class CreatureGameobjectParameter : LateLoadParameter
     {
         private readonly IDatabaseProvider database;

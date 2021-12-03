@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
+             xmlns:converters="clr-namespace:WDE.PacketViewer.Avalonia.Views.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="Root"
+             d:DataContext="{d:DesignInstance viewModels:UpdateHistoryViewModel, IsDesignTimeCreatable=False}"
+             x:Class="WDE.PacketViewer.Avalonia.Views.UpdateHistoryView">
+    <UserControl.Styles>
+        <Style Selector="TextBlock.LinkLike:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource BluishColor}" />
+            <Setter Property="TextDecorations" Value="Underline" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+    </UserControl.Styles>
+    <DockPanel LastChildFill="True">
+        <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+            <ImageToggleButton IsChecked="{Binding LockCurrentGuid}" 
+                               Width="20"
+                               Height="20"
+                               DockPanel.Dock="Left"
+                               VerticalAlignment="Center"
+                               Margin="2"
+                               ImageChecked="Icons/icon_lock.png"
+                               ImageUnchecked="Icons/icon_lock_unlocked.png" />
+            <CompletionComboBox HorizontalAlignment="Stretch"
+                                AsyncPopulator="{Binding FindGuidAsyncPopulator}"
+                                Items="{Binding Guids}" 
+                                SelectedItem="{Binding CurrentGuid}">
+                <CompletionComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding ., Converter={x:Static converters:UniversalGuidToHexConverter.Instance}}"></TextBlock>
+                    </DataTemplate>
+                </CompletionComboBox.ItemTemplate>
+            </CompletionComboBox>
+        </DockPanel>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ItemsControl FontSize="11" Items="{Binding CurrentValues}">
+                <ItemsControl.Styles>
+                    <Style Selector="ItemsControl > ContentPresenter:nth-child(2n)">
+                        <Setter Property="Background" Value="#107F7F7F" />
+                    </Style>
+                </ItemsControl.Styles>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,4">
+                            <CommandTextBlock Command="{Binding #Root.DataContext.JumpToPacket}" CommandParameter="{Binding PrevNumber}" Margin="8,0,8,0" Classes="LinkLike" ToolTip.Tip="{Binding Prev}" Text="⇦" Opacity="{Binding Prev, Converter={x:Static NullDoubleConverter.WhenNullThen0}}" />
+                            <CommandTextBlock Command="{Binding #Root.DataContext.JumpToPacket}" CommandParameter="{Binding NextNumber}" Classes="LinkLike" ToolTip.Tip="{Binding Next}" Text="⇨" Opacity="{Binding Next, Converter={x:Static NullDoubleConverter.WhenNullThen0}}" />
+                            
+                            <TextBlock Foreground="{DynamicResource BluishColor}" Text="{Binding Key}" TextAlignment="Right" HorizontalAlignment="Stretch" Margin="0,0,8, 0" Width="200" />
+                            <TextBlock FontFamily="Consolas,Menlo,Courier,Courier New" Text="{Binding Value}" />
+                            <TextBlock Text="{Binding Pretty}" Opacity="0.5" Margin="5, 0,0,0" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

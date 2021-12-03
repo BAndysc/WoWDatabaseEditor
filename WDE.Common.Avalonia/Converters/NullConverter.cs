@@ -6,6 +6,9 @@ namespace WDE.Common.Avalonia.Converters
 {
     public class NullConverter : IValueConverter
     {
+        public static NullConverter IsNull = new NullConverter();
+        public static NullConverter IsNotNull = new NullConverter(){Inverted = true};
+        
         public bool Inverted { get; set; }
         
         public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)

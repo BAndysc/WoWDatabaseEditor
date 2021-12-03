@@ -33,6 +33,7 @@ using WDE.PacketViewer.Processing;
 using WDE.PacketViewer.Processing.ProcessorProviders;
 using WDE.PacketViewer.Processing.Processors;
 using WDE.PacketViewer.Processing.Processors.ActionReaction;
+using WDE.PacketViewer.Processing.Processors.Utils;
 using WDE.PacketViewer.Services;
 using WDE.PacketViewer.Settings;
 using WDE.PacketViewer.Solutions;
@@ -53,7 +54,7 @@ namespace WDE.PacketViewer.ViewModels
         private readonly IRelatedPacketsFinder relatedPacketsFinder;
         private readonly ISniffLoader sniffLoader;
         private readonly PacketViewModelFactory packetViewModelCreator;
-        
+
         public PacketDocumentViewModel(PacketDocumentSolutionItem solutionItem, 
             IMainThread mainThread,
             MostRecentlySearchedService mostRecentlySearchedService,
@@ -74,7 +75,9 @@ namespace WDE.PacketViewer.ViewModels
             ITeachingTipService teachingTipService,
             PacketDocumentSolutionNameProvider solutionNameProvider,
             ISniffLoader sniffLoader,
-            ISpellStore spellStore)
+            ISpellStore spellStore,
+            PrettyFlagParameter prettyFlagParameter,
+            Func<IUpdateFieldsHistory> historyCreator)
         {
             this.solutionItem = solutionItem;
             this.mainThread = mainThread;
@@ -467,8 +470,10 @@ namespace WDE.PacketViewer.ViewModels
                 }
             }, _ => ReasonPanelVisibility);
 
-            On(() => ReasonPanelVisibility, _ =>
+            On(() => ReasonPanelVisibility, isVisible =>
             {
+                if (!isVisible)
+                    return;
                 ApplyFilterCommand.ExecuteAsync().ContinueWith(_ =>
                 {
                     ExplainSelectedPacketCommand.Execute(null);
@@ -541,6 +546,8 @@ namespace WDE.PacketViewer.ViewModels
                     ShowSplitUpdateTip = true;
             });
 
+            UpdateHistoryViewModel = AutoDispose(new UpdateHistoryViewModel(historyCreator,  prettyFlagParameter, JumpToPacketCommand, this.ToObservable(p => p.SelectedPacket)));
+
             LoadSniff().ListenErrors();
 
             AutoDispose(new ActionDisposable(() => currentActionToken?.Cancel()));
@@ -598,6 +605,8 @@ namespace WDE.PacketViewer.ViewModels
                 if (finalized != null)
                     foreach (var split in finalized)
                         AllPacketsSplit.Add(packetViewModelCreator.Process(split.Item1, split.Item2)!);
+
+                UpdateHistoryViewModel.Invalidate(AllPacketsSplit);
             });
         }
 
@@ -1012,6 +1021,7 @@ namespace WDE.PacketViewer.ViewModels
         public bool CanClose => true;
         public bool IsModified => false;
         public IHistoryManager? History { get; }
+        public UpdateHistoryViewModel UpdateHistoryViewModel { get; }
         public ISolutionItem SolutionItem { get; }
         public Task<string> GenerateQuery() => Task.FromResult("");
 

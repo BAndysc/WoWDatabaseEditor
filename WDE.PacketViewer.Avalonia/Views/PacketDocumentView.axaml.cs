@@ -9,8 +9,6 @@ using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Document;
 using AvaloniaEdit.Editing;
-using WDE.MVVM;
-using WDE.MVVM.Observable;
 using WDE.PacketViewer.Structures;
 using WDE.PacketViewer.ViewModels;
 
@@ -41,15 +39,6 @@ namespace WDE.PacketViewer.Avalonia.Views
         protected override void OnDataContextChanged(EventArgs e)
         {
             base.OnDataContextChanged(e);
-            if (DataContext is PacketDocumentViewModel dc)
-            {
-                dc.ToObservable(o => o.ReasonPanelVisibility)
-                    .SubscribeAction(show =>
-                    {
-                        var grid = this.FindControl<Grid>("RightPanel");
-                        grid.RowDefinitions = RowDefinitions.Parse(show ? "*,5,100" : "*,0,0");
-                    });
-            }
         }
 
         private void Handler(object? sender, KeyEventArgs e)

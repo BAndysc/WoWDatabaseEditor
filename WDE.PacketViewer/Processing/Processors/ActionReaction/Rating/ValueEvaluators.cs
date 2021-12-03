@@ -16,37 +16,51 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction.Rating
     
     public struct OneMinus : IEvaluation
     {
-        public OneMinus(IEvaluation other)
+        public static OneMinus From<T>(in T other) where T : IEvaluation
         {
-            Value = 1 - other.Value;
+            return new OneMinus()
+            {
+                Value = other.Value,
 #if TRACING
-            Explain = $"(1 - {other.Explain})";
+                Explain = $"(1 - {other.Explain})"
 #endif
+            };
         }
-
-        public float Value { get; }
+        
+        public float Value { get; private init; }
 #if TRACING
-        public string Explain { get; }
+        public string Explain { get; private init;}
+#else
+        public string Explain => "";
 #endif
     }
 
     public struct Remap : IEvaluation
     {
-        public Remap(IEvaluation value, float from, float to, float newFrom, float newTo)
+        public static Remap From<T>(T value, float from, float to, float newFrom, float newTo) where T : IEvaluation
         {
             float t = (Math.Clamp(value.Value, from, to) - from) / (to - from);
-            Value = newFrom + (newTo - newFrom) * t;
 #if TRACING
+            string explain = null!;
             if (newFrom == 0 && newTo == 1)
-                Explain = $"remap01({value.Explain}, {from}, {to})";
+                explain = $"remap01({value.Explain}, {from}, {to})";
             else
-                Explain = $"remap({value.Explain}, {from}, {to}, {newFrom}, {newTo})";
+                explain = $"remap({value.Explain}, {from}, {to}, {newFrom}, {newTo})";
 #endif
+            return new Remap()
+            {
+                Value = newFrom + (newTo - newFrom) * t,
+#if TRACING
+                Explain = explain
+#endif
+            };
         }
         
-        public float Value { get; }
+        public float Value { get; private init; }
 #if TRACING
-        public string Explain { get; }
+        public string Explain { get; private init; }
+#else
+        public string Explain => "";
 #endif
     }
 
@@ -67,74 +81,93 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction.Rating
         public float Value { get; }
 #if TRACING
         public string Explain { get; }
+#else
+        public string Explain => "";
 #endif
     }
     
     public struct Power : IEvaluation
     {
-        public Power(IEvaluation val, float exp)
+        public static Power From<T>(T val, float exp) where T : IEvaluation
         {
-            Value = (float)Math.Pow(val.Value, exp);
+            return new Power()
+            {
+                Value = (float)Math.Pow(val.Value, exp),
 #if TRACING
-            Explain = $"{val.Explain}^{exp}";
+                Explain = $"{val.Explain}^{exp}"
 #endif
+            };
         }
         
-        public float Value { get; }
+        public float Value { get; private init; }
 #if TRACING
-        public string Explain { get; }
+        public string Explain { get; private init; }
+#else
+        public string Explain => "";
 #endif
     }
 
-    public struct Weighted : IEvaluation
+    public struct Weighted : IEvaluation 
     {
-#if TRACING
-        public Weighted(params (IEvaluation?, float)[] coefs)
+        public static Weighted From<T1, T2, T3, T4>((T1, float) c1, (T2, float) c2, (T3, float) c3, (T4, float) c4) where T1 : IEvaluation where T2 : IEvaluation where T3 : IEvaluation where T4 : IEvaluation
         {
-            Value = 0;
-            foreach (var coef in coefs)
+            return new Weighted()
             {
-                if (coef.Item1 == null)
-                    continue;
-                Value += coef.Item2 * coef.Item1.Value;
-            }
-
-            Explain = "(" + string.Join(" + ", coefs.Where(p => p.Item1 != null).Select(pair => $"{pair.Item1!.Explain} * {pair.Item2}")) + ")";
-        }
-#else
-        // non alloc version
-        public Weighted((IEvaluation?, float) a, (IEvaluation?, float) b, (IEvaluation?, float) c, (IEvaluation?, float) d)
-        {
-            Value = 0;
-            if (a.Item1 != null)
-                Value += a.Item2 * a.Item1.Value;
-            if (b.Item1 != null)
-                Value += b.Item2 * b.Item1.Value;
-            if (c.Item1 != null)
-                Value += c.Item2 * c.Item1.Value;
-            if (d.Item1 != null)
-                Value += d.Item2 * d.Item1.Value;
-        }
-#endif
-
-        public float Value { get; }
+                Value = c1.Item1.Value * c1.Item2 + c2.Item1.Value * c2.Item2 + c3.Item1.Value * c3.Item2 +
+                        c4.Item1.Value * c4.Item2,
 #if TRACING
-        public string Explain { get; }
+                Explain = "(" + $"{c1.Item1!.Explain} * {c1.Item2}" + " + " + $"{c2.Item1!.Explain} * {c2.Item2}" +
+                          " + " + $"{c3.Item1!.Explain} * {c3.Item2}" + " + " + $"{c4.Item1!.Explain} * {c4.Item2}" + ")"
+#endif
+            };
+        }
+
+        public float Value { get; private init; }
+#if TRACING
+        public string Explain { get; private init; }
+#else
+        public string Explain => "";
 #endif
     }
 
     public struct Multiply : IEvaluation
     {
-        public Multiply(IEvaluation other, float mult)
+        public static Multiply From<T1>(in T1 other, float mult)  where T1 : IEvaluation
         {
-            Value = other.Value * mult;
+            return new Multiply()
+            {
+                Value = other.Value * mult,
 #if TRACING
-            Explain = other.Explain + $" * {mult:0.00}";
+                Explain = other.Explain + $" * {mult:0.00}"
 #endif
+            };
         }
-        public float Value { get; }
+        public float Value { get; private init; }
 #if TRACING
-        public string Explain { get; }
+        public string Explain { get; private init; }
+#else
+        public string Explain => "";
 #endif
+    }
+
+    public struct FinalEvaluation : IEvaluation
+    {
+        public float Value { get; init; }
+#if TRACING
+        public string Explain { get; init; }
+#else
+        public string Explain => "";
+#endif
+        
+        public static FinalEvaluation From<T>(in T t) where T : IEvaluation
+        {
+            return new FinalEvaluation()
+            {
+                Value = t.Value,
+#if TRACING
+                Explain = t.Explain,
+#endif
+            };
+        }
     }
 }

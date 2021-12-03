@@ -13,7 +13,7 @@ namespace WDE.TrinityMySqlDatabase
     [SingleInstance]
     public class AuthDatabaseProvider : AuthDatabaseDecorator
     {
-        public AuthDatabaseProvider(TrinityMySqlDatabaseProvider trinityDatabase,
+        public AuthDatabaseProvider(DatabaseResolver databaseResolver,
             NullAuthDatabaseProvider nullAuthDatabaseProvider,
             IAuthDatabaseSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService
@@ -30,7 +30,7 @@ namespace WDE.TrinityMySqlDatabase
                     db.Connection.Open();
                     db.Connection.Close();   
                 }
-                impl = trinityDatabase;
+                impl = databaseResolver.ResolveAuth();
             }
             catch (Exception e)
             {

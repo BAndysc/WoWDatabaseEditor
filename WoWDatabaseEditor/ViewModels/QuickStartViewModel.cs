@@ -27,6 +27,7 @@ using WoWDatabaseEditorCore.Services;
 using WoWDatabaseEditorCore.Services.DotNetUtils;
 using WoWDatabaseEditorCore.Services.Http;
 using WoWDatabaseEditorCore.Services.NewItemService;
+using WoWDatabaseEditorCore.Services.QuickLoadService;
 using WoWDatabaseEditorCore.Services.Statistics;
 
 namespace WoWDatabaseEditorCore.ViewModels
@@ -83,6 +84,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             IDotNetService dotNetService,
             IWindowManager windowManager,
             IProgramNameService programNameService,
+            IQuickLoadSettings quickLoadSettings,
             AboutViewModel aboutViewModel)
         {
             this.iconRegistry = iconRegistry;
@@ -94,12 +96,18 @@ namespace WoWDatabaseEditorCore.ViewModels
             Wizards.AddRange(wizards.Where(w => w.IsCompatibleWithCore(currentCoreVersion.Current)));
             HasWizards = Wizards.Count > 0;
             AboutViewModel = aboutViewModel;
-            
-            foreach (var item in solutionItemProvideService.All)
+
+            var all = solutionItemProvideService.All.ToList();
+            quickLoadSettings.Sort(all);
+
+            foreach (var item in all)
             {
                 if (item.IsContainer || !item.ShowInQuickStart(currentCoreVersion.Current))
                     continue;
 
+                if (!quickLoadSettings.IsVisible(item))
+                    continue;
+                
                 bool enabled = true;
 
                 if (!item.IsCompatibleWithCore(currentCoreVersion.Current))
@@ -110,7 +118,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                         enabled = false;
                 }
                 
-                var info = new NewItemPrototypeInfo(item, enabled);
+                var info = new NewItemPrototypeInfo(item, enabled, quickLoadSettings.IsNewLineSeparator(item));
 
                 if (info.RequiresName)
                     continue;

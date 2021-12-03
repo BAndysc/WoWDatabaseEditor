@@ -76,4 +76,23 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    
+    <Style Selector="ImageToggleButton">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <WdeImage IsVisible="{Binding $parent[ImageToggleButton].IsChecked}" ImageUri="{TemplateBinding ImageChecked}" />
+                    <WdeImage IsVisible="{Binding $parent[ImageToggleButton].IsChecked, Converter={x:Static BoolConverters.Not}}" ImageUri="{TemplateBinding ImageUnchecked}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="ImageToggleButton /template/ WdeImage">
+        <Setter Property="Opacity" Value="0.8" />
+    </Style>
+    
+    <Style Selector="ImageToggleButton:pointerover /template/ WdeImage">
+        <Setter Property="Opacity" Value="1" />
+    </Style>
 </Styles>

@@ -11,6 +11,9 @@
         <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Map:</TextBlock>
         <ComboBox Items="{Binding Maps}" SelectedItem="{Binding SelectedMap, Mode=TwoWay}" />
         <ToolbarSpacer />
+        <ToggleButton ToolTip.Tip="Toggle areatriggers visibility" IsChecked="{Binding ShowAreaTriggers, Mode=TwoWay}">
+            <WdeImage ImageUri="Icons/icon_areatrigger.png" />
+        </ToggleButton>
         <ToggleButton ToolTip.Tip="Toggle map chunk visibility" IsChecked="{Binding ShowGrid, Mode=TwoWay}">
             <WdeImage ImageUri="Icons/icon_grid.png" />
         </ToggleButton>

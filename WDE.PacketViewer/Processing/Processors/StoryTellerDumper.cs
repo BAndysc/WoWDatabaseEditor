@@ -9,6 +9,7 @@ using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
+using WDE.PacketViewer.Processing.Processors.Utils;
 using WowPacketParser.Proto;
 using WDE.PacketViewer.Processing.Runners;
 using WDE.PacketViewer.Utils;
@@ -48,6 +49,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly ISpellService spellService;
         private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly IPlayerGuidFollower playerGuidFollower;
+        private readonly PrettyFlagParameter prettyFlagParameter;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly IDespawnDetector despawnDetector;
         private WriterBuilder? writer = null;
@@ -56,14 +58,6 @@ namespace WDE.PacketViewer.Processing.Processors
         private int currentShortGuid;
         private readonly Dictionary<UniversalGuid, Dictionary<int, uint>> auras = new();
         private readonly Dictionary<uint, Dictionary<uint, string>> gossips = new();
-
-        private IParameter<long> unitFlagsParameter;
-        private IParameter<long> unitFlags2Parameter;
-        private IParameter<long> factionParameter;
-        private IParameter<long> emoteParameter;
-        private IParameter<long> npcFlagsParameter;
-        private IParameter<long> gameobjectBytes1Parameter;
-        private IParameter<long>[] unitBytesParameters = new IParameter<long>[3];
 
         public bool RequiresSplitUpdateObject => true;
         
@@ -79,6 +73,7 @@ namespace WDE.PacketViewer.Processing.Processors
             HighLevelUpdateDump highLevelUpdateDump,
             IDespawnDetector despawnDetector,
             IPlayerGuidFollower playerGuidFollower,
+            PrettyFlagParameter prettyFlagParameter,
             bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector)
         {
             this.databaseProvider = databaseProvider;
@@ -90,17 +85,9 @@ namespace WDE.PacketViewer.Processing.Processors
             this.spellService = spellService;
             this.updateObjectFollower = updateObjectFollower;
             this.playerGuidFollower = playerGuidFollower;
+            this.prettyFlagParameter = prettyFlagParameter;
             this.highLevelUpdateDump = highLevelUpdateDump;
             this.despawnDetector = despawnDetector;
-            unitFlagsParameter = parameterFactory.Factory("UnitFlagParameter");
-            unitFlags2Parameter = parameterFactory.Factory("UnitFlags2Parameter");
-            factionParameter = parameterFactory.Factory("FactionParameter");
-            emoteParameter = parameterFactory.Factory("EmoteParameter");
-            npcFlagsParameter = parameterFactory.Factory("NpcFlagParameter");
-            gameobjectBytes1Parameter = parameterFactory.Factory("GameobjectBytes1Parameter");
-            unitBytesParameters[0] = parameterFactory.Factory("UnitBytes0Parameter");
-            unitBytesParameters[1] = parameterFactory.Factory("UnitBytes1Parameter");
-            unitBytesParameters[2] = parameterFactory.Factory("UnitBytes2Parameter");
 
             if (perGuid)
                 perGuidWriter = new();
@@ -642,14 +629,14 @@ namespace WDE.PacketViewer.Processing.Processors
 
                 if (!isUpdate || !updateObjectFollower.TryGetIntOrDefault(guid, val.Key, out var intValue))
                 {
-                    var param = GetPrettyParameter(val.Key);
+                    var param = prettyFlagParameter.GetPrettyParameter(val.Key);
                     var stringValue = param == null ? "" : $" [{param.ToString(newValue)}]";
                     AppendLine(basePacket, guid, $"     {val.Key} = {newValue}{stringValue}", true);
                 }
                 else if (RemoveUselessFlag(val.Key, intValue, guid) != newValue)
                 {
                     intValue = RemoveUselessFlag(val.Key, intValue, guid);
-                    var param = GetPrettyParameter(val.Key);
+                    var param = prettyFlagParameter.GetPrettyParameter(val.Key);
                     var oldStringValue = param == null ? "" : $" [{param.ToString(intValue)}]";
                     var newStringValue = param == null ? "" : $" [{param.ToString(newValue)}]";
                     var change = TryGenerateFlagsDiff(param, val.Key, intValue, newValue);
@@ -686,34 +673,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     AppendLine(basePacket, guid, $"     {val.Key} = {val.Value} (old: {intValue})", true);
             }
         }
-
-        private IParameter<long>? GetPrettyParameter(string field)
-        {
-            switch (field)
-            {
-                case "UNIT_FIELD_FACTIONTEMPLATE":
-                    return factionParameter;
-                case "UNIT_FIELD_FLAGS":
-                    return unitFlagsParameter;
-                case "UNIT_FIELD_FLAGS_2":
-                    return unitFlags2Parameter;
-                case "UNIT_NPC_EMOTESTATE":
-                    return emoteParameter;
-                case "UNIT_NPC_FLAGS":
-                    return npcFlagsParameter;
-                case "UNIT_FIELD_BYTES_0":
-                    return unitBytesParameters[0];
-                case "UNIT_FIELD_BYTES_1":
-                    return unitBytesParameters[1];
-                case "UNIT_FIELD_BYTES_2":
-                    return unitBytesParameters[2];
-                case "GAMEOBJECT_BYTES_1":
-                    return gameobjectBytes1Parameter;
-            }
-
-            return null;
-        }
-
+        
         private long RemoveUselessFlag(string field, long value, UniversalGuid guid)
         {
             if (field == "UNIT_FIELD_FLAGS")

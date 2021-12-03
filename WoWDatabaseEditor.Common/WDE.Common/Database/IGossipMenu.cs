@@ -73,6 +73,6 @@ namespace WDE.Common.Database
         uint BoxMoney { get; }
         string? BoxText { get; }
         int BoxBroadcastTextId { get; }
-        ushort VerifiedBuild { get; }
+        short VerifiedBuild { get; }
     }
 }

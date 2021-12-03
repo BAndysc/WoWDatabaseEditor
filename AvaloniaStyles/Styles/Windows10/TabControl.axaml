@@ -127,6 +127,9 @@
   </Style>
 
   <!-- Disabled state -->
+  <Style Selector="TabItem:disabled">
+    <Setter Property="BorderBrush" Value="{DynamicResource TabControlBorderDisabled}" />
+  </Style>
   <Style Selector="TabItem:disabled /template/ Border#PART_LayoutRoot">
     <Setter Property="Background" Value="{DynamicResource TabItemHeaderBackgroundDisabled}" />
     <Setter Property="TextBlock.Foreground" Value="{DynamicResource TabItemHeaderForegroundDisabled}" />

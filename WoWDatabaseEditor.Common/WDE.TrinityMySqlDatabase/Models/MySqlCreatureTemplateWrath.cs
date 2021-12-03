@@ -5,7 +5,7 @@ using WDE.Common.Database;
 namespace WDE.TrinityMySqlDatabase.Models
 {
     [Table(Name = "creature_template")]
-    public class MySqlCreatureTemplate : ICreatureTemplate
+    public class MySqlCreatureTemplateWrath : ICreatureTemplate
     {
         [PrimaryKey]
         [Identity]
@@ -54,6 +54,36 @@ namespace WDE.TrinityMySqlDatabase.Models
                     return ModelId4;
             }
 
+            throw new Exception("Model out of range");
+        }
+    }
+    
+    [Table(Name = "creature_template")]
+    public class MySqlCreatureTemplateMaster : ICreatureTemplate
+    {
+        [PrimaryKey]
+        [Identity]
+        [Column(Name = "entry")]
+        public uint Entry { get; set; }
+        
+        [Column(Name = "scale")]
+        public uint Scale { get; set; }
+
+        [Column(Name = "gossip_menu_id")] 
+        public uint GossipMenuId { get; set; }
+
+        [Column(Name = "name")] 
+        public string Name { get; set; } = "";
+
+        [Column(Name = "AIName")]
+        public string AIName { get; set; } = "";
+
+        [Column(Name = "ScriptName")]
+        public string ScriptName { get; set; } = "";
+
+        public int ModelsCount => 0;
+        public uint GetModel(int index)
+        {
             throw new Exception("Model out of range");
         }
     }
