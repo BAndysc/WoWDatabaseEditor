@@ -114,4 +114,33 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     {
         return await model.Creature.FirstOrDefaultAsync(e => e.Guid == guid);
     }
+    
+    public override async Task<List<IGameObject>> GetGameObjectsAsync()
+    {
+        await using var model = Database();
+        return await model.GameObject.ToListAsync<IGameObject>();
+    }
+
+    public override IEnumerable<IGameObject> GetGameObjects()
+    {
+        using var model = Database();
+        return model.GameObject.ToList<IGameObject>();
+    }
+    
+    public override IGameObject? GetGameObjectByGuid(uint guid)
+    {
+        using var model = Database();
+        return model.GameObject.FirstOrDefault(g => g.Guid == guid);
+    }
+
+    public override IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry)
+    {
+        using var model = Database();
+        return model.GameObject.Where(g => g.Entry == entry).ToList();
+    }
+    
+    protected override Task<IGameObject?> GetGameObjectByGuidAsync(TrinityMasterDatabase model, uint guid)
+    {
+        return model.GameObject.FirstOrDefaultAsync<IGameObject>(g => g.Guid == guid);
+    }
 }

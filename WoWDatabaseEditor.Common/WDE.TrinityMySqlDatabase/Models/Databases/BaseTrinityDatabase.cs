@@ -16,7 +16,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlAreaTriggerScript> AreaTriggerScript => GetTable<MySqlAreaTriggerScript>();
         public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
         public ITable<MySqlGameObjectTemplate> GameObjectTemplate => GetTable<MySqlGameObjectTemplate>();
-        public ITable<MySqlGameObject> GameObject => GetTable<MySqlGameObject>();
         public ITable<MySqlQuestTemplate> QuestTemplate => GetTable<MySqlQuestTemplate>();
         public ITable<MySqlQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlQuestTemplateAddon>();
         public ITable<MySqlQuestTemplateAddonWithScriptName> QuestTemplateAddonWithScriptName => GetTable<MySqlQuestTemplateAddonWithScriptName>();

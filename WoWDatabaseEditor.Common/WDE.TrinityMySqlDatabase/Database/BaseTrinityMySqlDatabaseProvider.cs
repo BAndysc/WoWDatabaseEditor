@@ -216,7 +216,9 @@ namespace WDE.TrinityMySqlDatabase.Database
             await using var model = Database();
             return await (from t in model.GameObjectTemplate orderby t.Entry select t).ToListAsync<IGameObjectTemplate>();
         }
-        
+
+        public abstract Task<List<IGameObject>> GetGameObjectsAsync();
+
         private IQueryable<MySqlQuestTemplate> GetQuestsQuery(BaseTrinityDatabase model)
         {
             return (from t in model.QuestTemplate
@@ -288,7 +290,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                     uint entry = 0;
                     if (entryOrGuid < 0)
                     {
-                        var template = await model.GameObject.Where(p => p.Guid == (uint)-entryOrGuid).FirstOrDefaultAsync();
+                        var template = await GetGameObjectByGuidAsync(model, (uint)-entryOrGuid);
                         if (template == null)
                             throw new Exception(
                                 $"Trying to install gameobject script for guid {-entryOrGuid}, but this guid doesn't exist in gameobject table, so entry cannot be determined.");
@@ -334,6 +336,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         protected abstract Task<ICreature?> GetCreatureByGuid(T model, uint guid);
+        protected abstract Task<IGameObject?> GetGameObjectByGuidAsync(T model, uint guid);
         protected abstract Task SetCreatureTemplateAI(T model, uint entry, string ainame, string scriptname);
 
         public async Task InstallConditions(IEnumerable<IConditionLine> conditionLines,
@@ -412,21 +415,15 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract ICreature? GetCreatureByGuid(uint guid);
 
-        public IGameObject? GetGameObjectByGuid(uint guid)
-        {
-            using var model = Database();
-            return model.GameObject.FirstOrDefault(g => g.Guid == guid);
-        }
+        public abstract IGameObject? GetGameObjectByGuid(uint guid);
 
+        public abstract IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
+        
         public abstract IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
 
-        public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry)
-        {
-            using var model = Database();
-            return model.GameObject.Where(g => g.Entry == entry).ToList();
-        }
 
         public abstract IEnumerable<ICreature> GetCreatures();
+        public abstract IEnumerable<IGameObject> GetGameObjects();
 
         public IEnumerable<ICoreCommandHelp> GetCommands()
         {
