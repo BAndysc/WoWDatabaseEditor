@@ -8,6 +8,7 @@ namespace WDE.MapRenderer.Managers
         private readonly IGameContext gameContext;
         private readonly IDatabaseClientFileOpener opener;
 
+        public AreaTableStore AreaTableStore { get; }
         public AreaTriggerStore AreaTriggerStore { get; }
         public CreatureDisplayInfoStore CreatureDisplayInfoStore { get; }
         public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
@@ -33,6 +34,7 @@ namespace WDE.MapRenderer.Managers
         {
             this.gameContext = gameContext;
             this.opener = opener;
+            AreaTableStore = new(OpenDbc("AreaTable"));
             AreaTriggerStore = new(OpenDbc("AreaTrigger"));
             CreatureDisplayInfoStore = new(OpenDbc("CreatureDisplayInfo"));
             CreatureDisplayInfoExtraStore = new(OpenDbc("CreatureDisplayInfoExtra")); // for humanoids
