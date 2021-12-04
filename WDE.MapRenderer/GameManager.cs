@@ -39,11 +39,14 @@ namespace WDE.MapRenderer
             UpdateLoop = new UpdateManager(this);
         }
         
-        private bool TryOpenMpq(out IMpqArchive m)
+        private bool TryOpenMpq(out IMpqArchive m, out IMpqArchive m2) // we open two archive, once for async loading, second for sync loading
         {
+            m = null!;
+            m2 = null!;
             try
             {
                 m = mpqService.Open();
+                m2 = mpqService.Open();
                 return true;
             }
             catch (Exception e)
@@ -54,7 +57,9 @@ namespace WDE.MapRenderer
                     .SetContent(e.Message + "\n\nAre you using modified game files?")
                     .WithButton("Ok", false)
                     .Build());
-                m = null;
+                m?.Dispose();
+                m = null!;
+                m2 = null!;
                 return false;
             }
         }
@@ -62,7 +67,7 @@ namespace WDE.MapRenderer
         public bool Initialize(Engine engine)
         {
             this.engine = engine;
-            if (!TryOpenMpq(out mpq))
+            if (!TryOpenMpq(out mpq, out mpqSync))
             {
                 OnFailedInitialize?.Invoke();
                 waitForInitialized.SetResult(false);
@@ -180,8 +185,10 @@ namespace WDE.MapRenderer
             TextureManager.Dispose();
             MeshManager.Dispose();
             mpq.Dispose();
+            mpqSync.Dispose();
             NotificationsCenter = null!;
             mpq = null!;
+            mpqSync = null!;
             coroutineManager = null!;
             TimeManager = null!;
             ScreenSpaceSelector = null!;
@@ -194,7 +201,7 @@ namespace WDE.MapRenderer
             ChunkManager = null!;
             CameraManager = null!;
             LightingManager = null!;
-            AreaTriggerManager = null;
+            AreaTriggerManager = null!;
             WorldManager = null!;
             RaycastSystem = null!;
             ModuleManager = null!;
@@ -202,7 +209,7 @@ namespace WDE.MapRenderer
 
         public Engine Engine => engine;
 
-        private IMpqArchive mpq;
+        private IMpqArchive mpq, mpqSync;
         private CoroutineManager coroutineManager;
         public NotificationsCenter NotificationsCenter { get; private set; }
         public TimeManager TimeManager { get; private set; }
@@ -234,8 +241,7 @@ namespace WDE.MapRenderer
 
         public byte[]? ReadFileSync(string fileName)
         {
-            using var _ = monitor.Enter();
-            var bytes = mpq.ReadFile(fileName);
+            var bytes = mpqSync.ReadFile(fileName);
             if (bytes == null)
                 Console.WriteLine("File " + fileName + " is unreadable");
             return bytes;
