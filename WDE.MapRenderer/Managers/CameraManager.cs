@@ -1,6 +1,4 @@
-using System;
 using Avalonia.Input;
-using TheEngine.Interfaces;
 using TheMaths;
 using WDE.MapRenderer.StaticData;
 using MouseButton = TheEngine.Input.MouseButton;
@@ -53,6 +51,14 @@ namespace WDE.MapRenderer.Managers
             var camera = gameContext.Engine.CameraManager.MainCamera;
             camera.Transform.Rotation = Rotation;
             camera.Transform.Position = Position;
+        }
+
+        public void RenderGUI()
+        {
+            using var ui = gameContext.Engine.Ui.BeginImmediateDrawRel(0, 1, 0, 1);
+            ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 3);
+            var wowPos = Position.ToWoWPosition();
+            ui.Text("calibri", $"X: {wowPos.X:0.00} Y: {wowPos.Y:0.00} Z: {wowPos.Z:0.00}", 13, Vector4.One);
         }
     }
 }

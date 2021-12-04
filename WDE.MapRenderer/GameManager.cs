@@ -6,6 +6,7 @@ using TheEngine;
 using TheEngine.Coroutines;
 using TheEngine.Entities;
 using TheEngine.PhysicsSystem;
+using TheMaths;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
@@ -139,6 +140,7 @@ namespace WDE.MapRenderer
             ModuleManager.RenderGUI();
             NotificationsCenter.RenderGUI(delta);
             ScreenSpaceSelector.Render();
+            CameraManager.RenderGUI();
         }
 
         public event Action? RequestDispose;
