@@ -11,6 +11,7 @@ namespace WDE.MapRenderer.Managers
     {
         Engine Engine { get; }
         Task<PooledArray<byte>?> ReadFile(string fileName);
+        PooledArray<byte>? ReadFileSyncPool(string fileName);
         byte[]? ReadFileSync(string fileName);
         
         NotificationsCenter NotificationsCenter { get; }
@@ -27,6 +28,7 @@ namespace WDE.MapRenderer.Managers
         TimeManager TimeManager { get; }
         ScreenSpaceSelector ScreenSpaceSelector { get; }
         WorldManager WorldManager { get; }
+        LoadingManager LoadingManager { get; }
         Map CurrentMap { get; }
         void SetMap(int id);
         void StartCoroutine(IEnumerator coroutine);

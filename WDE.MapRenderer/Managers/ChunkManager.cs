@@ -33,6 +33,7 @@ namespace WDE.MapRenderer.Managers
         public float[,] heights;
         public Material? material;
         public CancellationTokenSource? loading = new CancellationTokenSource();
+        public uint[,] areaIds = new uint[16,16];
         public Task? chunkLoading;
 
         public List<StaticRenderHandle> renderHandles = new();
@@ -52,6 +53,15 @@ namespace WDE.MapRenderer.Managers
             context.Engine.TextureManager.DisposeTexture(splatMapTex);
             context.Engine.TextureManager.DisposeTexture(holesMapTex);
             heightsNormalBuffer?.Dispose();
+        }
+
+        public uint GetAreaId(Vector3 wowPosition)
+        {
+            var chunkPosition = (X, Z).ChunkToWoWPosition();
+            var relativePosition = chunkPosition - wowPosition;
+            var x = Math.Clamp((int)(relativePosition.X / Constants.ChunkSize), 0, 63);
+            var y = Math.Clamp((int)(relativePosition.Y / Constants.ChunkSize), 0, 63);
+            return areaIds[x, y];
         }
     }
 
@@ -194,6 +204,8 @@ namespace WDE.MapRenderer.Managers
                     {
                         throw new Exception("Unexpected end of chunks");
                     }
+
+                    chunk.areaIds[i, j] = chunksEnumerator2.Current.AreaId;
                     var basePos = chunksEnumerator2.Current.BasePosition;
                     int k_ = 0;
                     Vector3[] subVertices = new Vector3[145];
@@ -535,6 +547,9 @@ namespace WDE.MapRenderer.Managers
 
         public void Update(float delta)
         {
+            if (gameContext.LoadingManager.EssentialLoadingInProgress)
+                return;
+            
             int D = 1;
             (int x, int y) chunk = gameContext.CameraManager.CurrentChunk;
             for (int i = -D; i <= D; ++i)
@@ -542,7 +557,7 @@ namespace WDE.MapRenderer.Managers
                 for (int j = -D; j <= D; ++j)
                     gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
             }
-
+            
             UnloadChunks();
         }
 
@@ -554,29 +569,21 @@ namespace WDE.MapRenderer.Managers
                 var c = chunks[index];
                 var midPoint = new Vector2(c.MiddlePoint.X, c.MiddlePoint.Z);
                 if ((midPoint - camera).LengthSquared() > 7500 * 7500)
-                    UnloadChunk(c).ListenErrors();
+                {
+                    chunksXY.Remove((c.X, c.Z));
+                    loadedChunks.Remove((c.X, c.Z));
+                    chunks.Remove(c);
+                    gameContext.StartCoroutine(UnloadChunk(c));
+                }
             }
         }
 
-        public void UnloadAllNow()
+        private IEnumerator UnloadChunk(ChunkInstance chunk)
         {
-            for (var index = chunks.Count - 1; index >= 0; index--)
-            {
-                UnloadChunk(chunks[index]).ListenErrors();
-            }
-            chunks.Clear();
-            loadedChunks.Clear();
-        }
-
-        private async Task UnloadChunk(ChunkInstance chunk)
-        {
-            chunksXY.Remove((chunk.X, chunk.Z));
-            loadedChunks.Remove((chunk.X, chunk.Z));
-            chunks.Remove(chunk);
             if (chunk.loading != null)
             {
                 chunk.loading.Cancel();
-                await chunk.chunkLoading;
+                yield return chunk.chunkLoading;
             }
             
             foreach (var obj in chunk.renderHandles)
@@ -585,6 +592,16 @@ namespace WDE.MapRenderer.Managers
                 gameContext.Engine.EntityManager.DestroyEntity(entity);
             
             chunk.Dispose(gameContext);
+        }
+
+        public IEnumerator UnloadAllChunks()
+        {
+            var chunksCopy = chunks.ToList();
+            chunks.Clear();
+            loadedChunks.Clear();
+            chunksXY.Clear();
+            foreach (var chunk in chunksCopy)
+                yield return UnloadChunk(chunk);
         }
     }
 }

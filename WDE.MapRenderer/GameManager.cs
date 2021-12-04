@@ -80,6 +80,7 @@ namespace WDE.MapRenderer
             ScreenSpaceSelector = new ScreenSpaceSelector(this);
             DbcManager = new DbcManager(this, databaseClientFileOpener);
             CurrentMap = DbcManager.MapStore.FirstOrDefault(m => m.Id == 1) ?? Map.Empty;
+            LoadingManager = new(this);
             TextureManager = new WoWTextureManager(this);
             MeshManager = new WoWMeshManager(this);
             MdxManager = new MdxManager(this);
@@ -114,6 +115,8 @@ namespace WDE.MapRenderer
                 Console.WriteLine("GameManager not initialized (this is quite fatal)");
                 return;
             }
+
+            LoadingManager.Update(delta);
             coroutineManager.Step();
 
             TimeManager.Update(delta);
@@ -146,6 +149,7 @@ namespace WDE.MapRenderer
             NotificationsCenter.RenderGUI(delta);
             ScreenSpaceSelector.Render();
             CameraManager.RenderGUI();
+            LoadingManager.RenderGUI();
         }
 
         public event Action? RequestDispose;
@@ -156,7 +160,6 @@ namespace WDE.MapRenderer
             if (DbcManager.MapStore.Contains(mapId) && CurrentMap.Id != mapId)
             {
                 CurrentMap = DbcManager.MapStore[mapId];
-                ChunkManager?.UnloadAllNow();
                 ChangedMap?.Invoke(mapId);
             }
         }
@@ -180,6 +183,7 @@ namespace WDE.MapRenderer
             AreaTriggerManager.Dispose();
             ChunkManager.Dispose();
             WorldManager.Dispose();
+            LoadingManager.Dispose();
             WmoManager.Dispose();
             MdxManager.Dispose();
             TextureManager.Dispose();
@@ -205,6 +209,7 @@ namespace WDE.MapRenderer
             WorldManager = null!;
             RaycastSystem = null!;
             ModuleManager = null!;
+            LoadingManager = null!;
         }
 
         public Engine Engine => engine;
@@ -228,6 +233,7 @@ namespace WDE.MapRenderer
         public UpdateManager UpdateLoop { get; private set; }
         public WorldManager WorldManager { get; private set; }
         public Map CurrentMap { get; private set; }
+        public LoadingManager LoadingManager { get; private set; }
         public bool IsInitialized { get; private set; }
 
         public async Task<PooledArray<byte>?> ReadFile(string fileName)
@@ -246,6 +252,13 @@ namespace WDE.MapRenderer
                 Console.WriteLine("File " + fileName + " is unreadable");
             return bytes;
         }
-
+        
+        public PooledArray<byte>? ReadFileSyncPool(string fileName)
+        {
+            var bytes = mpqSync.ReadFilePool(fileName);
+            if (bytes == null)
+                Console.WriteLine("File " + fileName + " is unreadable");
+            return bytes;
+        }
     }
 }
