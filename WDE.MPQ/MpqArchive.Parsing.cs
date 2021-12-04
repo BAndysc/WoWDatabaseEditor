@@ -219,11 +219,11 @@ namespace WDE.MPQ
                     {
                         decompressedBuffer = Compression.BZip2Decompress(tempBuffer, 1, length - 1);
                         decompressedLength = decompressedBuffer.Length;
+                        Array.Copy(decompressedBuffer, 0, buffer, resultPosition, decompressedLength);
                     }
                     else if (compressionFlags == CompressionFlags.Deflated)
                     {
-                        decompressedBuffer = Compression.Deflate(tempBuffer, 1, length - 1);
-                        decompressedLength = decompressedBuffer.Length;
+                        decompressedLength = Compression.DeflateTo(tempBuffer, 1, length - 1, buffer.AsSpan(resultPosition));
                     }
                     else
                     {
@@ -231,8 +231,11 @@ namespace WDE.MPQ
                             "Currenlty only Bzip2 and Deflate compression is supported by Nmpq. Compression flags: " + compressionFlags);
                     }
                 }
+                else
+                {
+                    Array.Copy(decompressedBuffer, 0, buffer, resultPosition, decompressedLength);
+                }
 
-                Array.ConstrainedCopy(decompressedBuffer, 0, buffer, resultPosition, decompressedLength);
                 ArrayPool<byte>.Shared.Return(tempBuffer);
                 resultPosition += decompressedLength;
                 left -= decompressedLength;
