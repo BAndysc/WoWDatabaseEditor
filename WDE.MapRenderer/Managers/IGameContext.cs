@@ -26,6 +26,7 @@ namespace WDE.MapRenderer.Managers
         LightingManager LightingManager { get; }
         TimeManager TimeManager { get; }
         ScreenSpaceSelector ScreenSpaceSelector { get; }
+        WorldManager WorldManager { get; }
         Map CurrentMap { get; }
         void SetMap(int id);
         void StartCoroutine(IEnumerator coroutine);

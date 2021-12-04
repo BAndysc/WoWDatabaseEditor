@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Diagnostics;
 using Nito.AsyncEx;
@@ -6,7 +5,6 @@ using TheEngine;
 using TheEngine.Coroutines;
 using TheEngine.Entities;
 using TheEngine.PhysicsSystem;
-using TheMaths;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
@@ -81,6 +79,7 @@ namespace WDE.MapRenderer
             MeshManager = new WoWMeshManager(this);
             MdxManager = new MdxManager(this);
             WmoManager = new WmoManager(this);
+            WorldManager = new WorldManager(this);
             ChunkManager = new ChunkManager(this);
             CameraManager = new CameraManager(this);
             LightingManager = new LightingManager(this);
@@ -113,6 +112,7 @@ namespace WDE.MapRenderer
             coroutineManager.Step();
 
             TimeManager.Update(delta);
+            WorldManager.Update(delta);
             
             CameraManager.Update(delta);
             LightingManager.Update(delta);
@@ -174,6 +174,7 @@ namespace WDE.MapRenderer
             LightingManager.Dispose();
             AreaTriggerManager.Dispose();
             ChunkManager.Dispose();
+            WorldManager.Dispose();
             WmoManager.Dispose();
             MdxManager.Dispose();
             TextureManager.Dispose();
@@ -194,6 +195,7 @@ namespace WDE.MapRenderer
             CameraManager = null!;
             LightingManager = null!;
             AreaTriggerManager = null;
+            WorldManager = null!;
             RaycastSystem = null!;
             ModuleManager = null!;
         }
@@ -217,6 +219,7 @@ namespace WDE.MapRenderer
         public LightingManager LightingManager { get; private set; }
         public AreaTriggerManager AreaTriggerManager { get; private set; }
         public UpdateManager UpdateLoop { get; private set; }
+        public WorldManager WorldManager { get; private set; }
         public Map CurrentMap { get; private set; }
         public bool IsInitialized { get; private set; }
 
