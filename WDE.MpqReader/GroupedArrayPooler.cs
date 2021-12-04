@@ -9,6 +9,7 @@ namespace WDE.MpqReader
     {
         private readonly T[] array;
         private int length;
+        private bool disposed;
 
         public PooledArray(int length)
         {
@@ -16,6 +17,15 @@ namespace WDE.MpqReader
             array = ArrayPool<T>.Shared.Rent(length);
         }
 
+        ~PooledArray()
+        {
+            if (!disposed)
+            {
+                Console.WriteLine("PooledArray was not disposed");
+                Dispose();
+            }
+        }
+        
         public int Length => length;
     
         public T this[int index]
@@ -30,6 +40,7 @@ namespace WDE.MpqReader
 
         public void Dispose()
         {
+            disposed = true;
             ArrayPool<T>.Shared.Return(array);
         }
 
