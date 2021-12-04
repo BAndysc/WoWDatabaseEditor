@@ -47,9 +47,11 @@ public class WorldManager : System.IDisposable
                 chunks++;
             }
         }
-
-        var avg = middlePosSum / chunks;
-        gameContext.CameraManager?.Relocate(avg.ToOpenGlPosition().WithY(100));
+        if (chunks > 0)
+        {
+            var avg = middlePosSum / chunks;
+            gameContext.CameraManager?.Relocate(avg.ToOpenGlPosition().WithY(100));
+        }
     }
 
     public void Dispose()
