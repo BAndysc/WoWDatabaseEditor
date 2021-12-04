@@ -291,10 +291,10 @@ namespace WDE.MapRenderer.Managers
                     {
                         for (int _y = 0; _y < 64; ++_y)
                         {
-                            var col = new Rgba32(len >= 1 ? (byte)sm[_x, _y, 0] : (byte)255,
-                                len >= 2 ? (byte)sm[_x, _y, 1] : (byte)0,
-                                len >= 3 ? (byte)sm[_x, _y, 2] : (byte)0,
-                                chunksEnumerator2.Current.ShadowMap != null && chunksEnumerator2.Current.ShadowMap[_x, _y] == 1 ? (byte)255 : (byte)0);
+                            var col = new Rgba32(len >= 1 ? sm[_x, _y, 0] : (byte)255,
+                                len >= 2 ? sm[_x, _y, 1] : (byte)0,
+                                len >= 3 ? sm[_x, _y, 2] : (byte)0,
+                                chunksEnumerator2.Current.ShadowMap != null && chunksEnumerator2.Current.ShadowMap[_x, _y] ? (byte)255 : (byte)0);
                             var left = 255 - col.B;
                             col.G = (byte)Math.Min(col.G, left);
                             left -= col.G;
