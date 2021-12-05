@@ -1,4 +1,5 @@
-﻿using TheMaths;
+﻿using System.Diagnostics;
+using TheMaths;
 using WDE.MpqReader.Readers;
 
 namespace WDE.MpqReader.Structures
@@ -17,11 +18,25 @@ namespace WDE.MpqReader.Structures
 
     public class WDTChunk
     {
+        private static float BlockSize = 533.33333f;
+        
+        public uint X { get; }
+        public uint Y { get; }
+        public Vector3 MiddlePosition => ChunkToWoWPosition(X, Y);
         public uint chunkFlags { get; }
-
-        public WDTChunk(IBinaryReader reader)
+        public bool HasAdt => (chunkFlags & 1) == 1;
+        
+        private static Vector3 ChunkToWoWPosition(uint x, uint y)
+        {
+            return new Vector3((-(int)y + 32) * BlockSize, (-(int)x + 32) * BlockSize, 0);
+        }
+        
+        public WDTChunk(IBinaryReader reader, uint x, uint y)
         {
             chunkFlags = reader.ReadUInt32();
+            reader.ReadUInt32();
+            X = x;
+            Y = y;
         }
     }
     
@@ -29,13 +44,12 @@ namespace WDE.MpqReader.Structures
     {
         public uint Version { get; }
         public WDTHeader Header { get; }
-        public WDTChunk[] Chunks { get; } = new WDTChunk[4096];
-        public string Mwmo { get; }
+        public WDTChunk[,] Chunks { get; }
+        public string? Mwmo { get; }
         public MODF WorldMapObject { get; }
 
         public WDT(IBinaryReader reader)
         {
-            int chunkId = 0;
             Dictionary<int, string>? mwmosNameOffsets = null;
             while (!reader.IsFinished())
             {
@@ -51,13 +65,26 @@ namespace WDE.MpqReader.Structures
                 else if (chunkName == "MPHD")
                     Header = WDTHeader.Read(partialReader);
                 else if (chunkName == "MAIN")
-                    Chunks[chunkId++] = new WDTChunk(partialReader);
+                    Chunks = ReadWdtChunks(partialReader);
                 else if (chunkName == "MWMO")
-                    Mwmo = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out mwmosNameOffsets)[0];
+                    Mwmo = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out mwmosNameOffsets).FirstOrDefault();
                 else if (chunkName == "MODF")
                     WorldMapObject = MODF.Read(partialReader);
                 reader.Offset = offset + size;
             }
+        }
+
+        private WDTChunk[,] ReadWdtChunks(IBinaryReader reader)
+        {
+            WDTChunk[,] chunks = new WDTChunk[64, 64];
+            for (uint y = 0; y < 64; ++y)
+            {
+                for (uint x = 0; x < 64; ++x)
+                {
+                    chunks[y, x] = new WDTChunk(reader, x, y);
+                }
+            }
+            return chunks;
         }
     }
 

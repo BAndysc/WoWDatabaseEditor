@@ -1,5 +1,3 @@
-using TheMaths;
-
 namespace WDE.MapRenderer.StaticData
 {
     public static class Constants

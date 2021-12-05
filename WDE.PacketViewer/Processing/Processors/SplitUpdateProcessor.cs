@@ -106,7 +106,7 @@ namespace WDE.PacketViewer.Processing.Processors
         public override IEnumerable<(PacketHolder, int)>? Process(PacketHolder packet)
         {
             var packetTime = packet.BaseData.Time.ToDateTime();
-            if (!LastPacketTime.HasValue || (packetTime - LastPacketTime.Value).TotalMilliseconds > 1)
+            if (!LastPacketTime.HasValue || (packetTime - LastPacketTime.Value).TotalMilliseconds > 0)
             {
                 var enumerable = Finalize();
                 if (enumerable != null)

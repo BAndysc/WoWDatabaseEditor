@@ -1,20 +1,14 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Components;
-using TheEngine.Coroutines;
-using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
+using TheEngine.Interfaces;
 using TheEngine.Managers;
 using TheMaths;
-using WDE.Common.Utils;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader;
 using WDE.MpqReader.Readers;
@@ -33,6 +27,7 @@ namespace WDE.MapRenderer.Managers
         public float[,] heights;
         public Material? material;
         public CancellationTokenSource? loading = new CancellationTokenSource();
+        public uint[,] areaIds = new uint[16,16];
         public Task? chunkLoading;
 
         public List<StaticRenderHandle> renderHandles = new();
@@ -46,17 +41,40 @@ namespace WDE.MapRenderer.Managers
 
         public Vector3 MiddlePoint => ((X, Z).ChunkToWoWPosition() - new Vector3(Constants.BlockSize / 2, Constants.BlockSize / 2, 0)).ToOpenGlPosition();
 
-        public void Dispose(IGameContext context)
+        public void Dispose(ITextureManager textureManager)
         {
             chunkToSplatBuffer?.Dispose();
-            context.Engine.TextureManager.DisposeTexture(splatMapTex);
-            context.Engine.TextureManager.DisposeTexture(holesMapTex);
+            textureManager.DisposeTexture(splatMapTex);
+            textureManager.DisposeTexture(holesMapTex);
             heightsNormalBuffer?.Dispose();
+        }
+
+        public uint GetAreaId(Vector3 wowPosition)
+        {
+            var chunkPosition = (X, Z).ChunkToWoWPosition();
+            var relativePosition = chunkPosition - wowPosition;
+            var x = Math.Clamp((int)(relativePosition.X / Constants.ChunkSize), 0, 63);
+            var y = Math.Clamp((int)(relativePosition.Y / Constants.ChunkSize), 0, 63);
+            return areaIds[x, y];
         }
     }
 
     public class ChunkManager : System.IDisposable
     {
+        private readonly IEntityManager entityManager;
+        private readonly IGameProperties gameProperties;
+        private readonly ITextureManager textureManager;
+        private readonly IMeshManager meshManager;
+        private readonly WoWTextureManager woWTextureManager;
+        private readonly WoWMeshManager woWMeshManager;
+        private readonly IMaterialManager materialManager;
+        private readonly IGameFiles gameFiles;
+        private readonly CameraManager cameraManager;
+        private readonly IRenderManager renderManager;
+        private readonly MdxManager mdxManager;
+        private readonly WmoManager wmoManager;
+        private readonly Lazy<LoadingManager> loadingManager;
+        private readonly Engine engine;
         private readonly IGameContext gameContext;
         private HashSet<(int, int)> loadedChunks = new();
         private List<ChunkInstance> chunks = new();
@@ -65,16 +83,19 @@ namespace WDE.MapRenderer.Managers
         private Archetype collisionOnlyArchetype;
         private Archetype renderEntityArchetype;
         private Archetype terrainEntityArchetype;
+        
         private bool renderGrid;
-
-        public bool RenderGrid
+        private bool RenderGrid
         {
             get => renderGrid;
             set
             {
+                if (renderGrid == value)
+                    return;
+                
                 renderGrid = value;
                 foreach (var chunk in chunks)
-                    chunk.material.SetUniformInt("showGrid", value ? 1 : 0);
+                    chunk.material?.SetUniformInt("showGrid", value ? 1 : 0);
             }
         }
 
@@ -101,20 +122,48 @@ namespace WDE.MapRenderer.Managers
             return c.heights[xIndex, yIndex];
         }
         
-        public ChunkManager(IGameContext gameContext)
+        public ChunkManager(IEntityManager entityManager,
+            IGameProperties gameProperties,
+            ITextureManager textureManager,
+            IMeshManager meshManager,
+            WoWTextureManager woWTextureManager,
+            WoWMeshManager woWMeshManager,
+            IMaterialManager materialManager,
+            IGameFiles gameFiles,
+            CameraManager cameraManager,
+            IRenderManager renderManager,
+            MdxManager mdxManager,
+            WmoManager wmoManager,
+            IGameContext gameContext,
+            Lazy<LoadingManager> loadingManager,
+            Engine engine)
         {
+            this.entityManager = entityManager;
+            this.gameProperties = gameProperties;
+            this.textureManager = textureManager;
+            this.meshManager = meshManager;
+            this.woWTextureManager = woWTextureManager;
+            this.woWMeshManager = woWMeshManager;
+            this.materialManager = materialManager;
+            this.gameFiles = gameFiles;
+            this.cameraManager = cameraManager;
+            this.renderManager = renderManager;
+            this.mdxManager = mdxManager;
+            this.wmoManager = wmoManager;
             this.gameContext = gameContext;
-            collisionOnlyArchetype = gameContext.Engine.EntityManager.NewArchetype()
+            this.loadingManager = loadingManager;
+            this.engine = engine;
+            collisionOnlyArchetype = entityManager.NewArchetype()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<Collider>()
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<MeshRenderer>();
-            terrainEntityArchetype = gameContext.Engine.EntityManager.NewArchetype()
+            terrainEntityArchetype = entityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<MeshRenderer>();
-            renderEntityArchetype = gameContext.Engine.EntityManager.NewArchetype()
+            renderEntityArchetype = entityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<MeshBounds>()
@@ -124,20 +173,20 @@ namespace WDE.MapRenderer.Managers
                 .WithComponentData<MeshRenderer>();
         }
 
-        public IEnumerator LoadChunk(int x, int y, bool now)
+        public IEnumerator LoadChunk(int y, int x, bool now)
         {
-            if (!loadedChunks.Add((x, y)))
+            if (!loadedChunks.Add((y, x)))
                 yield break;
             
-            ChunkInstance chunk = new(x, y);
+            ChunkInstance chunk = new(y, x);
             var cancelationToken = chunk.loading.Token;
             var tasksource = new TaskCompletionSource();
             chunk.chunkLoading = tasksource.Task;
             chunks.Add(chunk);
-            chunksXY[(x, y)] = chunk;
+            chunksXY[(y, x)] = chunk;
 
-            var fullName = $"World\\Maps\\{gameContext.CurrentMap.Directory}\\{gameContext.CurrentMap.Directory}_{y}_{x}.adt";
-            var file = gameContext.ReadFile(fullName);
+            var fullName = gameFiles.Adt(gameContext.CurrentMap.Directory, x, y);
+            var file = gameFiles.ReadFile(fullName);
             yield return file;
             if (file.Result == null)
             {
@@ -194,6 +243,8 @@ namespace WDE.MapRenderer.Managers
                     {
                         throw new Exception("Unexpected end of chunks");
                     }
+
+                    chunk.areaIds[i, j] = chunksEnumerator2.Current.AreaId;
                     var basePos = chunksEnumerator2.Current.BasePosition;
                     int k_ = 0;
                     Vector3[] subVertices = new Vector3[145];
@@ -263,12 +314,12 @@ namespace WDE.MapRenderer.Managers
                             indices[k__++] = br;
                         }
                     }
-                    var subChunkMesh = gameContext.Engine.MeshManager.CreateManagedOnlyMesh(subVertices, indices);
-                    var entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
-                    gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
-                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;
-                    gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = subChunkMesh.Handle;
-                    gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
+                    var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices, indices);
+                    var entity = entityManager.CreateEntity(collisionOnlyArchetype);
+                    entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
+                    entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;
+                    entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = subChunkMesh.Handle;
+                    entityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
                     chunk.entities.Add(entity);
 
                     Rgba32[] holeMap = new Rgba32[4 * 4];
@@ -291,10 +342,10 @@ namespace WDE.MapRenderer.Managers
                     {
                         for (int _y = 0; _y < 64; ++_y)
                         {
-                            var col = new Rgba32(len >= 1 ? (byte)sm[_x, _y, 0] : (byte)255,
-                                len >= 2 ? (byte)sm[_x, _y, 1] : (byte)0,
-                                len >= 3 ? (byte)sm[_x, _y, 2] : (byte)0,
-                                chunksEnumerator2.Current.ShadowMap != null && chunksEnumerator2.Current.ShadowMap[_x, _y] == 1 ? (byte)255 : (byte)0);
+                            var col = new Rgba32(len >= 1 ? sm[_x, _y, 0] : (byte)255,
+                                len >= 2 ? sm[_x, _y, 1] : (byte)0,
+                                len >= 3 ? sm[_x, _y, 2] : (byte)0,
+                                chunksEnumerator2.Current.ShadowMap != null && chunksEnumerator2.Current.ShadowMap[_x, _y] ? (byte)255 : (byte)0);
                             var left = 255 - col.B;
                             col.G = (byte)Math.Min(col.G, left);
                             left -= col.G;
@@ -316,25 +367,24 @@ namespace WDE.MapRenderer.Managers
             }
         
             int chnk = 0;
-            var shaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/lit.json");
-            var material = gameContext.Engine.MaterialManager.CreateMaterial(shaderHandle);
+            var material = materialManager.CreateMaterial("data/lit.json");
             chunk.material = material;
-            material.SetUniformInt("showGrid", RenderGrid ? 1 : 0);
+            material.SetUniformInt("showGrid", gameProperties.ShowGrid ? 1 : 0);
 
             using var chunksEnumerator = ((IEnumerable<AdtChunk>)adt.Chunks).GetEnumerator();
             chunksEnumerator.MoveNext();
-            var chunkMesh = gameContext.MeshManager.MeshOfChunk;
+            var chunkMesh = woWMeshManager.MeshOfChunk;
             var t = new Transform();
             t.Position = new Vector3(chunksEnumerator.Current.BasePosition.Y, 0,
                 -chunksEnumerator.Current.BasePosition.X);
             t.Scale = new Vector3(1);
             chunkMesh.Activate();
         
-            chunk.splatMapTex = gameContext.Engine.TextureManager.CreateTextureArray(splatMaps, 64, 64);
-            gameContext.Engine.TextureManager.SetFiltering(chunk.splatMapTex, FilteringMode.Linear);
-            gameContext.Engine.TextureManager.SetWrapping(chunk.splatMapTex, WrapMode.ClampToEdge);
-            chunk.holesMapTex = gameContext.Engine.TextureManager.CreateTextureArray(holesMaps, 4, 4);
-            gameContext.Engine.TextureManager.SetFiltering(chunk.holesMapTex, FilteringMode.Nearest);
+            chunk.splatMapTex = textureManager.CreateTextureArray(splatMaps, 64, 64);
+            textureManager.SetFiltering(chunk.splatMapTex, FilteringMode.Linear);
+            textureManager.SetWrapping(chunk.splatMapTex, WrapMode.ClampToEdge);
+            chunk.holesMapTex = textureManager.CreateTextureArray(holesMaps, 4, 4);
+            textureManager.SetFiltering(chunk.holesMapTex, FilteringMode.Nearest);
             material.SetTexture("texture1", chunk.splatMapTex);
             material.SetTexture("holes", chunk.holesMapTex);
         
@@ -364,7 +414,7 @@ namespace WDE.MapRenderer.Managers
                         if (!textureToSlot.ContainsKey(texturePath))
                         {
                             var tcs = new TaskCompletionSource<TextureHandle>();
-                            yield return gameContext.TextureManager.GetTexture(texturePath, tcs);
+                            yield return woWTextureManager.GetTexture(texturePath, tcs);
                             var splatTex = tcs.Task.Result;
                             if (textureToSlot.Count <= 13)
                                 material.SetTexture("_tex" + (textureToSlot.Count), splatTex);
@@ -391,28 +441,28 @@ namespace WDE.MapRenderer.Managers
 
             for (int j = textureToSlot.Count; j <= 13; ++j)
             {
-                material.SetTexture("_tex" + j, gameContext.TextureManager.EmptyTexture);
+                material.SetTexture("_tex" + j, woWTextureManager.EmptyTexture);
             }
         
 
-            chunk.chunkToSplatBuffer = gameContext.Engine.CreateBuffer<VectorByte4>(BufferTypeEnum.StructuredBufferVertexOnly, chunkToSplatIdx, BufferInternalFormat.Byte4);
-            chunk.heightsNormalBuffer = gameContext.Engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal, BufferInternalFormat.Float4);// new NativeBuffer<Vector4>(device.device, BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal);
+            chunk.chunkToSplatBuffer = engine.CreateBuffer<VectorByte4>(BufferTypeEnum.StructuredBufferVertexOnly, chunkToSplatIdx, BufferInternalFormat.Byte4);
+            chunk.heightsNormalBuffer = engine.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal, BufferInternalFormat.Float4);// new NativeBuffer<Vector4>(device.device, BufferTypeEnum.StructuredBufferVertexOnly, heightsNormal);
         
             material.SetBuffer("chunkToSplat", chunk.chunkToSplatBuffer);
             material.SetBuffer("heightsNormalBuffer", chunk.heightsNormalBuffer);
 
-            //chunk.terrainHandle = gameContext.Engine.RenderManager.RegisterDynamicRenderer(chunkMesh.Handle, material, 0, t);
+            //chunk.terrainHandle = renderManager.RegisterDynamicRenderer(chunkMesh.Handle, material, 0, t);
             
-            var terrainEntity = gameContext.Engine.EntityManager.CreateEntity(terrainEntityArchetype);
-            gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(terrainEntity).Matrix = t.LocalToWorldMatrix;
-            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).SubMeshId = 0;
-            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).MaterialHandle = material.Handle;
-            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).MeshHandle = chunkMesh.Handle; 
-            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(terrainEntity).Opaque = !material.BlendingEnabled; 
+            var terrainEntity = entityManager.CreateEntity(terrainEntityArchetype);
+            entityManager.GetComponent<LocalToWorld>(terrainEntity).Matrix = t.LocalToWorldMatrix;
+            entityManager.GetComponent<MeshRenderer>(terrainEntity).SubMeshId = 0;
+            entityManager.GetComponent<MeshRenderer>(terrainEntity).MaterialHandle = material.Handle;
+            entityManager.GetComponent<MeshRenderer>(terrainEntity).MeshHandle = chunkMesh.Handle; 
+            entityManager.GetComponent<MeshRenderer>(terrainEntity).Opaque = !material.BlendingEnabled; 
             var localBounds = new BoundingBox(
                 new Vector3(chunkMesh.Bounds.Minimum.X, minHeight, chunkMesh.Bounds.Minimum.Z),
                 new Vector3(chunkMesh.Bounds.Maximum.X, maxHeight, chunkMesh.Bounds.Maximum.Z));
-            gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(terrainEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = t.LocalToWorldMatrix });
+            entityManager.GetComponent<WorldMeshBounds>(terrainEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = t.LocalToWorldMatrix });
             chunk.entities.Add(terrainEntity);
             
             if (cancelationToken.IsCancellationRequested)
@@ -445,7 +495,7 @@ namespace WDE.MapRenderer.Managers
 
                 TaskCompletionSource<MdxManager.MdxInstance?> result = new();
                 
-                yield return gameContext.MdxManager.LoadM2Mesh(m2.M2Path, result);
+                yield return mdxManager.LoadM2Mesh(m2.M2Path, result);
                 if (result.Task.Result == null)
                 {
                     Console.WriteLine(m2.M2Path + " is null");
@@ -462,16 +512,16 @@ namespace WDE.MapRenderer.Managers
                 foreach (var material in m.materials)
                 {
                     //
-                    // var entity = gameContext.Engine.EntityManager.CreateEntity(renderEntityArchetype);
-                    // gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = t.LocalToWorldMatrix;
-                    // gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = j++;
-                    // gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
-                    // gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = m.mesh.Handle;
-                    // gameContext.Engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)m.mesh.Bounds;
-                    // gameContext.Engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
+                    // var entity = entityManager.CreateEntity(renderEntityArchetype);
+                    // entityManager.GetComponent<LocalToWorld>(entity).Matrix = t.LocalToWorldMatrix;
+                    // entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = j++;
+                    // entityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
+                    // entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = m.mesh.Handle;
+                    // entityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)m.mesh.Bounds;
+                    // entityManager.GetComponent<DirtyPosition>(entity).Enable();
                     // chunk.objectHandles2.Add(entity);
                     //
-                    chunk.renderHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(m.mesh.Handle, material, j++, t));
+                    chunk.renderHandles.Add(renderManager.RegisterStaticRenderer(m.mesh.Handle, material, j++, t));
                 }
 
                 index++;
@@ -497,7 +547,7 @@ namespace WDE.MapRenderer.Managers
                     wmoReference.Rotation.Z);
 
                 var tcs = new TaskCompletionSource<WmoManager.WmoInstance?>();
-                yield return gameContext.WmoManager.LoadWorldMapObject(wmoReference.WmoPath, tcs);
+                yield return wmoManager.LoadWorldMapObject(wmoReference.WmoPath, tcs);
                 if (tcs.Task.Result == null)
                     continue;
 
@@ -506,15 +556,15 @@ namespace WDE.MapRenderer.Managers
                     int i = 0;
                     foreach (var material in mesh.Item2)
                     {
-                        chunk.renderHandles.Add(gameContext.Engine.RenderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
+                        chunk.renderHandles.Add(renderManager.RegisterStaticRenderer(mesh.Item1.Handle, material, i++, wmoTransform));
 
                         if (!material.BlendingEnabled)
                         {
-                            var entity = gameContext.Engine.EntityManager.CreateEntity(collisionOnlyArchetype);
-                            gameContext.Engine.EntityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
-                            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
-                            gameContext.Engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
-                            gameContext.Engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });   
+                            var entity = entityManager.CreateEntity(collisionOnlyArchetype);
+                            entityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
+                            entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
+                            entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
+                            entityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });   
                             chunk.entities.Add(entity);
                         }
                     }
@@ -530,61 +580,68 @@ namespace WDE.MapRenderer.Managers
         public void Dispose()
         {
             foreach (var c in chunks)
-                c.Dispose(gameContext);
+                c.Dispose(textureManager);
         }
 
         public void Update(float delta)
         {
+            if (loadingManager.Value.EssentialLoadingInProgress)
+                return;
+
+            RenderGrid = gameProperties.ShowGrid;
+            
             int D = 1;
-            (int x, int y) chunk = gameContext.CameraManager.CurrentChunk;
+            (int x, int y) chunk = cameraManager.CurrentChunk;
             for (int i = -D; i <= D; ++i)
             {
                 for (int j = -D; j <= D; ++j)
                     gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
             }
-
+            
             UnloadChunks();
         }
 
         private void UnloadChunks()
         {
-            var camera = new Vector2(gameContext.CameraManager.Position.X, gameContext.CameraManager.Position.Z);
+            var camera = new Vector2(cameraManager.Position.X, cameraManager.Position.Z);
             for (var index = chunks.Count - 1; index >= 0; index--)
             {
                 var c = chunks[index];
                 var midPoint = new Vector2(c.MiddlePoint.X, c.MiddlePoint.Z);
                 if ((midPoint - camera).LengthSquared() > 7500 * 7500)
-                    UnloadChunk(c).ListenErrors();
+                {
+                    chunksXY.Remove((c.X, c.Z));
+                    loadedChunks.Remove((c.X, c.Z));
+                    chunks.Remove(c);
+                    gameContext.StartCoroutine(UnloadChunk(c));
+                }
             }
         }
 
-        public void UnloadAllNow()
+        private IEnumerator UnloadChunk(ChunkInstance chunk)
         {
-            for (var index = chunks.Count - 1; index >= 0; index--)
-            {
-                UnloadChunk(chunks[index]).ListenErrors();
-            }
-            chunks.Clear();
-            loadedChunks.Clear();
-        }
-
-        private async Task UnloadChunk(ChunkInstance chunk)
-        {
-            chunksXY.Remove((chunk.X, chunk.Z));
-            loadedChunks.Remove((chunk.X, chunk.Z));
-            chunks.Remove(chunk);
             if (chunk.loading != null)
             {
                 chunk.loading.Cancel();
-                await chunk.chunkLoading;
+                yield return chunk.chunkLoading;
             }
             
             foreach (var obj in chunk.renderHandles)
-                gameContext.Engine.RenderManager.UnregisterStaticRenderer(obj);
+                renderManager.UnregisterStaticRenderer(obj);
             foreach (var entity in chunk.entities)
-                gameContext.Engine.EntityManager.DestroyEntity(entity);
+                entityManager.DestroyEntity(entity);
             
-            chunk.Dispose(gameContext);
+            chunk.Dispose(textureManager);
+        }
+
+        public IEnumerator UnloadAllChunks()
+        {
+            var chunksCopy = chunks.ToList();
+            chunks.Clear();
+            loadedChunks.Clear();
+            chunksXY.Clear();
+            foreach (var chunk in chunksCopy)
+                yield return UnloadChunk(chunk);
         }
     }
 }

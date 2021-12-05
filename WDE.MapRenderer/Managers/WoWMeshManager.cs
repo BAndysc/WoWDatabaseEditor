@@ -5,20 +5,20 @@ namespace WDE.MapRenderer.Managers
 {
     public class WoWMeshManager : System.IDisposable
     {
-        private readonly IGameContext gameContext;
+        private readonly IMeshManager meshManager;
         private IMesh chunkMesh;
 
-        public WoWMeshManager(IGameContext gameContext)
+        public WoWMeshManager(IMeshManager meshManager)
         {
-            this.gameContext = gameContext;
-            chunkMesh = gameContext.Engine.MeshManager.CreateMesh(ChunkMesh.Create());
+            this.meshManager = meshManager;
+            chunkMesh = meshManager.CreateMesh(ChunkMesh.Create());
         }
 
         public IMesh MeshOfChunk => chunkMesh;
         
         public void Dispose()
         {
-            gameContext.Engine.MeshManager.DisposeMesh(chunkMesh);
+            meshManager.DisposeMesh(chunkMesh);
             chunkMesh = null!;
         }
     }

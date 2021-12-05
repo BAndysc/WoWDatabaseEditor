@@ -1,13 +1,15 @@
 using Avalonia.Input;
+using TheEngine.Interfaces;
 using TheMaths;
+using IInputManager = TheEngine.Interfaces.IInputManager;
 using MouseButton = TheEngine.Input.MouseButton;
 
 namespace WDE.MapRenderer.Managers
 {
     public class ScreenSpaceSelector
     {
-        private readonly IGameContext gameContext;
-
+        private readonly IInputManager inputManager;
+        private readonly IUIManager uiManager;
         private Vector2 startDragPositionNormalized;
         private Vector2 currentDragPositionNormalized;
         private Vector2 startDragPosition;
@@ -16,15 +18,16 @@ namespace WDE.MapRenderer.Managers
 
         public event Action<Vector2, Vector2>? OnSelect;
         
-        public ScreenSpaceSelector(IGameContext gameContext)
+        public ScreenSpaceSelector(IInputManager inputManager, IUIManager uiManager)
         {
-            this.gameContext = gameContext;
+            this.inputManager = inputManager;
+            this.uiManager = uiManager;
         }
 
         public void Update(float diff)
         {
-            bool stopDrag = dragging && !gameContext.Engine.InputManager.Mouse.IsMouseDown(MouseButton.Left);
-            dragging = dragging && gameContext.Engine.InputManager.Mouse.IsMouseDown(MouseButton.Left);
+            bool stopDrag = dragging && !inputManager.Mouse.IsMouseDown(MouseButton.Left);
+            dragging = dragging && inputManager.Mouse.IsMouseDown(MouseButton.Left);
 
             if (stopDrag)
             {
@@ -33,18 +36,18 @@ namespace WDE.MapRenderer.Managers
                 OnSelect?.Invoke(min, max);
             }
             
-            if (gameContext.Engine.InputManager.Mouse.HasJustClicked(MouseButton.Left) &&
-                gameContext.Engine.InputManager.Keyboard.IsDown(Key.LeftShift))
+            if (inputManager.Mouse.HasJustClicked(MouseButton.Left) &&
+                inputManager.Keyboard.IsDown(Key.LeftShift))
             {
-                startDragPosition = gameContext.Engine.InputManager.Mouse.ScreenPoint;
-                startDragPositionNormalized = gameContext.Engine.InputManager.Mouse.NormalizedPosition;
+                startDragPosition = inputManager.Mouse.ScreenPoint;
+                startDragPositionNormalized = inputManager.Mouse.NormalizedPosition;
                 dragging = true;
             }
 
             if (dragging)
             {
-                currentDragPosition = gameContext.Engine.InputManager.Mouse.ScreenPoint;
-                currentDragPositionNormalized = gameContext.Engine.InputManager.Mouse.NormalizedPosition;
+                currentDragPosition = inputManager.Mouse.ScreenPoint;
+                currentDragPositionNormalized = inputManager.Mouse.NormalizedPosition;
             }
         }
 
@@ -56,7 +59,7 @@ namespace WDE.MapRenderer.Managers
                 var max = new Vector2(Math.Max(startDragPosition.X, currentDragPosition.X), Math.Max(startDragPosition.Y, currentDragPosition.Y));
                 var size = max - min;
                 
-                gameContext.Engine.Ui.DrawBox(min.X, min.Y, size.X, size.Y, new Vector4(0.2f, 0.66f, 1, 0.4f));
+                uiManager.DrawBox(min.X, min.Y, size.X, size.Y, new Vector4(0.2f, 0.66f, 1, 0.4f));
             }
         }
     }

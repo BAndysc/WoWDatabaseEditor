@@ -1,4 +1,3 @@
-using System;
 using TheMaths;
 
 namespace WDE.MapRenderer.StaticData

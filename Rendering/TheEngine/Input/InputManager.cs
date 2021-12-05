@@ -1,6 +1,8 @@
-﻿namespace TheEngine.Input
+﻿using TheEngine.Interfaces;
+
+namespace TheEngine.Input
 {
-    public class InputManager
+    internal class InputManager : IInputManager
     {
         internal Mouse mouse { get; }
         public IMouse Mouse { get; }

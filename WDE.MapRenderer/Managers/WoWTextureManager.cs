@@ -1,25 +1,26 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Handles;
+using TheEngine.Interfaces;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers
 {
     public class WoWTextureManager : System.IDisposable
     {
-        private readonly IGameContext gameContext;
+        private readonly ITextureManager textureManager;
+        private readonly IGameFiles gameFiles;
         private Dictionary<string, TextureHandle> texts = new();
 
         public TextureHandle EmptyTexture { get; }
         
-        public WoWTextureManager(IGameContext gameContext)
+        public WoWTextureManager(ITextureManager textureManager, IGameFiles gameFiles)
         {
-            this.gameContext = gameContext;
-            EmptyTexture = gameContext.Engine.TextureManager.CreateTexture(
+            this.textureManager = textureManager;
+            this.gameFiles = gameFiles;
+            EmptyTexture = textureManager.CreateTexture(
                     new[] { new Rgba32[] { new(255, 0, 0, 255) } }, 1, 1, false);
         }
 
@@ -31,15 +32,15 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            var dummy = gameContext.Engine.TextureManager.CreateDummyHandle();
+            var dummy = textureManager.CreateDummyHandle();
 
             texts[texturePath] = dummy;
 
-            var bytes = gameContext.ReadFile(texturePath);
+            var bytes = gameFiles.ReadFile(texturePath);
             yield return bytes;
             if (bytes.Result == null)
             {
-                result.SetResult(gameContext.Engine.TextureManager.CreateTexture(null, 1, 1, true));
+                result.SetResult(textureManager.CreateTexture(null, 1, 1, true));
                 yield break;
             }
 
@@ -47,17 +48,17 @@ namespace WDE.MapRenderer.Managers
             bytes.Result.Dispose();
         
             Debug.Assert(texts[texturePath] == dummy);
-            var actualHandle = gameContext.Engine.TextureManager.CreateTexture(blp.Data, (int)blp.Header.Width, (int)blp.Header.Height, blp.Header.Mips == BLP.MipmapLevelAndFlagType.MipsNone);
-            gameContext.Engine.TextureManager.SetFiltering(texts[texturePath], FilteringMode.Linear);
-            gameContext.Engine.TextureManager.ReplaceHandles(dummy, actualHandle);
+            var actualHandle = textureManager.CreateTexture(blp.Data, (int)blp.Header.Width, (int)blp.Header.Height, blp.Header.Mips == BLP.MipmapLevelAndFlagType.MipsNone);
+            textureManager.SetFiltering(texts[texturePath], FilteringMode.Linear);
+            textureManager.ReplaceHandles(dummy, actualHandle);
             result.SetResult(dummy);
         }
 
         public void Dispose()
         {
-            gameContext.Engine.TextureManager.DisposeTexture(EmptyTexture);
+            textureManager.DisposeTexture(EmptyTexture);
             foreach (var tex in texts.Values)
-                gameContext.Engine.TextureManager.DisposeTexture(tex);
+                textureManager.DisposeTexture(tex);
             texts.Clear();
         }
     }

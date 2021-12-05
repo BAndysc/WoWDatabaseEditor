@@ -51,9 +51,9 @@ namespace WDE.MapRenderer.Managers
             public IMesh mesh;
             public Material[] materials;
 
-            public void Dispose(IGameContext context)
+            public void Dispose(IMeshManager meshManager)
             {
-                context.Engine.MeshManager.DisposeMesh(mesh);
+                meshManager.DisposeMesh(mesh);
             }
         }
 
@@ -61,11 +61,17 @@ namespace WDE.MapRenderer.Managers
         private Dictionary<uint, MdxInstance?> creaturemeshes = new();
         private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
         private Dictionary<uint, Task<MdxInstance?>> creaturemeshesCurrentlyLoaded = new();
-        private readonly IGameContext gameContext;
+        private readonly IGameFiles gameFiles;
+        private readonly IMeshManager meshManager;
+        private readonly IMaterialManager materialManager;
+        private readonly WoWTextureManager textureManager;
 
-        public MdxManager(IGameContext gameContext)
+        public MdxManager(IGameFiles gameFiles, IMeshManager meshManager, IMaterialManager materialManager, WoWTextureManager textureManager)
         {
-            this.gameContext = gameContext;
+            this.gameFiles = gameFiles;
+            this.meshManager = meshManager;
+            this.materialManager = materialManager;
+            this.textureManager = textureManager;
         }
 
         public IEnumerator LoadM2Mesh(string path, TaskCompletionSource<MdxInstance?> result, uint displayid = 0)
@@ -163,7 +169,7 @@ namespace WDE.MapRenderer.Managers
 
             var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2);
             
-            var mesh = gameContext.Engine.MeshManager.CreateMesh(md);
+            var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
 
             // titi : set active batches/sections
@@ -691,11 +697,11 @@ namespace WDE.MapRenderer.Managers
         public void Dispose()
         {
             foreach (var mesh in meshes.Values)
-                mesh?.Dispose(gameContext);
+                mesh?.Dispose(meshManager);
 
             // titi test
             foreach (var creaturemesh in creaturemeshes.Values)
-                creaturemesh?.Dispose(gameContext);
+                creaturemesh?.Dispose(meshManager);
         }
     }
 }

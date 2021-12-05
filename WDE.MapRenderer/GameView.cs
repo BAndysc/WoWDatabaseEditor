@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using Avalonia.OpenGL;
-using Avalonia.OpenGL.Controls;
+using Prism.Ioc;
 using WDE.Common.Disposables;
 using WDE.Common.Managers;
-using WDE.MapRenderer.Managers;
 using WDE.Module.Attributes;
 
 namespace WDE.MapRenderer
@@ -14,18 +10,18 @@ namespace WDE.MapRenderer
     public class GameViewService : IGameView
     {
         private readonly Lazy<IDocumentManager> documentManager;
-        private List<Func<IGameModule>> modules = new();
+        private List<Func<IContainerProvider, IGameModule>> modules = new();
 
-        public IEnumerable<Func<IGameModule>> Modules => modules;
-        public event Action<Func<IGameModule>>? ModuleRegistered;
-        public event Action<Func<IGameModule>>? ModuleRemoved;
+        public IEnumerable<Func<IContainerProvider, IGameModule>> Modules => modules;
+        public event Action<Func<IContainerProvider, IGameModule>>? ModuleRegistered;
+        public event Action<Func<IContainerProvider, IGameModule>>? ModuleRemoved;
 
         public GameViewService(Lazy<IDocumentManager> documentManager)
         {
             this.documentManager = documentManager;
         }
         
-        public IDisposable RegisterGameModule(Func<IGameModule> gameModule)
+        public IDisposable RegisterGameModule(Func<IContainerProvider, IGameModule> gameModule)
         {
             modules.Add(gameModule);
             ModuleRegistered?.Invoke(gameModule);
@@ -38,7 +34,7 @@ namespace WDE.MapRenderer
             });
         }
 
-        public async Task<IGameContext> Open()
+        public async Task<Game> Open()
         {
             documentManager.Value.OpenTool<GameViewModel>();
             var tool = documentManager.Value.GetTool<GameViewModel>();

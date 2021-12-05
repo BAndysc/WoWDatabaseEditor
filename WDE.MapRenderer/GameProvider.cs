@@ -1,12 +1,3 @@
-using System;
-using System.Threading.Tasks;
-using WDE.Common.CoreVersion;
-using WDE.Common.Documents;
-using WDE.Common.Services.MessageBox;
-using WDE.Common.Tasks;
-using WDE.Common.Types;
-using WDE.Module.Attributes;
-
 namespace WDE.MapRenderer
 {
 //     [AutoRegister]

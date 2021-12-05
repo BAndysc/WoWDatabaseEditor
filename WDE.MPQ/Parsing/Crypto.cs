@@ -29,7 +29,7 @@ namespace WDE.MPQ.Parsing
                 seed2 = value + seed2 + (seed2 << 5) + 3;
 
                 var bytes = BitConverter.GetBytes(value);
-                Array.ConstrainedCopy(bytes, 0, data, i, sizeof (uint));
+                Array.Copy(bytes, 0, data, i, sizeof (uint));
             }
         }
 

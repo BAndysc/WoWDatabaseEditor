@@ -1,7 +1,7 @@
 ﻿using Avalonia.Input;
 using TheMaths;
 
-namespace TheEngine.Input
+namespace TheEngine.Interfaces
 {
     public interface IKeyboard
     {

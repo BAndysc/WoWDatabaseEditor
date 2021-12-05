@@ -1,27 +1,22 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using AsyncAwaitBestPractices.MVVM;
 using Avalonia;
 using Avalonia.Threading;
 using Prism.Commands;
-using TheEngine;
+using Prism.Ioc;
+using TheEngine.Interfaces;
 using TheMaths;
 using WDE.Common.DBC;
 using WDE.Common.Disposables;
-using WDE.Common.Documents;
-using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
+using WDE.MapRenderer.Managers;
 using WDE.MapRenderer.StaticData;
 using WDE.Module.Attributes;
 using WDE.MpqReader.Structures;
@@ -57,13 +52,10 @@ namespace WDE.MapRenderer
     [AutoRegister]
     public class GameViewModel : ObservableBase, ITool, IMapContext<GameCameraViewModel>
     {
-        private readonly IMpqService mpqService;
-        private readonly IMessageBoxService messageBoxService;
         private readonly Lazy<IDocumentManager> documentManager;
         private readonly GameViewSettings settings;
-        public GameManager Game { get; }
+        public Game Game { get; }
         public event Action? RequestDispose;
-
 
         private MapViewModel? selectedMap;
         
@@ -86,53 +78,163 @@ namespace WDE.MapRenderer
         
         public string Stats { get; private set; }
         
+        private GameProperties Properties { get; }
+
+        class GameProxy : IGameModule
+        {
+            private readonly GameViewModel vm;
+            private readonly CameraManager cameraManager;
+            private readonly IStatsManager statsManager;
+            private readonly ModuleManager moduleManager;
+            private readonly TimeManager timeManager;
+            private readonly IGameContext gameContext;
+
+            private IDisposable? mapSub;
+            private IDisposable? activationSub;
+
+            private ObservableCollection<object>? registeredViewModels;
+
+            public GameProxy(GameViewModel vm,
+                CameraManager cameraManager,
+                IStatsManager statsManager,
+                ModuleManager moduleManager,
+                TimeManager timeManager,
+                IGameContext gameContext)
+            {
+                this.vm = vm;
+                this.cameraManager = cameraManager;
+                this.statsManager = statsManager;
+                this.moduleManager = moduleManager;
+                this.timeManager = timeManager;
+                this.gameContext = gameContext;
+            }
+            
+            private void RegisteredViewModelsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            {
+                if (vm.IsSelected)
+                {
+                    if (moduleManager.ViewModels.Count > 0)
+                    {
+                        vm.documentManager.Value.ActivateDocumentInTheBackground((IDocument)moduleManager.ViewModels[0]);
+                    }
+                    else if (moduleManager.ViewModels.Count == 0)
+                        vm.documentManager.Value.ActiveDocument = null;
+                }
+            }
+
+            public void Dispose()
+            {
+                mapSub?.Dispose();
+                activationSub?.Dispose();
+                if (registeredViewModels != null)
+                    registeredViewModels.CollectionChanged -= RegisteredViewModelsOnCollectionChanged;
+            }
+
+            public object? ViewModel => null;
+            
+            public void Initialize()
+            {
+                registeredViewModels = moduleManager.ViewModels;
+                registeredViewModels.CollectionChanged += RegisteredViewModelsOnCollectionChanged;
+                
+                Dispatcher.UIThread.Post(() => vm.SelectedMap = vm.Maps.FirstOrDefault(x => x.Id == gameContext.CurrentMap.Id), DispatcherPriority.Background);
+                gameContext.ChangedMap += newMapId =>
+                {
+                    Dispatcher.UIThread.Post(() => vm.SelectedMap = vm.Maps.FirstOrDefault(x => x.Id == newMapId), DispatcherPriority.Background);
+                };
+
+                activationSub = vm.ToObservable(v => v.IsSelected)
+                    .SubscribeAction(@is =>
+                    {
+                        if (@is)
+                        {
+                            if (moduleManager.ViewModels.Count > 0)
+                            {
+                                vm.documentManager.Value.ActivateDocumentInTheBackground((IDocument)moduleManager.ViewModels[0]);
+                            }
+                        }
+                    });
+
+                mapSub = vm
+                    .ToObservable(i => i.SelectedMap)
+                    .Where(map => map != null)
+                    .SubscribeAction(map =>
+                    {
+                        gameContext.SetMap((int)map!.Id);
+                    });
+            }
+
+            public void Update(float delta)
+            {
+                var wowPos = cameraManager.Position.ToWoWPosition();
+                vm.cameraViewModel.UpdatePosition(wowPos.X, wowPos.Y, wowPos.Z);
+                vm.RaisePropertyChanged(nameof(CurrentTime));
+
+                UpdateRenderStats();
+            }
+
+            private void UpdateRenderStats()
+            {
+                if (!vm.DisplayStats)
+                    return;
+                
+                ref var counters = ref statsManager.Counters;
+                ref var stats = ref statsManager.RenderStats;
+                float w = statsManager.PixelSize.X;
+                float h = statsManager.PixelSize.Y;
+                vm.Stats =
+                    $"[{w:0}x{h:0}]\nTotal frame time: {counters.FrameTime.Average:0.00} ms\n - Render time: {counters.TotalRender.Average:0.00}\n  - Bounds: {counters.BoundsCalc.Average:0.00}ms\n  - Culling: {counters.Culling.Average:0.00}ms\n  - Drawing: {counters.Drawing.Average:0.00}ms\n  - Present time: {counters.PresentTime.Average:0.00} ms";
+
+                vm.Stats += "\n" + @"Shaders: " + stats.ShaderSwitches + @"
+Materials: " + stats.MaterialActivations + @"
+Meshes: " + stats.MeshSwitches + @"
+Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws) + @"
+Batches saved by instancing: " + stats.InstancedDrawSaved + @"
+Tris: " + stats.TrianglesDrawn;
+                Dispatcher.UIThread.Post(()=>
+                {
+                    vm.RaisePropertyChanged(nameof(Stats));
+                }, DispatcherPriority.Render);
+            }
+
+            public void Render()
+            {
+            }
+
+            public void RenderGUI()
+            {
+            }
+        }
+        
         public GameViewModel(IMpqService mpqService,
             IDbcStore dbcStore, 
             IMapDataProvider mapData, 
             ITaskRunner taskRunner,
             IMessageBoxService messageBoxService,
-            IDatabaseClientFileOpener databaseClientFileOpener,
             IGameView gameView,
-            GameManager gameManager,
+            Game game,
+            GameProperties gameProperties,
             Lazy<IDocumentManager> documentManager,
             GameViewSettings settings)
         {
-            this.mpqService = mpqService;
-            this.messageBoxService = messageBoxService;
             this.documentManager = documentManager;
             this.settings = settings;
             MapData = mapData;
-            Game = gameManager;
+            Game = game;
+            Properties = gameProperties;
+            Properties.OverrideLighting = settings.OverrideLighting;
+            Properties.DisableTimeFlow = settings.DisableTimeFlow;
+            Properties.CurrentTime = Time.FromMinutes(settings.CurrentTime);
+            Properties.TimeSpeedMultiplier = settings.TimeSpeedMultiplier;
+            Properties.ShowGrid = settings.ShowGrid;
+            Properties.ViewDistanceModifier = settings.ViewDistanceModifier;
+            Properties.ShowAreaTriggers = settings.ShowAreaTriggers;
+
+            gameView.RegisterGameModule(container => container.Resolve<GameProxy>((typeof(GameViewModel), this)));
+
             Game.OnFailedInitialize += () =>
             {
                 Dispatcher.UIThread.Post(() => Visibility = false, DispatcherPriority.Background);
-            };
-            Game.OnInitialized += () =>
-            {
-                Game.LightingManager.OverrideLighting = settings.OverrideLighting;
-                Game.TimeManager.IsPaused = settings.DisableTimeFlow;
-                Game.TimeManager.SetTime(Time.FromMinutes(settings.CurrentTime));
-                Game.TimeManager.TimeSpeedMultiplier = settings.TimeSpeedMultiplier;
-                Game.ChunkManager.RenderGrid = settings.ShowGrid;
-                Game.Engine.RenderManager.ViewDistanceModifier = settings.ViewDistanceModifier;
-                Game.AreaTriggerManager.RenderAreaTriggers = settings.ShowAreaTriggers;
-                RegisteredViewModels = Game.ModuleManager.ViewModels;
-                RegisteredViewModels.CollectionChanged += RegisteredViewModelsOnCollectionChanged;
-                
-                Dispatcher.UIThread.Post(() =>
-                {
-                    RaisePropertyChanged(nameof(OverrideLighting));
-                    RaisePropertyChanged(nameof(DisableTimeFlow));
-                    RaisePropertyChanged(nameof(TimeSpeedMultiplier));
-                    RaisePropertyChanged(nameof(ShowGrid));
-                    RaisePropertyChanged(nameof(CurrentTime));
-                    RaisePropertyChanged(nameof(ViewDistance));
-                    RaisePropertyChanged(nameof(ShowAreaTriggers));
-                });
-            };
-            Game.ChangedMap += newMapId =>
-            {
-                Dispatcher.UIThread.Post(() => SelectedMap = Maps.FirstOrDefault(x => x.Id == newMapId), DispatcherPriority.Background);
             };
             AutoDispose(new ActionDisposable(() =>
             {
@@ -148,65 +250,14 @@ namespace WDE.MapRenderer
                         return new MapViewModel(pair.Value,  mapName, (uint)pair.Key);
                     }).ToList();
                 RaisePropertyChanged(nameof(Maps));
-                SelectedMap = Maps.FirstOrDefault(k => k.MapPath == "Kalimdor") ?? Maps.FirstOrDefault();
             });
-
-            AutoDispose(this
-                .ToObservable(i => i.SelectedMap)
-                .Where(map => map != null && Game.IsInitialized)
-                .SubscribeAction(map =>
-                {
-                    Game.SetMap((int)map.Id);
-                }));
-
+            
             ToggleMapVisibilityCommand = new DelegateCommand(() => IsMapVisible = !IsMapVisible);
             ToggleStatsVisibilityCommand = new DelegateCommand(() => DisplayStats = !DisplayStats);
             
             cameraViewModel = new GameCameraViewModel(this);
             Items.Add(cameraViewModel);
             
-            Game.UpdateLoop.Register(d =>
-            {
-                var wowPos = Game.CameraManager.Position.ToWoWPosition();
-                cameraViewModel.UpdatePosition(wowPos.X, wowPos.Y, wowPos.Z);
-            });
-            
-            Game.UpdateLoop.Register(d =>
-            {
-                if (!DisplayStats)
-                    return;
-                
-                ref var counters = ref Game.Engine.StatsManager.Counters;
-                ref var stats = ref Game.Engine.StatsManager.RenderStats;
-                float w = Game.Engine.StatsManager.PixelSize.X;
-                float h = Game.Engine.StatsManager.PixelSize.Y;
-                Stats =
-                    $"[{w:0}x{h:0}]\nTotal frame time: {counters.FrameTime.Average:0.00} ms\n - Render time: {counters.TotalRender.Average:0.00}\n  - Bounds: {counters.BoundsCalc.Average:0.00}ms\n  - Culling: {counters.Culling.Average:0.00}ms\n  - Drawing: {counters.Drawing.Average:0.00}ms\n  - Present time: {counters.PresentTime.Average:0.00} ms";
-
-                Stats += "\n" + @"Shaders: " + stats.ShaderSwitches + @"
-Materials: " + stats.MaterialActivations + @"
-Meshes: " + stats.MeshSwitches + @"
-Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws) + @"
-Batches saved by instancing: " + stats.InstancedDrawSaved + @"
-Tris: " + stats.TrianglesDrawn;
-                Dispatcher.UIThread.Post(()=>
-                {
-                    RaisePropertyChanged(nameof(CurrentTime));
-                    RaisePropertyChanged(nameof(Stats));
-                }, DispatcherPriority.Render);
-            });
-
-            On(() => IsSelected, @is =>
-            {
-                if (@is)
-                {
-                    if (Game.IsInitialized && Game.ModuleManager.ViewModels.Count > 0)
-                    {
-                        documentManager.Value.ActivateDocumentInTheBackground((IDocument)Game.ModuleManager.ViewModels[0]);
-                    }
-                }
-            });
-
             On(() => Visibility, @is =>
             {
                 if (@is)
@@ -229,31 +280,12 @@ Tris: " + stats.TrianglesDrawn;
             });
         }
 
-        private void RegisteredViewModelsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (IsSelected)
-            {
-                if (Game.IsInitialized && Game.ModuleManager.ViewModels.Count > 0)
-                {
-                    documentManager.Value.ActivateDocumentInTheBackground((IDocument)Game.ModuleManager.ViewModels[0]);
-                }
-                else if (Game.IsInitialized && Game.ModuleManager.ViewModels.Count == 0)
-                    documentManager.Value.ActiveDocument = null;
-            }
-        }
-
-        public ObservableCollection<object> RegisteredViewModels
-        {
-            get => registeredViewModels;
-            set => SetProperty(ref registeredViewModels, value);
-        }
-
         public bool OverrideLighting
         {
-            get => Game.LightingManager?.OverrideLighting ?? false;
+            get => Properties.OverrideLighting;
             set
             {
-                Game.LightingManager.OverrideLighting = value;
+                Properties.OverrideLighting = value;
                 settings.OverrideLighting = value;
                 RaisePropertyChanged(nameof(OverrideLighting));
             }
@@ -261,10 +293,10 @@ Tris: " + stats.TrianglesDrawn;
         
         public bool DisableTimeFlow
         {
-            get => Game.TimeManager?.IsPaused ?? false;
+            get => Properties.DisableTimeFlow;
             set
             {
-                Game.TimeManager.IsPaused = value;
+                Properties.DisableTimeFlow = value;
                 settings.DisableTimeFlow = value;
                 RaisePropertyChanged(nameof(DisableTimeFlow));
             }
@@ -272,10 +304,10 @@ Tris: " + stats.TrianglesDrawn;
 
         public int TimeSpeedMultiplier
         {
-            get => Game.TimeManager?.TimeSpeedMultiplier ?? 0;
+            get => Properties.TimeSpeedMultiplier;
             set
             {
-                Game.TimeManager.TimeSpeedMultiplier = value;
+                Properties.TimeSpeedMultiplier = value;
                 settings.TimeSpeedMultiplier = value;
                 RaisePropertyChanged(nameof(TimeSpeedMultiplier));
             }
@@ -283,10 +315,10 @@ Tris: " + stats.TrianglesDrawn;
 
         public bool ShowAreaTriggers
         {
-            get => Game.AreaTriggerManager?.RenderAreaTriggers ?? false;
+            get => Properties.ShowAreaTriggers;
             set
             {
-                Game.AreaTriggerManager.RenderAreaTriggers = value;
+                Properties.ShowAreaTriggers = value;
                 settings.ShowAreaTriggers = value;
                 RaisePropertyChanged(nameof(ShowAreaTriggers));
             }
@@ -294,10 +326,10 @@ Tris: " + stats.TrianglesDrawn;
         
         public bool ShowGrid
         {
-            get => Game.ChunkManager?.RenderGrid ?? false;
+            get => Properties.ShowGrid;
             set
             {
-                Game.ChunkManager.RenderGrid = value;
+                Properties.ShowGrid = value;
                 settings.ShowGrid = value;
                 RaisePropertyChanged(nameof(ShowGrid));
             }
@@ -305,20 +337,20 @@ Tris: " + stats.TrianglesDrawn;
 
         public float ViewDistance
         {
-            get => Game?.Engine?.RenderManager?.ViewDistanceModifier ?? 0;
+            get => Properties.ViewDistanceModifier;
             set
             {
-                Game.Engine.RenderManager.ViewDistanceModifier = value;
+                Properties.ViewDistanceModifier = value;
                 RaisePropertyChanged(nameof(ViewDistance));
             }
         }
         
         public int CurrentTime
         {
-            get => Game.TimeManager?.Time.TotalMinutes ?? 0;
+            get => Properties.CurrentTime.TotalMinutes;
             set
             {
-                Game.TimeManager.SetTime(Time.FromMinutes(value));
+                Properties.CurrentTime = Time.FromMinutes(value);
                 settings.CurrentTime = value;
                 RaisePropertyChanged(nameof(CurrentTime));
             }
@@ -375,7 +407,6 @@ Tris: " + stats.TrianglesDrawn;
         private GameCameraViewModel cameraViewModel;
         private bool visibility;
         private bool displayStats;
-        private ObservableCollection<object> registeredViewModels = new();
         private bool isSelected;
         public ObservableCollection<GameCameraViewModel> Items { get; } = new();
         public IEnumerable<GameCameraViewModel> VisibleItems => Items;
@@ -383,17 +414,15 @@ Tris: " + stats.TrianglesDrawn;
         
         public void Move(GameCameraViewModel item, double x, double y)
         {
-            Game.CameraManager.Relocate(new Vector3((float)x, (float)y, 200).ToOpenGlPosition());
-//            item.X = x;
-  //          item.Y = y;
-            RequestRender?.Invoke();
+            var cameraManager = Game.Resolve<CameraManager>();
+            if (cameraManager != null)
+            {
+                cameraManager.Relocate(new Vector3((float)x, (float)y, 200).ToOpenGlPosition());
+                RequestRender?.Invoke();
+            }
         }
-        public void StartMove(){}
-        public void StopMove()
-        {
-            //if (SelectedItem != null)
-            //    TeleportPlayer(SelectedItem.Name, SelectedItem.X, SelectedItem.Y);
-        }
+        public void StartMove() { }
+        public void StopMove() { }
         
         public void DoRender()
         {

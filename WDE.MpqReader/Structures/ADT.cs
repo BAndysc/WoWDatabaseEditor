@@ -67,9 +67,10 @@ namespace WDE.MpqReader.Structures
         public float[] Heights { get; } = new float[9 * 9 + 8 * 8];
         public Vector3[] Normals { get; } = new Vector3[9 * 9 + 8 * 8];
         public bool[,]? Holes { get; } = null;
-        public uint[,,] SplatMap { get; } = new uint[64, 64, 4];
-        public byte[,]? ShadowMap { get; } = null;
+        public byte[,,] SplatMap { get; }
+        public ShadowMap? ShadowMap { get; } = null;
         public ADTSplat[] Splats { get; } = new ADTSplat[4];
+        public uint AreaId { get; }
     
         public AdtChunk(IBinaryReader reader)
         {
@@ -86,7 +87,7 @@ namespace WDE.MpqReader.Structures
             var sizeMCAL = reader.ReadInt32();
             var offsMCSH = reader.ReadInt32();
             var sizeMCSH = reader.ReadInt32();
-            var areaId = reader.ReadInt32();
+            AreaId = reader.ReadUInt32();
             var nMapObjRefs = reader.ReadInt32();
             var holesLowRes = reader.ReadUInt16();
         
@@ -137,6 +138,7 @@ namespace WDE.MpqReader.Structures
 
             if (offsMCAL > 0)
             {
+                SplatMap = new byte[64, 64, nLayers];
                 int k = 0;
                 for (int i = 0; i < nLayers; ++i)
                 {
@@ -178,8 +180,8 @@ namespace WDE.MpqReader.Structures
                             for (int x = 0; x < 64; x += 2)
                             {
                                 var val = reader.ReadByte();
-                                SplatMap[x, y, k] = (uint)(val & 0xF) * 0x10;
-                                SplatMap[x + 1, y, k] = (uint)((val >> 4) & 0xF) * 0x10;
+                                SplatMap[x, y, k] = (byte)((val & 0xF) * 0x10);
+                                SplatMap[x + 1, y, k] = (byte)(((val >> 4) & 0xF) * 0x10);
                             }
                         }
 
@@ -199,7 +201,7 @@ namespace WDE.MpqReader.Structures
                         {
                             for (int y = 0; y < 64; ++y)
                             {
-                                SplatMap[x, y, k] = (uint)reader.ReadByte();
+                                SplatMap[x, y, k] = reader.ReadByte();
                             }
                         }
                     }
@@ -210,25 +212,86 @@ namespace WDE.MpqReader.Structures
 
             if (offsMCSH > 0 && sizeMCSH > 0)
             {
-                ShadowMap = new byte[64, 64];
+                ShadowMap = new ShadowMap();
                 reader.Offset = offsMCSH;
                 for (int y = 0; y < 64; ++y)
                 {
                     for (int x = 0; x < 64; x += 8)
                     {
                         var b = reader.ReadByte();
-                        ShadowMap[x + 0, y] = (b & 0b00000001) == 0 ? (byte)0 : (byte)1;
-                        ShadowMap[x + 1, y] = (b & 0b00000010) == 0 ? (byte)0 : (byte)1;
-                        ShadowMap[x + 2, y] = (b & 0b00000100) == 0 ? (byte)0 : (byte)1;
-                        ShadowMap[x + 3, y] = (b & 0b00001000) == 0 ? (byte)0 : (byte)1;
-                        ShadowMap[x + 4, y] = (b & 0b00010000) == 0 ? (byte)0 : (byte)1;
-                        ShadowMap[x + 5, y] = (b & 0b00100000) == 0 ? (byte)0 : (byte)1;
-                        ShadowMap[x + 6, y] = (b & 0b01000000) == 0 ? (byte)0 : (byte)1;
-                        ShadowMap[x + 7, y] = (b & 0b10000000) == 0 ? (byte)0 : (byte)1;
+                        ShadowMap[x + 0, y] = (b & 0b00000001) != 0;
+                        ShadowMap[x + 1, y] = (b & 0b00000010) != 0;
+                        ShadowMap[x + 2, y] = (b & 0b00000100) != 0;
+                        ShadowMap[x + 3, y] = (b & 0b00001000) != 0;
+                        ShadowMap[x + 4, y] = (b & 0b00010000) != 0;
+                        ShadowMap[x + 5, y] = (b & 0b00100000) != 0;
+                        ShadowMap[x + 6, y] = (b & 0b01000000) != 0;
+                        ShadowMap[x + 7, y] = (b & 0b10000000) != 0;
                     }
                 }
             }
 
+        }
+    }
+
+    public struct FastAdtAreaTable
+    {
+        public uint[,] AreaIds { get; } = new uint[16, 16];
+        public FastAdtAreaTable(IBinaryReader reader)
+        {
+            int y = 0;
+            int x = 0;
+            while (!reader.IsFinished())
+            {
+                var chunkName = reader.ReadChunkName();
+                var size = reader.ReadInt32();
+
+                var offset = reader.Offset;
+
+                if (chunkName == "MCNK")
+                {
+                    AreaIds[y, x] = ReadChunkAreaId(reader);
+
+                    x++;
+                    if (x == 16)
+                    {
+                        x = 0;
+                        y++;
+                    }
+                }
+            
+                reader.Offset = offset + size;
+            }
+        }
+
+        private uint ReadChunkAreaId(IBinaryReader reader)
+        {
+            reader.Offset += 0x34; // skip part of the header
+            return reader.ReadUInt32();
+        }
+    }
+
+    // memory optimized storage for wow shadow map (64 x 64 bits)
+    public class ShadowMap
+    {
+        private ulong[] rows = new ulong[64];
+
+        public bool this[int y, int x]
+        {
+            get
+            {
+                var row = rows[y];
+                return (row & ((ulong)1 << x)) > 0;
+            }
+            set
+            {
+                var row = rows[y];
+                if (value)
+                    row |= (ulong)1 << x;
+                else
+                    row &= ~((ulong)1 << x);
+                rows[y] = row;
+            }
         }
     }
 

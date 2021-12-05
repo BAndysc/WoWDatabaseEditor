@@ -5,9 +5,10 @@ namespace WDE.MapRenderer.Managers
 {
     public class DbcManager
     {
-        private readonly IGameContext gameContext;
+        private readonly IGameFiles gameFiles;
         private readonly IDatabaseClientFileOpener opener;
 
+        public AreaTableStore AreaTableStore { get; }
         public AreaTriggerStore AreaTriggerStore { get; }
         public CreatureDisplayInfoStore CreatureDisplayInfoStore { get; }
         public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
@@ -26,13 +27,14 @@ namespace WDE.MapRenderer.Managers
 
         private IEnumerable<IDbcIterator> OpenDbc(string name)
         {
-            return opener.Open(gameContext.ReadFileSync($"DBFilesClient\\{name}.dbc"));
+            return opener.Open(gameFiles.ReadFileSync($"DBFilesClient\\{name}.dbc"));
         }
 
-        public DbcManager(IGameContext gameContext, IDatabaseClientFileOpener opener)
+        public DbcManager(IGameFiles gameFiles, IDatabaseClientFileOpener opener)
         {
-            this.gameContext = gameContext;
+            this.gameFiles = gameFiles;
             this.opener = opener;
+            AreaTableStore = new(OpenDbc("AreaTable"));
             AreaTriggerStore = new(OpenDbc("AreaTrigger"));
             CreatureDisplayInfoStore = new(OpenDbc("CreatureDisplayInfo"));
             CreatureDisplayInfoExtraStore = new(OpenDbc("CreatureDisplayInfoExtra")); // for humanoids
@@ -48,6 +50,17 @@ namespace WDE.MapRenderer.Managers
             LightFloatParamStore = new (OpenDbc("LightFloatBand"));
             LightParamStore = new (OpenDbc("LightParams"), LightIntParamStore, LightFloatParamStore);
             LightStore = new (OpenDbc("Light"), LightParamStore);
+        }
+
+        public IEnumerable<(System.Type, object)> Stores()
+        {
+            var properties = GetType().GetProperties().Where(prop => prop.Name.EndsWith("Store"));
+            foreach (var property in properties)
+            {
+                var store = property.GetValue(this);
+                if (store != null)
+                    yield return (property.PropertyType, store);
+            }
         }
     }
 }
