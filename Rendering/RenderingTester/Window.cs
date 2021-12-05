@@ -18,7 +18,11 @@ public class DummyStatusBar : IStatusBar
 
 public class DummyGameView : IGameView
 {
-    public IEnumerable<Func<IContainerProvider, IGameModule>> Modules => new List<Func<IContainerProvider, IGameModule>>();
+    public IEnumerable<Func<IContainerProvider, IGameModule>> Modules { get; } =
+        new List<Func<IContainerProvider, IGameModule>>()
+        {
+            provider => provider.Resolve<StandaloneCustomGameModule>()
+        };
     public event Action<Func<IContainerProvider, IGameModule>>? ModuleRegistered;
     public event Action<Func<IContainerProvider, IGameModule>>? ModuleRemoved;
     public IDisposable RegisterGameModule(Func<IContainerProvider, IGameModule> gameModule) => Disposable.Empty;
