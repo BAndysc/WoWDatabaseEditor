@@ -91,6 +91,8 @@ public class Game : IGame
         registry.RegisterSingleton<AreaTriggerManager>();
         registry.RegisterSingleton<RaycastSystem>();
         registry.RegisterSingleton<ModuleManager>();
+        registry.RegisterSingleton<CreatureManager>();
+        registry.RegisterSingleton<GameObjectManager>();
         registry.RegisterSingleton<IGameFiles, GameFiles>();
         
         manager = (GameManager)provider.Resolve(typeof(GameManager));

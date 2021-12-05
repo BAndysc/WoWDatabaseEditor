@@ -20,6 +20,10 @@ namespace WDE.MapRenderer.Managers
     {
         private Random rng = new Random();
         private readonly IGameContext gameContext;
+        private readonly IMeshManager meshManager;
+        private readonly IRenderManager renderManager;
+        private readonly DbcManager dbcManager;
+        private readonly MdxManager mdxManager;
         private IList<ICreature> CreatureData;
         private IList<ICreatureTemplate> CreatureTemplateData;
         private Transform transform = new Transform();
@@ -29,12 +33,22 @@ namespace WDE.MapRenderer.Managers
         // private readonly GameManager GameManager;
         // private readonly IDatabaseProvider database;
 
-        public CreatureManager(IGameContext gameContext, IDatabaseProvider database)
+        public CreatureManager(IGameContext gameContext, 
+            IMeshManager meshManager, 
+            IMaterialManager materialManager,
+            IRenderManager renderManager,
+            DbcManager dbcManager,
+            MdxManager mdxManager,
+            IDatabaseProvider database)
         {
             this.gameContext = gameContext;
+            this.meshManager = meshManager;
+            this.renderManager = renderManager;
+            this.dbcManager = dbcManager;
+            this.mdxManager = mdxManager;
             //Mesh = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
-            Mesh = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
-            Material = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+            Mesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
+            Material = materialManager.CreateMaterial("data/gizmo.json");
             Material.BlendingEnabled = true;
             Material.SourceBlending = Blending.SrcAlpha;
             Material.DestinationBlending = Blending.OneMinusSrcAlpha;
@@ -52,8 +66,7 @@ namespace WDE.MapRenderer.Managers
 
         public void Dispose()
         {
-            // gameContext.Engine.MeshManager.DisposeMesh(Mesh);
-            // gameContext.Engine.TextureManager.DisposeTexture(Texture);
+            meshManager.DisposeMesh(Mesh);
         }
 
         public IEnumerator LoadCeatures()
@@ -78,7 +91,7 @@ namespace WDE.MapRenderer.Managers
 
                 ICreatureTemplate creaturetemplate = CreatureTemplateData.First(x => x.Entry == creature.Entry);
 
-                if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(creaturetemplate.GetModel(0)))
+                if (dbcManager.CreatureDisplayInfoStore.Contains(creaturetemplate.GetModel(0)))
                 {
                     // System.Diagnostics.Debug.WriteLine($"Cr Y :  {creature.Y}");
 
@@ -94,14 +107,14 @@ namespace WDE.MapRenderer.Managers
 
                     var randomModel = creaturetemplate.GetModel(rng.Next(numberOfModels));
 
-                    CreatureDisplayInfo crdisplayinfo = gameContext.DbcManager.CreatureDisplayInfoStore[randomModel];
+                    CreatureDisplayInfo crdisplayinfo = dbcManager.CreatureDisplayInfoStore[randomModel];
 
-                    string M2Path = gameContext.DbcManager.CreatureModelDataStore[crdisplayinfo.ModelId].ModelName;
+                    string M2Path = dbcManager.CreatureModelDataStore[crdisplayinfo.ModelId].ModelName;
 
                     transform.Scale = new Vector3(crdisplayinfo.CreatureModelScale * creaturetemplate.Scale);
 
                     TaskCompletionSource<MdxManager.MdxInstance?> mdx = new();
-                    yield return gameContext.MdxManager.LoadM2Mesh(M2Path, mdx, crdisplayinfo.Id);
+                    yield return mdxManager.LoadM2Mesh(M2Path, mdx, crdisplayinfo.Id);
                     if (mdx.Task.Result == null)
                     {
                         System.Diagnostics.Debug.WriteLine($"Can't load {M2Path}"); //could not load mdx
@@ -113,11 +126,11 @@ namespace WDE.MapRenderer.Managers
                         height = instance.mesh.Bounds.Height / 2;
                         // position, rotation
                         foreach (var material in instance.materials)
-                            gameContext.Engine.RenderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, transform);
+                            renderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, transform);
 
                         transform.Scale = instance.mesh.Bounds.Size / 2 ;
                         transform.Position  += instance.mesh.Bounds.Center;
-                        gameContext.Engine.RenderManager.RegisterStaticRenderer(Mesh.Handle, Material, 0, transform);
+                        renderManager.RegisterStaticRenderer(Mesh.Handle, Material, 0, transform);
 
                         // gameContext.Engine.Ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), creaturetemplate.Name, 2.5f, Matrix.TRS(t.Position + Vector3.Up * height, in Quaternion.Identity, in Vector3.One));
                     }

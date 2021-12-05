@@ -65,13 +65,34 @@ namespace WDE.MapRenderer.Managers
         private readonly IMeshManager meshManager;
         private readonly IMaterialManager materialManager;
         private readonly WoWTextureManager textureManager;
+        private readonly CreatureDisplayInfoStore creatureDisplayInfoStore;
+        private readonly CreatureDisplayInfoExtraStore creatureDisplayInfoExtraStore;
+        private readonly ItemDisplayInfoStore itemDisplayInfoStore;
+        private readonly CharHairGeosetsStore charHairGeosetsStore;
+        private readonly CharacterFacialHairStylesStore characterFacialHairStylesStore;
+        private readonly CharSectionsStore charSectionsStore;
 
-        public MdxManager(IGameFiles gameFiles, IMeshManager meshManager, IMaterialManager materialManager, WoWTextureManager textureManager)
+        public MdxManager(IGameFiles gameFiles, 
+            IMeshManager meshManager, 
+            IMaterialManager materialManager,
+            WoWTextureManager textureManager,
+            CreatureDisplayInfoStore creatureDisplayInfoStore,
+            CreatureDisplayInfoExtraStore creatureDisplayInfoExtraStore,
+            ItemDisplayInfoStore itemDisplayInfoStore,
+            CharHairGeosetsStore charHairGeosetsStore,
+            CharacterFacialHairStylesStore characterFacialHairStylesStore,
+            CharSectionsStore charSectionsStore)
         {
             this.gameFiles = gameFiles;
             this.meshManager = meshManager;
             this.materialManager = materialManager;
             this.textureManager = textureManager;
+            this.creatureDisplayInfoStore = creatureDisplayInfoStore;
+            this.creatureDisplayInfoExtraStore = creatureDisplayInfoExtraStore;
+            this.itemDisplayInfoStore = itemDisplayInfoStore;
+            this.charHairGeosetsStore = charHairGeosetsStore;
+            this.characterFacialHairStylesStore = characterFacialHairStylesStore;
+            this.charSectionsStore = charSectionsStore;
         }
 
         public IEnumerator LoadM2Mesh(string path, TaskCompletionSource<MdxInstance?> result, uint displayid = 0)
@@ -116,13 +137,11 @@ namespace WDE.MapRenderer.Managers
             m2FilePath = m2FilePath.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apaprently there are still some MDL models
 
             var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
-            var file =
-                gameContext.ReadFile(m2FilePath);
+            var file = gameFiles.ReadFile(m2FilePath);
 
             yield return new WaitForTask(file);
 
-            var skinFile =
-                gameContext.ReadFile(skinFilePath);
+            var skinFile = gameFiles.ReadFile(skinFilePath);
             
             yield return new WaitForTask(skinFile);
             
@@ -215,16 +234,16 @@ namespace WDE.MapRenderer.Managers
 
             if (displayid > 0)
             {
-                if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(displayid))
+                if (creatureDisplayInfoStore.Contains(displayid))
                 {
-                    if (gameContext.DbcManager.CreatureDisplayInfoStore[displayid].ExtendedDisplayInfoID > 0)
+                    if (creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID > 0)
                     {
-                        if (gameContext.DbcManager.CreatureDisplayInfoExtraStore.Contains(gameContext.DbcManager.CreatureDisplayInfoStore[displayid].ExtendedDisplayInfoID))
+                        if (creatureDisplayInfoExtraStore.Contains(creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID))
                         {
                             ischaractermodel = true;
                             // load items to define active geosets
-                            var displayinfoextra = gameContext.DbcManager.CreatureDisplayInfoExtraStore[
-                                gameContext.DbcManager.CreatureDisplayInfoStore[displayid].ExtendedDisplayInfoID];
+                            var displayinfoextra = creatureDisplayInfoExtraStore[
+                                creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID];
 
                             // TODO : SKIN SECTIONS !!!!!!!
 
@@ -233,7 +252,7 @@ namespace WDE.MapRenderer.Managers
                             // hair
                             if (displayinfoextra.HairStyle > 0)
                             {
-                                int hairstyle = gameContext.DbcManager.CharHairGeosetsStore.First(x => x.RaceID == displayinfoextra.Race
+                                int hairstyle = charHairGeosetsStore.First(x => x.RaceID == displayinfoextra.Race
                                 && x.SexId == displayinfoextra.Gender && x.VariationId + 1 == displayinfoextra.HairStyle).GeosetId; // maybe +1 like beards ?
                                 
                                 geosetHair += hairstyle;
@@ -243,9 +262,9 @@ namespace WDE.MapRenderer.Managers
                             // facial hair
                             if (displayinfoextra.BeardStyle > 0)
                             {
-                                // System.Diagnostics.Debug.WriteLine($"facial hair stylrs count  :  {gameContext.DbcManager.CharacterFacialHairStylesStore.Count}");
+                                // System.Diagnostics.Debug.WriteLine($"facial hair stylrs count  :  {characterFacialHairStylesStore.Count}");
 
-                                CharacterFacialHairStyles facialhairstyle = gameContext.DbcManager.CharacterFacialHairStylesStore.First(x => x.RaceID == displayinfoextra.Race
+                                CharacterFacialHairStyles facialhairstyle = characterFacialHairStylesStore.First(x => x.RaceID == displayinfoextra.Race
                                 && x.SexId == displayinfoextra.Gender && x.VariationId +1 == displayinfoextra.BeardStyle );
                                 
                                 geosetFacial1 += facialhairstyle.Geoset1;
@@ -256,55 +275,55 @@ namespace WDE.MapRenderer.Managers
                             }
 
                             if (displayinfoextra.Helm > 0)
-                                geosetHelm = 2702 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Helm].geosetGroup1;
+                                geosetHelm = 2702 + itemDisplayInfoStore[(uint)displayinfoextra.Helm].geosetGroup1;
                                 // geoset group 2 ? some enable/disable 2100 (head) ?
 
                             if (displayinfoextra.Shoulder > 0)
-                                geosetShoulders = 2601 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Shoulder].geosetGroup1;
+                                geosetShoulders = 2601 + itemDisplayInfoStore[(uint)displayinfoextra.Shoulder].geosetGroup1;
 
                             if (displayinfoextra.Shirt > 0)
                             {
-                                geosetSleeves = 801 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup1;
-                                geosetChest = 1001 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup2;
+                                geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup1;
+                                geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup2;
                             }
                             if (displayinfoextra.Cuirass > 0)
                             {
-                                geosetSleeves = 801 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup1;
-                                geosetChest = 1001 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup2;
+                                geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup1;
+                                geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup2;
                                 // 1301 trousers set below
                                 // in later expensions, geoset group 4 and 5 ?
                             }
 
                             if (displayinfoextra.Legs > 0)
                             {
-                                geosetpants = 801 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup1;
-                                geosetlegcuffs = 1001 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup2;
-                                geosetTrousers = 1301 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup3;
+                                geosetpants = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup1;
+                                geosetlegcuffs = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup2;
+                                geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup3;
                             }
 
                             if (displayinfoextra.Boots > 0)
                             {
-                                geosetBoots = 501 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup1;
-                                geosetFeet = 2002 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup2;
+                                geosetBoots = 501 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup1;
+                                geosetFeet = 2002 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup2;
                             }
 
                             if (displayinfoextra.Gloves > 0)
                             {
-                                geosetGlove = 401 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup1;
-                                geosetHandsAttachments = 2301 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup2;
+                                geosetGlove = 401 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup1;
+                                geosetHandsAttachments = 2301 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup2;
                             }
                             if (displayinfoextra.Cape > 0)
-                                geosetCloak = 1501 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Cape].geosetGroup1;
+                                geosetCloak = 1501 + itemDisplayInfoStore[(uint)displayinfoextra.Cape].geosetGroup1;
 
                             if (displayinfoextra.Tabard > 0)
-                                geosetTabard = 1201 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Tabard].geosetGroup1;
+                                geosetTabard = 1201 + itemDisplayInfoStore[(uint)displayinfoextra.Tabard].geosetGroup1;
 
                             if (displayinfoextra.Belt > 0) // priority : belt > tabard
-                                geosetBelt = 1801 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Belt].geosetGroup1;
+                                geosetBelt = 1801 + itemDisplayInfoStore[(uint)displayinfoextra.Belt].geosetGroup1;
 
                             // Priority : Chest geosetGroup[2] (1301 set) > Pants geosetGroup[2] (1301 set) > Boots geosetGroup[0] (501 set) > Pants geosetGroup[1] (901 set)
                             if (displayinfoextra.Cuirass > 0)
-                                geosetTrousers = 1301 + gameContext.DbcManager.ItemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3;
+                                geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3;
                         }
                     }
                 }
@@ -349,9 +368,9 @@ namespace WDE.MapRenderer.Managers
                     if (batch.textureComboIndex + i >= m2.textureCombos.Length)
                     {
                         if (th.HasValue)
-                            th2 = gameContext.TextureManager.EmptyTexture;
+                            th2 = textureManager.EmptyTexture;
                         else
-                            th = gameContext.TextureManager.EmptyTexture;
+                            th = textureManager.EmptyTexture;
                         Console.WriteLine("File " + path + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
@@ -359,9 +378,9 @@ namespace WDE.MapRenderer.Managers
                     if (texId == -1)
                     {
                         if (th.HasValue)
-                            th2 = gameContext.TextureManager.EmptyTexture;
+                            th2 = textureManager.EmptyTexture;
                         else
-                            th = gameContext.TextureManager.EmptyTexture;
+                            th = textureManager.EmptyTexture;
                     }
                     else
                     {
@@ -374,21 +393,21 @@ namespace WDE.MapRenderer.Managers
                         // character models
                         if (ischaractermodel == true)
                         {
-                            CreatureDisplayInfoExtra displayinfoextra = gameContext.DbcManager.CreatureDisplayInfoExtraStore[
-                                gameContext.DbcManager.CreatureDisplayInfoStore[displayid].ExtendedDisplayInfoID];
+                            CreatureDisplayInfoExtra displayinfoextra = creatureDisplayInfoExtraStore[
+                                creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID];
 
                             // how the fuck to differenciate between body and face ?
                             if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_SKIN) // character skin
                             {
                                 // This is for player characters... Creatures always come with a baked texture.
-                                // texFile = gameContext.DbcManager.CharSectionsStore.First(x => x.RaceID == displayinfoextra.Race
+                                // texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race
                                 // && x.BaseSection == 0 && x.ColorIndex == displayinfoextra.SkinColor).TextureName1;
                                 texFile = "textures\\BakedNpcTextures\\" + displayinfoextra.Texture;
                             }
 
                             // else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_SKIN_EXTRA) // character skin
                             // {
-                            //     texFile = gameContext.DbcManager.CharSectionsStore.First(x => x.RaceID == displayinfoextra.Race
+                            //     texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race
                             //     && x.BaseSection == 0 && x.ColorIndex == displayinfoextra.SkinColor).TextureName2;
                             // }
 
@@ -405,7 +424,7 @@ namespace WDE.MapRenderer.Managers
                                 // texFile = pathsplit[0] + "\\" + pathsplit[1] + "\\Hair00_" + hairid + ".blp";
 
                                 // 2nd way : 
-                                texFile = gameContext.DbcManager.CharSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
+                                texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
                                     &&  x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.HairStyle && x.BaseSection == 3).TextureName1;
                             }
                         }
@@ -413,27 +432,27 @@ namespace WDE.MapRenderer.Managers
                         // TITI, set creature texture
                         else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_1) // creature skin1
                         {
-                            if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(displayid))
+                            if (creatureDisplayInfoStore.Contains(displayid))
                             {
-                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), gameContext.DbcManager.CreatureDisplayInfoStore[displayid].TextureVariation1
+                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation1
                                     + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
                             }
                         }
 
                         else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_2) // creature skin2
                         {
-                            if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(displayid))
+                            if (creatureDisplayInfoStore.Contains(displayid))
                             {
-                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), gameContext.DbcManager.CreatureDisplayInfoStore[displayid].TextureVariation2
+                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation2
                                     + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
                             }
                         }
 
                         else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_3) // creature skin3
                         {
-                            if (gameContext.DbcManager.CreatureDisplayInfoStore.Contains(displayid))
+                            if (creatureDisplayInfoStore.Contains(displayid))
                             {
-                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), gameContext.DbcManager.CreatureDisplayInfoStore[displayid].TextureVariation3
+                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation3
                                     + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
                             }
                         }
@@ -441,7 +460,7 @@ namespace WDE.MapRenderer.Managers
                         // System.Diagnostics.Debug.WriteLine($"M2 texture path :  {texFile}");
                         // var texFile = textureDef.filename.AsString();
                         var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return gameContext.TextureManager.GetTexture(texFile, tcs);
+                        yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
                         if (th.HasValue)
                             th2 = resTex;
@@ -451,11 +470,10 @@ namespace WDE.MapRenderer.Managers
                 }
 
                 var materialDef = m2.materials[batch.materialIndex];
-                var m2ShaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/m2.json");
-                var material = gameContext.Engine.MaterialManager.CreateMaterial(m2ShaderHandle);
+                var material = materialManager.CreateMaterial("data/m2.json");
 
-                material.SetTexture("texture1", th ?? gameContext.TextureManager.EmptyTexture);
-                material.SetTexture("texture2", th2 ?? gameContext.TextureManager.EmptyTexture);
+                material.SetTexture("texture1", th ?? textureManager.EmptyTexture);
+                material.SetTexture("texture2", th2 ?? textureManager.EmptyTexture);
 
                 var trans = 1.0f;
                 if (batch.colorIndex != -1 && m2.colors.Length < batch.colorIndex)

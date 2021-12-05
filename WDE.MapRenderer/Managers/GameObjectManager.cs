@@ -21,10 +21,18 @@ using WDE.MapRenderer.Managers;
 
 namespace WDE.MapRenderer.Managers
 {
-    public class GameObjectManager
+    public class GameObjectManager : System.IDisposable
     {
         private readonly IGameContext gameContext;
-        // private readonly IDatabaseProvider database;
+
+        private readonly IMeshManager meshManager;
+        private readonly IMaterialManager materialManager;
+        private readonly IRenderManager renderManager;
+        private readonly IUIManager ui;
+        private readonly MdxManager mdxManager;
+        private readonly DbcManager dbcManager;
+        private readonly CameraManager cameraManager;
+
         private IList<IGameObject> gameobjects;
         private IList<IGameObjectTemplate> gameobjectstemplates;
         private Transform t = new Transform();
@@ -34,14 +42,29 @@ namespace WDE.MapRenderer.Managers
         public static float GameObjectVisibilityDistanceSquare = 900 * 900;
 
 
-        public GameObjectManager(IGameContext gameContext, IDatabaseProvider db)
+        public GameObjectManager(IGameContext gameContext, 
+            IMeshManager meshManager,
+            IMaterialManager materialManager,
+            IRenderManager renderManager,
+            IUIManager ui,
+            MdxManager mdxManager,
+            DbcManager dbcManager,
+            CameraManager cameraManager,
+            IDatabaseProvider db)
         {
             this.gameContext = gameContext;
+            this.meshManager = meshManager;
+            this.materialManager = materialManager;
+            this.renderManager = renderManager;
+            this.ui = ui;
+            this.mdxManager = mdxManager;
+            this.dbcManager = dbcManager;
+            this.cameraManager = cameraManager;
             gameobjects = db.GetGameObjects().ToList();
             gameobjectstemplates = db.GetGameObjectTemplates().ToList();
 
-            BoxMesh = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
-            transcluentMaterial = gameContext.Engine.MaterialManager.CreateMaterial("data/gizmo.json");
+            BoxMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
+            transcluentMaterial = materialManager.CreateMaterial("data/gizmo.json");
             transcluentMaterial.BlendingEnabled = true;
             transcluentMaterial.SourceBlending = Blending.SrcAlpha;
             transcluentMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
@@ -68,7 +91,7 @@ namespace WDE.MapRenderer.Managers
 
                 t.Position = gameObjectPosition.ToOpenGlPosition();
 
-                if ((gameContext.CameraManager.Position - t.Position).LengthSquared() > GameObjectVisibilityDistanceSquare)
+                if ((cameraManager.Position - t.Position).LengthSquared() > GameObjectVisibilityDistanceSquare)
                     continue;
 
                 IGameObjectTemplate gotemplate = gameobjectstemplates.First(x => x.Entry == gameobject.Entry);
@@ -79,11 +102,11 @@ namespace WDE.MapRenderer.Managers
 
                 string M2Path = "";
 
-                if ( gameContext.DbcManager.GameObjectDisplayInfoStore.Contains((int)gotemplate.DisplayId) )
+                if (dbcManager.GameObjectDisplayInfoStore.Contains((int)gotemplate.DisplayId) )
                 { 
                     // M2Path = gameContext.DbcManager.GameObjectDisplayInfoStore.First(x => x.Id == gotemplate.DisplayId).ModelName;
-                    M2Path = gameContext.DbcManager.GameObjectDisplayInfoStore[(int)gotemplate.DisplayId].ModelName;
-                    gameContext.Engine.Ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), M2Path, 2.5f, Matrix.TRS(t.Position + Vector3.Up * 5.0f, in Quaternion.Identity, in Vector3.One));
+                    M2Path = dbcManager.GameObjectDisplayInfoStore[(int)gotemplate.DisplayId].ModelName;
+                    ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), M2Path, 2.5f, Matrix.TRS(t.Position + Vector3.Up * 5.0f, in Quaternion.Identity, in Vector3.One));
                 }
                 // 
                 // if (M2Path == null)
@@ -129,12 +152,12 @@ namespace WDE.MapRenderer.Managers
                 
                 string M2Path = "";
 
-                if (gameContext.DbcManager.GameObjectDisplayInfoStore.Contains((int)gotemplate.DisplayId))
+                if (dbcManager.GameObjectDisplayInfoStore.Contains((int)gotemplate.DisplayId))
                 {
-                    M2Path = gameContext.DbcManager.GameObjectDisplayInfoStore[(int)gotemplate.DisplayId].ModelName;
+                    M2Path = dbcManager.GameObjectDisplayInfoStore[(int)gotemplate.DisplayId].ModelName;
 
                     TaskCompletionSource<MdxManager.MdxInstance?> mdx = new();
-                    yield return gameContext.MdxManager.LoadM2Mesh(M2Path, mdx);
+                    yield return mdxManager.LoadM2Mesh(M2Path, mdx);
                     if (mdx.Task.Result == null)
                     {
                         System.Diagnostics.Debug.WriteLine($"Can't load {M2Path}"); //could not load mdx
@@ -146,12 +169,12 @@ namespace WDE.MapRenderer.Managers
                         height = instance.mesh.Bounds.Height / 2;
                         // position, rotation
                         foreach (var material in instance.materials)
-                            gameContext.Engine.RenderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, t);
+                            renderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, t);
 
                         t.Scale = instance.mesh.Bounds.Size /2 ;
                         t.Position += instance.mesh.Bounds.Center;
                         // t.Scale = new Vector3(instance.mesh.Bounds.Width, instance.mesh.Bounds.Depth, instance.mesh.Bounds.Height); 
-                        gameContext.Engine.RenderManager.RegisterStaticRenderer(BoxMesh.Handle, transcluentMaterial, 0, t);
+                        renderManager.RegisterStaticRenderer(BoxMesh.Handle, transcluentMaterial, 0, t);
 
                         // gameContext.Engine.Ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), gotemplate.Name, 2.5f, Matrix.TRS(t.Position + Vector3.Up * height, in Quaternion.Identity, in Vector3.One));
                     }
@@ -159,5 +182,9 @@ namespace WDE.MapRenderer.Managers
             }
         }
 
+        public void Dispose()
+        {
+            meshManager.DisposeMesh(BoxMesh);
+        }
     }
 }
