@@ -233,8 +233,8 @@ namespace AvaloniaStyles.Controls
 
             ToggleButton = e.NameScope.Find<ToggleButton>("PART_Button");
             
-
             ListBox = e.NameScope.Find<ListBox>("PART_SelectingItemsControl");
+            ListBox.PointerReleased += OnSelectorPointerReleased;
             if (ListBox != null)
             {
                 // Check if it is already an IItemsSelector
@@ -251,7 +251,15 @@ namespace AvaloniaStyles.Controls
 
             base.OnApplyTemplate(e);
         }
-        
+
+        private void OnSelectorPointerReleased(object? sender, PointerReleasedEventArgs e)
+        {
+            if (e.Source is IControl control && control.FindAncestorOfType<CheckBox>() != null)
+                return;
+            
+            Commit(adapter?.SelectedItem);
+        }
+
         private void OnTextBoxTextChanged()
         {
             //Uses Dispatcher.Post to allow the TextBox selection to update before processing
@@ -280,8 +288,6 @@ namespace AvaloniaStyles.Controls
             {
                 if (adapter != null)
                 {
-                    adapter.Commit -= OnAdapterSelectionComplete;
-                    adapter.SelectionChanged -= OnAdapterSelectionChanged;
                     adapter.Items = null;
                 }
 
@@ -289,8 +295,6 @@ namespace AvaloniaStyles.Controls
 
                 if (adapter != null)
                 {
-                    adapter.SelectionChanged += OnAdapterSelectionChanged;
-                    adapter.Commit += OnAdapterSelectionComplete;
                     adapter.Items = view;
                 }
             }
@@ -378,16 +382,7 @@ namespace AvaloniaStyles.Controls
                 }
             }
         }
-
-        private void OnAdapterSelectionChanged(object? sender, SelectionChangedEventArgs e)
-        {
-        }
         
-        private void OnAdapterSelectionComplete(object? sender, RoutedEventArgs e)
-        {
-            Commit(adapter?.SelectedItem);
-        }
-
         private void Commit(object? item)
         {
             if (SelectedItemExtractor != null)
