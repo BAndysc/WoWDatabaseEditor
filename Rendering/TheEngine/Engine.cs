@@ -63,7 +63,7 @@ namespace TheEngine
 
         public double TotalTime;
 
-        public Engine(IDevice device, IConfiguration configuration, IWindowHost host)
+        public Engine(IDevice device, IConfiguration configuration, IWindowHost host, bool flipY)
         {
             WindowHost = host;
             //windowHost.Bind(this);
@@ -83,7 +83,7 @@ namespace TheEngine
             materialManager = new MaterialManager(this);
             shaderManager = new ShaderManager(this);
             meshManager = new MeshManager(this);
-            renderManager = new RenderManager(this);
+            renderManager = new RenderManager(this, flipY);
 
             textureManager = new TextureManager(this);
             fontManager = new FontManager(this);

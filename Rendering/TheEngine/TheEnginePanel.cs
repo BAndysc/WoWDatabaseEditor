@@ -130,7 +130,7 @@ namespace TheEngine
 #else
                 device = new RealDeviceWrapper(real);
 #endif
-                engine = new Engine(device, new Configuration(), this);
+                engine = new Engine(device, new Configuration(), this, true);
 #endif
             }
             catch (Exception e)
