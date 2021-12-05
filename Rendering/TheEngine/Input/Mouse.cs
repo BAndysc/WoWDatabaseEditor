@@ -50,13 +50,17 @@ namespace TheEngine.Input
 
         internal void MouseDown(MouseButton button)
         {
-            leftDown = button.HasFlag(MouseButton.Left);
             if (button.HasFlag(MouseButton.Left))
+            {
+                leftDown = true;
                 leftJustDown = true;
+            }
 
-            rightDown = button.HasFlag(MouseButton.Right);
             if (button.HasFlag(MouseButton.Right))
+            {
+                rightDown = true;
                 rightJustDown = true;
+            }
         }
 
         internal void MouseUp(MouseButton button)
