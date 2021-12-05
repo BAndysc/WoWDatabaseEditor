@@ -38,5 +38,9 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.6.4" />
+    </ItemGroup>
 
 </Project>

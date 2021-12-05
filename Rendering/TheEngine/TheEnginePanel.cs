@@ -130,7 +130,7 @@ namespace TheEngine
 #else
                 device = new RealDeviceWrapper(real);
 #endif
-                engine = new Engine(device, new Configuration(), this);
+                engine = new Engine(device, new Configuration(), this, true);
 #endif
             }
             catch (Exception e)
@@ -276,6 +276,7 @@ namespace TheEngine
 
         public float WindowWidth => PixelSize.Item1;
         public float WindowHeight => PixelSize.Item2;
+        public float DpiScaling => 1;
 
         public IGame? Game
         {

@@ -69,7 +69,7 @@ namespace TheEngine.Managers
         private Archetype staticRendererArchetype;
         private Archetype dynamicRendererArchetype;
 
-        internal RenderManager(Engine engine)
+        internal RenderManager(Engine engine, bool flipY)
         {
             this.engine = engine;
 
@@ -134,6 +134,7 @@ namespace TheEngine.Managers
             blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json");
             engine.Device.device.CheckError("load shader");
             blitMaterial = engine.MaterialManager.CreateMaterial(blitShader);
+            blitMaterial.SetUniformInt("flipY", flipY ? 1 : 0);
 
             //unlitMaterial = engine.MaterialManager.CreateMaterial(engine.ShaderManager.LoadShader("../internalShaders/unlit.shader"));
         }
@@ -283,6 +284,7 @@ namespace TheEngine.Managers
 
             engine.Device.device.CheckError("Blitz");
             blitMaterial.Shader.Activate();
+            blitMaterial.ActivateUniforms();
             SetDepth(true, DepthCompare.Always);
             renderTexture.Activate(0);
             //outlineTexture.Activate(1);
