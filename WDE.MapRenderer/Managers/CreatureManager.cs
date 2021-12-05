@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheEngine.Data;
+using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
@@ -18,13 +19,19 @@ namespace WDE.MapRenderer.Managers
 {
     public class CreatureManager : System.IDisposable
     {
+        public class CreatureChunkData
+        {
+            public List<StaticRenderHandle> registeredEntities = new();
+        }
+        
         private Random rng = new Random();
         private readonly IGameContext gameContext;
         private readonly IMeshManager meshManager;
         private readonly IRenderManager renderManager;
         private readonly DbcManager dbcManager;
         private readonly MdxManager mdxManager;
-        private IList<ICreature> CreatureData;
+        private readonly IDatabaseProvider database;
+        private PerChunkHolder<IList<ICreature>> CreatureDataPerChunk = new();
         private IList<ICreatureTemplate> CreatureTemplateData;
         private Transform transform = new Transform();
         private IMesh Mesh;
@@ -46,6 +53,7 @@ namespace WDE.MapRenderer.Managers
             this.renderManager = renderManager;
             this.dbcManager = dbcManager;
             this.mdxManager = mdxManager;
+            this.database = database;
             //Mesh = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
             Mesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
             Material = materialManager.CreateMaterial("data/gizmo.json");
@@ -55,11 +63,31 @@ namespace WDE.MapRenderer.Managers
             Material.DepthTesting = DepthCompare.Lequal;
             Material.ZWrite = false;
             Material.SetUniform("objectColor", new Vector4(0.415f, 0.4f, 0.75f, 0.4f));            // this.database = database;
-            CreatureData = database.GetCreatures().ToList();
             CreatureTemplateData = database.GetCreatureTemplates().ToList();
+        }
 
-            gameContext.StartCoroutine(LoadCeatures());
+        public IEnumerator LoadEssentialData(CancellationToken cancel)
+        {
+            CreatureDataPerChunk.Clear();
 
+            var mapCreaturesTask = database.GetCreaturesByMapAsync((uint)gameContext.CurrentMap.Id);
+
+            yield return mapCreaturesTask;
+            
+            foreach (var creature in mapCreaturesTask.Result)
+            {
+                if (cancel.IsCancellationRequested)
+                    yield break;
+                
+                var chunk = new Vector3(creature.X, creature.Y, creature.Z).WoWPositionToChunk();
+                if (chunk.Item1 <= 0 || chunk.Item2 <= 0 || chunk.Item1 >= 64 || chunk.Item2 >= 64)
+                    continue;
+                
+                if (CreatureDataPerChunk[chunk.Item1, chunk.Item2] == null)
+                    CreatureDataPerChunk[chunk.Item1, chunk.Item2] = new List<ICreature>();
+                
+                CreatureDataPerChunk[chunk.Item1, chunk.Item2]!.Add(creature);
+            }
         }
 
         // public bool OverrideLighting { get; set; }
@@ -69,16 +97,16 @@ namespace WDE.MapRenderer.Managers
             meshManager.DisposeMesh(Mesh);
         }
 
-        public IEnumerator LoadCeatures()
+        public IEnumerator LoadCreatures(CreatureChunkData chunk, int chunkX, int chunkY, CancellationToken cancel)
         {
-            System.Diagnostics.Debug.WriteLine($"{CreatureData.Count} creature spawns");
-
-            foreach (var creature in CreatureData)
+            if (CreatureDataPerChunk[chunkX, chunkY] == null)
+                yield break;
+            
+            foreach (var creature in CreatureDataPerChunk[chunkX, chunkY]!)
             {
-                // check map id
-                if (creature.Map != gameContext.CurrentMap.Id)
-                    continue;
-
+                if (cancel.IsCancellationRequested)
+                    yield break;
+                
                 // check phasemask
                 if ((creature.PhaseMask & 1) != 1)
                     continue;
@@ -126,11 +154,11 @@ namespace WDE.MapRenderer.Managers
                         height = instance.mesh.Bounds.Height / 2;
                         // position, rotation
                         foreach (var material in instance.materials)
-                            renderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, transform);
+                            chunk.registeredEntities.Add(renderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, transform));
 
                         transform.Scale = instance.mesh.Bounds.Size / 2 ;
                         transform.Position  += instance.mesh.Bounds.Center;
-                        renderManager.RegisterStaticRenderer(Mesh.Handle, Material, 0, transform);
+                        chunk.registeredEntities.Add(renderManager.RegisterStaticRenderer(Mesh.Handle, Material, 0, transform));
 
                         // gameContext.Engine.Ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), creaturetemplate.Name, 2.5f, Matrix.TRS(t.Position + Vector3.Up * height, in Quaternion.Identity, in Vector3.One));
                     }
@@ -138,5 +166,14 @@ namespace WDE.MapRenderer.Managers
             }
         }
 
+        public IEnumerator UnloadChunk(CreatureChunkData chunk)
+        {
+            foreach (var creature in chunk.registeredEntities)
+            {
+                renderManager.UnregisterStaticRenderer(creature);
+            }
+
+            yield break;
+        }
     }
 }

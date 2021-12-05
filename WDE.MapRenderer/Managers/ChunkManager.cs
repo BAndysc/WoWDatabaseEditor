@@ -33,6 +33,9 @@ namespace WDE.MapRenderer.Managers
         public List<StaticRenderHandle> renderHandles = new();
         public List<Entity> entities = new();
 
+        public CreatureManager.CreatureChunkData Creatures = new();
+        public GameObjectManager.GameObjectChunkData GameObjects = new();
+
         public ChunkInstance(int x, int z)
         {
             X = x;
@@ -76,6 +79,8 @@ namespace WDE.MapRenderer.Managers
         private readonly Lazy<LoadingManager> loadingManager;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
+        private readonly CreatureManager creatureManager;
+        private readonly GameObjectManager gameObjectManager;
         private HashSet<(int, int)> loadedChunks = new();
         private List<ChunkInstance> chunks = new();
         private Dictionary<(int, int), ChunkInstance> chunksXY = new();
@@ -135,6 +140,8 @@ namespace WDE.MapRenderer.Managers
             MdxManager mdxManager,
             WmoManager wmoManager,
             IGameContext gameContext,
+            CreatureManager creatureManager,
+            GameObjectManager gameObjectManager,
             Lazy<LoadingManager> loadingManager,
             Engine engine)
         {
@@ -151,6 +158,8 @@ namespace WDE.MapRenderer.Managers
             this.mdxManager = mdxManager;
             this.wmoManager = wmoManager;
             this.gameContext = gameContext;
+            this.creatureManager = creatureManager;
+            this.gameObjectManager = gameObjectManager;
             this.loadingManager = loadingManager;
             this.engine = engine;
             collisionOnlyArchetype = entityManager.NewArchetype()
@@ -483,6 +492,10 @@ namespace WDE.MapRenderer.Managers
             yield return LoadWorldMapObjects(adt, chunk, cancellationToken);
 
             yield return LoadM2(adt, chunk, cancellationToken);
+
+            yield return creatureManager.LoadCreatures(chunk.Creatures, chunk.X, chunk.Z, cancellationToken);
+
+            yield return gameObjectManager.LoadGameObjects(chunk.GameObjects, chunk.X, chunk.Z, cancellationToken);
         }
 
         private IEnumerator LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
@@ -625,6 +638,9 @@ namespace WDE.MapRenderer.Managers
                 chunk.loading.Cancel();
                 yield return chunk.chunkLoading;
             }
+
+            yield return creatureManager.UnloadChunk(chunk.Creatures);
+            yield return gameObjectManager.UnloadChunk(chunk.GameObjects);
             
             foreach (var obj in chunk.renderHandles)
                 renderManager.UnregisterStaticRenderer(obj);
