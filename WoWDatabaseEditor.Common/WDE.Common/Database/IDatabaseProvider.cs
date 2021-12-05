@@ -60,6 +60,8 @@ namespace WDE.Common.Database
         IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
         IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
         IEnumerable<ICreature> GetCreatures();
+        Task<IList<ICreature>> GetCreaturesByMapAsync(uint map);
+        Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map);
         IEnumerable<IGameObject> GetGameObjects();
 
         IEnumerable<ICoreCommandHelp> GetCommands();

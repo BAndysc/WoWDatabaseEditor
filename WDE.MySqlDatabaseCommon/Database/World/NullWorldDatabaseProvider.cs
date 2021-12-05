@@ -72,6 +72,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => Enumerable.Empty<ICreature>();
 
         public IEnumerable<ICreature> GetCreatures() => Enumerable.Empty<ICreature>();
+        public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => Task.FromResult<IList<ICreature>>(new List<ICreature>());
+        
+        public Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map) => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());
 
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => Enumerable.Empty<IGameObject>();
 
