@@ -34,6 +34,7 @@ public class LoadingManager : IDisposable
     private readonly IUIManager uiManager;
     private readonly ChunkManager chunkManager;
     private readonly CreatureManager creatureManager;
+    private readonly GameObjectManager gameObjectManager;
     private readonly WorldManager worldManager;
     private int? currentLoadedMap;
     private LoadingToken? loadingToken;
@@ -44,12 +45,14 @@ public class LoadingManager : IDisposable
         IUIManager uiManager,
         ChunkManager chunkManager, 
         CreatureManager creatureManager,
+        GameObjectManager gameObjectManager,
         WorldManager worldManager)
     {
         this.gameContext = gameContext;
         this.uiManager = uiManager;
         this.chunkManager = chunkManager;
         this.creatureManager = creatureManager;
+        this.gameObjectManager = gameObjectManager;
         this.worldManager = worldManager;
     }
 
@@ -79,6 +82,8 @@ public class LoadingManager : IDisposable
         yield return worldManager.LoadMap(newToken.CancellationToken);
 
         yield return creatureManager.LoadEssentialData(newToken.CancellationToken);
+        
+        yield return gameObjectManager.LoadEssentialData(newToken.CancellationToken);
         
         if (loadingToken == newToken)
             EssentialLoadingInProgress = false;
