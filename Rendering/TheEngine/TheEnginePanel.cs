@@ -284,6 +284,7 @@ namespace TheEngine
 
         public float WindowWidth => PixelSize.Item1;
         public float WindowHeight => PixelSize.Item2;
+        public float DpiScaling => 1;
 
         public IGame? Game
         {
