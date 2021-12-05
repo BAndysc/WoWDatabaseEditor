@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -13,7 +10,10 @@ namespace WDE.MapRenderer.Managers
 {
     public class WmoManager : System.IDisposable
     {
-        private readonly IGameContext gameContext;
+        private readonly IGameFiles gameFiles;
+        private readonly IMeshManager meshManager;
+        private readonly WoWTextureManager textureManager;
+        private readonly IMaterialManager materialManager;
 
         public class WmoInstance
         {
@@ -21,11 +21,11 @@ namespace WDE.MapRenderer.Managers
 
             public IEnumerable<(IMesh, Material[])> Meshes => meshes;
 
-            public void Dispose(IGameContext context)
+            public void Dispose(IMeshManager meshManager)
             {
                 foreach (var mesh in meshes)
                 {
-                    context.Engine.MeshManager.DisposeMesh(mesh.Item1);
+                    meshManager.DisposeMesh(mesh.Item1);
                 }
 
                 meshes.Clear();
@@ -35,9 +35,15 @@ namespace WDE.MapRenderer.Managers
         private Dictionary<string, WmoInstance?> meshes = new();
         private Dictionary<string, Task> meshesCurrentlyLoaded = new();
 
-        public WmoManager(IGameContext gameContext)
+        public WmoManager(IGameFiles gameFiles,
+            IMeshManager meshManager,
+            WoWTextureManager textureManager,
+            IMaterialManager materialManager)
         {
-            this.gameContext = gameContext;
+            this.gameFiles = gameFiles;
+            this.meshManager = meshManager;
+            this.textureManager = textureManager;
+            this.materialManager = materialManager;
         }
 
         public IEnumerator LoadWorldMapObject(string path, TaskCompletionSource<WmoInstance?> result)
@@ -58,7 +64,7 @@ namespace WDE.MapRenderer.Managers
             var completion = new TaskCompletionSource<WmoInstance?>();
             meshesCurrentlyLoaded[path] = completion.Task;
 
-            var bytes = gameContext.ReadFile(path);
+            var bytes = gameFiles.ReadFile(path);
             yield return bytes;
             if (bytes.Result == null)
             {
@@ -77,7 +83,7 @@ namespace WDE.MapRenderer.Managers
             {
                 var groupFile = path.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo",
                     StringComparison.OrdinalIgnoreCase);
-                var bytesGroup = gameContext.ReadFile(groupFile);
+                var bytesGroup = gameFiles.ReadFile(groupFile);
                 yield return bytesGroup;
                 if (bytesGroup.Result == null)
                     continue;
@@ -98,7 +104,7 @@ namespace WDE.MapRenderer.Managers
                     indices, group.Vertices.Length, group.Indices.Length,
                     group.UVs.Count >= 2 ? group.UVs[1].AsArray() : null, group.VertexColors?.AsArray());
                 
-                var wmoMesh = gameContext.Engine.MeshManager.CreateMesh(wmoMeshData);
+                var wmoMesh = meshManager.CreateMesh(wmoMeshData);
                 wmoMesh.SetSubmeshCount(group.Batches.Length + 1); // + 1 for collision only submesh
                 int j = 0;
                 Material[] materials = new Material[group.Batches.Length];
@@ -107,8 +113,7 @@ namespace WDE.MapRenderer.Managers
                     wmoMesh.SetSubmeshIndicesRange(j++, (int)batch.startIndex, batch.count);
 
                     var materialDef = wmo.Materials[batch.material_id];
-                    var m2ShaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/wmo.json");
-                    var mat = gameContext.Engine.MaterialManager.CreateMaterial(m2ShaderHandle);
+                    var mat = materialManager.CreateMaterial("data/wmo.json");
 
                     mat.SetUniformInt("shader_id", (int)materialDef.shader);
                     //mat.SetUniform("notSupported", 0.0f);
@@ -173,20 +178,20 @@ namespace WDE.MapRenderer.Managers
                     if (materialDef.texture1Name != null)
                     {
                         var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return gameContext.TextureManager.GetTexture(materialDef.texture1Name, tcs);
+                        yield return textureManager.GetTexture(materialDef.texture1Name, tcs);
                         mat.SetTexture("texture1", tcs.Task.Result);
                     }
                     else
-                        mat.SetTexture("texture1", gameContext.TextureManager.EmptyTexture);
+                        mat.SetTexture("texture1", textureManager.EmptyTexture);
                     
                     if (materialDef.texture2Name != null)
                     {
                         var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return gameContext.TextureManager.GetTexture(materialDef.texture2Name, tcs);
+                        yield return textureManager.GetTexture(materialDef.texture2Name, tcs);
                         mat.SetTexture("texture2", tcs.Task.Result);
                     }
                     else
-                        mat.SetTexture("texture2", gameContext.TextureManager.EmptyTexture);
+                        mat.SetTexture("texture2", textureManager.EmptyTexture);
 
                     materials[j - 1] = mat;
                 }
@@ -208,7 +213,7 @@ namespace WDE.MapRenderer.Managers
         public void Dispose()
         {
             foreach (var wmo in meshes.Values)
-                wmo?.Dispose(gameContext);
+                wmo?.Dispose(meshManager);
         }
     }
 }

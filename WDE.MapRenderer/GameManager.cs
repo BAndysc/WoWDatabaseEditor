@@ -1,102 +1,97 @@
 using System.Collections;
-using System.Diagnostics;
-using Nito.AsyncEx;
-using TheEngine;
+using Prism.Ioc;
 using TheEngine.Coroutines;
-using TheEngine.Entities;
+using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
-using WDE.Common.DBC;
-using WDE.Common.MPQ;
-using WDE.Common.Services.MessageBox;
 using WDE.MapRenderer.Managers;
-using WDE.Module.Attributes;
-using WDE.MpqReader;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer
 {
-    [AutoRegister]
-    public class GameManager : IGame, IGameContext
+    public class GameManager : IGameContext
     {
-        private readonly IMpqService mpqService;
-        private readonly IGameView gameView;
-        private readonly IMessageBoxService messageBoxService;
-        private readonly IDatabaseClientFileOpener databaseClientFileOpener;
-        private AsyncMonitor monitor = new AsyncMonitor();
-        private Engine engine;
-        public event Action? OnInitialized;
-        public event Action? OnFailedInitialize;
-
-        public GameManager(IMpqService mpqService, 
-            IGameView gameView,
-            IMessageBoxService messageBoxService,
-            IDatabaseClientFileOpener databaseClientFileOpener)
+        private readonly IContainerProvider containerProvider;
+        private readonly IContainerRegistry registry;
+        private readonly IGameProperties gameProperties;
+        private readonly IRenderManager renderManager;
+        private readonly List<IDisposable> disposables = new List<IDisposable>();
+        
+        private CoroutineManager coroutineManager = null!;
+        private NotificationsCenter notificationsCenter = null!;
+        private TimeManager timeManager = null!;
+        private ScreenSpaceSelector screenSpaceSelector = null!;
+        private WoWMeshManager meshManager = null!;
+        private WoWTextureManager textureManager = null!;
+        private ChunkManager chunkManager = null!;
+        private ModuleManager moduleManager = null!;
+        private MdxManager mdxManager = null!;
+        private WmoManager wmoManager = null!;
+        private CameraManager cameraManager = null!;
+        private RaycastSystem raycastSystem = null!;
+        private DbcManager dbcManager = null!;
+        private LightingManager lightingManager = null!;
+        private AreaTriggerManager areaTriggerManager = null!;
+        private UpdateManager updateLoop = null!;
+        private WorldManager worldManager = null!;
+        private LoadingManager loadingManager = null!;
+        
+        public event Action<int>? ChangedMap;
+        public Map CurrentMap { get; private set; } = Map.Empty;
+        public bool IsInitialized { get; private set; }
+        
+        public GameManager(IContainerProvider containerProvider, 
+            IContainerRegistry registry,
+            IGameProperties gameProperties,
+            IRenderManager renderManager)
         {
-            this.mpqService = mpqService;
-            this.gameView = gameView;
-            this.messageBoxService = messageBoxService;
-            this.databaseClientFileOpener = databaseClientFileOpener;
-            UpdateLoop = new UpdateManager(this);
+            this.containerProvider = containerProvider;
+            this.registry = registry;
+            this.gameProperties = gameProperties;
+            this.renderManager = renderManager;
+            updateLoop = new UpdateManager();
         }
         
-        private bool TryOpenMpq(out IMpqArchive m, out IMpqArchive m2) // we open two archive, once for async loading, second for sync loading
+        public bool Initialize()
         {
-            m = null!;
-            m2 = null!;
-            try
+            var gameFiles = ResolveOrCreate<IGameFiles>();
+            if (!gameFiles.Initialize())
             {
-                m = mpqService.Open();
-                m2 = mpqService.Open();
-                return true;
-            }
-            catch (Exception e)
-            {
-                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                    .SetTitle("Invalid MPQ")
-                    .SetMainInstruction("Couldn't parse game MPQ.")
-                    .SetContent(e.Message + "\n\nAre you using modified game files?")
-                    .WithButton("Ok", false)
-                    .Build());
-                m?.Dispose();
-                m = null!;
-                m2 = null!;
-                return false;
-            }
-        }
-        
-        public bool Initialize(Engine engine)
-        {
-            this.engine = engine;
-            if (!TryOpenMpq(out mpq, out mpqSync))
-            {
-                OnFailedInitialize?.Invoke();
-                waitForInitialized.SetResult(false);
-                waitForInitialized = new();
                 return false;
             }
             coroutineManager = new();
-            NotificationsCenter = new NotificationsCenter(this);
-            TimeManager = new TimeManager(this);
-            ScreenSpaceSelector = new ScreenSpaceSelector(this);
-            DbcManager = new DbcManager(this, databaseClientFileOpener);
-            CurrentMap = DbcManager.MapStore.FirstOrDefault(m => m.Id == 1) ?? Map.Empty;
-            LoadingManager = new(this);
-            TextureManager = new WoWTextureManager(this);
-            MeshManager = new WoWMeshManager(this);
-            MdxManager = new MdxManager(this);
-            WmoManager = new WmoManager(this);
-            WorldManager = new WorldManager(this);
-            ChunkManager = new ChunkManager(this);
-            CameraManager = new CameraManager(this);
-            LightingManager = new LightingManager(this);
-            AreaTriggerManager = new AreaTriggerManager(this);
-            RaycastSystem = new RaycastSystem(engine);
-            ModuleManager = new ModuleManager(this, gameView); // must be last
+
+            dbcManager = ResolveOrCreate<DbcManager>();
+            SetMap(1);
+
+            foreach (var store in dbcManager.Stores())
+                registry.RegisterInstance(store.Item1, store.Item2);
             
-            OnInitialized?.Invoke();
+            notificationsCenter = ResolveOrCreate<NotificationsCenter>();
+            timeManager = ResolveOrCreate<TimeManager>();
+            screenSpaceSelector = ResolveOrCreate<ScreenSpaceSelector>();
+            loadingManager = ResolveOrCreate<LoadingManager>();
+            textureManager = ResolveOrCreate<WoWTextureManager>();
+            meshManager = ResolveOrCreate<WoWMeshManager>();
+            mdxManager = ResolveOrCreate<MdxManager>();
+            wmoManager = ResolveOrCreate<WmoManager>();
+            worldManager = ResolveOrCreate<WorldManager>();
+            chunkManager = ResolveOrCreate<ChunkManager>();
+            cameraManager = ResolveOrCreate<CameraManager>();
+            lightingManager = ResolveOrCreate<LightingManager>();
+            areaTriggerManager = ResolveOrCreate<AreaTriggerManager>();
+            raycastSystem = ResolveOrCreate<RaycastSystem>();
+            moduleManager = ResolveOrCreate<ModuleManager>();
+            
             IsInitialized = true;
-            waitForInitialized.SetResult(true);
             return true;
+        }
+        
+        private T ResolveOrCreate<T>()
+        {
+            var t = containerProvider.Resolve<T>();
+            if (t is IDisposable disp)
+                disposables.Add(disp);
+            return t;
         }
 
         public void StartCoroutine(IEnumerator coroutine)
@@ -104,10 +99,6 @@ namespace WDE.MapRenderer
             coroutineManager.Start(coroutine);
         }
 
-        private TaskCompletionSource<bool> waitForInitialized = new();
-        public Task<bool> WaitForInitialized => waitForInitialized.Task;
-
-        private Material? prevMaterial;
         public void Update(float delta)
         {
             if (!IsInitialized)
@@ -116,19 +107,19 @@ namespace WDE.MapRenderer
                 return;
             }
 
-            LoadingManager.Update(delta);
+            loadingManager.Update(delta);
             coroutineManager.Step();
 
-            TimeManager.Update(delta);
-            WorldManager.Update(delta);
+            timeManager.Update(delta);
+            worldManager.Update(delta);
             
-            CameraManager.Update(delta);
-            LightingManager.Update(delta);
+            cameraManager.Update(delta);
+            lightingManager.Update(delta);
             
-            ScreenSpaceSelector.Update(delta);
-            UpdateLoop.Update(delta);
-            ChunkManager.Update(delta);
-            ModuleManager.Update(delta);
+            screenSpaceSelector.Update(delta);
+            updateLoop.Update(delta);
+            chunkManager.Update(delta);
+            moduleManager.Update(delta);
         }
 
         public void Render(float delta)
@@ -138,127 +129,45 @@ namespace WDE.MapRenderer
                 Console.WriteLine("GameManager not initialized (this is quite fatal)");
                 return;
             }
-            ModuleManager.Render();
-            LightingManager.Render();
-            AreaTriggerManager.Render();
+
+            renderManager.ViewDistanceModifier = gameProperties.ViewDistanceModifier;
+            moduleManager.Render();
+            lightingManager.Render();
+            areaTriggerManager.Render();
         }
 
-        public void RenderGUI(float delta)
+        public void RenderGui(float delta)
         {
-            ModuleManager.RenderGUI();
-            NotificationsCenter.RenderGUI(delta);
-            ScreenSpaceSelector.Render();
-            CameraManager.RenderGUI();
-            LoadingManager.RenderGUI();
+            moduleManager.RenderGUI();
+            notificationsCenter.RenderGUI(delta);
+            screenSpaceSelector.Render();
+            cameraManager.RenderGUI();
+            loadingManager.RenderGUI();
+            timeManager.RenderGUI();
         }
-
-        public event Action? RequestDispose;
-        public event Action<int>? ChangedMap;
 
         public void SetMap(int mapId)
         {
-            if (DbcManager.MapStore.Contains(mapId) && CurrentMap.Id != mapId)
+            if (dbcManager.MapStore.Contains(mapId) && CurrentMap.Id != mapId)
             {
-                CurrentMap = DbcManager.MapStore[mapId];
+                CurrentMap = dbcManager.MapStore[mapId];
                 ChangedMap?.Invoke(mapId);
             }
-        }
-
-        public void DoDispose()
-        {
-            if (IsInitialized)
-                RequestDispose?.Invoke();
-            Debug.Assert(!IsInitialized);
         }
 
         public void DisposeGame()
         {
             if (!IsInitialized)
                 return;
-            waitForInitialized = new();
             IsInitialized = false;
-            ModuleManager.Dispose();
-            NotificationsCenter.Dispose();
-            LightingManager.Dispose();
-            AreaTriggerManager.Dispose();
-            ChunkManager.Dispose();
-            WorldManager.Dispose();
-            LoadingManager.Dispose();
-            WmoManager.Dispose();
-            MdxManager.Dispose();
-            TextureManager.Dispose();
-            MeshManager.Dispose();
-            mpq.Dispose();
-            mpqSync.Dispose();
-            NotificationsCenter = null!;
-            mpq = null!;
-            mpqSync = null!;
-            coroutineManager = null!;
-            TimeManager = null!;
-            ScreenSpaceSelector = null!;
-            DbcManager = null!;
-            CurrentMap = null!;
-            TextureManager = null!;
-            MeshManager = null!;
-            MdxManager = null!;
-            WmoManager = null!;
-            ChunkManager = null!;
-            CameraManager = null!;
-            LightingManager = null!;
-            AreaTriggerManager = null!;
-            WorldManager = null!;
-            RaycastSystem = null!;
-            ModuleManager = null!;
-            LoadingManager = null!;
+            for (int i = disposables.Count - 1; i >= 0; --i)
+                disposables[i].Dispose();
+            disposables.Clear();
         }
 
-        public Engine Engine => engine;
-
-        private IMpqArchive mpq, mpqSync;
-        private CoroutineManager coroutineManager;
-        public NotificationsCenter NotificationsCenter { get; private set; }
-        public TimeManager TimeManager { get; private set; }
-        public ScreenSpaceSelector ScreenSpaceSelector { get; private set; }
-        public WoWMeshManager MeshManager { get; private set; }
-        public WoWTextureManager TextureManager { get; private set; }
-        public ChunkManager ChunkManager { get; private set; }
-        public ModuleManager ModuleManager { get; private set; }
-        public MdxManager MdxManager { get; private set; }
-        public WmoManager WmoManager { get; private set; }
-        public CameraManager CameraManager { get; private set; }
-        public RaycastSystem RaycastSystem { get; private set; }
-        public DbcManager DbcManager { get; private set; }
-        public LightingManager LightingManager { get; private set; }
-        public AreaTriggerManager AreaTriggerManager { get; private set; }
-        public UpdateManager UpdateLoop { get; private set; }
-        public WorldManager WorldManager { get; private set; }
-        public Map CurrentMap { get; private set; }
-        public LoadingManager LoadingManager { get; private set; }
-        public bool IsInitialized { get; private set; }
-
-        public async Task<PooledArray<byte>?> ReadFile(string fileName)
+        public T? ResolveInstance<T>()
         {
-            using var _ = await monitor.EnterAsync();
-            var bytes = await Task.Run(() => mpq.ReadFilePool(fileName));
-            if (bytes == null)
-                Console.WriteLine("File " + fileName + " is unreadable");
-            return bytes;
-        }
-
-        public byte[]? ReadFileSync(string fileName)
-        {
-            var bytes = mpqSync.ReadFile(fileName);
-            if (bytes == null)
-                Console.WriteLine("File " + fileName + " is unreadable");
-            return bytes;
-        }
-        
-        public PooledArray<byte>? ReadFileSyncPool(string fileName)
-        {
-            var bytes = mpqSync.ReadFilePool(fileName);
-            if (bytes == null)
-                Console.WriteLine("File " + fileName + " is unreadable");
-            return bytes;
+            return containerProvider.Resolve<T>();
         }
     }
 }

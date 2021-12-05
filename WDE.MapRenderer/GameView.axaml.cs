@@ -1,10 +1,7 @@
-using System;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using TheEngine;
-using WDE.Common.MPQ;
 
 namespace WDE.MapRenderer
 {

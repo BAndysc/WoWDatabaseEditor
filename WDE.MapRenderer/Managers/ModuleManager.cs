@@ -1,33 +1,27 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Prism.Ioc;
 using WDE.MVVM.Observable;
 
 namespace WDE.MapRenderer.Managers
 {
     public class ModuleManager : System.IDisposable
     {
-        private readonly IGameContext gameContext;
+        private readonly IContainerProvider containerProvider;
         private readonly IGameView gameView;
 
-        private HashSet<Func<IGameModule>> modulesToAdd = new();
-        private HashSet<Func<IGameModule>> modulesToRemove = new();
-        private List<(Func<IGameModule>, IGameModule, object?)> modules = new();
+        private HashSet<Func<IContainerProvider, IGameModule>> modulesToAdd = new();
+        private HashSet<Func<IContainerProvider, IGameModule>> modulesToRemove = new();
+        private List<(Func<IContainerProvider, IGameModule>, IGameModule, object?)> modules = new();
         public ObservableCollection<object> ViewModels { get; } = new();
 
-        public ModuleManager(IGameContext gameContext, IGameView gameView)
+        public ModuleManager(IContainerProvider containerProvider,
+            IGameView gameView)
         {
-            this.gameContext = gameContext;
+            this.containerProvider = containerProvider;
             this.gameView = gameView;
             
             foreach (var m in gameView.Modules)
-            {
-                var moduleInstance = m();
-                moduleInstance.Initialize(gameContext);
-                modules.Add((m, moduleInstance, moduleInstance.ViewModel));
-                if (moduleInstance.ViewModel != null)
-                    ViewModels.Add(moduleInstance.ViewModel);
-            }
+                modulesToAdd.Add(m);
 
             gameView.ModuleRegistered += GameViewOnModuleRegistered;
             gameView.ModuleRemoved += GameViewOnModuleRemoved;
@@ -37,8 +31,8 @@ namespace WDE.MapRenderer.Managers
         {
             foreach (var m in modulesToAdd)
             {
-                var moduleInstance = m();
-                moduleInstance.Initialize(gameContext);
+                var moduleInstance = m(containerProvider);
+                moduleInstance.Initialize();
                 modules.Add((m, moduleInstance, moduleInstance.ViewModel));
                 if (moduleInstance.ViewModel != null)
                     ViewModels.Add(moduleInstance.ViewModel);
@@ -63,12 +57,12 @@ namespace WDE.MapRenderer.Managers
                 module.Item2.Update(delta);
         }
 
-        private void GameViewOnModuleRemoved(Func<IGameModule> m)
+        private void GameViewOnModuleRemoved(Func<IContainerProvider, IGameModule> m)
         {
             modulesToRemove.Add(m);
         }
 
-        private void GameViewOnModuleRegistered(Func<IGameModule> m)
+        private void GameViewOnModuleRegistered(Func<IContainerProvider, IGameModule> m)
         {
             modulesToAdd.Add(m);
         }

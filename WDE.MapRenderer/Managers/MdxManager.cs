@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 using TheEngine.Coroutines;
 using TheEngine.Data;
 using TheEngine.Entities;
@@ -14,6 +12,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     enum ModelPixelShader
     {
         Combiners_Opaque = 0,
@@ -49,19 +48,25 @@ namespace WDE.MapRenderer.Managers
             public IMesh mesh;
             public Material[] materials;
 
-            public void Dispose(IGameContext context)
+            public void Dispose(IMeshManager meshManager)
             {
-                context.Engine.MeshManager.DisposeMesh(mesh);
+                meshManager.DisposeMesh(mesh);
             }
         }
 
         private Dictionary<string, MdxInstance?> meshes = new();
         private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
-        private readonly IGameContext gameContext;
+        private readonly IGameFiles gameFiles;
+        private readonly IMeshManager meshManager;
+        private readonly IMaterialManager materialManager;
+        private readonly WoWTextureManager textureManager;
 
-        public MdxManager(IGameContext gameContext)
+        public MdxManager(IGameFiles gameFiles, IMeshManager meshManager, IMaterialManager materialManager, WoWTextureManager textureManager)
         {
-            this.gameContext = gameContext;
+            this.gameFiles = gameFiles;
+            this.meshManager = meshManager;
+            this.materialManager = materialManager;
+            this.textureManager = textureManager;
         }
 
         public IEnumerator LoadM2Mesh(string path, TaskCompletionSource<MdxInstance?> result)
@@ -84,13 +89,11 @@ namespace WDE.MapRenderer.Managers
 
             var m2FilePath = path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
             var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
-            var file =
-                gameContext.ReadFile(m2FilePath);
+            var file = gameFiles.ReadFile(m2FilePath);
 
             yield return new WaitForTask(file);
 
-            var skinFile =
-                gameContext.ReadFile(skinFilePath);
+            var skinFile = gameFiles.ReadFile(skinFilePath);
             
             yield return new WaitForTask(skinFile);
             
@@ -135,7 +138,7 @@ namespace WDE.MapRenderer.Managers
 
             var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2);
             
-            var mesh = gameContext.Engine.MeshManager.CreateMesh(md);
+            var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
 
             Material[] materials = new Material[skin.Batches.Length];
@@ -168,9 +171,9 @@ namespace WDE.MapRenderer.Managers
                     if (batch.textureComboIndex + i >= m2.textureCombos.Length)
                     {
                         if (th.HasValue)
-                            th2 = gameContext.TextureManager.EmptyTexture;
+                            th2 = textureManager.EmptyTexture;
                         else
-                            th = gameContext.TextureManager.EmptyTexture;
+                            th = textureManager.EmptyTexture;
                         Console.WriteLine("File " + path + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
@@ -178,16 +181,16 @@ namespace WDE.MapRenderer.Managers
                     if (texId == -1)
                     {
                         if (th.HasValue)
-                            th2 = gameContext.TextureManager.EmptyTexture;
+                            th2 = textureManager.EmptyTexture;
                         else
-                            th = gameContext.TextureManager.EmptyTexture;
+                            th = textureManager.EmptyTexture;
                     }
                     else
                     {
                         var textureDef = m2.textures[texId];
                         var texFile = textureDef.filename.AsString();
                         var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return gameContext.TextureManager.GetTexture(texFile, tcs);
+                        yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
                         if (th.HasValue)
                             th2 = resTex;
@@ -197,11 +200,10 @@ namespace WDE.MapRenderer.Managers
                 }
 
                 var materialDef = m2.materials[batch.materialIndex];
-                var m2ShaderHandle = gameContext.Engine.ShaderManager.LoadShader("data/m2.json");
-                var material = gameContext.Engine.MaterialManager.CreateMaterial(m2ShaderHandle);
+                var material = materialManager.CreateMaterial("data/m2.json");
 
-                material.SetTexture("texture1", th ?? gameContext.TextureManager.EmptyTexture);
-                material.SetTexture("texture2", th2 ?? gameContext.TextureManager.EmptyTexture);
+                material.SetTexture("texture1", th ?? textureManager.EmptyTexture);
+                material.SetTexture("texture2", th2 ?? textureManager.EmptyTexture);
 
                 var trans = 1.0f;
                 if (batch.colorIndex != -1 && m2.colors.Length < batch.colorIndex)
@@ -439,7 +441,7 @@ namespace WDE.MapRenderer.Managers
         public void Dispose()
         {
             foreach (var mesh in meshes.Values)
-                mesh?.Dispose(gameContext);
+                mesh?.Dispose(meshManager);
         }
     }
 }

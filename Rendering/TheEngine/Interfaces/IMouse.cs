@@ -1,7 +1,7 @@
-﻿using Avalonia;
+﻿using TheEngine.Input;
 using TheMaths;
 
-namespace TheEngine.Input
+namespace TheEngine.Interfaces
 {
     public interface IMouse
     {

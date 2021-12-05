@@ -1,4 +1,5 @@
 using System.Collections;
+using TheEngine.Interfaces;
 using TheMaths;
 
 namespace WDE.MapRenderer.Managers;
@@ -30,14 +31,22 @@ public class LoadingToken
 public class LoadingManager : IDisposable
 {
     private readonly IGameContext gameContext;
+    private readonly IUIManager uiManager;
+    private readonly ChunkManager chunkManager;
+    private readonly WorldManager worldManager;
     private int? currentLoadedMap;
     private LoadingToken? loadingToken;
     
     public bool EssentialLoadingInProgress { get; private set; }
     
-    public LoadingManager(IGameContext gameContext)
+    public LoadingManager(IGameContext gameContext,
+        IUIManager uiManager,
+        ChunkManager chunkManager, WorldManager worldManager)
     {
         this.gameContext = gameContext;
+        this.uiManager = uiManager;
+        this.chunkManager = chunkManager;
+        this.worldManager = worldManager;
     }
 
     public void Update(float delta)
@@ -61,14 +70,14 @@ public class LoadingManager : IDisposable
                 yield return null; // wait for previous loading to finish
         }
         
-        yield return gameContext.ChunkManager.UnloadAllChunks();
+        yield return chunkManager.UnloadAllChunks();
 
-        yield return gameContext.WorldManager.LoadMap(newToken.CancellationToken);
+        yield return worldManager.LoadMap(newToken.CancellationToken);
         
         if (loadingToken == newToken)
             EssentialLoadingInProgress = false;
         
-        yield return gameContext.WorldManager.LoadOptionals(newToken.CancellationToken);
+        yield return worldManager.LoadOptionals(newToken.CancellationToken);
 
         newToken.MarkAsLoaded();
         
@@ -84,7 +93,7 @@ public class LoadingManager : IDisposable
     {
         if (loadingToken != null)
         {
-            using var ui = gameContext.Engine.Ui.BeginImmediateDrawRel(0.5f, 1f, 0.5f, 1f);
+            using var ui = uiManager.BeginImmediateDrawRel(0.5f, 1f, 0.5f, 1f);
             ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 2);
             if (EssentialLoadingInProgress)
                 ui.Text( "calibri", "Loading essential things", 14, Vector4.One);

@@ -1,10 +1,8 @@
-using System;
 using TheEngine;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
 using TheMaths;
-using WDE.MapRenderer.Managers;
 
 namespace WDE.MapRenderer.Utils
 {
@@ -43,12 +41,12 @@ namespace WDE.MapRenderer.Utils
             TranslateXZ
         }
 
-        public HitType HitTest(IGameContext context, out Vector3 intersectionPoint)
+        public HitType HitTest(IInputManager inputManager, ICameraManager cameraManager, out Vector3 intersectionPoint)
         {
             intersectionPoint = Vector3.Zero;
             t.Position = position.Position;
             
-            var ray = context.Engine.CameraManager.MainCamera.NormalizedScreenPointToRay(context.Engine.InputManager.Mouse.NormalizedPosition);
+            var ray = cameraManager.MainCamera.NormalizedScreenPointToRay(inputManager.Mouse.NormalizedPosition);
 
             t.Rotation = PlaneX;
             if (Physics.RayIntersectsObject(dragPlaneMesh, 0,  t.LocalToWorldMatrix, ray, null, out intersectionPoint))
@@ -77,13 +75,13 @@ namespace WDE.MapRenderer.Utils
             return HitType.None;
         }
 
-        public void Render(IGameContext context)
+        public void Render(ICameraManager cameraManager, IRenderManager renderManager)
         {
-            InternalRender(context, true);
-            InternalRender(context, false);
+            InternalRender(cameraManager, renderManager, true);
+            InternalRender(cameraManager, renderManager, false);
         }
 
-        private void InternalRender(IGameContext context, bool transparent)
+        private void InternalRender(ICameraManager cameraManager, IRenderManager renderManager, bool transparent)
         {
             if (transparent)
             {
@@ -100,30 +98,30 @@ namespace WDE.MapRenderer.Utils
                 material.ZWrite = true;
             }
             
-            var dist = (position.Position - context.Engine.CameraManager.MainCamera.Transform.Position).Length();
+            var dist = (position.Position - cameraManager.MainCamera.Transform.Position).Length();
             t.Position = position.Position;
             t.Scale = Vector3.One * (float)Math.Sqrt(Math.Clamp(dist, 0.5f, 500) / 15);
             // +X (wow)
             t.Rotation = ArrowX;
             material.SetUniform("objectColor", new Vector4(0, 0, 1, transparent ? 0.5f : 1f));
-            context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
+            renderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneX;
-            context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);
+            renderManager.Render(dragPlaneMesh, material, 0, t);
                 
 
             // +Y (wow)
             t.Rotation = ArrowY;
             material.SetUniform("objectColor", new Vector4(0, 1, 0, transparent ? 0.5f : 1f));
-            context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
+            renderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneY;
-            context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);
+            renderManager.Render(dragPlaneMesh, material, 0, t);
                 
             // +Z (wow)
             t.Rotation = ArrowZ;
             material.SetUniform("objectColor", new Vector4(1, 0, 0, transparent ? 0.5f : 1f));
-            context.Engine.RenderManager.Render(arrowMesh, material, 0, t);
+            renderManager.Render(arrowMesh, material, 0, t);
             t.Rotation = PlaneZ;
-            context.Engine.RenderManager.Render(dragPlaneMesh, material, 0, t);
+            renderManager.Render(dragPlaneMesh, material, 0, t);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace TheEngine
         public ICameraManager CameraManager => cameraManger;
 
         internal InputManager inputManager { get; }
-        public InputManager InputManager => inputManager;
+        public IInputManager InputManager => inputManager;
 
         internal LightManager lightManager { get; }
         public ILightManager LightManager => lightManager;

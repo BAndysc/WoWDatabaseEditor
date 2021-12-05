@@ -11,34 +11,57 @@ namespace WDE.MapRenderer.Managers
     public class LightingManager : System.IDisposable
     {
         private readonly IGameContext gameContext;
+        private readonly IGameProperties gameProperties;
+        private readonly IMeshManager meshManager;
+        private readonly ITextureManager textureManager;
+        private readonly IRenderManager renderManager;
+        private readonly CameraManager cameraManager;
+        private readonly LightStore lightStore;
+        private readonly ILightManager lightManager;
+        private readonly TimeManager timeManager;
         private IMesh skySphereMesh;
         private Material skyMaterial;
         private TextureHandle noiseTexture;
 
-        public LightingManager(IGameContext gameContext)
+        public LightingManager(IGameContext gameContext,
+            IGameProperties gameProperties,
+            IMeshManager meshManager, 
+            IMaterialManager materialManager,
+            ITextureManager textureManager,
+            IRenderManager renderManager,
+            CameraManager cameraManager,
+            LightStore lightStore,
+            ILightManager lightManager,
+            TimeManager timeManager)
         {
             this.gameContext = gameContext;
-            skySphereMesh = gameContext.Engine.MeshManager.CreateMesh(ObjParser.LoadObj("meshes/skysphere.obj").MeshData);
-            skyMaterial = gameContext.Engine.MaterialManager.CreateMaterial("data/skybox.json");
-            noiseTexture = gameContext.Engine.TextureManager.LoadTexture("textures/noise_512.png");
+            this.gameProperties = gameProperties;
+            this.meshManager = meshManager;
+            this.textureManager = textureManager;
+            this.renderManager = renderManager;
+            this.cameraManager = cameraManager;
+            this.lightStore = lightStore;
+            this.lightManager = lightManager;
+            this.timeManager = timeManager;
+            skySphereMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/skysphere.obj").MeshData);
+            skyMaterial = materialManager.CreateMaterial("data/skybox.json");
+            noiseTexture = textureManager.LoadTexture("textures/noise_512.png");
             
             skyMaterial.SetTexture("cloudsTex", noiseTexture);
         }
 
-        public bool OverrideLighting { get; set; }
-
         public void Dispose()
         {
-            gameContext.Engine.MeshManager.DisposeMesh(skySphereMesh);
-            gameContext.Engine.TextureManager.DisposeTexture(noiseTexture);
+            meshManager.DisposeMesh(skySphereMesh);
+            textureManager.DisposeTexture(noiseTexture);
         }
 
         private Light? bestLight = null;
         public void Update(float delta)
         {
-            var position = gameContext.CameraManager.Position.ToWoWPosition();
+            var position = cameraManager.Position.ToWoWPosition();
             var bestDistance = float.MaxValue;
-            foreach (var lightning in gameContext.DbcManager.LightStore)
+            foreach (var lightning in lightStore)
             {
                 if (lightning.Continent != gameContext.CurrentMap.Id)
                     continue;
@@ -54,28 +77,27 @@ namespace WDE.MapRenderer.Managers
                 }
             }
             
-            
-            if (OverrideLighting)
+            if (gameProperties.OverrideLighting)
             {
-                gameContext.Engine.LightManager.MainLight.LightColor = Vector4.One;
-                gameContext.Engine.LightManager.MainLight.LightIntensity = 0.8f;
-                gameContext.Engine.LightManager.MainLight.AmbientColor = new Vector4(1, 1, 1, 0.4f);
+                lightManager.MainLight.LightColor = Vector4.One;
+                lightManager.MainLight.LightIntensity = 0.8f;
+                lightManager.MainLight.AmbientColor = new Vector4(1, 1, 1, 0.4f);
                 
-                gameContext.Engine.LightManager.SecondaryLight.LightColor = Vector4.One;
-                gameContext.Engine.LightManager.SecondaryLight.LightIntensity = 0;
+                lightManager.SecondaryLight.LightColor = Vector4.One;
+                lightManager.SecondaryLight.LightIntensity = 0;
             }
             else if (bestLight != null)
             {
-                var lightColor = bestLight.NormalWeather.GetLightParameter(LightIntParamType.GeneralLightning).GetColorAtTime(gameContext.TimeManager.Time);
-                var ambientLight = bestLight.NormalWeather.GetLightParameter(LightIntParamType.AmbientLight).GetColorAtTime(gameContext.TimeManager.Time);
+                var lightColor = bestLight.NormalWeather.GetLightParameter(LightIntParamType.GeneralLightning).GetColorAtTime(timeManager.Time);
+                var ambientLight = bestLight.NormalWeather.GetLightParameter(LightIntParamType.AmbientLight).GetColorAtTime(timeManager.Time);
 
-                gameContext.Engine.LightManager.MainLight.LightColor = lightColor.ToRgbaVector();
-                gameContext.Engine.LightManager.MainLight.AmbientColor = ambientLight.ToRgbaVector();
+                lightManager.MainLight.LightColor = lightColor.ToRgbaVector();
+                lightManager.MainLight.AmbientColor = ambientLight.ToRgbaVector();
                 
-                gameContext.Engine.LightManager.SecondaryLight.LightColor = lightColor.ToRgbaVector();
+                lightManager.SecondaryLight.LightColor = lightColor.ToRgbaVector();
             }
 
-            float timeOfDay = (gameContext.TimeManager.Time.TotalMinutes + gameContext.TimeManager.MinuteFraction) / 1440.0f;
+            float timeOfDay = (timeManager.Time.TotalMinutes + timeManager.MinuteFraction) / 1440.0f;
             float angle = (timeOfDay - 2 / 24.0f) * (float)Math.PI * 2 ; // offset by 2 hours
             var sin = (float)Math.Sin(angle);
             var cos = (float)Math.Cos(angle);
@@ -83,22 +105,22 @@ namespace WDE.MapRenderer.Managers
             var sunForward = (Vector3.Zero - sunPosition).Normalized;
             var moonForward = -sunForward;
             
-            gameContext.Engine.LightManager.MainLight.LightPosition = sunPosition;
-            gameContext.Engine.LightManager.MainLight.LightRotation = Quaternion.LookRotation(sunForward, Vector3.Up);
-            gameContext.Engine.LightManager.MainLight.LightIntensity = Math.Max(Vector3.Dot(Vector3.Up, sunForward), 0);
+            lightManager.MainLight.LightPosition = sunPosition;
+            lightManager.MainLight.LightRotation = Quaternion.LookRotation(sunForward, Vector3.Up);
+            lightManager.MainLight.LightIntensity = Math.Max(Vector3.Dot(Vector3.Up, sunForward), 0);
             
-            gameContext.Engine.LightManager.SecondaryLight.LightRotation = Quaternion.LookRotation(moonForward, Vector3.Up);
-            gameContext.Engine.LightManager.SecondaryLight.LightIntensity = 0.5f * Math.Max(Vector3.Dot(Vector3.Up, moonForward), 0);
+            lightManager.SecondaryLight.LightRotation = Quaternion.LookRotation(moonForward, Vector3.Up);
+            lightManager.SecondaryLight.LightIntensity = 0.5f * Math.Max(Vector3.Dot(Vector3.Up, moonForward), 0);
         }
 
         public void Render()
         {
-            Time time = gameContext.TimeManager.Time;
+            Time time = timeManager.Time;
 
             if (bestLight != null)
             {
                 //-30, 225
-                float preciseMinutes = (gameContext.TimeManager.Time.TotalMinutes + gameContext.TimeManager.MinuteFraction);
+                float preciseMinutes = (timeManager.Time.TotalMinutes + timeManager.MinuteFraction);
                 float timeOfDay = preciseMinutes / 1440.0f;
                 float timeOfDayHalf = ((preciseMinutes + 1440/2.0f) % 1440) / 1440.0f;
                 
@@ -126,13 +148,8 @@ namespace WDE.MapRenderer.Managers
                 
                 var t = new Transform();
                 t.Scale = Vector3.One * 10000f;
-                gameContext.Engine.RenderManager.Render(skySphereMesh, skyMaterial, 0, t);
+                renderManager.Render(skySphereMesh, skyMaterial, 0, t);
             }
-            
-            using var ui = gameContext.Engine.Ui.BeginImmediateDrawAbs(0, 0);
-            ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.7f), 5);
-            ui.Text("calibri", $"{time.Hour:00}:{time.Minute:00}", 16, Vector4.One);
-            ui.EndBox();
         }
     }
 }
