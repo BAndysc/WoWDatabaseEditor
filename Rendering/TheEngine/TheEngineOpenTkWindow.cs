@@ -4,6 +4,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using TheAvaloniaOpenGL;
 using TheEngine.Config;
+using TheEngine.Utils;
 using MouseButton = OpenTK.Windowing.GraphicsLibraryFramework.MouseButton;
 
 namespace TheEngine;
@@ -36,6 +37,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     protected override void OnRenderFrame(FrameEventArgs args)
     {
+        engine.statsManager.Counters.FrameTime.Add(args.Time * 1000);
         engine.renderManager.BeginFrame();
         engine.renderManager.PrepareRendering(0);
         engine.renderManager.RenderWorld(0);
