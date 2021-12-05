@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OpenTK" Version="4.6.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
+      <ProjectReference Include="..\..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
+      <ProjectReference Include="..\..\WDE.MPQ\WDE.MPQ.csproj" />
+      <ProjectReference Include="..\..\WDE.Trinity\WDE.Trinity.csproj" />
+      <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj" />
+      <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj" />
+      <ProjectReference Include="..\..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
+    </ItemGroup>
+
+</Project>
