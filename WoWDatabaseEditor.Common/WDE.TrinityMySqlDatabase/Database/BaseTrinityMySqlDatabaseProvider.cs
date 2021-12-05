@@ -423,6 +423,8 @@ namespace WDE.TrinityMySqlDatabase.Database
 
 
         public abstract IEnumerable<ICreature> GetCreatures();
+        public abstract Task<IList<ICreature>> GetCreaturesByMapAsync(uint map);
+        public abstract Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map);
         public abstract IEnumerable<IGameObject> GetGameObjects();
 
         public IEnumerable<ICoreCommandHelp> GetCommands()

@@ -171,6 +171,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetCreatures();
         }
 
+        public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => nonCachedDatabase.GetCreaturesByMapAsync(map);
+        
+        public Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map) => nonCachedDatabase.GetGameObjectsByMapAsync(map);
+
         public IEnumerable<IGameObject> GetGameObjects()
         {
             if (gameObjectCache != null)

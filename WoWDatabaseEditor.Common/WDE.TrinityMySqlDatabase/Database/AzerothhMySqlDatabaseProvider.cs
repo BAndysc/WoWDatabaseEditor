@@ -141,4 +141,16 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
     {
         return model.GameObject.FirstOrDefaultAsync<IGameObject>(g => g.Guid == guid);
     }
+    
+    public override async Task<IList<ICreature>> GetCreaturesByMapAsync(uint map)
+    {
+        await using var model = Database();
+        return await model.Creature.Where(c => c.Map == map).ToListAsync<ICreature>();
+    }
+
+    public override async Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map)
+    {
+        await using var model = Database();
+        return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
+    }
 }
