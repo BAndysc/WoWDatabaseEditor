@@ -178,7 +178,7 @@ namespace WDE.MapRenderer.Managers
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var vert = m2.vertices[i];
+                    var vert = m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coords[0];
