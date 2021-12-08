@@ -85,10 +85,10 @@ namespace WDE.MapRenderer.Managers
 
                 var areaTriggerPosition = new Vector3(areaTrigger.X, areaTrigger.Y, areaTrigger.Z);
 
-                if ((cameraManager.Position - areaTriggerPosition.ToOpenGlPosition()).LengthSquared() > AreaTriggerVisibilityDistanceSquare)
+                if ((cameraManager.Position - areaTriggerPosition).LengthSquared() > AreaTriggerVisibilityDistanceSquare)
                     continue;
                 
-                t.Position = areaTriggerPosition.ToOpenGlPosition();
+                t.Position = areaTriggerPosition;
                 float height = 0;
                 
                 if (areaTrigger.Shape == AreaTriggerShape.Box)

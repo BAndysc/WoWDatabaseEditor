@@ -26,13 +26,13 @@ namespace WDE.MapRenderer.Managers
             this.inputManager = inputManager;
             this.uiManager = uiManager;
 
-            Position = new Vector3(285.396f, -4746.17f, 9.48428f + 20).ToOpenGlPosition();
+            Position = new Vector3(285.396f, -4746.17f, 9.48428f + 20);
             Rotation = Quaternion.LookRotation(
-                new Vector3(223.698f, -4745.11f, 10.1022f + 20).ToOpenGlPosition() - Position, Vector3.Up);
+                new Vector3(223.698f, -4745.11f, 10.1022f + 20) - Position, Vector3.Up);
             engineCamera.MainCamera.FOV = 75;
         }
 
-        public (int, int) CurrentChunk => Position.ToWoWPosition().WoWPositionToChunk();
+        public (int, int) CurrentChunk => Position.WoWPositionToChunk();
 
         public void Relocate(Vector3 pos)
         {
@@ -50,7 +50,7 @@ namespace WDE.MapRenderer.Managers
 
             Rotation = Quaternion.FromEuler(0, pitch, yaw);
             var movement = inputManager.Keyboard.GetAxis(Vector3.Down, Key.W, Key.S) + 
-                           inputManager.Keyboard.GetAxis(Vector3.BackwardRH, Key.A, Key.D) + 
+                           inputManager.Keyboard.GetAxis(Vector3.Backward, Key.A, Key.D) + 
                            inputManager.Keyboard.GetAxis(Vector3.Left, Key.E, Key.Q);
             movement.Normalize();
             float speed = 1 * (delta / 16.0f) * (inputManager.Keyboard.IsDown(Key.LeftShift) ? 15 : 1);
@@ -65,8 +65,7 @@ namespace WDE.MapRenderer.Managers
         {
             using var ui = uiManager.BeginImmediateDrawRel(0, 1, 0, 1);
             ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 3);
-            var wowPos = Position.ToWoWPosition();
-            ui.Text("calibri", $"X: {wowPos.X:0.00} Y: {wowPos.Y:0.00} Z: {wowPos.Z:0.00}", 13, Vector4.One);
+            ui.Text("calibri", $"X: {Position.X:0.00} Y: {Position.Y:0.00} Z: {Position.Z:0.00}", 13, Vector4.One);
         }
     }
 }

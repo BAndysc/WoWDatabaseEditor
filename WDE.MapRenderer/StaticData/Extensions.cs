@@ -4,18 +4,6 @@ namespace WDE.MapRenderer.StaticData
 {
     public static class Extensions
     {
-        [Obsolete]
-        public static Vector3 ToWoWPosition(this Vector3 openGl)
-        {
-            return openGl;
-        }
-        
-        [Obsolete]
-        public static Vector3 ToOpenGlPosition(this Vector3 wow)
-        {
-            return wow;
-        }
-        
         public static Vector3 ChunkToWoWPosition(this (int x, int y) chunk)
         {
             return new Vector3((-chunk.x + 32) * Constants.BlockSize, (-chunk.y + 32) * Constants.BlockSize, 0);

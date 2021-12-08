@@ -190,7 +190,7 @@ namespace WDE.MapRenderer
 
             public void Update(float delta)
             {
-                var wowPos = cameraManager.Position.ToWoWPosition();
+                var wowPos = cameraManager.Position;
                 vm.cameraViewModel.UpdatePosition(wowPos.X, wowPos.Y, wowPos.Z);
                 vm.RaisePropertyChanged(nameof(CurrentTime));
 
@@ -460,7 +460,7 @@ Tris: " + stats.TrianglesDrawn;
             var cameraManager = currentGame.Resolve<CameraManager>();
             if (cameraManager != null)
             {
-                cameraManager.Relocate(new Vector3((float)x, (float)y, 200).ToOpenGlPosition());
+                cameraManager.Relocate(new Vector3((float)x, (float)y, 200));
                 RequestRender?.Invoke();
             }
         }

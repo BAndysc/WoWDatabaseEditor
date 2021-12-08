@@ -39,7 +39,7 @@ namespace WDE.MapRenderer.Managers
             Z = z;
         }
 
-        public Vector3 MiddlePoint => ((X, Z).ChunkToWoWPosition() - new Vector3(Constants.BlockSize / 2, Constants.BlockSize / 2, 0)).ToOpenGlPosition();
+        public Vector3 MiddlePoint => ((X, Z).ChunkToWoWPosition() - new Vector3(Constants.BlockSize / 2, Constants.BlockSize / 2, 0));
 
         public void Dispose(ITextureManager textureManager)
         {
@@ -262,7 +262,7 @@ namespace WDE.MapRenderer.Managers
                                 VERTX = (Constants.ChunkSize / 8) * 7 * (cx / 7.0f) + Constants.ChunkSize / 8 / 2;
                             }
                             float VERTY = cy / 16.0f * Constants.ChunkSize;
-                            var vert = new Vector3(-VERTY, -VERTX, chunksEnumerator2.Current.Heights[k_]) + basePos.ToOpenGlPosition();
+                            var vert = new Vector3(-VERTY, -VERTX, chunksEnumerator2.Current.Heights[k_]) + basePos;
                             subVertices[k_] = vert;
 
                             if (cy % 2 == 0) // inner row, 8 verts

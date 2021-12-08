@@ -633,10 +633,10 @@ namespace TheEngine.Managers
             sceneData.ProjectionMatrix = proj;
             sceneData.LightPosition = engine.lightManager.MainLight.LightPosition;
             sceneData.CameraPosition = new Vector4(engine.CameraManager.MainCamera.Transform.Position, 1);
-            sceneData.LightDirection = new Vector4((Vector3.ForwardLH * engine.lightManager.MainLight.LightRotation).Normalized, 0);
+            sceneData.LightDirection = new Vector4((Vector3.Forward * engine.lightManager.MainLight.LightRotation).Normalized, 0);
             sceneData.LightColor = engine.lightManager.MainLight.LightColor.XYZ;
             sceneData.LightIntensity = engine.lightManager.MainLight.LightIntensity;
-            sceneData.SecondaryLightDirection = new Vector4(Vector3.ForwardLH * engine.lightManager.SecondaryLight.LightRotation, 0);
+            sceneData.SecondaryLightDirection = new Vector4(Vector3.Forward * engine.lightManager.SecondaryLight.LightRotation, 0);
             sceneData.SecondaryLightColor = engine.lightManager.SecondaryLight.LightColor.XYZ;
             sceneData.SecondaryLightIntensity = engine.lightManager.SecondaryLight.LightIntensity;
             sceneData.AmbientColor = engine.lightManager.MainLight.AmbientColor;
@@ -676,7 +676,7 @@ namespace TheEngine.Managers
         {
             renderManager.DrawLine(ray.Position, ray.Position + ray.Direction);
             renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Left * 0.5f, ray.Position + ray.Direction);
-            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.ForwardWoW * 0.5f, ray.Position + ray.Direction);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Forward * 0.5f, ray.Position + ray.Direction);
         }
     }
 }

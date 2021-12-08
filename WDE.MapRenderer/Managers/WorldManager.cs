@@ -32,7 +32,7 @@ public class WorldManager : System.IDisposable
     private uint? prevAreaId;
     public void Update(float delta)
     {
-        var areaId = GetAreaId(cameraManager.Position.ToWoWPosition());
+        var areaId = GetAreaId(cameraManager.Position);
         if (areaId != prevAreaId)
         {
             prevAreaId = areaId;
@@ -125,10 +125,10 @@ public class WorldManager : System.IDisposable
                 // this is just for debugging
                 // since the beginning this was the initial position in Kalimdor
                 // and it is quite nice starting position
-                cameraManager.Relocate(new Vector3(285.396f, -4746.17f, 9.48428f + 20).ToOpenGlPosition());
+                cameraManager.Relocate(new Vector3(285.396f, -4746.17f, 9.48428f + 20));
             }
             else
-                cameraManager.Relocate(avg.ToOpenGlPosition().WithY(100));
+                cameraManager.Relocate(avg.WithZ(100));
         }
     }
 

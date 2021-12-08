@@ -59,7 +59,7 @@ namespace WDE.MapRenderer.Managers
         private Light? bestLight = null;
         public void Update(float delta)
         {
-            var position = cameraManager.Position.ToWoWPosition();
+            var position = cameraManager.Position;
             var bestDistance = float.MaxValue;
             foreach (var lightning in lightStore)
             {

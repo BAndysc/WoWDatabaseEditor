@@ -90,7 +90,7 @@ namespace TheMaths
         /// A unit <see cref="Vector3"/> designating up (0, 0, 1).
         /// </summary>
         public static readonly Vector3 Up = UnitZ;
-
+        
         /// <summary>
         /// A unit <see cref="Vector3"/> designating down (0, 0, -1).
         /// </summary>
@@ -109,26 +109,12 @@ namespace TheMaths
         /// <summary>
         /// A unit <see cref="Vector3"/> designating forward in a right-handed coordinate system (1, 0, 0).
         /// </summary>
-        public static readonly Vector3 ForwardRH = UnitX;
-
-        public static readonly Vector3 ForwardWoW = UnitX;
-        public static readonly Vector3 RightWoW = Right;
-        public static readonly Vector3 UpWoW = UnitZ;
-
+        public static readonly Vector3 Forward = UnitX;
+        
         /// <summary>
-        /// A unit <see cref="Vector3"/> designating forward in a left-handed coordinate system (-1, 0, 0).
+        /// A unit <see cref="Vector3"/> designating backward in a right-handed coordinate system (1, 0, 0).
         /// </summary>
-        public static readonly Vector3 ForwardLH = UnitX;
-
-        /// <summary>
-        /// A unit <see cref="Vector3"/> designating backward in a right-handed coordinate system (-1, 0, 0).
-        /// </summary>
-        public static readonly Vector3 BackwardRH = -UnitX;
-
-        /// <summary>
-        /// A unit <see cref="Vector3"/> designating backward in a left-handed coordinate system (1, 0, 0).
-        /// </summary>
-        public static readonly Vector3 BackwardLH = -UnitX;
+        public static readonly Vector3 Backward = -UnitX;
 
         /// <summary>
         /// The X component of the vector.
