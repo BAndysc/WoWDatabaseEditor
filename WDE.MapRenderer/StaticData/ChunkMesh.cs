@@ -21,20 +21,23 @@ namespace WDE.MapRenderer.StaticData
                     {
                         for (int cx = 0; cx < (cy % 2 == 0 ? 9 : 8); cx++)
                         {
-                            float VERTX = 0;
+                            float VERTX = 0, VERTX2 = 0;
                             if (cy % 2 == 0)
                             {
-                                VERTX = cx / 8.0f * Constants.ChunkSize;
+                                VERTX = (8 - cx) / 8.0f * Constants.ChunkSize;
+                                VERTX2 = (cx) / 8.0f * Constants.ChunkSize;
                             }
                             else
                             {
-                                VERTX = (Constants.ChunkSize / 8) * 7 * (cx / 7.0f) + Constants.ChunkSize / 8 / 2;
+                                VERTX = (Constants.ChunkSize / 8) * 7 * ((7 - cx) / 7.0f) + Constants.ChunkSize / 8 / 2;
+                                VERTX2 = (Constants.ChunkSize / 8) * 7 * ((cx) / 7.0f) + Constants.ChunkSize / 8 / 2;
                             }
 
-                            float VERTY = cy / 16.0f * Constants.ChunkSize;
-                            var vert = new Vector3(-VERTX - j * Constants.ChunkSize, 0, VERTY + i * Constants.ChunkSize);
+                            float VERTY = (16 - cy) / 16.0f * Constants.ChunkSize;
+                            float VERTY2 = (cy) / 16.0f * Constants.ChunkSize;
+                            var vert = new Vector3( VERTY + (Constants.ChunksInBlockX - i) * Constants.ChunkSize - 533.333333f - Constants.ChunkSize, VERTX + (Constants.ChunksInBlockY - j) * Constants.ChunkSize - 533.333333f - Constants.ChunkSize, 0);
                             vertices[k + globalVertexOffset] = vert;
-                            uvs[k + globalVertexOffset] = new Vector2(VERTX / Constants.ChunkSize, VERTY / Constants.ChunkSize);
+                            uvs[k + globalVertexOffset] = new Vector2(VERTX2 / Constants.ChunkSize, VERTY2 / Constants.ChunkSize);
                             k++;
                         }
                     }

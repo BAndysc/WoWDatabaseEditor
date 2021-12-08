@@ -182,6 +182,7 @@ namespace TheEngine
                 engine.renderManager.PrepareRendering(fb);
                 engine.renderManager.RenderWorld(fb);
                 Render(delta);
+                engine.Render();
                 engine.renderManager.FinalizeRendering(fb);
                 
                 if (engine.inputManager.Keyboard.JustPressed(Key.R))

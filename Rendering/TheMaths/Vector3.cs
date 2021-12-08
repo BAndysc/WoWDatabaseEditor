@@ -87,48 +87,48 @@ namespace TheMaths
         public static readonly Vector3 One = new Vector3(1.0f, 1.0f, 1.0f);
 
         /// <summary>
-        /// A unit <see cref="Vector3"/> designating up (0, 1, 0).
+        /// A unit <see cref="Vector3"/> designating up (0, 0, 1).
         /// </summary>
-        public static readonly Vector3 Up = new Vector3(0.0f, 1.0f, 0.0f);
+        public static readonly Vector3 Up = UnitZ;
 
         /// <summary>
-        /// A unit <see cref="Vector3"/> designating down (0, -1, 0).
+        /// A unit <see cref="Vector3"/> designating down (0, 0, -1).
         /// </summary>
-        public static readonly Vector3 Down = new Vector3(0.0f, -1.0f, 0.0f);
+        public static readonly Vector3 Down = -UnitZ;
 
         /// <summary>
-        /// A unit <see cref="Vector3"/> designating left (-1, 0, 0).
+        /// A unit <see cref="Vector3"/> designating left (0, 1, 0).
         /// </summary>
-        public static readonly Vector3 Left = new Vector3(-1.0f, 0.0f, 0.0f);
+        public static readonly Vector3 Left = UnitY;
 
         /// <summary>
-        /// A unit <see cref="Vector3"/> designating right (1, 0, 0).
+        /// A unit <see cref="Vector3"/> designating right (0, -1, 0).
         /// </summary>
-        public static readonly Vector3 Right = new Vector3(1.0f, 0.0f, 0.0f);
+        public static readonly Vector3 Right = -UnitY;
 
         /// <summary>
-        /// A unit <see cref="Vector3"/> designating forward in a right-handed coordinate system (0, 0, -1).
+        /// A unit <see cref="Vector3"/> designating forward in a right-handed coordinate system (1, 0, 0).
         /// </summary>
-        public static readonly Vector3 ForwardRH = new Vector3(0.0f, 0.0f, -1.0f);
+        public static readonly Vector3 ForwardRH = UnitX;
 
-        public static readonly Vector3 ForwardWoW = new Vector3(0.0f, 0.0f, 1);
-        public static readonly Vector3 RightWoW = new Vector3(-1.0f, 0.0f, 0);
-        public static readonly Vector3 UpWoW = new Vector3(0.0f, 1, 0);
-        
-        /// <summary>
-        /// A unit <see cref="Vector3"/> designating forward in a left-handed coordinate system (0, 0, 1).
-        /// </summary>
-        public static readonly Vector3 ForwardLH = new Vector3(0.0f, 0.0f, 1.0f);
+        public static readonly Vector3 ForwardWoW = UnitX;
+        public static readonly Vector3 RightWoW = Right;
+        public static readonly Vector3 UpWoW = UnitZ;
 
         /// <summary>
-        /// A unit <see cref="Vector3"/> designating backward in a right-handed coordinate system (0, 0, 1).
+        /// A unit <see cref="Vector3"/> designating forward in a left-handed coordinate system (-1, 0, 0).
         /// </summary>
-        public static readonly Vector3 BackwardRH = new Vector3(0.0f, 0.0f, 1.0f);
+        public static readonly Vector3 ForwardLH = UnitX;
 
         /// <summary>
-        /// A unit <see cref="Vector3"/> designating backward in a left-handed coordinate system (0, 0, -1).
+        /// A unit <see cref="Vector3"/> designating backward in a right-handed coordinate system (-1, 0, 0).
         /// </summary>
-        public static readonly Vector3 BackwardLH = new Vector3(0.0f, 0.0f, -1.0f);
+        public static readonly Vector3 BackwardRH = -UnitX;
+
+        /// <summary>
+        /// A unit <see cref="Vector3"/> designating backward in a left-handed coordinate system (1, 0, 0).
+        /// </summary>
+        public static readonly Vector3 BackwardLH = -UnitX;
 
         /// <summary>
         /// The X component of the vector.
@@ -307,6 +307,8 @@ namespace TheMaths
                 return new Vector3(X, Y, Z);
             }
         }
+
+        public Vector3 XZY => new Vector3(X, Z, Y);
 
         /// <summary>
         /// Creates an array containing the elements of the vector.
@@ -1925,6 +1927,11 @@ namespace TheMaths
         public Vector3 WithY(float y)
         {
             return new Vector3(X, y, Z);
+        }
+        
+        public Vector3 WithZ(float z)
+        {
+            return new Vector3(X, Y, z);
         }
     }
 }

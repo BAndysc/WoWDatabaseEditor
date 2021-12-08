@@ -98,19 +98,19 @@ namespace WDE.MapRenderer.Managers
             }
 
             float timeOfDay = (timeManager.Time.TotalMinutes + timeManager.MinuteFraction) / 1440.0f;
-            float angle = (timeOfDay - 2 / 24.0f) * (float)Math.PI * 2 ; // offset by 2 hours
+            float angle = (timeOfDay - 8 / 24.0f) * (float)Math.PI * 2;
             var sin = (float)Math.Sin(angle);
             var cos = (float)Math.Cos(angle);
-            Vector3 sunPosition = new Vector3(sin * 20, cos * 20, -cos * 10);
+            Vector3 sunPosition = new Vector3(0, -cos, sin);//sin * 30);//sin * 20, cos * 10, cos * 20);
             var sunForward = (Vector3.Zero - sunPosition).Normalized;
             var moonForward = -sunForward;
-            
+
             lightManager.MainLight.LightPosition = sunPosition;
             lightManager.MainLight.LightRotation = Quaternion.LookRotation(sunForward, Vector3.Up);
-            lightManager.MainLight.LightIntensity = Math.Max(Vector3.Dot(Vector3.Up, sunForward), 0);
+            lightManager.MainLight.LightIntensity = Math.Max(Vector3.Dot(Vector3.Down, sunForward), 0);
             
             lightManager.SecondaryLight.LightRotation = Quaternion.LookRotation(moonForward, Vector3.Up);
-            lightManager.SecondaryLight.LightIntensity = 0.5f * Math.Max(Vector3.Dot(Vector3.Up, moonForward), 0);
+            lightManager.SecondaryLight.LightIntensity = 0.5f * Math.Max(Vector3.Dot(Vector3.Down, moonForward), 0);
         }
 
         public void Render()

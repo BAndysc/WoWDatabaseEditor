@@ -77,6 +77,13 @@ namespace TheMaths
             this.Maximum = maximum;
         }
 
+        public static BoundingBox FromCenterSize(Vector3 center, Vector3 size)
+        {
+            var minimum = center - size / 2;
+            var maximum = center + size / 2;
+            return new BoundingBox(minimum, maximum);
+        }
+
         /// <summary>
         /// Returns the width of the bounding box
         /// </summary>

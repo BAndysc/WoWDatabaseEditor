@@ -13,7 +13,7 @@ namespace WDE.MapRenderer.Managers
         private readonly IInputManager inputManager;
         private readonly IUIManager uiManager;
         private float pitch;
-        private float yaw = 26.9f;
+        private float yaw = 26.9f + 90;
         
         public Vector3 Position { get; private set; }
         public Quaternion Rotation { get; private set; }
@@ -43,15 +43,15 @@ namespace WDE.MapRenderer.Managers
         {
             if (inputManager.Mouse.IsMouseDown(MouseButton.Right))
             {
-                yaw -= inputManager.Mouse.Delta.Y;
-                pitch -= inputManager.Mouse.Delta.X;
-                yaw = Math.Clamp(yaw, -89, 89);
+                yaw += inputManager.Mouse.Delta.Y;
+                pitch += inputManager.Mouse.Delta.X;
+                yaw = Math.Clamp(yaw, 0, 179);
             }
 
             Rotation = Quaternion.FromEuler(0, pitch, yaw);
-            var movement = inputManager.Keyboard.GetAxis(Vector3.ForwardWoW, Key.W, Key.S) + 
-                           inputManager.Keyboard.GetAxis(Vector3.RightWoW, Key.A, Key.D) + 
-                           inputManager.Keyboard.GetAxis(Vector3.UpWoW, Key.E, Key.Q);
+            var movement = inputManager.Keyboard.GetAxis(Vector3.Down, Key.W, Key.S) + 
+                           inputManager.Keyboard.GetAxis(Vector3.BackwardRH, Key.A, Key.D) + 
+                           inputManager.Keyboard.GetAxis(Vector3.Left, Key.E, Key.Q);
             movement.Normalize();
             float speed = 1 * (delta / 16.0f) * (inputManager.Keyboard.IsDown(Key.LeftShift) ? 15 : 1);
             Position += movement * Rotation * speed;

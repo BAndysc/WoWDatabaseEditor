@@ -105,7 +105,7 @@ namespace WDE.MpqReader.Structures
                 var x = (sbyte)reader.ReadByte();
                 var y = (sbyte)reader.ReadByte();
                 var z = (sbyte)reader.ReadByte();
-                Normals[i] = new Vector3(x / 127.0f, z / 127.0f, y / 127.0f);
+                Normals[i] = new Vector3(x / 127.0f, y / 127.0f, z / 127.0f);
             }
 
             reader.Offset = offsMCLY;
