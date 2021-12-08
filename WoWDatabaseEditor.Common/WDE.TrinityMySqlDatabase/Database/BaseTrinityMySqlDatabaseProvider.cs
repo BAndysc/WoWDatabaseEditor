@@ -319,14 +319,18 @@ namespace WDE.TrinityMySqlDatabase.Database
                     await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Id = entryOrGuid, ScriptName = "SmartTrigger"});
                     break;
                 case SmartScriptType.AreaTriggerEntity:
-                    await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == false)
-                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
-                        .UpdateAsync();
+                    throw new Exception(
+                                $"Trying to install gameobject script for guid {-entryOrGuid}, but this guid doesn't exist in gameobject table, so entry cannot be determined.");
+                    // await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == false)
+                    //     .Set(p => p.ScriptName, "SmartAreaTriggerAI")
+                    //     .UpdateAsync();
                     break;
                 case SmartScriptType.AreaTriggerEntityServerSide:
-                    await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == true)
-                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
-                        .UpdateAsync();
+                    throw new Exception(
+                                $"Trying to install gameobject script for guid {-entryOrGuid}, but this guid doesn't exist in gameobject table, so entry cannot be determined.");
+                    // await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == true)
+                    //     .Set(p => p.ScriptName, "SmartAreaTriggerAI")
+                    //     .UpdateAsync();
                     break;
             }
             

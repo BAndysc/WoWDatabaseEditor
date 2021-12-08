@@ -282,7 +282,7 @@ namespace WDE.TrinitySmartScriptEditor
         }
     }
     
-    [AutoRegisterToParentScopeAttribute]
+    // [AutoRegisterToParentScopeAttribute]
     public class SmartScriptAreaTriggerEntityListProvider : SmartScriptAreaTriggerEntityListProviderBase
     {
         public SmartScriptAreaTriggerEntityListProvider(
@@ -298,7 +298,7 @@ namespace WDE.TrinitySmartScriptEditor
             false) {}
     }
     
-    [AutoRegisterToParentScopeAttribute]
+    // [AutoRegisterToParentScopeAttribute]
     public class SmartScriptServerSideAreaTriggerEntityListProvider : SmartScriptAreaTriggerEntityListProviderBase
     {
         public SmartScriptServerSideAreaTriggerEntityListProvider(
