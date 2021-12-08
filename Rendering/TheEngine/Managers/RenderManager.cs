@@ -60,6 +60,8 @@ namespace TheEngine.Managers
 
         private Mesh currentMesh = null;
 
+        private Mesh lineMesh = null;
+        
         private Shader currentShader = null;
 
         private Archetype toRenderArchetype;
@@ -131,17 +133,22 @@ namespace TheEngine.Managers
             planeMesh = engine.MeshManager.CreateMesh(in ScreenPlane.Instance);
             engine.Device.device.CheckError("create mesh");
 
+            lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new int[]{});
+
             blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json");
             engine.Device.device.CheckError("load shader");
             blitMaterial = engine.MaterialManager.CreateMaterial(blitShader);
             blitMaterial.SetUniformInt("flipY", flipY ? 1 : 0);
 
-            //unlitMaterial = engine.MaterialManager.CreateMaterial(engine.ShaderManager.LoadShader("../internalShaders/unlit.shader"));
+            unlitMaterial = engine.MaterialManager.CreateMaterial("internalShaders/unlit.json");
+            unlitMaterial.ZWrite = false;
+            unlitMaterial.DepthTesting = DepthCompare.Always;
         }
 
         public void Dispose()
         {
             //outlineTexture.Dispose();
+            engine.meshManager.DisposeMesh(lineMesh);
             engine.meshManager.DisposeMesh(planeMesh);
             renderTexture.Dispose();
 
@@ -535,8 +542,13 @@ namespace TheEngine.Managers
                 worldToLocal = Matrix.Invert(localToWorld);
             
             Debug.Assert(inRenderingLoop);
-            material.Shader.Activate();
+            if (currentShader != material.Shader)
+            {
+                currentShader = material.Shader;
+                currentShader.Activate();
+            }
             EnableMaterial(material);
+            currentMesh = (Mesh)mesh;
             mesh.Activate();
             objectData.WorldMatrix = localToWorld;
             objectData.InverseWorldMatrix = worldToLocal.Value;
@@ -544,6 +556,24 @@ namespace TheEngine.Managers
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);
             engine.Device.DrawIndexed(count, start, 0);
+        }
+
+        public void DrawLine(Vector3 start, Vector3 end)
+        {
+            lineMesh.SetVertices(new Vector3[2]{start, end});
+            lineMesh.Rebuild();
+            if (currentShader != unlitMaterial.Shader)
+            {
+                currentShader = unlitMaterial.Shader;
+                currentShader.Activate();
+            }
+            EnableMaterial(unlitMaterial);
+            currentMesh = (Mesh)lineMesh;
+            lineMesh.Activate();
+            objectData.WorldMatrix = Matrix.Identity;
+            objectData.InverseWorldMatrix = Matrix.Identity;
+            objectBuffer.UpdateBuffer(ref objectData);
+            engine.Device.DrawLineMesh(2, 0);
         }
 
         public void Render(IMesh mesh, Material material, int submesh, Transform transform)
@@ -603,7 +633,7 @@ namespace TheEngine.Managers
             sceneData.ProjectionMatrix = proj;
             sceneData.LightPosition = engine.lightManager.MainLight.LightPosition;
             sceneData.CameraPosition = new Vector4(engine.CameraManager.MainCamera.Transform.Position, 1);
-            sceneData.LightDirection = new Vector4(Vector3.ForwardLH * engine.lightManager.MainLight.LightRotation, 0);
+            sceneData.LightDirection = new Vector4((Vector3.ForwardLH * engine.lightManager.MainLight.LightRotation).Normalized, 0);
             sceneData.LightColor = engine.lightManager.MainLight.LightColor.XYZ;
             sceneData.LightIntensity = engine.lightManager.MainLight.LightIntensity;
             sceneData.SecondaryLightDirection = new Vector4(Vector3.ForwardLH * engine.lightManager.SecondaryLight.LightRotation, 0);
@@ -637,6 +667,16 @@ namespace TheEngine.Managers
         public void UnregisterStaticRenderer(StaticRenderHandle handle)
         {
             engine.EntityManager.DestroyEntity(handle.Handle);
+        }
+    }
+
+    public static class Extensions
+    {
+        public static void DrawRay(this IRenderManager renderManager, Ray ray)
+        {
+            renderManager.DrawLine(ray.Position, ray.Position + ray.Direction);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Left * 0.5f, ray.Position + ray.Direction);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.ForwardWoW * 0.5f, ray.Position + ray.Direction);
         }
     }
 }

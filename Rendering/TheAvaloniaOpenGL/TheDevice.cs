@@ -177,6 +177,11 @@ namespace TheAvaloniaOpenGL
             //device.ImmediateContext.ClearRenderTargetView(renderTargetView, gray);
         }
 
+        public void DrawLineMesh(int verticesCount, int startLocation)
+        {
+            device.DrawArrays(PrimitiveType.Lines, startLocation, new IntPtr(verticesCount));
+        }
+        
         // call only form render thread
         public void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocation)
         {
