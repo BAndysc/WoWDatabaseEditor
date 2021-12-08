@@ -5,5 +5,6 @@ namespace TheEngine.ECS
         int Length { get; }
         Entity this[int index] { get; }
         ComponentDataAccess<T> DataAccess<T>() where T : unmanaged, IComponentData;
+        ManagedComponentDataAccess<T> ManagedDataAccess<T>() where T : IManagedComponentData;
     }
 }
