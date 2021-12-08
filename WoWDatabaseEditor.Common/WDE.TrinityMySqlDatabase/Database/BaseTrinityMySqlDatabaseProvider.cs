@@ -320,14 +320,14 @@ namespace WDE.TrinityMySqlDatabase.Database
                     break;
                 case SmartScriptType.AreaTriggerEntity:
                     throw new Exception(
-                                $"Trying to install gameobject script for guid {-entryOrGuid}, but this guid doesn't exist in gameobject table, so entry cannot be determined.");
+                                "New AreaTrigger system is currently (temporarily) not supported.");
                     // await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == false)
                     //     .Set(p => p.ScriptName, "SmartAreaTriggerAI")
                     //     .UpdateAsync();
                     break;
                 case SmartScriptType.AreaTriggerEntityServerSide:
                     throw new Exception(
-                                $"Trying to install gameobject script for guid {-entryOrGuid}, but this guid doesn't exist in gameobject table, so entry cannot be determined.");
+                                "New AreaTrigger system is currently (temporarily) not supported.");
                     // await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == true)
                     //     .Set(p => p.ScriptName, "SmartAreaTriggerAI")
                     //     .UpdateAsync();
