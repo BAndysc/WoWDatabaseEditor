@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TheAvaloniaOpenGL.Resources;
+using TheEngine.Components;
 using TheEngine.Data;
+using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
@@ -13,6 +15,7 @@ namespace TheEngine.Managers
     public class UIManager : IUIManager, System.IDisposable
     {
         private readonly Engine engine;
+        private readonly IEntityManager entityManager;
         private readonly ShaderHandle textShader;
         private readonly Material material;
         private readonly Material worldMaterial;
@@ -23,10 +26,24 @@ namespace TheEngine.Managers
         private Vector4[] glyphPositions = new Vector4[1];
 
         private float Scaling => engine.WindowHost.DpiScaling;
+
+        public class DrawTextData : IManagedComponentData
+        {
+            public string font;
+            public Vector2 pivot;
+            public string text;
+            public float fontSize;
+        }
+        
+        private Archetype persistentTextArchetype;
         
         public UIManager(Engine engine)
         {
+            persistentTextArchetype = entityManager.NewArchetype()
+                .WithManagedComponentData<DrawTextData>()
+                .WithComponentData<LocalToWorld>();
             this.engine = engine;
+            entityManager = engine.EntityManager;
             textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json");
             worldMaterial = engine.MaterialManager.CreateMaterial("internalShaders/world_text.json");
             worldMaterial.BlendingEnabled = true;
@@ -72,6 +89,18 @@ namespace TheEngine.Managers
             glyphPositionsBuffer.Dispose();
         }
 
+        internal void Render()
+        {
+            persistentTextArchetype.ForEach<LocalToWorld, DrawTextData>((itr, start, end, matrices, datas) =>
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    var data = datas[i];
+                    var matrix = matrices[i];
+                    DrawWorldText(data.font, data.pivot, data.text, data.fontSize, matrix);
+                }
+            });
+        }
 
         public void DrawBox(float x, float y, float w, float h, Vector4 color)
         {
@@ -84,6 +113,22 @@ namespace TheEngine.Managers
             glyphPositionsBuffer.UpdateBuffer(glyphPositions);
             glyphUVsBuffer.UpdateBuffer(glyphUVs);
             engine.RenderManager.RenderInstancedIndirect(quad, material, 0, 1);
+        }
+
+        public Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld)
+        {
+            var entity = entityManager.CreateEntity(persistentTextArchetype);
+
+            entityManager.SetManagedComponent(entity, new DrawTextData()
+            {
+                font = font,
+                fontSize = fontSize,
+                pivot = pivot,
+                text = text
+            });
+            entityManager.GetComponent<LocalToWorld>(entity).Matrix = localToWorld;
+            
+            return entity;
         }
 
         public void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld)

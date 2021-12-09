@@ -1,4 +1,5 @@
 using System;
+using TheEngine.ECS;
 using TheMaths;
 
 namespace TheEngine.Interfaces
@@ -12,6 +13,7 @@ namespace TheEngine.Interfaces
     
     public interface IUIManager
     {
+        Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld);
         void DrawWorldText(string font, Vector2 pivot, ReadOnlySpan<char> text, float fontSize, Matrix localToWorld);
         void DrawText(string font, ReadOnlySpan<char> text, float fontSize, float x, float y, float? maxWidth, Vector4 color);
         void DrawBox(float x, float y, float w, float h, Vector4 color);

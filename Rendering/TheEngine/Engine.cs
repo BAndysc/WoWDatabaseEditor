@@ -92,7 +92,7 @@ namespace TheEngine
 
         public void Render()
         {
-            
+            uiManager.Render();
         }
         
         public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size) where T : unmanaged => Device.CreateBuffer<T>(bufferType, size);
