@@ -19,6 +19,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Text="Path to DBC/DB2s" VerticalAlignment="Center" />
         <TextBox Margin="5" Grid.Column="1" Grid.Row="0"
@@ -34,7 +35,7 @@
         <TextBlock Text="DBC Locale" VerticalAlignment="Center" Grid.Row="2" />
         <ComboBox Name="dbcLocale" Grid.Row="2" Grid.Column="1" Margin="5" Padding="5"
                   VerticalAlignment="Center" HorizontalAlignment="Stretch"
-                  Items="{Binding DBCLocale}"
+                  Items="{Binding DBCLocales}"
                   SelectedItem="{Binding DBCLocale}" />
 
         <TextBlock Text="Skip loading dbc" VerticalAlignment="Center" Grid.Row="3" />
