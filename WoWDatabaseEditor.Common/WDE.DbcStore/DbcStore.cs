@@ -30,20 +30,20 @@ namespace WDE.DbcStore
     public enum DBCLocales
     {
         LANG_enUS = 0,
-        LANG_enGB = 1,
-        LANG_koKR = 2,
-        LANG_frFR = 3,
-        LANG_deDE = 4,
-        LANG_enCN = 5,
-        LANG_zhCN = 6,
-        LANG_enTW = 7,
-        LANG_zhTW = 8,
-        LANG_esES = 9,
-        LANG_esMX = 10,
-        LANG_ruRU = 11,
-        LANG_ptPT = 12,
-        LANG_ptBR = 13,
-        LANG_itIT = 14
+        LANG_enGB = LANG_enUS,
+        LANG_koKR = 1,
+        LANG_frFR = 2,
+        LANG_deDE = 3,
+        LANG_enCN = 4,
+        LANG_zhCN = LANG_enCN,
+        LANG_enTW = 5,
+        LANG_zhTW = LANG_enTW,
+        LANG_esES = 6,
+        LANG_esMX = 7,
+        LANG_ruRU = 8,
+        LANG_ptPT = 10,
+        LANG_ptBR = LANG_ptPT,
+        LANG_itIT = 11
     }
 
     [AutoRegister]
@@ -178,9 +178,14 @@ namespace WDE.DbcStore
                     foreachRow(entry);
             }
             
-            private void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary)
+            private void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary, bool useLocale = false)
             {
-                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetString(nameIndex + (int)dbcSettingsProvider.GetSettings().DBCLocale)));
+                int locale = (int) DBCLocales.LANG_enUS;
+
+                if (useLocale)
+                    locale = (int) dbcSettingsProvider.GetSettings().DBCLocale;
+
+                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetString(nameIndex + locale)));
             }
             
             private void Load(string filename, int id, int nameIndex, Dictionary<long, long> dictionary)
@@ -309,27 +314,27 @@ namespace WDE.DbcStore
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
                         max = 22;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
-                        Load("SkillLine.dbc", 0, 3, SkillStore);
-                        Load("Faction.dbc", 0, 23, FactionStore);
+                        Load("SkillLine.dbc", 0, 3, SkillStore, true);
+                        Load("Faction.dbc", 0, 23, FactionStore, true);
                         Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
-                        Load("Spell.dbc", 0, 136, SpellStore);
+                        Load("Spell.dbc", 0, 136, SpellStore, true);
                         Load("Movie.dbc", 0, 1, MovieStore);
-                        Load("Map.dbc", 0, 5, MapStore);
+                        Load("Map.dbc", 0, 5, MapStore, true);
                         Load("Map.dbc", 0, 1, MapDirectoryStore);
-                        Load("Achievement.dbc", 0, 4, AchievementStore);
-                        Load("AreaTable.dbc", 0, 11, AreaStore);
-                        Load("chrClasses.dbc", 0, 4, ClassStore);
-                        Load("chrRaces.dbc", 0, 14, RaceStore);
+                        Load("Achievement.dbc", 0, 4, AchievementStore, true);
+                        Load("AreaTable.dbc", 0, 11, AreaStore, true);
+                        Load("chrClasses.dbc", 0, 4, ClassStore, true);
+                        Load("chrRaces.dbc", 0, 14, RaceStore, true);
                         Load("Emotes.dbc", 0, 1, EmoteStore);
                         Load("EmotesText.dbc", 0, 1, TextEmoteStore);
                         Load("SoundEntries.dbc", 0, 2, SoundStore);
-                        Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore);
-                        Load("QuestInfo.dbc", 0, 1, QuestInfoStore);
-                        Load("CharTitles.dbc", 0, 2, CharTitleStore);
+                        Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore, true);
+                        Load("QuestInfo.dbc", 0, 1, QuestInfoStore, true);
+                        Load("CharTitles.dbc", 0, 2, CharTitleStore, true);
                         Load("CreatureModelData.dbc", 0, 2, CreatureModelDataStore);
                         Load("CreatureDisplayInfo.dbc", 0, 1, CreatureDisplayInfoStore);
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
-                        Load("Languages.dbc", 0, 1, LanguageStore);
+                        Load("Languages.dbc", 0, 1, LanguageStore, true);
                         break;
                     }
                     case DBCVersions.CATA_15595:
@@ -414,7 +419,6 @@ namespace WDE.DbcStore
                 switch (dbcSettingsProvider.GetSettings().DBCLocale)
                 {
                     case DBCLocales.LANG_enUS:
-                    case DBCLocales.LANG_enGB:
                         Validate(SpellStore, 1, "Word of Recall (OLD)");
                         break;
                     case DBCLocales.LANG_frFR:
