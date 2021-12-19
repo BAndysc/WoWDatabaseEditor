@@ -39,11 +39,11 @@ namespace TheEngine.Managers
         
         public UIManager(Engine engine)
         {
+            this.engine = engine;
+            entityManager = engine.EntityManager;
             persistentTextArchetype = entityManager.NewArchetype()
                 .WithManagedComponentData<DrawTextData>()
                 .WithComponentData<LocalToWorld>();
-            this.engine = engine;
-            entityManager = engine.EntityManager;
             textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json");
             worldMaterial = engine.MaterialManager.CreateMaterial("internalShaders/world_text.json");
             worldMaterial.BlendingEnabled = true;
