@@ -17,12 +17,14 @@ namespace WDE.DbcStore.ViewModels
         private DBCVersions dbcVersion;
         private string path;
         private bool skipLoading;
+        private DBCLocale dbcLocale;
 
         public DBCConfigViewModel(IDbcSettingsProvider dbcSettings, IWindowManager windowManager)
         {
             path = dbcSettings.GetSettings().Path;
             skipLoading = dbcSettings.GetSettings().SkipLoading;
             dbcVersion = dbcSettings.GetSettings().DBCVersion;
+            dbcLocale = dbcSettings.GetSettings().DBCLocale;
             
             PickFolder = new DelegateCommand(async () =>
             {
@@ -65,6 +67,16 @@ namespace WDE.DbcStore.ViewModels
             set
             {
                 SetProperty(ref dbcVersion, value);
+                IsModified = true;
+            }
+        }
+
+        public DBCLocale DBCLocale
+        {
+            get => dbcLocale;
+            set
+            {
+                SetProperty(ref dbcLocale, value);
                 IsModified = true;
             }
         }

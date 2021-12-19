@@ -27,6 +27,25 @@ namespace WDE.DbcStore
         SHADOWLANDS_41079 = 41079
     }
 
+    public enum DBCLocale
+    {
+        LANG_enUS = 0,
+        LANG_enGB = 1,
+        LANG_koKR = 2,
+        LANG_frFR = 3,
+        LANG_deDE = 4,
+        LANG_enCN = 5,
+        LANG_zhCN = 6,
+        LANG_enTW = 7,
+        LANG_zhTW = 8,
+        LANG_esES = 9,
+        LANG_esMX = 10,
+        LANG_ruRU = 11,
+        LANG_ptPT = 12,
+        LANG_ptBR = 13,
+        LANG_itIT = 14
+    }
+
     [AutoRegister]
     [SingleInstance]
     public class DbcStore : IDbcStore, ISpellService
@@ -166,7 +185,7 @@ namespace WDE.DbcStore
             
             private void Load(string filename, int id, int nameIndex, Dictionary<long, long> dictionary)
             {
-                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetInt(nameIndex)));
+                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetInt(nameIndex + (int) dbcSettingsProvider.GetSettings().DBCLocale)));
             }
 
             private void Load(string filename, string fieldName, Dictionary<long, string> dictionary)

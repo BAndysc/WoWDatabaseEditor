@@ -30,9 +30,15 @@
                   VerticalAlignment="Center" HorizontalAlignment="Stretch"
                   Items="{Binding DBCVersions}"
                   SelectedItem="{Binding DBCVersion}" />
+      
+        <TextBlock Text="DBC Locale" VerticalAlignment="Center" Grid.Row="2" />
+        <ComboBox Name="dbcLocale" Grid.Row="2" Grid.Column="1" Margin="5" Padding="5"
+                  VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                  Items="{Binding DBCLocale}"
+                  SelectedItem="{Binding DBCLocale}" />
 
-        <TextBlock Text="Skip loading dbc" VerticalAlignment="Center" Grid.Row="2" />
-        <CheckBox Grid.Column="1" IsChecked="{Binding SkipLoading}" Padding="0" Margin="0" Grid.Row="2"
+        <TextBlock Text="Skip loading dbc" VerticalAlignment="Center" Grid.Row="3" />
+        <CheckBox Grid.Column="1" IsChecked="{Binding SkipLoading}" Padding="0" Margin="0" Grid.Row="3"
                   HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </UserControl>
