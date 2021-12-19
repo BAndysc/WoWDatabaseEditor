@@ -55,4 +55,15 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+
+    <!-- this is a workaround to support .NET 6.0.101, remove it when `https://github.com/dotnet/runtime/issues/62840` is resolved -->
+    <Target Name="RemoveSystemRuntimeFromRefPack"
+            BeforeTargets="_HandlePackageFileConflicts"
+            Condition="'@(Reference -> WithMetadataValue('NugetPackageId', 'System.Runtime.Experimental'))' != ''">
+        <ItemGroup>
+            <Reference Remove="@(Reference)"
+                       Condition="$([System.String]::Copy(%(Reference.Identity)).Contains('System.Runtime.dll')) and
+                            '%(Reference.NuGetPackageId)' == 'Microsoft.NETCore.App.Ref'" />
+        </ItemGroup>
+    </Target>
 </Project>
