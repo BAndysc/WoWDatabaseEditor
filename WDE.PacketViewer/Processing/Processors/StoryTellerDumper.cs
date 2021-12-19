@@ -552,7 +552,7 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (updated.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
-                if (updated.Values.Ints.TryGetValue("UNIT_FIELD_HEALTH", out var hp) &&
+                if (updated.Values.TryGetInt("UNIT_FIELD_HEALTH", out var hp) &&
                     hp == 0)
                 {
                     var oldHp = updateObjectFollower.GetInt(updated.Guid, "UNIT_FIELD_HEALTH") ?? 1;
@@ -560,7 +560,7 @@ namespace WDE.PacketViewer.Processing.Processors
                         AppendLine(basePacket, updated.Guid, NiceGuid(updated.Guid) + " dies");
                 }
                 
-                if (updated.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var unitFlags))
+                if (updated.Values.TryGetInt("UNIT_FIELD_FLAGS", out var unitFlags))
                 {
                     long old = 0;
                     updateObjectFollower.TryGetIntOrDefault(updated.Guid, "UNIT_FIELD_FLAGS", out old);
@@ -621,7 +621,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         private void PrintValues(PacketBase basePacket, UniversalGuid guid, UpdateValues values, bool isUpdate)
         {
-            foreach (var val in values.Ints)
+            foreach (var val in values.Ints())
             {
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
                     continue;
@@ -651,7 +651,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 }
             }
             
-            foreach (var val in values.Floats)
+            foreach (var val in values.Floats())
             {
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
                     continue;
@@ -662,7 +662,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     AppendLine(basePacket, guid, $"     {val.Key} = {val.Value} (old: {intValue})", true);
             }
             
-            foreach (var val in values.Guids)
+            foreach (var val in values.Guids())
             {
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
                     continue;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using WDE.Module.Attributes;
+using WDE.PacketViewer.Utils;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
@@ -59,11 +60,11 @@ namespace WDE.PacketViewer.Processing.Processors
                     continue;
                 everCreated.Add(created.Guid);
                 var entity = entities[created.Guid] = new Entity();
-                foreach (var pair in created.Values.Ints)
+                foreach (var pair in created.Values.Ints())
                     entity.Ints[pair.Key] = pair.Value;
-                foreach (var pair in created.Values.Floats)
+                foreach (var pair in created.Values.Floats())
                     entity.Floats[pair.Key] = pair.Value;
-                foreach (var pair in created.Values.Guids)
+                foreach (var pair in created.Values.Guids())
                     entity.Guids[pair.Key] = pair.Value;
             }
             
@@ -74,11 +75,11 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (!entities.TryGetValue(updated.Guid, out var entity))
                     entity = entities[updated.Guid] = new();
                 
-                foreach (var pair in updated.Values.Ints)
+                foreach (var pair in updated.Values.Ints())
                     entity.Ints[pair.Key] = pair.Value;
-                foreach (var pair in updated.Values.Floats)
+                foreach (var pair in updated.Values.Floats())
                     entity.Floats[pair.Key] = pair.Value;
-                foreach (var pair in updated.Values.Guids)
+                foreach (var pair in updated.Values.Guids())
                     entity.Guids[pair.Key] = pair.Value;
             }
             return base.Process(basePacket, packet);

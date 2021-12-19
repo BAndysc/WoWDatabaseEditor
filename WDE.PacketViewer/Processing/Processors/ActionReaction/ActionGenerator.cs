@@ -295,9 +295,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                         create.Guid.Type != UniversalHighGuid.Vehicle)
                         continue;
                     
-                    bool _ = (!create.Values.Guids.TryGetValue("UNIT_FIELD_DEMON_CREATOR", out var summoner) &&
-                     !create.Values.Guids.TryGetValue("UNIT_FIELD_SUMMONEDBY", out summoner) &&
-                     !create.Values.Guids.TryGetValue("UNIT_FIELD_CREATEDBY", out summoner));
+                    bool _ = (!create.Values.TryGetGuid("UNIT_FIELD_DEMON_CREATOR", out var summoner) &&
+                     !create.Values.TryGetGuid("UNIT_FIELD_SUMMONEDBY", out summoner) &&
+                     !create.Values.TryGetGuid("UNIT_FIELD_CREATEDBY", out summoner));
                     yield return new ActionHappened()
                     {
                         Kind = ActionType.Summon,
@@ -308,7 +308,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                         EventLocation = unitPosition.GetPosition(create.Guid, basePacket.Time.ToDateTime()),
                         Time = basePacket.Time.ToDateTime(),
                         TimeFactor = 0.25f,
-                        CustomEntry = create.Values.Ints.TryGetValue("UNIT_CREATED_BY_SPELL", out var spellSummon) ? (int)spellSummon : null
+                        CustomEntry = create.Values.TryGetInt("UNIT_CREATED_BY_SPELL", out var spellSummon) ? (int)spellSummon : null
                     };
                 }
                 else
@@ -447,7 +447,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     };
                 }
                 
-                if (update.Values.Ints.TryGetValue("GAMEOBJECT_BYTES_1", out var bytes1)
+                if (update.Values.TryGetInt("GAMEOBJECT_BYTES_1", out var bytes1)
                     && updateObjectFollower.TryGetInt(update.Guid, "GAMEOBJECT_BYTES_1", out var oldBytes))
                 {
                     var oldState = oldBytes & 0xFF;
@@ -470,7 +470,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
         private bool FieldChanged(UpdateObject update, string field, out long newValue)
         {
-            if (update.Values.Ints.TryGetValue(field, out newValue) &&
+            if (update.Values.TryGetInt(field, out newValue) &&
                 updateObjectFollower.TryGetInt(update.Guid, field, out var oldValue) &&
                 newValue != oldValue)
                 return true;
@@ -481,7 +481,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         
         private bool FlagChanged(UpdateObject update, string field, long flag, out bool added, out bool removed)
         {
-            if (update.Values.Ints.TryGetValue(field, out var current) &&
+            if (update.Values.TryGetInt(field, out var current) &&
                 updateObjectFollower.TryGetIntOrDefault(update.Guid, field, out var oldValue) &&
                 current != oldValue &&
                 (current & flag) != (oldValue & flag))

@@ -89,7 +89,7 @@ namespace WDE.PacketViewer.Processing.Processors
             if (state.InCombat)
                 return true;
 
-            if (packet.PackedPoints.Count + packet.Points.Count == 0)
+            if (packet.PackedPoints.Count + packet.Points.Count == 0 || packet.Points.Count == 0)
                 return true;
 
             //if (packet.PackedPoints.Count == 0 && packet.Points.Count == 1 &&
@@ -186,13 +186,13 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             foreach (var create in packet.Created)
             {
-                if (create.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var flags))
+                if (create.Values.TryGetInt("UNIT_FIELD_FLAGS", out var flags))
                     Get(create.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
             }
             
             foreach (var update in packet.Updated)
             {
-                if (update.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var flags))
+                if (update.Values.TryGetInt("UNIT_FIELD_FLAGS", out var flags))
                     Get(update.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
             }
 

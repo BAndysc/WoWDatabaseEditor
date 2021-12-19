@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Runtime.Versioning;
 using WDE.Module.Attributes;
+using WDE.PacketViewer.Utils;
 using WDE.PacketViewer.Utils.IntervalTrees;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
@@ -139,12 +140,12 @@ public class UpdateFieldsHistory : PacketProcessor<Unit>, IUpdateFieldsHistory
             state.FinalizeState(basePacket.Number - 1);
             state.pendingState = (create.CreateType == CreateObjectType.Spawn ? SniffObjectState.Spawned : SniffObjectState.InRange, basePacket.Number);
             
-            foreach (var intVal in create.Values.Ints)
+            foreach (var intVal in create.Values.Ints())
             {
                 state.pendingIntChanges[intVal.Key] = (intVal.Value, basePacket.Number);
             }
             
-            foreach (var floatVal in create.Values.Floats)
+            foreach (var floatVal in create.Values.Floats())
             {
                 state.pendingFloatChanges[floatVal.Key] = (floatVal.Value, basePacket.Number);
             }
@@ -156,13 +157,13 @@ public class UpdateFieldsHistory : PacketProcessor<Unit>, IUpdateFieldsHistory
                 continue;
             
             var state = GetState(update.Guid);
-            foreach (var intVal in update.Values.Ints)
+            foreach (var intVal in update.Values.Ints())
             {
                 state.FinalizeInt(intVal.Key, basePacket.Number - 1);
                 state.pendingIntChanges[intVal.Key] = (intVal.Value, basePacket.Number);
             }
             
-            foreach (var floatVal in update.Values.Floats)
+            foreach (var floatVal in update.Values.Floats())
             {
                 state.FinalizeFloat(floatVal.Key, basePacket.Number - 1);
                 state.pendingFloatChanges[floatVal.Key] = (floatVal.Value, basePacket.Number);

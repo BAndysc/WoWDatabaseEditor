@@ -582,7 +582,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 }
                 #endif
                 
-                create.Values.Guids.TryGetValue("UNIT_FIELD_DEMON_CREATOR", out var summoner);
+                create.Values.TryGetGuid("UNIT_FIELD_DEMON_CREATOR", out var summoner);
                 Event(basePacket, EventType.Spawned)
                     .AddActor(create.Guid)
                     .AddActor(summoner)
@@ -592,7 +592,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             
             foreach (var update in packet.Updated)
             {
-                if (update.Values.Ints.TryGetValue("UNIT_FIELD_HEALTH", out var hp) && hp == 0)
+                if (update.Values.TryGetInt("UNIT_FIELD_HEALTH", out var hp) && hp == 0)
                 {
                     Event(basePacket, EventType.Death)
                         .SetDescription($"Unit {update.Guid.ToWowParserString()} dies")
@@ -628,7 +628,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 }
                 
 
-                if (update.Values.Ints.TryGetValue("GAMEOBJECT_BYTES_1", out var bytes1)
+                if (update.Values.TryGetInt("GAMEOBJECT_BYTES_1", out var bytes1)
                     && updateObjectFollower.TryGetInt(update.Guid, "GAMEOBJECT_BYTES_1", out var oldBytes))
                 {
                     var oldState = oldBytes & 0xFF;
@@ -654,7 +654,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 
         private bool FieldChanged(UpdateObject update, string field, out long newValue)
         {
-            if (update.Values.Ints.TryGetValue(field, out newValue) &&
+            if (update.Values.TryGetInt(field, out newValue) &&
                 updateObjectFollower.TryGetIntOrDefault(update.Guid, field, out var oldValue) &&
                 newValue != oldValue)
                 return true;
@@ -665,7 +665,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         
         private bool FlagChanged(UpdateObject update, string field, long flag, out bool added, out bool removed)
         {
-            if (update.Values.Ints.TryGetValue(field, out var current) &&
+            if (update.Values.TryGetInt(field, out var current) &&
                 updateObjectFollower.TryGetIntOrDefault(update.Guid, field, out var oldValue) &&
                 current != oldValue &&
                 (current & flag) != (oldValue & flag))
