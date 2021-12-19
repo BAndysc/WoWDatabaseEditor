@@ -2415,7 +2415,18 @@
 			"1": {"name": "can run"},
 			"2": {"name": "always run"}
 		}
+	},
+	"VisibilityDistanceTypeParameter": {
+		"name": "Visibility distance type",
+		"values": {
+			"0": {"name": "normal (100yd)"},
+			"1": {"name": "tiny (25yd)"},
+			"2": {"name": "small (50yd)"},
+			"3": {"name": "large (200yd)"},
+			"4": {"name": "gigantic (400yd)"},
+			"5": {"name": "infinite (533yd)"}
+		}
 	}
-
+	
 	
 }

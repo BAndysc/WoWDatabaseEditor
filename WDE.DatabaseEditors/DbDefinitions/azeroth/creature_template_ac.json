@@ -227,10 +227,10 @@
           "value_type": "EmoteParameter"
         },
         {
-          "name": "Is large",
-          "db_column_name": "isLarge",
+          "name": "Visibility Distance Type",
+          "db_column_name": "visibilityDistanceType",
           "foreign_table": "creature_template_addon",
-          "value_type": "BoolParameter"
+          "value_type": "VisibilityDistanceTypeParameter"
         },
         {
           "name": "Auras",
