@@ -22,8 +22,6 @@ namespace TheEngine.Managers
         private Vector4[] glyphUVs = new Vector4[1];
         private Vector4[] glyphPositions = new Vector4[1];
 
-        private float Scaling => engine.WindowHost.DpiScaling;
-        
         public UIManager(Engine engine)
         {
             this.engine = engine;
@@ -238,7 +236,7 @@ namespace TheEngine.Managers
                 this.uiManager = uiManager;
                 this.str = str;
                 this.font = font;
-                this.size = size * uiManager.Scaling;
+                this.size = size;
                 this.color = color;
             }
             
@@ -369,10 +367,10 @@ namespace TheEngine.Managers
             {
                 this.uiManager = uiManager;
                 this.color = color;
-                this.padding = padding * uiManager.Scaling;
+                this.padding = padding;
                 this.child = child;
-                this.minWidth = minWidth * uiManager.Scaling;
-                this.minHeight = minHeight * uiManager.Scaling;
+                this.minWidth = minWidth;
+                this.minHeight = minHeight;
             }
 
             public Vector2 Measure()

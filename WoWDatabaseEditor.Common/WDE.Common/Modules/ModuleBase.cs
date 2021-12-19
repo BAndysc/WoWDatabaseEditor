@@ -40,6 +40,7 @@ namespace WDE.Module
         
         protected void AutoRegisterByConvention(Assembly assembly, IContainerRegistry containerRegistry)
         {
+            IUnityContainer unityContainer = ((IContainerExtension<IUnityContainer>)containerRegistry).Instance;
             var defaultRegisters = assembly.GetTypes().Where(t => !t.IsAbstract && t.IsDefined(typeof(AutoRegisterAttribute), true));
 
             foreach (Type register in defaultRegisters)

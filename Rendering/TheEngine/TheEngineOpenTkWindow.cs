@@ -226,7 +226,6 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     protected override void OnResize(ResizeEventArgs e)
     {
         TryGetCurrentMonitorScale(out var scaleX, out var scaleY);
-        DpiScaling = scaleX;
         WindowWidth = e.Width * scaleX;
         WindowHeight = e.Height * scaleY;
         base.OnResize(e);
@@ -234,5 +233,4 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     public float WindowWidth { get; private set; }
     public float WindowHeight { get; private set; }
-    public float DpiScaling { get; private set; }
 }

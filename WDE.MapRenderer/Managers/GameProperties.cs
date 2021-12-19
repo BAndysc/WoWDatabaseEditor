@@ -6,13 +6,13 @@ namespace WDE.MapRenderer.Managers;
 [UniqueProvider]
 public interface IGameProperties
 {
-    bool OverrideLighting { get; }
-    bool DisableTimeFlow { get; }
-    int TimeSpeedMultiplier { get; }
-    bool ShowGrid { get; }
+    bool OverrideLighting { get; set; }
+    bool DisableTimeFlow { get; set; }
+    int TimeSpeedMultiplier { get; set; }
+    bool ShowGrid { get; set; }
     Time CurrentTime { get; set; }
-    float ViewDistanceModifier { get; }
-    bool ShowAreaTriggers { get; }
+    float ViewDistanceModifier { get; set; }
+    bool ShowAreaTriggers { get; set; }
 }
 
 [AutoRegister]
