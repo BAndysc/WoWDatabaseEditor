@@ -27,7 +27,7 @@ namespace WDE.DbcStore
         SHADOWLANDS_41079 = 41079
     }
 
-    public enum DBCLocale
+    public enum DBCLocales
     {
         LANG_enUS = 0,
         LANG_enGB = 1,
@@ -180,12 +180,12 @@ namespace WDE.DbcStore
             
             private void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary)
             {
-                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetString(nameIndex)));
+                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetString(nameIndex + (int)dbcSettingsProvider.GetSettings().DBCLocale)));
             }
             
             private void Load(string filename, int id, int nameIndex, Dictionary<long, long> dictionary)
             {
-                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetInt(nameIndex + (int) dbcSettingsProvider.GetSettings().DBCLocale)));
+                Load(filename, row => dictionary.Add(row.GetInt(id), row.GetInt(nameIndex)));
             }
 
             private void Load(string filename, string fieldName, Dictionary<long, string> dictionary)
@@ -410,7 +410,19 @@ namespace WDE.DbcStore
                     default:
                         return;
                 }
-                Validate(SpellStore, 1, "Word of Recall (OLD)");
+
+                switch (dbcSettingsProvider.GetSettings().DBCLocale)
+                {
+                    case DBCLocales.LANG_enUS:
+                    case DBCLocales.LANG_enGB:
+                        Validate(SpellStore, 1, "Word of Recall (OLD)");
+                        break;
+                    case DBCLocales.LANG_frFR:
+                        Validate(SpellStore, 1, "Mot de rappel (OLD)");
+                        break;
+                    default:
+                        return;
+                }
             }
 
             private void Validate(Dictionary<long,string> dict, int id, string expectedName)

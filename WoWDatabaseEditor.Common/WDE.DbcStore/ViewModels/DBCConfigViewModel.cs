@@ -17,7 +17,7 @@ namespace WDE.DbcStore.ViewModels
         private DBCVersions dbcVersion;
         private string path;
         private bool skipLoading;
-        private DBCLocale dbcLocale;
+        private DBCLocales dbcLocale;
 
         public DBCConfigViewModel(IDbcSettingsProvider dbcSettings, IWindowManager windowManager)
         {
@@ -34,11 +34,12 @@ namespace WDE.DbcStore.ViewModels
             });
             Save = new DelegateCommand(() =>
             {
-                dbcSettings.UpdateSettings(new DBCSettings {Path = Path, SkipLoading = SkipLoading, DBCVersion = DBCVersion});
+                dbcSettings.UpdateSettings(new DBCSettings {Path = Path, SkipLoading = SkipLoading, DBCVersion = DBCVersion, DBCLocale = DBCLocale});
                 IsModified = false;
             });
 
             DBCVersions = new ObservableCollection<DBCVersions>(Enum.GetValues<DBCVersions>());
+            DBCLocales = new ObservableCollection<DBCLocales>(Enum.GetValues<DBCLocales>());
         }
 
         public string Path
@@ -71,7 +72,7 @@ namespace WDE.DbcStore.ViewModels
             }
         }
 
-        public DBCLocale DBCLocale
+        public DBCLocales DBCLocale
         {
             get => dbcLocale;
             set
@@ -91,6 +92,7 @@ namespace WDE.DbcStore.ViewModels
         }
         
         public ObservableCollection<DBCVersions> DBCVersions { get; }
+        public ObservableCollection<DBCLocales> DBCLocales { get; }
         
         public string Name => "DBC";
 
