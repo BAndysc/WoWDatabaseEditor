@@ -75,7 +75,7 @@ namespace WDE.DbcStore.FastReader
                 var start = (int)(parent.stringsOffsetInBytes + GetUInt(field));
                 var zeroByteIndex = start;
                 while (parent.bytes[zeroByteIndex++] != 0) ;
-                return zeroByteIndex <= start ? "" : Encoding.ASCII.GetString(parent.bytes, start, zeroByteIndex - start - 1);
+                return zeroByteIndex <= start ? "" : Encoding.UTF8.GetString(parent.bytes, start, zeroByteIndex - start - 1);
             }
         }
 
