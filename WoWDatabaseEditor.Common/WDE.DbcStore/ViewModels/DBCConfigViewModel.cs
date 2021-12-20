@@ -8,11 +8,12 @@ using WDE.Common.Managers;
 using WDE.DbcStore.Data;
 using WDE.DbcStore.Providers;
 using WDE.Module.Attributes;
+using WDE.MVVM;
 
 namespace WDE.DbcStore.ViewModels
 {
     [AutoRegister]
-    public class DBCConfigViewModel : BindableBase, IConfigurable
+    public class DBCConfigViewModel : ObservableBase, IConfigurable
     {
         private DBCVersions dbcVersion;
         private string path;
@@ -40,7 +41,11 @@ namespace WDE.DbcStore.ViewModels
 
             DBCVersions = new ObservableCollection<DBCVersions>(Enum.GetValues<DBCVersions>());
             DBCLocales = new ObservableCollection<DBCLocales>(Enum.GetValues<DBCLocales>());
+            
+            Watch(() => DBCVersion, () => CanPickLocale);
         }
+        
+        public bool CanPickLocale => DBCVersion == global::WDE.DbcStore.DBCVersions.WOTLK_12340;
 
         public string Path
         {

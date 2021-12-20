@@ -3,12 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:data="clr-namespace:WDE.DbcStore"
-             xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:viewModels="clr-namespace:WDE.DbcStore.ViewModels;assembly=WDE.DbcStore"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
+             x:DataType="viewModels:DBCConfigViewModel"
              mc:Ignorable="d">
-    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -23,23 +22,24 @@
         </Grid.RowDefinitions>
         <TextBlock Text="Path to DBC/DB2s" VerticalAlignment="Center" />
         <TextBox Margin="5" Grid.Column="1" Grid.Row="0"
-                 Text="{Binding Path, Mode=TwoWay}" Padding="5" Name="Path" />
-        <Button Grid.Column="2" Grid.Row="0" Padding="5" VerticalAlignment="Center" Command="{Binding PickFolder}">...</Button>
+                 Text="{CompiledBinding Path, Mode=TwoWay}" Padding="5" Name="Path" />
+        <Button Grid.Column="2" Grid.Row="0" Padding="5" VerticalAlignment="Center" Command="{CompiledBinding PickFolder}">...</Button>
 
         <TextBlock Text="DBC/DB2 Version" VerticalAlignment="Center" Grid.Row="1" />
         <ComboBox Name="dbcVersion" Grid.Row="1" Grid.Column="1" Margin="5" Padding="5"
                   VerticalAlignment="Center" HorizontalAlignment="Stretch"
-                  Items="{Binding DBCVersions}"
-                  SelectedItem="{Binding DBCVersion}" />
+                  Items="{CompiledBinding DBCVersions}"
+                  SelectedItem="{CompiledBinding DBCVersion}" />
       
         <TextBlock Text="DBC Locale" VerticalAlignment="Center" Grid.Row="2" />
         <ComboBox Name="dbcLocale" Grid.Row="2" Grid.Column="1" Margin="5" Padding="5"
                   VerticalAlignment="Center" HorizontalAlignment="Stretch"
-                  Items="{Binding DBCLocales}"
-                  SelectedItem="{Binding DBCLocale}" />
+                  Items="{CompiledBinding DBCLocales}"
+                  IsEnabled="{CompiledBinding CanPickLocale}"
+                  SelectedItem="{CompiledBinding DBCLocale}" />
 
         <TextBlock Text="Skip loading dbc" VerticalAlignment="Center" Grid.Row="3" />
-        <CheckBox Grid.Column="1" IsChecked="{Binding SkipLoading}" Padding="0" Margin="0" Grid.Row="3"
+        <CheckBox Grid.Column="1" IsChecked="{CompiledBinding SkipLoading}" Padding="0" Margin="0" Grid.Row="3"
                   HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </UserControl>
