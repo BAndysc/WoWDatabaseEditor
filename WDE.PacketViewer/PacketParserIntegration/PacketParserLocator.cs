@@ -24,6 +24,13 @@ namespace WDE.PacketViewer.PacketParserIntegration
             located = true;
             return new[]
                 {
+#if DEBUG
+                    @"..\..\..\WowPacketParser\WowPacketParser\bin\Debug\WowPacketParser.exe",
+                    @"../../../WowPacketParser/WowPacketParser/bin/Debug/WowPacketParser.dll",
+#endif
+                    @"..\..\..\WowPacketParser\WowPacketParser\bin\Release\WowPacketParser.exe",
+                    @"../../../WowPacketParser/WowPacketParser/bin/Release/WowPacketParser.dll",
+                    
                     @"WoWPacketParser\WowPacketParser.exe",
                     @"WoWPacketParser/WowPacketParser.dll",
                     @"WowPacketParser.exe",
@@ -32,17 +39,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
                     
                     @"parser/WowPacketParser.exe",
                     @"parser/WowPacketParser",
-                    @"parser/WowPacketParser.dll",
-                    
-                    @"..\..\..\..\WowPacketParser\WowPacketParser\bin\Debug\WowPacketParser.exe",
-                    @"../../../../WowPacketParser/WowPacketParser/bin/Debug/WowPacketParser.dll",
-                    @"..\..\..\..\WowPacketParser\WowPacketParser\bin\Release\WowPacketParser.exe",
-                    @"../../../../WowPacketParser/WowPacketParser/bin/Release/WowPacketParser.dll",
-                    
-                    @"..\..\..\WowPacketParser\WowPacketParser\bin\Debug\WowPacketParser.exe",
-                    @"../../../WowPacketParser/WowPacketParser/bin/Debug/WowPacketParser.dll",
-                    @"..\..\..\WowPacketParser\WowPacketParser\bin\Release\WowPacketParser.exe",
-                    @"../../../WowPacketParser/WowPacketParser/bin/Release/WowPacketParser.dll"
+                    @"parser/WowPacketParser.dll"
                 }
                 .Select(Path.GetFullPath)
                 .FirstOrDefault(File.Exists);
