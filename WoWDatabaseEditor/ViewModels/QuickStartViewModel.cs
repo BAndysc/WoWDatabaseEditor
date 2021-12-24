@@ -156,7 +156,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 DismissCommand.Execute(null);
             });
             
-            parameterFactory.OnRegister().SubscribeAction(_ =>
+            parameterFactory.OnRegister().Safe().SubscribeAction(_ =>
             {
                 ReloadMruList();
             });
