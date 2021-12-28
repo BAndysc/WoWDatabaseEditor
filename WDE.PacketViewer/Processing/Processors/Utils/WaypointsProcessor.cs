@@ -74,6 +74,7 @@ namespace WDE.PacketViewer.Processing.Processors
     {
         private Dictionary<int, int> PacketToOriginalSplinePacket { get; } = new();
         public Dictionary<UniversalGuid, IWaypointProcessor.UnitMovementState> State { get; } = new();
+        private HashSet<UniversalGuid> notRandom = new();
 
         private IWaypointProcessor.UnitMovementState Get(UniversalGuid guid)
         {
@@ -89,6 +90,13 @@ namespace WDE.PacketViewer.Processing.Processors
             if (state.InCombat)
                 return true;
 
+            if ((packet.Flags & UniversalSplineFlag.Parabolic) != 0  ||
+                (packet.Jump != null && packet.Jump.Gravity > 0) ||
+                (packet.Flags & UniversalSplineFlag.TransportEnter) != 0)
+            {
+                notRandom.Add(packet.Mover);
+            }
+            
             if (packet.PackedPoints.Count + packet.Points.Count == 0 || packet.Points.Count == 0)
                 return true;
 
@@ -218,6 +226,9 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public float RandomMovementPacketRatio(UniversalGuid guid)
         {
+            if (notRandom.Contains(guid))
+                return 0;
+            
             if (!State.TryGetValue(guid, out var state))
                 return -1;
 

@@ -384,6 +384,13 @@ namespace WDE.PacketViewer.Processing.Processors
                 sb.Append("enters " +
                           (packet.TransportGuid.Type == UniversalHighGuid.Vehicle ? "vehicle" : "transport") + " " +
                           NiceGuid(packet.TransportGuid) + " on seat " + packet.VehicleSeat);
+            else if (packet.Flags.HasFlag(UniversalSplineFlag.Parabolic) &&
+                     packet.Points.Count == 1 && packet.PackedPoints.Count == 0 &&
+                     packet.Jump != null)
+            {
+                var dest = packet.Points[0];
+                sb.Append($"jumps to ({dest.X}, {dest.Y}, {dest.Z}) with gravity {packet.Jump.Gravity}");
+            }
             else if (packet.Flags.HasFlag(UniversalSplineFlag.TransportExit))
                 sb.Append("exits vehicle/transport");
             else if (packet.Points.Count > 0)
@@ -444,6 +451,16 @@ namespace WDE.PacketViewer.Processing.Processors
                         sb.AppendLine($" with destination ({packet.Points[0].X}, {packet.Points[0].Y}, {packet.Points[0].Z})");
                     }
                 }*/
+                
+                
+                if (packet.Jump != null && (packet.Flags & UniversalSplineFlag.Parabolic) != 0)
+                {
+                    if (sb.Length > 0)
+                        sb.Append("\n    then ");
+                
+                    sb.Append($"after [special time] jump with gravity {packet.Jump.Gravity}");
+                    sb.Append("\n    (explanation: this packet is both a path and a jump. Check the packet text view manually, because story teller doesn't support it fully)");
+                }
             }
 
             var skipOrientation = lastPathSegmentHadOrientation &&
@@ -459,7 +476,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookPosition)
                     sb.Append($"looks at ({packet.LookPosition.X}, {packet.LookPosition.Y}, {packet.LookPosition.Z})");   
             }
-
+            
             if (sb.Length == 0)
                 sb.Append("stops");
 
