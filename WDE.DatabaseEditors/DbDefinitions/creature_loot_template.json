@@ -45,9 +45,9 @@
           "default": 100
         },
         {
-          "name": "Quest Required",
+          "name": "Is Quest Required",
           "db_column_name": "QuestRequired",
-          "value_type": "QuestParameter"
+          "value_type": "BoolParameter"
         },
         {
           "name": "Loot Mode",
