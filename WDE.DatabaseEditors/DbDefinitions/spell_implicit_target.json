@@ -45,7 +45,8 @@
         {
           "name": "Spell effect",
           "db_column_name": "spell_effect",
-          "value_type": "SpellEffectMaskParameter"
+          "value_type": "SpellEffectMaskNo0Parameter",
+          "default": 7
         },
         {
           "is_condition": true,

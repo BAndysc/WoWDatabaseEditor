@@ -17,6 +17,16 @@
 			"4": {"name": "EFFECT_2"}
 		}
 	},
+	"SpellEffectMaskNo0Parameter": {
+		"name": "Spell effect masks",
+		"isflag": true,
+		"values": {
+			"0": {"name": "(invalid)"},
+			"1": {"name": "EFFECT_0"},
+			"2": {"name": "EFFECT_1"},
+			"4": {"name": "EFFECT_2"}
+		}
+	},
 	"AuraEffectModeHandleMaskParameter": {
 		"isflag": true,
 		"name": "Aura effect handle modes",
