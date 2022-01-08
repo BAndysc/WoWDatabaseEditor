@@ -29,6 +29,6 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
         public string Name { get; set; } = "";
         
         [Column(Name = "VerifiedBuild")]
-        public short? VerifiedBuild { get; set; }
+        public int? VerifiedBuild { get; set; }
     }
 }
