@@ -126,7 +126,7 @@
     {
         "date": "July 2021",
         "content": [
-            "July brought to us 'wizards'. A wizard for easy adding commands (including permissions) and a wizard for database strings. It is not a feature for everyone, but it can really save some time.",
+            "July brought to us 'wizards'. But don't worry, there is no magic involved. A wizard for easy adding commands (including permissions) and a wizard for database strings. It is not a feature for everyone, but it can really save some time.",
             "img:images/2021_07_06_wizards.png"
         ]
     },
