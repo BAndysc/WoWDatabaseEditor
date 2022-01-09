@@ -60,6 +60,15 @@
             img.src = text.substr(4)
             content.appendChild(img)
           }
+          else if (text.startsWith("link:"))
+          {
+            let a = document.createElement("a")
+            let p = document.createElement("p")
+            p.appendChild(a)
+            a.href = text.split('|')[1]
+            a.innerText = text.substr(5).split('|')[0]
+            content.appendChild(p)
+          }
           else {
             let p = document.createElement("p")
             p.innerHTML = text
