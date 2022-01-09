@@ -10,7 +10,7 @@
         "date": "What is WoW Database Editor?",
         "skip": true,
         "content": [
-            "Before we start the history journey, short introduction if you don't know what WoW Database Editor is.",
+            "Before we start the history journey, a short introduction if you don't know what WoW Database Editor is.",
             "WoW Database Editor (WDE) is an integrated development environment (IDE), an editor for Smart Scripts and a lot of other tables for TrinityCore based servers. It also has a 3D world viewer.",
             "With this editor, you can edit NPCs, edit creature texts, edit gossips, edit creature scripts and more!",
             "link:Download here|https://github.com/BAndysc/WoWDatabaseEditor/releases/latest"
