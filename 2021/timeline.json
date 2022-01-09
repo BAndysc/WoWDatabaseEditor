@@ -206,5 +206,15 @@
             "",
             "Special thanks again to Atlantiss and Tauri"
         ]
+    },
+    {
+        "date": "✍️ Guestbook form",
+        "skipWeb": true,
+        "content": [
+            "Do you have anything you would like to share? Any feedback, opinion, how you use the editor, how it helps you? Please, leave your comment here!",
+            "(everyone else will see your comment!)",
+            "guestform:",
+            "(note: all comments are moderated before publishing, so don't bother with spam 😜)"
+        ]
     }
 ]

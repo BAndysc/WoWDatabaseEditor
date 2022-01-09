@@ -44,6 +44,8 @@
 
       let timeline = document.body.getElementsByClassName("timeline")[0]
       for (let d of data) {
+        if (d.skipWeb) 
+          continue
         let container = document.createElement("div")
         container.classList.add("container")
         let content = document.createElement("div")
