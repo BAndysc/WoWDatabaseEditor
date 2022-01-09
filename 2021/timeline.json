@@ -69,7 +69,8 @@
         "date": "March 2021",
         "bg": "images/ats_tauri.svg",
         "content": [
-            "Since March I started working with Atlantiss team again. It is only thanks to Atlantiss that the editor is in active development! Hats off!"
+            "Since March I started working with Atlantiss team again. It is only thanks to Atlantiss that the editor is in active development! Hats off!",
+            "img:images/atstauri.png"
         ]
     },
     {
@@ -181,9 +182,11 @@
         "date": "December 2021",
         "bg": "images/sf.svg",
         "content": [
+            "img:images/sf.png",
             "Atlantiss and Tauri together creates a new brand - Stormforge. Does it matter for the editor? Yes it does, thanks to this the application can be still developed!",
             "img:https://stormforge.gg/storage/news/covers/O2lXfasTZ0qvt6vq6iFZxuQgXvdmMUXNRDtZYkcL.jpg",
-            "Stormforge is a new platform by Tauri and Atlantiss teams that intends to offer multiple WoW realms of different expansions starting with a fresh Mists of Pandaria server and adding more from 2022 onwards. If you’d like to know more about the project, check stormforge.gg"
+            "Stormforge is a new platform by Tauri and Atlantiss teams that intends to offer multiple WoW realms of different expansions starting with a fresh Mists of Pandaria server and adding more from 2022 onwards. If you’d like to know more about the project, check stormforge.gg",
+            "link:Open stormforge.gg|https://stormforge.gg"
         ]
     },
     {
