@@ -1,0 +1,294 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+</head>
+
+<body>
+  <div id="bg" class="bg"></div>
+  <div class="timeline">
+  </div>
+
+  <script>
+    class EnlargedImage {
+      constructor() {
+        this.parent = document.createElement("div")
+        this.parent.classList.add("fullscreen")
+        document.body.appendChild(this.parent)
+        this.parent.onclick = () => {
+          this.parent.classList.remove("open")
+        }
+
+        this.image = document.createElement("img")
+        this.parent.appendChild(this.image)
+      }
+
+      open(src) {
+        this.image.src = src
+        this.parent.classList.add("open")
+      }
+    }
+
+    let box = new EnlargedImage()
+
+    function enlargeImgage(path) {
+      box.open(path)
+    }
+
+    let data = [
+      {
+        date: "WoW Database Editor timeline",
+        content: [
+        "2021 has been a busy year, no doubt. But did you know that WoW Database Editor is already 5 years old?! And in fact, the development of it begun in 2015?",
+        "Fasten your belts and take a look at history of the development!"
+        ]
+      },
+      {
+        date: "2015",
+        content: [
+          "The story begins in 2015 when Visual SAI Studio was created. From the very beginning this tool offered the possibility to edit scripts in a more visual and more convenient way (compared to existing tools). Perhaps some of you remember this application because it was also open source.",
+          "img:images/2015_saistudio.png",
+          "Even back then there were many features that still exist today. For example, even back then editing conditions was an integral part of the editor. Even then one event could have multiple actions and links were created automatically. All data was in json files, to easily change actions and events, there was a dark theme"
+        ]
+      },
+      {
+        date: "2016 - 2017",
+        content: [
+          "In the following years, the project was developed as an editor for the Atlantiss server. As you can see in the screenshot, it somewhat resembles how the editor looks like now.",
+          "img:images/2017_ats_studio.png"
+        ]
+      },
+      {
+        date: "2017",
+        content: [
+          "Although in appearance Atlantiss Visual SAI Studio resembles current WoW Database Editor, it was a completely different application, unfortunately there was a lot of old code, which made adding certain features very hard (e.g. undo/redo, save on exit dialog). Therefore, in 2017 I decided to rewrite the app from scratch: the WoW Database Editor was born, as it is known today.",
+          "img:images/2017_wde_rewrite.png",
+          "Unfortunately at the time, the new application did not have many of the capabilities present in its predecessor. Therefore, the development of the new version was stopped."
+        ]
+      },
+      {
+        date: "January 2021",
+        content: [
+          "In 2021 I returned to work on the editor. From that point on, the app began to develop at an incredible rate. ",
+          "img:images/2021_01_mid_beginnings.png",
+          "Take a look at the screenshot and compare to how everything looks like now. Kinda the same, but different."
+        ]
+      },
+      {
+        date: "February 2021",
+        content: [
+          "At the end of February, the SAI editor was already in a very good condition, check the screnshot. You can edit conditions now, it is possible to multi-select actions, events, you can change the action type (previously you couldn't!).",
+          "img:images/2021_02_mid_sai_wpf.png",
+          "Pay attention to small details that really matter: the source of the action, the parameters have different colors, the open tab in the screenshot has an asterisk (*) next to it that means the document is changed and when you try to close the program you get a warning if you are sure you want to do it. When these things work, you don't think about them, but when they are missing - it bothers a lot."
+        ]
+      },
+      {
+        date: "March 2021",
+        bg: "images/ats_tauri.svg",
+        content: [
+          "Since March I started working with Atlantiss team again. It is only thanks to Atlantiss that the editor is in active development! Hats off!"
+        ]
+      },
+      {
+        date: "Beginning of March 2021",
+        content: [
+          "Old Visual SAI Studio was built using WinForms, which is Microsoft old technology for building User Interfaces. WoW Database Editor utilized WPF in the beginning, which was much better and easier to use, but it was still Windows only. Therefore in March 2021 I've decided to switch to yet another UI framework - Avalonia UI which is a cross platform and now the editor works on Windows, macOS and Linux!",
+          "img:images/2021_03_01_first_avalonia.png",
+          "In the beginning both WPF and Avalonia versions were available to download, because it took a while to port all the features to Avalonia. A task for you: compare this and the previous screenshot (which was WPF) and find the differences."
+        ]
+      },
+      {
+        date: "End of March 2021",
+        content: [
+          "By the end of March, Auto Updater was added. Can you imaging a life without it? Just think about how much time you saved by not having to update the program manually every time there's a new version. It's a great and important feature.",
+          "img:images/2021_03_27_auto_updater.png"
+        ]
+      },
+      {
+        date: "April 2021",
+        content: [
+          "In April I was working mostly on the Avalonia version and it was no doubt worthy. By the end of April the Avalonia version was almost ready to use and ready to replace the legacy WPF vesion.",
+          "img:images/2021_04_18_avalonia_lookin_good.png"
+        ]
+      },
+      {
+        date: "April 2021",
+        content: [
+          "April brought also a new important feature: SOAP connection. SOAP is a method to remotely invoke commands on the server. Thanks to this, every time you save a script, .reload smart_scripts is invoked on the server. What a time saver!",
+          "img:images/2021_04_20_soap_configuration_checkup.png",
+          "Also, the configuration check-up list on the start page was added, so that every user of the editor knows if it is set up correctly."
+        ]
+      },
+      {
+        date: "3rd of May 2021",
+        content: [
+          "No doubt 3rd of May is one of the most important dates in the WDE history! Until then, you could only edit Smart Scripts. May update introduced database table editors! Among many: creature_template, gameobject_template, creature_text, gossip_menu, gossip_menu_option and more!",
+          "img:images/2021_05_03_database_editors.png",
+          "At this point it was already a true WoW database editor! Thus it received for the first time version \"2021\"!"
+        ]
+      },
+      {
+        date: "May 2021",
+        content: [
+          "Another important thing is a conditions editor!",
+          "img:images/2021_05_08_conditions.png"
+        ]
+      },
+      {
+        date: "May 2021",
+        content: [
+          "But that's not all for May. May update introduced also Smart Script validators. This is a tool that checks if the script is valid and if it is not, it will show you a list of errors.",
+          "img:images/2021_05_14_inspections.png",
+          "Take a look at this screenshot. Can you spot all the problems?"
+        ]
+      },
+      {
+        date: "June 2021",
+        content: [
+          "In the meantime, many smaller fixes to existing things, including the user interface, were being introduced all the time. A new start page, new icons which increased the readability and thus your productivity.",
+          "img:images/2021_06_10_quick_start.png",
+          "(and it is not just June, small fixes were pushed every week this year!)"
+        ]
+      },
+      {
+        date: "July 2021",
+        content: [
+          "July brought to us 'wizards'. A wizard for easy adding commands (including permissions) and a wizard for database strings. It is not a feature for everyone, but it can really save some time.",
+          "img:images/2021_07_06_wizards.png"
+        ]
+      },
+      {
+        date: "July 2021",
+        content: [
+          "Though the most important July news is definitely the \"Packet Viewer\". The built-in WoW Packet Parser by TrinityCore and the \"Viewer\" allow you to work with sniffs much, much faster! This is such a significant new feature that the WoW Database Editor has now been renumbered to 2021.1",
+          "img:images/2021_07_end_packet_viewer.png"
+        ]
+      },
+      {
+        date: "August 2021",
+        content: [
+          "From the very beginning, the editor had a \"Solution Explorer\" - similar to the one in Visual Studio and other IDEs. However, when working with the TC database, this was not the most convenient solution. Therefore, that month \"Sessions\" were introduced. Sessions automatically remember all the changes you made and allow you to generate a summary SQL at the end.",
+          "img:images/2021_08_13_sessions.png",
+          "If you haven't tried sessions yet, you definietely should try them! (View -> Sessions)"
+        ]
+      },
+      {
+        date: "September 2021",
+        content: [
+          "September brings to us a lot of improvements to the packet viewer. Most importantly - 'Find related packets' feature, that automatically tries to filter important things from the sniff. This is such a significant feature, that the editor received a new version number - 2021.2",
+          "img:images/2021_09_21_parser_improvements.png",
+          "A task for you: compare this and the previous screenshot with the packet viewer and find differences."
+        ]
+      },
+      {
+        date: "October 2021",
+        content: [
+          "The improvements continue! This time table editors (like creature_template) got a big update. A lot of small things, that increased your productivity.",
+          "img:images/2021_10_08_db_improvements.png"
+        ]
+      },
+      {
+        date: "November 2021",
+        content: [
+          "Time for probablty the biggest feature of the year! A 3D View of the world! You can load and display WoW world IN THE EDITOR. At the moment this is only a viewer, but in the future a lot of things is gonna utilize it to display the data - paths, spawns, etc...",
+          "img:images/2021_11_mid_3d_view.png"
+        ]
+      },
+      {
+        date: "December 2021",
+        bg: "images/sf.svg",
+        content: [
+          "Atlantiss and Tauri together creates a new brand - Stormforge. Does it matter for the editor? Yes it does, thanks to this the application can be still developed!",
+          "img:https://stormforge.gg/storage/news/covers/O2lXfasTZ0qvt6vq6iFZxuQgXvdmMUXNRDtZYkcL.jpg",
+          "Stormforge is a new platform by Tauri and Atlantiss teams that intends to offer multiple WoW realms of different expansions starting with a fresh Mists of Pandaria server and adding more from 2022 onwards. If you’d like to know more about the project, check stormforge.gg"
+        ]
+      },
+      {
+        date: "Early 2022",
+        content: [
+          "img:images/2022_waypoints.png",
+          "This is a preview of a creature path editor. You will be able to create, view and edit paths, straight in the 3D world."
+        ]
+      },
+      {
+        date: "Future",
+        content: [
+          "What will the future bring?",
+          "Leave a star in a github project, to show your appreciation!"
+        ]
+      }
+    ]
+
+    document.body.onload = () => {
+      let cards = []
+
+      let timeline = document.body.getElementsByClassName("timeline")[0]
+      for (let d of data) {
+        let container = document.createElement("div")
+        container.classList.add("container")
+        let content = document.createElement("div")
+        container.classList.add("content")
+        container.appendChild(content)
+
+        let header = document.createElement("h2")
+        content.appendChild(header)
+        header.innerText = d.date;
+
+        for (let text of d.content) {
+          if (text.startsWith("img:")) {
+            let img = document.createElement("img")
+            img.src = text.substr(4)
+            content.appendChild(img)
+          }
+          else {
+            let p = document.createElement("p")
+            p.innerHTML = text
+            content.appendChild(p)
+          }
+        }
+
+        timeline.appendChild(container)
+        cards.push({
+          container: container,
+          content: content,
+          bg: d.bg
+        })
+      }
+
+      let imgs = document.body.getElementsByTagName("img")
+      for (let img of imgs) {
+        img.style.cursor = "pointer"
+        img.onclick = () => {
+          enlargeImgage(img.src)
+        }
+      }
+
+      let bg = document.getElementById("bg")
+      document.addEventListener('scroll', function (e) {
+        
+        let any = false
+        for (let card of cards) {
+          let rect = card.container.getBoundingClientRect()
+          if (rect.top < window.innerHeight) {
+            card.container.classList.add("active")
+            if (card.bg) {
+              bg.style.backgroundImage = "url(" + card.bg + ")"
+              bg.classList.add("shown")
+              any = true
+            }
+          }
+          else {
+            card.container.classList.remove("active")
+          }
+        }
+        if (!any) {
+          bg.classList.remove("shown")
+        }
+
+      });
+    }
+  </script>
+</body>
+
+</html>
