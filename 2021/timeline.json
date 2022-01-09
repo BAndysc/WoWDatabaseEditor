@@ -179,5 +179,22 @@
             "What will the future bring?",
             "Leave a star in a github project, to show your appreciation!"
         ]
+    },
+    {
+        "date": "Thanks",
+        "content": [
+            "Thanks to all the contributors! I hope you enjoy the editor!",
+            "List sorted by changed lines count:",
+            " - Pelekon",
+            " - funjoker",
+            " - Branel",
+            " - T1ti",
+            " - Intemporel",
+            " - Crypticaz",
+            " - jackpoz",
+            " - mdX7",
+            "",
+            "Special thanks again to Atlantiss and Tauri"
+        ]
     }
 ]
