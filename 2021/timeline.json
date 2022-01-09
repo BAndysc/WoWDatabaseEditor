@@ -1,9 +1,19 @@
 [
     {
         "date": "🎉 WoW Database Editor :: 2021 Summary",
+        "skip": true,
         "content": [
             "2021 has been a busy year, no doubt. But did you know that WoW Database Editor is already 5 years old?! And in fact, the development of it begun in 2015?",
             "Fasten your belts and take a look at history of the development!"
+        ]
+    },
+    {
+        "date": "🎉 WoW Database Editor :: 2021 Summary",
+        "skipWeb": true,
+        "content": [
+            "2021 has been a busy year, no doubt. But did you know that WoW Database Editor is already 5 years old?! And in fact, the development of it begun in 2015?",
+            "Fasten your belts and take a look at history of the development!",
+            "link:Open in web|https://bandysc.github.io/WoWDatabaseEditor/2021/"
         ]
     },
     {
