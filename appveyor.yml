@@ -1,5 +1,5 @@
 version: 0.1.{build}
-image: Visual Studio 2022
+image: Previous Visual Studio 2022
 configuration: Release
 environment:
   DEPLOY_URL:

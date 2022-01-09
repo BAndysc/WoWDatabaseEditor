@@ -9,7 +9,7 @@ URLs=( 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/TrinityC
 BRANCHEs=( 'master' '3.3.5' 'master' 'master')
 UPDATEs=( 'master' '3.3.5' '4.3.4' '')
 COREs=( 'TrinityMaster' 'TrinityWrath' 'TrinityCata' 'Azeroth' )
-SKIP=( false false false false )
+SKIP=( false false true true )
 
 for index in ${!URLs[*]}; do
 

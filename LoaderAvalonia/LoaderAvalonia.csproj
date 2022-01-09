@@ -44,6 +44,7 @@
       <ProjectReference Include="..\WoWDatabaseEditorCore.Avalonia\WoWDatabaseEditorCore.Avalonia.csproj" SkipGetTargetFrameworkProperties="true" />
       <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
       <ProjectReference Include="..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
+      <ProjectReference Include="..\Modules\WDE.AnniversaryInfo\WDE.AnniversaryInfo.csproj" />
     </ItemGroup>
 
 </Project>

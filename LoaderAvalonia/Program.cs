@@ -26,6 +26,7 @@ using WDE.TrinitySmartScriptEditor;
 using WDE.Updater;
 using WDE.WorldMap;
 using WDE.WoWHeadConnector;
+using WDE.AnniversaryInfo;
 
 namespace LoaderAvalonia
 {
@@ -62,7 +63,8 @@ namespace LoaderAvalonia
                 typeof(TrinityMySqlDatabaseModule),
                 typeof(SmartScriptModule),
                 typeof(TrinityModule),
-                typeof(AzerothModule)
+                typeof(AzerothModule),
+                typeof(AnniversaryModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

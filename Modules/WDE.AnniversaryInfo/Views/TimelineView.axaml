@@ -1,0 +1,118 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.AnniversaryInfo.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TimelineViewModel"
+             x:Name="Root"
+             x:Class="WDE.AnniversaryInfo.Views.TimelineView">
+    <UserControl.Styles>
+        <Style Selector="Border.Content">
+            <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        </Style>
+        <Style Selector="Grid:not(.odd) Border.Content">
+            <Setter Property="(Grid.Column)" Value="1" />
+            <Setter Property="Padding" Value="35,20,20,20" />
+            <Setter Property="CornerRadius" Value="0,8,8,0" />
+        </Style>
+        <Style Selector="Grid.odd Border.Content">
+            <Setter Property="(Grid.Column)" Value="0" />
+            <Setter Property="Padding" Value="20,20,35,20" />
+            <Setter Property="CornerRadius" Value="8,0,0,8" />
+        </Style>
+        <Style Selector="Grid:not(.odd) Rectangle">
+            <Setter Property="(Grid.Column)" Value="0" />
+        </Style>
+        <Style Selector="Grid.odd Rectangle">
+            <Setter Property="(Grid.Column)" Value="2" />
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style Selector="TextBlock.H2">
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <Style Selector="ItemsControl > ContentPresenter">
+            <Setter Property="(DockPanel.Dock)" Value="Top" />
+        </Style>
+    </UserControl.Styles>
+    <Panel>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" Background="#474e5d">
+            <DockPanel LastChildFill="True">
+                <AlternatingItemsControl Items="{CompiledBinding Cards}" Padding="0,20,0,20">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <DockPanel MaxWidth="1200" LastChildFill="False" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,10,*" HorizontalAlignment="Stretch">
+                                <Rectangle/>
+                                <Border Classes="Content" Grid.ColumnSpan="2">
+                                    <DockPanel LastChildFill="True">
+                                        <TextBlock DockPanel.Dock="Top" Classes="H2" Text="{CompiledBinding Date}" />
+                                        <ItemsControl Items="{CompiledBinding Content}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Spacing="15" Orientation="Vertical">
+                                    
+                                                    </StackPanel>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.DataTemplates>
+                                                <DataTemplate DataType="viewModels:GuestBookFormContentItem">
+                                                    <Grid ColumnDefinitions="Auto,10,*"
+                                                          KeyboardNavigation.TabNavigation="Contained"
+                                                          RowDefinitions="Auto,10,Auto,10,Auto">
+                                                        <TextBlock VerticalAlignment="Center">Username: </TextBlock>
+                                                        <TextBlock VerticalAlignment="Center" Grid.Row="2">Comment: </TextBlock>
+                                                        <TextBox Grid.Column="2" AcceptsReturn="False" Text="{CompiledBinding Username}" />
+                                                        <TextBox Grid.Column="2" Grid.Row="2" AcceptsReturn="True" VerticalContentAlignment="Top" Height="90" Text="{CompiledBinding Text}" />
+                                                        <Button Grid.Row="4" Command="{CompiledBinding PublishCommand}">Publish!</Button>
+                                                    </Grid>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="viewModels:TextContentItem">
+                                                    <TextBlock TextWrapping="WrapWithOverflow"
+                                                               Text="{CompiledBinding Text}"></TextBlock>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="viewModels:ButtonContentItem">
+                                                    <Button Command="{CompiledBinding Command}" Content="{Binding Text}" />
+                                                </DataTemplate>
+                                                <DataTemplate DataType="viewModels:ImageContentItem">
+                                                    <Image Cursor="Hand" x:Name="Img" Source="{CompiledBinding Image}">
+                                                        <Interaction.Behaviors>
+                                                            <EventTriggerBehavior EventName="PointerPressed" SourceObject="{Binding #Img}">
+                                                                <InvokeCommandAction Command="{Binding #Root.DataContext.OpenBigImage}" CommandParameter="{CompiledBinding Image}" />
+                                                            </EventTriggerBehavior>
+                                                        </Interaction.Behaviors>
+                                                    </Image>
+                                                </DataTemplate>
+                                            </ItemsControl.DataTemplates>
+                                        </ItemsControl>
+                                    </DockPanel>
+                                </Border>
+                                <Panel Grid.Column="1" VerticalAlignment="Top" Margin="0,15,0,0">
+                                    <Ellipse Width="32" Height="32" Fill="Orange" />
+                                    <Ellipse Width="22" Height="22" Fill="White" />
+                                </Panel>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </AlternatingItemsControl>
+            </DockPanel>
+        </ScrollViewer>
+        <Border x:Name="Border" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#A0000000" Padding="25"
+                IsVisible="{CompiledBinding BigImage, Converter={x:Static NullConverter.IsNotNull}}">
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="PointerPressed" SourceObject="{Binding #Border}">
+                    <InvokeCommandAction Command="{Binding #Root.DataContext.CloseBigImage}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
+            <Image StretchDirection="DownOnly" Source="{CompiledBinding BigImage}" IsHitTestVisible="False" />
+        </Border>
+    </Panel>
+</UserControl>
