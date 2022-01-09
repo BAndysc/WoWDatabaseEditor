@@ -179,7 +179,12 @@ namespace WoWDatabaseEditorCore.ViewModels
                               !applicationReleaseConfiguration.GetBool("SKIP_STAR_BOX").GetValueOrDefault() &&
                               !userSettings.Get<QuickStartSettings>().DismissedLeaveStarBox;
 
-            ReloadMruList();
+            try
+            {
+                ReloadMruList();
+            } catch (Exception)
+            {
+            }
         }
 
         private void ReloadMruList()
