@@ -1,13 +1,13 @@
 [
     {
-        "date": "WoW Database Editor :: 2021 Summary",
+        "date": "🎉 WoW Database Editor :: 2021 Summary",
         "content": [
             "2021 has been a busy year, no doubt. But did you know that WoW Database Editor is already 5 years old?! And in fact, the development of it begun in 2015?",
             "Fasten your belts and take a look at history of the development!"
         ]
     },
     {
-        "date": "What is WoW Database Editor?",
+        "date": "ℹ️ What is WoW Database Editor?",
         "skip": true,
         "content": [
             "Before we start the history journey, a short introduction if you don't know what WoW Database Editor is.",
@@ -17,7 +17,7 @@
         ]
     },
     {
-        "date": "2015",
+        "date": "👴 2015",
         "content": [
             "The story begins in 2015 when Visual SAI Studio was created. From the very beginning this tool offered the possibility to edit scripts in a more visual and more convenient way (compared to existing tools). Perhaps some of you remember this application because it was also open source.",
             "img:images/2015_saistudio.png",
@@ -184,14 +184,14 @@
         ]
     },
     {
-        "date": "Future",
+        "date": "🔮 Future",
         "content": [
             "What will the future bring?",
             "Leave a star in a github project, to show your appreciation!"
         ]
     },
     {
-        "date": "Thanks",
+        "date": "🙌 Thanks",
         "content": [
             "Thanks to all the contributors! I hope you enjoy the editor!",
             "List sorted by changed lines count:",
