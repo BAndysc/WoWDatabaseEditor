@@ -1,6 +1,6 @@
 [
     {
-        "date": "WoW Database Editor timeline",
+        "date": "WoW Database Editor :: 2021 Summary",
         "content": [
             "2021 has been a busy year, no doubt. But did you know that WoW Database Editor is already 5 years old?! And in fact, the development of it begun in 2015?",
             "Fasten your belts and take a look at history of the development!"
@@ -24,7 +24,7 @@
     {
         "date": "2017",
         "content": [
-            "Although in appearance Atlantiss Visual SAI Studio resembles current WoW Database Editor, it was a completely different application, unfortunately there was a lot of old code, which made adding certain features very hard (e.g. undo/redo, save on exit dialog). Therefore, in 2017 I decided to rewrite the app from scratch: the WoW Database Editor was born, as it is known today.",
+            "Although Atlantiss Visual SAI Studio resembles current WoW Database Editor, it was a completely different application, unfortunately there was a lot of old code, which made adding certain features very hard (e.g. undo/redo, save on exit dialog). Therefore, in 2017 I decided to rewrite the app from scratch: the WoW Database Editor was born, as it is known today.",
             "img:images/2017_wde_rewrite.png",
             "Unfortunately at the time, the new application did not have many of the capabilities present in its predecessor. Therefore, the development of the new version was stopped."
         ]
@@ -55,7 +55,7 @@
     {
         "date": "Beginning of March 2021",
         "content": [
-            "Old Visual SAI Studio was built using WinForms, which is Microsoft old technology for building User Interfaces. WoW Database Editor utilized WPF in the beginning, which was much better and easier to use, but it was still Windows only. Therefore in March 2021 I've decided to switch to yet another UI framework - Avalonia UI which is a cross platform and now the editor works on Windows, macOS and Linux!",
+            "The old Visual SAI Studio was built using WinForms, which is Microsoft old technology for building User Interfaces. WoW Database Editor utilized WPF in the beginning, which was much better and easier to use, but it was still Windows only. Therefore in March 2021 I've decided to switch to yet another UI framework - Avalonia UI which is a cross platform and now the editor works on Windows, macOS and Linux!",
             "img:images/2021_03_01_first_avalonia.png",
             "In the beginning both WPF and Avalonia versions were available to download, because it took a while to port all the features to Avalonia. A task for you: compare this and the previous screenshot (which was WPF) and find the differences."
         ]
