@@ -69,9 +69,10 @@ namespace WDE.Common.Parameters
 
     public class SwitchStringParameter : GenericBaseParameter<string>
     {
-        public SwitchStringParameter(Dictionary<string, SelectOption> options)
+        public SwitchStringParameter(Dictionary<string, SelectOption> options, string? prefix = null)
         {
             Items = options;
+            Prefix = prefix;
         }
 
         public override string ToString(string value)

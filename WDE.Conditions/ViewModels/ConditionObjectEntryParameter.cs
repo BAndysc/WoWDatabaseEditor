@@ -6,6 +6,7 @@ namespace WDE.Conditions.ViewModels
     public class ConditionObjectEntryParameter : IContextualParameter<long, ConditionViewModel>
     {
         private readonly IParameterFactory parameterFactory;
+        public string? Prefix => null;
         public bool HasItems => true;
 
         public ConditionObjectEntryParameter(IParameterFactory parameterFactory)

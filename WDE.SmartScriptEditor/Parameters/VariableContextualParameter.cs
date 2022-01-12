@@ -10,7 +10,8 @@ namespace WDE.SmartScriptEditor.Parameters
         private readonly string name;
 
         public bool AllowUnknownItems => true;
-        
+        public string? Prefix => null;
+
         private static SmartScriptBase? GetScript(SmartBaseElement element)
         {
             if (element is SmartSource source)

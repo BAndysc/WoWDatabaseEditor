@@ -14,6 +14,8 @@ namespace WDE.SmartScriptEditor.Parameters
             this.databaseProvider = databaseProvider;
         }
         
+        public string? Prefix => null;
+
         public bool HasItems => true;
         
         public string ToString(long value) => value.ToString();

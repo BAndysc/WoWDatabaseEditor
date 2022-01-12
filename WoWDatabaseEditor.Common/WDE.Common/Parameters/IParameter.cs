@@ -6,6 +6,7 @@ namespace WDE.Common.Parameters
 {
     public interface IParameter
     {
+        string? Prefix { get; }
         bool HasItems { get; }
         bool AllowUnknownItems => false;
         Func<Task<object?>>? SpecialCommand => null;

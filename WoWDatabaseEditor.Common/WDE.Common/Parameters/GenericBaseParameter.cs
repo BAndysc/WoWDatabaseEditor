@@ -21,6 +21,7 @@ namespace WDE.Common.Parameters
         public Dictionary<T, SelectOption>? Items { get; set; }
         public abstract string ToString(T value);
         public virtual string ToString(T value, ToStringOptions options) => ToString(value);
+        public virtual string? Prefix { get; set; }
         public virtual bool HasItems => Items != null && Items.Count > 0;
         public virtual Func<Task<object?>>? SpecialCommand => null;
     }
