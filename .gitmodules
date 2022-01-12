@@ -4,6 +4,9 @@
 [submodule "AvaloniaEdit"]
 	path = AvaloniaEdit
 	url = https://github.com/BAndysc/AvaloniaEdit
+[submodule "WowPacketParser"]
+	path = WowPacketParser
+	url = https://github.com/TrinityCore/WowPacketParser
 [submodule "Prism.Avalonia"]
 	path = Prism.Avalonia
 	url = https://github.com/BAndysc/Prism.Avalonia
