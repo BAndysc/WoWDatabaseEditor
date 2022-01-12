@@ -48,7 +48,10 @@ namespace WDE.Common.Avalonia.Utils
                             nativeMenuItem.Command = WrapCommand(cmd.ItemCommand, cmd);
                             if (cmd.Shortcut.HasValue && Enum.TryParse(cmd.Shortcut.Value.Key, out Key key))
                             { 
-                                var keyGesture = new KeyGesture(key, cmd.Shortcut.Value.Control ? systemWideControlModifier : KeyModifiers.None);
+                                var modifier = cmd.Shortcut.Value.Control ? systemWideControlModifier : KeyModifiers.None;
+                                if (cmd.Shortcut.Value.Shift)
+                                    modifier |= KeyModifiers.Shift;
+                                var keyGesture = new KeyGesture(key, modifier);
                                 nativeMenuItem.Gesture = keyGesture;
                             }
                         }
@@ -138,8 +141,11 @@ namespace WDE.Common.Avalonia.Utils
                     
                     if (!cmd.Shortcut.HasValue || !Enum.TryParse(cmd.Shortcut.Value.Key, out Key key)) 
                         continue;
-                    
-                    var keyGesture = new KeyGesture(key, cmd.Shortcut.Value.Control ? systemWideControlModifier : KeyModifiers.None);
+
+                    var modifier = cmd.Shortcut.Value.Control ? systemWideControlModifier : KeyModifiers.None;
+                    if (cmd.Shortcut.Value.Shift)
+                        modifier |= KeyModifiers.Shift;
+                    var keyGesture = new KeyGesture(key, modifier);
                     var command = WrapCommand(cmd.ItemCommand, cmd);
 
                     window.KeyBindings.Add(new KeyBinding(){Command = command, Gesture = keyGesture});
