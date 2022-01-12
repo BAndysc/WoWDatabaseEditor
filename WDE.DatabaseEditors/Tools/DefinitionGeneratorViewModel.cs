@@ -8,6 +8,7 @@ using Prism.Mvvm;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Extensions;
 using WDE.Module.Attributes;
