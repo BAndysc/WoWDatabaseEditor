@@ -260,27 +260,27 @@ namespace WDE.DbcStore
                 store.GameObjectDisplayInfoStore = GameObjectDisplayInfoStore;
                 store.MapDirectoryStore = MapDirectoryStore;
                 
-                parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore));
-                parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore));
+                parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore), QuickAccessMode.Limited);
+                parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
-                parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore));
-                parameterFactory.Register("TextEmoteParameter", new DbcParameter(TextEmoteStore));
-                parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore));
+                parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore), QuickAccessMode.Limited);
+                parameterFactory.Register("TextEmoteParameter", new DbcParameter(TextEmoteStore), QuickAccessMode.Limited);
+                parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ClassMaskParameter", new DbcMaskParameter(ClassStore, -1));
-                parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
+                parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore), QuickAccessMode.Limited);
                 parameterFactory.Register("RaceMaskParameter", new DbcMaskParameter(RaceStore, -1));
-                parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore));
-                parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore));
-                parameterFactory.Register("ZoneAreaParameter", new DbcParameter(AreaStore));
-                parameterFactory.Register("MapParameter", new DbcParameter(MapStore));
-                parameterFactory.Register("PhaseParameter", new DbcParameter(PhaseStore));
-                parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore));
+                parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore), QuickAccessMode.Limited);
+                parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore), QuickAccessMode.Limited);
+                parameterFactory.Register("ZoneAreaParameter", new DbcParameter(AreaStore), QuickAccessMode.Limited);
+                parameterFactory.Register("MapParameter", new DbcParameter(MapStore), QuickAccessMode.Limited);
+                parameterFactory.Register("PhaseParameter", new DbcParameter(PhaseStore), QuickAccessMode.Limited);
+                parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore), QuickAccessMode.Limited);
                 parameterFactory.Register("QuestInfoParameter", new DbcParameter(QuestInfoStore));
                 parameterFactory.Register("CharTitleParameter", new DbcParameter(CharTitleStore));
                 parameterFactory.Register("CreatureModelDataParameter", new CreatureModelParameter(CreatureModelDataStore, CreatureDisplayInfoStore));
                 parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
-                parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore));
+                parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore), QuickAccessMode.Limited);
 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {

@@ -68,6 +68,7 @@
 	"QuestFlagParameter": {
 		"isflag": true,
 		"inmenu": true,
+		"quickaccess": "Full",
 		"name": "Quest flags",
 		"prefix": "QUEST_FLAGS_",
 		"values": {
@@ -109,6 +110,7 @@
 	"UnitFlagParameter": {
 		"isflag": true,
 		"inmenu": true,
+		"quickaccess": "Full",
 		"name": "Unit flags",
 		"prefix": "UNIT_FLAG_",
 		"values": {
@@ -149,6 +151,7 @@
 	"UnitFlags2Parameter": {
 		"isflag": true,
 		"inmenu": true,
+		"quickaccess": "Full",
 		"name": "Unit flags2",
 		"prefix": "UNIT_FLAG2_",
 		"values": {
@@ -178,6 +181,7 @@
 	"NpcFlagParameter": {
 		"isflag": true,
 		"inmenu": true,
+		"quickaccess": "Full",
 		"name": "NPC flags",
 		"prefix": "UNIT_NPC_FLAG_",
 		"values": {
@@ -240,6 +244,7 @@
 	"MovementFlagParameter": {
 		"isflag": true,
 		"inmenu": true,
+		"quickaccess": "Full",
 		"name": "Movement flag",
 		"prefix": "MOVEMENT_FLAG_",
 		"values": {
@@ -317,6 +322,7 @@
 	"ExtraFlagParameter": {
 		"isflag": true,
 		"inmenu": true,
+		"quickaccess": "Full",
 		"name": "Creature extra flags",
 		"prefix": "CREATURE_FLAG_EXTRA_",
 		"values": {
@@ -1211,6 +1217,7 @@
 		"name": "Dynamic flags",
 		"isflag": true,
 		"prefix": "UNIT_DYNFLAG_",
+		"quickaccess": "Full",
 		"values": {
 			"0": {
 				"name": "NONE"
@@ -1675,7 +1682,8 @@
 	},
 	"GameobjectTypeParameter": {
 		"name": "Types of gameobject",
-		"prefix": "GAMEOBJECT_TYPE",
+		"prefix": "GAMEOBJECT_TYPE_",
+		"quickaccess": "Full",
 		"values": {
 			"0" : {
 				"name": "DOOR"
@@ -1888,6 +1896,7 @@
 	"GameObjectFlagParameter": {
 		"name": "Gameobject flags",
 		"isflag": true,
+		"quickaccess": "Full",
 		"prefix": "GO_FLAG_",
 		"values": {
 			"0": {"name": "none"},
@@ -1927,6 +1936,7 @@
 	},
 	"StandStateParameter": {
 		"prefix": "UNIT_STAND_",
+		"quickaccess": "Full",
 		"name": "Stand state",
 		"values": {
 			"0": {"name": "STAND"},
@@ -1944,6 +1954,7 @@
 	"UnitStandFlagParameter": {
 		"isflag": true,
 		"prefix": "UNIT_STAND_FLAGS_",
+		"quickaccess": "Full",
 		"name": "Unit stand",
 		"values": {
 			"0": {"name": "none"},
@@ -1956,6 +1967,7 @@
 	},
 	"AnimationTierParameter": {
 		"name": "Animation tier",
+		"quickaccess": "Full",
 		"values": {
 			"0": {"name": "Ground"},
 			"1": {"name": "Swim"},
@@ -1966,6 +1978,7 @@
 	},
 	"SheathStateParameter": {
 		"name": "Sheath state",
+		"quickaccess": "Full",
 		"values": {
 			"0": {"name": "Unarmed"},
 			"1": {"name": "Melee"},
@@ -2036,6 +2049,7 @@
 	"QuestStatusParameter": {
 		"isflag": true,
 		"prefix": "QUEST_STATUS",
+		"quickaccess": "Full",
 		"name": "Quest status (mask)",
 		"values": {
 			"1": {"name": "none", "description": "Player does not have or had quest at all. He could accept it, but he did not (yet)."},
@@ -2058,6 +2072,7 @@
 	},
 	"GossipIconParameter": {
 		"name": "Gossip icons for gossip_menu",
+		"quickaccess": "Full",
 		"prefix": "GOSSIP_ICON_",
 		"values": {
 			"0": {"name": "Chat", "description": "White chat bubble"},
@@ -2075,6 +2090,7 @@
 	},
 	"GossipOptionTypeParameter": {
 		"name": "Gossip menu option types",
+		"quickaccess": "Full",
 		"prefix": "GOSSIP_OPTION_",
 		"values": {
 			"0": {"name": "None", "description": "Requires npc flag NONE"},
@@ -2343,7 +2359,8 @@
 	},
 	"UnitStateParameter": {	
 		"name": "Unit state",	
-		"isflag": true,	
+		"isflag": true,
+		"quickaccess": "Full",
 		"values": {	
 			"1": {"name": "UNIT_STATE_DIED", "description": "player has fake death aura"},	
 			"2": {"name": "UNIT_STATE_MELEE_ATTACKING", "description": "player is melee attacking someone"},	

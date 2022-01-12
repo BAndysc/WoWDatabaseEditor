@@ -65,7 +65,7 @@ namespace WDE.DatabaseEditors.Solution
         }
     }
 
-    internal class DatabaseTableSolutionItemProvider : ISolutionItemProvider, IRelatedSolutionItemCreator
+    internal class DatabaseTableSolutionItemProvider : ISolutionItemProvider, IRelatedSolutionItemCreator, INumberSolutionItemProvider
     {
         private readonly IDatabaseTableDataProvider tableDataProvider;
         private readonly IItemFromListProvider itemFromListProvider;
@@ -180,5 +180,12 @@ namespace WDE.DatabaseEditors.Solution
                    related.Type == RelatedSolutionItem.RelatedType.QuestEntry &&
                    definition.Picker == "QuestParameter";
         }
+
+        public Task<ISolutionItem?> CreateSolutionItem(long number)
+        {
+            return Create((uint)number);
+        }
+
+        public string ParameterName => definition.Picker;
     }
 }

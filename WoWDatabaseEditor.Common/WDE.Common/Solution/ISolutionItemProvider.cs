@@ -23,6 +23,12 @@ namespace WDE.Common
         Task<ISolutionItem?> CreateSolutionItem();
     }
 
+    public interface INumberSolutionItemProvider : ISolutionItemProvider
+    {
+        Task<ISolutionItem?> CreateSolutionItem(long number);
+        string ParameterName { get; }
+    }
+
     [NonUniqueProvider]
     public interface IRelatedSolutionItemCreator : ISolutionItemProvider
     {

@@ -9,8 +9,10 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.MVVM.Observable;
+using WDE.Parameters.Models;
 using WDE.Parameters.Parameters;
 using WDE.Parameters.Providers;
+using WDE.Parameters.QuickAccess;
 
 namespace WDE.Parameters
 {
@@ -22,15 +24,17 @@ namespace WDE.Parameters
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IEventAggregator eventAggregator;
         private readonly ILoadingEventAggregator loadingEventAggregator;
+        private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
 
         private Dictionary<Type, List<IDatabaseObserver>> reloadable = new();
         private List<LateLoadParameter> databaseParameters = new();
-        public ParameterLoader(IDatabaseProvider database, 
+        internal ParameterLoader(IDatabaseProvider database, 
             IParameterDefinitionProvider parameterDefinitionProvider,
             IServerIntegration serverIntegration,
             IItemFromListProvider itemFromListProvider,
             IEventAggregator eventAggregator,
-            ILoadingEventAggregator loadingEventAggregator)
+            ILoadingEventAggregator loadingEventAggregator,
+            IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
         {
             this.database = database;
             this.parameterDefinitionProvider = parameterDefinitionProvider;
@@ -38,6 +42,7 @@ namespace WDE.Parameters
             this.itemFromListProvider = itemFromListProvider;
             this.eventAggregator = eventAggregator;
             this.loadingEventAggregator = loadingEventAggregator;
+            this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
         }
 
         public void Load(ParameterFactory factory)
@@ -46,26 +51,30 @@ namespace WDE.Parameters
             {
                 if (pair.Value.StringValues != null)
                 {
-                    SwitchStringParameter stringParameter = new SwitchStringParameter(pair.Value.StringValues);
+                    SwitchStringParameter stringParameter = new SwitchStringParameter(pair.Value.StringValues, pair.Value.Prefix);
                     factory.Register(pair.Key, stringParameter);
                 }
                 else if (pair.Value.Values != null)
                 {
                     Parameter p = pair.Value.IsFlag ? new FlagParameter() : new Parameter();
                     p.Items = pair.Value.Values;
-                    factory.Register(pair.Key, p);   
+                    p.Prefix = pair.Value.Prefix;
+                    factory.Register(pair.Key, p);
                 }
+                
+                if (pair.Value.QuickAccess != QuickAccessMode.None)
+                    quickAccessRegisteredParameters.Register(pair.Value.QuickAccess, pair.Key, pair.Value.Name);
             }
 
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
-            factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)));
-            factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, serverIntegration)));
+            factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
+            factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, serverIntegration)), QuickAccessMode.Limited);
             factory.Register("CreatureGameobjectNameParameter", AddDatabaseParameter(new CreatureGameobjectNameParameter(database)));
             factory.Register("CreatureGameobjectParameter", AddDatabaseParameter(new CreatureGameobjectParameter(database)));
-            factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database)));
+            factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database)), QuickAccessMode.Limited);
             factory.Register("PrevQuestParameter", AddDatabaseParameter(new PrevQuestParameter(database)));
-            factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)));
+            factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)), QuickAccessMode.Limited);
             factory.Register("GossipMenuParameter", AddDatabaseParameter(new GossipMenuParameter(database)));
             factory.Register("NpcTextParameter", AddDatabaseParameter(new NpcTextParameter(database)));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));

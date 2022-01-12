@@ -42,5 +42,6 @@
     <PackageReference Include="Unity.RegistrationByConvention">
       <Version>5.11.1</Version>
     </PackageReference>
+    <PackageReference Include="FuzzySharp" Version="2.0.2" />
   </ItemGroup>
 </Project>

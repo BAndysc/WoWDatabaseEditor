@@ -24,7 +24,7 @@ namespace WDE.Spells
                 .Subscribe(() =>
                     {
                         var factory = containerProvider.Resolve<IParameterFactory>();
-                        factory.RegisterCombined("SpellParameter", "DbcSpellParameter", "DatabaseSpellParameter", (dbc, db) => new SpellParameter(dbc, db));
+                        factory.RegisterCombined("SpellParameter", "DbcSpellParameter", "DatabaseSpellParameter", (dbc, db) => new SpellParameter(dbc, db), QuickAccessMode.Limited);
                         factory.RegisterDepending("MultiSpellParameter", "SpellParameter",  spells => new MultiSpellParameter(spells));
                         factory.RegisterDepending("SpellAreaSpellParameter", "SpellParameter", spells => new SpellAreaSpellParameter(spells));
                     },

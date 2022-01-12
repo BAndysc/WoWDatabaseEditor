@@ -11,6 +11,7 @@
           xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
           xmlns:types="clr-namespace:WDE.Common.Types;assembly=WDE.Common"
+          xmlns:quickAccess="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.QuickAccess"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindowWithDocking"
@@ -77,12 +78,29 @@
     </controls:ExtendedWindow.StatusBar>
     
     <controls:ExtendedWindow.Overlay>
-        <views:TasksPanel DataContext="{Binding TasksViewModel}"
-                          Margin="0,0,5,0"
-                          HorizontalAlignment="Right"
-                          VerticalAlignment="Bottom"
-                          ClipToBounds="False"
-                          IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
+        <Panel>
+            <views:TasksPanel DataContext="{Binding TasksViewModel}"
+                              Margin="0,0,5,0"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Bottom"
+                              ClipToBounds="False"
+                              IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
+            <Panel Name="Panel" 
+                   DataContext="{Binding QuickAccessViewModel, Mode=OneWay}"
+                   IsVisible="{Binding IsOpened, Mode=OneWay}"
+                   Background="Transparent">
+                <quickAccess:QuickAccessView 
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding IsOpened, Mode=OneWay}"
+                    Margin="0,200,0,0"
+                    VerticalAlignment="Top"/>
+                <Interaction.Behaviors>
+                    <EventTriggerBehavior EventName="PointerPressed" SourceObject="{Binding #Panel}">
+                        <InvokeCommandAction Command="{Binding CloseQuickAccessCommand}" />
+                    </EventTriggerBehavior>
+                </Interaction.Behaviors>
+            </Panel>
+        </Panel>
     </controls:ExtendedWindow.Overlay>
 
     <idc:DockControl Name="DockControl">

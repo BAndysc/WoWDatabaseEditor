@@ -19,6 +19,9 @@ namespace WDE.Parameters.Models
         [JsonProperty(PropertyName = "inmenu")]
         public bool InMenu { get; set; }
 
+        [JsonProperty(PropertyName = "quickaccess")]
+        public QuickAccessMode QuickAccess { get; set; }
+
         [JsonProperty(PropertyName = "prefix")]
         public string Prefix { get; set; }
 

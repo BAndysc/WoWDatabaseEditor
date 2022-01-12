@@ -9,6 +9,7 @@ using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
+using WDE.Common.QuickAccess;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
 using WDE.Common.Solution;
@@ -20,6 +21,7 @@ using WDE.MVVM.Observable;
 using WoWDatabaseEditor.Providers;
 using WoWDatabaseEditorCore.Managers;
 using WoWDatabaseEditorCore.Services;
+using WoWDatabaseEditorCore.Services.QuickAccess;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
@@ -51,7 +53,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             ITaskRunner taskRunner,
             IEventAggregator eventAggregator,
             IProgramNameService programNameService,
-            IMainThread mainThread)
+            IMainThread mainThread,
+            IQuickAccessViewModel quickAccessViewModel)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
@@ -118,6 +121,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             
             TasksViewModel = tasksViewModel;
             RelatedSolutionItems = relatedSolutionItems;
+            QuickAccessViewModel = quickAccessViewModel;
 
             MenuItemProviders = menuItemProvider.GetItems();
 
@@ -160,6 +164,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public TasksViewModel TasksViewModel { get; }
         public RelatedSolutionItems RelatedSolutionItems { get; }
+        public IQuickAccessViewModel QuickAccessViewModel { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 

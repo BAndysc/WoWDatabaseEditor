@@ -4,6 +4,13 @@ using WDE.Module.Attributes;
 
 namespace WDE.Common.Parameters
 {
+    public enum QuickAccessMode
+    {
+        None,
+        Limited,
+        Full
+    }
+    
     [UniqueProvider]
     public interface IParameterFactory
     {
@@ -11,13 +18,13 @@ namespace WDE.Common.Parameters
         IParameter<string> FactoryString(string type);
         bool IsRegisteredLong(string type);
         bool IsRegisteredString(string type);
-        void Register(string key, IParameter<long> parameter);
+        void Register(string key, IParameter<long> parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None);
         void Register(string key, IParameter<string> parameter);
 
-        void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<long>> creator);
+        void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<long>> creator, QuickAccessMode quickAccessMode = QuickAccessMode.None);
         void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<string>> creator);
-        void RegisterCombined(string name, string param1, string param2, Func<IParameter<long>, IParameter<long>, IParameter<long>> creator);
-        void RegisterCombined(string name, string param1, string param2, string param3, string param4, Func<IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>> creator);
+        void RegisterCombined(string name, string param1, string param2, Func<IParameter<long>, IParameter<long>, IParameter<long>> creator, QuickAccessMode quickAccessMode = QuickAccessMode.None);
+        void RegisterCombined(string name, string param1, string param2, string param3, string param4, Func<IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>> creator, QuickAccessMode quickAccessMode = QuickAccessMode.None);
         
         IEnumerable<string> GetKeys();
 

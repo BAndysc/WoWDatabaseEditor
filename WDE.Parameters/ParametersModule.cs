@@ -1,9 +1,12 @@
-﻿using Prism.Events;
+﻿using System.Runtime.CompilerServices;
+using Prism.Events;
 using Prism.Ioc;
 using WDE.Common.Events;
 using WDE.Module;
 using WDE.Module.Attributes;
 
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+[assembly: InternalsVisibleTo("WDE.Parameters.Test")]
 namespace WDE.Parameters
 {
     [AutoRegister]

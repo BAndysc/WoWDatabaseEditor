@@ -5,6 +5,7 @@ using Prism.Commands;
 using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Menu;
+using WDE.Common.QuickAccess;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Providers
@@ -17,7 +18,8 @@ namespace WoWDatabaseEditorCore.Providers
         public MainMenuItemSortPriority SortPriority => MainMenuItemSortPriority.PriorityHigh;
         public IDocumentManager DocumentManager { get; }
 
-        public EditorEditMenuItemProvider(IDocumentManager documentManager)
+        public EditorEditMenuItemProvider(IDocumentManager documentManager,
+            IQuickAccessViewModel quickAccessViewModel)
         {
             DocumentManager = documentManager;
             SubItems = new List<IMenuItem>();
@@ -51,6 +53,16 @@ namespace WoWDatabaseEditorCore.Providers
                 new DelegateCommand(() => DocumentManager.ActiveDocument?.Paste.Execute(null),
                 () => DocumentManager.ActiveDocument?.Paste.CanExecute(null) ?? false)
                     .ObservesProperty(() => DocumentManager.ActiveDocument), new("Control+V")));
+            
+            SubItems.Add(new ModuleManuSeparatorItem());
+            
+            SubItems.Add(new ModuleMenuItem("Open quick access",
+                new DelegateCommand(() => quickAccessViewModel.OpenSearch("")),
+                new("Control+T")));
+            
+            SubItems.Add(new ModuleMenuItem("Open quick commands",
+                new DelegateCommand(() => quickAccessViewModel.OpenSearch("/")),
+                new("Control+Shift+T")));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

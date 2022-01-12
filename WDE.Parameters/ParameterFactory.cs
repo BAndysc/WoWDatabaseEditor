@@ -4,9 +4,11 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using WDE.Common.Parameters;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
+using WDE.Parameters.QuickAccess;
 
 namespace WDE.Parameters
 {
@@ -14,10 +16,19 @@ namespace WDE.Parameters
     [SingleInstance]
     public class ParameterFactory : IParameterFactory
     {
-        private readonly Dictionary<string, ParameterSpecModel> data = new();
-        private readonly Dictionary<string, IParameter<long>> parameters = new();
-        private readonly Dictionary<string, IParameter<string>> stringParameters = new();
-        
+        private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
+        private readonly Dictionary<string, ParameterSpecModel> data;
+        private readonly Dictionary<string, IParameter<long>> parameters;
+        private readonly Dictionary<string, IParameter<string>> stringParameters;
+
+        internal ParameterFactory(IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
+        {
+            this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
+            data = new(StringComparer.OrdinalIgnoreCase);
+            parameters = new(StringComparer.OrdinalIgnoreCase);
+            stringParameters = new(StringComparer.OrdinalIgnoreCase);
+        }
+
         public IParameter<long> Factory(string type)
         {
             if (parameters.TryGetValue(type, out var parameter))
@@ -42,7 +53,7 @@ namespace WDE.Parameters
             return stringParameters.ContainsKey(type);
         }
 
-        public void Register(string key, IParameter<long> parameter)
+        public void Register(string key, IParameter<long> parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None)
         {
             parameters.Add(key, parameter);
             if (pendingObservables.TryGetValue(key, out var pending))
@@ -50,6 +61,7 @@ namespace WDE.Parameters
             if (pendingLongObservables.TryGetValue(key, out var pending2))
                 pending2.Publish(parameter);
             registration.OnNext(parameter);
+            quickAccessRegisteredParameters.Register(quickAccessMode, key, key.Replace("Parameter", "").ToTitleCase());
         }
 
         public void Register(string key, IParameter<string> parameter)
@@ -125,30 +137,32 @@ namespace WDE.Parameters
         
         ////
         public void RegisterCombined(string name, string param1, string param2,
-            Func<IParameter<long>, IParameter<long>, IParameter<long>> creator)
+            Func<IParameter<long>, IParameter<long>, IParameter<long>> creator,
+            QuickAccessMode quickAccessMode = QuickAccessMode.None)
         {
             OnRegisterLong(param1).CombineLatest(OnRegisterLong(param2)).Subscribe(pair =>
             {
-                Register(name, creator(pair.First, pair.Second));
+                Register(name, creator(pair.First, pair.Second), quickAccessMode);
             });
         }
 
         public void RegisterCombined(string name, string param1, string param2, string param3, string param4,
-            Func<IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>> creator)
+            Func<IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>> creator,
+            QuickAccessMode quickAccessMode = QuickAccessMode.None)
         {
             OnRegisterLong(param1)
                 .CombineLatest(OnRegisterLong(param2), OnRegisterLong(param3), OnRegisterLong(param4))
                 .Subscribe(pair =>
             {
-                Register(name, creator(pair.First, pair.Second, pair.Third, pair.Fourth));
+                Register(name, creator(pair.First, pair.Second, pair.Third, pair.Fourth), quickAccessMode);
             });
         }
 
-        public void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<long>> creator)
+        public void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<long>> creator, QuickAccessMode quickAccessMode = QuickAccessMode.None)
         {
             OnRegisterLong(dependsOn).Subscribe(item =>
             {
-                Register(name, creator(item));
+                Register(name, creator(item), quickAccessMode);
             });
         }
         

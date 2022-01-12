@@ -22,6 +22,7 @@
     <PackageReference Include="SmartFormat.NET">
       <Version>2.5.3</Version>
     </PackageReference>
+    <PackageReference Include="FuzzySharp" Version="2.0.2" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Icons\*.png">
