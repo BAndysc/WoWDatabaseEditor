@@ -291,6 +291,11 @@ namespace WoWDatabaseEditorCore.Avalonia
     }
     public class MainThread : IMainThread
     {
+        public void Delay(Action action, TimeSpan delay)
+        {
+            DispatcherTimer.RunOnce(action, delay);
+        }
+
         public void Dispatch(Action action)
         {
             Dispatcher.UIThread.Post(action);

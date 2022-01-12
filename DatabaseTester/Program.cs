@@ -30,6 +30,12 @@ public class Program
 {
     public class SyncMainThread : IMainThread
     {
+        public void Delay(Action action, TimeSpan delay)
+        {
+            Console.Write(" -- no waiting -- ");
+            action();
+        }
+
         public void Dispatch(Action action)
         {
             action();
