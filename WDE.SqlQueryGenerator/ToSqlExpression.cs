@@ -119,15 +119,39 @@ namespace WDE.SqlQueryGenerator
         {
             return expr is BinaryExpression be && GetPriority(be.NodeType) > GetPriority(type);
         }
+
+        private bool SimplifyConstantExpression(ConstantExpression exp, out string value)
+        {
+            if (exp.Value is string s)
+            {
+                value = s;
+                return true;
+            }
+
+            if (exp.Value is string[] arr && arr.Length == 1)
+            {
+                value = arr[0];
+                return true;
+            }
+
+            value = null!;
+            return false;
+        }
         
         protected override Expression VisitBinary(BinaryExpression node)
         {
             var left = Visit(node.Left);
             var right = Visit(node.Right);
 
-            if (left is not ConstantExpression lc || lc.Value is not string ls)
+            if (left is ConstantExpression lConst && lConst.Value is string[] array &&
+                right is ConstantExpression rConst && rConst.Value is string s && int.TryParse(s, out var index))
+            {
+                return Expression.Constant(array[index]);
+            }
+            
+            if (left is not ConstantExpression lc || !SimplifyConstantExpression(lc, out var ls))
                 throw new Exception();
-            if (right is not ConstantExpression rc || rc.Value is not string rs)
+            if (right is not ConstantExpression rc || !SimplifyConstantExpression(rc, out var rs))
                 throw new Exception();
 
             var op = OperatorToSql(node);

@@ -32,6 +32,9 @@ namespace WoWDatabaseEditorCore.Services.MostRecentlyUsed
             
             eventAggregator.GetEvent<EventRequestOpenItem>().Subscribe(item =>
             {
+                if (item is MetaSolutionSQL)
+                    return;
+                
                 var serialized = TrySerialize(item);
                 if (serialized == null)
                     return;
