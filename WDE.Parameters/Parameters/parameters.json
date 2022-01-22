@@ -1178,6 +1178,7 @@
 	"TypeMaskParameter": {
 		"name": "Type mask",
 		"inmenu": true,
+		"isflag": true,
 		"prefix": "TYPEMASK_",
 		"values": {
 			"0": {"name": "none"},
