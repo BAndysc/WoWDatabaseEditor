@@ -23,6 +23,8 @@ namespace WDE.WorldMap.PanAndZoom
             ZoomXProperty.Changed.AddClassHandler<ExtendedZoomBorder>(UpdateTopBottomLeftRight);
             ZoomYProperty.Changed.AddClassHandler<ExtendedZoomBorder>(UpdateTopBottomLeftRight);
             BoundsProperty.Changed.AddClassHandler<ExtendedZoomBorder>(UpdateTopBottomLeftRight);
+            MinWidthProperty.OverrideDefaultValue<ExtendedZoomBorder>(10);
+            MinHeightProperty.OverrideDefaultValue<ExtendedZoomBorder>(10);
         }
 
         private static void UpdateTopBottomLeftRight(ExtendedZoomBorder arg1, AvaloniaPropertyChangedEventArgs arg2)
