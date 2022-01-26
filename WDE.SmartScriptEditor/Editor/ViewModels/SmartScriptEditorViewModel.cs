@@ -1208,7 +1208,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartTarget? target = null;
 
-            if (!actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0)
+            if (!actionData.TargetIsSource && !actionData.DoNotProposeTarget && (actionData.TargetTypes?.Count ?? 0) > 0)
             {
                 var targetPick = await ShowTargetPicker(e, actionData);
 
