@@ -6,6 +6,11 @@ namespace WDE.SqlQueryGenerator
     {
         private readonly IWhere condition;
 
+        public UpdateQuery(IWhere condition)
+        {
+            this.condition = condition;
+        }
+        
         public UpdateQuery(IWhere condition, string key, string value)
         {
             this.condition = condition;

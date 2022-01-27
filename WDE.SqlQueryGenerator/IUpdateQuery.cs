@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WDE.SqlQueryGenerator
 {
@@ -6,5 +7,6 @@ namespace WDE.SqlQueryGenerator
     {
         public IWhere Condition { get; }
         public IEnumerable<(string, string)> Updates { get; }
+        bool Empty => !Updates.Any();
     }
 }

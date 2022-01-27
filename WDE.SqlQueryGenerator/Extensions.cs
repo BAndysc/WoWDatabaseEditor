@@ -171,6 +171,11 @@ namespace WDE.SqlQueryGenerator
             return new Query(query.Table, $"DELETE FROM `{query.Table.TableName}` WHERE {query.Condition};");
         }
         
+        public static IUpdateQuery ToUpdateQuery(this IWhere query)
+        {
+            return new UpdateQuery(query);
+        }
+        
         public static IUpdateQuery Set(this IWhere query, string key, object? value)
         {
             return new UpdateQuery(query, key, value.ToSql());
