@@ -8,12 +8,13 @@ namespace WDE.AzerothCore
 {
     [AutoRegister]
     [SingleInstance]
-    public class AzerothCoreVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures
+    public class AzerothCoreVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures
     {
         public string Tag => "Azeroth";
         public string FriendlyName => "AzerothCore Wrath of the Lich King";
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
+        public IGameVersionFeatures GameVersionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
         public bool SupportsRbac => false;
 
@@ -38,5 +39,7 @@ namespace WDE.AzerothCore
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";
         public string ConditionSourcesFile => "SmartData/condition_sources.json";
+        public CharacterRaces AllRaces => CharacterRaces.AllWrath;
+        public CharacterClasses AllClasses => CharacterClasses.AllWrath;
     }
 }

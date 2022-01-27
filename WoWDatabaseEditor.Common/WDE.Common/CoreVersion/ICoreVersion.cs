@@ -13,9 +13,16 @@ namespace WDE.Common.CoreVersion
         IDatabaseFeatures DatabaseFeatures { get; }
         ISmartScriptFeatures SmartScriptFeatures { get; }
         IConditionFeatures ConditionFeatures { get; }
+        IGameVersionFeatures GameVersionFeatures { get; }
         bool SupportsRbac => true;
         bool SupportsSpecialCommands => false;
         bool SupportsReverseCommands => false;
+    }
+    
+    public interface IGameVersionFeatures
+    {
+        CharacterRaces AllRaces { get; }
+        CharacterClasses AllClasses { get; }
     }
 
     public interface IConditionFeatures

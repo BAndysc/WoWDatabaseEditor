@@ -8,7 +8,7 @@ namespace WDE.Trinity
 {
     [AutoRegister]
     [SingleInstance]
-    public class TrinityCataclysmVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures
+    public class TrinityCataclysmVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures
     {
         public string Tag => "TrinityCata";
         public string FriendlyName => "The Cataclysm Preservation Project";
@@ -16,6 +16,7 @@ namespace WDE.Trinity
         public IDatabaseFeatures DatabaseFeatures => this;
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
+        public IGameVersionFeatures GameVersionFeatures => this;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ICreatureClassLevelStat)};
         public bool AlternativeTrinityDatabase => false;
@@ -31,5 +32,7 @@ namespace WDE.Trinity
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";
         public string ConditionSourcesFile => "SmartData/condition_sources.json";
+        public CharacterRaces AllRaces => CharacterRaces.AllCatataclysm;
+        public CharacterClasses AllClasses => CharacterClasses.AllCataclysm;
     }
 }
