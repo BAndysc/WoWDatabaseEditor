@@ -15,13 +15,19 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "LogTitle")]
         public string Name { get; set; } = "";
 
+        public CharacterClasses AllowableClasses => addon == null ? CharacterClasses.None : (CharacterClasses)addon.AllowableClasses;
+
+        [Column(Name="AllowableRaces")]
+        public CharacterRaces AllowableRaces { get; set; }
+        
         public int PrevQuestId => addon == null ? 0 : addon.PrevQuestId;
 
         public int NextQuestId => addon == null ? 0 : addon.NextQuestId;
 
         public int ExclusiveGroup => addon == null ? 0 : addon.ExclusiveGroup;
 
-        public int NextQuestInChain => 0;
+        [Column(Name = "RewardNextQuest")]
+        public uint NextQuestInChain { get; set; }
 
         public MySqlQuestTemplate SetAddon(MySqlQuestTemplateAddon? addon)
         {

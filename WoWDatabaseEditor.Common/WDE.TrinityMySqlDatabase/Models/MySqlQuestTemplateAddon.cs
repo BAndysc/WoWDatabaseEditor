@@ -17,6 +17,9 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ExclusiveGroup")]
         public int ExclusiveGroup { get; set; }
+        
+        [Column(Name = "AllowableClasses")]
+        public uint AllowableClasses { get; set; }
     }
     
     [Table(Name = "quest_template_addon")]
