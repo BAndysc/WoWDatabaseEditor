@@ -1,7 +1,7 @@
 {
   "id": "gossip_menu_option",
   "compatibility": [
-    "TrinityWrath", "Azeroth"
+    "TrinityWrath", "Azeroth", "TrinityMaster"
   ],
   "name": "Gossip Menu Option",
   "single_solution_name": "{key} gossip menu options",
