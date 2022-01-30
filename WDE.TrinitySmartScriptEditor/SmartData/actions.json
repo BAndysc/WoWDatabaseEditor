@@ -904,7 +904,7 @@
     {
         "id": 38,
         "name": "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE_335_CATA",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "description": "{target}: Set in combat with current zone",
         "name_readable": "Set in combat with zone",
         "implicit_source": "SMART_TARGET_SELF",
@@ -914,7 +914,7 @@
     {
         "id": 38,
         "name": "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE",
-        "tags": ["Azeroth", "TrinityMaster"],
+        "tags": ["Azeroth"],
         "description": "{target}: Set in combat with current zone",
         "name_readable": "Set in combat with zone",
         "target_types": ["Creature"],
@@ -923,7 +923,7 @@
     {
         "id": 39,
         "name": "SMART_ACTION_CALL_FOR_HELP_335_CATA",
-        "tags": ["TrinityCata", "TrinityWrath"],
+        "tags": ["TrinityCata", "TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -942,7 +942,7 @@
     {
         "id": 39,
         "name": "SMART_ACTION_CALL_FOR_HELP",
-        "tags": ["TrinityMaster", "Azeroth"],
+        "tags": ["Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1685,7 +1685,7 @@
     {
         "id": 70,
         "name": "SMART_ACTION_ENABLE_TEMP_GOBJ",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1700,7 +1700,7 @@
     {
         "id": 70,
         "name": "SMART_ACTION_RESPAWN_TARGET",
-        "tags": ["Azeroth", "TrinityMaster"],
+        "tags": ["Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2812,7 +2812,7 @@
     {
         "id": 127,
         "name": "SMART_ACTION_PAUSE_MOVEMENT",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2835,7 +2835,7 @@
     {
         "id": 127,
         "name": "SMART_ACTION_STOP_MOTION",
-        "tags": ["TrinityCata", "TrinityMaster"],
+        "tags": ["TrinityCata"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -3110,7 +3110,7 @@
     {
         "id": 138,
         "name": "SMART_ACTION_OVERRIDE_LIGHT",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "ZoneAreaParameter",
@@ -3136,7 +3136,7 @@
     {
         "id": 139,
         "name": "SMART_ACTION_OVERRIDE_WEATHER",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "ZoneAreaParameter",
