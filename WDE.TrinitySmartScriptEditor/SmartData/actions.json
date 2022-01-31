@@ -161,7 +161,8 @@
         "id": 9,
         "name": "SMART_ACTION_ACTIVATE_GOBJECT",
         "description": "{source}: Activate gameobject",
-        "name_readable": "Activate gobject",
+        "name_readable": "Activate gobject (legacy)",
+        "deprecated": true,
         "target_types": ["GameObject"],
         "target_is_source": true
     },
@@ -1801,7 +1802,24 @@
     },
     {
         "id": 75,
+        "name": "SMART_ACTION_ADD_AURA_WRATH",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell",
+                "required": true
+            }
+        ],
+        "description": "{source}: Add aura {pram1}",
+        "name_readable": "Add aura",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 75,
         "name": "SMART_ACTION_ADD_AURA",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "SpellParameter",
@@ -3265,6 +3283,62 @@
         "target_is_source": true
     },
     
+    {
+        "id": 147,
+        "name": "SMART_ACTION_ACTIVATE_GAMEOBJECT",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "GameObjectActionParameter",
+                "name": "Action type"
+            }
+        ],
+        "description": "{source}: {pram1}",
+        "name_readable": "Activate gobject",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 148,
+        "name": "SMART_ACTION_ADD_TO_STORED_TARGET_LIST",
+        "tags": ["TrinityMaster"],
+        "parameters": [
+            {
+                "type": "StoredTargetParameter",
+                "name": "Variable ID"
+            }
+        ],
+        "description": "{source}: Add {target} to {pram1}",
+        "name_readable": "Add to stored target list",
+        "target_types": ["Creature", "Player", "GameObject"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 149,
+        "name": "SMART_ACTION_BECOME_PERSONAL_CLONE_FOR_PLAYER",
+        "tags": ["TrinityMaster"],
+        "parameters": [
+            {
+                "type": "SummonTypeParameter",
+                "name": "Summon Type",
+                "required": true,
+                "defaultVal": 8
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Duration",
+                "description": "In ms"
+            }
+        ],
+        "description": "{source}: Become personal clone for {targetid:choose(8):[p]Action invoker[/p]|{target}}{targetid:choose(8): at position {targetcoords}|} for {pram2} seconds ({pram1})",
+        "name_readable": "Summon creature",
+        "target_types": ["Creature", "Player", "GameObject", "Position"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+
     {
         "id": 201,
         "name": "SMART_ACTION_MOVE_TO_POS_TARGET_AC",
