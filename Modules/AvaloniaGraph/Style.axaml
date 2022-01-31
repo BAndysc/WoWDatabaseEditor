@@ -1,0 +1,149 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:AvaloniaGraph.Controls">
+    <Style Selector="controls|GraphNodeItemView">
+        <Setter Property="Canvas.Left" Value="{Binding X, RelativeSource={RelativeSource Self}, Mode=OneWay}" />
+        <Setter Property="Canvas.Top" Value="{Binding Y, RelativeSource={RelativeSource Self}, Mode=OneWay}" />
+        <Setter Property="Canvas.ZIndex" Value="{Binding ZIndex, RelativeSource={RelativeSource Self}, Mode=TwoWay}" />
+        
+        <!-- This assumes DataContext of GraphNodeItem is always subclass of NodeViewModelBase, which is not as MVVM as it could be -->
+        <Setter Property="X" Value="{Binding X, Mode=OneWay}" />
+        <Setter Property="Y" Value="{Binding Y, Mode=TwoWay}" />
+        <Setter Property="IsDragging" Value="{Binding IsDragging, Mode=TwoWay}" />
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+        
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style Selector="controls|ConnectorItem">
+        <!-- this assumes datacontext is always ConnectorViewModel, which might be not most MVVMish way -->
+        <Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <!-- default style -->
+                    <Rectangle Width="15" Height="15" Fill="Blue" StrokeThickness="1" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style Selector="controls|ConnectionItem">
+        <Setter Property="Canvas.Left"
+                Value="{Binding TopLeftPosition.X, RelativeSource={RelativeSource Self}, Mode=OneWay}" />
+        <Setter Property="Canvas.Top"
+                Value="{Binding TopLeftPosition.Y, RelativeSource={RelativeSource Self}, Mode=OneWay}" />
+        <Setter Property="ClipToBounds" Value="False" />
+        <!-- this assumes datacontext is always ConnectionViewModel, which might be not most MVVMish way -->
+        <Setter Property="TopLeftPosition" Value="{Binding TopLeftPosition, Mode=OneWay}" />
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      ClipToBounds="False"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style Selector="controls|GraphControl">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate TargetType="{x:Type controls:GraphControl}">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border>
+                        <Border.Background>
+                            <VisualBrush TileMode="Tile" Stretch="None" AlignmentX="Left" AlignmentY="Top"
+                                         SourceRect="0,0,25,25" DestinationRect="0,0,25,25">
+                                <VisualBrush.Visual>
+                                    <Border BorderThickness="0 0 1 1"
+                                            Height="25" Width="25">
+                                        <Border.BorderBrush>
+                                            <SolidColorBrush Color="#77A9A9A9" />
+                                        </Border.BorderBrush>
+                                    </Border>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Border.Background>
+                        <Grid>
+                            <controls:NodesContainer x:Name="PART_ElementItemsControl"
+                                                          Items="{TemplateBinding ElementsSource}"
+                                                          VirtualizationMode="None"
+                                                          ItemTemplate="{TemplateBinding ElementItemTemplate}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas Classes="ElementCanvas" x:Name="PART_Elements" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.Styles>
+                                    <Style Selector="ListBox">
+                                        <Setter Property="Template">
+                                            <ControlTemplate>
+                                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                                Items="{TemplateBinding Items}"
+                                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                                ItemTemplate="{TemplateBinding ItemTemplate}"
+                                                                Margin="{TemplateBinding Padding}"
+                                                                VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                                            </ControlTemplate>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.Styles>
+                            </controls:NodesContainer>
+
+                            <controls:ConnectionsContainer x:Name="PART_ConnectionItemsControl"
+                                                             Items="{TemplateBinding ConnectionsSource}"
+                                                             SelectedItems="{TemplateBinding SelectedConnections}"
+                                                             VirtualizationMode="None"
+                                                             ItemTemplate="{TemplateBinding ConnectionItemTemplate}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.Styles>
+                                    <Style Selector="ListBox">
+                                        <Setter Property="Template">
+                                            <ControlTemplate>
+                                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                                Items="{TemplateBinding Items}"
+                                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                                ItemTemplate="{TemplateBinding ItemTemplate}"
+                                                                Margin="{TemplateBinding Padding}"
+                                                                VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                                            </ControlTemplate>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.Styles>
+                            </controls:ConnectionsContainer>
+                        </Grid>
+                    </Border>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
