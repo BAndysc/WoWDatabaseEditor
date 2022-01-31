@@ -1,0 +1,122 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:graphing="clr-namespace:AvaloniaGraph.Controls;assembly=AvaloniaGraph"
+             xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.ViewModels"
+             xmlns:views="clr-namespace:WDE.QuestChainEditor.Views"
+             xmlns:panAndZoom="clr-namespace:WDE.WorldMap.PanAndZoom;assembly=WDE.Common.Avalonia"
+             xmlns:mvvm="http://prismlibrary.com/"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:QuestChainDocumentViewModel"
+             mvvm:ViewModelLocator.AutoWireViewModel="False"
+             x:Name="Root"
+             x:Class="WDE.QuestChainEditor.Views.QuestChainDocumentView">
+    <UserControl.Resources>
+        <views:AttachModeToBoolConverter x:Key="AttachModeToBoolConverter" TrueValue="Bottom" />
+                                   
+    </UserControl.Resources>
+    
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelected}" />
+        <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelected}" />
+    </UserControl.KeyBindings>
+    <Panel>
+        <panAndZoom:ExtendedZoomBorder EnablePan="True" PanButton="Left"
+                                       Focusable="True"
+                                       Stretch="None"
+                                       VerticalAlignment="Stretch" 
+                                       EnableConstrains="False">
+            <graphing:GraphControl x:Name="GraphControl" Background="#FF363636"
+                                   Width="100000"
+                                   Height="100000"
+                                   SelectedConnections="{CompiledBinding SelectedConnections}"
+                                   ElementsSource="{CompiledBinding Elements}"
+                                   ConnectionsSource="{CompiledBinding Connections}"
+                                   ConnectionDragStarted="OnGraphControlConnectionDragStarted"
+                                   ConnectionDragging="OnGraphControlConnectionDragging"
+                                   ConnectionDragCompleted="OnGraphControlConnectionDragCompleted">
+                <graphing:GraphControl.Styles>
+                    <Style Selector="Canvas">
+                        <Setter Property="Margin" Value="50000, 50000, 0, 0" />
+                        <Setter Property="ClipToBounds" Value="False" />
+                    </Style>
+                    <Style Selector="graphing|ConnectorItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Ellipse Width="12" Height="12" Margin="0,2,0,0" StrokeThickness="1"
+                                             Classes.isEmpty="{Binding NonEmpty, Converter={x:Static BoolConverters.Not}}" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    
+                    <Style Selector="graphing|ConnectorItem /template/ Ellipse">
+                        <Setter Property="Fill" Value="Blue" />
+                        <Setter Property="Stroke" Value="Blue" />
+                    </Style>
+                    <Style Selector="graphing|ConnectorItem /template/ Ellipse.isEmpty">
+                        <Setter Property="Fill" Value="Transparent" />
+                    </Style>
+                    
+                    <Style Selector="graphing|UniversalBezierLine">
+                        <Setter Property="Stroke" Value="Green" />
+                        <Setter Property="StrokeThickness" Value="2" />
+                        <Setter Property="StrokeDashArray" Value="2,2" />
+                    </Style>
+                    
+                    <Style Selector="graphing|UniversalBezierLine.isHierarchy">
+                        <Setter Property="Stroke" Value="LightSkyBlue" />
+                        <Setter Property="StrokeThickness" Value="4" />
+                        <Setter Property="StrokeDashArray" Value="{x:Null}" />
+                    </Style>
+                    <Style Selector="graphing|UniversalBezierLine.selected">
+                        <Setter Property="Stroke" Value="Red" />
+                    </Style>
+                    
+                    
+                </graphing:GraphControl.Styles>
+
+                <graphing:GraphControl.ElementItemTemplate>
+                    <DataTemplate>
+                        <views:QuestNodeView />
+                    </DataTemplate>
+                </graphing:GraphControl.ElementItemTemplate>
+
+                <graphing:GraphControl.ConnectionItemTemplate>
+                    <DataTemplate>
+                        <Panel>
+                            <graphing:UniversalBezierLine StrokeThickness="20"
+                                                          Stroke="Transparent"
+                                                          StartMode="{Binding StartAttachMode}"
+                                                          EndMode="{Binding EndAttachMode}"
+                                                          StartPoint="{Binding FromPosition}"
+                                                          EndPoint="{Binding ToPosition}" />
+                            <graphing:UniversalBezierLine IsHitTestVisible="False"
+                                                          StartMode="{Binding StartAttachMode}"
+                                                          EndMode="{Binding EndAttachMode}"
+                                                          Classes.selected="{Binding IsSelected}"
+                                                          Classes.isHierarchy="{Binding StartAttachMode, Converter={StaticResource AttachModeToBoolConverter}}"
+                                                          StartPoint="{Binding FromPosition}"
+                                                          EndPoint="{Binding ToPosition}" />
+                        </Panel>
+                    </DataTemplate>
+                </graphing:GraphControl.ConnectionItemTemplate>
+
+            </graphing:GraphControl>
+        </panAndZoom:ExtendedZoomBorder>
+        <Popup PlacementAnchor="Top" PlacementConstraintAdjustment="ResizeY" IsLightDismissEnabled="True" WindowManagerAddShadowHint="False" PlacementMode="Pointer" IsOpen="{CompiledBinding IsPickingQuest, Mode=TwoWay}" MaxHeight="500" Width="250">
+            <Border CornerRadius="3" Background="#242424" BorderThickness="3" BorderBrush="BlueViolet">
+                <DockPanel>
+                    <Border Background="BlueViolet" Padding="5" DockPanel.Dock="Top" BorderThickness="0, 0, 0, 1" BorderBrush="BlueViolet" >
+                        <TextBlock HorizontalAlignment="Stretch"
+                                   TextAlignment="Center"
+                                   Foreground="White">Pick a quest</TextBlock>
+                    </Border>
+                    <views:QuestPickerView IsVisible="{Binding #Root.DataContext.IsPickingQuest}" DataContext="{CompiledBinding QuestPicker}" />
+                </DockPanel>
+            </Border>
+        </Popup>
+    </Panel>
+</UserControl>
