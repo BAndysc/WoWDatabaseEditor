@@ -3,6 +3,9 @@
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
+        <SelfContained>true</SelfContained>
+        <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+        <RuntimeIdentifiers>win8-x64;osx-x64;linux-x64;osx-arm64</RuntimeIdentifiers>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
