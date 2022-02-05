@@ -28,7 +28,7 @@ namespace WoWDatabaseEditorCore.Services.MostRecentlyUsed
             this.deserializer = deserializer;
             this.serializer = serializer;
             var previous = userSettings.Get<Data>(new Data(new List<MruEntry>()));
-            mostRecentlyUsed = previous.Items;
+            mostRecentlyUsed = previous.Items ?? new List<MruEntry>();
             
             eventAggregator.GetEvent<EventRequestOpenItem>().Subscribe(item =>
             {
