@@ -149,4 +149,26 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var model = Database();
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
     }
+    
+    protected IQueryable<MySqlMasterQuestTemplate> GetMasterQuestsQuery(BaseTrinityDatabase model)
+    {
+        return (from t in model.MasterQuestTemplate
+            join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
+            from subaddon in adn.DefaultIfEmpty()
+            orderby t.Entry
+            select t.SetAddon(subaddon));
+    }
+    
+    public override IEnumerable<IQuestTemplate> GetQuestTemplates()
+    {
+        using var model = Database();
+
+        return GetMasterQuestsQuery(model).ToList<IQuestTemplate>();
+    }
+
+    public override async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+    {
+        await using var model = Database();
+        return await GetMasterQuestsQuery(model).ToListAsync<IQuestTemplate>();
+    }
 }

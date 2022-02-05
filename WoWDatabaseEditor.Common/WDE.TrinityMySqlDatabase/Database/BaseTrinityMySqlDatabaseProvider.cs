@@ -225,7 +225,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<List<IGameObject>> GetGameObjectsAsync();
 
-        private IQueryable<MySqlQuestTemplate> GetQuestsQuery(BaseTrinityDatabase model)
+        protected virtual IQueryable<MySqlQuestTemplate> GetQuestsQuery(BaseTrinityDatabase model)
         {
             return (from t in model.QuestTemplate
                 join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
@@ -234,14 +234,14 @@ namespace WDE.TrinityMySqlDatabase.Database
                 select t.SetAddon(subaddon));
         }
         
-        public IEnumerable<IQuestTemplate> GetQuestTemplates()
+        public virtual IEnumerable<IQuestTemplate> GetQuestTemplates()
         {
             using var model = Database();
 
             return GetQuestsQuery(model).ToList<IQuestTemplate>();
         }
 
-        public async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+        public virtual async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
         {
             await using var model = Database();
             return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
