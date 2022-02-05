@@ -166,6 +166,12 @@ namespace WDE.TrinityMySqlDatabase.Database
             await using var model = Database();
             return await (from t in model.NpcTexts orderby t.Id select t).ToListAsync<INpcText>();
         }
+        
+        public async Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry)
+        {
+            await using var model = Database();
+            return await model.AreaTriggerScript.FirstOrDefaultAsync(script => script.Entry == entry);
+        }
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
         {
@@ -315,8 +321,8 @@ namespace WDE.TrinityMySqlDatabase.Database
                         .UpdateAsync();
                     break;
                 case SmartScriptType.AreaTrigger:
-                    await model.AreaTriggerScript.Where(p => p.Id == entryOrGuid).DeleteAsync();
-                    await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Id = entryOrGuid, ScriptName = "SmartTrigger"});
+                    await model.AreaTriggerScript.Where(p => p.Entry == entryOrGuid).DeleteAsync();
+                    await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Entry = entryOrGuid, ScriptName = "SmartTrigger"});
                     break;
                 case SmartScriptType.AreaTriggerEntity:
                     throw new Exception(

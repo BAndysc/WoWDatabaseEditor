@@ -16,6 +16,7 @@ namespace WDE.Common.Database
         IGameObjectTemplate? GetGameObjectTemplate(uint entry);
         IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
 
+        Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry);
         IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates();
 
         IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();

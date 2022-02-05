@@ -16,6 +16,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => null;
 
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => Enumerable.Empty<IGameObjectTemplate>();
+        
+        public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => Task.FromResult<IAreaTriggerScript?>(null);
 
         public IQuestTemplate? GetQuestTemplate(uint entry) => null;
 

@@ -155,6 +155,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetGameObjectTemplates();
         }
 
+        public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => nonCachedDatabase.GetAreaTriggerScript(entry);
+
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates()
         {
             if (creatureTemplateCache != null)

@@ -45,11 +45,12 @@ public class QuickAccessView : UserControl
             {
                 DispatcherTimer.RunOnce(() =>
                 {
-                    searchBox.Focus();
+                    searchBox?.Focus();
                 }, TimeSpan.FromMilliseconds(1));
                 DispatcherTimer.RunOnce(() =>
                 {
-                    searchBox.SelectionEnd = searchBox.SelectionStart = searchBox.Text.Length;
+                    if (searchBox != null && searchBox.Text != null)
+                        searchBox.SelectionEnd = searchBox.SelectionStart = searchBox.Text.Length;
                 }, TimeSpan.FromMilliseconds(2));
             }
         });
