@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using Prism.Events;
 using WDBXEditor.Storage;
 using DBCD;
+using WDE.Common.CoreVersion;
+using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.DbcStore.FastReader;
 using WDE.DbcStore.Providers;
 using WDE.DbcStore.Spells;
@@ -53,6 +56,7 @@ namespace WDE.DbcStore
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IEventAggregator eventAggregator;
+        private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly NullSpellService nullSpellService;
         private readonly CataSpellService cataSpellService;
         private readonly WrathSpellService wrathSpellService;
@@ -65,6 +69,7 @@ namespace WDE.DbcStore
             IDbcSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator,
+            ICurrentCoreVersion currentCoreVersion,
             NullSpellService nullSpellService,
             CataSpellService cataSpellService,
             WrathSpellService wrathSpellService,
@@ -75,6 +80,7 @@ namespace WDE.DbcStore
             dbcSettingsProvider = settingsProvider;
             this.messageBoxService = messageBoxService;
             this.eventAggregator = eventAggregator;
+            this.currentCoreVersion = currentCoreVersion;
             this.nullSpellService = nullSpellService;
             this.cataSpellService = cataSpellService;
             this.wrathSpellService = wrathSpellService;
@@ -110,7 +116,9 @@ namespace WDE.DbcStore
         public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
         
         internal void Load()
-        {
+        {            
+            parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces), QuickAccessMode.Limited);
+
             if (dbcSettingsProvider.GetSettings().SkipLoading)
                 return;
 
@@ -268,8 +276,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("TextEmoteParameter", new DbcParameter(TextEmoteStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ClassMaskParameter", new DbcMaskParameter(ClassStore, -1));
-                parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore), QuickAccessMode.Limited);
-                parameterFactory.Register("RaceMaskParameter", new DbcMaskParameter(RaceStore, -1));
+                parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
                 parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore), QuickAccessMode.Limited);
                 parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ZoneAreaParameter", new DbcParameter(AreaStore), QuickAccessMode.Limited);
@@ -544,6 +551,26 @@ namespace WDE.DbcStore
             Items = new Dictionary<long, SelectOption>();
             foreach (int key in storage.Keys)
                 Items.Add(1L << (key + offset), new SelectOption(storage[key]));
+        }
+    }
+
+    public class RaceMaskParameter : FlagParameter
+    {
+        private static bool IsPowerOfTwo(ulong x)
+        {
+            return (x != 0) && ((x & (x - 1)) == 0);
+        }
+    
+        public RaceMaskParameter(CharacterRaces allowableRaces)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (CharacterRaces race in Enum.GetValues<CharacterRaces>())
+            {
+                if (IsPowerOfTwo((ulong)race) && allowableRaces.HasFlag(race))
+                {
+                    Items.Add((long)race, new SelectOption(race.ToString().ToTitleCase()));
+                }
+            }
         }
     }
     
