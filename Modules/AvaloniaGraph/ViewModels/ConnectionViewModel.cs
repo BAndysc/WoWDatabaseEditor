@@ -10,35 +10,35 @@ public interface IConnectionViewModel
     ITreeNode? ToNode { get; }
 }
 
-public class ConnectionViewModel<T> : ViewModelBase, IConnectionViewModel where T : NodeViewModelBase<T>
+public class ConnectionViewModel<T, K> : ViewModelBase, IConnectionViewModel where T : NodeViewModelBase<T, K> where K : ConnectionViewModel<T, K>
 {
-    private OutputConnectorViewModel<T>? from;
+    private OutputConnectorViewModel<T, K>? from;
 
     private Point fromPosition;
 
     private bool isSelected;
 
-    private InputConnectorViewModel<T>? to;
+    private InputConnectorViewModel<T, K>? to;
 
     private Point toPosition;
 
-    public ConnectionViewModel(OutputConnectorViewModel<T> from, InputConnectorViewModel<T> to)
+    public ConnectionViewModel(OutputConnectorViewModel<T, K> from, InputConnectorViewModel<T, K> to)
     {
         From = from;
         To = to;
     }
 
-    public ConnectionViewModel(InputConnectorViewModel<T> to)
+    public ConnectionViewModel(InputConnectorViewModel<T, K> to)
     {
         To = to;
     }
 
-    public ConnectionViewModel(OutputConnectorViewModel<T> from)
+    public ConnectionViewModel(OutputConnectorViewModel<T, K> from)
     {
         From = from;
     }
 
-    public OutputConnectorViewModel<T>? From
+    public OutputConnectorViewModel<T, K>? From
     {
         get => from;
         set
@@ -46,7 +46,7 @@ public class ConnectionViewModel<T> : ViewModelBase, IConnectionViewModel where 
             if (from != null)
             {
                 from.PositionChanged -= OnFromPositionChanged;
-                from.Connections.Remove(this);
+                from.Connections.Remove((this as K)!);
             }
 
             from = value;
@@ -54,7 +54,7 @@ public class ConnectionViewModel<T> : ViewModelBase, IConnectionViewModel where 
             if (from != null)
             {
                 from.PositionChanged += OnFromPositionChanged;
-                from.Connections.Add(this);
+                from.Connections.Add((this as K)!);
                 FromPosition = from.Position;
                 // why?
                 //To = to;
@@ -65,7 +65,7 @@ public class ConnectionViewModel<T> : ViewModelBase, IConnectionViewModel where 
         }
     }
 
-    public InputConnectorViewModel<T>? To
+    public InputConnectorViewModel<T, K>? To
     {
         get => to;
         set
@@ -73,7 +73,7 @@ public class ConnectionViewModel<T> : ViewModelBase, IConnectionViewModel where 
             if (to != null)
             {
                 to.PositionChanged -= OnToPositionChanged;
-                to.Connections.Remove(this);
+                to.Connections.Remove((this as K)!);
             }
 
             to = value;
@@ -81,7 +81,7 @@ public class ConnectionViewModel<T> : ViewModelBase, IConnectionViewModel where 
             if (to != null)
             {
                 to.PositionChanged += OnToPositionChanged;
-                to.Connections.Add(this);
+                to.Connections.Add((this as K)!);
                 ToPosition = to.Position;
             }
 
@@ -131,10 +131,10 @@ public class ConnectionViewModel<T> : ViewModelBase, IConnectionViewModel where 
     public void Detach()
     {
         if (From != null)
-            From.Connections.Remove(this);
+            From.Connections.Remove((this as K)!);
 
         if (To != null)
-            To.Connections.Remove(this);
+            To.Connections.Remove((this as K)!);
     }
 
     private void OnFromPositionChanged(object? sender, EventArgs e)

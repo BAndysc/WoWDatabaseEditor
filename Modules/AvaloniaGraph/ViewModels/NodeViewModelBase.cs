@@ -15,7 +15,7 @@ public interface INodeViewModelBase
     public double Y { get; set; }
 }
 
-public abstract class NodeViewModelBase<T> : ViewModelBase, ITreeNode, INodeViewModelBase where T : NodeViewModelBase<T>
+public abstract class NodeViewModelBase<T, K> : ViewModelBase, ITreeNode, INodeViewModelBase where T : NodeViewModelBase<T, K> where K : ConnectionViewModel<T, K>
 {
     private bool isDragging;
     private bool isSelected;
@@ -27,8 +27,8 @@ public abstract class NodeViewModelBase<T> : ViewModelBase, ITreeNode, INodeView
 
     protected NodeViewModelBase()
     {
-        InputConnectors = new ObservableCollection<InputConnectorViewModel<T>>();
-        OutputConnectors = new ObservableCollection<OutputConnectorViewModel<T>>();
+        InputConnectors = new ObservableCollection<InputConnectorViewModel<T, K>>();
+        OutputConnectors = new ObservableCollection<OutputConnectorViewModel<T, K>>();
     }
 
     public Vector2 Force { get; set; }
@@ -57,11 +57,11 @@ public abstract class NodeViewModelBase<T> : ViewModelBase, ITreeNode, INodeView
         set => SetProperty(ref isSelected, value);
     }
 
-    public IList<InputConnectorViewModel<T>> InputConnectors { get; }
+    protected IList<InputConnectorViewModel<T, K>> InputConnectors { get; }
 
-    public IList<OutputConnectorViewModel<T>> OutputConnectors { get; }
+    protected IList<OutputConnectorViewModel<T, K>> OutputConnectors { get; }
 
-    public IEnumerable<ConnectionViewModel<T>> AttachedConnections
+    protected IEnumerable<K> AttachedConnections
     {
         get
         {
@@ -90,16 +90,16 @@ public abstract class NodeViewModelBase<T> : ViewModelBase, ITreeNode, INodeView
 
     public event EventHandler? OutputChanged;
 
-    protected InputConnectorViewModel<T> AddInputConnector(ConnectorAttachMode attachMode, string name, Color color)
+    protected InputConnectorViewModel<T, K> AddInputConnector(ConnectorAttachMode attachMode, string name, Color color)
     {
-        InputConnectorViewModel<T> inputConnector = new((this as T)!, attachMode, name, color);
+        InputConnectorViewModel<T, K> inputConnector = new((this as T)!, attachMode, name, color);
         InputConnectors.Add(inputConnector);
         return inputConnector;
     }
 
-    protected OutputConnectorViewModel<T> AddOutputConnector(ConnectorAttachMode attachMode, string name, Color color)
+    protected OutputConnectorViewModel<T, K> AddOutputConnector(ConnectorAttachMode attachMode, string name, Color color)
     {
-        OutputConnectorViewModel<T> outputConnector = new((this as T)!, attachMode, name, color);
+        OutputConnectorViewModel<T, K> outputConnector = new((this as T)!, attachMode, name, color);
         OutputConnectors.Add(outputConnector);
         return outputConnector;
     }

@@ -30,7 +30,7 @@ public class QuestChainDocumentView : UserControl
     private void OnGraphControlConnectionDragStarted(object sender, ConnectionDragStartedEventArgs e)
     {
         elementsCanvas ??= graphControl.FindDescendantOfType<Canvas>();
-        var sourceConnector = (ConnectorViewModel<QuestViewModel>)e.SourceConnector.DataContext!;
+        var sourceConnector = (ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>)e.SourceConnector.DataContext!;
         var currentDragPoint = e.GetPosition(elementsCanvas);
         var connection = ViewModel.OnConnectionDragStarted(sourceConnector, currentDragPoint);
         e.Connection = connection;
@@ -40,7 +40,7 @@ public class QuestChainDocumentView : UserControl
     {
         elementsCanvas ??= graphControl.FindDescendantOfType<Canvas>();
         var currentDragPoint = e.GetPosition(elementsCanvas);
-        var connection = (ConnectionViewModel<QuestViewModel>)e.Connection;
+        var connection = (QuestConnectionViewModel)e.Connection;
         ViewModel.OnConnectionDragging(currentDragPoint, connection);
     }
 
@@ -48,8 +48,8 @@ public class QuestChainDocumentView : UserControl
     {
         elementsCanvas ??= graphControl.FindDescendantOfType<Canvas>();
         var currentDragPoint = e.GetPosition(elementsCanvas);
-        var sourceConnector = (ConnectorViewModel<QuestViewModel>)e.SourceConnector.DataContext!;
-        var newConnection = (ConnectionViewModel<QuestViewModel>)e.Connection;
+        var sourceConnector = (ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>)e.SourceConnector.DataContext!;
+        var newConnection = (QuestConnectionViewModel)e.Connection;
         ViewModel.OnConnectionDragCompleted(currentDragPoint, newConnection, sourceConnector);
     }
 

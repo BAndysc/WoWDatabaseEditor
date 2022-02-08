@@ -23,8 +23,8 @@
         <Border CornerRadius="4" Background="#FF0F0F0F">
             <DockPanel LastChildFill="True">
                 
-                <controls:ConnectorItem DockPanel.Dock="Top" DataContext="{Binding InputConnector}" AttachMode="Top" />
-                <controls:ConnectorItem DockPanel.Dock="Bottom" DataContext="{Binding OutputConnector}" AttachMode="Bottom" />
+                <controls:ConnectorItem DockPanel.Dock="Top" DataContext="{CompiledBinding RequiresConnector}" AttachMode="Top" />
+                <controls:ConnectorItem DockPanel.Dock="Bottom" DataContext="{CompiledBinding IsRequiredByConnector}" AttachMode="Bottom" />
                 
                 
                 <controls:ConnectorItem DockPanel.Dock="Left" DataContext="{CompiledBinding LeftInputConnector}" AttachMode="Middle" />

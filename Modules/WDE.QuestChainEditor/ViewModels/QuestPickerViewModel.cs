@@ -65,6 +65,7 @@ public class QuestPickerService
 public class QuestPickerViewModel : ObservableBase, IDialog
 {
     private List<QuestListItemViewModel> quests;
+    private Dictionary<uint, int> questById;
     private List<string> questNames;
     private string searchText = "";
     public ObservableCollection<QuestListItemViewModel> Quests { get; } = new();
@@ -82,6 +83,7 @@ public class QuestPickerViewModel : ObservableBase, IDialog
     {
         quests = databaseProvider.GetQuestTemplates().Select(qt => new QuestListItemViewModel(qt.Entry, qt.Name))
             .ToList();
+        questById = quests.Select((quest, index) => (quest, index)).ToDictionary(pair => pair.quest.Entry, pair => pair.index);
         questNames = quests.Select(q => q.Title.ToLower()).ToList();
         
         On(() => SearchText, searchText =>
@@ -116,6 +118,16 @@ public class QuestPickerViewModel : ObservableBase, IDialog
 
     private async Task DoFilter(string searchText, CancellationTokenSource cancellationToken)
     {
+        if (uint.TryParse(searchText, out var entryInt) && questById.TryGetValue(entryInt, out var questIndex))
+        {
+            if (filteringToken == cancellationToken)
+            {
+                Quests.Clear();
+                Quests.Add(quests[questIndex]);
+            }
+            return;
+        }
+        
         await Task.Delay(50, cancellationToken.Token);
 
         if (cancellationToken.IsCancellationRequested)

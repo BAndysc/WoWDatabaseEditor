@@ -5,7 +5,7 @@ using AvaloniaGraph.Controls;
 
 namespace AvaloniaGraph.ViewModels;
 
-public abstract class ConnectorViewModel<T> : ViewModelBase where T : NodeViewModelBase<T>
+public abstract class ConnectorViewModel<T, K> : ViewModelBase where T : NodeViewModelBase<T, K> where K : ConnectionViewModel<T, K>
 {
     private Point position;
 

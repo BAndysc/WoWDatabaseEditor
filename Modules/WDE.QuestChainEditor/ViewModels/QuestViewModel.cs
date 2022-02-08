@@ -192,15 +192,15 @@ public class ClassMiniIconViewModel : MiniIconViewModel
     public CharacterClasses Class { get; }
 }
 
-public class QuestViewModel : NodeViewModelBase<QuestViewModel>
+public class QuestViewModel : NodeViewModelBase<QuestViewModel, QuestConnectionViewModel>
 {
     //public uint Entry { get; }
     public string Name { get; }
     
     public QuestViewModel(IQuestTemplate template, IMiniIcons miniIcons)
     {
-        InputConnector = AddInputConnector(ConnectorAttachMode.Top, "", Colors.Aqua);
-        OutputConnector = AddOutputConnector(ConnectorAttachMode.Bottom, "", Colors.Aqua);
+        RequiresConnector = AddInputConnector(ConnectorAttachMode.Top, "", Colors.Aqua);
+        IsRequiredByConnector = AddOutputConnector(ConnectorAttachMode.Bottom, "", Colors.Aqua);
         LeftInputConnector = AddInputConnector(ConnectorAttachMode.Left, "", Colors.Red);
         RightOutputConnector = AddOutputConnector(ConnectorAttachMode.Right, "", Colors.Red);
         Entry = template.Entry;
@@ -227,11 +227,11 @@ public class QuestViewModel : NodeViewModelBase<QuestViewModel>
     public List<MiniIconViewModel>? Classes { get; }
     public List<MiniIconViewModel>? Races { get; }
     
-    public override TreeNodeIterator ChildrenIterator => new TreeNodeIterator(OutputConnector.Connections);
+    public override TreeNodeIterator ChildrenIterator => new TreeNodeIterator(IsRequiredByConnector.Connections);
 
-    public InputConnectorViewModel<QuestViewModel> InputConnector { get; }
-    public OutputConnectorViewModel<QuestViewModel> OutputConnector { get; }
+    public InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> RequiresConnector { get; }
+    public OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> IsRequiredByConnector { get; }
 
-    public InputConnectorViewModel<QuestViewModel> LeftInputConnector { get; }
-    public OutputConnectorViewModel<QuestViewModel> RightOutputConnector { get; }
+    public InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> LeftInputConnector { get; }
+    public OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> RightOutputConnector { get; }
 }
