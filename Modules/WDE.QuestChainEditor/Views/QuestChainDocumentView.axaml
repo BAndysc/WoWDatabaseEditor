@@ -66,6 +66,21 @@
                         <Setter Property="StrokeDashArray" Value="2,2" />
                     </Style>
                     
+                    <Style Selector="graphing|UniversalBezierLine.isAnd">
+                        <Setter Property="Stroke" Value="Orange" />
+                        <Setter Property="StrokeThickness" Value="4" />
+                        <Setter Property="StrokeDashArray" Value="{x:Null}" />
+                    </Style>
+                    <Style Selector="graphing|UniversalBezierLine.isOneOf">
+                        <Setter Property="Stroke" Value="Violet" />
+                        <Setter Property="StrokeThickness" Value="4" />
+                        <Setter Property="StrokeDashArray" Value="{x:Null}" />
+                    </Style>
+                    <Style Selector="graphing|UniversalBezierLine.isOr">
+                        <Setter Property="Stroke" Value="Green" />
+                        <Setter Property="StrokeThickness" Value="2" />
+                        <Setter Property="StrokeDashArray" Value="{x:Null}" />
+                    </Style>
                     <Style Selector="graphing|UniversalBezierLine.isHierarchy">
                         <Setter Property="Stroke" Value="LightSkyBlue" />
                         <Setter Property="StrokeThickness" Value="4" />
@@ -85,7 +100,7 @@
                 </graphing:GraphControl.ElementItemTemplate>
 
                 <graphing:GraphControl.ConnectionItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="viewModels:QuestConnectionViewModel">
                         <Panel>
                             <graphing:UniversalBezierLine StrokeThickness="20"
                                                           Stroke="Transparent"
@@ -97,9 +112,13 @@
                                                           StartMode="{Binding StartAttachMode}"
                                                           EndMode="{Binding EndAttachMode}"
                                                           Classes.selected="{Binding IsSelected}"
-                                                          Classes.isHierarchy="{Binding StartAttachMode, Converter={StaticResource AttachModeToBoolConverter}}"
+                                                          Classes.isHierarchy="{Binding IsHierarchyConnection}"
+                                                          Classes.isAnd="{Binding IsAndConnection}"
+                                                          Classes.isOr="{Binding IsOrConnection}"
+                                                          Classes.isOneOf="{Binding IsOneOfConnection}"
                                                           StartPoint="{Binding FromPosition}"
                                                           EndPoint="{Binding ToPosition}" />
+                            <TextBlock Text="{Binding Text}" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
                         </Panel>
                     </DataTemplate>
                 </graphing:GraphControl.ConnectionItemTemplate>

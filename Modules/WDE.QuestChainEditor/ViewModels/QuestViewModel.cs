@@ -226,8 +226,36 @@ public class QuestViewModel : NodeViewModelBase<QuestViewModel, QuestConnectionV
 
     public List<MiniIconViewModel>? Classes { get; }
     public List<MiniIconViewModel>? Races { get; }
+
+    private static bool IsToTheRight(QuestViewModel? a, QuestViewModel? b)
+    {
+        while (a != null)
+        {
+            a = a?.RightOutputConnector.Connections.FirstOrDefault()?.To?.Node;
+            
+            if (a == b)
+                return true;
+        }
+
+        return false;
+    }
     
-    public override TreeNodeIterator ChildrenIterator => new TreeNodeIterator(IsRequiredByConnector.Connections);
+    public override TreeNodeIterator ChildrenIterator
+    {
+        get
+        {
+            var copy = IsRequiredByConnector.Connections.ToList();
+            copy.Sort((a, b) =>
+            {
+                if (IsToTheRight(a.To?.Node, b.To?.Node))
+                    return -1;
+                if (IsToTheRight(b.To?.Node, a.To?.Node))
+                    return 1;
+                return 0;
+            });
+            return new TreeNodeIterator(copy);
+        }
+    }
 
     public InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> RequiresConnector { get; }
     public OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> IsRequiredByConnector { get; }

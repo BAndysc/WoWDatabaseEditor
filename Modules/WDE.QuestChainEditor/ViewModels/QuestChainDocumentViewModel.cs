@@ -138,7 +138,7 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
         //     Console.WriteLine(top[i].Item1 + " " + top[i].Item2 + " " + top[i].Item3);
         // }
         
-        LoadQuestWithDependencies(15);
+        LoadQuestWithDependencies(100000);
 
         DispatcherTimer.Run(Update, TimeSpan.FromMilliseconds(16));
     }
@@ -164,27 +164,37 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
                 foreach (var requiredQuestEntry in q.Requirements[0].Quests)
                 {
                     var requiredQuest = GetOrCreate(quests[requiredQuestEntry]);
-                    var connection = new QuestConnectionViewModel(requiredQuest.IsRequiredByConnector, viewModel.RequiresConnector);
+                    var connection = new QuestConnectionViewModel(requiredQuest.IsRequiredByConnector, viewModel.RequiresConnector, QuestConnectionType.Hierarchy);
                     Connections.Add(connection);
                 }
             }
             else
             {
                 QuestViewModel? prev = null;
+                QuestConnectionType type;
                 foreach (var requirementGroup in q.Requirements)
                 {
+                    type = QuestConnectionType.Or;
                     foreach (var requiredQuestEntry in requirementGroup.Quests)
                     {
                         var requiredQuest = GetOrCreate(quests[requiredQuestEntry]);
-                        var connection = new QuestConnectionViewModel(requiredQuest.IsRequiredByConnector, viewModel.RequiresConnector);
+                        var connection = new QuestConnectionViewModel(requiredQuest.IsRequiredByConnector, viewModel.RequiresConnector, QuestConnectionType.Hierarchy);
                         Connections.Add(connection);
 
                         if (prev != null)
                         {
-                            connection = new QuestConnectionViewModel(prev.RightOutputConnector, requiredQuest.LeftInputConnector);
+                            connection = new QuestConnectionViewModel(prev.RightOutputConnector, requiredQuest.LeftInputConnector, type);
                             Connections.Add(connection);
                         }
-                    
+
+                        if (requirementGroup.RequirementType == QuestRequirementType.AllCompleted)
+                            type = QuestConnectionType.And;
+                        else if (requirementGroup.RequirementType == QuestRequirementType.MustBeActive)
+                            type = QuestConnectionType.And;
+                        else if (requirementGroup.RequirementType == QuestRequirementType.OnlyOneCompleted ||
+                                 requirementGroup.RequirementType == QuestRequirementType.Breadcrumb)
+                            type = QuestConnectionType.OneOf;
+
                         prev = requiredQuest;
                     }
                 }
@@ -227,12 +237,25 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
         set => SetProperty(ref autoLayout, value);
     }
 
+    private QuestViewModel GetLeftMostNode(QuestViewModel quest)
+    {
+        QuestViewModel left = quest;
+        while (left.LeftInputConnector.Connections.Count == 1 &&
+               left.LeftInputConnector.Connections[0].From != null)
+        {
+            left = left.LeftInputConnector.Connections[0].From!.Node;
+        }
+
+        return left;
+    }
+    
     private bool Update()
     {
         if (!autoLayout)
             return true;
         
-        List<QuestViewModel> roots = Elements.Where(e => e.RequiresConnector.Connections.Count == 0).ToList();
+        List<QuestViewModel> roots = Elements.Where(e => e.RequiresConnector.Connections.Count == 0 ||
+                                                         e.RequiresConnector.Connections[0].From == null).ToList();
         if (roots == null || roots.Count == 0)
             return true;
         
@@ -240,12 +263,7 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
 
         foreach (var e in Elements)
         {
-            QuestViewModel left = e;
-            while (left.LeftInputConnector.Connections.Count == 1 &&
-                   left.LeftInputConnector.Connections[0].From != null)
-            {
-                left = left.LeftInputConnector.Connections[0].From!.Node;
-            }
+            QuestViewModel left = GetLeftMostNode(e);
 
             QuestViewModel? node = left;
             double max = double.MinValue;
@@ -298,15 +316,17 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
     #region Draggin
 
     private bool connectingTo;
+    private bool connectingHierarchy;
     private Point currentDragPoint;
     private bool isPickingQuest;
 
     public QuestConnectionViewModel? OnConnectionDragStarted(ConnectorViewModel<QuestViewModel, QuestConnectionViewModel> sourceConnector, Point currentDragPoint)
     {
-        if (sourceConnector is OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> outputSource)
+        if (sourceConnector == sourceConnector.Node.IsRequiredByConnector)
         {
             connectingTo = true;
-            QuestConnectionViewModel connection = new(outputSource)
+            connectingHierarchy = true;
+            QuestConnectionViewModel connection = new(sourceConnector.Node.IsRequiredByConnector, QuestConnectionType.Hierarchy)
             {
                 ToPosition = currentDragPoint
             };
@@ -316,12 +336,41 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
             return connection;
         }
 
-        if (sourceConnector is InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> inputSource)
+        if (sourceConnector == sourceConnector.Node.RequiresConnector)
         {
             connectingTo = false;
-            QuestConnectionViewModel connection = new(inputSource)
+            connectingHierarchy = true;
+            QuestConnectionViewModel connection = new(sourceConnector.Node.RequiresConnector, QuestConnectionType.Hierarchy)
             {
                 FromPosition = currentDragPoint
+            };
+
+            Connections.Add(connection);
+
+            return connection;
+        }
+        
+        if (sourceConnector == sourceConnector.Node.RightOutputConnector)
+        {
+            connectingTo = true;
+            connectingHierarchy = false;
+            QuestConnectionViewModel connection = new(sourceConnector.Node.RightOutputConnector, QuestConnectionType.And)
+            {
+                FromPosition = currentDragPoint
+            };
+
+            Connections.Add(connection);
+
+            return connection;
+        }
+
+        if (sourceConnector == sourceConnector.Node.LeftInputConnector)
+        {
+            connectingTo = false;
+            connectingHierarchy = false;
+            QuestConnectionViewModel connection = new(sourceConnector.Node.LeftInputConnector, QuestConnectionType.And)
+            {
+                ToPosition = currentDragPoint
             };
 
             Connections.Add(connection);
@@ -337,10 +386,17 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
         // If current drag point is close to an input connector, show its snapped position.
         ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>? nearbyConnector = null;
 
-        if (connectingTo)
-            nearbyConnector = FindNearbyInputConnector(connection, currentDragPoint);
+        if (connectingHierarchy)
+        {
+            if (connectingTo)
+                nearbyConnector = FindNearbyInputConnector(connection, currentDragPoint);
+            else
+                nearbyConnector = FindNearbyOutputConnector(connection, currentDragPoint);   
+        }
         else
-            nearbyConnector = FindNearbyOutputConnector(connection, currentDragPoint);
+        {
+            nearbyConnector = FindNearbyNonHierarchyConnector(connection, currentDragPoint);
+        }
 
         var pnt = nearbyConnector?.Position ?? currentDragPoint;
 
@@ -350,6 +406,31 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
             connection.FromPosition = pnt;
     }
 
+    private bool AddNonHierarchyConnection(QuestViewModel from, QuestViewModel to, QuestConnectionType type)
+    {
+        if (from == to)
+            return false;
+
+        if (DoesNewEdgeIntroducesCycle(from, to, true, true)||
+            DoesNewEdgeIntroducesCycle(to, from, true, true))
+            return false;
+        
+        while (from.RightOutputConnector.NonEmpty)
+        {
+            Connections.Remove(from.RightOutputConnector.Connections[0]);
+            from.RightOutputConnector.Connections[0].Detach();
+        }
+        while (to.LeftInputConnector.NonEmpty)
+        {
+            Connections.Remove(to.LeftInputConnector.Connections[0]);
+            to.LeftInputConnector.Connections[0].Detach();
+        }
+        
+        var connection = new QuestConnectionViewModel(from.RightOutputConnector, to.LeftInputConnector, type);
+        Connections.Add(connection);
+        return true;
+    }
+    
     private bool AddConnection(QuestViewModel from, QuestViewModel to)
     {
         if (from == to)
@@ -359,7 +440,7 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
             return false;
             
         RemoveConflictingConnections(to, from);
-        var connection = new QuestConnectionViewModel(from.IsRequiredByConnector, to.RequiresConnector);
+        var connection = new QuestConnectionViewModel(from.IsRequiredByConnector, to.RequiresConnector, QuestConnectionType.Hierarchy);
         Connections.Add(connection);
         return true;
     }
@@ -375,40 +456,45 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
         Connections.Remove(newConnection);
 
         this.currentDragPoint = currentDragPoint;
-        if (connectingTo)
+
+        if (connectingHierarchy)
         {
-            var nearbyConnector = FindNearbyInputConnector(newConnection, currentDragPoint);
-
-            if (nearbyConnector == null)
+            if (connectingTo)
             {
-                AsyncTryConnect((sourceConnector as OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>)!, newConnection.ToPosition).ListenErrors();
-                //QuestDefinition quest = picker.ChooseQuest();
-                //if (quest == null)
-                //    return;
-                return;
-            }
+                var nearbyConnector = FindNearbyInputConnector(newConnection, currentDragPoint);
 
-            AddConnection(sourceConnector.Node, nearbyConnector.Node);
+                if (nearbyConnector == null)
+                    AsyncTryConnect((sourceConnector as OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>)!, newConnection.ToPosition).ListenErrors();
+                else
+                   AddConnection(sourceConnector.Node, nearbyConnector.Node);
+            }
+            else
+            {
+                var nearbyConnector = FindNearbyOutputConnector(newConnection, currentDragPoint);
+
+                if (nearbyConnector == null)
+                    AsyncTryConnectTo((sourceConnector as InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>)!, newConnection.FromPosition).ListenErrors();
+                else
+                    AddConnection(nearbyConnector.Node, sourceConnector.Node);
+            }   
         }
         else
         {
-            var nearbyConnector = FindNearbyOutputConnector(newConnection, currentDragPoint);
-
-            if (nearbyConnector == null)
+            var nearbyConnector = FindNearbyNonHierarchyConnector(newConnection, currentDragPoint);
+            if (nearbyConnector != null)
             {
-                //QuestDefinition quest = picker.ChooseQuest();
-                //if (quest == null)
-                //    return;
-                return;
+                if (nearbyConnector == nearbyConnector.Node.LeftInputConnector)
+                    AddNonHierarchyConnection(sourceConnector.Node, nearbyConnector.Node, QuestConnectionType.And);
+                else
+                    AddNonHierarchyConnection(nearbyConnector.Node, sourceConnector.Node, QuestConnectionType.And);
             }
-
-            AddConnection(nearbyConnector.Node, sourceConnector.Node);
         }
     }
 
-    private bool DoesNewEdgeIntroducesCycle(QuestViewModel from, QuestViewModel to)
+    private bool DoesNewEdgeIntroducesCycle(QuestViewModel from, QuestViewModel to, bool includingSiblings = false, bool bothWays = false)
     {
-        if (IsElementInChildren(from, to))
+        if (IsElementInChildren(from, to) ||
+            (bothWays && IsElementInChildren(to, from)))
         {
             messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                 .SetTitle("Invalid connection")
@@ -418,6 +504,20 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
                 .WithOkButton(true)
                 .Build()).ListenErrors();
             return true;
+        }
+
+        if (includingSiblings)
+        {
+            var left = GetLeftMostNode(from);
+            while (left != null)
+            {
+                if (DoesNewEdgeIntroducesCycle(left, to, false, bothWays))
+                    return true;
+                if (left.RightOutputConnector.Connections.Count == 0)
+                    left = null;
+                else
+                    left = left.RightOutputConnector.Connections[0].To?.Node;
+            }
         }
 
         return false;
@@ -434,6 +534,29 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
                 existing.Detach();
                 Connections.Remove(existing);
             }
+        }
+    }
+    
+    private async Task AsyncTryConnectTo(InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel> destination, Point newConnectionToPosition)
+    {
+        var id = await PickQuest();
+        if (!id.HasValue)
+            return;
+
+        var existing = Elements.FirstOrDefault(e => e.Entry == id.Value);
+        if (existing != null)
+        {
+            AddConnection(existing, destination.Node);
+        }
+        else
+        {
+            var newQuest = LoadQuestWithDependencies(id.Value);
+        
+            newQuest.X = newConnectionToPosition.X;
+            newQuest.Y = newConnectionToPosition.Y;
+        
+            var connection = new QuestConnectionViewModel(newQuest.IsRequiredByConnector, destination, QuestConnectionType.Hierarchy);
+            Connections.Add(connection);
         }
     }
     
@@ -455,7 +578,7 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
             newQuest.X = newConnectionToPosition.X;
             newQuest.Y = newConnectionToPosition.Y;
         
-            var connection = new QuestConnectionViewModel(source, newQuest.RequiresConnector);
+            var connection = new QuestConnectionViewModel(source, newQuest.RequiresConnector, QuestConnectionType.Hierarchy);
             Connections.Add(connection);
         }
     }
@@ -507,15 +630,35 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
         return false;
     }
 
+    private T? FindNearby<T>(Point position, Func<QuestViewModel, ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>> getConnector)
+        where T : ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>
+    {
+        foreach (var element in Elements)
+        {
+            var connector = getConnector(element);
+            if (AreClose(connector.Position, position, 20))
+                return (T)connector;
+        }
+
+        return null;
+    }
+    
     private InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>? FindNearbyInputConnector(QuestConnectionViewModel connection, Point mousePosition)
     {
-        return Elements.Select(x => x.RequiresConnector).FirstOrDefault(x => AreClose(x.Position, mousePosition, 20));
+        return FindNearby<InputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>>(mousePosition, x => x.RequiresConnector);
     }
 
     private OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>? FindNearbyOutputConnector(QuestConnectionViewModel connection, Point mousePosition)
     {
-        return Elements.Select(x => x.IsRequiredByConnector)
-            .FirstOrDefault(x => AreClose(x.Position, mousePosition, 20));
+        return FindNearby<OutputConnectorViewModel<QuestViewModel, QuestConnectionViewModel>>(mousePosition, x => x.IsRequiredByConnector);
+    }
+    
+    private ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>? FindNearbyNonHierarchyConnector(QuestConnectionViewModel connection, Point mousePosition)
+    {
+        var nearby = FindNearby<ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>>(mousePosition, x => x.LeftInputConnector);
+        if (nearby != null)
+            return nearby;
+        return FindNearby<ConnectorViewModel<QuestViewModel, QuestConnectionViewModel>>(mousePosition, x => x.RightOutputConnector);
     }
 
     private static bool AreClose(Point point1, Point point2, double distance)
