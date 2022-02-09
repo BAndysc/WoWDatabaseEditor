@@ -8,4 +8,5 @@ public interface IQuestTemplateSource
     public IQuestTemplate? GetTemplate(uint entry);
     public IEnumerable<IQuestTemplate> GetByPreviousQuestId(uint previous);
     public IEnumerable<IQuestTemplate> GetByNextQuestId(uint previous);
+    public IEnumerable<IQuestTemplate> GetByBreadCrumbQuestId(uint questId);
 }

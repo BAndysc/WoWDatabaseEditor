@@ -28,6 +28,7 @@ public class QuestStoreTests
         template.Entry.Returns(entry);
         template.PrevQuestId.Returns(prev);
         template.ExclusiveGroup.Returns(exclusiveGroup);
+        template.BreadcrumbForQuestId.Returns(0);
         var nextId = (int)next;
         template.NextQuestId.Returns(nextId);
         return template;
@@ -56,6 +57,8 @@ public class QuestStoreTests
             source.GetByNextQuestId(grouped.Key)
                 .Returns(byNext);
         }
+        
+        source.GetByBreadCrumbQuestId(0).Returns(Enumerable.Empty<IQuestTemplate>());
 
         var store = new QuestStore(source);
         return store;

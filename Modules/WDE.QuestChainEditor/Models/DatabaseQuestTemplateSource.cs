@@ -31,4 +31,10 @@ public class DatabaseQuestTemplateSource : IQuestTemplateSource
         // optimize this!
         return databaseProvider.GetQuestTemplates().Where(qt => qt.NextQuestId == previous);
     }
+
+    public IEnumerable<IQuestTemplate> GetByBreadCrumbQuestId(uint questId)
+    {
+        // optimize this!
+        return databaseProvider.GetQuestTemplates().Where(qt => qt.BreadcrumbForQuestId == questId);
+    }
 }

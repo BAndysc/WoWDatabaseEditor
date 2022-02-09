@@ -36,7 +36,8 @@ public class TrinitySqlGenerator : ISqlGenerator
             {
                 update = update.Set("PrevQuestID", q.PrevQuestId)
                     .Set("NextQuestID", q.NextQuestId)
-                    .Set("ExclusiveGroup", q.ExclusiveGroup);
+                    .Set("ExclusiveGroup", q.ExclusiveGroup)
+                    .Set("BreadcrumbForQuestId", q.BreadcrumbQuestId);
             }
             else
             {
@@ -46,6 +47,8 @@ public class TrinitySqlGenerator : ISqlGenerator
                     update = update.Set("NextQuestID", q.NextQuestId);
                 if (q.ExclusiveGroup != existingData.ExclusiveGroup)
                     update = update.Set("ExclusiveGroup", q.ExclusiveGroup);
+                if (q.BreadcrumbQuestId != existingData.BreadcrumbQuestId)
+                    update = update.Set("BreadcrumbForQuestId", q.BreadcrumbQuestId);
             }
 
             if (!update.Empty)

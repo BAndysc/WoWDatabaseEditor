@@ -26,6 +26,8 @@ public class QueryGenerator : IQueryGenerator
                     var requirement = group.Quests[0];
                     if (group.RequirementType == QuestRequirementType.MustBeActive)
                         datas[q.Entry].PrevQuestId = -(int)requirement;
+                    else if (group.RequirementType == QuestRequirementType.Breadcrumb)
+                        datas[requirement].BreadcrumbQuestId = (int)q.Entry;
                     else
                         datas[q.Entry].PrevQuestId = (int)requirement;
                 }
@@ -38,11 +40,16 @@ public class QueryGenerator : IQueryGenerator
                         exclusiveGroup = -exclusiveGroup;
                     else if (group.RequirementType == QuestRequirementType.OnlyOneCompleted)
                         exclusiveGroup = exclusiveGroup;
+                    else if (group.RequirementType == QuestRequirementType.Breadcrumb)
+                        exclusiveGroup = exclusiveGroup;
 
                     foreach (var requirement in group.Quests)
                     {
                         datas[requirement].ExclusiveGroup = exclusiveGroup;
-                        datas[requirement].NextQuestId = (int)q.Entry;
+                        if (group.RequirementType == QuestRequirementType.Breadcrumb)
+                            datas[requirement].BreadcrumbQuestId = (int)q.Entry;
+                        else
+                            datas[requirement].NextQuestId = (int)q.Entry;
                     }
                 }
             }
@@ -55,6 +62,8 @@ public class QueryGenerator : IQueryGenerator
                         var requirement = group.Quests[0];
                         if (group.RequirementType == QuestRequirementType.MustBeActive)
                             throw new Exception("Cannot handle single quest with multiple quests as active requirement");
+                        else if (group.RequirementType == QuestRequirementType.Breadcrumb)
+                            throw new Exception("Cannot handle single quest with multiple quests as breadcrumb requirement");
                         else
                             datas[requirement].NextQuestId = (int)q.Entry;
                     }
@@ -65,13 +74,17 @@ public class QueryGenerator : IQueryGenerator
                             throw new Exception("Cannot handle exclusive group with multiple quests");
                         else if (group.RequirementType == QuestRequirementType.AllCompleted)
                             exclusiveGroup = -exclusiveGroup;
-                        else if (group.RequirementType == QuestRequirementType.OnlyOneCompleted)
+                        else if (group.RequirementType == QuestRequirementType.OnlyOneCompleted ||
+                                 group.RequirementType == QuestRequirementType.Breadcrumb)
                             exclusiveGroup = exclusiveGroup;
 
                         foreach (var requirement in group.Quests)
                         {
                             datas[requirement].ExclusiveGroup = exclusiveGroup;
-                            datas[requirement].NextQuestId = (int)q.Entry;
+                            if (group.RequirementType == QuestRequirementType.Breadcrumb)
+                                datas[requirement].BreadcrumbQuestId = (int)q.Entry;
+                            else
+                                datas[requirement].NextQuestId = (int)q.Entry;
                         }
                     }
                 }

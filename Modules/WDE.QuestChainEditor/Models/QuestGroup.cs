@@ -31,6 +31,8 @@ public class QuestGroup : IQuestGroup
             return string.Join("|", Quests.OrderBy(o => o));
         if (RequirementType == QuestRequirementType.MustBeActive)
             return "+" + quests[0];
+        if (RequirementType == QuestRequirementType.Breadcrumb)
+            return ">" + quests[0];
         throw new ArgumentOutOfRangeException();
     }
 

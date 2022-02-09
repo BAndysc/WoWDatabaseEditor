@@ -4,5 +4,6 @@ public enum QuestRequirementType
 {
     AllCompleted,
     MustBeActive,
-    OnlyOneCompleted
+    OnlyOneCompleted,
+    Breadcrumb
 }

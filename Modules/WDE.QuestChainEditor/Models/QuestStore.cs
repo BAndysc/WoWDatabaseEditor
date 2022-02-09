@@ -53,6 +53,14 @@ public class QuestStore : IEnumerable<Quest>
                 toLoad.Enqueue((uint)-template.PrevQuestId);
             }
 
+            if (template.BreadcrumbForQuestId > 0)
+            {
+                var next = (uint)template.BreadcrumbForQuestId;
+                var nextQuest = GetOrCreate(next);
+                nextQuest.AddRequirement(new QuestGroup(QuestRequirementType.Breadcrumb, template.ExclusiveGroup, entry));
+                toLoad.Enqueue(next);
+            }
+
             if (template.NextQuestId > 0)
             {
                 var next = (uint)template.NextQuestId;
@@ -78,6 +86,12 @@ public class QuestStore : IEnumerable<Quest>
 
             var byNext = Source.GetByNextQuestId(entry);
             foreach (var next in byNext)
+            {
+                toLoad.Enqueue(next.Entry);
+            }
+
+            var byBreadcrumb = Source.GetByBreadCrumbQuestId(entry);
+            foreach (var next in byBreadcrumb)
             {
                 toLoad.Enqueue(next.Entry);
             }
