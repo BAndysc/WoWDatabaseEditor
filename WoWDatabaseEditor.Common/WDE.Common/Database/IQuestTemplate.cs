@@ -11,6 +11,7 @@
         int PrevQuestId { get; }
         int NextQuestId { get; }
         int ExclusiveGroup { get; }
+        int BreadcrumbForQuestId { get; }
         uint NextQuestInChain { get; }
     }
 }

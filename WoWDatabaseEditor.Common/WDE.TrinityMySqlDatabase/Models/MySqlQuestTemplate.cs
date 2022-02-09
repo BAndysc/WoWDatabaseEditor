@@ -26,6 +26,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         public int NextQuestId => addon == null ? 0 : addon.NextQuestId;
 
         public int ExclusiveGroup => addon == null ? 0 : addon.ExclusiveGroup;
+        
+        public int BreadcrumbForQuestId => addon?.BreadcrumbForQuest ?? 0;
 
         [Column(Name = "RewardNextQuest")]
         public uint NextQuestInChain { get; set; }
@@ -51,6 +53,8 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         public CharacterClasses AllowableClasses => addon == null ? CharacterClasses.None : (CharacterClasses)addon.AllowableClasses;
 
+        public int BreadcrumbForQuestId => addon?.BreadcrumbForQuest ?? 0;
+        
         [Column(Name="AllowableRaces")]
         private ulong allowableRaces { get; set; }
 

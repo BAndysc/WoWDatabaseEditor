@@ -18,6 +18,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "ExclusiveGroup")]
         public int ExclusiveGroup { get; set; }
         
+        [Column(Name = "BreadcrumbForQuestId")]
+        public int BreadcrumbForQuest { get; set; }
+
         [Column(Name = "AllowableClasses")]
         public uint AllowableClasses { get; set; }
     }
