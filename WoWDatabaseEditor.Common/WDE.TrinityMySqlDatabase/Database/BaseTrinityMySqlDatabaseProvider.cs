@@ -61,6 +61,12 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
         }
 
+        public async Task<IQuestRequestItem?> GetQuestRequestItem(uint entry)
+        {
+            await using var model = Database();
+            return await model.QuestRequestItems.FirstOrDefaultAsync<IQuestRequestItem>(quest => quest.Entry == entry);
+        }
+
         public IEnumerable<IGameEvent> GetGameEvents()
         {
             using var model = Database();

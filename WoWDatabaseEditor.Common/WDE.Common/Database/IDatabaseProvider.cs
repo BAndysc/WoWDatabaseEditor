@@ -23,6 +23,7 @@ namespace WDE.Common.Database
 
         IQuestTemplate? GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
+        Task<IQuestRequestItem?> GetQuestRequestItem(uint entry);
 
         IEnumerable<IGameEvent> GetGameEvents();
         IEnumerable<IConversationTemplate> GetConversationTemplates();

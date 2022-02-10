@@ -23,6 +23,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IQuestTemplate? GetQuestTemplate(uint entry) => impl.GetQuestTemplate(entry);
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => impl.GetAreaTriggerTemplates();
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
+        public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => impl.GetQuestRequestItem(entry);
+
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => impl.GetConversationTemplates();
         public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => impl.GetGossipMenuOptionsAsync(menuId);

@@ -193,6 +193,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetQuestTemplates();
         }
 
+        public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => nonCachedDatabase.GetQuestRequestItem(entry);
+
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() =>
             creatureClassLevelStatsCache ?? nonCachedDatabase.GetCreatureClassLevelStats();
 

@@ -22,6 +22,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IQuestTemplate? GetQuestTemplate(uint entry) => null;
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => Enumerable.Empty<IQuestTemplate>();
+        
+        public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => Task.FromResult<IQuestRequestItem?>(null);
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => Enumerable.Empty<IAreaTriggerTemplate>();
 
