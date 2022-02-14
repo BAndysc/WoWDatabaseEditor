@@ -137,7 +137,7 @@ public class LoadCommandQuickAccess : IQuickAccessCommand
 
                 if (source.Items != null)
                 {
-                    if (int.TryParse(value, out var longValue))
+                    if (long.TryParse(value, out var longValue))
                     {
                         if (source.Items.TryGetValue(longValue, out var item))
                             produce(new QuickAccessItem(longProvider.GetImage(), 
@@ -153,7 +153,7 @@ public class LoadCommandQuickAccess : IQuickAccessCommand
                         {
                             if (item.Value.Name.Contains(value, StringComparison.OrdinalIgnoreCase))
                             {
-                                produce(new QuickAccessItem(longProvider.GetImage(), item.Value.Name, item.Key.ToString(), "", DirectCreateCommand, (longProvider, item.Key)));
+                                produce(new QuickAccessItem(longProvider.GetImage(), item.Value.Name, item.Key.ToString(), "", DirectCreateCommand, (longProvider, (long)item.Key)));
                                 total++;
                                 if (total > 100)
                                 {
