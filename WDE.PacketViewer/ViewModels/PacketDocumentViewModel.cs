@@ -850,7 +850,7 @@ namespace WDE.PacketViewer.ViewModels
 
         private bool IsPlayerMovePacket(PacketViewModel packetViewModel)
         {
-            return packetViewModel.Opcode.StartsWith("CMSG_MOVE_") ||
+            return (packetViewModel.Opcode.StartsWith("CMSG_MOVE_") && !packetViewModel.Opcode.StartsWith("CMSG_MOVE_DISMISS_VEHICLE")) ||
                    packetViewModel.Opcode.StartsWith("SMSG_MOVE_");
         }
 
