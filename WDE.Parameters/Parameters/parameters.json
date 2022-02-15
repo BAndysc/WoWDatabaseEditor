@@ -2482,7 +2482,42 @@
 			"22": {"name": "Use Art Kit 3"},
 			//"23": {"name": "Set Tap List"}
 		}
+	},
+	"PhaseMaskParameter": {
+		"name": "Phasemask parameter",
+		"isflag": true,
+		"values": {
+			"1": {"name": "Phase 1"},
+			"2": {"name": "Phase 2"},
+			"4": {"name": "Phase 3"},
+			"8": {"name": "Phase 4"},
+			"16": {"name": "Phase 5"},
+			"32": {"name": "Phase 6"},
+			"64": {"name": "Phase 7"},
+			"128": {"name": "Phase 8"},
+			"256": {"name": "Phase 9"},
+			"512": {"name": "Phase 10"},
+			"1024": {"name": "Phase 11"},
+			"2048": {"name": "Phase 12"},
+			"4096": {"name": "Phase 13"},
+			"8192": {"name": "Phase 14"},
+			"16384": {"name": "Phase 15"},
+			"32768": {"name": "Phase 16"},
+			"65536": {"name": "Phase 17"},
+			"131072": {"name": "Phase 18"},
+			"262144": {"name": "Phase 19"},
+			"524288": {"name": "Phase 20"},
+			"1048576": {"name": "Phase 21"},
+			"2097152": {"name": "Phase 22"},
+			"4194304": {"name": "Phase 23"},
+			"8388608": {"name": "Phase 24"},
+			"16777216": {"name": "Phase 25"},
+			"33554432": {"name": "Phase 26"},
+			"67108864": {"name": "Phase 27"},
+			"134217728": {"name": "Phase 28"},
+			"268435456": {"name": "Phase 29"},
+			"536870912": {"name": "Phase 30"},
+			"1073741824": {"name": "Phase 31"}
+		}
 	}
-	
-	
 }
