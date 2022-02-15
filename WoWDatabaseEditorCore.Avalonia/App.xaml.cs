@@ -155,8 +155,8 @@ namespace WoWDatabaseEditorCore.Avalonia
                 var bRequires = b.GetCustomAttributes(typeof(ModuleRequiresCoreAttribute), false);
                 return bRequires.Length.CompareTo(aRequires.Length);
             }));
-            
-            List<Assembly> loadAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+
+            List<Assembly> loadAssemblies = allAssemblies
                 .Where(modulesManager!.ShouldLoad)
                 .ToList();
 
