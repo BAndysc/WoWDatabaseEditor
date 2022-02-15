@@ -3,7 +3,7 @@
     public interface ICreatureTemplate
     {
         uint Entry { get; set; }
-        uint Scale { get; set; }
+        float Scale { get; set; }
         uint GossipMenuId { get; set; }
         string Name { get; set; }
         string AIName { get; set; }
