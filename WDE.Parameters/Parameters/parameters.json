@@ -2271,14 +2271,14 @@
 	"ReputationRankParameter": {	
 		"name": "Reputation rank",	
 		"values": {	
-			"0": {"name": "REP_HATED"},	
-			"1": {"name": "REP_HOSTILE"},	
-			"2": {"name": "REP_UNFRIENDLY"},	
-			"3": {"name": "REP_NEUTRAL"},	
-			"4": {"name": "REP_FRIENDLY"},	
-			"5": {"name": "REP_HONORED"},	
-			"6": {"name": "REP_REVERED"},	
-			"7": {"name": "REP_EXALTED"}	
+			"0": {"name": "Hated"},	
+			"1": {"name": "Hostile"},	
+			"2": {"name": "Unfriendly"},	
+			"3": {"name": "Neutral"},	
+			"4": {"name": "Friendly"},	
+			"5": {"name": "Honored"},	
+			"6": {"name": "Revered"},	
+			"7": {"name": "Exalted"}	
 		}	
 	},	
 	"ReputationRankMaskParameter": {	
@@ -2519,5 +2519,22 @@
 			"536870912": {"name": "Phase 30"},
 			"1073741824": {"name": "Phase 31"}
 		}
-	}
+	},
+	"CreatureSummonGroupSummonerTypeParameter": {
+		"name": "Creature summon group summoner type parameter",
+		"values": {
+			"0": {"name": "Creature"},
+			"1": {"name": "GameObject"},
+			"2": {"name": "Map"}
+		}
+	},
+	"InhabitTypeParameter": {
+		"name": "Inhabit type",
+		"isflag": true,
+		"values": {
+			"1": {"name": "ground"},
+			"2": {"name": "water"},
+			"4": {"name": "air"}
+		}
+	},
 }
