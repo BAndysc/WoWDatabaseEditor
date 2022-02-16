@@ -5,7 +5,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
 {
     public class AvaloniaThemeStyle : SystemTheme
     {
-        internal static SystemThemeOptions Theme = SystemThemeOptions.Auto;
+        internal static SystemThemeOptions Theme = SystemThemeOptions.Windows10Light;
 
         internal static bool UseDock
         {

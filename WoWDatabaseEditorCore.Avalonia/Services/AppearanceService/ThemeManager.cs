@@ -13,7 +13,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
     [SingleInstance]
     public class ThemeManager : IThemeManager, IUserAgentPart
     {
-        private readonly Theme defaultTheme = new(SystemThemeOptions.Auto.ToString());
+        private readonly Theme defaultTheme = new(SystemThemeOptions.Windows10Light.ToString());
 
         public ThemeManager(IThemeSettingsProvider themeSettings)
         {
