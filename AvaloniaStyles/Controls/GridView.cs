@@ -168,6 +168,7 @@ namespace AvaloniaStyles.Controls
                 header.Children.Add(headerCell);
                     
                 var splitter = new GridSplitter();
+                splitter.Focusable = false;
                 Grid.SetColumn(splitter, i++);
                 header.Children.Add(splitter);
             }
