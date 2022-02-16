@@ -114,6 +114,7 @@ namespace WDE.DbcStore
         public Dictionary<long, string> CreatureModelDataStore {get; internal set; } = new();
         public Dictionary<long, string> GameObjectDisplayInfoStore {get; internal set; } = new();
         public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
+        public Dictionary<long, string> QuestSortStore { get; internal set;} = new();
         
         internal void Load()
         {            
@@ -161,6 +162,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> CreatureModelDataStore { get; } = new();
             public Dictionary<long, string> GameObjectDisplayInfoStore { get; } = new();
             public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
+            public Dictionary<long, string> QuestSortStore { get; internal set;} = new();
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -267,12 +269,14 @@ namespace WDE.DbcStore
                 store.CreatureModelDataStore = CreatureModelDataStore;
                 store.GameObjectDisplayInfoStore = GameObjectDisplayInfoStore;
                 store.MapDirectoryStore = MapDirectoryStore;
+                store.QuestSortStore = QuestSortStore;
                 
+                parameterFactory.Register("AchievementParameter", new DbcParameter(AchievementStore), QuickAccessMode.Full);
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore), QuickAccessMode.Limited);
                 parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
-                parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore), QuickAccessMode.Limited);
+                parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore), QuickAccessMode.Full);
                 parameterFactory.Register("TextEmoteParameter", new DbcParameter(TextEmoteStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ClassMaskParameter", new DbcMaskParameter(ClassStore, -1));
@@ -288,6 +292,8 @@ namespace WDE.DbcStore
                 parameterFactory.Register("CreatureModelDataParameter", new CreatureModelParameter(CreatureModelDataStore, CreatureDisplayInfoStore));
                 parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
                 parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore), QuickAccessMode.Limited);
+                parameterFactory.Register("AreaTriggerParameter", new LanguageParameter(AreaTriggerStore));
+                parameterFactory.Register("ZoneOrQuestSortParameter", new ZoneOrQuestSortParameter(AreaStore, QuestSortStore));
 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {
@@ -319,7 +325,7 @@ namespace WDE.DbcStore
                     case DBCVersions.WOTLK_12340:
                     {
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 22;
+                        max = 23;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
                         Load("Faction.dbc", 0, 23, FactionStore, true);
@@ -342,12 +348,13 @@ namespace WDE.DbcStore
                         Load("CreatureDisplayInfo.dbc", 0, 1, CreatureDisplayInfoStore);
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
                         Load("Languages.dbc", 0, 1, LanguageStore, true);
+                        Load("QuestSort.dbc", 0, 1, QuestSortStore, true);
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
                         store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 24;
+                        max = 25;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -372,6 +379,7 @@ namespace WDE.DbcStore
                         Load("CreatureDisplayInfo.dbc", 0, 1, CreatureDisplayInfoStore);
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
                         Load("Languages.dbc", 0, 1, LanguageStore);
+                        Load("QuestSort.dbc", 0, 1, QuestSortStore);
                         break;
                     }
                     case DBCVersions.LEGION_26972:
@@ -400,7 +408,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.SHADOWLANDS_41079:
                     {
-                        max = 16;
+                        max = 17;
                         Load("AreaTrigger.db2", string.Empty, AreaTriggerStore);
                         Load("SpellName.db2", "Name_lang", SpellStore);
                         Load("Achievement.db2", "Title_lang", AchievementStore);
@@ -417,6 +425,7 @@ namespace WDE.DbcStore
                         Load("SpellFocusObject.db2", "Name_lang", SpellFocusObjectStore);
                         Load("QuestInfo.db2", "InfoName_lang", QuestInfoStore);
                         Load("CharTitles.db2", "Name_lang", CharTitleStore);
+                        Load("QuestSort.db2", "SortName_lang", QuestSortStore);
                         break;
                     }
                     default:
@@ -525,6 +534,15 @@ namespace WDE.DbcStore
         public LanguageParameter(Dictionary<long, string> storage) : base(storage)
         {
             Items.Add(0, new SelectOption("Universal"));
+        }
+    }
+
+    public class ZoneOrQuestSortParameter : DbcParameter
+    {
+        public ZoneOrQuestSortParameter(Dictionary<long, string> zones, Dictionary<long, string> questSorts) : base(zones)
+        {
+            foreach (var pair in questSorts)
+                Items.Add(-pair.Key, new SelectOption(pair.Value));
         }
     }
 
