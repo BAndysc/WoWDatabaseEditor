@@ -97,10 +97,12 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 if (ReferenceEquals(null, y)) return 1;
                 if (ReferenceEquals(null, x)) return -1;
 
-                if (definition.SortBy == null || definition.SortBy.Length == 0)
+                var sortByList = definition.SortBy ?? definition.PrimaryKey;
+                
+                if (sortByList == null || sortByList.Count == 0)
                     return 0;
 
-                foreach (var sortBy in definition.SortBy)
+                foreach (var sortBy in sortByList)
                 {
                     var comparisonResult = x.GetCell(sortBy)?.CompareTo(y.GetCell(sortBy)) ?? 0;
                     if (comparisonResult != 0) 

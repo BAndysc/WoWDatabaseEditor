@@ -6,7 +6,7 @@
   "name": "Npc Text",
   "single_solution_name": "{name} npc text editor",
   "multi_solution_name": "Multiple npc texts editor",
-  "description": "Npc text is text visible when you talk with an npc",
+  "description": "Npc text is the text visible when you talk with an npc",
   "table_name": "npc_text",
   "table_index_name": "ID",
   "multi_record": true,

@@ -88,7 +88,7 @@
         {
           "name": "Quest sort ID",
           "db_column_name": "QuestSortID",
-          "value_type": "int",
+          "value_type": "ZoneOrQuestSortParameter",
           "help": "This field defines under what category the quest falls in the quest log."
         },
         {

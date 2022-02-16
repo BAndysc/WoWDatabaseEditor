@@ -11,6 +11,7 @@ namespace WDE.DatabaseEditors.Data
     [AutoRegister]
     public class TableDefinitionProvider : ITableDefinitionProvider
     {
+        private readonly List<DatabaseTableDefinitionJson> incompatibleDefinitionList = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitionsByTableName = new();
@@ -62,7 +63,10 @@ namespace WDE.DatabaseEditors.Data
                     definitionsByTableName[definition.TableName] = definition;
                 }
                 else
+                {
                     incompatibleDefinitions[definition.Id] = definition;
+                    incompatibleDefinitionList.Add(definition);
+                }
             }
         }
 
@@ -93,7 +97,7 @@ namespace WDE.DatabaseEditors.Data
 
         public IEnumerable<DatabaseTableDefinitionJson> IncompatibleDefinitions => incompatibleDefinitions.Values;
         public IEnumerable<DatabaseTableDefinitionJson> AllDefinitions =>
-            definitions.Values.Concat(IncompatibleDefinitions);
+            definitions.Values.Concat(incompatibleDefinitionList);
         public IEnumerable<DatabaseTableDefinitionJson> Definitions => definitions.Values;
     }
 }

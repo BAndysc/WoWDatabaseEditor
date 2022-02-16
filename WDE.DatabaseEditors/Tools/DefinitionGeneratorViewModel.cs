@@ -87,7 +87,7 @@ namespace WDE.DatabaseEditors.Tools
                     DbColumnName = column.ColumnName,
                     CanBeNull = column.Nullable,
                     Default = defaultIsZero ? null : column.DefaultValue,
-                    ValueType = isInt ? "int" : (isUInt ? "uint" : (isFloat ? "float" : "string"))
+                    ValueType = isInt ? "int" : (isUInt ? "uint" : (isFloat ? "float" : "string")),
                 });
             }
 
@@ -100,6 +100,7 @@ namespace WDE.DatabaseEditors.Tools
             tableDefinition.MultiSolutionName = $"multiple {tableName} editor";
             tableDefinition.Description = $"Here insert short description what is {tableName} for";
             tableDefinition.IsMultiRecord = primaryKeys.Count != 1;
+            tableDefinition.IconPath = "Icons/document_.png";
             tableDefinition.ReloadCommand = $"reload {tableName}";
             tableDefinition.TablePrimaryKeyColumnName = primaryKeys.Count > 0
                 ? primaryKeys[0].ColumnName

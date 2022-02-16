@@ -16,12 +16,6 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "name")] 
         public string Name { get; set; } = "";
         
-        [JsonProperty(PropertyName = "group_name")] 
-        public string? GroupName { get; set; }
-        
-        [JsonProperty(PropertyName = "icon_path")] 
-        public string? IconPath { get; set; }
-        
         [JsonProperty(PropertyName = "single_solution_name")] 
         public string SingleSolutionName { get; set; } = "";
         
@@ -43,6 +37,12 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "only_conditions")]
         public bool IsOnlyConditionsTable { get; set; }
         
+        [JsonProperty(PropertyName = "group_name")] 
+        public string? GroupName { get; set; }
+        
+        [JsonProperty(PropertyName = "icon_path")] 
+        public string? IconPath { get; set; }
+
         [JsonProperty(PropertyName = "reload_command")]
         public string? ReloadCommand { get; set; }
         
