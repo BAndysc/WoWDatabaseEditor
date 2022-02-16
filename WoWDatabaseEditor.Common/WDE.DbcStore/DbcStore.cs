@@ -163,6 +163,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> GameObjectDisplayInfoStore { get; } = new();
             public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
             public Dictionary<long, string> QuestSortStore { get; internal set;} = new();
+            public Dictionary<long, string> ExtendedCostStore { get; internal set;} = new();
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -289,6 +290,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore), QuickAccessMode.Limited);
                 parameterFactory.Register("QuestInfoParameter", new DbcParameter(QuestInfoStore));
                 parameterFactory.Register("CharTitleParameter", new DbcParameter(CharTitleStore));
+                parameterFactory.Register("ExtendedCostParameter", new DbcParameter(ExtendedCostStore));
                 parameterFactory.Register("CreatureModelDataParameter", new CreatureModelParameter(CreatureModelDataStore, CreatureDisplayInfoStore));
                 parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
                 parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore), QuickAccessMode.Limited);
@@ -325,7 +327,7 @@ namespace WDE.DbcStore
                     case DBCVersions.WOTLK_12340:
                     {
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 23;
+                        max = 24;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
                         Load("Faction.dbc", 0, 23, FactionStore, true);
@@ -349,12 +351,13 @@ namespace WDE.DbcStore
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
                         Load("Languages.dbc", 0, 1, LanguageStore, true);
                         Load("QuestSort.dbc", 0, 1, QuestSortStore, true);
+                        Load("ItemExtendedCost.dbc", row => ExtendedCostStore.Add(row.GetInt(0), GenerateCostDescription(row.GetInt(1), row.GetInt(2), row.GetInt(4))));
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
                         store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 25;
+                        max = 26;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -380,6 +383,7 @@ namespace WDE.DbcStore
                         Load("GameObjectDisplayInfo.dbc", 0, 1, GameObjectDisplayInfoStore);
                         Load("Languages.dbc", 0, 1, LanguageStore);
                         Load("QuestSort.dbc", 0, 1, QuestSortStore);
+                        Load("ItemExtendedCost.dbc", row => ExtendedCostStore.Add(row.GetInt(0), GenerateCostDescription(row.GetInt(1), row.GetInt(2), row.GetInt(4))));
                         break;
                     }
                     case DBCVersions.LEGION_26972:
@@ -443,6 +447,19 @@ namespace WDE.DbcStore
                     default:
                         return;
                 }
+            }
+
+            private string GenerateCostDescription(int honor, int arenaPoints, int item)
+            {
+                if (honor != 0 && arenaPoints == 0 && item == 0)
+                    return honor + " honor";
+                if (honor == 0 && arenaPoints != 0 && item == 0)
+                    return arenaPoints + " arena points";
+                if (honor == 0 && arenaPoints == 0 && item != 0)
+                    return item + " item";
+                if (item == 0)
+                    return honor + " honor, " + arenaPoints + " arena points";
+                return honor + " honor, " + arenaPoints + " arena points, " + item + " item";
             }
 
             private void Validate(Dictionary<long,string> dict, int id, string expectedName)
