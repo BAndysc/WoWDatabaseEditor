@@ -574,6 +574,21 @@ namespace WDE.DbcStore
 
     public class RaceMaskParameter : FlagParameter
     {
+        private CharacterRaces alliance;
+        private CharacterRaces horde;
+        private CharacterRaces all;
+
+        public override string ToString(long value)
+        {
+            if ((long)all == value)
+                return "Any race";
+            if ((long)alliance == value)
+                return "Alliance";
+            if ((long)horde == value)
+                return "Horde";
+            return base.ToString(value);
+        }
+
         private static bool IsPowerOfTwo(ulong x)
         {
             return (x != 0) && ((x & (x - 1)) == 0);
@@ -582,6 +597,13 @@ namespace WDE.DbcStore
         public RaceMaskParameter(CharacterRaces allowableRaces)
         {
             Items = new Dictionary<long, SelectOption>();
+
+            alliance = allowableRaces & CharacterRaces.AllAlliance;
+            horde = allowableRaces & CharacterRaces.AllHorde;
+            all = allowableRaces;
+            Items.Add((long)alliance, new SelectOption("Alliance"));
+            Items.Add((long)horde, new SelectOption("Horde"));
+            
             foreach (CharacterRaces race in Enum.GetValues<CharacterRaces>())
             {
                 if (IsPowerOfTwo((ulong)race) && allowableRaces.HasFlag(race))

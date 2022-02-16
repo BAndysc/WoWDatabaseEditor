@@ -151,7 +151,7 @@ namespace WDE.Common.Avalonia.Controls
                         if (OptionValue == 0 && completionBox.SelectedValue == 0)
                             return true;
                         
-                        return (completionBox.SelectedValue & OptionValue) > 0;
+                        return (completionBox.SelectedValue & OptionValue) == OptionValue;
                     }
 
                     return false;

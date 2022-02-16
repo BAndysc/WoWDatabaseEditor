@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 
 namespace WDE.Common.Parameters
 {
@@ -97,21 +98,36 @@ namespace WDE.Common.Parameters
     
     public class FlagParameter : Parameter
     {
+        private static ThreadLocal<List<string>> temp = new ThreadLocal<List<string>>(() => new List<string>());
+        
         public override string ToString(long value)
         {
             if (Items == null)
                 return value.ToString();
-            var flags = new List<string>();
+            
             if (value == 0 && Items.TryGetValue(0, out var zero))
                 return zero.Name;
-            for (var i = 0; i < 31; ++i)
+            
+            var flags = temp.Value!;
+            flags.Clear();
+            
+            foreach (var item in Items)
             {
-                if (((1 << i) & value) > 0)
+                if ((item.Key & value) == item.Key)
                 {
-                    if (Items.ContainsKey(1 << i))
-                        flags.Add(Items[1 << i].Name);
-                    else
+                    flags.Add(item.Value.Name);
+                    value &= ~item.Key;
+                }
+            }
+
+            if (value > 0)
+            {
+                for (var i = 0; i < 31; ++i)
+                {
+                    if (((1 << i) & value) > 0)
+                    {
                         flags.Add("Flag unknown " + (1 << i));
+                    }
                 }
             }
 
