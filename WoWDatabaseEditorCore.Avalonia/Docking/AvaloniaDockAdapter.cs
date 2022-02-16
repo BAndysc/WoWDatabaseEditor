@@ -114,7 +114,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                         if (tool.PreferedPosition == ToolPreferedPosition.DocumentCenter)
                             factory.AddToolAsDocument(currentLayout!, dockable);
                         else
-                            factory.AddTool(currentLayout!, dockable);
+                            factory.AddTool(currentLayout!, dockable, tool.PreferedPosition);
                         factory.SetActiveDockable(dockable);
                     } else if (isVisible && tools.ContainsKey(tool))
                     {

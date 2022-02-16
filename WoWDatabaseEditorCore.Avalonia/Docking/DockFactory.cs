@@ -6,6 +6,7 @@ using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.ReactiveUI;
 using Dock.Model.ReactiveUI.Controls;
+using WDE.Common.Windows;
 
 namespace WoWDatabaseEditorCore.Avalonia.Docking
 {
@@ -38,9 +39,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             AddDockable(documentsDock, document);
         }
         
-        public void AddTool(IDock layout, AvaloniaToolDockWrapper toolWrapper)
+        public void AddTool(IDock layout, AvaloniaToolDockWrapper toolWrapper, ToolPreferedPosition position)
         {
             var toolDock = FindDockable(layout, dockable => dockable is ToolDock) as ToolDock;
+            if (position == ToolPreferedPosition.Left)
+                toolDock = null;
             if (toolDock == null)
             {
                 toolDock = new ToolDock
@@ -50,8 +53,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     Proportion = 0.2f,
                     CanFloat = false
                 };
-                AddDockable(layout, CreateProportionalDockSplitter());
-                AddDockable(layout, toolDock);
+                if (position == ToolPreferedPosition.Left)
+                {
+                    InsertDockable(layout, CreateProportionalDockSplitter(), 0);
+                    InsertDockable(layout, toolDock, 0);
+                }
+                else
+                {
+                    AddDockable(layout, CreateProportionalDockSplitter());
+                    AddDockable(layout, toolDock);
+                }
             }
             
             AddDockable(toolDock, toolWrapper);
