@@ -6,6 +6,7 @@ using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Menu;
 using WDE.Common.QuickAccess;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Providers
@@ -19,6 +20,7 @@ namespace WoWDatabaseEditorCore.Providers
         public IDocumentManager DocumentManager { get; }
 
         public EditorEditMenuItemProvider(IDocumentManager documentManager,
+            ITablesToolService tablesToolService,
             IQuickAccessViewModel quickAccessViewModel)
         {
             DocumentManager = documentManager;
@@ -56,13 +58,23 @@ namespace WoWDatabaseEditorCore.Providers
             
             SubItems.Add(new ModuleManuSeparatorItem());
             
+            SubItems.Add(new ModuleMenuItem("Toggle tables view",
+                new DelegateCommand(() =>
+                {
+                    if (tablesToolService.Visibility)
+                        tablesToolService.Close();
+                    else
+                        tablesToolService.Open();
+                }),
+                new("Control+T")));
+
             SubItems.Add(new ModuleMenuItem("Open quick access",
                 new DelegateCommand(() => quickAccessViewModel.OpenSearch("")),
-                new("Control+T")));
+                new("Control+Y")));
             
             SubItems.Add(new ModuleMenuItem("Open quick commands",
                 new DelegateCommand(() => quickAccessViewModel.OpenSearch("/")),
-                new("Control+Shift+T")));
+                new("Control+Shift+Y")));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

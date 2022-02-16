@@ -33,6 +33,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<AboutViewModel> aboutViewModelCreator;
         private readonly Func<QuickStartViewModel> quickStartCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
+        private readonly ITablesToolService tablesToolService;
 
         private readonly Dictionary<string, ITool> toolById = new();
 
@@ -54,7 +55,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             IEventAggregator eventAggregator,
             IProgramNameService programNameService,
             IMainThread mainThread,
-            IQuickAccessViewModel quickAccessViewModel)
+            IQuickAccessViewModel quickAccessViewModel,
+            ITablesToolService tablesToolService)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
@@ -62,6 +64,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
+            this.tablesToolService = tablesToolService;
             Title = programNameService.Title;
             Subtitle = programNameService.Subtitle;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
@@ -137,6 +140,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             
             Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowExportButtons));
             Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowPlayButtons));
+            Watch(tablesToolService, serv => serv.Visibility, nameof(ShowTablesList));
             
             eventAggregator.GetEvent<AllModulesLoaded>()
                 .Subscribe(OpenFatalLogIfExists, ThreadOption.PublisherThread, true);
@@ -184,6 +188,18 @@ namespace WoWDatabaseEditorCore.ViewModels
         public AsyncAutoCommand CopyCurrentSqlCommand { get; }
         
         public DelegateCommand GenerateCurrentSqlCommand { get; }
+
+        public bool ShowTablesList
+        {
+            get => tablesToolService.Visibility;
+            set
+            {
+                if (value)
+                    tablesToolService.Open();
+                else
+                    tablesToolService.Close();
+            }
+        }
         
         private void ShowAbout()
         {

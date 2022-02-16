@@ -107,13 +107,15 @@ namespace WDE.Common.Parameters
             
             if (value == 0 && Items.TryGetValue(0, out var zero))
                 return zero.Name;
+            else if (value == 0)
+                return "";
             
             var flags = temp.Value!;
             flags.Clear();
             
             foreach (var item in Items)
             {
-                if ((item.Key & value) == item.Key)
+                if (item.Key > 0 && (item.Key & value) == item.Key)
                 {
                     flags.Add(item.Value.Name);
                     value &= ~item.Key;

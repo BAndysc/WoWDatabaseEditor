@@ -4,6 +4,7 @@ using System.Reflection;
 using Prism.Ioc;
 using Prism.Modularity;
 using Unity;
+using Unity.Lifetime;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
@@ -59,7 +60,7 @@ namespace WDE.Module
                     if (singleton && isUnique)
                     {
                         containerRegistry.RegisterSingleton(@interface, register);
-//                        unityContainer.RegisterFactory(@interface, c => unityContainer.Resolve(register), new ContainerControlledLifetimeManager());
+                        //unityContainer.RegisterFactory(@interface, c => unityContainer.Resolve(register), new ContainerControlledLifetimeManager());
                     }
                     else
                         containerRegistry.Register(@interface, register, isUnique ? null : name);
