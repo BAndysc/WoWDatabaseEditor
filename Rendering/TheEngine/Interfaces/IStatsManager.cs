@@ -5,14 +5,14 @@ namespace TheEngine.Interfaces
 {
     public struct RenderStats
     {
-        public int ShaderSwitches = 0;
-        public int MaterialActivations = 0;
-        public int MeshSwitches = 0;
-        public int InstancedDraws = 0;
-        public int NonInstancedDraws = 0;
-        public int InstancedDrawSaved = 0;
-        public int TrianglesDrawn = 0;
-        public int IndicesDrawn = 0;
+        public int ShaderSwitches;
+        public int MaterialActivations;
+        public int MeshSwitches;
+        public int InstancedDraws;
+        public int NonInstancedDraws;
+        public int InstancedDrawSaved;
+        public int TrianglesDrawn;
+        public int IndicesDrawn;
     }
     
     public struct PerformanceCounters
