@@ -37,41 +37,5 @@ namespace WDE.SmartScriptEditor.Data
         public IEnumerable<SmartGroupsJsonData> GetEventsGroups() => eventsGroups;
         public IEnumerable<SmartGroupsJsonData> GetActionsGroups() => actionsGroups;
         public IEnumerable<SmartGroupsJsonData> GetTargetsGroups() => targetsGroups;
-
-        public async Task SaveEvents(List<SmartGenericJsonData> events)
-        {
-            await jsonProvider.SaveEventsAsync(serializationProvider.SerializeSmartData(events));
-            this.events = events;
-        }
-        
-        public async Task SaveActions(List<SmartGenericJsonData> actions)
-        {
-            await jsonProvider.SaveActionsAsync(serializationProvider.SerializeSmartData(actions));
-            this.actions = actions;
-        }
-        
-        public async Task SaveTargets(List<SmartGenericJsonData> targets)
-        {
-            await jsonProvider.SaveTargetsAsync(serializationProvider.SerializeSmartData(targets));
-            this.targets = targets;
-        }
-        
-        public async Task SaveEventGroups(List<SmartGroupsJsonData> groups)
-        {
-            await jsonProvider.SaveEventsGroupsAsync(serializationProvider.SerializeSmartData(groups));
-            eventsGroups = groups;
-        }
-        
-        public async Task SaveActionsGroups(List<SmartGroupsJsonData> groups)
-        {
-            await jsonProvider.SaveActionsGroupsAsync(serializationProvider.SerializeSmartData(groups));
-            actionsGroups = groups;
-        }
-        
-        public async Task SaveTargetsGroups(List<SmartGroupsJsonData> groups)
-        {
-            await jsonProvider.SaveTargetsGroupsAsync(serializationProvider.SerializeSmartData(groups));
-            targetsGroups = groups;
-        }
     }
 }
