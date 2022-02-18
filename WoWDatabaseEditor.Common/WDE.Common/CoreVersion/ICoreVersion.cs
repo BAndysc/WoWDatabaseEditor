@@ -49,5 +49,12 @@ namespace WDE.Common.CoreVersion
 
         string? ForceLoadTag => null;
         string TableName { get; }
+
+        string? ActionsPath => null;
+        string? EventsPath => null;
+        string? TargetsPath => null;
+        string? ActionGroupPath => null;
+        string? EventGroupPath => null;
+        string? TargetGroupPath => null;
     }
 }
