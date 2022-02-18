@@ -96,7 +96,7 @@
         "name": "SMART_ACTION_PLAY_EMOTE",
         "parameters": [
             {
-                "type": "EmoteParameter",
+                "type": "EmoteOneShotParameter",
                 "name": "Emote ID",
                 "description": "Emote id to play"
             }
@@ -449,7 +449,7 @@
         "name": "SMART_ACTION_SET_EMOTE_STATE",
         "parameters": [
             {
-                "type": "EmoteParameter",
+                "type": "EmoteStateParameter",
                 "name": "Emote ID"
             }
         ],
@@ -1174,7 +1174,7 @@
         "name": "SMART_ACTION_ACTIVATE_TAXI",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TaxiPathParameter",
                 "name": "Taxi ID"
             }
         ],

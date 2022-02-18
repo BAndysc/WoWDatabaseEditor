@@ -152,6 +152,8 @@ namespace WDE.DbcStore
             public Dictionary<long, string> ClassStore { get; } = new();
             public Dictionary<long, string> RaceStore { get; } = new();
             public Dictionary<long, string> EmoteStore { get; } = new();
+            public Dictionary<long, string> EmoteOneShotStore { get; } = new();
+            public Dictionary<long, string> EmoteStateStore { get; } = new();
             public Dictionary<long, string> TextEmoteStore { get; } = new();
             public Dictionary<long, string> AchievementStore { get; } = new();
             public Dictionary<long, string> ItemStore { get; } = new();
@@ -164,6 +166,8 @@ namespace WDE.DbcStore
             public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
             public Dictionary<long, string> QuestSortStore { get; internal set;} = new();
             public Dictionary<long, string> ExtendedCostStore { get; internal set;} = new();
+            public Dictionary<long, string> TaxiNodeStore { get; internal set;} = new();
+            public Dictionary<long, (int, int)> TaxiPathsStore { get; internal set;} = new();
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -204,6 +208,13 @@ namespace WDE.DbcStore
                 Load(filename, row => dictionary.Add(row.GetInt(id), row.GetInt(nameIndex)));
             }
 
+            private void LoadDB2(string filename, Action<DBCDRow> doAction)
+            {
+                var storage = store.dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
+                foreach (DBCDRow item in storage.Values)
+                    doAction(item);
+            }
+            
             private void Load(string filename, string fieldName, Dictionary<long, string> dictionary)
             {
                 var storage = store.dbcd.Load($"{dbcSettingsProvider.GetSettings().Path}/{filename}");
@@ -278,6 +289,8 @@ namespace WDE.DbcStore
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore), QuickAccessMode.Full);
+                parameterFactory.Register("EmoteOneShotParameter", new DbcParameter(EmoteOneShotStore));
+                parameterFactory.Register("EmoteStateParameter", new DbcParameter(EmoteStateStore));
                 parameterFactory.Register("TextEmoteParameter", new DbcParameter(TextEmoteStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ClassParameter", new DbcParameter(ClassStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ClassMaskParameter", new DbcMaskParameter(ClassStore, -1));
@@ -296,6 +309,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore), QuickAccessMode.Limited);
                 parameterFactory.Register("AreaTriggerParameter", new LanguageParameter(AreaTriggerStore));
                 parameterFactory.Register("ZoneOrQuestSortParameter", new ZoneOrQuestSortParameter(AreaStore, QuestSortStore));
+                parameterFactory.Register("TaxiPathParameter", new TaxiPathParameter(TaxiPathsStore, TaxiNodeStore));
 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {
@@ -327,7 +341,7 @@ namespace WDE.DbcStore
                     case DBCVersions.WOTLK_12340:
                     {
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 24;
+                        max = 26;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
                         Load("Faction.dbc", 0, 23, FactionStore, true);
@@ -340,7 +354,15 @@ namespace WDE.DbcStore
                         Load("AreaTable.dbc", 0, 11, AreaStore, true);
                         Load("chrClasses.dbc", 0, 4, ClassStore, true);
                         Load("chrRaces.dbc", 0, 14, RaceStore, true);
-                        Load("Emotes.dbc", 0, 1, EmoteStore);
+                        Load("Emotes.dbc", row =>
+                        {
+                            var proc = row.GetUInt(4);
+                            if (proc == 0)
+                                EmoteOneShotStore.Add(row.GetUInt(0), row.GetString(1));
+                            else if (proc == 2)
+                                EmoteStateStore.Add(row.GetUInt(0), row.GetString(1));
+                            EmoteStore.Add(row.GetUInt(0), row.GetString(1));
+                        });
                         Load("EmotesText.dbc", 0, 1, TextEmoteStore);
                         Load("SoundEntries.dbc", 0, 2, SoundStore);
                         Load("SpellFocusObject.dbc", 0, 1, SpellFocusObjectStore, true);
@@ -352,12 +374,14 @@ namespace WDE.DbcStore
                         Load("Languages.dbc", 0, 1, LanguageStore, true);
                         Load("QuestSort.dbc", 0, 1, QuestSortStore, true);
                         Load("ItemExtendedCost.dbc", row => ExtendedCostStore.Add(row.GetInt(0), GenerateCostDescription(row.GetInt(1), row.GetInt(2), row.GetInt(4))));
+                        Load("TaxiNodes.dbc", 0, 5, TaxiNodeStore, true);
+                        Load("TaxiPath.dbc",  row => TaxiPathsStore.Add(row.GetUInt(0), (row.GetInt(1), row.GetInt(2))));
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
                         store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 26;
+                        max = 28;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -370,7 +394,15 @@ namespace WDE.DbcStore
                         Load("AreaTable.dbc", 0, 11, AreaStore);
                         Load("chrClasses.dbc", 0, 3, ClassStore);
                         Load("chrRaces.dbc", 0, 14, RaceStore);
-                        Load("Emotes.dbc", 0, 1, EmoteStore);
+                        Load("Emotes.dbc", row =>
+                        {
+                            var proc = row.GetUInt(4);
+                            if (proc == 0)
+                                EmoteOneShotStore.Add(row.GetUInt(0), row.GetString(1));
+                            else if (proc == 2)
+                                EmoteStateStore.Add(row.GetUInt(0), row.GetString(1));
+                            EmoteStore.Add(row.GetUInt(0), row.GetString(1));
+                        });
                         Load("EmotesText.dbc", 0, 1, TextEmoteStore);
                         Load("item-sparse.db2", 0, 99, ItemStore);
                         Load("Phase.dbc", 0, 1, PhaseStore);
@@ -384,6 +416,8 @@ namespace WDE.DbcStore
                         Load("Languages.dbc", 0, 1, LanguageStore);
                         Load("QuestSort.dbc", 0, 1, QuestSortStore);
                         Load("ItemExtendedCost.dbc", row => ExtendedCostStore.Add(row.GetInt(0), GenerateCostDescription(row.GetInt(1), row.GetInt(2), row.GetInt(4))));
+                        Load("TaxiNodes.dbc", 0, 5, TaxiNodeStore);
+                        Load("TaxiPath.dbc",  row => TaxiPathsStore.Add(row.GetUInt(0), (row.GetInt(1), row.GetInt(2))));
                         break;
                     }
                     case DBCVersions.LEGION_26972:
@@ -412,14 +446,23 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.SHADOWLANDS_41079:
                     {
-                        max = 17;
+                        max = 19;
                         Load("AreaTrigger.db2", string.Empty, AreaTriggerStore);
                         Load("SpellName.db2", "Name_lang", SpellStore);
                         Load("Achievement.db2", "Title_lang", AchievementStore);
                         Load("AreaTable.db2", "AreaName_lang", AreaStore);
                         Load("ChrClasses.db2", "Name_lang", ClassStore);
                         Load("ChrRaces.db2", "Name_lang", RaceStore);
-                        Load("Emotes.db2", "EmoteSlashCommand", EmoteStore);
+                        LoadDB2("Emotes.db2", row =>
+                        {
+                            var proc = row.FieldAs<uint>("EmoteSpecProc");
+                            var name = row.FieldAs<string>("EmoteSlashCommand");
+                            if (proc == 0)
+                                EmoteOneShotStore.Add(row.ID, name);
+                            else if (proc == 2)
+                                EmoteStateStore.Add(row.ID, name);
+                            EmoteStore.Add(row.ID, name);
+                        });
                         Load("EmotesText.db2", "Name", TextEmoteStore);
                         Load("ItemSparse.db2", "Display_lang", ItemStore);
                         Load("Languages.db2", "Name_lang", LanguageStore);
@@ -430,6 +473,8 @@ namespace WDE.DbcStore
                         Load("QuestInfo.db2", "InfoName_lang", QuestInfoStore);
                         Load("CharTitles.db2", "Name_lang", CharTitleStore);
                         Load("QuestSort.db2", "SortName_lang", QuestSortStore);
+                        Load("TaxiNodes.db2",  "Name_lang", TaxiNodeStore);
+                        LoadDB2("TaxiPath.db2",  row => TaxiPathsStore.Add(row.ID, (row.Field<int>("FromTaxiNode"), row.Field<int>("ToTaxiNode"))));
                         break;
                     }
                     default:
@@ -536,6 +581,11 @@ namespace WDE.DbcStore
 
     public class DbcParameter : ParameterNumbered
     {
+        public DbcParameter()
+        {
+            Items = new();
+        }
+        
         public DbcParameter(Dictionary<long, string> storage)
         {
             Items = new Dictionary<long, SelectOption>();
@@ -563,6 +613,19 @@ namespace WDE.DbcStore
         }
     }
 
+    public class TaxiPathParameter : DbcParameter
+    {
+        public TaxiPathParameter(Dictionary<long, (int, int)> taxiPathsStore, Dictionary<long, string> taxiNodes)
+        {
+            foreach (var path in taxiPathsStore)
+            {
+                var from = taxiNodes.TryGetValue(path.Value.Item1, out var fromName) ? fromName : "unknown";
+                var to = taxiNodes.TryGetValue(path.Value.Item2, out var toName) ? toName : "unknown";
+                Items.Add(path.Key, new SelectOption($"{from} -> {to}"));
+            }
+        }
+    }
+    
     public class DbcFileParameter : Parameter
     {
         public DbcFileParameter(Dictionary<long, string> storage)
