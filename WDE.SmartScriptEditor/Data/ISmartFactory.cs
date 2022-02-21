@@ -40,7 +40,7 @@ namespace WDE.SmartScriptEditor.Data
 
     public class InvalidSmartTargetException : Exception
     {
-        public InvalidSmartTargetException(int id) : base("Invalid event with id " + id) { }
+        public InvalidSmartTargetException(int id) : base("Invalid target with id " + id) { }
     }
 
     public class InvalidSmartActionException : Exception

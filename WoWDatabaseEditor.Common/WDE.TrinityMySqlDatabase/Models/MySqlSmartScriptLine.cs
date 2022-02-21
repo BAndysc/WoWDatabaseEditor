@@ -51,7 +51,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public int ActionType { get; set; }
 
         [Column(Name = "action_param1")]
-        public int ActionParam1 { get; set; }
+        public long ActionParam1 { get; set; }
 
         [Column(Name = "action_param2")]
         public int ActionParam2 { get; set; }
