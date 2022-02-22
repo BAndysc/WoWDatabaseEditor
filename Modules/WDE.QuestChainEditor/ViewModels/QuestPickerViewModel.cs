@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using FuzzySharp;
 using Prism.Commands;
 using WDE.Common.Database;
@@ -104,10 +105,15 @@ public class QuestPickerViewModel : ObservableBase, IDialog
             CloseOk?.Invoke();
         });
 
-        CloseCancelCommand = new DelegateCommand(() =>
+        Cancel = CloseCancelCommand = new DelegateCommand(() =>
         {
             CloseCancel?.Invoke();
         });
+
+        Accept = new DelegateCommand(() =>
+        {
+            CloseOk?.Invoke();
+        }, () => SelectedQuest != null).ObservesProperty(() => SelectedQuest);
     }
 
     public void Reset()
@@ -165,6 +171,8 @@ public class QuestPickerViewModel : ObservableBase, IDialog
     public int DesiredHeight => 500;
     public string Title => "Pick a quest";
     public bool Resizeable => true;
+    public ICommand Accept { get; set; }
+    public ICommand Cancel { get; set; }
 
     public event Action? CloseCancel;
     public event Action? CloseOk;
