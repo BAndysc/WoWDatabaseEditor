@@ -86,10 +86,10 @@ namespace WoWDatabaseEditorCore.ViewModels
                     if (solutionTasksService.CanSaveAndReloadRemotely)
                         solutionTasksService.SaveAndReloadSolutionTask(item);
                     else if (solutionTasksService.CanSaveToDatabase)
-                        solutionTasksService.SaveSolutionToDatabaseTask(item);
+                        solutionTasksService.SaveSolutionToDatabaseTask(DocumentManager.ActiveSolutionItemDocument);
                 }
                 
-                taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(item));
+                taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(DocumentManager.ActiveSolutionItemDocument));
 
             }, () => DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase));

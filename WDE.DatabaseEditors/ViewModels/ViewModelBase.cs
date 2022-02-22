@@ -124,7 +124,7 @@ namespace WDE.DatabaseEditors.ViewModels
         protected abstract ICollection<uint> GenerateKeys();
         protected abstract Task InternalLoadData(DatabaseTableData data);
         protected abstract void UpdateSolutionItem();
-
+        
         protected void ScheduleLoading()
         {
             IsLoading = true;
@@ -160,7 +160,7 @@ namespace WDE.DatabaseEditors.ViewModels
         {
             UpdateSolutionItem();
             solutionManager.Refresh(SolutionItem);
-            solutionTasksService.SaveSolutionToDatabaseTask(SolutionItem);
+            solutionTasksService.SaveSolutionToDatabaseTask(this);
             History.MarkAsSaved();
             Title = solutionItemName.GetName(SolutionItem);
         }
@@ -250,6 +250,7 @@ namespace WDE.DatabaseEditors.ViewModels
         }
         
         protected DatabaseTableDefinitionJson tableDefinition = null!;
+        public DatabaseTableDefinitionJson TableDefinition => tableDefinition;
         public ObservableCollection<DatabaseEntity> Entities { get; } = new();
 
         public ObservableCollection<TableCommandViewModel> Commands { get; } = new();

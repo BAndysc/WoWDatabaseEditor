@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using WDE.Common.Managers;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Services
@@ -7,6 +8,7 @@ namespace WDE.Common.Services
     public interface ISolutionTasksService
     {
         Task SaveSolutionToDatabaseTask(ISolutionItem item);
+        Task SaveSolutionToDatabaseTask(ISolutionItemDocument document);
         Task ReloadSolutionRemotelyTask(ISolutionItem item);
         Task SaveAndReloadSolutionTask(ISolutionItem item);
         

@@ -41,8 +41,8 @@ namespace WoWDatabaseEditor.Services.SolutionService
             this.databaseProvider = databaseProvider;
             this.statusBar = statusBar;
         }
-        
-        public Task SaveSolutionToDatabaseTask(ISolutionItem item)
+
+        private Task SaveSolutionToDatabaseTask(ISolutionItem item, ISolutionItemDocument? document, Func<ISolutionItem, ISolutionItemDocument?, Task<string>> queryGenerator)
         {
             if (!CanSaveToDatabase)
                 return Task.CompletedTask;
@@ -52,7 +52,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
                 async progress =>
                 {
                     progress.Report(0, 2, "Generate query");
-                    var query = await sqlGenerator.GenerateSql(item);
+                    var query = await queryGenerator(item, document);
                     progress.Report(1, 2, "Execute query");
                     try
                     {
@@ -65,6 +65,16 @@ namespace WoWDatabaseEditor.Services.SolutionService
                     }
                     progress.ReportFinished();
                 });
+        }
+
+        public Task SaveSolutionToDatabaseTask(ISolutionItemDocument document)
+        {
+            return SaveSolutionToDatabaseTask(document.SolutionItem, document, (_, doc) => doc!.GenerateQuery());
+        }
+        
+        public Task SaveSolutionToDatabaseTask(ISolutionItem i)
+        {
+            return SaveSolutionToDatabaseTask(i, null, (item, _) => sqlGenerator.GenerateSql(item));
         }
 
         public Task ReloadSolutionRemotelyTask(ISolutionItem item)

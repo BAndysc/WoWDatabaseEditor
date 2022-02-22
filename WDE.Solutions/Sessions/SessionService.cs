@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Database;
+using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
 using WDE.Common.Solution;
@@ -132,6 +133,20 @@ namespace WDE.Solutions.Sessions
             fs.WriteAllText(GetPath(CurrentSession), serializerDeserializer.Serialize(CurrentSession));
         }
 
+        public async Task UpdateQuery(ISolutionItemDocument document)
+        {
+            if (CurrentSession == null)
+                return;
+            
+            if (IsPaused)
+                return;
+
+            if (document is ISplitSolutionItemQueryGenerator solutionItemDocument)
+                await UpdateQuery(await solutionItemDocument.GenerateSplitQuery());
+            else
+                await UpdateQuery(document.SolutionItem);
+        }
+
         public async Task UpdateQuery(ISolutionItem solutionItem)
         {
             if (CurrentSession == null)
@@ -141,7 +156,17 @@ namespace WDE.Solutions.Sessions
                 return;
             
             var query = await queryGenerator.GenerateSplitSql(solutionItem);
+            await UpdateQuery(query);
+        }
 
+        private async Task UpdateQuery(IList<(ISolutionItem, string)> query)
+        {
+            if (CurrentSession == null)
+                return;
+            
+            if (IsPaused)
+                return;
+            
             foreach (var q in query)
                 CurrentSession.Insert(q.Item1, q.Item2);
 
@@ -150,7 +175,7 @@ namespace WDE.Solutions.Sessions
 
             Save();
         }
-
+        
         public void BeginSession(string sessionName)
         {
             var sess = new EditorSession(sessionName, GenerateSessionFileName(sessionName), DateTime.Now, DateTime.Now);

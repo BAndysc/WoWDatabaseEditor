@@ -22,6 +22,7 @@ namespace WDE.Common.Sessions
         void Save();
         ISolutionItem? Find(ISolutionItem item);
         Task UpdateQuery(ISolutionItem solutionItem);
+        Task UpdateQuery(ISolutionItemDocument documentItem);
         void BeginSession(string name);
         void Finalize(string fileName);
         string? GenerateCurrentQuery();
