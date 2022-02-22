@@ -58,6 +58,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             var pen = new ImmutablePen(brush, 1);
             foreach (var group in groupStartHeight)
             {
+                if (group.Value.height < float.Epsilon)
+                    continue;
                 var lineY = group.Value.Item1 + 15;
                 var ft = new FormattedText();
                 ft.FontSize = 12;
@@ -109,7 +111,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
         }
         
         Dictionary<string, List<IControl>> elementsInGroup = new();
-        Dictionary<string, (double, double, double, int)> groupStartHeight = new();
+        Dictionary<string, (double y, double x, double height, int count)> groupStartHeight = new();
         private IControl?[,] grid = new IControl[0, 0];
         private bool gridDirty = true;
         protected override Size MeasureOverride(Size availableSize)
@@ -123,6 +125,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
 
             elementsInGroup.Clear();
             groupStartHeight.Clear();
+            elementsInGroup["Favourites"] = new List<IControl>() { };
             for (var i = 0; i < visualCount; i++)
             {
                 IVisual visual = visualChildren[i];
@@ -141,9 +144,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             var itemsPerRow = Max(1, Floor(availableSize.Width / itemWidth));
             foreach (var group in elementsInGroup)
             {
-                height += 32; // header
-                groupStartHeight[group.Key] = (height - 32, 0, height, 0);
-                height += itemHeight * Ceiling(group.Value.Count / itemsPerRow);
+                if (group.Value.Count > 0)
+                {
+                    height += 32; // header
+                    groupStartHeight[group.Key] = (height - 32, 0, height, 0);
+                    height += itemHeight * Ceiling(group.Value.Count / itemsPerRow);                    
+                }
+                else
+                    groupStartHeight[group.Key] = (0, 0, 0, 0);
             }
             
             return new Size(Min(availableSize.Width, visualCount * itemWidth), height);

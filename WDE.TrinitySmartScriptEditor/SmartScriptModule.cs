@@ -4,6 +4,7 @@ using WDE.Common.Windows;
 using WDE.Module;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
+using WDE.SmartScriptEditor.Services;
 
 namespace WDE.TrinitySmartScriptEditor
 {
@@ -22,6 +23,13 @@ namespace WDE.TrinitySmartScriptEditor
             var t = new ToolSmartEditorViewModel();
             containerRegistry.RegisterInstance(typeof(ITool), t);
             containerRegistry.RegisterInstance(typeof(IToolSmartEditorViewModel), t);
+        }
+
+        public override void FinalizeRegistration(IContainerRegistry container)
+        {
+            base.FinalizeRegistration(container);
+            if (!container.IsRegistered(typeof(IFavouriteSmartsService)))
+                container.RegisterSingleton<IFavouriteSmartsService, FavouriteSmartsService>();
         }
     }
 }

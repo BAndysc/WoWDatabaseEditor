@@ -4,6 +4,7 @@ using WDE.Common.Managers;
 using WDE.Conditions.Data;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Editor.ViewModels;
+using WDE.SmartScriptEditor.Services;
 
 namespace WDE.SmartScriptEditor.Data
 {
@@ -14,18 +15,23 @@ namespace WDE.SmartScriptEditor.Data
         private readonly IWindowManager windowManager;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
+        private readonly IFavouriteSmartsService favouriteSmartsService;
 
-        public SmartTypeListProvider(IWindowManager windowManager, ISmartDataManager smartDataManager, IConditionDataManager conditionDataManager)
+        public SmartTypeListProvider(IWindowManager windowManager,
+            ISmartDataManager smartDataManager, 
+            IConditionDataManager conditionDataManager,
+            IFavouriteSmartsService favouriteSmartsService)
         {
             this.windowManager = windowManager;
             this.smartDataManager = smartDataManager;
             this.conditionDataManager = conditionDataManager;
+            this.favouriteSmartsService = favouriteSmartsService;
         }
 
         public async System.Threading.Tasks.Task<(int, bool)?> Get(SmartType type, Func<SmartGenericJsonData, bool> predicate, List<(int, string)>? customItems)
         {
             var title = GetTitleForType(type);
-            SmartSelectViewModel model = new(title, type, predicate, customItems, smartDataManager, conditionDataManager);
+            SmartSelectViewModel model = new(title, type, predicate, customItems, smartDataManager, conditionDataManager, favouriteSmartsService);
 
             if (await windowManager.ShowDialog(model) && model.SelectedItem != null)
             {
