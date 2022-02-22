@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
+using WDE.Common.Services;
 using WDE.Conditions.Data;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Models;
@@ -20,7 +22,9 @@ namespace WDE.SmartScriptEditor.Data
         public SmartFactory(IParameterFactory parameterFactory, 
             ISmartDataManager smartDataManager, 
             IDatabaseProvider databaseProvider,
-            IConditionDataManager conditionDataManager)
+            IConditionDataManager conditionDataManager,
+            ITableEditorPickerService tableEditorPickerService,
+            IItemFromListProvider itemFromListProvider)
         {
             this.parameterFactory = parameterFactory;
             this.smartDataManager = smartDataManager;
@@ -28,6 +32,7 @@ namespace WDE.SmartScriptEditor.Data
 
             if (!parameterFactory.IsRegisteredLong("StoredTargetParameter"))
             {
+                parameterFactory.Register("CreatureTextParameter", new CreatureTextParameter(databaseProvider, tableEditorPickerService, itemFromListProvider));
                 parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("StoredTargetParameter", new VariableContextualParameter(GlobalVariableType.StoredTarget, "storedTarget"));

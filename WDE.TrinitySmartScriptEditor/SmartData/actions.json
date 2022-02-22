@@ -12,7 +12,7 @@
         "name": "SMART_ACTION_TALK",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "CreatureTextParameter",
                 "name": "Group ID",
                 "description": "Group id from table creature_text. Random text will be said if multiple rows with the same group"
             },
@@ -1950,7 +1950,7 @@
         "name": "SMART_ACTION_SIMPLE_TALK",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "CreatureTextParameter",
                 "name": "Group ID",
                 "description": "Makes target say its line from creature_text. If player, line from creature_text from this entry will be said. Doesn't trigger TEXT_OVER"
             }
