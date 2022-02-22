@@ -18,6 +18,8 @@ build_script:
 - cmd: >-
     Rem Building WDE
     
+    dotnet --list-sdks
+    
     dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
 
     dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
@@ -111,7 +113,7 @@ test_script:
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
 
-    dotnet test Modules/WDE.PacketViewer.Test/WDE.PacketViewer.Test.csproj
+    Rem dotnet test Modules/WDE.PacketViewer.Test/WDE.PacketViewer.Test.csproj
 artifacts:
 - path: WoWDatabaseEditorMacOs.zip
   name: WoWDatabaseEditorMacOs.zip
