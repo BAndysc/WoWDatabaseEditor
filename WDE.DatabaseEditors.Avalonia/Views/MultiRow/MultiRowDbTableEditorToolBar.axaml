@@ -5,30 +5,36 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:multiRow="clr-namespace:WDE.DatabaseEditors.ViewModels.MultiRow;assembly=WDE.DatabaseEditors"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseEditors.ViewModels;assembly=WDE.DatabaseEditors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="multiRow:MultiRowDbTableEditorViewModel"
              IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new key" Image="Icons/icon_add.png"/>
+        <components:ButtonImage Command="{CompiledBinding AddNewCommand, Mode=OneTime}" 
+                                IsVisible="{CompiledBinding AllowMultipleKeys}"
+                                Text="Add new key" 
+                                Image="Icons/icon_add.png"/>
         
-        <ToggleButton ToolTip.Tip="Split view horizontally" IsChecked="{Binding SplitHorizontal, Mode=TwoWay}">
+        <ToggleButton ToolTip.Tip="Split view horizontally" IsChecked="{CompiledBinding SplitHorizontal, Mode=TwoWay}">
             <components:WdeImage ImageUri="Icons/icon_split_horiz.png" />
         </ToggleButton>
-        <ToggleButton ToolTip.Tip="Split view vertically" IsChecked="{Binding SplitVertical, Mode=TwoWay}">
+        <ToggleButton ToolTip.Tip="Split view vertically" IsChecked="{CompiledBinding SplitVertical, Mode=TwoWay}">
             <components:WdeImage ImageUri="Icons/icon_split_vert.png" />
         </ToggleButton>
         
-        <ItemsPresenter Items="{Binding Commands}">
+        <ItemsPresenter Items="{CompiledBinding Commands}">
             <ItemsPresenter.ItemsPanel>
                 <ItemsPanelTemplate>
                     <controls:ToolbarPanel />
                 </ItemsPanelTemplate>
             </ItemsPresenter.ItemsPanel>
             <ItemsPresenter.ItemTemplate>
-                <DataTemplate>
-                    <Button Command="{Binding Command}"
-                            ToolTip.Tip="{Binding Name}">
-                        <components:WdeImage Image="{Binding Icon}" />
+                <DataTemplate DataType="viewModels:TableCommandViewModel">
+                    <Button Command="{CompiledBinding Command}"
+                            ToolTip.Tip="{CompiledBinding Name}">
+                        <components:WdeImage Image="{CompiledBinding Icon}" />
                     </Button>
                 </DataTemplate>
             </ItemsPresenter.ItemTemplate>

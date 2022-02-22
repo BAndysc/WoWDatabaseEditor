@@ -10,6 +10,7 @@ using Prism.Events;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.History;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
@@ -95,6 +96,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         private HashSet<uint> keys = new();
 
+        public bool AllowMultipleKeys
+        {
+            get => allowMultipleKeys;
+            set => SetProperty(ref allowMultipleKeys, value);
+        }
         public AsyncAutoCommand AddNewCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
@@ -289,7 +295,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         protected override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
 
         private MultiRowTableEditorHistoryHandler? historyHandler;
-        
+        private bool allowMultipleKeys = true;
+
         protected override void UpdateSolutionItem()
         {
             solutionItem.Entries = keys.Select(e =>

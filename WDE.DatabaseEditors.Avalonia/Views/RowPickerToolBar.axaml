@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseEditors.ViewModels;assembly=WDE.DatabaseEditors"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:RowPickerViewModel"
+             x:Class="WDE.DatabaseEditors.Avalonia.Views.RowPickerToolBar">
+    <ToolbarPanel>
+        <ButtonImage Image="Icons/icon_play.png"
+                     Command="{CompiledBinding ExecuteChangedCommand}" />
+        <ButtonImage Command="{CompiledBinding GenerateCurrentSqlCommand}"
+                                Text="To SQL" 
+                                Image="Icons/icon_to_sql.png" />
+        <ButtonImage Command="{CompiledBinding CopyCurrentSqlCommand}"
+                                ToolTip.Tip="Copy SQL" 
+                                Image="Icons/icon_copy_sql.png" />
+        <ContentPresenter HorizontalAlignment="Left" DataContext="{CompiledBinding MainViewModel}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+        <ToolbarSpacer />
+        <ButtonImage Command="{CompiledBinding PickSelected}"
+                     ToolTip.Tip="Pick"
+                     Text="Pick"
+                     Image="Icons/icon_right.png" />
+    </ToolbarPanel>
+</UserControl>

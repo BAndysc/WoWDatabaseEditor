@@ -52,7 +52,7 @@
                         </WdeImage>
                     </ToggleButton>
                     
-                    <components:ButtonImage Image="Icons/icon_play.png" IsVisible="{CompiledBinding ShowPlayButtons}" Command="{Binding ExecuteChangedCommand}" />
+                    <components:ButtonImage Image="Icons/icon_play.png" IsVisible="{CompiledBinding ShowPlayButtons}" Command="{CompiledBinding ExecuteChangedCommand}" />
                     <components:ButtonImage Command="{CompiledBinding GenerateCurrentSqlCommand}"
                                             IsVisible="{CompiledBinding ShowExportButtons}"
                                             Text="To SQL" 

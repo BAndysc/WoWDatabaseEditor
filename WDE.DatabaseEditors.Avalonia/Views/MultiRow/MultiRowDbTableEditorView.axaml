@@ -219,6 +219,7 @@
                                                                   Items="{Binding ., Mode=OneTime}" 
                                                                   ClipToBounds="False"
                                                                   MinHeight="20" 
+                                                                  utils:FocusUtils.FocusFirst="True"
                                                                   ItemTemplate="{StaticResource RowTemplate}" />
                             </StackPanel>
                         </DataTemplate>
@@ -227,6 +228,7 @@
             </DockPanel>
             <ScrollViewer.Styles>
                 <Style Selector="GridSplitter">
+                    <Setter Property="Focusable" Value="False"></Setter>
                     <Setter Property="Template">
                         <ControlTemplate>
                             <Border 

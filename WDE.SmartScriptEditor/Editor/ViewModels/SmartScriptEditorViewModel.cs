@@ -365,11 +365,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             DirectEditParameter = new DelegateCommand<object>(async obj =>
             {
-                if (obj is ParameterValueHolder<long> param)
+                if (obj is ParameterWithContext param)
                 {
-                    long? val = await itemFromListProvider.GetItemFromList(param.Parameter.Items ?? new Dictionary<long, SelectOption>(), param.Parameter is FlagParameter, param.Value);
-                    if (val.HasValue)
-                        param.Value = val.Value;   
+                    (long? val, bool ok) = await parameterPickerService.PickParameter(param.Parameter.Parameter, param.Parameter.Value, param.Context);
+                    if (ok)
+                    {
+                        param.Parameter.Value = val.Value;
+                        if (param.Parameter.Parameter is ICustomPickerContextualParameter<long>) // custom pickers can save to database, which makes a delay when the value will be ready
+                            mainThread.Delay(() => param.Context.InvalidateReadable(), TimeSpan.FromMilliseconds(50));
+                    }
                 } 
                 else if (obj is MetaSmartSourceTargetEdit sourceTargetEdit)
                 {
@@ -942,6 +946,56 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AutoDispose(new ActionDisposable(() => disposed = true));
             
             SetSolutionItem(item);
+
+            DoAllTest().ListenErrors();
+        }
+
+        private class CustomMsgBox : IMessageBoxService
+        {
+            private readonly int entry;
+            private readonly SmartScriptType type;
+
+            public CustomMsgBox(int entry, SmartScriptType type)
+            {
+                this.entry = entry;
+                this.type = type;
+            }
+            
+            public Task<T?> ShowDialog<T>(IMessageBox<T> messageBox)
+            {
+                if (messageBox.MainInstruction != "Script with multiple links")
+                    Console.WriteLine($"[{entry}, {type}]" + messageBox.Content + ": " + messageBox.MainInstruction);
+                return Task.FromResult<T?>(default(T));
+            }
+        }
+        
+        public async Task DoAllTest()
+        {
+            return;
+            foreach (var type in Enum.GetValues<SmartScriptType>())
+            {
+                var entries = await database.GetSmartScriptEntriesByType(type);
+                foreach (var entry in entries)
+                {
+                    //
+                    smartScriptImporter.messageBoxService = new CustomMsgBox(entry, type);
+                    var script = new SmartScript(new SmartScriptSolutionItem(entry, type), smartFactory, smartDataManager, new CustomMsgBox(entry, type));
+                    var lines = (await smartScriptDatabase.GetScriptFor(entry, type)).ToList();
+                    var conditions = smartScriptDatabase.GetConditionsForScript(entry, type).ToList();
+                    var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(entry, type).ToList();
+                    await smartScriptImporter.Import(script, true, lines, conditions, targetSourceConditions);
+                    var problems = inspectorService.GenerateInspections(script);
+                    if (problems.Count > 0)
+                    {
+                        Console.WriteLine(type + " " + entry);
+                        foreach (var p in problems)
+                        {
+                            Console.WriteLine($"   {p.Line} [{p.Severity}]: {p.Message}");
+                        }
+                    }
+                }
+            }
+            
         }
 
         public Task<string> GenerateQuery()

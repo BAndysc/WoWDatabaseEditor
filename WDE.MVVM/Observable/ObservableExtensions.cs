@@ -20,6 +20,24 @@ namespace WDE.MVVM.Observable
             return observable.Subscribe(new DelegateObserver<T>(onNext));
         }
         
+        public static IDisposable SubscribeOnce<T>(this IObservable<T> observable, Action<T> onNext)
+        {
+            System.IDisposable? disposable = null;
+            bool fired = false;
+            disposable = observable.Subscribe(new DelegateObserver<T>(x =>
+            {
+                onNext(x);
+                fired = true;
+                disposable?.Dispose();
+            }));
+            if (fired)
+            {
+                disposable.Dispose();
+                disposable = new EmptyDisposable();
+            }
+            return disposable;
+        }
+        
         public static IDisposable Subscribe<T, R>(this R observable, Expression<Func<R, T>> propertyGetter, Action<T> onNext) where R : INotifyPropertyChanged
         {
             return observable.ToObservable(propertyGetter).Subscribe(new DelegateObserver<T>(onNext));

@@ -58,7 +58,7 @@ namespace WDE.SmartScriptEditor.Models
                 @params[i].PropertyChanged += (_, _) => CallOnChanged();
             }
 
-            Context = @params.Select(p => (object)p).ToList();
+            Context = @params.Select(p => (object)new ParameterWithContext(p, this)).ToList();
             OnChanged += (sender, args) => OnPropertyChanged(nameof(Readable));
         }
 
@@ -105,5 +105,17 @@ namespace WDE.SmartScriptEditor.Models
                 smartBaseElement.BulkEditingFinished.Invoke(name);
             }
         }
+    }
+
+    public class ParameterWithContext
+    {
+        public ParameterWithContext(ParameterValueHolder<long> parameter, SmartBaseElement context)
+        {
+            Parameter = parameter;
+            Context = context;
+        }
+
+        public ParameterValueHolder<long> Parameter { get; }
+        public SmartBaseElement Context { get; }
     }
 }
