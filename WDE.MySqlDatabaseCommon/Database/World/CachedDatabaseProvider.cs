@@ -28,6 +28,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         private List<IQuestTemplate>? questTemplateCache;
         private Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
+        
+        private Dictionary<uint, IReadOnlyList<ICreatureText>?> creatureTextsCache = new();
 
         private List<IAreaTriggerTemplate>? areaTriggerTemplates;
         private List<IGameEvent>? gameEventsCache;
@@ -68,6 +70,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     Refresh(RefreshGossipMenu);
                 else if (tableName == "npc_text")
                     Refresh(RefreshNpcTexts);
+                else if (tableName == "creature_text")
+                    Refresh(RefreshCreatureTexts);
             }, true);
         }
 
@@ -85,6 +89,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             npcTextsCache = await nonCachedDatabase.GetNpcTextsAsync().ConfigureAwait(false);
             npcTextsByIdCache = npcTextsCache.ToDictionary(npcText => npcText.Id);
             return typeof(INpcText);
+        }
+        
+        private async Task<Type> RefreshCreatureTexts()
+        {
+            creatureTextsCache.Clear();
+            return typeof(ICreatureText);
         }
         
         private async Task<Type> RefreshGossipMenu()
@@ -222,8 +232,17 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => nonCachedDatabase.GetPointsOfInterestsAsync();
 
-        public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => nonCachedDatabase.GetCreatureTextsByEntry(entry);
-       
+        public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => nonCachedDatabase.GetCreatureTextsByEntryAsync(entry);
+        
+        public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry)
+        {
+            if (creatureTextsCache.TryGetValue(entry, out var texts))
+                return texts;
+
+            creatureTextsCache[entry] = texts = nonCachedDatabase.GetCreatureTextsByEntry(entry);
+            return texts;
+        }
+
         public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => nonCachedDatabase.GetLinesCallingSmartTimedActionList(timedActionList);
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>

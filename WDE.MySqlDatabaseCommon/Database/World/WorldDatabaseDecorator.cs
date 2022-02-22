@@ -31,7 +31,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<INpcText> GetNpcTexts() => impl.GetNpcTexts();
         public INpcText? GetNpcText(uint entry) => impl.GetNpcText(entry);
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => impl.GetPointsOfInterestsAsync();
-        public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => impl.GetCreatureTextsByEntry(entry);
+        public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => impl.GetCreatureTextsByEntryAsync(entry);
+        public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry) => impl.GetCreatureTextsByEntry(entry);
+
         public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => impl.GetLinesCallingSmartTimedActionList(timedActionList);
 
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() => impl.GetCreatureClassLevelStats();

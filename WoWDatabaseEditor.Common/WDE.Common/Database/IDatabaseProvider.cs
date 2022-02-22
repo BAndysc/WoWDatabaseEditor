@@ -34,7 +34,8 @@ namespace WDE.Common.Database
         INpcText? GetNpcText(uint entry);
         Task<List<IPointOfInterest>> GetPointsOfInterestsAsync();
 
-        Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry);
+        Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry);
+        IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry);
         
         Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
@@ -70,6 +71,7 @@ namespace WDE.Common.Database
         Task<IList<ITrinityString>> GetStringsAsync();
         Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync();
 
+        
         [Flags]
         public enum ConditionKeyMask
         {

@@ -41,7 +41,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<INpcText> GetNpcTexts() => Enumerable.Empty<INpcText>();
         public INpcText? GetNpcText(uint entry) => null;
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => Task.FromResult(new List<IPointOfInterest>());
-        public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => Task.FromResult(new List<ICreatureText>());
+        public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => Task.FromResult(new List<ICreatureText>());
+        public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry) => null;
+
         public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => Task.FromResult<IList<ISmartScriptLine>>(new List<ISmartScriptLine>());
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
