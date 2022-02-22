@@ -946,8 +946,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             AutoDispose(new ActionDisposable(() => disposed = true));
             
             SetSolutionItem(item);
-
-            DoAllTest().ListenErrors();
         }
 
         private class CustomMsgBox : IMessageBoxService
@@ -969,35 +967,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
         
-        public async Task DoAllTest()
-        {
-            return;
-            foreach (var type in Enum.GetValues<SmartScriptType>())
-            {
-                var entries = await database.GetSmartScriptEntriesByType(type);
-                foreach (var entry in entries)
-                {
-                    //
-                    smartScriptImporter.messageBoxService = new CustomMsgBox(entry, type);
-                    var script = new SmartScript(new SmartScriptSolutionItem(entry, type), smartFactory, smartDataManager, new CustomMsgBox(entry, type));
-                    var lines = (await smartScriptDatabase.GetScriptFor(entry, type)).ToList();
-                    var conditions = smartScriptDatabase.GetConditionsForScript(entry, type).ToList();
-                    var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(entry, type).ToList();
-                    await smartScriptImporter.Import(script, true, lines, conditions, targetSourceConditions);
-                    var problems = inspectorService.GenerateInspections(script);
-                    if (problems.Count > 0)
-                    {
-                        Console.WriteLine(type + " " + entry);
-                        foreach (var p in problems)
-                        {
-                            Console.WriteLine($"   {p.Line} [{p.Severity}]: {p.Message}");
-                        }
-                    }
-                }
-            }
-            
-        }
-
         public Task<string> GenerateQuery()
         {
             return Task.FromResult(smartScriptExporter.GenerateSql(item, script));
