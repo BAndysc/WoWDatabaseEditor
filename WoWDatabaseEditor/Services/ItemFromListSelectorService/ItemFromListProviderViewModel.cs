@@ -81,7 +81,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             ShowItemsList = items?.Count > 0;
             DesiredHeight = ShowItemsList ? 670 : 130;
             DesiredWidth = ShowItemsList ? 800 : 400;
-            Accept = new DelegateCommand(() =>
+            accept = new DelegateCommand(() =>
             {
                 if (SelectedItem == null && FilteredItems.Count == 1)
                     SelectedItem = FilteredItems[0];
@@ -89,9 +89,9 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             }, () => asFlags || SelectedItem != null || FilteredItems.Count == 1 || int.TryParse(SearchText, out _));
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
             
-            FilteredItems.ObserveCollectionChanges().Subscribe(_ => Accept.RaiseCanExecuteChanged());
-            this.WhenPropertyChanged(t => t.SearchText).Subscribe(_ => Accept.RaiseCanExecuteChanged());
-            this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => Accept.RaiseCanExecuteChanged());
+            FilteredItems.ObserveCollectionChanges().Subscribe(_ => accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SearchText).Subscribe(_ => accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => accept.RaiseCanExecuteChanged());
         }
 
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
@@ -143,7 +143,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         protected abstract bool StringToT(string str, out T result);
 
         public bool ShowItemsList { get; }
-        public DelegateCommand Accept { get; }
+        private DelegateCommand accept;
+        public ICommand Accept => accept;
         public ICommand Cancel { get; }
         public int DesiredWidth { get; }
         public int DesiredHeight { get; }

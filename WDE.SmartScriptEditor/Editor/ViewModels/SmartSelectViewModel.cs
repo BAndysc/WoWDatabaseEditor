@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using DynamicData.Binding;
 using Prism.Commands;
 using WDE.Common.Managers;
@@ -112,7 +113,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 SelectedItem = Items[0];
 
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
-            Accept = new DelegateCommand(() =>
+            accept = new DelegateCommand(() =>
             {
                 if (selectedItem == null)
                     SelectedItem = FindExactMatching() ?? Items.FirstOrDefault();
@@ -161,7 +162,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set
             {
                 SetProperty(ref selectedItem, value);
-                Accept?.RaiseCanExecuteChanged();
+                accept?.RaiseCanExecuteChanged();
             }
         }
         
@@ -251,8 +252,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        public DelegateCommand Cancel { get; }
-        public DelegateCommand Accept { get; }
+        public ICommand Cancel { get; }
+        private DelegateCommand accept { get; }
+        public ICommand Accept => accept;
         public int DesiredWidth => 750;
         public int DesiredHeight => 650;
         public string Title { get; }

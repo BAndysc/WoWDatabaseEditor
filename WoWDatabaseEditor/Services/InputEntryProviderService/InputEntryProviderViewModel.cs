@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.MVVM;
@@ -14,7 +15,7 @@ namespace WoWDatabaseEditorCore.Services.InputEntryProviderService
             Description = description;
             entry = defaultValue;
             Title = title;
-            Save = new DelegateCommand(() =>
+            Accept = Save = new DelegateCommand(() =>
             {
                 CloseOk?.Invoke();
             }, () => isValid == null || isValid(Entry)).ObservesProperty(() => Entry);
@@ -33,7 +34,8 @@ namespace WoWDatabaseEditorCore.Services.InputEntryProviderService
         }
 
         public DelegateCommand Save { get; }
-        public DelegateCommand Cancel { get; }
+        public ICommand Accept { get; }
+        public ICommand Cancel { get; }
 
         public int DesiredWidth { get; } = 460;
         public int DesiredHeight { get; } = 230;

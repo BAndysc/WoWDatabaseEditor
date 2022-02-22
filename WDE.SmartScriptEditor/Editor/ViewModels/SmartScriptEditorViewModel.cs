@@ -55,6 +55,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IConditionEditService conditionEditService;
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ISmartScriptInspectorService inspectorService;
+        private readonly IParameterPickerService parameterPickerService;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -108,7 +109,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ISolutionItemIconRegistry iconRegistry,
             IConditionEditService conditionEditService,
             ICurrentCoreVersion currentCoreVersion,
-            ISmartScriptInspectorService inspectorService)
+            ISmartScriptInspectorService inspectorService,
+            IParameterPickerService parameterPickerService)
         {
             History = history;
             this.database = databaseProvider;
@@ -131,6 +133,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.conditionEditService = conditionEditService;
             this.currentCoreVersion = currentCoreVersion;
             this.inspectorService = inspectorService;
+            this.parameterPickerService = parameterPickerService;
             this.conditionDataManager = conditionDataManager;
             script = null!;
             this.item = null!;
@@ -1508,6 +1511,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
+                parameterPickerService,
                 obj, 
                 !editOriginal,
                 parametersList, 
@@ -1556,7 +1560,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         originalAction.Comment = obj.Comment;
                     }
-                });
+                }, context: obj);
             return viewModel;
         }
 
@@ -1596,6 +1600,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
+                parameterPickerService,
                 obj, 
                 !editOriginal,
                 parametersList, 
@@ -1667,6 +1672,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
+                parameterPickerService,
                 ev,
                 !editOriginal,
                 parametersList,

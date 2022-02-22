@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Prism.Commands;
 using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.MVVM;
@@ -18,19 +19,28 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly ICurrentCoreVersion currentCoreVersion;
+        private readonly IParameterPickerService parameterPickerService;
+        private readonly object? context;
 
         public EditableParameterViewModel(ParameterValueHolder<T> parameter, 
             string group, 
             IItemFromListProvider itemFromListProvider,
-            ICurrentCoreVersion currentCoreVersion)
+            ICurrentCoreVersion currentCoreVersion,
+            IParameterPickerService parameterPickerService,
+            object? context = null)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.currentCoreVersion = currentCoreVersion;
+            this.parameterPickerService = parameterPickerService;
+            this.context = context;
             Group = group;
             Parameter = parameter;
             SelectItemAction = new AsyncAutoCommand(SelectItem);
             SpecialCopying = typeof(T) == typeof(float);
 
+            Accept = new DelegateCommand(() => CloseOk?.Invoke());
+            Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
+            
             Watch(parameter, p => p.IsUsed, nameof(IsHidden));
             Watch(parameter, p => p.ForceHidden, nameof(IsHidden));
             Watch(parameter, p => p.Parameter, nameof(HasItems));
@@ -112,12 +122,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         
         private async Task SelectItem()
         {
-            if (Parameter.HasItems)
             {
                 if (Parameter is ParameterValueHolder<long> p)
                 {
-                    long? val = await itemFromListProvider.GetItemFromList(p.Items, Parameter.Parameter is FlagParameter, p.Value);
-                    if (val.HasValue)
+                    (long? val, bool ok) = await parameterPickerService.PickParameter(p.Parameter, p.Value, context);
+                    if (ok)
                         p.Value = val.Value;   
                 }
             }
@@ -127,6 +136,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public int DesiredHeight { get; } = 50;
         public string Title { get; } = "Editing";
         public bool Resizeable { get; } = false;
+        public ICommand Accept { get; }
+        public ICommand Cancel { get; }
         public event Action? CloseCancel;
         public event Action? CloseOk;
     }

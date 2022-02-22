@@ -32,4 +32,9 @@ namespace WDE.Common.Parameters
         System.Type ContextType => typeof(R);
         Dictionary<T, SelectOption>? ItemsForContext(R context) => null;
     }
+
+    public interface ICustomPickerContextualParameter<T> : IParameter<T> where T : notnull
+    {
+        Task<(T, bool)> PickValue(T value, object context);
+    }
 }
