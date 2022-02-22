@@ -54,7 +54,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             MessageBoxView view = new MessageBoxView();
             var viewModel = new MessageBoxViewModel<T>(messageBox);
             view.DataContext = viewModel;
-            await view.ShowDialog<bool>(mainWindowHolder.Window);
+            await mainWindowHolder.ShowDialog<bool>(view);
             dialogOpened = false;
 
             if (pending.Count > 0)
