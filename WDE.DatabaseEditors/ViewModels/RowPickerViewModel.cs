@@ -20,11 +20,12 @@ using WDE.MVVM;
 
 namespace WDE.DatabaseEditors.ViewModels;
 
-public class RowPickerViewModel : ObservableBase, IDialog
+public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
 {
     private readonly MultiRowDbTableEditorViewModel baseViewModel;
     private readonly ISolutionItemEditorRegistry solutionItemEditorRegistry;
     private readonly ISessionService sessionService;
+    private readonly IMessageBoxService messageBoxService;
 
     public RowPickerViewModel(MultiRowDbTableEditorViewModel baseViewModel,
         ITaskRunner taskRunner, 
@@ -39,6 +40,7 @@ public class RowPickerViewModel : ObservableBase, IDialog
         this.baseViewModel = baseViewModel;
         this.solutionItemEditorRegistry = solutionItemEditorRegistry;
         this.sessionService = sessionService;
+        this.messageBoxService = messageBoxService;
         Watch(baseViewModel, o => o.IsModified, nameof(Title));
         ExecuteChangedCommand = new AsyncAutoCommand(async () =>
         {
@@ -60,22 +62,7 @@ public class RowPickerViewModel : ObservableBase, IDialog
         });
         PickSelected = new AsyncAutoCommand(async () =>
         {
-            if (baseViewModel.IsModified)
-            {
-                var result = await messageBoxService.ShowDialog(new MessageBoxFactory<int>()
-                    .SetTitle("Save changes")
-                    .SetMainInstruction($"{Title} has unsaved changes")
-                    .SetContent("Do you want to save them before picking the row?")
-                    .WithNoButton(1)
-                    .WithYesButton(2)
-                    .WithCancelButton(0)
-                    .Build());
-                if (result == 0)
-                    return;
-                if (result == 2)
-                    ExecuteChangedCommand.Execute(null);
-            }
-            CloseOk?.Invoke();
+            await AskIfSave(false);
         });
         Cancel = new DelegateCommand(() =>
         {
@@ -84,6 +71,39 @@ public class RowPickerViewModel : ObservableBase, IDialog
         Accept = PickSelected;
     }
 
+    private async Task AskIfSave(bool cancel)
+    {
+        if (baseViewModel.IsModified)
+        {
+            var result = await messageBoxService.ShowDialog(new MessageBoxFactory<int>()
+                .SetTitle("Save changes")
+                .SetMainInstruction($"{Title} has unsaved changes")
+                .SetContent("Do you want to save them before picking the row?")
+                .WithNoButton(1)
+                .WithYesButton(2)
+                .WithCancelButton(0)
+                .Build());
+            if (result == 0)
+                return;
+            if (result == 2)
+                ExecuteChangedCommand.Execute(null);
+        }
+        if (cancel)
+            CloseCancel?.Invoke();
+        else
+            CloseOk?.Invoke();
+    }
+
+    public void OnClose()
+    {
+        if (baseViewModel.IsModified)
+        {
+            AskIfSave(true).ListenErrors();
+        }
+        else
+            CloseCancel?.Invoke();
+    }
+    
     public DatabaseEntityViewModel? SelectedRow => baseViewModel.SelectedRow;
     public object? MainViewModel => baseViewModel;
 

@@ -14,4 +14,9 @@ namespace WDE.Common.Managers
         event System.Action CloseCancel;
         event System.Action CloseOk;
     }
+
+    public interface IClosableDialog
+    {
+        void OnClose();
+    }
 }
