@@ -82,7 +82,7 @@ namespace WDE.DatabaseEditors.Models
 
         public DatabaseEntity Clone()
         {
-            var fields = new Dictionary<string, IDatabaseField>();
+            var fields = new Dictionary<string, IDatabaseField>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var field in Cells)
                 fields[field.Key] = field.Value.Clone();
             

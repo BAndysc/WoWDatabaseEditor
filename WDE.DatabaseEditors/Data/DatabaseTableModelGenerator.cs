@@ -32,7 +32,7 @@ namespace WDE.DatabaseEditors.Data
         
         public DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson definition, uint key)
         {
-            Dictionary<string, IDatabaseField> columns = new();
+            Dictionary<string, IDatabaseField> columns = new(StringComparer.InvariantCultureIgnoreCase);
             
             foreach (var column in definition.Groups.SelectMany(t => t.Fields)
                 .Distinct(
@@ -82,7 +82,7 @@ namespace WDE.DatabaseEditors.Data
             foreach (var entity in fieldsFromDb)
             {
                 uint? key = null;
-                Dictionary<string, IDatabaseField> columns = new();
+                Dictionary<string, IDatabaseField> columns = new(StringComparer.InvariantCultureIgnoreCase);
                 foreach (var column in entity)
                 {
                     IValueHolder valueHolder = null!;
