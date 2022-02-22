@@ -162,6 +162,12 @@ namespace WDE.SmartScriptEditor.Models
             if (Phases.Value != other.Phases.Value)
                 return false;
 
+            if (CooldownMin.Value != other.CooldownMin.Value)
+                return false;
+            
+            if (CooldownMax.Value != other.CooldownMax.Value)
+                return false;
+
             return Chance.Value == other.Chance.Value;
         }
 

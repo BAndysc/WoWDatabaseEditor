@@ -17,6 +17,7 @@ namespace WDE.AzerothCore
         public IGameVersionFeatures GameVersionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
         public bool SupportsRbac => false;
+        public bool SupportsConditionTargetVictim => true;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
             typeof(IConversationTemplate),

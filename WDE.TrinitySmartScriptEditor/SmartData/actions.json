@@ -2211,7 +2211,7 @@
                 "name": "Instant"
             }
         ],
-        "description": "{source}: Interrupt casted spell {pram2}",
+        "description": "{source}: Interrupt {pram2value:choose(0):any |}casted spell{pram2value:choose(0):| {pram2}}",
         "name_readable": "Interrupt spell",
         "target_types": ["Creature", "Player"],
         "target_is_source": true

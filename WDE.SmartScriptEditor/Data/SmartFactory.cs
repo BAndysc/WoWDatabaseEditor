@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
@@ -18,17 +19,20 @@ namespace WDE.SmartScriptEditor.Data
         private readonly IParameterFactory parameterFactory;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
+        private readonly ICurrentCoreVersion currentCoreVersion;
 
         public SmartFactory(IParameterFactory parameterFactory, 
             ISmartDataManager smartDataManager, 
             IDatabaseProvider databaseProvider,
             IConditionDataManager conditionDataManager,
             ITableEditorPickerService tableEditorPickerService,
-            IItemFromListProvider itemFromListProvider)
+            IItemFromListProvider itemFromListProvider,
+            ICurrentCoreVersion currentCoreVersion)
         {
             this.parameterFactory = parameterFactory;
             this.smartDataManager = smartDataManager;
             this.conditionDataManager = conditionDataManager;
+            this.currentCoreVersion = currentCoreVersion;
 
             if (!parameterFactory.IsRegisteredLong("StoredTargetParameter"))
             {
@@ -89,7 +93,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!conditionDataManager.HasConditionData(id))
                 throw new NullReferenceException("No data for condition id " + id);
 
-            SmartCondition ev = new(id);
+            SmartCondition ev = new(id, currentCoreVersion.Current.SmartScriptFeatures.SupportsConditionTargetVictim);
             var raw = conditionDataManager.GetConditionData(id);
             SetParameterObjects(ev, raw);
 

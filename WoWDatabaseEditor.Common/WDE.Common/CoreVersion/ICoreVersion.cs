@@ -44,6 +44,7 @@ namespace WDE.Common.CoreVersion
         ISet<SmartScriptType> SupportedTypes { get; }
         bool SupportsCreatingTimedEventsInsideTimedEvents => false;
         bool ProposeSmartScriptOnMainPage => true;
+        bool SupportsConditionTargetVictim => false;
         string CreatureSmartAiName => "SmartAI";
         string GameObjectSmartAiName => "SmartGameObjectAI";
 
