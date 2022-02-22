@@ -198,7 +198,8 @@
         "name": "Phase",
         "group_members": [
             "SMART_ACTION_SET_INGAME_PHASE_ID",
-            "SMART_ACTION_SET_INGAME_PHASE_GROUP"
+            "SMART_ACTION_SET_INGAME_PHASE_GROUP",
+            "SMART_ACTION_SET_INGAME_PHASE_MASK"
         ]
     },
     {
@@ -227,7 +228,8 @@
             "SMART_ACTION_NO_ENVIRONMENT_UPDATE_AC",
             "SMART_ACTION_RESPAWN_TARGET",
             "SMART_ACTION_ENABLE_TEMP_GOBJ",
-            "SMART_ACTION_SET_HOME_POS"
+            "SMART_ACTION_SET_HOME_POS",
+            "SMART_ACTION_COMBAT_STOP"
         ]
     },
     {

@@ -684,6 +684,13 @@
         "target_is_source": true
     },
     {
+        "id": 27,
+        "name": "SMART_ACTION_COMBAT_STOP",
+        "description": "{source}: Stop combat",
+        "name_readable": "Combat stop",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
         "id": 28,
         "name": "SMART_ACTION_REMOVEAURASFROMSPELL",
         "parameters": [
@@ -1026,6 +1033,21 @@
         "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Dismount|Mount to model {pram2}}|{pram2value:choose(0):Mount to creature {pram1}|Invalid mount ({pram1}, {pram2}}}",
         "name_readable": "Mount to entry or model",
         "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 44,
+        "name": "SMART_ACTION_SET_INGAME_PHASE_MASK",
+        "tags": ["TrinityWrath", "Azeroth"],
+        "parameters": [
+            {
+                "type": "PhaseMaskParameter",
+                "name": "Phase mask"
+            }
+        ],
+        "description": "{source}: Set phasemask {pram1}",
+        "name_readable": "Set phasemask",
+        "target_types": ["Creature", "GameObject", "Player"],
         "target_is_source": true
     },
     {
