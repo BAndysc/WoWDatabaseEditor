@@ -6,6 +6,7 @@ using WDE.Common;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
@@ -45,14 +46,25 @@ namespace WDE.DatabaseEditors.Services
                 if (q is UpdateQuery updateQuery)
                 {
                     var defi = tableDefinitionProvider.GetDefinitionByTableName(updateQuery.TableName);
+                    DatabaseForeignTableJson? foreignTable = null;
+                    if (defi == null)
+                    {
+                        defi = tableDefinitionProvider.GetDefinitionByForeignTableName(updateQuery.TableName);
+                        if (defi?.ForeignTableByName.TryGetValue(updateQuery.TableName, out var foreignTable_) ?? false)
+                            foreignTable = foreignTable_;
+                    }
+
                     if (defi == null)
                     {
                         missingTables.Add(updateQuery.TableName);
                         continue;
                     }
                 
-                    if (!updateQuery.Where.ColumnName.Equals(defi.TablePrimaryKeyColumnName,
-                        StringComparison.InvariantCultureIgnoreCase))
+                    if (
+                        (!foreignTable.HasValue && !updateQuery.Where.ColumnName.Equals(defi.TablePrimaryKeyColumnName, StringComparison.InvariantCultureIgnoreCase))
+                        ||
+                        (foreignTable.HasValue && !updateQuery.Where.ColumnName.Equals(foreignTable.Value.ForeignKeys[0], StringComparison.InvariantCultureIgnoreCase))
+                        )
                     {
                         missingTables.Add(updateQuery.TableName);
                         continue;

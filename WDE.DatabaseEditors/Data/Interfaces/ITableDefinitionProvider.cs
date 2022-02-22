@@ -9,6 +9,7 @@ namespace WDE.DatabaseEditors.Data.Interfaces
     {
         DatabaseTableDefinitionJson? GetDefinition(string? definitionId);
         DatabaseTableDefinitionJson? GetDefinitionByTableName(string? tableName);
+        DatabaseTableDefinitionJson? GetDefinitionByForeignTableName(string? tableName);
         IEnumerable<string>? CoreCompatibility(string definitionId);
         IEnumerable<DatabaseTableDefinitionJson> Definitions { get; }
         IEnumerable<DatabaseTableDefinitionJson> IncompatibleDefinitions { get; }

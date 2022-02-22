@@ -15,7 +15,8 @@ namespace WDE.DatabaseEditors.Data
         private readonly Dictionary<string, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitionsByTableName = new();
-        
+        private readonly Dictionary<string, DatabaseTableDefinitionJson> definitionsByForeignTableName = new();
+
         public TableDefinitionProvider(ITableDefinitionDeserializer serializationProvider,
             ITableDefinitionJsonProvider jsonProvider,
             ICurrentCoreVersion currentCoreVersion)
@@ -61,6 +62,11 @@ namespace WDE.DatabaseEditors.Data
                 {
                     definitions[definition.Id] = definition;
                     definitionsByTableName[definition.TableName] = definition;
+                    if (definition.ForeignTable != null)
+                    {
+                        foreach (var foreign in definition.ForeignTable)
+                            definitionsByForeignTableName[foreign.TableName] = definition;
+                    }
                 }
                 else
                 {
@@ -88,6 +94,17 @@ namespace WDE.DatabaseEditors.Data
             return null;
         }
         
+        public DatabaseTableDefinitionJson? GetDefinitionByForeignTableName(string? tableName)
+        {
+            if (tableName == null)
+                return null;
+            
+            if (definitionsByForeignTableName.TryGetValue(tableName, out var definition))
+                return definition;
+            
+            return null;
+        }
+
         public DatabaseTableDefinitionJson? GetDefinition(string? definitionId)
         {
             if (definitionId != null && definitions.TryGetValue(definitionId, out var definition))
