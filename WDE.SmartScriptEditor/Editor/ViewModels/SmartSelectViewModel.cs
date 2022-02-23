@@ -126,6 +126,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }, () => selectedItem != null || (visibleCount == 1 || FindExactMatching() != null))
                 .ObservesProperty(() => SearchBox)
                 .ObservesProperty(() => SelectedItem);
+            
+            ToggleFavouriteCommand = new DelegateCommand<SmartItem>(item =>
+            {
+                item.IsFavourite = !item.IsFavourite;
+            });
         }
 
         private SmartItem? FindExactMatching()
@@ -253,6 +258,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
+        public DelegateCommand<SmartItem> ToggleFavouriteCommand { get; }
         public ICommand Cancel { get; }
         private DelegateCommand accept { get; }
         public ICommand Accept => accept;
