@@ -9,13 +9,15 @@ namespace AvaloniaStyles
 {
     public enum SystemThemeOptions
     {
-        //Auto,
+        Auto,
         //MacOsCatalinaLight,
         //MacOsCatalinaDark,
         //MacOsBigSurLight,
         //MacOsBigSurDark,
-        Windows10Dark,
-        Windows10Light
+        DarkWindows10,
+        LightWindows10,
+        DarkWindows11,
+        LightWindows11
     }
     
     public class SystemTheme : StyleInclude
@@ -40,24 +42,19 @@ namespace AvaloniaStyles
         }
 
         public bool ThemeUsesDock =>
-            mode == SystemThemeOptions.Windows10Dark || mode == SystemThemeOptions.Windows10Light;
+            mode is SystemThemeOptions.DarkWindows10 or SystemThemeOptions.DarkWindows11 or
+                SystemThemeOptions.LightWindows10 or SystemThemeOptions.LightWindows11;
 
         protected static SystemThemeOptions ResolveTheme(SystemThemeOptions theme)
         {
-            return theme;
-            /*if (theme != SystemThemeOptions.Auto) 
+            if (theme != SystemThemeOptions.Auto) 
                 return theme;
-            
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                var version = Environment.OSVersion;
-                if (version.Version.Major >= 11)
-                    return SystemThemeOptions.MacOsBigSurLight;
-                else
-                    return SystemThemeOptions.MacOsCatalinaLight;
-            }*/
-            
-            return SystemThemeOptions.Windows10Dark;
+
+            var os = Environment.OSVersion.Version;
+            if (OperatingSystem.IsWindows() && os.Major == 10)
+                return SystemThemeOptions.LightWindows10;
+
+            return SystemThemeOptions.LightWindows11;
         }
         
         private SystemThemeOptions mode;
@@ -70,7 +67,7 @@ namespace AvaloniaStyles
             {
                 mode = value;
                 EffectiveTheme = ResolveTheme(Mode);
-                EffectiveThemeIsDark = EffectiveTheme == SystemThemeOptions.Windows10Dark;
+                EffectiveThemeIsDark = EffectiveTheme is SystemThemeOptions.DarkWindows10 or SystemThemeOptions.DarkWindows11;
                                        // || EffectiveTheme == SystemThemeOptions.MacOsCatalinaDark ||
                                        // EffectiveTheme == SystemThemeOptions.MacOsBigSurDark;
 
@@ -88,11 +85,17 @@ namespace AvaloniaStyles
                     // case SystemThemeOptions.MacOsBigSurDark:
                     //     Source = new Uri("avares://AvaloniaStyles/Styles/MacOsBigSurDark.xaml", UriKind.Absolute);
                     //     break;
-                    case SystemThemeOptions.Windows10Dark:
+                    case SystemThemeOptions.DarkWindows10:
                         Source = new Uri("avares://AvaloniaStyles/Styles/Windows10Dark.xaml", UriKind.Absolute);
                         break;
-                    case SystemThemeOptions.Windows10Light:
+                    case SystemThemeOptions.LightWindows10:
                         Source = new Uri("avares://AvaloniaStyles/Styles/Windows10Light.xaml", UriKind.Absolute);
+                        break;
+                    case SystemThemeOptions.DarkWindows11:
+                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows11Dark.xaml", UriKind.Absolute);
+                        break;
+                    case SystemThemeOptions.LightWindows11:
+                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows11Light.xaml", UriKind.Absolute);
                         break;
                 }
             }

@@ -81,7 +81,7 @@
                     <DataTemplate>
                         <DockPanel LastChildFill="True">
                             <TextBlock Text="{Binding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
-                            <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" BorderBrush="Gray" Content="{Binding}" Margin="20,0,0,0" />
+                            <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{Binding}" Margin="20,0,0,0" />
                         </DockPanel>
 
                     </DataTemplate>
@@ -121,7 +121,7 @@
                     <ControlTemplate>
                         <Border BorderThickness="0,0,1,0" 
                                 Background="Transparent"
-                                BorderBrush="{DynamicResource TextControlBorderBrush}" />
+                                BorderBrush="#3F000000" />
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

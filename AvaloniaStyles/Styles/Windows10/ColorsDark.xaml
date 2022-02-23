@@ -41,6 +41,7 @@
         <SolidColorBrush x:Key="MessageBoxBottomPanelBorder" Color="#686868" />
         
         <!-- buttons -->
+        <CornerRadius x:Key="ControlCornerTopRadius">0</CornerRadius>
         <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
         <Thickness x:Key="ListBoxItemPadding">7,5,7,7</Thickness>
         <Thickness x:Key="ButtonPadding">8,5,8,6</Thickness>

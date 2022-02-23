@@ -53,7 +53,7 @@
             </Button>
         </Panel>
         <Panel Grid.Column="1" VerticalAlignment="Stretch" Margin="0,0,10,0">
-            <Button Command="{Binding OpenProblemTool}">
+            <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{Binding OpenProblemTool}">
                 <WrapPanel>
                     <Image Width="13" Height="13" Margin="0,0,3,0" VerticalAlignment="Center">
                         <Interaction.Behaviors>
@@ -76,7 +76,7 @@
         </Panel>
         
         <Panel Grid.Column="2" VerticalAlignment="Stretch" Margin="0">
-            <Button Command="{Binding TasksViewModel.TogglePanelVisibility}">
+            <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{Binding TasksViewModel.TogglePanelVisibility}">
                 <WrapPanel>
                     <TextBlock Text="{Binding TasksViewModel.PendingTasksCount, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
                     <TextBlock Text=" tasks running in background"></TextBlock>

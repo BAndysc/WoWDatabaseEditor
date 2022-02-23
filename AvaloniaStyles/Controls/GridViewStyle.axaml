@@ -17,6 +17,7 @@
                                                             Extent="{TemplateBinding Extent, Mode=TwoWay}"
                                                             Margin="{TemplateBinding Padding}"
                                                             Offset="{TemplateBinding Offset, Mode=TwoWay}"
+                                                            CornerRadius="{TemplateBinding CornerRadius}"
                                                             Viewport="{TemplateBinding Viewport, Mode=TwoWay}">
                     <ScrollContentPresenter.GestureRecognizers>
                         <ScrollGestureRecognizer
@@ -39,6 +40,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <controls:AlternativeScrollViewer Name="PART_ScrollViewer"
+                                                  CornerRadius="{TemplateBinding CornerRadius}"
                                                   Background="{TemplateBinding Background}"
                                                   HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
                                                   VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
@@ -59,7 +61,9 @@
         <Setter Property="BorderBrush" Value="Gray" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                <Border BorderThickness="{TemplateBinding BorderThickness}" 
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        BorderBrush="{TemplateBinding BorderBrush}">
                     <Grid  ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
                         <controls:AlternativeScrollViewer 
                                                           Grid.RowSpan="2" Grid.ColumnSpan="2"
@@ -146,7 +150,11 @@
         <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
         <Setter Property="Template">
             <ControlTemplate>
-                <ContentPresenter Content="{TemplateBinding Content}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                <ContentPresenter Content="{TemplateBinding Content}" 
+                                  CornerRadius="{TemplateBinding CornerRadius}"
+                                  Background="{TemplateBinding Background}" 
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  BorderThickness="{TemplateBinding BorderThickness}" />
             </ControlTemplate>
         </Setter>
     </Style>

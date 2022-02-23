@@ -1,0 +1,28 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style Selector="GridView">
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    
+    <Style Selector="GridView GridViewHeader">
+        <Setter Property="CornerRadius" Value="4,4,0,0" />
+    </Style>
+    <Style Selector="GridViewHeader">
+        <Setter Property="Background" Value="{DynamicResource TextControlBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}"/>
+    </Style>
+    <Style Selector="GridView GridViewListBox">
+        <Setter Property="CornerRadius" Value="0,0,4,4" />
+    </Style>
+    <Style Selector="GridView GridSplitter">
+        <Setter Property="BorderBrush" Value="#3f000000"></Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border 
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Background="Transparent"/>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

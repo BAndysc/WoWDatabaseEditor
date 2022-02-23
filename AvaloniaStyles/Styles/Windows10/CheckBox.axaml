@@ -5,9 +5,6 @@
       <Setter Property="MinHeight" Value="20" />
       
       <!-- copy paste from original, but changed height from 32 to 20 -->
-      <!-- add 
-                              CornerRadius="{TemplateBinding CornerRadius}"
-                          CornerRadius="{TemplateBinding CornerRadius}"  from avalonia 0.10.7 -->
       <Setter Property="Template">
           <ControlTemplate>
               <Grid x:Name="RootGrid" ColumnDefinitions="20,*">
@@ -21,6 +18,7 @@
                       <Border x:Name="NormalRectangle"
                               BorderThickness="{DynamicResource CheckBoxBorderThemeThickness}"
                               UseLayoutRounding="False"
+                              CornerRadius="{TemplateBinding CornerRadius}"
                               Height="20"
                               Width="20" />
 

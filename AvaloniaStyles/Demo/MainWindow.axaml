@@ -23,13 +23,13 @@
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
             <controls:ToolBar.LeftContent>
-                <StackPanel Orientation="Horizontal">
+                <ToolbarPanel>
                     <Button>Play</Button>
                     <Button>Pause</Button>
-                </StackPanel>
+                </ToolbarPanel>
             </controls:ToolBar.LeftContent>
             <controls:ToolBar.RightContent>
-                <StackPanel Orientation="Horizontal">
+                <ToolbarPanel>
                     <Button>
                         <Border Background="Transparent"
                                 Width="12"
@@ -43,10 +43,12 @@
                         </Border>
                     </Button>
                     <Button>SQL</Button>
-                </StackPanel>
+                </ToolbarPanel>
             </controls:ToolBar.RightContent>
             <controls:ToolBar.MiddleContent>
-                <Button>Search</Button>
+                <ToolbarPanel>
+                    <Button>Search</Button>
+                </ToolbarPanel>
             </controls:ToolBar.MiddleContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>

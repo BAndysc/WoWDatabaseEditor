@@ -1,0 +1,59 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ColorsDark.xaml" />
+    <Styles.Resources>
+        <SolidColorBrush x:Key="TabControlBorder" Color="Transparent" />
+        <SolidColorBrush x:Key="TabControlBorderSelected" Color="#333333" />
+        <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="Transparent" />
+        
+        <SolidColorBrush Color="#202020" x:Key="TitleBarBackground" />
+        <SolidColorBrush Color="#202020" x:Key="WindowContentBackground" />
+        <SolidColorBrush Color="#202020" x:Key="MainWindowContentBackground" />
+        
+        <SolidColorBrush Color="#2D2D2D" x:Key="ContentBackground" />
+        
+        <Thickness x:Key="ButtonBorderThemeThickness">1</Thickness>
+        
+        <Color x:Key="ControlStrokeColorDefault">#12FFFFFF</Color>
+        <Color x:Key="ControlStrokeColorSecondary">#18FFFFFF</Color>
+        <!-- button -->
+        <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+        <CornerRadius x:Key="ControlCornerTopRadius">4,4,0,0</CornerRadius>
+        
+        <SolidColorBrush x:Key="ButtonBackground" Color="#0FFFFFFF" />
+        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#15FFFFFF" />
+        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#08FFFFFF" />
+        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#0BFFFFFF" />
+        
+        
+        <SolidColorBrush x:Key="ButtonForeground" Color="#FFFFFF" />
+        <LinearGradientBrush x:Key="ControlElevationBorderBrush" StartPoint="0,0" EndPoint="0,3">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Offset="0.33" Color="{StaticResource ControlStrokeColorSecondary}" />
+                <GradientStop Offset="1" Color="{StaticResource ControlStrokeColorDefault}" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+        <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ControlElevationBorderBrush" />
+        
+        <!-- textbox -->
+        <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,1</Thickness>
+        <Thickness x:Key="TextControlBorderThemeThicknessFocused">0,0,0,2</Thickness>
+        <SolidColorBrush x:Key="TextControlBorderBrush" Color="#303030" />
+        <SolidColorBrush x:Key="TextControlBorderBrushBottom" Color="#9A9A9A" />
+        <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#6EBFF9" />
+        <StaticResource ResourceKey="ContentBackground" x:Key="TextControlBackground" />
+        <SolidColorBrush Color="#313231" x:Key="TextControlBackgroundPointerOver" />
+        <SolidColorBrush Color="#1F1F20" x:Key="TextControlBackgroundFocused" />
+        
+        <!-- combobox -->
+        <SolidColorBrush x:Key="ComboBoxBackground" Color="#2D2D2D" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#323232" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#272726" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#3F3F3D" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundUnfocused" Color="#2D2D2D" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#353535" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#353535" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#353535" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#454545" />
+    </Styles.Resources>
+</Styles>
