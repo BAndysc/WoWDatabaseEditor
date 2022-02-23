@@ -681,8 +681,11 @@ namespace WDE.DbcStore
             alliance = allowableRaces & CharacterRaces.AllAlliance;
             horde = allowableRaces & CharacterRaces.AllHorde;
             all = allowableRaces;
-            Items.Add((long)alliance, new SelectOption("Alliance"));
-            Items.Add((long)horde, new SelectOption("Horde"));
+            if (alliance != CharacterRaces.None)
+                Items.Add((long)alliance, new SelectOption("Alliance"));
+            
+            if (horde != CharacterRaces.None)
+                Items.Add((long)horde, new SelectOption("Horde"));
             
             foreach (CharacterRaces race in Enum.GetValues<CharacterRaces>())
             {
