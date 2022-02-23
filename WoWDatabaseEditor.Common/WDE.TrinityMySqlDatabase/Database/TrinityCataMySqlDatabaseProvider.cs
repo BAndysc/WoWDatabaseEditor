@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LinqToDB;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.MySqlDatabaseCommon.CommonModels;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.TrinityMySqlDatabase.Models;
@@ -37,15 +38,28 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
     public override async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
     {
         await using var model = Database();
-        return await (from t in model.SplitGossipMenuOptions
+        var query = GetGossipOptionsQuery(model);
+        return await query.ToListAsync<IGossipMenuOption>();
+    }
+
+    public override List<IGossipMenuOption> GetGossipMenuOptions(uint menuId)
+    {
+        using var model = Database();
+        var query = GetGossipOptionsQuery(model);
+        return query.ToList<IGossipMenuOption>();
+    }
+    private static IQueryable<MySqlGossipMenuOptionCata> GetGossipOptionsQuery(TrinityCataDatabase model)
+    {
+        IQueryable<MySqlGossipMenuOptionCata> query = (from t in model.SplitGossipMenuOptions
             join actions in model.SplitGossipMenuOptionActions on t.MenuId equals actions.MenuId into adn
             from subaddon in adn.DefaultIfEmpty()
             join boxes in model.SplitGossipMenuOptionBoxes on t.MenuId equals boxes.MenuId into box
             from subaddon2 in box.DefaultIfEmpty()
             orderby t.MenuId
-            select t.SetAction(subaddon).SetBox(subaddon2)).ToListAsync<IGossipMenuOption>();
+            select t.SetAction(subaddon).SetBox(subaddon2));
+        return query;
     }
-    
+
     public override async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
     {
         await using var model = Database();

@@ -28,6 +28,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => impl.GetConversationTemplates();
         public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => impl.GetGossipMenuOptionsAsync(menuId);
+        public List<IGossipMenuOption> GetGossipMenuOptions(uint menuId) => impl.GetGossipMenuOptions(menuId);
         public IEnumerable<INpcText> GetNpcTexts() => impl.GetNpcTexts();
         public INpcText? GetNpcText(uint entry) => impl.GetNpcText(entry);
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => impl.GetPointsOfInterestsAsync();

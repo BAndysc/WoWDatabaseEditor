@@ -35,6 +35,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() => Enumerable.Empty<ICreatureClassLevelStat>();
 
+        public List<IGossipMenuOption> GetGossipMenuOptions(uint menuId) => new();
+
         public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) =>
             Task.FromResult(new List<IGossipMenuOption>());
 

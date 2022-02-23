@@ -154,6 +154,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         public abstract Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
+        public abstract List<IGossipMenuOption> GetGossipMenuOptions(uint menuId);
 
         public INpcText? GetNpcText(uint entry)
         {

@@ -39,6 +39,12 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         await using var model = Database();
         return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
     }
+    
+    public override List<IGossipMenuOption> GetGossipMenuOptions(uint menuId)
+    {
+        using var model = Database();
+        return model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToList<IGossipMenuOption>();
+    }
 
     public override async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
     {
