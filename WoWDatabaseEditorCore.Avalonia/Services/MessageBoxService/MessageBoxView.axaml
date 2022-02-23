@@ -21,7 +21,7 @@
     <controls:BaseMessageBoxWindow.KeyBindings>
         <KeyBinding Gesture="Escape" Command="{Binding CancelButtonCommand}" />
     </controls:BaseMessageBoxWindow.KeyBindings>
-    <ItemsPresenter Items="{Binding Buttons}" Name="ButtonsList">
+    <ItemsPresenter KeyboardNavigation.TabNavigation="Continue" Items="{Binding Buttons}" Name="ButtonsList">
         <ItemsPresenter.ItemTemplate>
             <DataTemplate>
                 <Button Content="{Binding Name}" 
@@ -32,7 +32,7 @@
         </ItemsPresenter.ItemTemplate>
         <ItemsPresenter.ItemsPanel>
             <ItemsPanelTemplate>
-                <StackPanel />
+                <StackPanel KeyboardNavigation.TabNavigation="Continue" />
             </ItemsPanelTemplate>
         </ItemsPresenter.ItemsPanel>
     </ItemsPresenter>
