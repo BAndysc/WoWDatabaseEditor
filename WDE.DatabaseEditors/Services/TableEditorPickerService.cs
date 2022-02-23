@@ -40,15 +40,15 @@ public class TableEditorPickerService : ITableEditorPickerService
         this.windowManager = windowManager;
     }
     
-    public async Task<long?> PickByColumn(string table, uint key, string column, long? initialValue)
+    public async Task<long?> PickByColumn(string table, uint key, string column, long? initialValue, string? backupColumn = null)
     {
         var definition = definitionProvider.GetDefinition(table);
         if (definition == null)
-            return null;
+            throw new UnsupportedTableException(table);
         
         var solutionItem = await tableOpenService.Create(definition, key);
         if (solutionItem == null)
-            return null;
+            throw new UnsupportedTableException(table);
 
         var tableViewModel = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
         tableViewModel.AllowMultipleKeys = false;
@@ -62,8 +62,10 @@ public class TableEditorPickerService : ITableEditorPickerService
                     if (group != null)
                     {
                         var row = group.FirstOrDefault(r =>
-                            r.Entity.GetCell(column) is DatabaseField<long> longField &&
-                            longField.Current.Value == initialValue);
+                            (r.Entity.GetCell(column) is DatabaseField<long> longField &&
+                             longField.Current.Value == initialValue) ||
+                            (backupColumn != null && r.Entity.GetCell(backupColumn) is DatabaseField<long> longField2 &&
+                             longField2.Current.Value == initialValue));
                         if (row != null)
                         {
                             mainThread.Delay(() => tableViewModel.SelectedRow = row, TimeSpan.FromMilliseconds(1));
@@ -77,6 +79,12 @@ public class TableEditorPickerService : ITableEditorPickerService
             var col = viewModel.SelectedRow?.Entity.GetCell(column);
             if (col is DatabaseField<long> longColumn)
                 return longColumn.Current.Value;
+            if (backupColumn != null)
+            {
+                col = viewModel.SelectedRow?.Entity.GetCell(backupColumn);
+                if (col is DatabaseField<long> longColumn2)
+                    return longColumn2.Current.Value;
+            }
         }
         return null;
     }
