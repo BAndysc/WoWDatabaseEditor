@@ -1876,12 +1876,12 @@
         "description": "Menu ID (gossip_menu)"
       },
       {
-        "type": "Parameter",
+        "type": "GossipMenuOptionParameter",
         "name": "Action ID",
         "description": "Option ID (gossip_menu_option)"
       }
     ],
-    "description": "On gossip action {pram2} from menu {pram1value} selected",
+    "description": "On gossip action {pram2}{pram1value:choose(0):| from menu [p=0]{pram1value}[/p] selected}",
     "name_readable": "On gossip select",
     "invoker": {
       "name": "Gossip player",

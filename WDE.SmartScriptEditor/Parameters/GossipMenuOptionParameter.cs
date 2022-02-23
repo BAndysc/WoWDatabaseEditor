@@ -5,17 +5,18 @@ using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
+public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
 {
     private readonly IDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly IItemFromListProvider itemFromListProvider;
 
-    public CreatureTextParameter(IDatabaseProvider databaseProvider,
+    public GossipMenuOptionParameter(IDatabaseProvider databaseProvider,
         ITableEditorPickerService tableEditorPickerService,
         IItemFromListProvider itemFromListProvider)
     {
@@ -39,36 +40,33 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         return null;
     }
 
-    private uint? GetEntry(SmartBaseElement? element)
+    private uint? GetMenuEntry(SmartBaseElement? element)
     {
+        if (element is SmartEvent ev)
+        {
+            if (ev.GetParameter(0).Value > 0)
+                return (uint)ev.GetParameter(0).Value;
+        }
+        
         var script = GetScript(element);
         if (script == null)
             return null;
-        if (element is SmartAction action)
-        {
-            if (action.GetParameter(2).Value != 0 ||
-                action.Source.Id == SmartConstants.SourceNone ||
-                action.Source.Id == SmartConstants.SourceSelf)
-            {
-                if (script.EntryOrGuid >= 0)
-                    return (uint)script.EntryOrGuid;
-                return databaseProvider.GetCreatureByGuid((uint)(-script.EntryOrGuid))?.Entry;
-            }
-            else if (action.Source.Id == 9) // creature range
-                return (uint)action.Source.GetParameter(0).Value;
-            else if (action.Source.Id == 10) // creature guid
-                return databaseProvider.GetCreatureByGuid((uint)action.Source.GetParameter(0).Value)?.Entry;
-            else if (action.Source.Id == 11) // creature distance
-                return (uint)action.Source.GetParameter(0).Value;
-            else if (action.Source.Id == 19) // closest creature
-                return (uint)action.Source.GetParameter(0).Value;
-        }
-        return null;
+        
+        uint? entry = 0;
+        if (script.EntryOrGuid < 0)
+            entry = databaseProvider.GetCreatureByGuid((uint)(-script.EntryOrGuid))?.Entry;
+        else
+            entry = (uint)script.EntryOrGuid;
+        
+        if (!entry.HasValue)
+            return null;
+
+        return databaseProvider.GetCreatureTemplate(entry.Value)?.GossipMenuId;
     }
 
     public async Task<(long, bool)> PickValue(long value, object context)
     {
-        var entry = GetEntry(context as SmartBaseElement);
+        var entry = GetMenuEntry(context as SmartBaseElement);
         if (!entry.HasValue)
         {
             return await FallbackPicker(value);
@@ -77,8 +75,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         {
             try
             {
-                var id = await tableEditorPickerService.PickByColumn("creature_text", entry ?? 0, "GroupId",
-                    (uint)value);
+                var id = await tableEditorPickerService.PickByColumn("gossip_menu_option", entry.Value, "OptionID", (uint)value, "id");
                 if (id.HasValue)
                     return (id.Value, true);
                 return (0, false);
@@ -92,7 +89,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
 
     private async Task<(long, bool)> FallbackPicker(long value)
     {
-        var item = await itemFromListProvider.GetItemFromList(null, false, value, "Pick creature text group id");
+        var item = await itemFromListProvider.GetItemFromList(null, false, value, "Pick gossip menu option");
         if (item.HasValue)
             return (item.Value, true);
         return (0, false);
@@ -105,14 +102,14 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
     
     public string ToString(long value, SmartBaseElement context)
     {
-        var entry = GetEntry(context);
+        var entry = GetMenuEntry(context);
         if (entry == null)
             return value.ToString();
-        var text = databaseProvider.GetCreatureTextsByEntry(entry.Value);
-        if (text == null || text.Count == 0)
+        var options = databaseProvider.GetGossipMenuOptions(entry.Value);
+        if (options == null || options.Count == 0)
             return value.ToString();
-        var firstOrDefault = text.FirstOrDefault(x => x.GroupId == value);
-        return firstOrDefault == null ? value.ToString() : $"{firstOrDefault.Text} ({value})";
+        var firstOrDefault = options.FirstOrDefault(x => x.OptionIndex == value);
+        return firstOrDefault == null ? value.ToString() : $"{firstOrDefault.Text?.TrimToLength(25)} ({value})";
     }
     
     public string ToString(long value)
