@@ -1718,7 +1718,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                 originalEvent.GetParameter(i).Value = ev.GetParameter(i).Value;
                         }
                     },
-                "Event specific");
+                "Event specific", context: ev);
 
             return viewModel;
         }

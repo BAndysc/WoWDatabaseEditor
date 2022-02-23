@@ -767,7 +767,7 @@
     "name": "SMART_EVENT_ACCEPTED_QUEST",
     "parameters": [
       {
-        "type": "QuestParameter",
+        "type": "QuestStarterParameter",
         "name": "Quest",
         "description": "If 0, any quest will trigger the event"
       },
@@ -800,7 +800,7 @@
     "name": "SMART_EVENT_REWARD_QUEST",
     "parameters": [
       {
-        "type": "QuestParameter",
+        "type": "QuestEnderParameter",
         "name": "Quest",
         "description": "If 0, any quest will trigger the event"
       },
