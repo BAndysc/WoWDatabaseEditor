@@ -61,6 +61,13 @@ namespace WDE.Common.Utils
             return sb.ToString();
         }
 
+        public static string TrimToLength(this string str, int length)
+        {
+            if (str.Length < length + 8)
+                return str;
+            return str.Substring(0, length) + "...";
+        }
+        
         private enum State
         {
             Text,
