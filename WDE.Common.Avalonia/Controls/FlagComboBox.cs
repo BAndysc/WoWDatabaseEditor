@@ -148,8 +148,8 @@ namespace WDE.Common.Avalonia.Controls
                 {
                     if (completionBoxReference.TryGetTarget(out var completionBox))
                     {
-                        if (OptionValue == 0 && completionBox.SelectedValue == 0)
-                            return true;
+                        if (OptionValue == 0)
+                            return completionBox.SelectedValue == 0;
                         
                         return (completionBox.SelectedValue & OptionValue) == OptionValue;
                     }
