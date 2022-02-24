@@ -121,6 +121,11 @@ namespace WDE.Parameters.Models
             Parameter = other.Parameter;
         }
         
+        public void ForceRefresh()
+        {
+            OnPropertyChanged(nameof(String));
+        }
+        
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public event System.Action<ParameterValueHolder<T>, T, T>? OnValueChanged;

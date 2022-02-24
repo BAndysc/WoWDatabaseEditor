@@ -372,7 +372,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     {
                         param.Parameter.Value = val.Value;
                         if (param.Parameter.Parameter is ICustomPickerContextualParameter<long>) // custom pickers can save to database, which makes a delay when the value will be ready
+                        {
+                            param.Parameter.ForceRefresh();
                             mainThread.Delay(() => param.Context.InvalidateReadable(), TimeSpan.FromMilliseconds(50));
+                        }
                     }
                 } 
                 else if (obj is MetaSmartSourceTargetEdit sourceTargetEdit)

@@ -1,18 +1,51 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
+using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters
 {
-    public class VariableContextualParameter : IContextualParameter<long, SmartBaseElement>
+    public class VariableContextualParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
     {
         private readonly GlobalVariableType type;
         private readonly string name;
+        private readonly IVariablePickerService picker;
+        private readonly IItemFromListProvider itemFromListProvider;
 
         public bool AllowUnknownItems => true;
+        
+        internal VariableContextualParameter(GlobalVariableType type, 
+            string name, IVariablePickerService picker, IItemFromListProvider itemFromListProvider)
+        {
+            this.type = type;
+            this.name = name;
+            this.picker = picker;
+            this.itemFromListProvider = itemFromListProvider;
+        }
+
+        public async Task<(long, bool)> PickValue(long value, object context)
+        {
+            var script = GetScript(context as SmartBaseElement);
+            if (script != null)
+            {
+                var result = await picker.PickVariable(type, script, value);
+                return (result ?? 0, result.HasValue);
+            }
+
+            return await FallbackPicker(value);
+        }
+
+        private async Task<(long, bool)> FallbackPicker(long value)
+        {
+            var result = await itemFromListProvider.GetItemFromList(null, false, value, "Pick a " + name);
+            return (result ?? 0, result.HasValue);
+        }
+
         public string? Prefix => null;
 
-        private static SmartScriptBase? GetScript(SmartBaseElement element)
+        private static SmartScriptBase? GetScript(SmartBaseElement? element)
         {
             if (element is SmartSource source)
                 return source.Parent?.Parent?.Parent;
@@ -23,12 +56,6 @@ namespace WDE.SmartScriptEditor.Parameters
             if (element is SmartCondition @condition)
                 return @condition.Parent?.Parent;
             return null;
-        }
-        
-        internal VariableContextualParameter(GlobalVariableType type, string name)
-        {
-            this.type = type;
-            this.name = name;
         }
         
         public Dictionary<long, SelectOption>? ItemsForContext(SmartBaseElement context)

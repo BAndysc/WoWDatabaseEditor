@@ -127,7 +127,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 {
                     (long? val, bool ok) = await parameterPickerService.PickParameter(p.Parameter, p.Value, context);
                     if (ok)
-                        p.Value = val.Value;   
+                    {
+                        p.Value = val.Value;
+                        if (p.Parameter is ICustomPickerContextualParameter<long>)
+                            p.ForceRefresh();
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Prism.Ioc;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
@@ -29,7 +30,8 @@ namespace WDE.SmartScriptEditor.Data
             ITableEditorPickerService tableEditorPickerService,
             IItemFromListProvider itemFromListProvider,
             ICurrentCoreVersion currentCoreVersion,
-            IQuestEntryProviderService questEntryProviderService)
+            IQuestEntryProviderService questEntryProviderService,
+            IContainerProvider containerProvider)
         {
             this.parameterFactory = parameterFactory;
             this.smartDataManager = smartDataManager;
@@ -44,13 +46,20 @@ namespace WDE.SmartScriptEditor.Data
                 parameterFactory.Register("QuestEnderParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, false));
                 parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
-                parameterFactory.Register("StoredTargetParameter", new VariableContextualParameter(GlobalVariableType.StoredTarget, "storedTarget"));
-                parameterFactory.Register("DataVariableParameter", new VariableContextualParameter(GlobalVariableType.DataVariable, "data"));
-                parameterFactory.Register("TimedEventParameter", new VariableContextualParameter(GlobalVariableType.TimedEvent, "timedEvent"));
-                parameterFactory.Register("DoActionParameter", new VariableContextualParameter(GlobalVariableType.Action, "action"));
-                parameterFactory.Register("DoFunctionParameter", new VariableContextualParameter(GlobalVariableType.Function, "function"));
-                parameterFactory.Register("StoredPointParameter", new VariableContextualParameter(GlobalVariableType.StoredPoint, "storedPoint"));
-                parameterFactory.Register("DatabasePointParameter", new VariableContextualParameter(GlobalVariableType.DatabasePoint, "databasePoint"));   
+                parameterFactory.Register("StoredTargetParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.StoredTarget), (typeof(string), "storedTarget")));
+                parameterFactory.Register("DataVariableParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.DataVariable), (typeof(string), "data")));
+                parameterFactory.Register("TimedEventParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.TimedEvent), (typeof(string), "timedEvent")));
+                parameterFactory.Register("DoActionParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.Action), (typeof(string), "action")));
+                parameterFactory.Register("DoFunctionParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.Function), (typeof(string), "function")));
+                parameterFactory.Register("StoredPointParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.StoredPoint), (typeof(string), "storedPoint")));
+                parameterFactory.Register("DatabasePointParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.DatabasePoint), (typeof(string), "databasePoint")));
             }
         }
 

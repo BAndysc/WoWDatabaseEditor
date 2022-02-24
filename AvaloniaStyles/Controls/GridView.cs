@@ -357,6 +357,8 @@ namespace AvaloniaStyles.Controls
                     return;
                 view.selectionDisposable = ((ISelectionModel)args.NewValue).ToObservable(o => o.SelectedItem).SubscribeAction(sel =>
                 {
+                    if (view.items == null)
+                        return; // can happen when detaching view, we don't want to modify selected item then
                     view.RaisePropertyChanged(SelectedItemProperty, null, sel);
                 });
             });

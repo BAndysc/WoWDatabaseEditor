@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:VariablePickerViewModel"
+             x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.VariablePickerView">
+    <UserControl.Resources>
+        <BoolToDoubleConverter x:Key="BoolToDoubleConverter" WhenTrue="0.4" WhenFalse="1" />
+    </UserControl.Resources>
+    <UserControl.KeyBindings>
+        <KeyBinding Command="{CompiledBinding RemoveItemCommand}" Gesture="Delete" />
+        <KeyBinding Command="{CompiledBinding RemoveItemCommand}" Gesture="Back" />
+    </UserControl.KeyBindings>
+    <Grid RowDefinitions="*,Auto">
+        <GridView 
+            Margin="0,0,0,10"
+            Items="{CompiledBinding Items}"
+            SelectedItem="{Binding SelectedItem}">
+            <GridView.Columns>
+                <GridColumnDefinition Name="Id"
+                                       Property="Id"
+                                       PreferedWidth="70">
+                    <GridColumnDefinition.DataTemplate>
+                        <DataTemplate DataType="viewModels:VariableItemViewModel">
+                            <EditableTextBlock Text="{CompiledBinding Id}"></EditableTextBlock>
+                        </DataTemplate>
+                    </GridColumnDefinition.DataTemplate>
+                </GridColumnDefinition>
+                <GridColumnDefinition Name="Name"
+                                      Property="Name"
+                                      PreferedWidth="150">
+                    <GridColumnDefinition.DataTemplate>
+                        <DataTemplate DataType="viewModels:VariableItemViewModel">
+                            <EditableTextBlock Opacity="{CompiledBinding IsPhantom, Converter={StaticResource BoolToDoubleConverter}}" Text="{CompiledBinding Name}"></EditableTextBlock>
+                        </DataTemplate>
+                    </GridColumnDefinition.DataTemplate>
+                </GridColumnDefinition>
+                <GridColumnDefinition Name="Comment"
+                                      Property="Comment"
+                                      PreferedWidth="350">
+                    <GridColumnDefinition.DataTemplate>
+                        <DataTemplate DataType="viewModels:VariableItemViewModel">
+                            <EditableTextBlock Text="{CompiledBinding Comment}"></EditableTextBlock>
+                        </DataTemplate>
+                    </GridColumnDefinition.DataTemplate>
+                </GridColumnDefinition>
+            </GridView.Columns>
+        </GridView>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
+            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Pick" />
+        </Grid>
+    </Grid>
+</UserControl>
