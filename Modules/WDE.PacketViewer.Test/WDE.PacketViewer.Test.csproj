@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="System.Runtime.Experimental" Version="6.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
         <PackageReference Include="NUnit" Version="3.13.2" />
         <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
@@ -19,4 +20,10 @@
       <ProjectReference Include="..\..\WDE.PacketViewer\WDE.PacketViewer.csproj" />
     </ItemGroup>
 
+    <!-- this is a workaround to support .NET 6.0.101, remove it when `https://github.com/dotnet/runtime/issues/62840` is resolved -->
+    <Target Name="RemoveSystemRuntimeFromRefPack" BeforeTargets="_HandlePackageFileConflicts" Condition="'@(Reference -&gt; WithMetadataValue('NugetPackageId', 'System.Runtime.Experimental'))' != ''">
+        <ItemGroup>
+            <Reference Remove="@(Reference)" Condition="$([System.String]::Copy(%(Reference.Identity)).Contains('System.Runtime.dll')) and&#xA;                            '%(Reference.NuGetPackageId)' == 'Microsoft.NETCore.App.Ref'" />
+        </ItemGroup>
+    </Target>
 </Project>
