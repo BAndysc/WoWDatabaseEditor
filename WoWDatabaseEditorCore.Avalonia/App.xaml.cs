@@ -19,6 +19,7 @@ using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
@@ -101,6 +102,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             var mainScope = new ScopedContainer(container, unity);
             container.RegisterInstance<IScopedContainer>(mainScope);
             ViewBind.ContainerProvider = container;
+            DI.Container = unity;
             return container;
         }
         

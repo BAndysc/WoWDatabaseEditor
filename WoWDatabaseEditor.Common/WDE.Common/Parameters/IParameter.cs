@@ -37,4 +37,9 @@ namespace WDE.Common.Parameters
     {
         Task<(T, bool)> PickValue(T value, object context);
     }
+    
+    public interface ICustomPickerParameter<T> : IParameter<T> where T : notnull
+    {
+        Task<(T, bool)> PickValue(T value);
+    }
 }

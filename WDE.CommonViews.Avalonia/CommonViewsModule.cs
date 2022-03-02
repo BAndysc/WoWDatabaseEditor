@@ -1,8 +1,10 @@
+using WDE.Common.Parameters;
 using WDE.Common.Windows;
 using WDE.CommonViews.Avalonia.DatabaseEditors;
 using WDE.CommonViews.Avalonia.DbcStore.Views;
 using WDE.CommonViews.Avalonia.History.Views;
 using WDE.CommonViews.Avalonia.Mpq;
+using WDE.CommonViews.Avalonia.Parameters;
 using WDE.CommonViews.Avalonia.Parameters.Views;
 using WDE.CommonViews.Avalonia.RemoteSOAP.Views;
 using WDE.CommonViews.Avalonia.Sessions;
@@ -40,6 +42,7 @@ namespace WDE.CommonViews.Avalonia
             viewLocator.Bind<SessionsConfigurationViewModel, SessionsConfigurationView>();
             // parameters
             viewLocator.Bind<ParametersViewModel, ParametersView>();
+            viewLocator.Bind<StringPickerViewModel, StringPickerView>();
             // history
             viewLocator.Bind<HistoryViewModel, HistoryView>();
             // dbc store

@@ -122,16 +122,24 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         
         private async Task SelectItem()
         {
+            if (Parameter is ParameterValueHolder<long> p)
             {
-                if (Parameter is ParameterValueHolder<long> p)
+                (long? val, bool ok) = await parameterPickerService.PickParameter(p.Parameter, p.Value, context);
+                if (ok)
                 {
-                    (long? val, bool ok) = await parameterPickerService.PickParameter(p.Parameter, p.Value, context);
-                    if (ok)
-                    {
-                        p.Value = val.Value;
-                        if (p.Parameter is ICustomPickerContextualParameter<long>)
-                            p.ForceRefresh();
-                    }
+                    p.Value = val.Value;
+                    if (p.Parameter is ICustomPickerContextualParameter<long>)
+                        p.ForceRefresh();
+                }
+            }
+            else if (Parameter is ParameterValueHolder<string> s)
+            {
+                (string? val, bool ok) = await parameterPickerService.PickParameter(s.Parameter, s.Value, context);
+                if (ok)
+                {
+                    s.Value = val ?? "";
+                    if (s.Parameter is ICustomPickerContextualParameter<string>)
+                        s.ForceRefresh();
                 }
             }
         }

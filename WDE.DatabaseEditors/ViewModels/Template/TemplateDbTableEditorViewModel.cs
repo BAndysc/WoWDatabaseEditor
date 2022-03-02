@@ -74,11 +74,12 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             ICreatureStatCalculatorService creatureStatCalculatorService,
             ITableDefinitionProvider tableDefinitionProvider,
             ISolutionItemIconRegistry iconRegistry, ISessionService sessionService,
-            IDatabaseTableCommandService commandService) : base(history, solutionItem, solutionItemName, 
+            IDatabaseTableCommandService commandService,
+            IParameterPickerService parameterPickerService) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, 
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService,
-            commandService)
+            commandService, parameterPickerService)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;

@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:parameters="clr-namespace:WDE.Common.Parameters;assembly=WDE.Common"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="parameters:StringPickerViewModel"
+             x:Class="WDE.CommonViews.Avalonia.Parameters.StringPickerView">
+    <DockPanel LastChildFill="True">
+        <DockPanel LastChildFill="False" DockPanel.Dock="Bottom" Margin="0,5,0,0">
+            <Button DockPanel.Dock="Left" Width="80" Content="Cancel" Command="{CompiledBinding Cancel}" HorizontalAlignment="Stretch" />
+            <Button DockPanel.Dock="Right" Width="80" Content="OK" Command="{CompiledBinding Accept}" HorizontalAlignment="Stretch"/>
+        </DockPanel>
+        <TextBox Name="TextBox" Text="{CompiledBinding Content}" 
+                 VerticalContentAlignment="Top"
+                 utils:FocusUtils.FocusFirst="True"
+                 AcceptsReturn="{CompiledBinding MultiLine}">
+        </TextBox>
+    </DockPanel>
+</UserControl>

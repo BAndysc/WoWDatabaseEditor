@@ -124,11 +124,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ITableDefinitionProvider tableDefinitionProvider,
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
             ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
-            IDatabaseTableCommandService commandService) 
+            IDatabaseTableCommandService commandService,
+            IParameterPickerService parameterPickerService) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
-            tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService)
+            tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService,
+            parameterPickerService)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;

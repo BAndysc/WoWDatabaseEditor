@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
+using WDE.Common.Managers;
+using WDE.Common.Services;
 
 namespace WDE.Common.Parameters
 {
@@ -61,11 +64,37 @@ namespace WDE.Common.Parameters
         }
     }
     
-    public class StringParameter : GenericBaseParameter<string>
+    public class StringParameter : GenericBaseParameter<string>, ICustomPickerParameter<string>
     {
-        public static StringParameter Instance { get; } = new StringParameter();
+        private readonly IWindowManager windowManager;
+        private static StringParameter? instance;
+        public static StringParameter Instance
+        {
+            get
+            {
+                instance ??= DI.Resolve<StringParameter>();
+                return instance;
+            }
+        }
+
+        public StringParameter(IWindowManager windowManager)
+        {
+            this.windowManager = windowManager;
+        }
         
         public override string ToString(string value) => value;
+
+        public override bool HasItems => true;
+
+        public async Task<(string, bool)> PickValue(string value)
+        {
+            var vm = new StringPickerViewModel(value, true, true);
+            if (await windowManager.ShowDialog(vm))
+            {
+                return (vm.Content, true);
+            }
+            return ("", false);
+        }
     }
 
     public class SwitchStringParameter : GenericBaseParameter<string>

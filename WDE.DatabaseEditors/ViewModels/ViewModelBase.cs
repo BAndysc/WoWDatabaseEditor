@@ -45,6 +45,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly ISessionService sessionService;
         private readonly IDatabaseTableCommandService commandService;
+        private readonly IParameterPickerService parameterPickerService;
 
         protected ViewModelBase(IHistoryManager history,
             DatabaseTableSolutionItem solutionItem,
@@ -61,7 +62,8 @@ namespace WDE.DatabaseEditors.ViewModels
             IItemFromListProvider itemFromListProvider,
             ISolutionItemIconRegistry iconRegistry,
             ISessionService sessionService,
-            IDatabaseTableCommandService commandService)
+            IDatabaseTableCommandService commandService,
+            IParameterPickerService parameterPickerService)
         {
             this.solutionItemName = solutionItemName;
             this.solutionManager = solutionManager;
@@ -74,6 +76,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.itemFromListProvider = itemFromListProvider;
             this.sessionService = sessionService;
             this.commandService = commandService;
+            this.parameterPickerService = parameterPickerService;
             this.solutionItem = solutionItem;
             History = history;
             
@@ -104,17 +107,15 @@ namespace WDE.DatabaseEditors.ViewModels
             
             if (parameterValue is ParameterValue<long> valueHolder)
             {
-                var result = await itemFromListProvider.GetItemFromList(valueHolder.Parameter.Items,
-                    valueHolder.Parameter is FlagParameter, valueHolder.Value);
-                if (result.HasValue)
-                    valueHolder.Value = result.Value;                 
+                var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value);
+                if (result.ok)
+                    valueHolder.Value = result.value;
             }
             else if (parameterValue is ParameterValue<string> stringValueHolder)
             {
-                var result = await itemFromListProvider.GetItemFromList(stringValueHolder.Parameter.Items, 
-                    stringValueHolder.Parameter is MultiSwitchStringParameter, stringValueHolder.Value);
-                if (result != null)
-                    stringValueHolder.Value = result;                 
+                var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "");
+                if (result.ok)
+                    stringValueHolder.Value = result.value;             
             }
         }
 
