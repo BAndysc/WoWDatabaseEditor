@@ -22,7 +22,7 @@ namespace WDE.SmartScriptEditor.Models
         public int ActionParametersCount => action?.ParametersCount ?? 0;
         public int ActionSourceParametersCount => action?.Source.ParametersCount ?? 0;
         public int ActionTargetParametersCount => action?.Target.ParametersCount ?? 0;
-
+        public long GetEventFlags() => @event.Flags.Value;
         public long GetEventParameter(int index) => @event.GetParameter(index).Value;
         public long GetActionParameter(int index) => action?.GetParameter(index).Value ?? 0;
         public long GetActionSourceParameter(int index) => action?.Source.GetParameter(index).Value ?? 0;

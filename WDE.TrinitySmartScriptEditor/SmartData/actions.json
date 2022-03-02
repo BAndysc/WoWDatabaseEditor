@@ -2391,7 +2391,7 @@
         "id": 101,
         "name": "SMART_ACTION_SET_HOME_POS",
         "description": "{source}: Set home position to {sourceid:choose(1|8):current position|{targetcoords}|current position}",
-        "name_readable": "Send home position",
+        "name_readable": "Set home position",
         "target_types": ["Creature"],
         "target_is_source": true,
         "uses_target_position": true
