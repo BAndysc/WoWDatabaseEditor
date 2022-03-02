@@ -18,7 +18,7 @@ using WDE.Module.Attributes;
 namespace WoWDatabaseEditorCore.Services.NewItemService;
 
 [AutoRegister]
-public class LoadCommandQuickAccess : IQuickAccessCommand
+public class LoadCommandQuickAccess : IQuickAccessCommand, IQuickAccessSearchProvider
 {
     private readonly IQuickCommands quickCommands;
     private readonly IEventAggregator eventAggregator;
