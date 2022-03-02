@@ -26,7 +26,7 @@
 
         <components:ButtonImage ToolTip.Tip="Select previous packet&#xA;&#xA;Shortcut: Control + Z" Command="{Binding UndoCommand}" Image="Icons/icon_left.png" />
 
-        <components:ButtonImage ToolTip.Tip="Select next packet&#xA;&#xA;Shortcut: Control + Y" Command="{Binding RedoCommand}" Image="Icons/icon_right.png" />
+        <components:ButtonImage ToolTip.Tip="Select next packet&#xA;&#xA;Shortcut: Control + Shift + Z" Command="{Binding RedoCommand}" Image="Icons/icon_right.png" />
         
         <components:ButtonImage ToolTip.Tip="Go to packet&#xA;&#xA;Shortcut: Control + G" Image="Icons/icon_goto_packet.png" Command="{Binding GoToPacketCommand}" />
         

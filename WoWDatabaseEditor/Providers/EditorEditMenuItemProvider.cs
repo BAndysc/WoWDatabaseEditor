@@ -35,7 +35,7 @@ namespace WoWDatabaseEditorCore.Providers
             
             SubItems.Add(new ModuleMenuItem("_Redo", new DelegateCommand(() => DocumentManager.ActiveUndoRedo?.Redo.Execute(null),
                 () => DocumentManager.ActiveUndoRedo?.Redo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveUndoRedo).
-                ObservesProperty(() => DocumentManager.ActiveUndoRedo!.IsModified), new("Control+Y")));
+                ObservesProperty(() => DocumentManager.ActiveUndoRedo!.IsModified), new("Control+Shift+Z")));
             
             SubItems.Add(new ModuleManuSeparatorItem());
             
