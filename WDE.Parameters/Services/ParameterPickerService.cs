@@ -18,9 +18,6 @@ public class ParameterPickerService : IParameterPickerService
     
     public async Task<(T?, bool)> PickParameter<T>(IParameter<T> parameter, T currentValue, object? context = null) where T : notnull
     {
-        if (!parameter.HasItems)
-            return (default, false);
-
         if (parameter is ICustomPickerContextualParameter<long> custom && context != null)
         {
             var val = await custom.PickValue((currentValue as long?) ?? 0, context);
