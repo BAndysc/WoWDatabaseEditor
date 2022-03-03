@@ -165,6 +165,12 @@ namespace WDE.Common.Avalonia.Controls
                     if (index < text.Length - 1)
                         startIndex = index + 1;
                 }
+                else if (s == '\n' && state == State.Text && toFulsh == null)
+                {
+                    toFulsh = text.AsSpan(startIndex, index - startIndex);
+                    if (index < text.Length - 1)
+                        startIndex = index + 1;
+                }
 
                 if (state == State.Text && index == text.Length - 1)
                     toFulsh = text.AsSpan(startIndex);
