@@ -1,4 +1,5 @@
 using LinqToDB;
+using WDE.MySqlDatabaseCommon.CommonModels;
 
 namespace WDE.TrinityMySqlDatabase.Models;
 
@@ -10,4 +11,5 @@ public class AzerothDatabase : BaseTrinityDatabase
     public ITable<ACoreString> Strings => GetTable<ACoreString>();
     public ITable<AzerothMySqlSpellDbc> SpellDbc => GetTable<AzerothMySqlSpellDbc>();
     public ITable<MySqlGameObjectWrath> GameObject => GetTable<MySqlGameObjectWrath>();
+    public ITable<MySqlItemTemplate> ItemTemplate => GetTable<MySqlItemTemplate>();
 }

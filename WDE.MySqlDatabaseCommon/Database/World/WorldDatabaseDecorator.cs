@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.DBC;
 
 namespace WDE.MySqlDatabaseCommon.Database.World
 {
@@ -24,6 +25,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => impl.GetAreaTriggerTemplates();
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => impl.GetQuestRequestItem(entry);
+        public Task<IList<IItem>?> GetItemTemplatesAsync() => impl.GetItemTemplatesAsync();
 
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => impl.GetConversationTemplates();

@@ -7,6 +7,7 @@ using LinqToDB;
 using LinqToDB.Data;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.DBC;
 using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
@@ -476,6 +477,8 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract IBroadcastText? GetBroadcastTextByText(string text);
         public abstract Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
         public abstract Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
+
+        public virtual Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
 
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {

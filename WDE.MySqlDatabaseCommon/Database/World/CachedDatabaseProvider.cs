@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using KTrie;
 using Prism.Events;
 using WDE.Common.Database;
+using WDE.Common.DBC;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -234,7 +235,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => nonCachedDatabase.GetPointsOfInterestsAsync();
 
         public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => nonCachedDatabase.GetCreatureTextsByEntryAsync(entry);
-        
+
+        public Task<IList<IItem>?> GetItemTemplatesAsync() => nonCachedDatabase.GetItemTemplatesAsync();
+
         public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry)
         {
             if (creatureTextsCache.TryGetValue(entry, out var texts))

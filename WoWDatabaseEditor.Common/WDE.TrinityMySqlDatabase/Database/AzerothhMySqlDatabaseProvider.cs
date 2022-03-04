@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LinqToDB;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.DBC;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.TrinityMySqlDatabase.Models;
@@ -158,5 +159,11 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
     {
         await using var model = Database();
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
+    }
+
+    public override async Task<IList<IItem>?> GetItemTemplatesAsync()
+    {
+        await using var model = Database();
+        return await model.ItemTemplate.ToListAsync<IItem>();
     }
 }

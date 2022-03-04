@@ -287,7 +287,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore), QuickAccessMode.Limited);
                 parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(SpellStore));
-                parameterFactory.Register("ItemParameter", new DbcParameter(ItemStore));
+                parameterFactory.Register("ItemDbcParameter", new DbcParameter(ItemStore));
                 parameterFactory.Register("EmoteParameter", new DbcParameter(EmoteStore), QuickAccessMode.Full);
                 parameterFactory.Register("EmoteOneShotParameter", new DbcParameter(EmoteOneShotStore));
                 parameterFactory.Register("EmoteStateParameter", new DbcParameter(EmoteStateStore));
