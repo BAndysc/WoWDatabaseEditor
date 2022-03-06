@@ -5,6 +5,7 @@ using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
@@ -54,7 +55,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
                     return (uint)script.EntryOrGuid;
                 return databaseProvider.GetCreatureByGuid((uint)(-script.EntryOrGuid))?.Entry;
             }
-            else if (action.Source.Id == 9) // creature range
+            else if (action.Source.Id == 9 || action.Source.Id == 59) // creature range or creature by spawn key
                 return (uint)action.Source.GetParameter(0).Value;
             else if (action.Source.Id == 10) // creature guid
                 return databaseProvider.GetCreatureByGuid((uint)action.Source.GetParameter(0).Value)?.Entry;
@@ -112,7 +113,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         if (text == null || text.Count == 0)
             return value.ToString();
         var firstOrDefault = text.FirstOrDefault(x => x.GroupId == value);
-        return firstOrDefault == null ? value.ToString() : $"{firstOrDefault.Text} ({value})";
+        return firstOrDefault == null ? value.ToString() : $"{firstOrDefault.Text?.TrimToLength(60)} ({value})";
     }
     
     public string ToString(long value)
