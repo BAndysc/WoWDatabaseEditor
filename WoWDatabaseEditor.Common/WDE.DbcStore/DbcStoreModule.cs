@@ -38,6 +38,7 @@ namespace WDE.DbcStore
                 .SubscribeAction(_ =>
                 {
                     LoadDatabaseItemsAsync().ListenErrors();
+                    LoadSpawnGroupTemplates().ListenErrors();
                 });
         }
 
@@ -48,6 +49,25 @@ namespace WDE.DbcStore
             factory.Register("ItemDatabaseParameter", new DatabaseItemParameter(await database.GetItemTemplatesAsync()));
         }
         
+        private async Task LoadSpawnGroupTemplates()
+        {
+            var factory = containerProvider.Resolve<IParameterFactory>();
+            var database = containerProvider.Resolve<IDatabaseProvider>();
+            factory.Register("SpawnGroupTemplateParameter", new SpawnGroupTemplateParameter(await database.GetSpawnGroupTemplatesAsync()));
+        }
+
+        internal class SpawnGroupTemplateParameter : ParameterNumbered
+        {
+            public SpawnGroupTemplateParameter(IList<ISpawnGroupTemplate>? items)
+            {
+                if (items == null)
+                    return;
+                Items = new();
+                foreach (var i in items)
+                    Items.Add(i.Id, new SelectOption(i.Name));
+            }
+        }
+
         internal class DatabaseItemParameter : ParameterNumbered
         {
             public DatabaseItemParameter(IList<IItem>? items)

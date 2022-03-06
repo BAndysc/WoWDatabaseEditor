@@ -72,6 +72,7 @@ namespace WDE.Common.Database
         IEnumerable<ICoreCommandHelp> GetCommands();
         Task<IList<ITrinityString>> GetStringsAsync();
         Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync();
+        Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => Task.FromResult<IList<ISpawnGroupTemplate>?>(null);
 
         Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
         

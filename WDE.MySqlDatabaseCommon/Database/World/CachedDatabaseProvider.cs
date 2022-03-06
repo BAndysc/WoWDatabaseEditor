@@ -238,6 +238,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<IItem>?> GetItemTemplatesAsync() => nonCachedDatabase.GetItemTemplatesAsync();
 
+        public Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => nonCachedDatabase.GetSpawnGroupTemplatesAsync();
+
         public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry)
         {
             if (creatureTextsCache.TryGetValue(entry, out var texts))

@@ -26,6 +26,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => impl.GetQuestRequestItem(entry);
         public Task<IList<IItem>?> GetItemTemplatesAsync() => impl.GetItemTemplatesAsync();
+        public Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => impl.GetSpawnGroupTemplatesAsync();
 
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => impl.GetConversationTemplates();

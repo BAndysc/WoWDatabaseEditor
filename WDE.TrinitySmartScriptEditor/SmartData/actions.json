@@ -2959,20 +2959,20 @@
         "name": "SMART_ACTION_SPAWN_SPAWNGROUP",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "GroupID"
+                "type": "SpawnGroupTemplateParameter",
+                "name": "Group"
             },
             {
                 "type": "Parameter",
-                "name": "minDelay"
+                "name": "Min delay"
             },
             {
                 "type": "Parameter",
-                "name": "maxDelay"
+                "name": "Max delay"
             },
             {
                 "type": "FlagParameter",
-                "name": "Spawnflags",
+                "name": "Spawn flags",
                 "values": {
                     "0": { "name": "SMARTAI_SPAWN_FLAG_NONE" },
                     "1": { "name": "SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN" },
@@ -2981,7 +2981,7 @@
                 }
             }
         ],
-        "description": "{source}: Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
+        "description": "Spawn spawn group {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
         "name_readable": "Spawn Spawngroup",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -2991,20 +2991,20 @@
         "name": "SMART_ACTION_DESPAWN_SPAWNGROUP",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "GroupID"
+                "type": "SpawnGroupTemplateParameter",
+                "name": "Group"
             },
             {
                 "type": "Parameter",
-                "name": "minDelay"
+                "name": "Min delay"
             },
             {
                 "type": "Parameter",
-                "name": "maxDelay"
+                "name": "Max delay"
             },
             {
                 "type": "FlagParameter",
-                "name": "Spawnflags",
+                "name": "Spawn flags",
                 "values": {
                     "0": { "name": "SMARTAI_SPAWN_FLAG_NONE" },
                     "1": { "name": "SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN" },
@@ -3013,7 +3013,7 @@
                 }
             }
         ],
-        "description": "{source}: Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
+        "description": "Despawn spawn group {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
         "name_readable": "Despawn Spawngroup",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
