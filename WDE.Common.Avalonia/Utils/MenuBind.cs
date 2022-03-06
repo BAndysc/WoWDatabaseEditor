@@ -83,22 +83,24 @@ namespace WDE.Common.Avalonia.Utils
         {
             if (!cmd.Shortcut.HasValue || !Enum.TryParse(cmd.Shortcut.Value.Key, out Key key)) 
                 return command;
-            
+
+            var modifierKey = (cmd.Shortcut.Value.Shift ? KeyModifiers.Shift : KeyModifiers.None);
+
             // ok, so this is terrible, but TextBox gestures handling is inside OnKeyDown
             // which is executed AFTER handling application wise shortcuts
             // However application wise shortcuts take higher priority
             // and effectively TextBox doesn't handle copy/paste/cut/undo/redo -.-
             var original = command;
-            command = OverrideCommand<ICustomCopyPaste>(command, Key.C, key, cmd, tb => tb.DoCopy((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))));
-            command = OverrideCommand<ICustomCopyPaste>(command, Key.V, key, cmd, tb => tb.DoPaste().ListenErrors());
-            command = OverrideCommand<TextBox>(command, Key.C, key, cmd, tb => tb.Copy());
-            command = OverrideCommand<TextBox>(command, Key.X, key, cmd, tb => tb.Cut());
-            command = OverrideCommand<TextBox>(command, Key.V, key, cmd, tb => tb.Paste());
-            command = OverrideCommand<TextBox>(command, Key.Z, key, cmd, Undo);
-            command = OverrideCommand<TextBox>(command, Key.Y, key, cmd, Redo);
-            command = OverrideCommand<FixedTextBox>(command, Key.V, key, cmd, tb => tb.CustomPaste());
+            command = OverrideCommand<ICustomCopyPaste>(command, Key.C, KeyModifiers.None, key, modifierKey, cmd, tb => tb.DoCopy((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))));
+            command = OverrideCommand<ICustomCopyPaste>(command, Key.V, KeyModifiers.None, key, modifierKey, cmd, tb => tb.DoPaste().ListenErrors());
+            command = OverrideCommand<TextBox>(command, Key.C, KeyModifiers.None, key, modifierKey, cmd, tb => tb.Copy());
+            command = OverrideCommand<TextBox>(command, Key.X, KeyModifiers.None, key, modifierKey, cmd, tb => tb.Cut());
+            command = OverrideCommand<TextBox>(command, Key.V, KeyModifiers.None, key, modifierKey, cmd, tb => tb.Paste());
+            command = OverrideCommand<TextBox>(command, Key.Z, KeyModifiers.None, key, modifierKey, cmd, Undo);
+            command = OverrideCommand<TextBox>(command, Key.Z, KeyModifiers.Shift, key, modifierKey, cmd, Redo);
+            command = OverrideCommand<FixedTextBox>(command, Key.V, KeyModifiers.None, key, modifierKey, cmd, tb => tb.CustomPaste());
 
-            command = OverrideCommand<TextArea>(command, Key.Z, key, cmd, tb =>
+            command = OverrideCommand<TextArea>(command, Key.Z, KeyModifiers.None, key, modifierKey, cmd, tb =>
             {
                 var te = GetTextEditor(tb);
                 if (te == null || te.Document.UndoStack.SizeLimit == 0)
@@ -106,7 +108,7 @@ namespace WDE.Common.Avalonia.Utils
                 te.Undo();
                 return true;
             });
-            command = OverrideCommand<TextArea>(command, Key.Y, key, cmd, tb =>
+            command = OverrideCommand<TextArea>(command, Key.Z, KeyModifiers.Shift, key, modifierKey, cmd, tb =>
             {
                 var te = GetTextEditor(tb);
                 if (te == null || te.Document.UndoStack.SizeLimit == 0)
@@ -114,9 +116,9 @@ namespace WDE.Common.Avalonia.Utils
                 te.Redo();
                 return true;
             });
-            command = OverrideCommand<TextArea>(command, Key.C, key, cmd, tb => ApplicationCommands.Copy.Execute(null, tb));
-            command = OverrideCommand<TextArea>(command, Key.X, key, cmd, tb => ApplicationCommands.Cut.Execute(null, tb));
-            command = OverrideCommand<TextArea>(command, Key.V, key, cmd, tb => ApplicationCommands.Paste.Execute(null, tb));
+            command = OverrideCommand<TextArea>(command, Key.C, KeyModifiers.None, key, modifierKey, cmd, tb => ApplicationCommands.Copy.Execute(null, tb));
+            command = OverrideCommand<TextArea>(command, Key.X, KeyModifiers.None, key, modifierKey, cmd, tb => ApplicationCommands.Cut.Execute(null, tb));
+            command = OverrideCommand<TextArea>(command, Key.V, KeyModifiers.None, key, modifierKey, cmd, tb => ApplicationCommands.Paste.Execute(null, tb));
 
             var newCommand = new DelegateCommand(() => command.Execute(null), () => command.CanExecute(null));
             original.CanExecuteChanged += (_, _) => newCommand.RaiseCanExecuteChanged();
@@ -187,9 +189,9 @@ namespace WDE.Common.Avalonia.Utils
             undoMethod.Invoke(undoHelper, null);
         }
 
-        private static ICommand OverrideCommand<T>(ICommand command, Key require, Key commandKey, IMenuCommandItem item, Func<T, bool> func)
+        private static ICommand OverrideCommand<T>(ICommand command, Key require, KeyModifiers requireModifier, Key commandKey, KeyModifiers commandModifier, IMenuCommandItem item, Func<T, bool> func)
         {
-            if (require != commandKey || !(item.Shortcut?.Control ?? false))
+            if (require != commandKey || !(item.Shortcut?.Control ?? false) || requireModifier != commandModifier)
                 return command;
 
             return new DelegateCommand(() =>
@@ -207,9 +209,9 @@ namespace WDE.Common.Avalonia.Utils
             });
         }
         
-        private static ICommand OverrideCommand<T>(ICommand command, Key require, Key commandKey, IMenuCommandItem item, Action<T> func)
+        private static ICommand OverrideCommand<T>(ICommand command, Key require, KeyModifiers requireModifier, Key commandKey, KeyModifiers commandModifier, IMenuCommandItem item, Action<T> func)
         {
-            if (require != commandKey || !(item.Shortcut?.Control ?? false))
+            if (require != commandKey || !(item.Shortcut?.Control ?? false) || requireModifier != commandModifier)
                 return command;
 
             return new DelegateCommand(() =>
