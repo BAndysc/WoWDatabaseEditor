@@ -106,7 +106,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "SQL copied!"));
                         });
                 }
-            }, _ => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+            }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
             
             GenerateCurrentSqlCommand = new DelegateCommand(() =>
             {

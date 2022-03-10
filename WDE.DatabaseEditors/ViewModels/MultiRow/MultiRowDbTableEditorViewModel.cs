@@ -205,7 +205,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return;
             }
             
-            var data = await tableDataProvider.Load(tableDefinition.Id, key);
+            var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, key);
             if (data == null) 
                 return;
 
@@ -275,7 +275,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             return Task.CompletedTask;
         }
 
-        protected override ICollection<uint> GenerateKeys() => keys;
+        protected override IReadOnlyList<uint> GenerateKeys() => keys.ToList();
+        protected override IReadOnlyList<uint>? GenerateDeletedKeys() => null;
 
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
@@ -409,7 +410,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     IParameterValue parameterValue = null!;
                     if (cell is DatabaseField<long> longParam)
                     {
-                        parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
+                        parameterValue = new ParameterValue<long, DatabaseEntity>(entity, longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
                     }
                     else if (cell is DatabaseField<string> stringParam)
                     {
@@ -418,11 +419,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                             stringParam.Current.Value = stringParam.Current.Value.GetComment(column.CanBeNull);
                             stringParam.Original.Value = stringParam.Original.Value.GetComment(column.CanBeNull);
                         }
-                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
+                        parameterValue = new ParameterValue<string, DatabaseEntity>(entity, stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
                     }
                     else if (cell is DatabaseField<float> floatParameter)
                     {
-                        parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
+                        parameterValue = new ParameterValue<float, DatabaseEntity>(entity, floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                     }
 
                     parameterValue.DefaultIsBlank = column.IsZeroBlank;
@@ -464,14 +465,17 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
         }
 
-        private async Task AsyncAddEntities(IList<DatabaseEntity> tableDataEntities)
+        private async Task AsyncAddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
         {
-            List<DatabaseEntity> finalList = new();
             foreach (var entity in tableDataEntities)
             {
-                if (await AddEntity(entity))
-                    finalList.Add(entity);
+                await AddEntity(entity);
             }
+        }
+        
+        protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
+        {
+            return null; // because in multirow we always delete and reinsert all
         }
     }
 }

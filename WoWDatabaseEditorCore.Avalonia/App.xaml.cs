@@ -277,6 +277,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             
             IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+            Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
         }
 
         private class Conflict

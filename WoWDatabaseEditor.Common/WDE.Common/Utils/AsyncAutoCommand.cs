@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Prism.Commands;
 using WDE.Common.Annotations;
 using WDE.Common.Tasks;
 
@@ -12,9 +13,9 @@ namespace WDE.Common.Utils
         private bool isBusy;
 
         private readonly AsyncCommand command;
-
+        
         public AsyncAutoCommand(Func<Task> execute,
-            Func<object?, bool>? canExecute = null,
+            Func<bool>? canExecute = null,
             Action<Exception>? onException = null,
             bool continueOnCapturedContext = false)
         {
@@ -24,7 +25,7 @@ namespace WDE.Common.Utils
                     await execute();
                     IsBusy = false;
                 },
-                a => !isBusy && (canExecute?.Invoke(a) ?? true),
+                _ => !isBusy && (canExecute?.Invoke() ?? true),
                 e =>
                 {
                     IsBusy = false;

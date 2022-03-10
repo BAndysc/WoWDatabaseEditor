@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:tools="clr-namespace:WDE.DatabaseEditors.Tools;assembly=WDE.DatabaseEditors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="tools:ToolsViewModel"
              x:Class="WDE.CommonViews.Avalonia.DatabaseEditors.DefinitionToolView">
     <UserControl.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
@@ -12,39 +14,40 @@
     </UserControl.Resources>
     <TabControl>
         <TabItem Header="Definition generator">
-            <Grid ColumnDefinitions="200,10,*" DataContext="{Binding Definitions}">
+            <Grid ColumnDefinitions="200,10,*" RowDefinitions="*,10,Auto" DataContext="{CompiledBinding Definitions}">
                 <DockPanel LastChildFill="True">
                     <TextBlock DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" FontWeight="Bold" Padding="4">Connected database tables:</TextBlock>
-                    <ListBox Items="{Binding Tables, Mode=OneTime}"
-                             IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
-                             SelectedItem="{Binding SelectedTable, Mode=TwoWay}">
+                    <ListBox Items="{CompiledBinding Tables, Mode=OneTime}"
+                             IsEnabled="{CompiledBinding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                             SelectedItem="{CompiledBinding SelectedTable, Mode=TwoWay}">
                                   
                     </ListBox>                    
                 </DockPanel>
                 <GridSplitter Grid.Column="1" />
                 <avaloniaEdit:TextEditor Grid.Column="2"
-                                         IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                                         IsEnabled="{CompiledBinding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                                          SyntaxHighlighting="Json" 
-                                         Document="{Binding Definition, Converter={StaticResource DocumentConverter}}" 
+                                         Document="{CompiledBinding Definition, Converter={StaticResource DocumentConverter}}" 
                                          BorderThickness="0"
                                          ShowLineNumbers="True"
                                          FontFamily="Consolas,Menlo,Courier,Courier New">
                 </avaloniaEdit:TextEditor>
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Command="{CompiledBinding SaveAllDefinitions}">Save all definitions</Button>
             </Grid>
         </TabItem>
         <TabItem Header="Compatibility checker">
-            <Grid ColumnDefinitions="200,10,*" DataContext="{Binding Compatibility}">
+            <Grid ColumnDefinitions="200,10,*" DataContext="{CompiledBinding Compatibility}">
                 <DockPanel LastChildFill="True">
                     <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">All provided table definitions:</TextBlock>
-                    <ListBox Items="{Binding Definitions, Mode=OneTime}"
+                    <ListBox Items="{CompiledBinding Definitions, Mode=OneTime}"
                              VirtualizationMode="None"
-                             SelectedItem="{Binding SelectedDefinition, Mode=TwoWay}">
+                             SelectedItem="{CompiledBinding SelectedDefinition, Mode=TwoWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Vertical">
-                                    <TextBlock Text="{Binding Name, Mode=OneTime}" FontWeight="Bold" />
-                                    <TextBlock Text="{Binding FileName, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
-                                    <TextBlock Text="{Binding Description, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                                    <TextBlock Text="{CompiledBinding Name, Mode=OneTime}" FontWeight="Bold" />
+                                    <TextBlock Text="{CompiledBinding FileName, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                                    <TextBlock Text="{CompiledBinding Description, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -53,7 +56,7 @@
                 <GridSplitter Grid.Column="1" />
                 <DockPanel Grid.Column="2">
                     <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">Raport:</TextBlock>
-                    <avaloniaEdit:TextEditor Document="{Binding Raport, Converter={StaticResource DocumentConverter}}" 
+                    <avaloniaEdit:TextEditor Document="{CompiledBinding Raport, Converter={StaticResource DocumentConverter}}" 
                                              BorderThickness="0"
                                              ShowLineNumbers="True"
                                              FontFamily="Consolas,Menlo,Courier,Courier New">

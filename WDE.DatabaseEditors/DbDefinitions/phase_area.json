@@ -11,7 +11,7 @@
   "multi_solution_name": "Phases in multiple areas",
   "reload_command": "reload phase_area",
   "icon_path": "Icons/document_phase_definitions.png",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "picker": "ZoneAreaParameter",
   "group_name": "Common scripting tables",
   "primary_key": ["AreaId", "PhaseId"],

@@ -1,0 +1,39 @@
+{
+  "id": "player_xp_for_level",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player Xp For Level",
+  "single_solution_name": "Player Xp For Level Table",
+  "multi_solution_name": "Player Xp For Level Table",
+  "description": "Here insert short description what is player_xp_for_level for",
+  "table_name": "player_xp_for_level",
+  "table_index_name": "Level",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload player_xp_for_level",
+  "picker": "",
+  "skip_quick_load": true,
+  "primary_key": [
+    "Level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Level",
+          "db_column_name": "Level",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Experience",
+          "db_column_name": "Experience",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

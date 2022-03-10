@@ -16,6 +16,9 @@
     <None Update="Parameters\parameters.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Parameters\spell_parameters.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />

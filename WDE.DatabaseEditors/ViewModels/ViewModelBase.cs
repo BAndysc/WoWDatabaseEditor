@@ -28,6 +28,7 @@ using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
+using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.MVVM;
 
 namespace WDE.DatabaseEditors.ViewModels
@@ -38,12 +39,12 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly ISolutionManager solutionManager;
         private readonly ISolutionTasksService solutionTasksService;
         private readonly IQueryGenerator queryGenerator;
-        private readonly IDatabaseTableDataProvider databaseTableDataProvider;
+        protected readonly IDatabaseTableDataProvider databaseTableDataProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly ITaskRunner taskRunner;
         private readonly IParameterFactory parameterFactory;
         private readonly IItemFromListProvider itemFromListProvider;
-        private readonly ISessionService sessionService;
+        protected readonly ISessionService sessionService;
         private readonly IDatabaseTableCommandService commandService;
         private readonly IParameterPickerService parameterPickerService;
 
@@ -105,13 +106,13 @@ namespace WDE.DatabaseEditors.ViewModels
             if (!parameterValue.BaseParameter.HasItems)
                 return;
             
-            if (parameterValue is ParameterValue<long> valueHolder)
+            if (parameterValue is IParameterValue<long> valueHolder)
             {
                 var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value);
                 if (result.ok)
                     valueHolder.Value = result.value;
             }
-            else if (parameterValue is ParameterValue<string> stringValueHolder)
+            else if (parameterValue is IParameterValue<string> stringValueHolder)
             {
                 var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "");
                 if (result.ok)
@@ -122,25 +123,37 @@ namespace WDE.DatabaseEditors.ViewModels
         public abstract bool ForceRemoveEntity(DatabaseEntity entity);
         public abstract bool ForceInsertEntity(DatabaseEntity entity, int index);
 
-        protected abstract ICollection<uint> GenerateKeys();
+        protected abstract IReadOnlyList<uint> GenerateKeys();
+        protected abstract IReadOnlyList<uint>? GenerateDeletedKeys();
         protected abstract Task InternalLoadData(DatabaseTableData data);
         protected abstract void UpdateSolutionItem();
         
-        protected void ScheduleLoading()
+        protected Task ScheduleLoading()
         {
             IsLoading = true;
-            taskRunner.ScheduleTask($"Loading {Title}..", LoadTableDefinition);
+            return taskRunner.ScheduleTask($"Loading {Title}..", LoadTableDefinition);
         }
 
-        public Task<string> GenerateQuery()
+        public virtual Task<string> GenerateQuery()
         {
             return Task.FromResult(queryGenerator
-                .GenerateQuery(GenerateKeys(), new DatabaseTableData(tableDefinition, Entities)).QueryString);
+                .GenerateQuery(GenerateKeys(), GenerateDeletedKeys(), new DatabaseTableData(tableDefinition, Entities)).QueryString);
         }
 
-        protected virtual List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity) => null;
+        protected virtual List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
+        {
+            if (!entity.ExistInDatabase)
+                return null;
+            
+            var modified = entity.Fields.Where(f => f.IsModified).ToList();
+            if (modified.Count == 0)
+                return null;
+            
+            return modified.Select(f => new EntityOrigianlField()
+                {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
+        }
 
-        public Task<IList<(ISolutionItem, string)>> GenerateSplitQuery()
+        public virtual Task<IList<(ISolutionItem, string)>> GenerateSplitQuery()
         {
             var keys = GenerateKeys();
             IList<(ISolutionItem, string)> split = new List<(ISolutionItem, string)>();
@@ -148,9 +161,9 @@ namespace WDE.DatabaseEditors.ViewModels
             {
                 var entities = Entities.Where(e => e.Key == key).ToList();
                 var sql = queryGenerator
-                    .GenerateQuery(new List<uint>(){key}, new DatabaseTableData(tableDefinition, entities)).QueryString;
-                var splitItem = new DatabaseTableSolutionItem(tableDefinition.Id);
-                splitItem.Entries.Add(new SolutionItemDatabaseEntity(key, entities.Count > 0 ? entities[0].ExistInDatabase : false, entities.Count > 0 ? GetOriginalFields(entities[0]) : null));
+                    .GenerateQuery(new List<uint>(){key}, null, new DatabaseTableData(tableDefinition, entities)).QueryString;
+                var splitItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
+                splitItem.Entries.Add(new SolutionItemDatabaseEntity(key, entities.Count > 0 && entities[0].ExistInDatabase, entities.Count > 0 ? GetOriginalFields(entities[0]) : null));
                 split.Add((splitItem, sql));
             }
 
@@ -166,9 +179,16 @@ namespace WDE.DatabaseEditors.ViewModels
             Title = solutionItemName.GetName(SolutionItem);
         }
         
+        protected virtual string? CustomWhere { get; }
+        protected virtual long Offset { get; }
+        protected virtual int Limit { get; }
+
+        protected virtual Task BeforeLoadData() => Task.CompletedTask;
+
         private async Task LoadTableDefinition()
         {
-            var data = await databaseTableDataProvider.Load(solutionItem.DefinitionId, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData;
+            await BeforeLoadData();
+            var data = await databaseTableDataProvider.Load(solutionItem.DefinitionId, CustomWhere, Offset, Limit, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData;
 
             if (data == null)
             {
@@ -219,7 +239,7 @@ namespace WDE.DatabaseEditors.ViewModels
                         return messageBoxService.WrapError(() => 
                             WrapBulkEdit(
                                 () => WrapBlockingTask(() => cmdPerKey.Process(command,
-                            new DatabaseTableData(data.TableDefinition, Entities), GenerateKeys(), this))
+                            new DatabaseTableData(data.TableDefinition, Entities), GenerateKeys().ToList(), this))
                                     , cmdPerKey.Name));
                     })));
                 }

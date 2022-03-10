@@ -1,0 +1,50 @@
+{
+  "id": "player_classlevelstats",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player Classlevelstats",
+  "single_solution_name": "{name} player_classlevelstats editor",
+  "multi_solution_name": "multiple player_classlevelstats editor",
+  "description": "Here insert short description what is player_classlevelstats for",
+  "table_name": "player_classlevelstats",
+  "table_index_name": "class",
+  "record_mode": "MultiRecord",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload player_classlevelstats",
+  "picker": "Parameter",
+  "skip_quick_load": true,
+  "primary_key": [
+    "class",
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "Basehp",
+          "db_column_name": "basehp",
+          "value_type": "uint"
+        },
+        {
+          "name": "Basemana",
+          "db_column_name": "basemana",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

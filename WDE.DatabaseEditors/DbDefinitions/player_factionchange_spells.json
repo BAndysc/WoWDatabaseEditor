@@ -1,0 +1,40 @@
+{
+  "id": "player_factionchange_spells",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player Factionchange Spells",
+  "single_solution_name": "{name} player_factionchange_spells editor",
+  "multi_solution_name": "multiple player_factionchange_spells editor",
+  "description": "Here insert short description what is player_factionchange_spells for",
+  "table_name": "player_factionchange_spells",
+  "table_index_name": "alliance_id",
+  "record_mode": "MultiRecord",
+  "group_name": "Faction changing",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload player_factionchange_spells",
+  "picker": "Parameter",
+  "skip_quick_load": true,
+  "primary_key": [
+    "alliance_id",
+    "horde_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Alliance Id",
+          "db_column_name": "alliance_id",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Horde Id",
+          "db_column_name": "horde_id",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

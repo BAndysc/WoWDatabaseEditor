@@ -61,7 +61,7 @@ namespace WDE.RemoteSOAP.ViewModels
                 {
                     TestConnectionOutput = "Connection failed: " + e.Message;
                 }
-            }, _ => !string.IsNullOrEmpty(host) && int.TryParse(port, out var _) && !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(pass));
+            }, () => !string.IsNullOrEmpty(host) && int.TryParse(port, out var _) && !string.IsNullOrEmpty(user) && !string.IsNullOrEmpty(pass));
 
             PropertyChanged += (_, _) => TestConnection.RaiseCanExecuteChanged();
         }

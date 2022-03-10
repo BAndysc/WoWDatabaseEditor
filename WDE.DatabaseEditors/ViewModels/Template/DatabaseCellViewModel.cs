@@ -8,7 +8,6 @@ namespace WDE.DatabaseEditors.ViewModels.Template
     public class DatabaseCellViewModel : BaseDatabaseCellViewModel
     {
         public DatabaseRowViewModel Parent { get; }
-        public DatabaseEntity ParentEntity { get; }
         public IDatabaseField? TableField { get; }
         public bool IsVisible { get; private set; } = true;
         public bool IsModified { get; private set; }
@@ -22,10 +21,9 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             DatabaseEntity parentEntity, 
             IDatabaseField tableField, 
             IParameterValue parameterValue, 
-            IObservable<bool>? cellIsVisible)
+            IObservable<bool>? cellIsVisible) : base(parentEntity)
         {
             Link(tableField, tf => tf.IsModified, () => IsModified);
-            ParentEntity = parentEntity;
             Parent = parent;
             TableField = tableField;
             ParameterValue = parameterValue;
@@ -61,9 +59,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         public DatabaseCellViewModel(DatabaseRowViewModel parent, 
             DatabaseEntity parentEntity,
-            IParameterValue parameterValue)
+            IParameterValue parameterValue) : base(parentEntity)
         {
-            ParentEntity = parentEntity;
             Parent = parent;
             ParameterValue = parameterValue;
 

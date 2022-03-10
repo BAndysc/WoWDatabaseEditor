@@ -1,0 +1,53 @@
+{
+  "id": "quest_pool_members",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Quest Pool Members",
+  "single_solution_name": "Quest Pool Members Table",
+  "multi_solution_name": "Quest Pool Members Table",
+  "description": "Here insert short description what is quest_pool_members for",
+  "table_name": "quest_pool_members",
+  "table_index_name": "questId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Quests",
+  "icon_path": "Icons/document_.png",
+  "picker": "QuestParameter",
+  "primary_key": [
+    "questId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Quest Id",
+          "db_column_name": "questId",
+          "value_type": "QuestParameter",
+          "read_only": true,
+          "preferred_width": 335.0
+        },
+        {
+          "name": "Pool Id",
+          "db_column_name": "poolId",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Pool Index",
+          "db_column_name": "poolIndex",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Description",
+          "db_column_name": "description",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 340.0
+        }
+      ]
+    }
+  ]
+}

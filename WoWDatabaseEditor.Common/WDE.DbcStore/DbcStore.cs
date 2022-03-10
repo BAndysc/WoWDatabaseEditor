@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDBXEditor.Storage;
@@ -168,6 +169,9 @@ namespace WDE.DbcStore
             public Dictionary<long, string> ExtendedCostStore { get; internal set;} = new();
             public Dictionary<long, string> TaxiNodeStore { get; internal set;} = new();
             public Dictionary<long, (int, int)> TaxiPathsStore { get; internal set;} = new();
+            public Dictionary<long, string> SpellItemEnchantmentStore { get; internal set;} = new();
+            public Dictionary<long, string> AreaGroupStore { get; internal set;} = new();
+            public Dictionary<long, string> ItemDisplayInfoStore { get; internal set;} = new();
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -285,6 +289,7 @@ namespace WDE.DbcStore
                 
                 parameterFactory.Register("AchievementParameter", new DbcParameter(AchievementStore), QuickAccessMode.Full);
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore), QuickAccessMode.Limited);
+                parameterFactory.Register("RawFactionParameter", new DbcParameter(FactionStore), QuickAccessMode.Limited);
                 parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("ItemDbcParameter", new DbcParameter(ItemStore));
@@ -310,6 +315,9 @@ namespace WDE.DbcStore
                 parameterFactory.Register("AreaTriggerParameter", new LanguageParameter(AreaTriggerStore));
                 parameterFactory.Register("ZoneOrQuestSortParameter", new ZoneOrQuestSortParameter(AreaStore, QuestSortStore));
                 parameterFactory.Register("TaxiPathParameter", new TaxiPathParameter(TaxiPathsStore, TaxiNodeStore));
+                parameterFactory.Register("SpellItemEnchantmentParameter", new DbcParameter(SpellItemEnchantmentStore));
+                parameterFactory.Register("AreaGroupParameter", new DbcParameter(AreaGroupStore));
+                parameterFactory.Register("ItemDisplayInfoParameter", new DbcParameter(ItemDisplayInfoStore));
 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {
@@ -341,7 +349,7 @@ namespace WDE.DbcStore
                     case DBCVersions.WOTLK_12340:
                     {
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 26;
+                        max = 29;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
                         Load("Faction.dbc", 0, 23, FactionStore, true);
@@ -376,12 +384,15 @@ namespace WDE.DbcStore
                         Load("ItemExtendedCost.dbc", row => ExtendedCostStore.Add(row.GetInt(0), GenerateCostDescription(row.GetInt(1), row.GetInt(2), row.GetInt(4))));
                         Load("TaxiNodes.dbc", 0, 5, TaxiNodeStore, true);
                         Load("TaxiPath.dbc",  row => TaxiPathsStore.Add(row.GetUInt(0), (row.GetInt(1), row.GetInt(2))));
+                        Load("SpellItemEnchantment.dbc", 0, 14, SpellItemEnchantmentStore, true);
+                        Load("AreaGroup.dbc",  row => AreaGroupStore.Add(row.GetUInt(0), BuildAreaGroupName(row, 1, 6)));
+                        Load("ItemDisplayInfo.dbc", 0, 5, ItemDisplayInfoStore);
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
                         store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 28;
+                        max = 31;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -418,6 +429,9 @@ namespace WDE.DbcStore
                         Load("ItemExtendedCost.dbc", row => ExtendedCostStore.Add(row.GetInt(0), GenerateCostDescription(row.GetInt(1), row.GetInt(2), row.GetInt(4))));
                         Load("TaxiNodes.dbc", 0, 5, TaxiNodeStore);
                         Load("TaxiPath.dbc",  row => TaxiPathsStore.Add(row.GetUInt(0), (row.GetInt(1), row.GetInt(2))));
+                        Load("SpellItemEnchantment.dbc", 0, 14, SpellItemEnchantmentStore);
+                        Load("AreaGroup.dbc",  row => AreaGroupStore.Add(row.GetUInt(0), BuildAreaGroupName(row, 1, 6)));
+                        Load("ItemDisplayInfo.dbc", 0, 5, ItemDisplayInfoStore);
                         break;
                     }
                     case DBCVersions.LEGION_26972:
@@ -492,6 +506,32 @@ namespace WDE.DbcStore
                     default:
                         return;
                 }
+            }
+
+            private string BuildAreaGroupName(IDbcIterator row, int start, int count)
+            {
+                for (int i = start; i < start + count; ++i)
+                {
+                    var id = row.GetUInt(i);
+                    if (id == 0)
+                    {
+                        count = i - start;
+                        break;
+                    }
+                }
+
+                if (count == 1)
+                    return AreaStore[row.GetUInt(start)];
+                
+                StringBuilder sb = new();
+                for (int i = start; i < start + count; ++i)
+                {
+                    sb.Append(AreaStore[row.GetUInt(i)]);
+                    if (i != start + count - 1)
+                        sb.Append(", ");
+                }
+
+                return sb.ToString();
             }
 
             private string GenerateCostDescription(int honor, int arenaPoints, int item)

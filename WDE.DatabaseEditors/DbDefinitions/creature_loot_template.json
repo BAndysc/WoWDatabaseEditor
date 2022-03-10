@@ -9,7 +9,7 @@
   "description": "To define items dropped by creature, use this table",
   "table_name": "creature_loot_template",
   "table_index_name": "Entry",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "icon_path": "Icons/document_loot.png",
   "reload_command": "reload creature_loot_template",
   "picker": "CreatureParameter",

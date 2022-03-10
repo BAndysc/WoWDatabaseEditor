@@ -8,29 +8,33 @@ namespace WDE.DatabaseEditors.ViewModels
 {
     public class BaseDatabaseCellViewModel : ObservableBase
     {
+        public BaseDatabaseCellViewModel(DatabaseEntity parentEntity)
+        {
+            ParentEntity = parentEntity;
+        }
+
+        public DatabaseEntity ParentEntity { get; }
         public IParameterValue? ParameterValue { get; init; }
         
         public IList<object>? Items
         {
             get
             {
-                if (ParameterValue is not ParameterValue<long> p)
+                if (ParameterValue is not IParameterValue<long> p)
                     return null;
-                return p.Parameter.HasItems
-                    ? p.Parameter.Items!.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList()
-                    : null;
+                return p.Items?.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList();
             }
         }
 
-        public Dictionary<long, SelectOption>? Flags => ParameterValue is ParameterValue<long> p ? p.Parameter.Items : null;
+        public Dictionary<long, SelectOption>? Flags => ParameterValue is IParameterValue<long> p ? p.Items : null;
 
         public ParameterOption? OptionValue
         {
             get
             {
-                if (ParameterValue is ParameterValue<long> p)
+                if (ParameterValue is IParameterValue<long> p)
                 {
-                    if (p.Parameter.Items != null && p.Parameter.Items.TryGetValue(p.Value, out var option))
+                    if (p.Items != null && p.Items.TryGetValue(p.Value, out var option))
                         return new ParameterOption(p.Value, option.Name);
                     return new ParameterOption(p.Value, "Unknown");
                 }
@@ -40,7 +44,7 @@ namespace WDE.DatabaseEditors.ViewModels
             {
                 if (value != null)
                 {
-                    if (ParameterValue is ParameterValue<long> p)
+                    if (ParameterValue is IParameterValue<long> p)
                     {
                         p.Value = value.Value;
                     }
@@ -67,10 +71,10 @@ namespace WDE.DatabaseEditors.ViewModels
 
         public long AsLongValue
         {
-            get => ((ParameterValue as ParameterValue<long>)?.Value ?? 0);
+            get => ((ParameterValue as IParameterValue<long>)?.Value ?? 0);
             set
             {
-                if (ParameterValue is ParameterValue<long> longParam)
+                if (ParameterValue is IParameterValue<long> longParam)
                 {
                     longParam.Value = value;
                 }
@@ -81,13 +85,13 @@ namespace WDE.DatabaseEditors.ViewModels
         {
             get
             {
-                if (ParameterValue is ParameterValue<long> longParam)
+                if (ParameterValue is IParameterValue<long> longParam)
                     return longParam.IsNull ? null : longParam.Value > 0;
                 return null;
             }
             set
             {
-                if (ParameterValue is ParameterValue<long> longParam)
+                if (ParameterValue is IParameterValue<long> longParam)
                 {
                     if (value.HasValue)
                         longParam.Value = value.Value ? 1 : 0;
@@ -97,7 +101,8 @@ namespace WDE.DatabaseEditors.ViewModels
             }
         }
 
-        public bool UseItemPicker => (ParameterValue is ParameterValue<long> vm) && vm.Parameter.HasItems && vm.Parameter.Items!.Count < 300;
-        public bool UseFlagsPicker => (ParameterValue is ParameterValue<long> vm) && vm.Parameter.HasItems && vm.Parameter is FlagParameter;
+        public bool HasItems => ParameterValue?.BaseParameter.HasItems ?? false;
+        public bool UseItemPicker => (ParameterValue is IParameterValue<long> vm) && vm.Items != null && vm.Items.Count < 300;
+        public bool UseFlagsPicker => (ParameterValue is IParameterValue<long> vm) && vm.Parameter.HasItems && vm.Parameter is FlagParameter;
     }
 }

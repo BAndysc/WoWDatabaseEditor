@@ -30,12 +30,13 @@ namespace WDE.DatabaseEditors.Solution
                 return $"-- Unable to load data for {item} from the database";
 
             item.UpdateEntitiesWithOriginalValues(tableData.Entities);
-            return queryGenerator.GenerateQuery(item.Entries.Select(e => e.Key).ToList(), tableData).QueryString;
+            return queryGenerator.GenerateQuery(item.Entries.Select(e => e.Key).ToList(), item.DeletedEntries, tableData).QueryString;
         }
 
         private Task<IDatabaseTableData?> LoadTable(DatabaseTableSolutionItem item)
         {
-            return tableDataProvider.Load(item.DefinitionId, item.Entries.Select(e => e.Key).ToArray());
+            //todo single record scenario?
+            return tableDataProvider.Load(item.DefinitionId, null, null,null ,item.Entries.Select(e => e.Key).ToArray());
         }
     }
 }

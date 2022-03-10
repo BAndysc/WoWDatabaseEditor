@@ -27,4 +27,7 @@
       <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Controls\FastTableView" />
+    </ItemGroup>
 </Project>

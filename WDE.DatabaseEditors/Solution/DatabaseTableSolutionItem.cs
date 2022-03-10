@@ -9,15 +9,17 @@ namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
-        public DatabaseTableSolutionItem(uint entry, bool existsInDatabase, string definitionId)
+        public DatabaseTableSolutionItem(uint entry, bool existsInDatabase, string definitionId, bool ignoreEquality)
         {
             Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase));
             DefinitionId = definitionId;
+            IgnoreEquality = ignoreEquality;
         }
 
-        public DatabaseTableSolutionItem(string definitionId)
+        public DatabaseTableSolutionItem(string definitionId, bool ignoreEquality)
         {
             DefinitionId = definitionId;
+            IgnoreEquality = ignoreEquality;
         }
 
         public DatabaseTableSolutionItem()
@@ -25,14 +27,21 @@ namespace WDE.DatabaseEditors.Solution
             DefinitionId = null!;
         }
 
-        public ISolutionItem Clone() => new DatabaseTableSolutionItem(DefinitionId)
-            { Entries = Entries.Select(e => new SolutionItemDatabaseEntity(e)).ToList() };
+        public ISolutionItem Clone() => new DatabaseTableSolutionItem(DefinitionId, IgnoreEquality)
+        {
+            Entries = Entries.Select(e => new SolutionItemDatabaseEntity(e)).ToList(),
+            DeletedEntries = DeletedEntries.ToList()
+        };
 
+        public List<uint> DeletedEntries { get; set; } = new();
         public List<SolutionItemDatabaseEntity> Entries { get; set; } = new();
 
         [JsonProperty]
         public readonly string DefinitionId;
 
+        [JsonProperty]
+        public readonly bool IgnoreEquality;
+        
         [JsonIgnore]
         public bool IsContainer => false;
 
@@ -40,23 +49,32 @@ namespace WDE.DatabaseEditors.Solution
         public ObservableCollection<ISolutionItem>? Items { get; } = null;
         
         [JsonIgnore]
-        public string ExtraId => string.Join(", ", Entries);
+        public string? ExtraId => IgnoreEquality ? null : string.Join(", ", Entries);
 
         [JsonIgnore]
         public bool IsExportable => true;
 
         private bool Equals(DatabaseTableSolutionItem other)
         {
-            if (Entries.Count != other.Entries.Count)
+            if (DefinitionId != other.DefinitionId)
                 return false;
 
-            if (DefinitionId != other.DefinitionId)
+            if (IgnoreEquality)
+                return true;
+         
+            if (Entries.Count != other.Entries.Count)
                 return false;
 
             if (other.Entries.Any(e => !Entries.Contains(e)))
                 return false;
             
             if (Entries.Any(e => !other.Entries.Contains(e)))
+                return false;
+
+            if (other.DeletedEntries.Any(e => !DeletedEntries.Contains(e)))
+                return false;
+            
+            if (DeletedEntries.Any(e => !other.DeletedEntries.Contains(e)))
                 return false;
             
             return true;

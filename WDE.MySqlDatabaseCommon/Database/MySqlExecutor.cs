@@ -180,6 +180,12 @@ namespace WDE.MySqlDatabaseCommon.Database
                 await cmd.ExecuteNonQueryAsync();
                 await transaction.CommitAsync();
             }
+            catch (MySqlConnector.MySqlException e)
+            {
+                await transaction.RollbackAsync();
+                await conn.CloseAsync();
+                throw new IMySqlExecutor.QueryFailedDatabaseException(e.Message, e);
+            }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
@@ -218,6 +224,11 @@ namespace WDE.MySqlDatabaseCommon.Database
             {
                 MySqlCommand cmd = new(query, conn);
                 reader = await cmd.ExecuteReaderAsync();
+            }
+            catch (MySqlConnector.MySqlException e)
+            {
+                await conn.CloseAsync();
+                throw new IMySqlExecutor.QueryFailedDatabaseException(e.Message, e);
             }
             catch (Exception ex)
             {

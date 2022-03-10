@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Solution;
+using WDE.DatabaseEditors.Data;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -12,13 +13,20 @@ namespace WDE.DatabaseEditors.Solution
     [AutoRegister]
     public class DatabaseTableSolutionItemDeserializer : ISolutionItemDeserializer<DatabaseTableSolutionItem>, ISolutionItemSerializer<DatabaseTableSolutionItem>
     {
+        private readonly TableDefinitionProvider tableDefinitionProvider;
+
+        public DatabaseTableSolutionItemDeserializer(TableDefinitionProvider tableDefinitionProvider)
+        {
+            this.tableDefinitionProvider = tableDefinitionProvider;
+        }
+        
         public bool TryDeserialize(ISmartScriptProjectItem projectItem, out ISolutionItem? solutionItem)
         {
             solutionItem = null;
             if (projectItem.Type == 32 && projectItem.StringValue != null)
             {
                 var split = projectItem.StringValue.Split(':');
-                if (split.Length != 2)
+                if (split.Length != 2 && split.Length != 3)
                     return false;
 
                 var table = split[0];
@@ -26,8 +34,15 @@ namespace WDE.DatabaseEditors.Solution
                     .Where(i => uint.TryParse(i, out var _))
                     .Select(uint.Parse)
                     .Select(i => new SolutionItemDatabaseEntity(i, true));
+                var deletedEntries = split.Length == 2 ? null : split[2].Split(',')
+                    .Where(i => uint.TryParse(i, out var _))
+                    .Select(uint.Parse);
 
-                var dbItem = new DatabaseTableSolutionItem(table);
+                var definition = tableDefinitionProvider.GetDefinition(table);
+                if (definition == null)
+                    return false;
+                
+                var dbItem = new DatabaseTableSolutionItem(table, definition.IgnoreEquality);
                 if (string.IsNullOrEmpty(projectItem.Comment))
                 {
                     dbItem.Entries.AddRange(items);
@@ -37,6 +52,8 @@ namespace WDE.DatabaseEditors.Solution
                     var entries = JsonConvert.DeserializeObject<List<SolutionItemDatabaseEntity>>(projectItem.Comment);
                     dbItem.Entries.AddRange(entries);
                 }
+                if (deletedEntries != null)
+                    dbItem.DeletedEntries.AddRange(deletedEntries);
                 solutionItem = dbItem;
                 return true;
             }
@@ -48,10 +65,11 @@ namespace WDE.DatabaseEditors.Solution
         {
             var entries = JsonConvert.SerializeObject(item.Entries);
             var items = string.Join(",", item.Entries.Select(e => e.Key));
+            var deletedKeys = string.Join(",", item.DeletedEntries);
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 32,
-                StringValue = $"{item.DefinitionId}:{items}",
+                StringValue = $"{item.DefinitionId}:{items}:{deletedKeys}",
                 Comment = entries
             };
         }

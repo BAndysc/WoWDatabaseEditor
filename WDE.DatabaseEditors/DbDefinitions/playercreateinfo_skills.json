@@ -1,0 +1,57 @@
+{
+  "id": "playercreateinfo_skills",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Playercreateinfo Skills",
+  "single_solution_name": "{name} playercreateinfo_skills editor",
+  "multi_solution_name": "multiple playercreateinfo_skills editor",
+  "description": "Here insert short description what is playercreateinfo_skills for",
+  "table_name": "playercreateinfo_skills",
+  "table_index_name": "raceMask",
+  "record_mode": "MultiRecord",
+  "group_name": "Player create info",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload playercreateinfo_skills",
+  "picker": "Parameter",
+  "skip_quick_load": true,
+  "primary_key": [
+    "raceMask",
+    "classMask",
+    "skill"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race Mask",
+          "db_column_name": "raceMask",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Class Mask",
+          "db_column_name": "classMask",
+          "value_type": "uint"
+        },
+        {
+          "name": "Skill",
+          "db_column_name": "skill",
+          "value_type": "uint"
+        },
+        {
+          "name": "Rank",
+          "db_column_name": "rank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

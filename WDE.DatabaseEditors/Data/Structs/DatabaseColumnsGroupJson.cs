@@ -5,10 +5,10 @@ using Newtonsoft.Json;
 namespace WDE.DatabaseEditors.Data.Structs
 {
     [ExcludeFromCodeCoverage]
-    public struct DatabaseColumnsGroupJson
+    public class DatabaseColumnsGroupJson
     {
         [JsonProperty(PropertyName = "group_name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         
         [JsonProperty(PropertyName = "show_if")]
         public ShowIfCondition? ShowIf { get; set; }
@@ -17,7 +17,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         public string? GroupSortField { get; set; }
 
         [JsonProperty(PropertyName = "fields")]
-        public IList<DatabaseColumnJson> Fields { get; set; }
+        public IList<DatabaseColumnJson> Fields { get; set; } = null!;
 
         public struct ShowIfCondition
         {

@@ -1,0 +1,52 @@
+{
+  "id": "playercreateinfo_spell_custom",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Playercreateinfo Spell Custom",
+  "single_solution_name": "{name} playercreateinfo_spell_custom editor",
+  "multi_solution_name": "multiple playercreateinfo_spell_custom editor",
+  "description": "Here insert short description what is playercreateinfo_spell_custom for",
+  "table_name": "playercreateinfo_spell_custom",
+  "table_index_name": "racemask",
+  "record_mode": "MultiRecord",
+  "group_name": "Player create info",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload playercreateinfo_spell_custom",
+  "picker": "Parameter",
+  "skip_quick_load": true,
+  "primary_key": [
+    "racemask",
+    "classmask",
+    "Spell"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Racemask",
+          "db_column_name": "racemask",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Classmask",
+          "db_column_name": "classmask",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "Spell",
+          "value_type": "uint"
+        },
+        {
+          "name": "Note",
+          "db_column_name": "Note",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

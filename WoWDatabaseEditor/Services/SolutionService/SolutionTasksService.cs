@@ -60,7 +60,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
                     }
                     catch (IMySqlExecutor.QueryFailedDatabaseException e)
                     {
-                        statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Couldn't apply SQL: " + e.InnerException!.Message));
+                        statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Couldn't apply SQL: " + e.Message));
                         throw;
                     }
                     progress.ReportFinished();

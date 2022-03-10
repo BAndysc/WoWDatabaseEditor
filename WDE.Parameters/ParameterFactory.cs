@@ -146,6 +146,18 @@ namespace WDE.Parameters
             });
         }
 
+        public void RegisterCombined(string name, string param1, string param2, string param3,
+            Func<IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>> creator,
+            QuickAccessMode quickAccessMode = QuickAccessMode.None)
+        {
+            OnRegisterLong(param1)
+                .CombineLatest(OnRegisterLong(param2), OnRegisterLong(param3))
+                .Subscribe(pair =>
+                {
+                    Register(name, creator(pair.First, pair.Second, pair.Third), quickAccessMode);
+                });
+        }
+        
         public void RegisterCombined(string name, string param1, string param2, string param3, string param4,
             Func<IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>> creator,
             QuickAccessMode quickAccessMode = QuickAccessMode.None)

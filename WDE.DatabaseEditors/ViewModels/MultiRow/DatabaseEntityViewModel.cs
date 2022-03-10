@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using AvaloniaStyles.Controls.FastTableView;
 using Prism.Mvvm;
 using WDE.DatabaseEditors.Models;
 

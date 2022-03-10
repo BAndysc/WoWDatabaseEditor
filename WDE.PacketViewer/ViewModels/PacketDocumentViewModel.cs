@@ -253,7 +253,7 @@ namespace WDE.PacketViewer.ViewModels
                 FilteringInProgress = false;
                 currentActionToken = null;
 
-            }, _ => Processors.Any(c => c.IsChecked));
+            }, () => Processors.Any(c => c.IsChecked));
             
             foreach (var proc in Processors)
                 AutoDispose(proc.ToObservable(p => p.IsChecked)
@@ -468,7 +468,7 @@ namespace WDE.PacketViewer.ViewModels
                         continue;
                     PossibleActions.Add(new PossibleActionViewModel(selectedPacket.Packet.BaseData, action.chance, "", actionHappened.Value));
                 }
-            }, _ => ReasonPanelVisibility);
+            }, () => ReasonPanelVisibility);
 
             On(() => ReasonPanelVisibility, isVisible =>
             {
@@ -527,7 +527,7 @@ namespace WDE.PacketViewer.ViewModels
 
                 if (jumpToId.HasValue)
                     SelectedPacket = filteredPackets[jumpToId.Value];
-            }, _ => filteredPackets.Count > 0);
+            }, () => filteredPackets.Count > 0);
 
             AutoDispose(this.ToObservable(o => o.FilteredPackets)
                 .SubscribeAction(_ => GoToPacketCommand.RaiseCanExecuteChanged()));

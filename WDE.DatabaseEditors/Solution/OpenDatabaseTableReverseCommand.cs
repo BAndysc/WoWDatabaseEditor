@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Events;
 using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -12,10 +13,12 @@ namespace WDE.DatabaseEditors.Solution
     public class OpenDatabaseTableReverseCommand : IReverseRemoteCommand
     {
         private readonly IEventAggregator eventAggregator;
+        private readonly ITableDefinitionProvider tableDefinitionProvider;
 
-        public OpenDatabaseTableReverseCommand(IEventAggregator eventAggregator)
+        public OpenDatabaseTableReverseCommand(IEventAggregator eventAggregator, ITableDefinitionProvider tableDefinitionProvider)
         {
             this.eventAggregator = eventAggregator;
+            this.tableDefinitionProvider = tableDefinitionProvider;
         }
         
         public Task Invoke(ICommandArguments arguments)
@@ -25,8 +28,12 @@ namespace WDE.DatabaseEditors.Solution
             
             if (!arguments.TryGetUint(out var entry))
                 return Task.CompletedTask;
+
+            var definition = tableDefinitionProvider.GetDefinition(tableName);
+            if (definition == null)
+                return Task.CompletedTask;
             
-            eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(entry, true, tableName));
+            eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(entry, true, tableName, definition.IgnoreEquality));
             return Task.CompletedTask;
         }
 

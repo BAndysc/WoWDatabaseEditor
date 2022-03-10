@@ -29,16 +29,46 @@ namespace WDE.DatabaseEditors.QueryGenerators
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
-        public IQuery GenerateQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        public IQuery GenerateQuery(IReadOnlyList<uint> keys, IReadOnlyList<uint>? deletedKeys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.IsOnlyConditionsTable)
                 return BuildConditions(keys, tableData);
-            if (tableData.TableDefinition.IsMultiRecord)
+            if (tableData.TableDefinition.RecordMode == RecordMode.MultiRecord)
                 return GenerateInsertQuery(keys, tableData);
+            if (tableData.TableDefinition.RecordMode == RecordMode.SingleRow)
+                return GenerateSingleRecordQuery(keys, deletedKeys, tableData);
             return GenerateUpdateQuery(tableData);
         }
 
-        public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, ICollection<uint> keys)
+        public IQuery GenerateSingleRecordQuery(IReadOnlyList<uint> keys, IReadOnlyList<uint>? deletedKeys, IDatabaseTableData tableData)
+        {
+            var query = Queries.BeginTransaction();
+
+            GeneratePrimaryKeyDeletion(tableData.TableDefinition, deletedKeys, query);
+
+            query.Add(GenerateUpdateQuery(tableData));
+            
+            return query.Close();
+        }
+
+        private static void GeneratePrimaryKeyDeletion(DatabaseTableDefinitionJson definition, IReadOnlyList<uint>? keys,
+            IMultiQuery query)
+        {
+            if (keys == null) 
+                return;
+            
+            var table = query.Table(definition.TableName);
+            if (keys.Count == 1)
+            {
+                var key = keys[0];
+                table.Where(r => r.Column<uint>(definition.TablePrimaryKeyColumnName) == key)
+                    .Delete();
+            }
+            else
+                table.WhereIn(definition.TablePrimaryKeyColumnName, keys).Delete();
+        }
+
+        public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, IReadOnlyList<uint> keys)
         {
             if (keys.Count == 1)
                 return GenerateDeleteQuery(table, keys.First());
@@ -115,7 +145,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             }
         }
 
-        private IQuery GenerateInsertQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        private IQuery GenerateInsertQuery(IReadOnlyList<uint> keys, IDatabaseTableData tableData)
         {
             if (keys.Count == 0)
                 return Queries.Empty();
@@ -197,7 +227,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             return query.Close();
         }
 
-        private IQuery BuildConditions(ICollection<uint> keys, IDatabaseTableData tableData)
+        private IQuery BuildConditions(IReadOnlyList<uint> keys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.Condition == null)
                 return Queries.Empty();
@@ -239,7 +269,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             return query.Close();
         }
 
-        private IQuery BuildConditionsDeleteQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        private IQuery BuildConditionsDeleteQuery(IReadOnlyList<uint> keys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.Condition == null)
                 return Queries.Empty();
@@ -340,14 +370,44 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 }
                 else
                 {
+                    foreach (var table in fieldsByTable.Reverse())
+                    {
+                        var where = GenerateConditionsForSingleRow(query.Table(table.Key), tableData.TableDefinition, table.Key, entity);
+                        where.Delete();
+                    }
                     foreach (var table in fieldsByTable)
                     {
-                        var q = query.Table(table.Key);
-                        var where = GenerateConditionsForSingleRow(q, tableData.TableDefinition, table.Key, entity);
-                        where.Delete();
+                        if (table.Key == tableData.TableDefinition.TableName)
+                        {
+                            query.Table(table.Key)
+                                .Insert(table.Value.ToDictionary(t => t.FieldName, t => t.Object));
+                        }
+                        else
+                        {
+                            var isModified = table.Value.Any(f => f.IsModified);
+                            if (isModified)
+                            {
+                                var updates = table.Value
+                                    .Where(f => f.IsModified)
+                                    .ToList();
+                                var primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKeys[0];
+                                query.Table(table.Key)
+                                    .InsertIgnore(
+                                        tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKeys
+                                            .Zip(tableData.TableDefinition.PrimaryKey!)
+                                            .ToDictionary<(string, string), string, object?>(
+                                                key => key.Item1,
+                                                key => entity.GetTypedValueOrThrow<long>(key.Item2))
+                                    );
+                                IUpdateQuery update = query.Table(table.Key)
+                                    .Where(row => row.Column<uint>(primaryKeyColumn) == entity.Key)
+                                    .Set(updates[0].FieldName, updates[0].Object);
+                                for (int i = 1; i < updates.Count; ++i)
+                                    update = update.Set(updates[i].FieldName, updates[i].Object);
 
-                        query.Table(table.Key)
-                            .Insert(table.Value.ToDictionary(t => t.FieldName, t => t.Object));
+                                update.Update();
+                            }
+                        }
                     }
                 }
             }

@@ -1,0 +1,51 @@
+{
+  "id": "spell_threat",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell Threat",
+  "single_solution_name": "Spell Threat Table",
+  "multi_solution_name": "Spell Threat Table",
+  "description": "This table holds threat values on all spells that should either give or take away threat.",
+  "table_name": "spell_threat",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Spells",
+  "icon_path": "Icons/document_.png",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter",
+          "read_only": true,
+          "preferred_width": 415.0
+        },
+        {
+          "name": "Flat Mod",
+          "db_column_name": "flatMod",
+          "value_type": "int",
+          "can_be_null": true
+        },
+        {
+          "name": "Pct Mod",
+          "db_column_name": "pctMod",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Ap Pct Mod",
+          "db_column_name": "apPctMod",
+          "value_type": "float"
+        }
+      ]
+    }
+  ]
+}

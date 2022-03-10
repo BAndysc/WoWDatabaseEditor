@@ -133,7 +133,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             if (!selected.HasValue)
                 return;
 
-            var data = await tableDataProvider.Load(tableDefinition.Id, (uint) selected);
+            var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, (uint) selected);
             if (data == null) 
                 return;
 
@@ -240,16 +240,6 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue!);
 
-        protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
-        {
-            var modified = entity.Fields.Where(f => f.IsModified).ToList();
-            if (modified.Count == 0)
-                return null;
-            
-            return modified.Select(f => new EntityOrigianlField()
-                {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
-        }
-
         public override DatabaseEntity AddRow(uint key)
         {
             throw new NotImplementedException();
@@ -294,7 +284,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         {
             Dictionary<string, IObservable<bool>?> groupVisibility = new();
 
-            var pseudoItem = new DatabaseTableSolutionItem(entity.Key, entity.ExistInDatabase, tableDefinition.Id);
+            var pseudoItem = new DatabaseTableSolutionItem(entity.Key, entity.ExistInDatabase, tableDefinition.Id, tableDefinition.IgnoreEquality);
             var savedItem = sessionService.Find(pseudoItem);
             if (savedItem is DatabaseTableSolutionItem savedTableItem)
                 savedTableItem.UpdateEntitiesWithOriginalValues(new List<DatabaseEntity>(){entity});
@@ -307,7 +297,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 if (column.IsMetaColumn)
                 {
                     var evaluator = new DatabaseExpressionEvaluator(creatureStatCalculatorService, parameterFactory, tableDefinition, column.Expression!);
-                    var parameterValue = new ParameterValue<string>(new ValueHolder<string>(evaluator.Evaluate(entity)!.ToString(), false),
+                    var parameterValue = new ParameterValue<string, DatabaseEntity>(entity, new ValueHolder<string>(evaluator.Evaluate(entity)!.ToString(), false),
                         new ValueHolder<string>("", false), StringParameter.Instance);
                     entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, parameterValue));
@@ -321,15 +311,15 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     IParameterValue parameterValue = null!;
                     if (cell is DatabaseField<long> longParam)
                     {
-                        parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
+                        parameterValue = new ParameterValue<long, DatabaseEntity>(entity, longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
                     }
                     else if (cell is DatabaseField<string> stringParam)
                     {
-                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
+                        parameterValue = new ParameterValue<string, DatabaseEntity>(entity, stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
                     }
                     else if (cell is DatabaseField<float> floatParameter)
                     {
-                        parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
+                        parameterValue = new ParameterValue<float, DatabaseEntity>(entity, floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                     }
 
                     IObservable<bool>? cellVisible = null!;
@@ -369,7 +359,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return true;
         }
 
-        protected override ICollection<uint> GenerateKeys() => Entities.Select(e => e.Key).ToList();
+        protected override IReadOnlyList<uint> GenerateKeys() => Entities.Select(e => e.Key).ToList();
+        protected override IReadOnlyList<uint>? GenerateDeletedKeys() => null;
 
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
@@ -411,13 +402,11 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             }
         }
 
-        private async Task AsyncAddEntities(IList<DatabaseEntity> tableDataEntities)
+        private async Task AsyncAddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
         {
-            List<DatabaseEntity> finalList = new();
             foreach (var entity in tableDataEntities)
             {
-                if (await AddEntity(entity))
-                    finalList.Add(entity);
+                await AddEntity(entity);
             }
 
             ReEvalVisibility();

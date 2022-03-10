@@ -1,0 +1,50 @@
+{
+  "id": "skill_discovery_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Skill Discovery Template",
+  "single_solution_name": "{name} skill_discovery_template",
+  "multi_solution_name": "Skill_discovery_template table",
+  "description": "This table controls the so called \"discovery\" system of learning spells. This system is solely (pytanie) used by the alchemy profession and controls the chance for a player to \"discover\" another recipe while creating items with other recipes.",
+  "table_name": "skill_discovery_template",
+  "table_index_name": "spellId",
+  "record_mode": "MultiRecord",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload skill_discovery_template",
+  "skip_quick_load": true,
+  "picker": "SpellParameter",
+  "primary_key": [
+    "spellId",
+    "reqSpell"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell Id",
+          "db_column_name": "spellId",
+          "value_type": "SpellParameter",
+          "read_only": true
+        },
+        {
+          "name": "Req Spell",
+          "db_column_name": "reqSpell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Req Skill Value",
+          "db_column_name": "reqSkillValue",
+          "value_type": "uint"
+        },
+        {
+          "name": "Chance",
+          "db_column_name": "chance",
+          "value_type": "float"
+        }
+      ]
+    }
+  ]
+}

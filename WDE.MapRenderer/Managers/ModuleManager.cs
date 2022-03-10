@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Prism.Ioc;
+using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 
 namespace WDE.MapRenderer.Managers

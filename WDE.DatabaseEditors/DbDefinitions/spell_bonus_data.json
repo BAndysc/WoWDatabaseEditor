@@ -1,0 +1,60 @@
+{
+  "id": "spell_bonus_data",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell Bonus Data",
+  "single_solution_name": "Spell Bonus Data Table",
+  "multi_solution_name": "Spell Bonus Data Table",
+  "description": "Table used for storing custom damage/healing bonus coefficients.",
+  "table_name": "spell_bonus_data",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload spell_bonus_data",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "SpellParameter",
+          "read_only": true,
+          "preferred_width": 205.0
+        },
+        {
+          "name": "Direct Bonus",
+          "db_column_name": "direct_bonus",
+          "value_type": "float"
+        },
+        {
+          "name": "Dot Bonus",
+          "db_column_name": "dot_bonus",
+          "value_type": "float"
+        },
+        {
+          "name": "Ap Bonus",
+          "db_column_name": "ap_bonus",
+          "value_type": "float"
+        },
+        {
+          "name": "Ap Dot Bonus",
+          "db_column_name": "ap_dot_bonus",
+          "value_type": "float"
+        },
+        {
+          "name": "Comments",
+          "db_column_name": "comments",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 230.0
+        }
+      ]
+    }
+  ]
+}

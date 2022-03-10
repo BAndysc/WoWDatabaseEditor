@@ -1,9 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace WDE.DatabaseEditors.Data.Structs
 {
+    public enum RecordMode
+    {
+        Template,
+        MultiRecord,
+        SingleRow
+    }
+    
     [ExcludeFromCodeCoverage]
     public class DatabaseTableDefinitionJson
     {
@@ -31,11 +39,15 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "table_index_name")]
         public string TablePrimaryKeyColumnName { get; set; } = "";
         
-        [JsonProperty(PropertyName = "multi_record")]
-        public bool IsMultiRecord { get; set; }
+        [JsonProperty(PropertyName = "record_mode")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public RecordMode RecordMode { get; set; }
         
         [JsonProperty(PropertyName = "only_conditions")]
         public bool IsOnlyConditionsTable { get; set; }
+        
+        [JsonProperty(PropertyName = "skip_quick_load")]
+        public bool SkipQuickLoad { get; set; }
         
         [JsonProperty(PropertyName = "group_name")] 
         public string? GroupName { get; set; }
@@ -78,6 +90,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonIgnore] 
         public IDictionary<string, DatabaseForeignTableJson> ForeignTableByName { get; set; } = null!;
+
+        // single row table type ignores solution item entries quality, because there is no keys
+        [JsonIgnore] public bool IgnoreEquality => RecordMode == RecordMode.SingleRow;
     }
 
     public class DatabaseCommandDefinitionJson

@@ -75,7 +75,7 @@ public class GuestBookFormContentItem : ObservableBase, IContentItem
             {
                 Enabled = true;
             }
-        }, _ => !string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Username));
+        }, () => !string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Username));
 
         On(() => Username, _ => PublishCommand.RaiseCanExecuteChanged());
         On(() => Text, _ => PublishCommand.RaiseCanExecuteChanged());

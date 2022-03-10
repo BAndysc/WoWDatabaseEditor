@@ -9,7 +9,7 @@
   "description": "Gossip menu options are possible choices when a player talk to the npc",
   "table_name": "gossip_menu_option",
   "table_index_name": "MenuID",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "icon_path": "Icons/gossip.png",
   "reload_command": "reload gossip_menu_option",
   "picker": "GossipMenuParameter",

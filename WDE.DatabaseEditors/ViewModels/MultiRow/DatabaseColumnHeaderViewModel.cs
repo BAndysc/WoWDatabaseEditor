@@ -1,10 +1,13 @@
+using AvaloniaStyles.Controls.FastTableView;
 using Prism.Mvvm;
+using PropertyChanged.SourceGenerator;
 using WDE.DatabaseEditors.Data.Structs;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class DatabaseColumnHeaderViewModel : BindableBase
+    public partial class DatabaseColumnHeaderViewModel : BindableBase, ITableColumnHeader
     {
+        [Notify] private bool isVisible = true;
         public string Name { get; }
         public string? Help { get; }
         public string DatabaseName { get; }
@@ -16,6 +19,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             DatabaseName = column.DbColumnName;
             Help = column.Help;
             PreferredWidth = column.PreferredWidth;
+            width = PreferredWidth ?? 100;
         }
 
         public DatabaseColumnHeaderViewModel(string name, string databaseName)
@@ -23,5 +27,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             Name = name;
             DatabaseName = databaseName;
         }
+
+        public string Header => Name;
+        [Notify] private double width;
     }
 }

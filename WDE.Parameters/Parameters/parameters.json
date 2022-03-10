@@ -1136,13 +1136,13 @@
 		"name": "Spell school type",
 		"prefix": "SPELL_SCHOOL_",
 		"values": {
-			"0": {"name": "NORMAL"},
-			"1": {"name": "HOLY"},
-			"2": {"name": "FIRE"},
-			"3": {"name": "NATURE"},
-			"4": {"name": "FROST"},
-			"5": {"name": "SHADOW"},
-			"6": {"name": "ARCANE"}
+			"0": {"name": "normal"},
+			"1": {"name": "holy"},
+			"2": {"name": "fire"},
+			"3": {"name": "nature"},
+			"4": {"name": "frost"},
+			"5": {"name": "shadow"},
+			"6": {"name": "arcane"}
 		}
 	},
 	"SpellSchoolMaskParameter": {
@@ -2257,7 +2257,20 @@
 		"4": {"name": "epic dung/10 heroic raid"},	
 		"8": {"name": "25 heroic raid"}	
 	  }	
-	},	
+	},
+	"SpawnMaskParameter": {
+		"name": "Spawn Mask",
+		"isflag": true,
+		"values": {
+			"15": {"name": "any raid"},
+			"12": {"name": "heroic raid"},
+			"8": {"name": "25 man heroic raid"},
+			"4": {"name": "10 man heroic raid"},
+			"3": {"name": "normal raid / any dungeon"},
+			"2": {"name": "heroic dungeon / 25 man raid normal"},
+			"1": {"name": "normal dungeon / 10 man raid normal / continent"}
+		}
+	},
 	"ConditionsComparisonTypeParameter": {	
 		"name": "Conditions comparison type",	
 		"values": {	
@@ -2728,13 +2741,180 @@
 		}
 	},
 	"MapTypeParameter": {
-		"name": "Map type parameter",
+		"name": "Map type",
 		"values": {
 			"0": {"name": "Continent"},
 			"1": {"name": "Dungeon"},
 			"2": {"name": "Raid"},
 			"3": {"name": "Battleground"},
 			"4": {"name": "Arena"}
+		}
+	},
+	"DatabaseMovementTypeParameter": {
+		"name": "Database movement type",
+		"values": {
+			"0": {"name": "idle"},
+			"1": {"name": "random"},
+			"2": {"name": "path"}
+		}
+	},
+	"AuraStateTypeParameter": {
+		"name": "Aura state type",
+		"values": {
+			"1": {"name": "Defense"},
+			"2": {"name": "Healthless 20 percent"},
+			"3": {"name": "Berserking"},
+			"4": {"name": "Frozen"},
+			"5": {"name": "Judgement"},
+			"6": {"name": "Unknown 6"},
+			"7": {"name": "Hunter parry"},
+			"7": {"name": "Unknown 7"},
+			"8": {"name": "Unknown 8"},
+			"9": {"name": "Unknown 9"},
+			"10": {"name": "Warrior victory rush"},
+			"11": {"name": "Unknown 11"},
+			"12": {"name": "Faerie fire"},
+			"13": {"name": "Healthless 35 percent"},
+			"14": {"name": "Conflagrate"},
+			"15": {"name": "Swiftmend"},
+			"16": {"name": "Deadly poison"},
+			"17": {"name": "Enrage"},
+			"18": {"name": "Bleeding"},
+			"19": {"name": "Unknown 19"},
+			"20": {"name": "Unknown 20"},
+			"21": {"name": "Unknown 21"},
+			"22": {"name": "Unknown 22"},
+			"23": {"name": "Health above 75 percent"}
+		}
+	},
+	"SpellCustomAttributeParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "Enchant proc"},
+			"2": {"name": "Cone back"},
+			"4": {"name": "Cone line"},
+			"8": {"name": "Share damage"},
+			"16": {"name": "No initial threat"},
+			"32": {"name": "Aura CC"},
+			"64": {"name": "Dont break stealth"},
+			"128": {"name": "Can crit"},
+			"256": {"name": "Direct damage"},
+			"512": {"name": "Charge"},
+			"1024": {"name": "Pickpocket"},
+			"2048": {"name": "Rolling periodic"},
+			"4096": {"name": "Negative eff0"},
+			"8192": {"name": "Negative eff1"},
+			"16384": {"name": "Negative eff2"},
+			"32768": {"name": "Ignore armor"},
+			"65536": {"name": "Req target facing_caster"},
+			"131072": {"name": "Req caster behind_target"},
+			"262144": {"name": "Allow inflight target"},
+			"524288": {"name": "Needs ammo data"},
+			"1048576": {"name": "Binary spell"},
+			"2097152": {"name": "Schoolmask normal with magic"},
+			"4194304": {"name": "Liquid aura"}
+		}
+	},
+	"TrainerTypeParameter": {
+		"values": {
+			"0": {"name": "class trainer"},
+			"1": {"name": "mount trainer"},
+			"2": {"name": "tradeskill trainer"},
+			"3": {"name": "pet trainer"}
+		}
+	},
+	"SpellSpecificParameter": {
+		"values": {
+			"0": {"name": "Normal"},
+			"1": {"name": "Seal"},
+			"3": {"name": "Aura"},
+			"4": {"name": "Sting"},
+			"5": {"name": "Curse"},
+			"6": {"name": "Aspect"},
+			"7": {"name": "Tracker"},
+			"8": {"name": "Warlock armor"},
+			"9": {"name": "Mage armor"},
+			"10": {"name": "Elemental shield"},
+			"11": {"name": "Mage polymorph"},
+			"13": {"name": "Judgement"},
+			"17": {"name": "Warlock corruption"},
+			"19": {"name": "Food"},
+			"20": {"name": "Drink"},
+			"21": {"name": "Food and drink"},
+			"22": {"name": "Presence"},
+			"23": {"name": "Charm"},
+			"24": {"name": "Scroll"},
+			"25": {"name": "Mage arcane brillance"},
+			"26": {"name": "Warrior enrage"},
+			"27": {"name": "Priest divine spirit"},
+			"28": {"name": "Hand"}			
+		}
+	},
+	"SpellFamilyNameParameter": {
+		"values": {
+			"0": {"name": "Generic"},
+			"1": {"name": "Unk1"},
+			"3": {"name": "Mage"},
+			"4": {"name": "Warrior"},
+			"5": {"name": "Warlock"},
+			"6": {"name": "Priest"},
+			"7": {"name": "Druid"},
+			"8": {"name": "Rogue"},
+			"9": {"name": "Hunter"},
+			"10": {"name": "Paladin"},
+			"11": {"name": "Shaman"},
+			"12": {"name": "Unk2"},
+			"13": {"name": "Potion"},
+			"15": {"name": "Death Knight"},
+			"17": {"name": "Pet"},
+			"53": {"name": "Monk"},
+			"107": {"name": "Demon hunter"}
+		}
+	},
+	"InventoryTypeParameter": {
+		"values": {
+			"0": {"name": "Non equip"},
+			"1": {"name": "Head"},
+			"2": {"name": "Neck"},
+			"3": {"name": "Shoulders"},
+			"4": {"name": "Body"},
+			"5": {"name": "Chest"},
+			"6": {"name": "Waist"},
+			"7": {"name": "Legs"},
+			"8": {"name": "Feet"},
+			"9": {"name": "Wrists"},
+			"10": {"name": "Hands"},
+			"11": {"name": "Finger"},
+			"12": {"name": "Trinket"},
+			"13": {"name": "Weapon"},
+			"14": {"name": "Shield"},
+			"15": {"name": "Ranged"},
+			"16": {"name": "Cloak"},
+			"17": {"name": "Two-hand weapon"},
+			"18": {"name": "Bag"},
+			"19": {"name": "Tabard"},
+			"20": {"name": "Robe"},
+			"21": {"name": "Weapon main hand"},
+			"22": {"name": "Weapon off-hand"},
+			"23": {"name": "Holdable"},
+			"24": {"name": "Ammo"},
+			"25": {"name": "Thrown"},
+			"26": {"name": "Ranged right"},
+			"27": {"name": "Quiver"},
+			"28": {"name": "Relic"}			
+		}
+	},
+	"QuestGreetingTypeParameter": {
+		"values": {
+			"0": {"name": "Creature"},
+			"1": {"name": "GameObject"}
+		}
+	},
+	"PoolMemberTypeParameter": {
+		"values": {
+			"0": {"name": "Creature"},
+			"1": {"name": "GameObject"},
+			"2": {"name": "Pool"}
 		}
 	}
 }

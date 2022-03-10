@@ -11,7 +11,7 @@
   "multi_solution_name": "spell_area in many areas",
   "reload_command": "reload spell_area",
   "icon_path": "Icons/document_spell_area.png",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "picker": "ZoneAreaParameter",
   "group_name": "Common scripting tables",
   "primary_key": ["spell", "area", "quest_start", "aura_spell", "racemask", "gender"],

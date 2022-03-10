@@ -48,10 +48,10 @@ namespace WDE.Solutions.Sessions
             
             NewSessionCommand = new AsyncAutoCommand(NewSession);
             
-            var save = new AsyncAutoCommand(SaveCurrent, _ => sessionService.IsNonEmpty);
+            var save = new AsyncAutoCommand(SaveCurrent, () => sessionService.IsNonEmpty);
             SaveCurrentCurrent = save;
 
-            var forget = new AsyncAutoCommand(ForgetCurrent, _ => sessionService.IsOpened);
+            var forget = new AsyncAutoCommand(ForgetCurrent, () => sessionService.IsOpened);
             ForgetCurrentCurrent = forget;
 
             DeleteItem = new DelegateCommand<ISolutionItem>(sessionService.RemoveItem, _ => sessionService.IsOpened).ObservesProperty(() => this.SessionService.IsOpened);

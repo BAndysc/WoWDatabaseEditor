@@ -1,0 +1,83 @@
+{
+  "id": "reputation_reward_rate",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Reputation Reward Rate",
+  "single_solution_name": "Reputation Reward Rate Table",
+  "multi_solution_name": "Reputation Reward Rate Table",
+  "description": "Holds reputation multipliers for specific factions.",
+  "table_name": "reputation_reward_rate",
+  "table_index_name": "faction",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload reputation_reward_rate",
+  "picker": "RawFactionParameter",
+  "primary_key": [
+    "faction"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Faction",
+          "db_column_name": "faction",
+          "value_type": "RawFactionParameter",
+          "read_only": true,
+          "preferred_width": 280.0
+        },
+        {
+          "name": "Quest Rate",
+          "db_column_name": "quest_rate",
+          "value_type": "float",
+          "default": 1.0,
+          "preferred_width": 110.0
+        },
+        {
+          "name": "Quest Daily Rate",
+          "db_column_name": "quest_daily_rate",
+          "value_type": "float",
+          "default": 1.0,
+          "preferred_width": 120.0
+        },
+        {
+          "name": "Quest Weekly Rate",
+          "db_column_name": "quest_weekly_rate",
+          "value_type": "float",
+          "default": 1.0,
+          "preferred_width": 130.0
+        },
+        {
+          "name": "Quest Monthly Rate",
+          "db_column_name": "quest_monthly_rate",
+          "value_type": "float",
+          "default": 1.0,
+          "preferred_width": 75.0
+        },
+        {
+          "name": "Quest Repeatable Rate",
+          "db_column_name": "quest_repeatable_rate",
+          "value_type": "float",
+          "default": 1.0,
+          "preferred_width": 75.0
+        },
+        {
+          "name": "Creature Rate",
+          "db_column_name": "creature_rate",
+          "value_type": "float",
+          "default": 1.0,
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Spell Rate",
+          "db_column_name": "spell_rate",
+          "value_type": "float",
+          "default": 1.0
+        }
+      ]
+    }
+  ]
+}

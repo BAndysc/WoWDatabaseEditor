@@ -15,7 +15,7 @@ namespace WDE.MVVM.Observable
         {
             return new SelectObservable<T, R>(observable, converter);
         }
-        
+
         public static IObservable<bool> Not(this IObservable<bool> observable)
         {
             return observable.Select(t => !t);
@@ -103,12 +103,6 @@ namespace WDE.MVVM.Observable
         public static IObservable<CollectionEvent<T>> ToStream<T>(this INotifyCollectionChanged collection, IEnumerable<T> initial)
         {
             return new ObservableCollectionStream<T>(initial, collection, false, true);
-        }
-
-        public static void RemoveAll<T>(this ObservableCollection<T> collection)
-        {
-            for (int i = collection.Count - 1; i >= 0; --i)
-                collection.RemoveAt(i);
         }
     }
 }

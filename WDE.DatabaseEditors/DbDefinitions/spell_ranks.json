@@ -1,0 +1,44 @@
+{
+  "id": "spell_ranks",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell Ranks",
+  "single_solution_name": "{name} spell_ranks",
+  "multi_solution_name": "Spell_ranks table",
+  "description": "Table used by the core to group different ranks of spells (the gray text seen on ranked spells) into one \"spell stem\".",
+  "table_name": "spell_ranks",
+  "table_index_name": "first_spell_id",
+  "record_mode": "MultiRecord",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_.png",
+  "skip_quick_load": true,
+  "picker": "SpellParameter",
+  "primary_key": [
+    "first_spell_id",
+    "rank"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "First Spell Id",
+          "db_column_name": "first_spell_id",
+          "value_type": "SpellParameter",
+          "read_only": true
+        },
+        {
+          "name": "Spell Id",
+          "db_column_name": "spell_id",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Rank",
+          "db_column_name": "rank",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

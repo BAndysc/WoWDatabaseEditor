@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:singleRow="clr-namespace:WDE.DatabaseEditors.ViewModels.SingleRow;assembly=WDE.DatabaseEditors"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="singleRow:MySqlFilterViewModel"
+             x:Class="WDE.DatabaseEditors.Avalonia.Views.SingleRow.MySqlFilterControl">
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyFilter}" />
+    </UserControl.KeyBindings>
+    <DockPanel Margin="4">
+        <ComboBox Margin="0,0,4,0" SelectedItem="{CompiledBinding SelectedColumn}" Items="{CompiledBinding Columns}" />
+        <ComboBox Margin="0,0,4,0" IsVisible="{CompiledBinding ShowOperatorChoice}" SelectedItem="{CompiledBinding SelectedOperator}" Items="{CompiledBinding Operators}" />
+        <TextBox Text="{CompiledBinding FilterText}" />
+    </DockPanel>
+</UserControl>

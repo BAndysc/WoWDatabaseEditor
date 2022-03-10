@@ -1,0 +1,113 @@
+{
+	"SpellProcFlagParameter": {
+		"isflag": true,
+		"values": {
+			"204": {"name": "Auto attack proc flag mask"},
+			"12582972": {"name": "Melee proc flag mask"},
+			"960": {"name": "Ranged proc flag mask"},
+			"3145712": {"name": "Spell proc flag mask"},
+			"15029588": {"name": "Done hit proc flag mask"},
+			"1747624": {"name": "Taken hit proc flag mask"},
+			"1": {"name": "Heartbeat", "description": "Heartbeat"},
+			"2": {"name": "Kill", "description": "Kill target (in most cases need XP/Honor reward)"},
+			"4": {"name": "Deal melee swing", "description": "Done melee auto attack"},
+			"8": {"name": "Take melee swing", "description": "Taken melee auto attack"},
+			"16": {"name": "Deal melee ability", "description": "Done attack by Spell that has dmg class melee"},
+			"32": {"name": "Take melee ability", "description": "Taken attack by Spell that has dmg class melee"},
+			"64": {"name": "Deal ranged attack", "description": "Done ranged auto attack"},
+			"128": {"name": "Take ranged attack", "description": "Taken ranged auto attack"},
+			"256": {"name": "Deal ranged ability", "description": "Done attack by Spell that has dmg class ranged"},
+			"512": {"name": "Take ranged ability", "description": "Taken attack by Spell that has dmg class ranged"},
+			"1024": {"name": "Deal helpful ability", "description": "Done positive spell that has dmg class none"},
+			"2048": {"name": "Take helpful ability", "description": "Taken positive spell that has dmg class none"},
+			"4096": {"name": "Deal harmful ability", "description": "Done negative spell that has dmg class none"},
+			"8192": {"name": "Take harmful ability", "description": "Taken negative spell that has dmg class none"},
+			"16384": {"name": "Deal helpful spell", "description": "Done positive spell that has dmg class magic"},
+			"32768": {"name": "Take helpful spell", "description": "Taken positive spell that has dmg class magic"},
+			"65536": {"name": "Deal harmful spell", "description": "Done negative spell that has dmg class magic"},
+			"131072": {"name": "Take harmful spell", "description": "Taken negative spell that has dmg class magic"},
+			"262144": {"name": "Deal harmful periodic", "description": "Successful do periodic (damage / healing)"},
+			"524288": {"name": "Take harmful periodic", "description": "Taken spell periodic (damage / healing)"},
+			"1048576": {"name": "Take any damage", "description": "Taken any damage"},
+			"2097152": {"name": "Deal helpful periodic", "description": "On trap activation (possibly needs name change to ON_GAMEOBJECT_CAST or USE)"},
+			"4194304": {"name": "Main hand weapon swing", "description": "Done main-hand melee attacks (spell and autoattack)"},
+			"8388608": {"name": "Off hand weapon swing", "description": "Done off-hand melee attacks (spell and autoattack)"},
+			"16777216": {"name": "Death", "description": "Died in any way"}
+		}
+	},
+	"ProcSpellTypeMaskParameter": {
+		"isflag": true,
+		"values": {
+			"7": {"name": "all"},
+			"1": {"name": "damage", "description": "only damaging spells"},
+			"2": {"name": "heal", "description": "only healing spells"},
+			"4": {"name": "other", "description": "only other spells"}
+		}
+	},
+	"ProcSpellPhaseMaskParameter": {
+		"isflag": true,
+		"values": {
+			"7": {"name": "any"},
+			"1": {"name": "cast", "description": "trigger when spell has just finished casting"},
+			"2": {"name": "hit", "description": "trigger when the spell hits its target"},
+			"4": {"name": "finish", "description": "trigger after spell has done all its effects on all targets"}
+		}
+	},
+	"ProcFlagsHitParameter": {
+		"isflag": true,
+		"values": {
+			"16383": {"name": "All"},
+			"0": {"name": "None"},
+			"1": {"name": "Normal"},
+			"2": {"name": "Critical"},
+			"4": {"name": "Miss"},
+			"8": {"name": "Full resist"},
+			"16": {"name": "Dodge"},
+			"32": {"name": "Parry"},
+			"64": {"name": "Block"},
+			"128": {"name": "Evade"},
+			"256": {"name": "Immune"},
+			"512": {"name": "Deflect"},
+			"1024": {"name": "Absorb"},
+			"2048": {"name": "Reflect"},
+			"4096": {"name": "Interrupt"},
+			"8192": {"name": "Full block"}
+		}
+	},
+	"EnchantProcAttributesParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "while hit", "description": "enchant shall only proc off white hits (not abilities)"},
+			"2": {"name": "limit 60", "description": "enchant effects shall be reduced past lvl 60"}
+		}
+	},
+	"ProcAttributesParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "req exp or honor", "description": "requires proc target to give exp or honor for aura proc"},
+			"2": {"name": "triggered can proc", "description": "aura can proc even with triggered spells"},
+			"4": {"name": "req mana cost", "description": "requires triggering spell to have a mana cost for aura proc"},
+			"8": {"name": "req spellmod", "description": "requires triggering spell to be affected by proccing aura to drop charges"},
+			"128": {"name": "reduce proc 60", "description": "aura should have a reduced chance to proc if level of proc Actor > 60"},
+			"256": {"name": "can't proc from item cast", "description": "do not allow aura proc if proc is caused by a spell casted by item"}
+		}
+	},
+	"DisableProcEffectMaskParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "effect 0"},
+			"2": {"name": "effect 1"},
+			"4": {"name": "effect 2"}
+		}
+	},
+	"SpellGroupStackRuleParameter": {
+		"values": {
+			"0": {"name": "default"},
+			"1": {"name": "exclusive", "description": "auras from group can't stack with each other"},
+			"2": {"name": "exclusive from same caster", "description": "auras from group can't stack with each other when cast by same caster"},
+			"3": {"name": "exclusive same effect", "description": "same effects of spells will not stack, yet auras will remain on a target"},
+			"4": {"name": "highest", "description": "only highest effect will remain on target"}
+		}
+	}
+	
+}

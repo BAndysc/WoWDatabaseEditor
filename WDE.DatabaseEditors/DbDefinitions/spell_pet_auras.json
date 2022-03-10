@@ -1,0 +1,51 @@
+{
+  "id": "spell_pet_auras",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell Pet Auras",
+  "single_solution_name": "{name} spell_pet_auras editor",
+  "multi_solution_name": "Spell_pet_auras table",
+  "description": "",
+  "table_name": "spell_pet_auras",
+  "table_index_name": "spell",
+  "record_mode": "MultiRecord",
+  "group_name": "Spells",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload spell_pet_auras",
+  "skip_quick_load": true,
+  "picker": "SpellParameter",
+  "primary_key": [
+    "spell",
+    "effectId",
+    "pet"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "spell",
+          "value_type": "SpellParameter",
+          "read_only": true
+        },
+        {
+          "name": "Effect Id",
+          "db_column_name": "effectId",
+          "value_type": "SpellEffectIndexParameter"
+        },
+        {
+          "name": "Pet",
+          "db_column_name": "pet",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Aura",
+          "db_column_name": "aura",
+          "value_type": "SpellParameter"
+        }
+      ]
+    }
+  ]
+}

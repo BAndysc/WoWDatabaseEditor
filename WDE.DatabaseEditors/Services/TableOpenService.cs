@@ -4,6 +4,7 @@ using WDE.Common;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services.MessageBox;
+using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Solution;
@@ -18,22 +19,28 @@ public class TableOpenService : ITableOpenService
     private readonly IParameterFactory parameterFactory;
     private readonly IItemFromListProvider itemFromListProvider;
     private readonly IDatabaseTableDataProvider tableDataProvider;
+    private readonly ITableDefinitionProvider definitionProvider;
     private readonly IMessageBoxService messageBoxService;
 
     public TableOpenService(
         IParameterFactory parameterFactory,
         IItemFromListProvider itemFromListProvider,
         IDatabaseTableDataProvider tableDataProvider,
+        ITableDefinitionProvider definitionProvider,
         IMessageBoxService messageBoxService)
     {
         this.parameterFactory = parameterFactory;
         this.itemFromListProvider = itemFromListProvider;
         this.tableDataProvider = tableDataProvider;
+        this.definitionProvider = definitionProvider;
         this.messageBoxService = messageBoxService;
     }
     
     public async Task<ISolutionItem?> TryCreate(DatabaseTableDefinitionJson definition)
     {
+        if (definition.RecordMode == RecordMode.SingleRow)
+            return await Create(definition, 0);
+        
         var parameter = parameterFactory.Factory(definition.Picker);
         var key = await itemFromListProvider.GetItemFromList(parameter.HasItems ? parameter.Items! : new Dictionary<long, SelectOption>(), false);
         if (key.HasValue)
@@ -45,15 +52,16 @@ public class TableOpenService : ITableOpenService
     
     public async Task<ISolutionItem?> Create(DatabaseTableDefinitionJson definition, uint key)
     {
-        var data = await tableDataProvider.Load(definition.Id, key);
-                
-        if (data == null)
-            return null;
-                
-        if (data.TableDefinition.IsMultiRecord)
-            return new DatabaseTableSolutionItem(key, false, definition.Id);
+        if (definition.RecordMode == RecordMode.MultiRecord)
+            return new DatabaseTableSolutionItem(key, false, definition.Id, definition.IgnoreEquality);
+        if (definition.RecordMode == RecordMode.SingleRow)
+            return new DatabaseTableSolutionItem(key, false, definition.Id, definition.IgnoreEquality);
         else
         {
+            var data = await tableDataProvider.Load(definition.Id, null, null,null, key);
+                
+            if (data == null)
+                return null;
             if (data.Entities.Count == 0)
                 return null; 
                     
@@ -68,7 +76,7 @@ public class TableOpenService : ITableOpenService
                         .WithNoButton(false).Build()))
                     return null;
             }
-            return new DatabaseTableSolutionItem(data.Entities[0].Key, data.Entities[0].ExistInDatabase, definition.Id);
+            return new DatabaseTableSolutionItem(data.Entities[0].Key, data.Entities[0].ExistInDatabase, definition.Id, definition.IgnoreEquality);
         }
     }
 

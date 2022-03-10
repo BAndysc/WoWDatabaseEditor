@@ -1,0 +1,62 @@
+{
+  "id": "player_factionchange_items",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player Factionchange Items",
+  "single_solution_name": "{name} player_factionchange_items editor",
+  "multi_solution_name": "multiple player_factionchange_items editor",
+  "description": "Here insert short description what is player_factionchange_items for",
+  "table_name": "player_factionchange_items",
+  "table_index_name": "alliance_id",
+  "record_mode": "MultiRecord",
+  "group_name": "Faction changing",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload player_factionchange_items",
+  "picker": "Parameter",
+  "skip_quick_load": true,
+  "primary_key": [
+    "alliance_id",
+    "horde_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race A",
+          "db_column_name": "race_A",
+          "value_type": "uint"
+        },
+        {
+          "name": "Alliance Id",
+          "db_column_name": "alliance_id",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Comment A",
+          "db_column_name": "commentA",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Race H",
+          "db_column_name": "race_H",
+          "value_type": "uint"
+        },
+        {
+          "name": "Horde Id",
+          "db_column_name": "horde_id",
+          "value_type": "uint"
+        },
+        {
+          "name": "Comment H",
+          "db_column_name": "commentH",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

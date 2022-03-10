@@ -1,0 +1,90 @@
+{
+  "id": "pet_levelstats",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Pet Levelstats",
+  "single_solution_name": "{name} pet_levelstats editor",
+  "multi_solution_name": "multiple pet_levelstats editor",
+  "description": "Here insert short description what is pet_levelstats for",
+  "table_name": "pet_levelstats",
+  "table_index_name": "creature_entry",
+  "record_mode": "MultiRecord",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload pet_levelstats",
+  "picker": "Parameter",
+  "skip_quick_load": true,
+  "primary_key": [
+    "creature_entry",
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature Entry",
+          "db_column_name": "creature_entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "Hp",
+          "db_column_name": "hp",
+          "value_type": "uint"
+        },
+        {
+          "name": "Mana",
+          "db_column_name": "mana",
+          "value_type": "uint"
+        },
+        {
+          "name": "Armor",
+          "db_column_name": "armor",
+          "value_type": "uint"
+        },
+        {
+          "name": "Str",
+          "db_column_name": "str",
+          "value_type": "uint"
+        },
+        {
+          "name": "Agi",
+          "db_column_name": "agi",
+          "value_type": "uint"
+        },
+        {
+          "name": "Sta",
+          "db_column_name": "sta",
+          "value_type": "uint"
+        },
+        {
+          "name": "Inte",
+          "db_column_name": "inte",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spi",
+          "db_column_name": "spi",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min Dmg",
+          "db_column_name": "min_dmg",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max Dmg",
+          "db_column_name": "max_dmg",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

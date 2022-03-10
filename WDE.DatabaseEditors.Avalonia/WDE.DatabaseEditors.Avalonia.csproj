@@ -14,6 +14,16 @@
         <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Views\SingleRow\SingleRowDbTableEditorToolBar.axaml.cs">
+        <DependentUpon>SingleRowDbTableEditorToolBar.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\SingleRow\SingleRowDbTableEditorView.axaml.cs">
+        <DependentUpon>SingleRowDbTableEditorView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
     <Import Project="..\Avalonia.props" />
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>

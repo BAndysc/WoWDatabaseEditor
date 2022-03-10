@@ -1,0 +1,50 @@
+{
+  "id": "page_text",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Page Text",
+  "single_solution_name": "Page Text Table",
+  "multi_solution_name": "Page Text Table",
+  "description": "Here insert short description what is page_text for",
+  "table_name": "page_text",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload page_text",
+  "picker": "",
+  "skip_quick_load": true,
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Text",
+          "db_column_name": "Text",
+          "value_type": "string"
+        },
+        {
+          "name": "Next Page ID",
+          "db_column_name": "NextPageID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

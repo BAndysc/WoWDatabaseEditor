@@ -6,9 +6,9 @@ namespace WDE.DatabaseEditors.Models
     public class DatabaseTableData : IDatabaseTableData
     {
         public DatabaseTableDefinitionJson TableDefinition { get; }
-        public IList<DatabaseEntity> Entities { get; }
+        public IReadOnlyList<DatabaseEntity> Entities { get; }
 
-        public DatabaseTableData(DatabaseTableDefinitionJson definitionJson, IList<DatabaseEntity> entities)
+        public DatabaseTableData(DatabaseTableDefinitionJson definitionJson, IReadOnlyList<DatabaseEntity> entities)
         {
             TableDefinition = definitionJson;
             Entities = entities;

@@ -74,13 +74,13 @@ namespace WDE.DatabaseEditors.Services
                     {
                         if (key is not long lkey)
                             continue;
-                        var old = await loader.Load(defi.Id, (uint)lkey);
+                        var old = await loader.Load(defi.Id, null,null,null, (uint)lkey);
                         if (old == null || old.Entities.Count != 1 || !old.Entities[0].ExistInDatabase)
                         {
                             errors.Add($"{defi.TableName} where {defi.TablePrimaryKeyColumnName} = {lkey} not found, no update");
                             continue;
                         }
-                        var item = new DatabaseTableSolutionItem(defi.Id);
+                        var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
                         item.Entries.Add(new SolutionItemDatabaseEntity((uint)lkey, true));
                         var savedItem = sessionService.Find(item);
                         if (savedItem != null)
@@ -134,7 +134,7 @@ namespace WDE.DatabaseEditors.Services
                     {
                         if (line[indexOf] is not long lkey)
                             continue;
-                        var item = new DatabaseTableSolutionItem(defi.Id);
+                        var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
                         item.Entries.Add(new SolutionItemDatabaseEntity((uint)lkey, false));
                         found.Add(item);
                     }

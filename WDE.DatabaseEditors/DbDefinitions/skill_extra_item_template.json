@@ -1,0 +1,53 @@
+{
+  "id": "skill_extra_item_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Skill Extra Item Template",
+  "single_solution_name": "Skill Extra Item Template Table",
+  "multi_solution_name": "Skill Extra Item Template Table",
+  "description": "This table holds information about when using certain profession spells, you have the chance of creating more than one copy of the item.",
+  "table_name": "skill_extra_item_template",
+  "table_index_name": "spellId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload skill_extra_item_template",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "spellId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell Id",
+          "db_column_name": "spellId",
+          "value_type": "SpellParameter",
+          "read_only": true,
+          "preferred_width": 300.0
+        },
+        {
+          "name": "Required Specialization",
+          "db_column_name": "requiredSpecialization",
+          "value_type": "SpellParameter",
+          "preferred_width": 225.0
+        },
+        {
+          "name": "Additional Create Chance",
+          "db_column_name": "additionalCreateChance",
+          "value_type": "float",
+          "preferred_width": 195.0
+        },
+        {
+          "name": "Additional Max Num",
+          "db_column_name": "additionalMaxNum",
+          "value_type": "uint",
+          "preferred_width": 165.0
+        }
+      ]
+    }
+  ]
+}

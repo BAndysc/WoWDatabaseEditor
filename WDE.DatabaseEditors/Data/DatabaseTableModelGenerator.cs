@@ -156,7 +156,7 @@ namespace WDE.DatabaseEditors.Data
                     rows.Add(new DatabaseEntity(true, key.Value, columns, conditions?.ToList<ICondition>()));
             }
 
-            if (!tableDefinition.IsMultiRecord)
+            if (tableDefinition.RecordMode == RecordMode.Template)
             {
                 foreach (var key in keys)
                 {

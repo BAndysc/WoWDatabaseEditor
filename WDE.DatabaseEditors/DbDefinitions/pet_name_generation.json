@@ -1,0 +1,49 @@
+{
+  "id": "pet_name_generation",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Pet Name Generation",
+  "single_solution_name": "Pet Name Generation Table",
+  "multi_solution_name": "Pet Name Generation Table",
+  "description": "Here insert short description what is pet_name_generation for",
+  "table_name": "pet_name_generation",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload pet_name_generation",
+  "picker": "",
+  "skip_quick_load": true,
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Word",
+          "db_column_name": "word",
+          "value_type": "string"
+        },
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Half",
+          "db_column_name": "half",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

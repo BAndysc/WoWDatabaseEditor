@@ -1,0 +1,61 @@
+{
+  "id": "quest_greeting",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Quest Greeting",
+  "single_solution_name": "{name} quest_greeting",
+  "multi_solution_name": "Multiple quest_greeting",
+  "description": "This table add greeting behavior to an NPC or an Gameobject.",
+  "table_name": "quest_greeting",
+  "table_index_name": "ID",
+  "record_mode": "MultiRecord",
+  "group_name": "Quests",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload quest_greeting",
+  "picker": "CreatureGameobjectParameter",
+  "skip_quick_load": true,
+  "primary_key": [
+    "ID",
+    "Type"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "CreatureGameobjectParameter",
+          "read_only": true
+        },
+        {
+          "name": "Type",
+          "db_column_name": "Type",
+          "value_type": "QuestGreetingTypeParameter"
+        },
+        {
+          "name": "Greet Emote Type",
+          "db_column_name": "GreetEmoteType",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Greet Emote Delay",
+          "db_column_name": "GreetEmoteDelay",
+          "value_type": "uint"
+        },
+        {
+          "name": "Greeting",
+          "db_column_name": "Greeting",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

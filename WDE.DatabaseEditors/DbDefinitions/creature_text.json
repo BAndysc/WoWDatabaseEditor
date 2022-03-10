@@ -11,7 +11,7 @@
   "multi_solution_name": "Texts for multiple npcs",
   "icon_path": "Icons/chat.png",
   "reload_command": "reload creature_text",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "picker": "CreatureParameter",
   "group_name": "Common scripting tables",
   "primary_key": ["CreatureID", "GroupID", "ID"],
