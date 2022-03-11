@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.Database;
 using WDE.Common.History;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
@@ -34,9 +35,9 @@ namespace WDE.DatabaseEditors.Models
         
         public bool ExistInDatabase { get; set; }
         
-        public uint Key { get; }
+        public DatabaseKey Key { get; }
         
-        public DatabaseEntity(bool existInDatabase, uint key, Dictionary<string, IDatabaseField> cells, IReadOnlyList<ICondition>? conditions)
+        public DatabaseEntity(bool existInDatabase, DatabaseKey key, Dictionary<string, IDatabaseField> cells, IReadOnlyList<ICondition>? conditions)
         {
             ExistInDatabase = existInDatabase;
             Key = key;
@@ -80,13 +81,13 @@ namespace WDE.DatabaseEditors.Models
             return typed.Current.Value;
         }
 
-        public DatabaseEntity Clone()
+        public DatabaseEntity Clone(DatabaseKey? newKey = null)
         {
             var fields = new Dictionary<string, IDatabaseField>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var field in Cells)
                 fields[field.Key] = field.Value.Clone();
             
-            return new DatabaseEntity(ExistInDatabase, Key, fields, Conditions == null ? null : CloneConditions(Conditions));
+            return new DatabaseEntity(ExistInDatabase, newKey ?? Key, fields, Conditions == null ? null : CloneConditions(Conditions));
         }
 
         private IReadOnlyList<ICondition> CloneConditions(IReadOnlyList<ICondition> conditions)

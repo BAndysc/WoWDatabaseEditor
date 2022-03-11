@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json;
 using WDE.Common;
+using WDE.Common.Services;
+using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
-        public DatabaseTableSolutionItem(uint entry, bool existsInDatabase, string definitionId, bool ignoreEquality)
+        public DatabaseTableSolutionItem(DatabaseKey entry, bool existsInDatabase, string definitionId, bool ignoreEquality)
         {
             Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase));
             DefinitionId = definitionId;
@@ -33,7 +35,7 @@ namespace WDE.DatabaseEditors.Solution
             DeletedEntries = DeletedEntries.ToList()
         };
 
-        public List<uint> DeletedEntries { get; set; } = new();
+        public List<DatabaseKey> DeletedEntries { get; set; } = new();
         public List<SolutionItemDatabaseEntity> Entries { get; set; } = new();
 
         [JsonProperty]
@@ -97,14 +99,14 @@ namespace WDE.DatabaseEditors.Solution
     public class SolutionItemDatabaseEntity
     {
         [JsonConstructor]
-        public SolutionItemDatabaseEntity(uint key, bool existsInDatabase, List<EntityOrigianlField>? originalValues = null)
+        public SolutionItemDatabaseEntity(DatabaseKey key, bool existsInDatabase, List<EntityOrigianlField>? originalValues = null)
         {
             Key = key;
             ExistsInDatabase = existsInDatabase;
             OriginalValues = originalValues;
         }
 
-        public readonly uint Key;
+        public readonly DatabaseKey Key;
         public readonly bool ExistsInDatabase;
 
         public SolutionItemDatabaseEntity(SolutionItemDatabaseEntity copy)

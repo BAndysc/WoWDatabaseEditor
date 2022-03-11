@@ -16,6 +16,6 @@ public class LootSolutionItem : ISolutionItem
     public bool IsExportable { get; set; }
     public ISolutionItem Clone()
     {
-        return new LootSolutionItem()
+        return new LootSolutionItem();
     }
 }

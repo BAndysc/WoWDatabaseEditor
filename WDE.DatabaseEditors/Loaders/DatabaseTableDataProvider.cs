@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
@@ -57,10 +59,10 @@ namespace WDE.DatabaseEditors.Loaders
             }
             
             var where = string.IsNullOrEmpty(customWhere) ? "" : $"WHERE ({customWhere})";
-            return $"SELECT {names} FROM {tableDefinitionJson.TableName} {joins} {where} ORDER BY {tableDefinitionJson.TablePrimaryKeyColumnName} ASC LIMIT {limit ?? 300} OFFSET {offset ?? 0}";
+            return $"SELECT {names} FROM `{tableDefinitionJson.TableName}` {joins} {where} ORDER BY {string.Join(", ", tableDefinitionJson.PrimaryKey.Select(x => $"`{x}`"))} ASC LIMIT {limit ?? 300} OFFSET {offset ?? 0}";
         }
         
-        private string BuildSQLQueryFromTableDefinition(DatabaseTableDefinitionJson tableDefinitionJson, uint[] entries)
+        private string BuildSQLQueryFromTableDefinition(DatabaseTableDefinitionJson tableDefinitionJson, DatabaseKey[] entries)
         {
             var tableName = tableDefinitionJson.TableName;
             var tablePrimaryKey = tableDefinitionJson.TablePrimaryKeyColumnName;
@@ -86,11 +88,20 @@ namespace WDE.DatabaseEditors.Loaders
                 $"SELECT {names} FROM {tableDefinitionJson.TableName} {joins} WHERE `{tableName}`.`{tablePrimaryKey}` IN ({string.Join(", ", entries)});";
         }
         
-        public async Task<long> GetCount(string definitionId, string? customWhere)
+        public async Task<long> GetCount(string definitionId, string? customWhere, IEnumerable<DatabaseKey>? keys)
         {
             var definition = tableDefinitionProvider.GetDefinition(definitionId);
             if (definition == null)
                 return 0;
+
+            if (keys != null)
+            {
+                var whereKeys = BuildWhereFromKeys(definition, keys.ToArray());
+                if (string.IsNullOrEmpty(customWhere))
+                    customWhere = whereKeys;
+                else
+                    customWhere = "(" + customWhere + ") AND " + whereKeys;
+            }
 
             var where = string.IsNullOrEmpty(customWhere) ? "" : $"WHERE ({customWhere})";
             var sql = $"SELECT COUNT(*) AS num FROM {definition.TableName} {where}";
@@ -109,8 +120,33 @@ namespace WDE.DatabaseEditors.Loaders
                 return 0;
             }
         }
+
+        private string BuildWhereFromKeys(DatabaseTableDefinitionJson definition, DatabaseKey[] keys)
+        {
+            if (keys.Length == 0)
+                return "false";
+            if (definition.GroupByKeys.Count == 1)
+            {
+                return $"`{definition.TableName}`.`{definition.GroupByKeys[0]}` IN ({string.Join(", ", keys.Select(k => k[0]))})";
+            }
+            else
+            {
+                Debug.Assert(keys[0].Count == definition.GroupByKeys.Count);
+                return string.Join(" OR ", keys.Select(key =>
+                {
+                    StringBuilder sb = new();
+                    for (int i = 0; i < definition.GroupByKeys.Count; ++i)
+                    {
+                        if (i != 0)
+                            sb.Append(" AND ");
+                        sb.Append($"(`{definition.TableName}`.`{definition.GroupByKeys[i]}` = {key[i]})");
+                    }
+                    return sb.ToString();
+                }));
+            }
+        }
         
-        public async Task<IDatabaseTableData?> Load(string definitionId, string? customWhere, long? offset, int? limit, params uint[] keys)
+        public async Task<IDatabaseTableData?> Load(string definitionId, string? customWhere, long? offset, int? limit, DatabaseKey[]? keys)
         {
             var definition = tableDefinitionProvider.GetDefinition(definitionId);
             if (definition == null)
@@ -130,6 +166,14 @@ namespace WDE.DatabaseEditors.Loaders
 
             if (definition.RecordMode == RecordMode.SingleRow)
             {
+                if (keys != null)
+                {
+                    var whereKeys = BuildWhereFromKeys(definition, keys);
+                    if (string.IsNullOrEmpty(customWhere))
+                        customWhere = whereKeys;
+                    else
+                        customWhere = "(" + customWhere + ") AND " + whereKeys;
+                }
                 var sqlStatement = BuildSQLQueryForSingleRow(definition, customWhere, offset, limit);
                 try
                 {
@@ -192,7 +236,7 @@ namespace WDE.DatabaseEditors.Loaders
                     return null;
                 }                
             }
-            else if (keys.Length > 0)
+            else if (keys != null && keys.Length > 0)
             {
                 Debug.Assert(customWhere == null, "Custom where with non single record mode is not supported");
                 if (definition.IsOnlyConditionsTable)
@@ -204,26 +248,27 @@ namespace WDE.DatabaseEditors.Loaders
                     
                     foreach (var key in keys)
                     {
+                        Debug.Assert(key.Count == 1, "todo?");
                         int? sourceGroup = null, sourceEntry = null, sourceId = null;
                         if (definition.Condition.SourceGroupColumn != null &&
                             definition.TablePrimaryKeyColumnName == definition.Condition.SourceGroupColumn)
                         {
                             keyMask = IDatabaseProvider.ConditionKeyMask.SourceGroup;
-                            sourceGroup = (int)key;
+                            sourceGroup = (int)key[0];
                         }
 
                         if (definition.Condition.SourceEntryColumn != null &&
                             definition.TablePrimaryKeyColumnName == definition.Condition.SourceEntryColumn)
                         {
                             keyMask = IDatabaseProvider.ConditionKeyMask.SourceEntry;
-                            sourceEntry = (int)key;
+                            sourceEntry = (int)key[0];
                         }
 
                         if (definition.Condition.SourceIdColumn != null &&
                             definition.TablePrimaryKeyColumnName == definition.Condition.SourceIdColumn)
                         {
                             keyMask = IDatabaseProvider.ConditionKeyMask.SourceId;
-                            sourceId = (int)key;
+                            sourceId = (int)key[0];
                         }
                         
                         IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,

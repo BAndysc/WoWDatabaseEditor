@@ -70,18 +70,19 @@ namespace WDE.DatabaseEditors.Services
                         continue;
                     }
 
+                    // todo: support for multiple primary keys
                     foreach (var key in updateQuery.Where.Values)
                     {
                         if (key is not long lkey)
                             continue;
-                        var old = await loader.Load(defi.Id, null,null,null, (uint)lkey);
+                        var old = await loader.Load(defi.Id, null,null,null, new[]{new DatabaseKey(lkey)});
                         if (old == null || old.Entities.Count != 1 || !old.Entities[0].ExistInDatabase)
                         {
                             errors.Add($"{defi.TableName} where {defi.TablePrimaryKeyColumnName} = {lkey} not found, no update");
                             continue;
                         }
                         var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
-                        item.Entries.Add(new SolutionItemDatabaseEntity((uint)lkey, true));
+                        item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), true));
                         var savedItem = sessionService.Find(item);
                         if (savedItem != null)
                             item = (DatabaseTableSolutionItem)savedItem.Clone();
@@ -130,12 +131,13 @@ namespace WDE.DatabaseEditors.Services
                         continue;
                     }
 
+                    //todo: support for multiple primary keys
                     foreach (var line in insertQuery.Inserts)
                     {
                         if (line[indexOf] is not long lkey)
                             continue;
                         var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
-                        item.Entries.Add(new SolutionItemDatabaseEntity((uint)lkey, false));
+                        item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), false));
                         found.Add(item);
                     }
                 }

@@ -52,11 +52,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private readonly IDatabaseEditorsSettings editorSettings;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
-        private HashSet<uint> keys = new HashSet<uint>();
-        private HashSet<uint> removedKeys = new HashSet<uint>();
+        private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
+        private HashSet<DatabaseKey> removedKeys = new HashSet<DatabaseKey>();
         private List<System.IDisposable> rowsDisposable = new();
         public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
 
+        [Notify] private bool showOnlyModified;
         [AlsoNotify(nameof(SelectedRow))] [Notify] private int selectedRowIndex;
         [AlsoNotify(nameof(SelectedCell))] [Notify] private int selectedCellIndex;
         public DatabaseEntityViewModel? SelectedRow => selectedRowIndex >= 0 && selectedRowIndex < Rows.Count ? Rows[selectedRowIndex] : null;
@@ -123,7 +124,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         public event Action<DatabaseEntity>? OnDeletedQuery;
         public event Action<DatabaseEntity>? OnKeyDeleted;
-        public event Action<uint>? OnKeyAdded;
+        public event Action<DatabaseKey>? OnKeyAdded;
 
         public SingleRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
@@ -156,6 +157,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             splitMode = editorSettings.MultiRowSplitMode;
 
+            
+            AutoDispose(this.ToObservable(() => ShowOnlyModified).Skip(1).Subscribe(show =>
+            {
+                OffsetQuery = 0;
+                ScheduleLoading().ListenErrors();
+            }));
+
             OpenParameterWindow = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel>(EditParameter);
             RemoveTemplateCommand = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
             RevertCommand = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel?>(Revert, cell => cell is SingleRecordDatabaseCellViewModel vm && vm.CanBeReverted && (vm.TableField?.IsModified ?? false));
@@ -185,7 +193,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 var duplicate = SelectedRow!.Entity.Clone();
                 //todo ask for a new key
-                ForceInsertEntity(duplicate, SelectedRowIndex + 1);
+                int index = SelectedRowIndex + 1;
+                ForceInsertEntity(duplicate, index);
+                selectedRowIndex = -1;
+                SelectedRowIndex = index;
             }, () => SelectedRow != null);
             AutoDispose(this.ToObservable(() => SelectedRow).Subscribe(_ => DuplicateSelectedCommand.RaiseCanExecuteChanged()));
                 
@@ -231,21 +242,38 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             ScheduleLoading();
         }
 
-        public override DatabaseEntity AddRow(uint key)
+        public override DatabaseEntity AddRow(DatabaseKey key)
         {
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
             ForceInsertEntity(freshEntity, Entities.Count);
+            selectedRowIndex = -1;
+            SelectedRowIndex = Entities.Count;
             return freshEntity;
+        }
+
+        private async Task<List<long>?> AskForNewKey()
+        {
+            List<long> values = new List<long>();
+            for (int i = 0; i < tableDefinition.PrimaryKey.Count; ++i)
+            {
+                var column = tableDefinition.TableColumns[tableDefinition.PrimaryKey[i]];
+                var parameter = parameterFactory.Factory(column.ValueType);
+                var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
+                if (!selected.HasValue)
+                    return null;
+                values.Add(selected.Value);
+            }
+
+            return values;
         }
         
         private async Task AddNewEntity()
         {
-            var parameter = parameterFactory.Factory(tableDefinition.Picker);
-            var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
-            if (!selected.HasValue)
+            var newKey = await AskForNewKey();
+            if (newKey == null)
                 return;
 
-            uint key = (uint) selected;
+            DatabaseKey key = new DatabaseKey(newKey);
 
             if (ContainsKey(key))
             {
@@ -262,7 +290,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             OnKeyAdded?.Invoke(key);
             
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
-            ForceInsertEntity(freshEntity, SelectedRow == null ? Entities.Count : selectedRowIndex + 1);
+            var index = SelectedRow == null ? Entities.Count : selectedRowIndex + 1;
+            ForceInsertEntity(freshEntity, index);
+            selectedRowIndex = -1;
+            SelectedRowIndex = index;
         }
         
         private void SetToNull(SingleRecordDatabaseCellViewModel? view)
@@ -344,15 +375,18 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         }
 
         // TODO
-        protected override IReadOnlyList<uint> GenerateKeys() => keys.ToList();
-        protected override IReadOnlyList<uint>? GenerateDeletedKeys() => removedKeys.Count == 0 ? null : removedKeys.ToList();
-        protected override string? CustomWhere => FilterViewModel.BuildWhere();
-        protected override int Limit => limitQuery;
-        protected override long Offset => offsetQuery;
-
+        protected override IReadOnlyList<DatabaseKey> GenerateKeys() => keys.ToList();
+        protected override IReadOnlyList<DatabaseKey>? GenerateDeletedKeys() => removedKeys.Count == 0 ? null : removedKeys.ToList();
+       
+        protected override async Task<DatabaseTableData?> LoadData()
+        {
+            return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), offsetQuery, limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData; ;
+        }
+        
         protected override Task BeforeLoadData()
         {
             // save existing changes
+            SelectedRowIndex = -1;
             UpdateSolutionItem();
             return base.BeforeLoadData();
         }
@@ -385,7 +419,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             await AsyncAddEntities(data.Entities);
             
-            var allRows = await tableDataProvider.GetCount(tableDefinition.Id, FilterViewModel.BuildWhere());
+            var allRows = await tableDataProvider.GetCount(tableDefinition.Id, FilterViewModel.BuildWhere(), showOnlyModified ? keys : null);
             RowsSummaryText = $"{offsetQuery + 1} - {offsetQuery + data.Entities.Count} of {allRows} rows";
             // TODO
             //historyHandler = History.AddHandler(AutoDispose(new MultiRowTableEditorHistoryHandler(this)));
@@ -429,6 +463,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
             //Todo
+            if (SelectedRow?.Entity == entity)
+                SelectedRowIndex = -1;
+            keys.Remove(entity.Key);
             removedKeys.Add(entity.Key);
             Rows.RemoveIf(r => r.Entity == entity);
             Entities.Remove(entity);
@@ -466,6 +503,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         public override bool ForceInsertEntity(DatabaseEntity entity, int index)
         {
+            removedKeys.Remove(entity.Key);
             var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
             var savedItem = sessionService.Find(pseudoItem);
             if (savedItem is DatabaseTableSolutionItem savedTableItem)
@@ -473,7 +511,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             var row = new DatabaseEntityViewModel(entity);
             row.Changed += OnRowChanged;
-            AutoDisposeEntity(new ActionDisposable(() => row.Changed -= OnRowChanged));
+            row.ChangedCell += OnRowChangedCell;
+            AutoDisposeEntity(new ActionDisposable(() =>
+            {
+                row.ChangedCell -= OnRowChangedCell;
+                row.Changed -= OnRowChanged;
+            }));
             
             int columnIndex = 0;
             foreach (var column in columns)
@@ -520,8 +563,60 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             
             Entities.Insert(index, entity);
             Rows.Insert(index, row);
-            SelectedRowIndex = index;
             return true;
+        }
+
+        private void OnRowChangedCell(DatabaseEntityViewModel entity, string cell)
+        {
+            if (!tableDefinition.GroupByKeys.Contains(cell))
+                return;
+
+            ReKey(entity).ListenErrors();
+        }
+
+        private async Task ReKey(DatabaseEntityViewModel entity)
+        {
+            DatabaseKey BuildKey(DatabaseEntity e)
+            {
+                return new DatabaseKey(tableDefinition.GroupByKeys.Select(e.GetTypedValueOrThrow<long>));
+            }
+
+            var newKey = BuildKey(entity.Entity);
+
+            if (newKey == entity.Key)
+                return; // no re-keying needed
+            
+            if (ContainsKey(newKey))
+            {
+                int i = 0;
+                // revert values
+                foreach (var column in tableDefinition.GroupByKeys)
+                    entity.Entity.SetTypedCellOrThrow(column, entity.Key[i++]);
+
+                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Duplicate key")
+                    .SetMainInstruction($"The key {newKey} is already in the database.")
+                    .SetContent("If you want to change existing key, just modify it.")
+                    .WithOkButton(false)
+                    .Build());
+            }
+            else
+            {
+                var insertIndex = selectedRowIndex;
+                var clone = entity.Entity.Clone(newKey);
+                clone.ExistInDatabase = false;
+                var old = Rows.Select((row, index) => (row, index)).Where(pair => pair.row.Key == entity.Key).Select(pair => (int?)pair.index).FirstOrDefault();
+                if (old.HasValue)
+                {
+                    await RemoveEntity(Rows[old.Value].Entity);
+                    insertIndex = Math.Clamp(old.Value, 0, Rows.Count);
+                    ForceInsertEntity(clone, insertIndex);
+                    selectedRowIndex = -1;
+                    SelectedRowIndex = insertIndex;
+                }
+                else
+                    throw new Exception("Entity not found while re-keying");
+            }
         }
 
         private void OnRowChanged(ITableRow obj)
@@ -535,7 +630,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 keys.Remove(row.Key);
         }
 
-        private bool ContainsKey(uint key)
+        private bool ContainsKey(DatabaseKey key)
         {
             return Rows.Any(row => row.Key == key);
         }
@@ -546,6 +641,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 await AddEntity(entity);
             }
+            selectedRowIndex = -1;
+            if (Rows.Count > 0)
+                SelectedRowIndex = 0;
         }
 
         public override async Task<IList<(ISolutionItem, string)>> GenerateSplitQuery()
@@ -564,13 +662,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             var newData = Entities.Where(e => !e.ExistInDatabase || EntityIsModified(e)).ToList();
 
-            var newDataKeys = newData.Select(e => e.Key).ToList();
+            var newDataKeys = newData.Select(e => e.Key).ToArray();
+            var oldKeys = keys.Except(newDataKeys).ToArray();
             
-            var keysString = string.Join(",", keys.Except(newDataKeys));
             IDatabaseTableData? data = null;
-            if (!string.IsNullOrEmpty(keysString))
+            if (oldKeys.Length > 0)
             {
-                data = await databaseTableDataProvider.Load(tableDefinition.Id, $"`{tableDefinition.TableName}`.`{tableDefinition.TablePrimaryKeyColumnName}` IN ({keysString})", null, keys.Count);
+                data = await databaseTableDataProvider.Load(tableDefinition.Id, null, null, keys.Count, oldKeys);
                 if (data == null)
                     return "ERROR";
                 solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);

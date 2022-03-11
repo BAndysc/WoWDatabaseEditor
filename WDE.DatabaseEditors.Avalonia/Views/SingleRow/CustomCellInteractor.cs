@@ -30,9 +30,6 @@ public class CustomCellInteractor : ICustomCellInteractor
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
 
-        if (cell.IsReadOnly)
-            return true; // pretend we do editing, but we don't == disallow editing
-        
         if (initialText != null)
             return false; // then use builtin-text editor
 

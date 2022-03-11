@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -117,6 +118,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
             canOpenRevertTip = !teachingTipService.IsTipShown(TipYouCanRevertId);
             
+            Debug.Assert(tableDefinition.PrimaryKey.Count == 1);
+            
             ScheduleLoading();
         }
 
@@ -133,7 +136,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             if (!selected.HasValue)
                 return;
 
-            var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, (uint) selected);
+            var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, new []{new DatabaseKey(selected.Value)});
             if (data == null) 
                 return;
 
@@ -240,7 +243,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue!);
 
-        public override DatabaseEntity AddRow(uint key)
+        public override DatabaseEntity AddRow(DatabaseKey key)
         {
             throw new NotImplementedException();
         }
@@ -346,7 +349,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             }
 
             Entities.Insert(index, entity);
-            var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key);
+            var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key[0]);
             Header.Insert(index, name);
 
             var typeCell = entity.GetCell("type");
@@ -359,8 +362,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return true;
         }
 
-        protected override IReadOnlyList<uint> GenerateKeys() => Entities.Select(e => e.Key).ToList();
-        protected override IReadOnlyList<uint>? GenerateDeletedKeys() => null;
+        protected override IReadOnlyList<DatabaseKey> GenerateKeys() => Entities.Select(e => e.Key).ToList();
+        protected override IReadOnlyList<DatabaseKey>? GenerateDeletedKeys() => null;
 
         protected override async Task InternalLoadData(DatabaseTableData data)
         {

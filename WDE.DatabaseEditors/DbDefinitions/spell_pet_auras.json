@@ -4,16 +4,16 @@
     "TrinityWrath"
   ],
   "name": "Spell Pet Auras",
-  "single_solution_name": "{name} spell_pet_auras editor",
-  "multi_solution_name": "Spell_pet_auras table",
+  "single_solution_name": "Spell Pet Auras table",
+  "multi_solution_name": "Spell Pet Auras table",
   "description": "",
   "table_name": "spell_pet_auras",
   "table_index_name": "spell",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Spells",
   "icon_path": "Icons/document_.png",
   "reload_command": "reload spell_pet_auras",
-  "skip_quick_load": true,
   "picker": "SpellParameter",
   "primary_key": [
     "spell",
@@ -28,22 +28,28 @@
           "name": "Spell",
           "db_column_name": "spell",
           "value_type": "SpellParameter",
-          "read_only": true
+          "read_only": true,
+          "preferred_width": 225.0
         },
         {
           "name": "Effect Id",
           "db_column_name": "effectId",
-          "value_type": "SpellEffectIndexParameter"
+          "value_type": "SpellEffectIndexParameter",
+          "read_only": true,
+          "preferred_width": 105.0
         },
         {
           "name": "Pet",
           "db_column_name": "pet",
-          "value_type": "CreatureParameter"
+          "value_type": "CreatureParameter",
+          "read_only": true,
+          "preferred_width": 190.0
         },
         {
           "name": "Aura",
           "db_column_name": "aura",
-          "value_type": "SpellParameter"
+          "value_type": "SpellParameter",
+          "preferred_width": 280.0
         }
       ]
     }

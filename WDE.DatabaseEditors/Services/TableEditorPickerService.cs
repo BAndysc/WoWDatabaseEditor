@@ -40,7 +40,7 @@ public class TableEditorPickerService : ITableEditorPickerService
         this.windowManager = windowManager;
     }
     
-    public async Task<long?> PickByColumn(string table, uint key, string column, long? initialValue, string? backupColumn = null)
+    public async Task<long?> PickByColumn(string table, DatabaseKey key, string column, long? initialValue, string? backupColumn = null)
     {
         var definition = definitionProvider.GetDefinition(table);
         if (definition == null)

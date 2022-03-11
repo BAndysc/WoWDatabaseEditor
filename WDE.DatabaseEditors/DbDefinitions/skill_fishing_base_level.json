@@ -27,7 +27,7 @@
           "db_column_name": "entry",
           "value_type": "ZoneAreaParameter",
           "read_only": true,
-          "preferred_width": 350.0
+          "preferred_width": 305.0
         },
         {
           "name": "Minimum skill",

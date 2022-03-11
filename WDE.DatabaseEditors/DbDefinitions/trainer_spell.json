@@ -4,16 +4,17 @@
     "TrinityWrath"
   ],
   "name": "Trainer Spell",
-  "single_solution_name": "{name} trainer_spell editor",
-  "multi_solution_name": "multiple trainer_spell editor",
+  "single_solution_name": "Trainer Spell Table",
+  "multi_solution_name": "Trainer Spell Table",
   "description": "Used to setup what spells trainers can teach",
   "table_name": "trainer_spell",
   "table_index_name": "TrainerId",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Trainers",
   "icon_path": "Icons/document_.png",
   "reload_command": "reload trainer",
-  "skip_quick_load": true,
+  "picker": "",
   "primary_key": [
     "TrainerId",
     "SpellId"
@@ -26,17 +27,21 @@
           "name": "Trainer Id",
           "db_column_name": "TrainerId",
           "value_type": "uint",
-          "read_only": true
+          "read_only": true,
+          "preferred_width": 50.0
         },
         {
-          "name": "Spell Id",
+          "name": "Spell",
           "db_column_name": "SpellId",
-          "value_type": "SpellParameter"
+          "value_type": "SpellParameter",
+          "read_only": true,
+          "preferred_width": 145.0
         },
         {
           "name": "Money Cost",
           "db_column_name": "MoneyCost",
-          "value_type": "uint"
+          "value_type": "MoneyParameter",
+          "preferred_width": 115.0
         },
         {
           "name": "Req Skill Line",

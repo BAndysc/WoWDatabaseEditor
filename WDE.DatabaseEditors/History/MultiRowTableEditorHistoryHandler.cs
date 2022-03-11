@@ -1,5 +1,6 @@
 ﻿using System;
 using WDE.Common.History;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.MVVM.Observable;
@@ -49,7 +50,7 @@ namespace WDE.DatabaseEditors.History
             PushAction(new DatabaseExecuteDeleteHistoryAction(viewModel, obj));
         }
 
-        private void ViewModelOnKeyAdded(uint key)
+        private void ViewModelOnKeyAdded(DatabaseKey key)
         {
             PushAction(new DatabaseKeyAddedHistoryAction(viewModel, key));
         }

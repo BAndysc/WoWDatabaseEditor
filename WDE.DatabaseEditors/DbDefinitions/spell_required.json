@@ -4,12 +4,12 @@
     "TrinityWrath"
   ],
   "name": "Spell Required",
-  "single_solution_name": "{name} required spells",
-  "multi_solution_name": "Spell_required table",
+  "single_solution_name": "Spell Required table",
+  "multi_solution_name": "Spell Required table",
   "description": "Table used to add restrictions for learning spells from trainer. Player can't learn spell 'spell_id' till he learns 'req_spell', when he loses 'req_spell' 'spell_id' will be lost too. Table is used also for profession specialisations as specialisations require profession of certain rank to learn.",
   "table_name": "spell_required",
   "table_index_name": "spell_id",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
   "group_name": "Spells",
   "icon_path": "Icons/document_.png",
   "reload_command": "reload spell_required",
@@ -24,15 +24,16 @@
       "group_name": "group",
       "fields": [
         {
-          "name": "Spell Id",
+          "name": "Spell",
           "db_column_name": "spell_id",
           "value_type": "SpellParameter",
           "read_only": true
         },
         {
-          "name": "Req Spell",
+          "name": "Required Spell",
           "db_column_name": "req_spell",
-          "value_type": "SpellParameter"
+          "value_type": "SpellParameter",
+          "read_only": true
         }
       ]
     }

@@ -134,10 +134,10 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
             // row
             {
                 var index = GetRowIndexByY(e.GetPosition(this).Y);
-                if (Rows?.Count == 0 || !index.HasValue)
+                if (Rows == null || Rows.Count == 0 || !index.HasValue)
                     SelectedRowIndex = -1;
                 else
-                    SelectedRowIndex = Math.Clamp(index.Value, 0, (Rows?.Count - 1) ?? 0);
+                    SelectedRowIndex = Math.Clamp(index.Value, 0, Rows!.Count - 1);
             }
             // cell
             {

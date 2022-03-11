@@ -1,12 +1,15 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
+using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
 
@@ -39,26 +42,28 @@ public class TableOpenService : ITableOpenService
     public async Task<ISolutionItem?> TryCreate(DatabaseTableDefinitionJson definition)
     {
         if (definition.RecordMode == RecordMode.SingleRow)
-            return await Create(definition, 0);
+            return await Create(definition, default);
+        
+        Debug.Assert(definition.GroupByKeys.Count == 1);
         
         var parameter = parameterFactory.Factory(definition.Picker);
         var key = await itemFromListProvider.GetItemFromList(parameter.HasItems ? parameter.Items! : new Dictionary<long, SelectOption>(), false);
         if (key.HasValue)
         {
-            return await Create(definition, (uint)key.Value);
+            return await Create(definition, new DatabaseKey(key.Value));
         }
         return null;
     }
     
-    public async Task<ISolutionItem?> Create(DatabaseTableDefinitionJson definition, uint key)
+    public async Task<ISolutionItem?> Create(DatabaseTableDefinitionJson definition, DatabaseKey key)
     {
         if (definition.RecordMode == RecordMode.MultiRecord)
             return new DatabaseTableSolutionItem(key, false, definition.Id, definition.IgnoreEquality);
         if (definition.RecordMode == RecordMode.SingleRow)
-            return new DatabaseTableSolutionItem(key, false, definition.Id, definition.IgnoreEquality);
+            return new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
         else
         {
-            var data = await tableDataProvider.Load(definition.Id, null, null,null, key);
+            var data = await tableDataProvider.Load(definition.Id, null, null,null, new []{key});
                 
             if (data == null)
                 return null;

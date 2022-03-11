@@ -5,12 +5,14 @@ using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
+using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Services;
 using WDE.Module.Attributes;
 
@@ -99,9 +101,9 @@ namespace WDE.DatabaseEditors.Solution
                 var template = databaseProvider.GetCreatureTemplate((uint)related.Entry);
                 if (template == null || template.GossipMenuId == 0)
                     return Task.FromResult<ISolutionItem?>(null);
-                return tableOpenService.Create(definition, template.GossipMenuId);
+                return tableOpenService.Create(definition, new DatabaseKey(template.GossipMenuId));
             }
-            return tableOpenService.Create(definition, (uint)related.Entry);
+            return tableOpenService.Create(definition, new DatabaseKey(related.Entry));
         }
 
         public bool CanCreatedRelatedSolutionItem(RelatedSolutionItem related)
@@ -125,7 +127,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public Task<ISolutionItem?> CreateSolutionItem(long number)
         {
-            return tableOpenService.Create(definition, (uint)number);
+            return tableOpenService.Create(definition, new DatabaseKey(number));
         }
 
         public string ParameterName => definition.Picker;

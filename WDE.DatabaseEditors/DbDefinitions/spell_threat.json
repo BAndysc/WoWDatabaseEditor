@@ -22,11 +22,11 @@
       "group_name": "group",
       "fields": [
         {
-          "name": "Entry",
+          "name": "Spell",
           "db_column_name": "entry",
           "value_type": "SpellParameter",
           "read_only": true,
-          "preferred_width": 415.0
+          "preferred_width": 325.0
         },
         {
           "name": "Flat Mod",

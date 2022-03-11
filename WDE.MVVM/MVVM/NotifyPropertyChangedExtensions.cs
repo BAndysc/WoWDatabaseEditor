@@ -22,6 +22,11 @@ namespace WDE.MVVM
             return new NotifyPropertyToObservable<T, R>(obj, getter);
         }
         
+        public static IObservable<Unit> ToObservable<R>(this R obj, string propertyName) where R : INotifyPropertyChanged
+        {
+            return new NotifySpecificPropertyToUnitObservable<R>(obj, propertyName);
+        }
+        
         public static IObservable<Unit> ToObservable<R>(this R obj) where R : INotifyPropertyChanged
         {
             return new NotifyPropertyToUnitObservable<R>(obj);

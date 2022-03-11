@@ -231,6 +231,7 @@
                             </Flyout>
                         </Button.Flyout>
                     </Button>
+                    <CheckBox DockPanel.Dock="Left" IsChecked="{CompiledBinding ShowOnlyModified}">Only modified</CheckBox>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                         <Button Command="{CompiledBinding PreviousDataPage}" Width="32">
                             <Path Stretch="Uniform" Height="16" Data="{StaticResource caret_left_regular}" Fill="{Binding $parent[Button].Foreground}" />

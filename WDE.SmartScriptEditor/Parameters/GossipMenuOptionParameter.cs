@@ -75,7 +75,7 @@ public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseEle
         {
             try
             {
-                var id = await tableEditorPickerService.PickByColumn("gossip_menu_option", entry.Value, "OptionID", (uint)value, "id");
+                var id = await tableEditorPickerService.PickByColumn("gossip_menu_option", new DatabaseKey(entry.Value), "OptionID", (uint)value, "id");
                 if (id.HasValue)
                     return (id.Value, true);
                 return (0, false);

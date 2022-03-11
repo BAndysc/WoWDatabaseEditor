@@ -127,7 +127,7 @@
         {
           "name": "Box Money",
           "db_column_name": "BoxMoney",
-          "value_type": "uint",
+          "value_type": "MoneyParameter",
           "foreign_table": "gossip_menu_option_box",
           "zero_is_blank": true
         },

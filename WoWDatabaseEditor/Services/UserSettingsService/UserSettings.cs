@@ -19,6 +19,7 @@ namespace WoWDatabaseEditorCore.Services.UserSettingsService
         public UserSettings(IFileSystem fileSystem, IStatusBar statusBar)
         {
             json = new() {TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented};
+            json.Converters.Add(new DatabaseKeyConverter());
             this.fileSystem = fileSystem;
             this.statusBar = statusBar;
             basePath = "~";

@@ -78,7 +78,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         {
             try
             {
-                var id = await tableEditorPickerService.PickByColumn("creature_text", entry ?? 0, "GroupId",
+                var id = await tableEditorPickerService.PickByColumn("creature_text", new DatabaseKey(entry ?? 0), "GroupId",
                     (uint)value);
                 if (id.HasValue)
                     return (id.Value, true);

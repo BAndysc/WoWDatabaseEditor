@@ -1,16 +1,18 @@
 {
   "id": "points_of_interest",
   "compatibility": [
-    "TrinityWrath", "TrinityCata"
+    "TrinityWrath",
+    "TrinityCata"
   ],
   "name": "Points Of Interest",
-  "single_solution_name": "{name} POI editor",
-  "multi_solution_name": "multiple POI editor",
+  "single_solution_name": "Points Of Interest",
+  "multi_solution_name": "Points Of Interest",
   "description": "POI that can be displayed when user select an gossip option",
   "table_name": "points_of_interest",
   "table_index_name": "ID",
-  "reload_command": "reload points_of_interest",
+  "record_mode": "SingleRow",
   "icon_path": "Icons/document_point_of_interest.png",
+  "reload_command": "reload points_of_interest",
   "picker": "Parameter",
   "primary_key": [
     "ID"
@@ -37,22 +39,26 @@
         {
           "name": "Icon",
           "db_column_name": "Icon",
-          "value_type": "uint"
+          "value_type": "uint",
+          "preferred_width": 35.0
         },
         {
           "name": "Flags",
           "db_column_name": "Flags",
-          "value_type": "uint"
+          "value_type": "uint",
+          "preferred_width": 60.0
         },
         {
           "name": "Importance",
           "db_column_name": "Importance",
-          "value_type": "uint"
+          "value_type": "uint",
+          "preferred_width": 55.0
         },
         {
           "name": "Name",
           "db_column_name": "Name",
-          "value_type": "string"
+          "value_type": "string",
+          "preferred_width": 220.0
         },
         {
           "name": "Verified Build",

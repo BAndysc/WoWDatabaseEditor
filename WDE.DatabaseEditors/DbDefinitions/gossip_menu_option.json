@@ -114,7 +114,7 @@
         {
           "name": "Box Money",
           "db_column_name": "BoxMoney",
-          "value_type": "uint",
+          "value_type": "MoneyParameter",
           "zero_is_blank": true
         },
         {

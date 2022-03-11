@@ -22,7 +22,7 @@
       "group_name": "group",
       "fields": [
         {
-          "name": "Spell Id",
+          "name": "Spell",
           "db_column_name": "SpellId",
           "value_type": "SpellParameter",
           "read_only": true,

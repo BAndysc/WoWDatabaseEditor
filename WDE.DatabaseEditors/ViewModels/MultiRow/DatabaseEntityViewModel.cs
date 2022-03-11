@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AvaloniaStyles.Controls.FastTableView;
 using Prism.Mvvm;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
@@ -11,7 +12,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
     public class DatabaseEntityViewModel : BindableBase
     {
         public string Name { get; }
-        public uint Key => Entity.Key;
+        public DatabaseKey Key => Entity.Key;
         public DatabaseEntity Entity { get; }
         public ObservableCollection<DatabaseCellViewModel> Cells { get; } = new();
 

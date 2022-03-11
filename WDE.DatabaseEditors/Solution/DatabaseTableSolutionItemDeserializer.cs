@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using WDE.Common;
 using WDE.Common.Database;
+using WDE.Common.Services;
 using WDE.Common.Solution;
 using WDE.DatabaseEditors.Data;
 using WDE.Module.Attributes;
@@ -31,12 +32,12 @@ namespace WDE.DatabaseEditors.Solution
 
                 var table = split[0];
                 var items = split[1].Split(',')
-                    .Where(i => uint.TryParse(i, out var _))
-                    .Select(uint.Parse)
+                    .Where(i => DatabaseKey.TryDeserialize(i, out var _))
+                    .Select(DatabaseKey.Deserialize)
                     .Select(i => new SolutionItemDatabaseEntity(i, true));
                 var deletedEntries = split.Length == 2 ? null : split[2].Split(',')
-                    .Where(i => uint.TryParse(i, out var _))
-                    .Select(uint.Parse);
+                    .Where(i => DatabaseKey.TryDeserialize(i, out var _))
+                    .Select(DatabaseKey.Deserialize);
 
                 var definition = tableDefinitionProvider.GetDefinition(table);
                 if (definition == null)
@@ -64,8 +65,8 @@ namespace WDE.DatabaseEditors.Solution
         public ISmartScriptProjectItem Serialize(DatabaseTableSolutionItem item)
         {
             var entries = JsonConvert.SerializeObject(item.Entries);
-            var items = string.Join(",", item.Entries.Select(e => e.Key));
-            var deletedKeys = string.Join(",", item.DeletedEntries);
+            var items = string.Join(",", item.Entries.Select(e => e.Key.Serialize()));
+            var deletedKeys = string.Join(",", item.DeletedEntries.Select(key => key.Serialize()));
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 32,

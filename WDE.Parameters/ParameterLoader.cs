@@ -81,6 +81,7 @@ namespace WDE.Parameters
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
             factory.Register("PercentageParameter", new PercentageParameter());
+            factory.Register("MoneyParameter", new MoneyParameter());
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
                 (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
@@ -124,6 +125,29 @@ namespace WDE.Parameters
         public override string ToString(long key)
         {
             return key + "%";
+        }
+    }
+
+    public class MoneyParameter : Parameter
+    {
+        public override string ToString(long key)
+        {
+            int gold = (int) (key / 10000);
+            int silver = (int) ((key % 10000) / 100);
+            int copper = (int) (key % 100);
+            if (gold > 0 && silver > 0 && copper > 0)
+                return $"{gold}g {silver}s {copper}c";
+            if (gold > 0 && silver > 0)
+                return $"{gold}g {silver}s";
+            if (gold > 0 && copper > 0)
+                return $"{gold}g {copper}c";
+            if (gold > 0)
+                return $"{gold}g";
+            if (silver > 0 && copper > 0)
+                return $"{silver}s {copper}c";
+            if (silver > 0)
+                return $"{silver}s";
+            return $"{copper}c";
         }
     }
 

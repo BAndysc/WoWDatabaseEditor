@@ -4,12 +4,12 @@
     "TrinityWrath"
   ],
   "name": "Quest Greeting",
-  "single_solution_name": "{name} quest_greeting",
-  "multi_solution_name": "Multiple quest_greeting",
+  "single_solution_name": "Quest Greeting",
+  "multi_solution_name": "Quest Greeting",
   "description": "This table add greeting behavior to an NPC or an Gameobject.",
   "table_name": "quest_greeting",
   "table_index_name": "ID",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
   "group_name": "Quests",
   "icon_path": "Icons/document_.png",
   "reload_command": "reload quest_greeting",
@@ -32,7 +32,8 @@
         {
           "name": "Type",
           "db_column_name": "Type",
-          "value_type": "QuestGreetingTypeParameter"
+          "value_type": "QuestGreetingTypeParameter",
+          "read_only": true
         },
         {
           "name": "Greet Emote Type",

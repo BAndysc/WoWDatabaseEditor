@@ -3,6 +3,7 @@ using Prism.Events;
 using WDE.Common.Events;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -25,15 +26,21 @@ namespace WDE.DatabaseEditors.Solution
         {
             if (!arguments.TryGetString(out var tableName))
                 return Task.CompletedTask;
-            
-            if (!arguments.TryGetUint(out var entry))
-                return Task.CompletedTask;
 
             var definition = tableDefinitionProvider.GetDefinition(tableName);
             if (definition == null)
                 return Task.CompletedTask;
+
+            if (definition.RecordMode == RecordMode.SingleRow)
+            {
+                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality));
+                return Task.CompletedTask;
+            }
             
-            eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(entry, true, tableName, definition.IgnoreEquality));
+            if (!arguments.TryGetUint(out var entry))
+                return Task.CompletedTask;
+
+            eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(new DatabaseKey(entry), true, tableName, definition.IgnoreEquality));
             return Task.CompletedTask;
         }
 

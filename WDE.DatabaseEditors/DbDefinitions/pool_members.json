@@ -4,12 +4,12 @@
     "TrinityWrath"
   ],
   "name": "Pool Members",
-  "single_solution_name": "{name} pool_members editor",
-  "multi_solution_name": "multiple pool_members editor",
+  "single_solution_name": "Pool Members",
+  "multi_solution_name": "Pool Members",
   "description": "This table holds the contents of pools created in pool_template.",
   "table_name": "pool_members",
   "table_index_name": "spawnId",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
   "group_name": "Pooling",
   "icon_path": "Icons/document_.png",
   "reload_command": "reload pool_members",
@@ -32,7 +32,8 @@
         {
           "name": "Type",
           "db_column_name": "type",
-          "value_type": "PoolMemberTypeParameter"
+          "value_type": "PoolMemberTypeParameter",
+          "read_only": true
         },
         {
           "name": "Pool Spawn Id",

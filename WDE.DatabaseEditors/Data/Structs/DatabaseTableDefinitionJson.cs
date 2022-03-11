@@ -66,9 +66,9 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         [JsonProperty(PropertyName = "table_name_source_field")]
         public string? TableNameSource { get; set; }
-        
+
         [JsonProperty(PropertyName = "primary_key")]
-        public IList<string>? PrimaryKey { get; set; }
+        public IList<string> PrimaryKey { get; set; } = null!;
         
         [JsonProperty(PropertyName = "conditions")]
         public DatabaseConditionReferenceJson? Condition { get; set; }
@@ -91,6 +91,17 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonIgnore] 
         public IDictionary<string, DatabaseForeignTableJson> ForeignTableByName { get; set; } = null!;
 
+        [JsonIgnore]
+        public IList<string> GroupByKeys
+        {
+            get
+            {
+                if (RecordMode == RecordMode.SingleRow)
+                    return PrimaryKey!;
+                return new List<string>(){PrimaryKey[0]};
+            }
+        }
+        
         // single row table type ignores solution item entries quality, because there is no keys
         [JsonIgnore] public bool IgnoreEquality => RecordMode == RecordMode.SingleRow;
     }

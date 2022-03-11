@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Prism.Events;
 using Prism.Ioc;
 using WDE.Common.Database;
@@ -18,6 +19,17 @@ namespace WDE.DatabaseEditors
     public class DatabaseEditorsModule : ModuleBase
     {
         private IContainerProvider containerProvider = null!;
+
+        static DatabaseEditorsModule()
+        {
+            var previousDefault = JsonConvert.DefaultSettings?.Invoke();
+            JsonConvert.DefaultSettings = () =>
+            {
+                var settings = previousDefault ?? new JsonSerializerSettings();
+                settings.Converters.Add(new DatabaseKeyConverter());
+                return settings;
+            };
+        }
         
         public override void OnInitialized(IContainerProvider containerProvider)
         {

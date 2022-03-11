@@ -4,16 +4,16 @@
     "TrinityWrath"
   ],
   "name": "Spell Learn Spell",
-  "single_solution_name": "{name} spell_learn_spell",
-  "multi_solution_name": "Spell_learn_spell table",
+  "single_solution_name": "Spell Learn Spell",
+  "multi_solution_name": "Spell Learn Spell",
   "description": "This table holds information on spells that should be learned at the same time a player learns another spell.",
   "table_name": "spell_learn_spell",
   "table_index_name": "entry",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Spells",
   "icon_path": "Icons/document_.png",
   "reload_command": "reload spell_learn_spell",
-  "skip_quick_load": true,
   "picker": "SpellParameter",
   "primary_key": [
     "entry",
@@ -24,21 +24,25 @@
       "group_name": "group",
       "fields": [
         {
-          "name": "Entry",
+          "name": "When learned",
           "db_column_name": "entry",
           "value_type": "SpellParameter",
-          "read_only": true
+          "read_only": true,
+          "preferred_width": 235.0
         },
         {
-          "name": "Spell ID",
+          "name": "Spell to also learn",
           "db_column_name": "SpellID",
-          "value_type": "SpellParameter"
+          "value_type": "SpellParameter",
+          "read_only": true,
+          "preferred_width": 310.0
         },
         {
           "name": "Show in spellbook",
           "db_column_name": "Active",
           "value_type": "BoolParameter",
-          "default": 1
+          "default": 1,
+          "preferred_width": 200.0
         }
       ]
     }

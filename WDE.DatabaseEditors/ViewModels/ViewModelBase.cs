@@ -123,8 +123,8 @@ namespace WDE.DatabaseEditors.ViewModels
         public abstract bool ForceRemoveEntity(DatabaseEntity entity);
         public abstract bool ForceInsertEntity(DatabaseEntity entity, int index);
 
-        protected abstract IReadOnlyList<uint> GenerateKeys();
-        protected abstract IReadOnlyList<uint>? GenerateDeletedKeys();
+        protected abstract IReadOnlyList<DatabaseKey> GenerateKeys();
+        protected abstract IReadOnlyList<DatabaseKey>? GenerateDeletedKeys();
         protected abstract Task InternalLoadData(DatabaseTableData data);
         protected abstract void UpdateSolutionItem();
         
@@ -161,7 +161,7 @@ namespace WDE.DatabaseEditors.ViewModels
             {
                 var entities = Entities.Where(e => e.Key == key).ToList();
                 var sql = queryGenerator
-                    .GenerateQuery(new List<uint>(){key}, null, new DatabaseTableData(tableDefinition, entities)).QueryString;
+                    .GenerateQuery(new List<DatabaseKey>(){key}, null, new DatabaseTableData(tableDefinition, entities)).QueryString;
                 var splitItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
                 splitItem.Entries.Add(new SolutionItemDatabaseEntity(key, entities.Count > 0 && entities[0].ExistInDatabase, entities.Count > 0 ? GetOriginalFields(entities[0]) : null));
                 split.Add((splitItem, sql));
@@ -179,16 +179,17 @@ namespace WDE.DatabaseEditors.ViewModels
             Title = solutionItemName.GetName(SolutionItem);
         }
         
-        protected virtual string? CustomWhere { get; }
-        protected virtual long Offset { get; }
-        protected virtual int Limit { get; }
-
         protected virtual Task BeforeLoadData() => Task.CompletedTask;
 
+        protected virtual async Task<DatabaseTableData?> LoadData()
+        {
+            return await databaseTableDataProvider.Load(solutionItem.DefinitionId, null, null, null, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData; ;
+        }
+        
         private async Task LoadTableDefinition()
         {
             await BeforeLoadData();
-            var data = await databaseTableDataProvider.Load(solutionItem.DefinitionId, CustomWhere, Offset, Limit, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData;
+            var data = await LoadData();
 
             if (data == null)
             {
@@ -239,7 +240,7 @@ namespace WDE.DatabaseEditors.ViewModels
                         return messageBoxService.WrapError(() => 
                             WrapBulkEdit(
                                 () => WrapBlockingTask(() => cmdPerKey.Process(command,
-                            new DatabaseTableData(data.TableDefinition, Entities), GenerateKeys().ToList(), this))
+                            new DatabaseTableData(data.TableDefinition, Entities), GenerateKeys().Select(k => (uint)k[0]).ToList(), this))
                                     , cmdPerKey.Name));
                     })));
                 }
@@ -265,7 +266,7 @@ namespace WDE.DatabaseEditors.ViewModels
             }
         }
 
-        protected string GenerateName(uint entity)
+        protected string GenerateName(long entity)
         {
             return nameGeneratorParameter.ToString(entity);
         }
@@ -319,6 +320,6 @@ namespace WDE.DatabaseEditors.ViewModels
         public IHistoryManager History { get; }
         protected DatabaseTableSolutionItem solutionItem;
         public ISolutionItem SolutionItem => solutionItem;
-        public abstract DatabaseEntity AddRow(uint key);
+        public abstract DatabaseEntity AddRow(DatabaseKey key);
     }
 }
