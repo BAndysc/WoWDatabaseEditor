@@ -35,7 +35,7 @@ namespace WoWDatabaseEditorCore.Providers
             
             SubItems.Add(new ModuleMenuItem("_Redo", new DelegateCommand(() => DocumentManager.ActiveUndoRedo?.Redo.Execute(null),
                 () => DocumentManager.ActiveUndoRedo?.Redo.CanExecute(null) ?? false).ObservesProperty(() => DocumentManager.ActiveUndoRedo).
-                ObservesProperty(() => DocumentManager.ActiveUndoRedo!.IsModified), new("Control+Shift+Z")));
+                ObservesProperty(() => DocumentManager.ActiveUndoRedo!.IsModified), new("Control+Y")));
             
             SubItems.Add(new ModuleManuSeparatorItem());
             
@@ -70,11 +70,11 @@ namespace WoWDatabaseEditorCore.Providers
 
             SubItems.Add(new ModuleMenuItem("Open quick access",
                 new DelegateCommand(() => quickAccessViewModel.OpenSearch("")),
-                new("Control+Y")));
+                new("Control+R")));
             
             SubItems.Add(new ModuleMenuItem("Open quick commands",
                 new DelegateCommand(() => quickAccessViewModel.OpenSearch("/")),
-                new("Control+Shift+Y")));
+                new("Control+Shift+R")));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

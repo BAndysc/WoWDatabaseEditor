@@ -97,6 +97,7 @@ namespace WDE.Common.Avalonia.Utils
             command = OverrideCommand<TextBox>(command, Key.X, KeyModifiers.None, key, modifierKey, cmd, tb => tb.Cut());
             command = OverrideCommand<TextBox>(command, Key.V, KeyModifiers.None, key, modifierKey, cmd, tb => tb.Paste());
             command = OverrideCommand<TextBox>(command, Key.Z, KeyModifiers.None, key, modifierKey, cmd, Undo);
+            command = OverrideCommand<TextBox>(command, Key.Y, KeyModifiers.None, key, modifierKey, cmd, Redo);
             command = OverrideCommand<TextBox>(command, Key.Z, KeyModifiers.Shift, key, modifierKey, cmd, Redo);
             command = OverrideCommand<FixedTextBox>(command, Key.V, KeyModifiers.None, key, modifierKey, cmd, tb => tb.CustomPaste());
 
@@ -109,6 +110,14 @@ namespace WDE.Common.Avalonia.Utils
                 return true;
             });
             command = OverrideCommand<TextArea>(command, Key.Z, KeyModifiers.Shift, key, modifierKey, cmd, tb =>
+            {
+                var te = GetTextEditor(tb);
+                if (te == null || te.Document.UndoStack.SizeLimit == 0)
+                    return false;
+                te.Redo();
+                return true;
+            });
+            command = OverrideCommand<TextArea>(command, Key.Y, KeyModifiers.None, key, modifierKey, cmd, tb =>
             {
                 var te = GetTextEditor(tb);
                 if (te == null || te.Document.UndoStack.SizeLimit == 0)
