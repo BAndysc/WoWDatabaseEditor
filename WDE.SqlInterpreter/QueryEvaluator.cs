@@ -29,6 +29,12 @@ namespace WDE.SqlInterpreter
             return visitor?.Updates ?? Enumerable.Empty<UpdateQuery>();
         }
 
+        public IEnumerable<DeleteQuery> ExtractDeletes(string query)
+        {
+            var visitor = CreateVisitor(query);
+            return visitor?.Deletes ?? Enumerable.Empty<DeleteQuery>();
+        }
+
         private static SqlVisitor? CreateVisitor(string query)
         {
             try

@@ -8,6 +8,7 @@ using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
@@ -31,6 +32,7 @@ namespace WoWDatabaseEditorCore.Managers
 
         public DocumentManager(IEventAggregator eventAggregator, 
             IMessageBoxService messageBoxService,
+            ITextDocumentService textDocumentService,
             IEnumerable<ITool> tools)
         {
             this.eventAggregator = eventAggregator;
@@ -49,6 +51,7 @@ namespace WoWDatabaseEditorCore.Managers
                 if (e.Type == CollectionEventType.Remove && e.Item is IDisposable disposable)
                     disposable.Dispose();
             });
+            OpenDocument(textDocumentService.CreateDocument("DEMO DEMO", "", "sql", true));
         }
 
         public IReadOnlyList<ITool> AllTools => allTools;

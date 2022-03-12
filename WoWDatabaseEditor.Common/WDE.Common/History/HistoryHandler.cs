@@ -40,7 +40,7 @@ namespace WDE.Common.History
                 ActionPush(this, action);
         }
         
-        protected void DoAction(IHistoryAction action)
+        public void DoAction(IHistoryAction action)
         {
             if (inBulkEditing)
                 throw new Exception("Cannot execute action while bulk editing!");

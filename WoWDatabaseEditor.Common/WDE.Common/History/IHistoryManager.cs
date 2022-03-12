@@ -23,6 +23,7 @@ namespace WDE.Common.History
         void MarkNoSave();
 
         T AddHandler<T>(T handler) where T : HistoryHandler;
+        void RemoveHandler(HistoryHandler handler);
         void Clear();
         void LimitStack(int limit);
     }

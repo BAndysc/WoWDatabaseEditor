@@ -11,6 +11,7 @@ namespace WDE.Common.Services
         Task SaveSolutionToDatabaseTask(ISolutionItemDocument document);
         Task ReloadSolutionRemotelyTask(ISolutionItem item);
         Task SaveAndReloadSolutionTask(ISolutionItem item);
+        Task Save(ISolutionItemDocument document);
         
         bool CanSaveToDatabase { get; }
         bool CanReloadRemotely { get; }

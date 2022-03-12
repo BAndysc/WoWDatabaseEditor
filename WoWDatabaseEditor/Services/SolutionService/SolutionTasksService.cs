@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AsyncAwaitBestPractices.MVVM;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
@@ -22,6 +24,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
         private readonly IRemoteConnectorService remoteConnectorService;
         private readonly IDatabaseProvider databaseProvider;
         private readonly IStatusBar statusBar;
+        private readonly ISessionService sessionService;
 
         public SolutionTasksService(ITaskRunner taskRunner,
             ISolutionItemSqlGeneratorRegistry sqlGenerator,
@@ -30,7 +33,8 @@ namespace WoWDatabaseEditor.Services.SolutionService
             ISolutionItemNameRegistry solutionItemNameRegistry,
             IRemoteConnectorService remoteConnectorService,
             IDatabaseProvider databaseProvider,
-            IStatusBar statusBar)
+            IStatusBar statusBar,
+            ISessionService sessionService)
         {
             this.taskRunner = taskRunner;
             this.sqlGenerator = sqlGenerator;
@@ -40,6 +44,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
             this.remoteConnectorService = remoteConnectorService;
             this.databaseProvider = databaseProvider;
             this.statusBar = statusBar;
+            this.sessionService = sessionService;
         }
 
         private Task SaveSolutionToDatabaseTask(ISolutionItem item, ISolutionItemDocument? document, Func<ISolutionItem, ISolutionItemDocument?, Task<string>> queryGenerator)
@@ -67,9 +72,10 @@ namespace WoWDatabaseEditor.Services.SolutionService
                 });
         }
 
-        public Task SaveSolutionToDatabaseTask(ISolutionItemDocument document)
+        public async Task SaveSolutionToDatabaseTask(ISolutionItemDocument document)
         {
-            return SaveSolutionToDatabaseTask(document.SolutionItem, document, (_, doc) => doc!.GenerateQuery());
+            await SaveSolutionToDatabaseTask(document.SolutionItem, document, (_, doc) => doc!.GenerateQuery());
+            await sessionService.UpdateQuery(document);
         }
         
         public Task SaveSolutionToDatabaseTask(ISolutionItem i)
@@ -161,6 +167,32 @@ namespace WoWDatabaseEditor.Services.SolutionService
                     
                     progress.ReportFinished();
                 });
+        }
+
+        public async Task Save(ISolutionItemDocument document)
+        {
+            if (document.Save?.CanExecute(null) ?? false)
+            {
+                if (document.Save is IAsyncCommand async)
+                    await async.ExecuteAsync();
+                else
+                    document.Save.Execute(null);
+
+                await sessionService.UpdateQuery(document);
+                
+                if (CanReloadRemotely)
+                    await ReloadSolutionRemotelyTask(document.SolutionItem);
+            }
+            else
+            {
+                if (CanSaveAndReloadRemotely)
+                {
+                    await SaveAndReloadSolutionTask(document.SolutionItem);
+                    await sessionService.UpdateQuery(document);
+                }
+                else if (CanSaveToDatabase)
+                    await SaveSolutionToDatabaseTask(document);
+            }
         }
 
         public bool CanSaveToDatabase => databaseProvider.IsConnected;

@@ -50,7 +50,7 @@ namespace WDE.DatabaseEditors.History
         
         public void Undo()
         {
-            viewModel.ForceInsertEntity(entity, index);
+            viewModel.ForceInsertEntity(entity, index, true);
         }
 
         public void Redo()

@@ -4,7 +4,12 @@ using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.History
 {
-    public class DatabaseFieldHistoryAction<T> : IHistoryAction where T : IComparable<T>
+    public interface IDatabaseFieldHistoryAction
+    {
+        public string Property { get; }
+    }
+    
+    public class DatabaseFieldHistoryAction<T> : IHistoryAction, IDatabaseFieldHistoryAction where T : IComparable<T>
     {
         private readonly DatabaseField<T> tableField;
         private readonly string property;
@@ -44,5 +49,7 @@ namespace WDE.DatabaseEditors.History
             var value = isNull || newValue == null ? "(null)" : newValue.ToString();
             return $"Changed value of {property} to {value}";
         }
+
+        public string Property => property;
     }
 }

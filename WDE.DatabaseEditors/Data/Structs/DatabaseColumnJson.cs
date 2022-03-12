@@ -48,5 +48,9 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         [JsonProperty(PropertyName = "preferred_width")]
         public float? PreferredWidth { get; set; }
+
+        [JsonIgnore] public bool IsTypeString => ValueType is "string" || ValueType.EndsWith("StringParameter");
+        [JsonIgnore] public bool IsTypeLong => ValueType is "long" or "uint" or "int" || (ValueType.EndsWith("Parameter") && !IsTypeString);
+        [JsonIgnore] public bool IsTypeFloat => ValueType is "float";
     }
 }

@@ -81,13 +81,13 @@ namespace WDE.DatabaseEditors.Models
             return typed.Current.Value;
         }
 
-        public DatabaseEntity Clone(DatabaseKey? newKey = null)
+        public DatabaseEntity Clone(DatabaseKey? newKey = null, bool? existInDatabase = null)
         {
             var fields = new Dictionary<string, IDatabaseField>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var field in Cells)
                 fields[field.Key] = field.Value.Clone();
             
-            return new DatabaseEntity(ExistInDatabase, newKey ?? Key, fields, Conditions == null ? null : CloneConditions(Conditions));
+            return new DatabaseEntity(existInDatabase ?? ExistInDatabase, newKey ?? Key, fields, Conditions == null ? null : CloneConditions(Conditions));
         }
 
         private IReadOnlyList<ICondition> CloneConditions(IReadOnlyList<ICondition> conditions)

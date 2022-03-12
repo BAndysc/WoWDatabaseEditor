@@ -8,6 +8,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -36,7 +37,7 @@ namespace WDE.DatabaseEditors.ViewModels
     public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator, IAddRowKey
     {
         private readonly ISolutionItemNameRegistry solutionItemName;
-        private readonly ISolutionManager solutionManager;
+        protected readonly ISolutionManager solutionManager;
         private readonly ISolutionTasksService solutionTasksService;
         private readonly IQueryGenerator queryGenerator;
         protected readonly IDatabaseTableDataProvider databaseTableDataProvider;
@@ -47,6 +48,8 @@ namespace WDE.DatabaseEditors.ViewModels
         protected readonly ISessionService sessionService;
         private readonly IDatabaseTableCommandService commandService;
         private readonly IParameterPickerService parameterPickerService;
+        private readonly IStatusBar statusBar;
+        private readonly IMySqlExecutor mySqlExecutor;
 
         protected ViewModelBase(IHistoryManager history,
             DatabaseTableSolutionItem solutionItem,
@@ -64,7 +67,9 @@ namespace WDE.DatabaseEditors.ViewModels
             ISolutionItemIconRegistry iconRegistry,
             ISessionService sessionService,
             IDatabaseTableCommandService commandService,
-            IParameterPickerService parameterPickerService)
+            IParameterPickerService parameterPickerService,
+            IStatusBar statusBar,
+            IMySqlExecutor mySqlExecutor)
         {
             this.solutionItemName = solutionItemName;
             this.solutionManager = solutionManager;
@@ -78,12 +83,14 @@ namespace WDE.DatabaseEditors.ViewModels
             this.sessionService = sessionService;
             this.commandService = commandService;
             this.parameterPickerService = parameterPickerService;
+            this.statusBar = statusBar;
+            this.mySqlExecutor = mySqlExecutor;
             this.solutionItem = solutionItem;
             History = history;
             
             undoCommand = new DelegateCommand(History.Undo, CanUndo);
             redoCommand = new DelegateCommand(History.Redo, CanRedo);
-            Save = new DelegateCommand(SaveSolutionItem);
+            Save = new AsyncAutoCommand(SaveSolutionItem);
             title = solutionItemName.GetName(solutionItem);
             Icon = iconRegistry.GetIcon(solutionItem);
             nameGeneratorParameter = parameterFactory.Factory("Parameter");
@@ -121,7 +128,7 @@ namespace WDE.DatabaseEditors.ViewModels
         }
 
         public abstract bool ForceRemoveEntity(DatabaseEntity entity);
-        public abstract bool ForceInsertEntity(DatabaseEntity entity, int index);
+        public abstract bool ForceInsertEntity(DatabaseEntity entity, int index, bool undoing = false);
 
         protected abstract IReadOnlyList<DatabaseKey> GenerateKeys();
         protected abstract IReadOnlyList<DatabaseKey>? GenerateDeletedKeys();
@@ -131,9 +138,11 @@ namespace WDE.DatabaseEditors.ViewModels
         protected Task ScheduleLoading()
         {
             IsLoading = true;
-            return taskRunner.ScheduleTask($"Loading {Title}..", LoadTableDefinition);
+            return taskRunner.ScheduleTask($"Loading {Title}..", InternalLoadData);
         }
 
+        protected virtual Task<string> GenerateSaveQuery() => GenerateQuery();
+        
         public virtual Task<string> GenerateQuery()
         {
             return Task.FromResult(queryGenerator
@@ -170,25 +179,49 @@ namespace WDE.DatabaseEditors.ViewModels
             return Task.FromResult(split);
         }
 
-        private void SaveSolutionItem()
+        protected async Task SaveSolutionItem()
         {
             UpdateSolutionItem();
             solutionManager.Refresh(SolutionItem);
-            solutionTasksService.SaveSolutionToDatabaseTask(this);
-            History.MarkAsSaved();
+            await taskRunner.ScheduleTask($"Export {Title} to database",
+                async progress =>
+                {
+                    progress.Report(0, 2, "Generate query");
+                    var query = await GenerateSaveQuery();
+                    progress.Report(1, 2, "Execute query");
+                    try
+                    {
+                        await mySqlExecutor.ExecuteSql(query);
+                        History.MarkAsSaved();
+                        await AfterSave();
+                        statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
+                    }
+                    catch (IMySqlExecutor.QueryFailedDatabaseException e)
+                    {
+                        statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Couldn't apply SQL: " + e.Message));
+                        throw;
+                    }
+                    progress.ReportFinished();
+                });
             Title = solutionItemName.GetName(SolutionItem);
         }
         
-        protected virtual Task BeforeLoadData() => Task.CompletedTask;
+        protected virtual Task AfterSave() => Task.CompletedTask;
+
+        protected virtual Task<bool> BeforeLoadData() => Task.FromResult(true);
 
         protected virtual async Task<DatabaseTableData?> LoadData()
         {
             return await databaseTableDataProvider.Load(solutionItem.DefinitionId, null, null, null, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData; ;
         }
         
-        private async Task LoadTableDefinition()
+        protected async Task<bool> InternalLoadData()
         {
-            await BeforeLoadData();
+            if (!await BeforeLoadData())
+            {
+                IsLoading = false;
+                return false;
+            }
             var data = await LoadData();
 
             if (data == null)
@@ -198,16 +231,18 @@ namespace WDE.DatabaseEditors.ViewModels
                     .SetIcon(MessageBoxIcon.Error)
                     .WithOkButton(true)
                     .Build());
-                return;
+                IsLoading = false;
+                return false;
             }
 
             solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
 
             LoadAndCreateCommands(data);
             
-            Entities.Clear();
+            Entities.RemoveAll();
             await InternalLoadData(data);
             IsLoading = false;
+            return true;
         }
 
         private void LoadAndCreateCommands(DatabaseTableData data)

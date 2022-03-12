@@ -53,7 +53,7 @@ public class SingleRecordDatabaseCellViewModel : BaseDatabaseCellViewModel, ITab
             tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
         AutoDispose(parameterValue.ToObservable("Value").Skip(1).SubscribeAction(_ =>
         {
-            Parent.RaiseChanged(tableField.FieldName);
+            Parent.RaiseChanged(this, tableField.FieldName);
             OriginalValueTooltip =
                 tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
             RaisePropertyChanged(nameof(OriginalValueTooltip));

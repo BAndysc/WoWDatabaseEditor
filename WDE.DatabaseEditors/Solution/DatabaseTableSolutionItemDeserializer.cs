@@ -64,7 +64,12 @@ namespace WDE.DatabaseEditors.Solution
 
         public ISmartScriptProjectItem Serialize(DatabaseTableSolutionItem item)
         {
-            var entries = JsonConvert.SerializeObject(item.Entries);
+            var entries = JsonConvert.SerializeObject(item.Entries, new JsonSerializerSettings()
+            {
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
+                Converters = { new DatabaseKeyConverter() }
+            });
             var items = string.Join(",", item.Entries.Select(e => e.Key.Serialize()));
             var deletedKeys = string.Join(",", item.DeletedEntries.Select(key => key.Serialize()));
             return new AbstractSmartScriptProjectItem()

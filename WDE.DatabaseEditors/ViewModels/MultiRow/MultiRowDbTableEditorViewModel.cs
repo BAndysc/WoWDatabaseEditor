@@ -126,12 +126,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
             ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
             IDatabaseTableCommandService commandService,
-            IParameterPickerService parameterPickerService) 
+            IParameterPickerService parameterPickerService,
+            IStatusBar statusBar) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService,
-            parameterPickerService)
+            parameterPickerService, statusBar, mySqlExecutor)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
@@ -391,7 +392,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             return ForceInsertEntity(entity, Entities.Count);
         }
 
-        public override bool ForceInsertEntity(DatabaseEntity entity, int index)
+        public override bool ForceInsertEntity(DatabaseEntity entity, int index, bool undoing = false)
         {
             var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key[0]);
             var row = new DatabaseEntityViewModel(entity, name);

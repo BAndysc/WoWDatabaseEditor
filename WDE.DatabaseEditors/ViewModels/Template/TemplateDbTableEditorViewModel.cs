@@ -12,6 +12,7 @@ using Prism.Events;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.History;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
@@ -76,11 +77,12 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             ITableDefinitionProvider tableDefinitionProvider,
             ISolutionItemIconRegistry iconRegistry, ISessionService sessionService,
             IDatabaseTableCommandService commandService,
-            IParameterPickerService parameterPickerService) : base(history, solutionItem, solutionItemName, 
+            IParameterPickerService parameterPickerService,
+            IStatusBar statusBar) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, 
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService,
-            commandService, parameterPickerService)
+            commandService, parameterPickerService, statusBar, mySqlExecutor)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;
@@ -283,7 +285,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return Task.FromResult(ForceInsertEntity(entity, Entities.Count));
         }
 
-        public override bool ForceInsertEntity(DatabaseEntity entity, int index)
+        public override bool ForceInsertEntity(DatabaseEntity entity, int index, bool undoing = false)
         {
             Dictionary<string, IObservable<bool>?> groupVisibility = new();
 

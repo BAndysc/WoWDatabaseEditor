@@ -8,7 +8,7 @@ using WDE.Common.Tasks;
 
 namespace WDE.Common.Utils
 {
-    public class AsyncAutoCommand : ICommand
+    public class AsyncAutoCommand : ICommand, IAsyncCommand
     {
         private bool isBusy;
 
@@ -55,6 +55,11 @@ namespace WDE.Common.Utils
             ((ICommand) command).Execute(parameter);
         }
 
+        public Task ExecuteAsync()
+        {
+            return command.ExecuteAsync();
+        }
+
         public void RaiseCanExecuteChanged()
         {
             command.RaiseCanExecuteChanged();
@@ -75,7 +80,7 @@ namespace WDE.Common.Utils
 
         public AsyncAutoCommand([NotNull]
             Func<T, Task> execute,
-            Func<object?, bool>? canExecute = null,
+            Func<T?, bool>? canExecute = null,
             Action<Exception>? onException = null,
             bool continueOnCapturedContext = false)
         {
@@ -85,7 +90,7 @@ namespace WDE.Common.Utils
                     await execute(t);
                     IsBusy = false;
                 },
-                a => !isBusy && (canExecute?.Invoke(a) ?? true),
+                a => !isBusy && (canExecute?.Invoke((T?)a) ?? true),
                 e =>
                 {
                     IsBusy = false;

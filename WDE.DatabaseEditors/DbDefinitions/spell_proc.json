@@ -74,7 +74,7 @@
           "name": "Spell Phase Mask",
           "db_column_name": "SpellPhaseMask",
           "value_type": "ProcSpellPhaseMaskParameter",
-          "preferred_width": 60.0
+          "preferred_width": 190.0
         },
         {
           "name": "Hit Mask",

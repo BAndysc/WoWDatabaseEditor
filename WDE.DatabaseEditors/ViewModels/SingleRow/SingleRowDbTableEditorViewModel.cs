@@ -17,6 +17,7 @@ using WDE.Common.Avalonia;
 using WDE.Common.Database;
 using WDE.Common.Disposables;
 using WDE.Common.History;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
@@ -30,6 +31,7 @@ using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.History;
+using WDE.DatabaseEditors.History.SingleRow;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
@@ -54,10 +56,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> removedKeys = new HashSet<DatabaseKey>();
+        private HashSet<DatabaseKey> forceInsertKeys = new HashSet<DatabaseKey>();
         private List<System.IDisposable> rowsDisposable = new();
         public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
 
-        [Notify] private bool showOnlyModified;
+        private bool showOnlyModified;
         [AlsoNotify(nameof(SelectedRow))] [Notify] private int selectedRowIndex;
         [AlsoNotify(nameof(SelectedCell))] [Notify] private int selectedCellIndex;
         public DatabaseEntityViewModel? SelectedRow => selectedRowIndex >= 0 && selectedRowIndex < Rows.Count ? Rows[selectedRowIndex] : null;
@@ -66,6 +69,36 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         [Notify] private int limitQuery = 300;
         [Notify] private long offsetQuery = 0;
 
+        private bool ignoreShowOnlyModifiedEvents;
+        public bool ShowOnlyModified
+        {
+            get => showOnlyModified;
+            set
+            {
+                if (showOnlyModified == value)
+                    return;
+                if (ignoreShowOnlyModifiedEvents)
+                    return;
+                ignoreShowOnlyModifiedEvents = true;
+                
+                async Task ScheduleLoadingAndUpdateOnlyModified(bool showOnlyModified)
+                {
+                    if (!await BeforeLoadData())
+                    {
+                        ignoreShowOnlyModifiedEvents = false;
+                        return;                        
+                    }
+                    History.MarkAsSaved(); // workaround for double showing message regarding unsaved changes
+                    this.showOnlyModified = showOnlyModified;
+                    await ScheduleLoading();
+                    RaisePropertyChanged(nameof(ShowOnlyModified));
+                    ignoreShowOnlyModifiedEvents = false;
+                }
+
+                ScheduleLoadingAndUpdateOnlyModified(value).ListenErrors();
+            }
+        }
+        
         private MultiRowSplitMode splitMode;
         public bool SplitView => splitMode != MultiRowSplitMode.None;
 
@@ -106,8 +139,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public MySqlFilterViewModel FilterViewModel { get; }
 
         public AsyncAutoCommand AddNewCommand { get; }
-        public AsyncAutoCommand<SingleRecordDatabaseCellViewModel?> RemoveTemplateCommand { get; }
-        public AsyncAutoCommand<SingleRecordDatabaseCellViewModel?> RevertCommand { get; }
+        public DelegateCommand<SingleRecordDatabaseCellViewModel?> RevertCommand { get; }
         public AsyncAutoCommand<SingleRecordDatabaseCellViewModel?> EditConditionsCommand { get; }
         public DelegateCommand<SingleRecordDatabaseCellViewModel?> SetNullCommand { get; }
         public DelegateCommand<SingleRecordDatabaseCellViewModel?> DuplicateCommand { get; }
@@ -123,8 +155,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public AsyncAutoCommand NextDataPage { get; }
 
         public event Action<DatabaseEntity>? OnDeletedQuery;
-        public event Action<DatabaseEntity>? OnKeyDeleted;
-        public event Action<DatabaseKey>? OnKeyAdded;
+        public event Action<DatabaseEntity, int>? OnKeyDeleted;
+        public event Action<DatabaseKey, int>? OnKeyAdded;
 
         public SingleRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
@@ -137,12 +169,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
             ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
             IDatabaseTableCommandService commandService,
-            IParameterPickerService parameterPickerService) 
+            IParameterPickerService parameterPickerService,
+            IStatusBar statusBar) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService,
-            parameterPickerService)
+            parameterPickerService, statusBar, mySqlExecutor)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
@@ -157,16 +190,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             splitMode = editorSettings.MultiRowSplitMode;
 
-            
-            AutoDispose(this.ToObservable(() => ShowOnlyModified).Skip(1).Subscribe(show =>
-            {
-                OffsetQuery = 0;
-                ScheduleLoading().ListenErrors();
-            }));
-
             OpenParameterWindow = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel>(EditParameter);
-            RemoveTemplateCommand = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
-            RevertCommand = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel?>(Revert, cell => cell is SingleRecordDatabaseCellViewModel vm && vm.CanBeReverted && (vm.TableField?.IsModified ?? false));
+            RevertCommand = new DelegateCommand<SingleRecordDatabaseCellViewModel?>(cell =>
+            {
+                cell!.ParameterValue!.Revert();
+            }, cell => cell != null && cell.CanBeReverted && (cell?.TableField?.IsModified ?? false));
             SetNullCommand = new DelegateCommand<SingleRecordDatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             DuplicateCommand = new DelegateCommand<SingleRecordDatabaseCellViewModel?>(Duplicate, vm => vm != null);
             EditConditionsCommand = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel?>(EditConditions);
@@ -179,13 +207,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             RevertSelectedCommand = new AsyncAutoCommand(async () =>
             {
-                await Revert(SelectedCell);
+                SelectedCell?.ParameterValue?.Revert();
             }, () => SelectedCell != null && SelectedCell.CanBeReverted);
             AutoDispose(this.ToObservable(() => SelectedCell).Subscribe(_ => RevertSelectedCommand.RaiseCanExecuteChanged()));
 
             DeleteRowSelectedCommand = new AsyncAutoCommand(async () =>
             {
-                await RemoveEntity(SelectedRow!.Entity);
+                ForceRemoveEntity(SelectedRow!.Entity);
             }, () => SelectedRow != null);
             AutoDispose(this.ToObservable(() => SelectedRow).Subscribe(_ => DeleteRowSelectedCommand.RaiseCanExecuteChanged()));
             
@@ -195,8 +223,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 //todo ask for a new key
                 int index = SelectedRowIndex + 1;
                 ForceInsertEntity(duplicate, index);
-                selectedRowIndex = -1;
-                SelectedRowIndex = index;
             }, () => SelectedRow != null);
             AutoDispose(this.ToObservable(() => SelectedRow).Subscribe(_ => DuplicateSelectedCommand.RaiseCanExecuteChanged()));
                 
@@ -246,8 +272,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
             ForceInsertEntity(freshEntity, Entities.Count);
-            selectedRowIndex = -1;
-            SelectedRowIndex = Entities.Count;
             return freshEntity;
         }
 
@@ -275,7 +299,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             DatabaseKey key = new DatabaseKey(newKey);
 
-            if (ContainsKey(key))
+            if (await ContainsKey(key))
             {
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Key already added")
@@ -287,13 +311,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 return;
             }
             
-            OnKeyAdded?.Invoke(key);
+            var index = SelectedRow == null ? Entities.Count : selectedRowIndex + 1;
+            OnKeyAdded?.Invoke(key, index);
             
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
-            var index = SelectedRow == null ? Entities.Count : selectedRowIndex + 1;
             ForceInsertEntity(freshEntity, index);
-            selectedRowIndex = -1;
-            SelectedRowIndex = index;
         }
         
         private void SetToNull(SingleRecordDatabaseCellViewModel? view)
@@ -331,14 +353,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
         }
         
-        private async Task Revert(SingleRecordDatabaseCellViewModel? view)
+        private async Task Revert(SingleRecordDatabaseCellViewModel view)
         {
-            if (view == null || view.IsReadOnly || view.TableField == null)
-                return;
-            
-            view.ParameterValue!.Revert();
-            
-            if (!view.ParentEntity.ExistInDatabase)
+            if (!view.ParentEntity.ExistInDatabase || view.TableField == null)
                 return;
             
             if (!mySqlExecutor.IsConnected)
@@ -357,14 +374,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             var query = queryGenerator.GenerateUpdateFieldQuery(tableDefinition, view.ParentEntity, view.TableField);
             await mySqlExecutor.ExecuteSql(query);
-        }
-
-        private async Task RemoveTemplate(SingleRecordDatabaseCellViewModel? view)
-        {
-            if (view == null)
-                return;
-
-            await RemoveEntity(view.ParentEntity);
+            History.MarkNoSave();
         }
 
         private Task EditParameter(SingleRecordDatabaseCellViewModel cell)
@@ -383,16 +393,48 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), offsetQuery, limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData; ;
         }
         
-        protected override Task BeforeLoadData()
+        protected override async Task<bool> BeforeLoadData()
         {
+            if (IsModified)
+            {
+                var result = await messageBoxService.ShowDialog(new MessageBoxFactory<int>()
+                    .SetTitle("Save changes")
+                    .SetMainInstruction("You have unsaved changes. Do you want to save them?")
+                    .SetContent("Changing the rows you see will discard unsaved changes.")
+                    .WithYesButton(0)
+                    .WithNoButton(1)
+                    .WithCancelButton(2)
+                    .Build());
+                if (result == 2)
+                    return false;
+                if (result == 0)
+                    await SaveDataNow();
+            }
             // save existing changes
             SelectedRowIndex = -1;
             UpdateSolutionItem();
-            return base.BeforeLoadData();
+
+            if (historyHandler != null)
+            {
+                historyHandler.Dispose();
+                History.RemoveHandler(historyHandler);
+                historyHandler = null;
+            }
+            return true;
         }
 
+        private async Task SaveDataNow()
+        {
+            UpdateSolutionItem();
+            solutionManager.Refresh(SolutionItem);
+            await mySqlExecutor.ExecuteSql(await GenerateQuery());
+            await sessionService.UpdateQuery(this);
+            History.MarkAsSaved();
+        }
+        
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
+            History.Clear();
             rowsDisposable.ForEach(x => x.Dispose());
             rowsDisposable.Clear();
             Rows.RemoveAll();
@@ -421,8 +463,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             
             var allRows = await tableDataProvider.GetCount(tableDefinition.Id, FilterViewModel.BuildWhere(), showOnlyModified ? keys : null);
             RowsSummaryText = $"{offsetQuery + 1} - {offsetQuery + data.Entities.Count} of {allRows} rows";
-            // TODO
-            //historyHandler = History.AddHandler(AutoDispose(new MultiRowTableEditorHistoryHandler(this)));
+            historyHandler = History.AddHandler(new SingleRowTableEditorHistoryHandler(this));
         }
 
         public string SerializeDefinition(DatabaseTableDefinitionJson json)
@@ -441,7 +482,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         
         protected override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
 
-        private MultiRowTableEditorHistoryHandler? historyHandler;
+        private SingleRowTableEditorHistoryHandler? historyHandler;
 
         protected override void UpdateSolutionItem()
         {
@@ -460,19 +501,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return databaseEntity.Cells.Any(c => c.Value.IsModified);
         }
 
-        public async Task<bool> RemoveEntity(DatabaseEntity entity)
-        {
-            //Todo
-            if (SelectedRow?.Entity == entity)
-                SelectedRowIndex = -1;
-            keys.Remove(entity.Key);
-            removedKeys.Add(entity.Key);
-            Rows.RemoveIf(r => r.Entity == entity);
-            Entities.Remove(entity);
-            OnKeyDeleted?.Invoke(entity);
-            return true;
-        }
-        
         public void RedoExecuteDelete(DatabaseEntity entity)
         {
             if (mySqlExecutor.IsConnected)
@@ -485,13 +513,19 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public override bool ForceRemoveEntity(DatabaseEntity entity)
         {
             var indexOfEntity = Entities.IndexOf(entity);
-            if (indexOfEntity == -1)
-                return false;
+            Debug.Assert(indexOfEntity >= 0);
+            
+            keys.Remove(entity.Key);
+            removedKeys.Add(entity.Key);
+            forceInsertKeys.Remove(entity.Key);
             
             Entities.RemoveAt(indexOfEntity);
             if (SelectedRow?.Entity == entity)
                 SelectedRowIndex = -1;
-            Rows.RemoveIf(x => x.Entity == entity);
+            
+            Rows[indexOfEntity].ChangedCell -= OnRowChangedCell;
+            Rows[indexOfEntity].Changed -= OnRowChanged;
+            Rows.RemoveAt(indexOfEntity);
 
             return true;
         }
@@ -501,8 +535,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return ForceInsertEntity(entity, Entities.Count);
         }
 
-        public override bool ForceInsertEntity(DatabaseEntity entity, int index)
+        public override bool ForceInsertEntity(DatabaseEntity entity, int index, bool undoing = false)
         {
+            if (undoing)
+                forceInsertKeys.Add(entity.Key);
             removedKeys.Remove(entity.Key);
             var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
             var savedItem = sessionService.Find(pseudoItem);
@@ -563,15 +599,20 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             
             Entities.Insert(index, entity);
             Rows.Insert(index, row);
+            selectedRowIndex = -1;
+            SelectedRowIndex = index;
             return true;
         }
 
-        private void OnRowChangedCell(DatabaseEntityViewModel entity, string cell)
+        private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, string columnName)
         {
-            if (!tableDefinition.GroupByKeys.Contains(cell))
-                return;
-
-            ReKey(entity).ListenErrors();
+            if (tableDefinition.GroupByKeys.Contains(columnName))
+                ReKey(entity).ListenErrors();
+            else
+            {
+                if (!cell.IsModified)
+                    Revert(cell).ListenErrors();
+            }
         }
 
         private async Task ReKey(DatabaseEntityViewModel entity)
@@ -582,11 +623,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
 
             var newKey = BuildKey(entity.Entity);
+            var oldKey = entity.Key;
+            var originalExistsInDb = entity.Entity.ExistInDatabase;
 
             if (newKey == entity.Key)
                 return; // no re-keying needed
             
-            if (ContainsKey(newKey))
+            if (await ContainsKey(newKey))
             {
                 int i = 0;
                 // revert values
@@ -602,20 +645,38 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
             else
             {
-                var insertIndex = selectedRowIndex;
-                var clone = entity.Entity.Clone(newKey);
-                clone.ExistInDatabase = false;
-                var old = Rows.Select((row, index) => (row, index)).Where(pair => pair.row.Key == entity.Key).Select(pair => (int?)pair.index).FirstOrDefault();
-                if (old.HasValue)
+                historyHandler!.DoAction(new AnonymousHistoryAction("Change key", () =>
                 {
-                    await RemoveEntity(Rows[old.Value].Entity);
-                    insertIndex = Math.Clamp(old.Value, 0, Rows.Count);
-                    ForceInsertEntity(clone, insertIndex);
-                    selectedRowIndex = -1;
-                    SelectedRowIndex = insertIndex;
-                }
-                else
-                    throw new Exception("Entity not found while re-keying");
+                    var clone = entity.Entity.Clone(oldKey);
+                    clone.ExistInDatabase = originalExistsInDb;
+                    var old = Rows.Select((row, index) => (row, index)).Where(pair => pair.row.Key == newKey).Select(pair => (int?)pair.index).FirstOrDefault();
+                    if (old.HasValue)
+                    {
+                        ForceRemoveEntity(Rows[old.Value].Entity);
+                        ForceInsertEntity(clone, Math.Clamp(old.Value, 0, Rows.Count));
+                        int i = 0;
+                        foreach (var column in tableDefinition.GroupByKeys)
+                            clone.SetTypedCellOrThrow(column, clone.Key[i++]);
+                        forceInsertKeys.Add(oldKey);
+                    }
+                    else
+                        throw new Exception("Entity not found while re-keying");
+                }, () =>
+                {
+                    var clone = entity.Entity.Clone(newKey);
+                    clone.ExistInDatabase = false;
+                    var old = Rows.Select((row, index) => (row, index)).Where(pair => pair.row.Key == oldKey).Select(pair => (int?)pair.index).FirstOrDefault();
+                    if (old.HasValue)
+                    {
+                        ForceRemoveEntity(Rows[old.Value].Entity);
+                        ForceInsertEntity(clone, Math.Clamp(old.Value, 0, Rows.Count));
+                        int i = 0;
+                        foreach (var column in tableDefinition.GroupByKeys)
+                            clone.SetTypedCellOrThrow(column, clone.Key[i++]);
+                    }
+                    else
+                        throw new Exception("Entity not found while re-keying");
+                }));
             }
         }
 
@@ -630,9 +691,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 keys.Remove(row.Key);
         }
 
-        private bool ContainsKey(DatabaseKey key)
+        private async Task<bool> ContainsKey(DatabaseKey key)
         {
-            return Rows.Any(row => row.Key == key);
+            if (Rows.Any(row => row.Key == key))
+                return true;
+
+            return await databaseTableDataProvider.GetCount(tableDefinition.Id, null, new [] { key }) > 0;
         }
         
         private async Task AsyncAddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
@@ -657,10 +721,31 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             rowsDisposable.Add(entity);
             return entity;
         }
-        
-        public override async Task<string> GenerateQuery()
+
+        protected override Task<string> GenerateSaveQuery()
         {
-            var newData = Entities.Where(e => !e.ExistInDatabase || EntityIsModified(e)).ToList();
+            return GenerateQueryImpl(true);
+        }
+
+        public override Task<string> GenerateQuery()
+        {
+            return GenerateQueryImpl(false);
+        }
+
+        private async Task<string> GenerateQueryImpl(bool saveQuery)
+        {
+            var newData = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e)) && (!saveQuery || !forceInsertKeys.Contains(e.Key))).ToList();
+
+            if (saveQuery)
+            {
+                foreach (var e in forceInsertKeys)
+                {
+                    var entity = Entities.FirstOrDefault(x => x.Key == e);
+                    if (entity == null)
+                        continue;
+                    newData.Add(entity.Clone(null, false));
+                }
+            }
 
             var newDataKeys = newData.Select(e => e.Key).ToArray();
             var oldKeys = keys.Except(newDataKeys).ToArray();
@@ -678,6 +763,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             
             return queryGenerator
                 .GenerateQuery(GenerateKeys(),  GenerateDeletedKeys(), data).QueryString;
+        }
+
+        protected override Task AfterSave()
+        {
+            forceInsertKeys.Clear();
+            return Task.CompletedTask;
         }
     }
 }

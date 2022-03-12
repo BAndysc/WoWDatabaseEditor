@@ -133,7 +133,8 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
 
     protected override void Cleanup(TextBox element)
     {
-        element.LostFocus -= ElementLostFocus;
+        if (element != null)
+            element.LostFocus -= ElementLostFocus;
         currentOnApply = null;
     }
 

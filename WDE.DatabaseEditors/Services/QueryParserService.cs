@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
@@ -35,12 +36,42 @@ namespace WDE.DatabaseEditors.Services
             this.sessionService = sessionService;
             this.loader = loader;
         }
+
+        private bool TryBuildKey(DatabaseTableDefinitionJson definition, EqualityWhereCondition condition, out DatabaseKey key)
+        {
+            key = default;
+            if (condition.Columns.Length != definition.GroupByKeys.Count ||
+                definition.GroupByKeys.Count == 0)
+                return false;
+
+            List<long>? values = null;
+            foreach (var groupBy in definition.GroupByKeys)
+            {
+                int index = condition.Columns.IndexIf(x => x.Equals(groupBy, StringComparison.InvariantCultureIgnoreCase));
+                if (index == -1)
+                    return false;
+                var value = condition.Values[index];
+                if (value is not long l)
+                    return false;
+                if (definition.GroupByKeys.Count == 1)
+                {
+                    key = new DatabaseKey(l);
+                    return true;
+                }
+                values = values ?? new();
+                values.Add(l);
+            }
+
+            key = new DatabaseKey(values!);
+            return true;
+        }
     
         public async Task<(IList<ISolutionItem> items, IList<string> errors)> GenerateItemsForQuery(string query)
         {
             IList<ISolutionItem> found = new List<ISolutionItem>();
             IList<string> errors = new List<string>();
             HashSet<string> missingTables = new HashSet<string>();
+            Dictionary<string, DatabaseTableSolutionItem> byTable = new();
             foreach (var q in queryEvaluator.Extract(query))
             {
                 if (q is UpdateQuery updateQuery)
@@ -59,35 +90,52 @@ namespace WDE.DatabaseEditors.Services
                         missingTables.Add(updateQuery.TableName);
                         continue;
                     }
-                
-                    if (
-                        (!foreignTable.HasValue && !updateQuery.Where.ColumnName.Equals(defi.TablePrimaryKeyColumnName, StringComparison.InvariantCultureIgnoreCase))
-                        ||
-                        (foreignTable.HasValue && !updateQuery.Where.ColumnName.Equals(foreignTable.Value.ForeignKeys[0], StringComparison.InvariantCultureIgnoreCase))
-                        )
+                    
+                    foreach (var condition in updateQuery.Where.Conditions)
                     {
-                        missingTables.Add(updateQuery.TableName);
-                        continue;
-                    }
-
-                    // todo: support for multiple primary keys
-                    foreach (var key in updateQuery.Where.Values)
-                    {
-                        if (key is not long lkey)
+                        if (!TryBuildKey(defi, condition, out var key))
                             continue;
-                        var old = await loader.Load(defi.Id, null,null,null, new[]{new DatabaseKey(lkey)});
+                        var old = await loader.Load(defi.Id, null,null,null, new[]{key});
                         if (old == null || old.Entities.Count != 1 || !old.Entities[0].ExistInDatabase)
                         {
-                            errors.Add($"{defi.TableName} where {defi.TablePrimaryKeyColumnName} = {lkey} not found, no update");
+                            errors.Add($"{defi.TableName} where {defi.TablePrimaryKeyColumnName} = {key} not found, no update");
                             continue;
                         }
-                        var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
-                        item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), true));
-                        var savedItem = sessionService.Find(item);
-                        if (savedItem != null)
-                            item = (DatabaseTableSolutionItem)savedItem.Clone();
 
-                        var originals = item.Entries[0].OriginalValues ??= new();
+                        List<EntityOrigianlField> originals;
+                        if (defi.RecordMode == RecordMode.SingleRow)
+                        {
+                            DatabaseTableSolutionItem? existing = null;
+                            if (byTable.TryGetValue(defi.Id, out existing))
+                            {
+                            }
+                            else
+                            {
+                                var phantom = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
+                                existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
+                                found.Add(existing);
+                                byTable[defi.Id] = existing;
+                            }
+
+                            var entry = existing.Entries.FirstOrDefault(e => e.Key == key);
+                            if (entry == null)
+                            {
+                                entry = new(key, true);
+                                existing.Entries.Add(entry);
+                            }
+                            originals = entry.OriginalValues ??= new();
+                        }
+                        else
+                        {
+                            var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
+                            item.Entries.Add(new SolutionItemDatabaseEntity(key, true));
+                            var savedItem = sessionService.Find(item);
+                            if (savedItem != null)
+                                item = (DatabaseTableSolutionItem)savedItem.Clone();
+
+                            originals = item.Entries[0].OriginalValues ??= new();
+                            found.Add(item);
+                        }
                         foreach (var upd in updateQuery.Updates)
                         {
                             var cell = old.Entities[0].GetCell(upd.ColumnName);
@@ -102,8 +150,11 @@ namespace WDE.DatabaseEditors.Services
                             };
                             originals.Add(original);
                         }
-                        found.Add(item);
                     }
+                }
+                else if (q is DeleteQuery deleteQuery)
+                {
+                    
                 }
                 else if (q is InsertQuery insertQuery)
                 {
@@ -132,13 +183,39 @@ namespace WDE.DatabaseEditors.Services
                     }
 
                     //todo: support for multiple primary keys
-                    foreach (var line in insertQuery.Inserts)
+
+                    if (defi.RecordMode == RecordMode.SingleRow)
                     {
-                        if (line[indexOf] is not long lkey)
-                            continue;
-                        var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
-                        item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), false));
-                        found.Add(item);
+                        DatabaseTableSolutionItem? existing = null;
+                        if (byTable.TryGetValue(defi.Id, out existing))
+                        {
+                        }
+                        else
+                        {
+                            var phantom = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
+                            existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
+                            found.Add(existing);
+                            byTable[defi.Id] = existing;
+                        }
+                        foreach (var line in insertQuery.Inserts)
+                        {
+                            if (line[indexOf] is not long lkey)
+                                continue;
+                            var key = new DatabaseKey(lkey);
+                            if (existing.Entries.All(x => x.Key != key))
+                                existing.Entries.Add(new SolutionItemDatabaseEntity(key, false));
+                        }
+                    }
+                    else
+                    {
+                        foreach (var line in insertQuery.Inserts)
+                        {
+                            if (line[indexOf] is not long lkey)
+                                continue;
+                            var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
+                            item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), false));
+                            found.Add(item);
+                        }
                     }
                 }
             }

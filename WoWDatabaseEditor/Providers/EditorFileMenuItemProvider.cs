@@ -53,7 +53,13 @@ namespace WoWDatabaseEditorCore.Providers
             
             SubItems.Add(new ModuleMenuItem("_Save to database", 
                 new DelegateCommand(
-                        () => DocumentManager.ActiveDocument?.Save.Execute(null),
+                        () =>
+                        {
+                            if (DocumentManager.ActiveSolutionItemDocument != null)
+                                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!).ListenErrors();
+                            else
+                                documentManager.ActiveDocument!.Save.Execute(null);
+                        },
                 () => solutionTasksService.CanSaveToDatabase && (DocumentManager.ActiveDocument?.Save.CanExecute(null) ?? false))
                     .ObservesProperty(() => DocumentManager.ActiveDocument)
                     .ObservesProperty(() => DocumentManager.ActiveDocument!.IsModified), new("Control+S")));

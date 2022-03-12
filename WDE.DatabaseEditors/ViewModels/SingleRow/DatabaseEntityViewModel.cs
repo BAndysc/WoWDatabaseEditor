@@ -22,12 +22,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         public IReadOnlyList<ITableCell> CellsList => Cells;
         public event Action<ITableRow>? Changed;
-        public event Action<DatabaseEntityViewModel, string>? ChangedCell;
+        public event Action<DatabaseEntityViewModel, SingleRecordDatabaseCellViewModel, string>? ChangedCell;
 
-        public void RaiseChanged(string column)
+        public void RaiseChanged(SingleRecordDatabaseCellViewModel cell, string column)
         {
+            ChangedCell?.Invoke(this, cell, column);
             Changed?.Invoke(this);
-            ChangedCell?.Invoke(this, column);
         }
     }
 }

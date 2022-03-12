@@ -47,6 +47,8 @@ public partial class VeryFastTableView
             
             // background
             context.FillRectangle(SelectedRowIndex == index ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
+
+            CustomCellDrawer?.DrawRow(context, row, rowRect);
             
             var textColor = index == SelectedRowIndex ? FocusTextBrush : TextBrush;
             
@@ -116,7 +118,7 @@ public partial class VeryFastTableView
         
         // draw the background
         context.DrawRectangle(HeaderBackground, null, new Rect(scrollViewer.Offset.X, y, scrollViewer.Viewport.Width, height));
-        context.DrawLine(HeaderBorderBackground, new Point(scrollViewer.Offset.X, y + height), new Point(scrollViewer.Offset.X + scrollViewer.Viewport.Width, y + height));
+        context.DrawLine(HeaderBorderBackground, new Point(scrollViewer.Offset.X, y + height - 1), new Point(scrollViewer.Offset.X + scrollViewer.Viewport.Width, y + height - 1));
         
         // small todo: we could optimize this by only drawing the visible columns
         for (int i = 0; i < Columns.Count; ++i)

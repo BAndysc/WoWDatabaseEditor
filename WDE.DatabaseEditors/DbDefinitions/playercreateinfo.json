@@ -28,7 +28,7 @@
           "db_column_name": "race",
           "value_type": "RaceParameter",
           "read_only": true,
-          "preferred_width": 125.0
+          "preferred_width": 220.0
         },
         {
           "name": "Class",
