@@ -3,18 +3,17 @@
   "compatibility": [
     "TrinityWrath"
   ],
-  "name": "Playercreateinfo Spell Custom",
-  "single_solution_name": "{name} playercreateinfo_spell_custom editor",
-  "multi_solution_name": "multiple playercreateinfo_spell_custom editor",
-  "description": "Here insert short description what is playercreateinfo_spell_custom for",
+  "name": "Player createinfo Spell Custom",
+  "single_solution_name": "Player createinfo Spell Custom",
+  "multi_solution_name": "Player createinfo Spell Custom",
+  "description": "This table holds information on what spells newly created characters should start out with if the PlayerStart.AllSpells setting in enabled in worldserver.conf",
   "table_name": "playercreateinfo_spell_custom",
   "table_index_name": "racemask",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Player create info",
   "icon_path": "Icons/document_.png",
-  "reload_command": "reload playercreateinfo_spell_custom",
   "picker": "Parameter",
-  "skip_quick_load": true,
   "primary_key": [
     "racemask",
     "classmask",
@@ -25,26 +24,29 @@
       "group_name": "group",
       "fields": [
         {
-          "name": "Racemask",
+          "name": "Race Mask",
           "db_column_name": "racemask",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "RaceMaskParameter",
+          "preferred_width": 115.0
         },
         {
-          "name": "Classmask",
+          "name": "Class Mask",
           "db_column_name": "classmask",
-          "value_type": "uint"
+          "value_type": "ClassMaskParameter",
+          "preferred_width": 125.0
         },
         {
           "name": "Spell",
           "db_column_name": "Spell",
-          "value_type": "uint"
+          "value_type": "SpellParameter",
+          "preferred_width": 240.0
         },
         {
           "name": "Note",
           "db_column_name": "Note",
           "value_type": "string",
-          "can_be_null": true
+          "can_be_null": true,
+          "preferred_width": 225.0
         }
       ]
     }

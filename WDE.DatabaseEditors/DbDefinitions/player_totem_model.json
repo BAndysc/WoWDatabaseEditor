@@ -4,17 +4,16 @@
     "TrinityWrath"
   ],
   "name": "Player Totem Model",
-  "single_solution_name": "{name} player_totem_model editor",
-  "multi_solution_name": "multiple player_totem_model editor",
-  "description": "Here insert short description what is player_totem_model for",
+  "single_solution_name": "Player Totem Model",
+  "multi_solution_name": "Player Totem Model",
+  "description": "",
   "table_name": "player_totem_model",
   "table_index_name": "TotemSlot",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Advanced",
   "icon_path": "Icons/document_.png",
-  "reload_command": "reload player_totem_model",
   "picker": "Parameter",
-  "skip_quick_load": true,
   "primary_key": [
     "TotemSlot",
     "RaceId"
@@ -26,18 +25,20 @@
         {
           "name": "Totem Slot",
           "db_column_name": "TotemSlot",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "TotemSlotParameter",
+          "preferred_width": 155.0
         },
         {
           "name": "Race Id",
           "db_column_name": "RaceId",
-          "value_type": "uint"
+          "value_type": "RaceParameter",
+          "preferred_width": 190.0
         },
         {
           "name": "Display Id",
           "db_column_name": "DisplayId",
-          "value_type": "uint"
+          "value_type": "CreatureModelDataParameter",
+          "preferred_width": 355.0
         }
       ]
     }

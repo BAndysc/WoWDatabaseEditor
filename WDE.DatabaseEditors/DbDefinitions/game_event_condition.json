@@ -1,0 +1,57 @@
+{
+  "id": "game_event_condition",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event Condition",
+  "description": "This table contains conditions to meet for the specified game event to be completed. Also contains the world state fields used for reporting the given conditions progress and/or max required value. This table will do absolutely nothing if you have not set the event to be a world event.",
+  "table_name": "game_event_condition",
+  "table_index_name": "eventEntry",
+  "record_mode": "SingleRow",
+  "group_name": "Game events",
+  "skip_quick_load": true,
+  "icon_path": "Icons/document_.png",
+  "primary_key": [
+    "eventEntry",
+    "condition_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "eventEntry",
+          "value_type": "GameEventParameter"
+        },
+        {
+          "name": "Condition Id",
+          "db_column_name": "condition_id",
+          "value_type": "TableReference(game_event_quest_condition#condition_id)Parameter"
+        },
+        {
+          "name": "Req Num",
+          "db_column_name": "req_num",
+          "value_type": "float",
+          "can_be_null": true
+        },
+        {
+          "name": "Max World State Field",
+          "db_column_name": "max_world_state_field",
+          "value_type": "uint"
+        },
+        {
+          "name": "Done World State Field",
+          "db_column_name": "done_world_state_field",
+          "value_type": "uint"
+        },
+        {
+          "name": "Description",
+          "db_column_name": "description",
+          "value_type": "string",
+          "default": ""
+        }
+      ]
+    }
+  ]
+}

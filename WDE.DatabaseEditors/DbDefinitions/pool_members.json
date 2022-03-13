@@ -10,10 +10,10 @@
   "table_name": "pool_members",
   "table_index_name": "spawnId",
   "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Pooling",
   "icon_path": "Icons/document_.png",
   "reload_command": "reload pool_members",
-  "skip_quick_load": true,
   "picker": "Parameter",
   "primary_key": [
     "type",
@@ -26,19 +26,19 @@
         {
           "name": "Spawn Id",
           "db_column_name": "spawnId",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "TableReference(creature#guid)Parameter",
+          "preferred_width": 100.0
         },
         {
           "name": "Type",
           "db_column_name": "type",
-          "value_type": "PoolMemberTypeParameter",
-          "read_only": true
+          "value_type": "PoolMemberTypeParameter"
         },
         {
-          "name": "Pool Spawn Id",
+          "name": "Pool Id",
           "db_column_name": "poolSpawnId",
-          "value_type": "uint"
+          "value_type": "TableReference(pool_template#entry)Parameter",
+          "preferred_width": 95.0
         },
         {
           "name": "Chance",
@@ -49,7 +49,8 @@
           "name": "Description",
           "db_column_name": "description",
           "value_type": "string",
-          "can_be_null": true
+          "can_be_null": true,
+          "preferred_width": 395.0
         }
       ]
     }

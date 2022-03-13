@@ -1,0 +1,55 @@
+{
+  "id": "graveyard_zone",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Graveyard Zone",
+  "single_solution_name": "Graveyard Zone",
+  "multi_solution_name": "Graveyard Zone",
+  "description": "Contains information about zones connected to world's graveyards.  This table is used to set what factions a given graveyard will accept, and also to specify the nearest graveyard to a given zone.",
+  "table_name": "graveyard_zone",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload graveyard_zone",
+  "picker": "Parameter",
+  "primary_key": [
+    "ID",
+    "GhostZone"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Graveyard Id",
+          "db_column_name": "ID",
+          "value_type": "WorldSafeLocParameter",
+          "preferred_width": 240.0
+        },
+        {
+          "name": "Ghost Zone",
+          "db_column_name": "GhostZone",
+          "value_type": "ZoneAreaParameter",
+          "preferred_width": 295.0
+        },
+        {
+          "name": "Team",
+          "db_column_name": "Faction",
+          "value_type": "TeamAllianceParameter",
+          "preferred_width": 185.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 270.0
+        }
+      ]
+    }
+  ]
+}

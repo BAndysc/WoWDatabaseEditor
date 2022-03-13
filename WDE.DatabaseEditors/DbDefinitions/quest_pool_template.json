@@ -25,7 +25,6 @@
           "name": "Pool Id",
           "db_column_name": "poolId",
           "value_type": "uint",
-          "read_only": true,
           "preferred_width": 65.0
         },
         {
@@ -33,6 +32,11 @@
           "db_column_name": "numActive",
           "value_type": "uint",
           "preferred_width": 50.0
+        },
+        {
+          "name": "Quests",
+          "is_meta": true,
+          "meta": "table:quest_pool_members;`poolId` = {poolId}"
         },
         {
           "name": "Description",

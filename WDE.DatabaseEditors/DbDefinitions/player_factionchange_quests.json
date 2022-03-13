@@ -3,18 +3,17 @@
   "compatibility": [
     "TrinityWrath"
   ],
-  "name": "Player Factionchange Quests",
-  "single_solution_name": "{name} player_factionchange_quests editor",
-  "multi_solution_name": "multiple player_factionchange_quests editor",
-  "description": "Here insert short description what is player_factionchange_quests for",
+  "name": "Player Faction Change Quests",
+  "single_solution_name": "Player Faction Change Quests",
+  "multi_solution_name": "Player Faction Change Quests",
+  "description": "Defines what quests should be converted to their faction specific counterparts when a player changes faction.",
   "table_name": "player_factionchange_quests",
   "table_index_name": "alliance_id",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Faction changing",
   "icon_path": "Icons/document_.png",
-  "reload_command": "reload player_factionchange_quests",
   "picker": "Parameter",
-  "skip_quick_load": true,
   "primary_key": [
     "alliance_id",
     "horde_id"
@@ -24,15 +23,16 @@
       "group_name": "group",
       "fields": [
         {
-          "name": "Alliance Id",
+          "name": "Alliance Quest",
           "db_column_name": "alliance_id",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "QuestParameter",
+          "preferred_width": 340.0
         },
         {
-          "name": "Horde Id",
+          "name": "Horde Quest",
           "db_column_name": "horde_id",
-          "value_type": "uint"
+          "value_type": "QuestParameter",
+          "preferred_width": 385.0
         }
       ]
     }

@@ -28,21 +28,18 @@
           "name": "Spell",
           "db_column_name": "spell",
           "value_type": "SpellParameter",
-          "read_only": true,
           "preferred_width": 225.0
         },
         {
           "name": "Effect Id",
           "db_column_name": "effectId",
           "value_type": "SpellEffectIndexParameter",
-          "read_only": true,
           "preferred_width": 105.0
         },
         {
           "name": "Pet",
           "db_column_name": "pet",
           "value_type": "CreatureParameter",
-          "read_only": true,
           "preferred_width": 190.0
         },
         {

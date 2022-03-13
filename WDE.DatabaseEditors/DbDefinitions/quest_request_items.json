@@ -26,7 +26,6 @@
           "name": "ID",
           "db_column_name": "ID",
           "value_type": "QuestParameter",
-          "read_only": true,
           "preferred_width": 230.0
         },
         {

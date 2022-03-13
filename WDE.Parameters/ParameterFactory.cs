@@ -4,10 +4,12 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
+using WDE.Parameters.Parameters;
 using WDE.Parameters.QuickAccess;
 
 namespace WDE.Parameters
@@ -17,13 +19,16 @@ namespace WDE.Parameters
     public class ParameterFactory : IParameterFactory
     {
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
+        private readonly Lazy<ITableEditorPickerService> tableEditorPickerService;
         private readonly Dictionary<string, ParameterSpecModel> data;
         private readonly Dictionary<string, IParameter<long>> parameters;
         private readonly Dictionary<string, IParameter<string>> stringParameters;
 
-        internal ParameterFactory(IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
+        internal ParameterFactory(IQuickAccessRegisteredParameters quickAccessRegisteredParameters,
+            Lazy<ITableEditorPickerService> tableEditorPickerService)
         {
             this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
+            this.tableEditorPickerService = tableEditorPickerService;
             data = new(StringComparer.OrdinalIgnoreCase);
             parameters = new(StringComparer.OrdinalIgnoreCase);
             stringParameters = new(StringComparer.OrdinalIgnoreCase);
@@ -33,6 +38,18 @@ namespace WDE.Parameters
         {
             if (parameters.TryGetValue(type, out var parameter))
                 return parameter;
+
+            if (type.StartsWith("TableReference("))
+            {
+                var indexOf = type.IndexOf("#", StringComparison.Ordinal);
+                var indexOfEnd = type.IndexOf(")", indexOf, StringComparison.Ordinal);
+                var referenceTable = type.Substring("TableReference(".Length, indexOf - "TableReference(".Length);
+                var referenceColumn = type.Substring(indexOf + 1, indexOfEnd - indexOf - 1);
+                parameter = new ForeignReferenceParameter(tableEditorPickerService.Value, referenceTable, referenceColumn);
+                Register(type, parameter);
+                return parameter;
+            }
+            
             return Parameter.Instance;
         }
 
@@ -140,7 +157,7 @@ namespace WDE.Parameters
             Func<IParameter<long>, IParameter<long>, IParameter<long>> creator,
             QuickAccessMode quickAccessMode = QuickAccessMode.None)
         {
-            OnRegisterLong(param1).CombineLatest(OnRegisterLong(param2)).Subscribe(pair =>
+            OnRegisterLong(param1).CombineLatest(OnRegisterLong(param2)).SubscribeOnce(pair =>
             {
                 Register(name, creator(pair.First, pair.Second), quickAccessMode);
             });
@@ -152,7 +169,7 @@ namespace WDE.Parameters
         {
             OnRegisterLong(param1)
                 .CombineLatest(OnRegisterLong(param2), OnRegisterLong(param3))
-                .Subscribe(pair =>
+                .SubscribeOnce(pair =>
                 {
                     Register(name, creator(pair.First, pair.Second, pair.Third), quickAccessMode);
                 });
@@ -164,15 +181,27 @@ namespace WDE.Parameters
         {
             OnRegisterLong(param1)
                 .CombineLatest(OnRegisterLong(param2), OnRegisterLong(param3), OnRegisterLong(param4))
-                .Subscribe(pair =>
+                .SubscribeOnce(pair =>
             {
                 Register(name, creator(pair.First, pair.Second, pair.Third, pair.Fourth), quickAccessMode);
             });
         }
+        
+        public void RegisterCombined(string name, string param1, string param2, string param3, string param4, string param5,
+            Func<IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>, IParameter<long>> creator,
+            QuickAccessMode quickAccessMode = QuickAccessMode.None)
+        {
+            OnRegisterLong(param1)
+                .CombineLatest(OnRegisterLong(param2), OnRegisterLong(param3), OnRegisterLong(param4), OnRegisterLong(param5))
+                .SubscribeOnce(pair =>
+                {
+                    Register(name, creator(pair.First, pair.Second, pair.Third, pair.Fourth, pair.Fifth), quickAccessMode);
+                });
+        }
 
         public void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<long>> creator, QuickAccessMode quickAccessMode = QuickAccessMode.None)
         {
-            OnRegisterLong(dependsOn).Subscribe(item =>
+            OnRegisterLong(dependsOn).SubscribeOnce(item =>
             {
                 Register(name, creator(item), quickAccessMode);
             });
@@ -180,7 +209,7 @@ namespace WDE.Parameters
         
         public void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<string>> creator)
         {
-            OnRegisterLong(dependsOn).Subscribe(item =>
+            OnRegisterLong(dependsOn).SubscribeOnce(item =>
             {
                 Register(name, creator(item));
             });

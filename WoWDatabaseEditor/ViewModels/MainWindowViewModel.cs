@@ -86,7 +86,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                         async () =>
                         {
                             var sql = await queryGeneratorRegistry.GenerateSql(sid.SolutionItem);
-                            clipboardService.SetText(sql);
+                            clipboardService.SetText(sql.QueryString);
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "SQL copied!"));
                         });
                 }

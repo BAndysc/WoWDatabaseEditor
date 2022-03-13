@@ -11,6 +11,7 @@ using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.TrinitySmartScriptEditor.Providers
 {
@@ -39,7 +40,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
             this.importer = importer;
         }
 
-        public async Task<string> GenerateSql(SmartScriptSolutionItem item)
+        public async Task<IQuery> GenerateSql(SmartScriptSolutionItem item)
         {
             SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService());
             var lines = database.Value.GetScriptFor(item.Entry, item.SmartType).ToList();

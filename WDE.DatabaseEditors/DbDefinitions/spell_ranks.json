@@ -26,14 +26,12 @@
           "name": "First Spell",
           "db_column_name": "first_spell_id",
           "value_type": "SpellParameter",
-          "read_only": true,
           "preferred_width": 215.0
         },
         {
           "name": "Rank",
           "db_column_name": "rank",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "uint"
         },
         {
           "name": "Spell (ranked)",

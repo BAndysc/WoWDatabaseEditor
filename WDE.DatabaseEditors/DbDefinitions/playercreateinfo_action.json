@@ -3,18 +3,17 @@
   "compatibility": [
     "TrinityWrath"
   ],
-  "name": "Playercreateinfo Action",
-  "single_solution_name": "{name} playercreateinfo_action editor",
-  "multi_solution_name": "multiple playercreateinfo_action editor",
-  "description": "Here insert short description what is playercreateinfo_action for",
+  "name": "Player createinfo Action",
+  "single_solution_name": "Player createinfo Action",
+  "multi_solution_name": "Player createinfo Action",
+  "description": "This table holds information on what default actions a brand new character should start out with. Each race-class combination can have a different default starting setup.",
   "table_name": "playercreateinfo_action",
   "table_index_name": "race",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Player create info",
   "icon_path": "Icons/document_.png",
-  "reload_command": "reload playercreateinfo_action",
   "picker": "Parameter",
-  "skip_quick_load": true,
   "primary_key": [
     "race",
     "class",
@@ -27,28 +26,31 @@
         {
           "name": "Race",
           "db_column_name": "race",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "RaceParameter",
+          "preferred_width": 120.0
         },
         {
           "name": "Class",
           "db_column_name": "class",
-          "value_type": "uint"
+          "value_type": "ClassParameter",
+          "preferred_width": 150.0
         },
         {
           "name": "Button",
           "db_column_name": "button",
-          "value_type": "uint"
+          "value_type": "PlayercreateinfoActionButtonParameter",
+          "preferred_width": 220.0
         },
         {
           "name": "Action",
           "db_column_name": "action",
-          "value_type": "uint"
+          "value_type": "SpellParameter",
+          "preferred_width": 215.0
         },
         {
           "name": "Type",
           "db_column_name": "type",
-          "value_type": "uint"
+          "value_type": "PlayerCreateinfoActionTypeParameter"
         }
       ]
     }

@@ -32,6 +32,7 @@ using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels.Template
 {
@@ -54,6 +55,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> FilteredRows { get; }
         public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
         public SourceList<DatabaseRowViewModel> Rows { get; } = new();
+        private HashSet<(DatabaseKey key, string columnName)> forceUpdateCells = new HashSet<(DatabaseKey, string)>();
         
         public AsyncAutoCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
@@ -180,26 +182,6 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 return;
             
             view.ParameterValue!.Revert();
-            
-            if (!view.ParentEntity.ExistInDatabase)
-                return;
-            
-            if (!mySqlExecutor.IsConnected)
-                return;
-
-            if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                .SetTitle("Reverting")
-                .SetMainInstruction("Do you want to revert field in the database?")
-                .SetContent(
-                    "Reverted field will become unmodified field and unmodified fields are not generated in query. Therefore if you want to revert the field in the database, it can be done now.\n\nDo you want to revert the field in the database now (this will execute query)?")
-                .SetIcon(MessageBoxIcon.Information)
-                .WithYesButton(true)
-                .WithNoButton(false)
-                .Build()))
-                return;
-
-            var query = queryGenerator.GenerateUpdateFieldQuery(tableDefinition, view.ParentEntity, view.TableField);
-            await mySqlExecutor.ExecuteSql(query);
         }
 
         private async Task RemoveTemplate(DatabaseCellViewModel? view)
@@ -301,11 +283,16 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 
                 if (column.IsMetaColumn)
                 {
-                    var evaluator = new DatabaseExpressionEvaluator(creatureStatCalculatorService, parameterFactory, tableDefinition, column.Expression!);
-                    var parameterValue = new ParameterValue<string, DatabaseEntity>(entity, new ValueHolder<string>(evaluator.Evaluate(entity)!.ToString(), false),
-                        new ValueHolder<string>("", false), StringParameter.Instance);
-                    entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
-                    cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, parameterValue));
+                    if (column.Meta!.StartsWith("expression:"))
+                    {
+                        var evaluator = new DatabaseExpressionEvaluator(creatureStatCalculatorService, parameterFactory, tableDefinition, column.Meta!.Substring(11));
+                        var parameterValue = new ParameterValue<string, DatabaseEntity>(entity, new ValueHolder<string>(evaluator.Evaluate(entity)!.ToString(), false),
+                            new ValueHolder<string>("", false), StringParameter.Instance);
+                        entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
+                        cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, parameterValue));   
+                    }
+                    else
+                        throw new Exception("Unsupported meta column: " + column.Meta!);
                 }
                 else
                 {
@@ -344,6 +331,15 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     }
 
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, cell, parameterValue, cellVisible));
+                    if (cellViewModel.ParameterValue != null && cellViewModel.TableField != null && entity.ExistInDatabase)
+                        AutoDispose(cellViewModel.ParameterValue.ToObservable("Value").Skip(1).SubscribeAction(_ =>
+                        {
+                            if (!cellViewModel.IsModified)
+                            {
+                                forceUpdateCells.Add((cellViewModel.ParentEntity.Key, cellViewModel.TableField!.FieldName));
+                                History.MarkNoSave();
+                            }
+                        }));
                 }
 
                 
@@ -437,6 +433,27 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     }
                 }
             }
+        }
+
+        protected override async Task<IQuery> GenerateSaveQuery()
+        {
+            IMultiQuery multi = Queries.BeginTransaction();
+            multi.Add(await base.GenerateSaveQuery());
+            
+            foreach (var pair in forceUpdateCells)
+            {
+                var entity = Entities.FirstOrDefault(e => e.Key == pair.key);
+                var cell = entity?.GetCell(pair.columnName);
+                if (entity != null && cell != null)
+                    multi.Add(queryGenerator.GenerateUpdateFieldQuery(tableDefinition, entity, cell));
+            }
+            return multi.Close();
+        }
+
+        protected override Task AfterSave()
+        {
+            forceUpdateCells.Clear();
+            return Task.CompletedTask;
         }
 
         public IObservable<bool> GetGroupVisibility(string str)

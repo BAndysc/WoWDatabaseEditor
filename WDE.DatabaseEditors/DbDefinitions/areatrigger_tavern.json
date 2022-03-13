@@ -1,0 +1,41 @@
+{
+  "id": "areatrigger_tavern",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Areatrigger Tavern",
+  "single_solution_name": "Areatrigger Tavern",
+  "multi_solution_name": "Areatrigger Tavern",
+  "description": "Enable a trigger when player enters a city or tavern. This causes the player to enter a resting state.",
+  "table_name": "areatrigger_tavern",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Areatriggers",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload areatrigger_tavern",
+  "picker": "",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "AreaTriggerParameter",
+          "preferred_width": 455.0
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 500.0
+        }
+      ]
+    }
+  ]
+}

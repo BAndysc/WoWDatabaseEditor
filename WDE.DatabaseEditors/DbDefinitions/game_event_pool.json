@@ -1,0 +1,38 @@
+{
+  "id": "game_event_pool",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event Pool",
+  "single_solution_name": "Game Event Pool",
+  "multi_solution_name": "Game Event Pool",
+  "description": "This table determines if a given pool is active for a given game event.",
+  "table_name": "game_event_pool",
+  "table_index_name": "pool_entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_.png",
+  "picker": "",
+  "primary_key": [
+    "pool_entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "eventEntry",
+          "value_type": "GameEventParameter",
+          "preferred_width": 155.0
+        },
+        {
+          "name": "Pool Entry",
+          "db_column_name": "pool_entry",
+          "value_type": "TableReference(pool_template#entry)Parameter"
+        }
+      ]
+    }
+  ]
+}

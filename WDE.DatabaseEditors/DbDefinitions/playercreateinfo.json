@@ -3,9 +3,9 @@
   "compatibility": [
     "TrinityWrath"
   ],
-  "name": "Playercreateinfo",
-  "single_solution_name": "{name} playercreateinfo editor",
-  "multi_solution_name": "multiple playercreateinfo editor",
+  "name": "Player createinfo",
+  "single_solution_name": "Player createinfo",
+  "multi_solution_name": "Player createinfo",
   "description": "This table holds the start positions of each class-race combinations for all newly created characters.",
   "table_name": "playercreateinfo",
   "table_index_name": "race",
@@ -27,14 +27,12 @@
           "name": "Race",
           "db_column_name": "race",
           "value_type": "RaceParameter",
-          "read_only": true,
           "preferred_width": 220.0
         },
         {
           "name": "Class",
           "db_column_name": "class",
           "value_type": "ClassParameter",
-          "read_only": true,
           "preferred_width": 150.0
         },
         {
@@ -68,6 +66,26 @@
           "name": "Orientation",
           "db_column_name": "orientation",
           "value_type": "float"
+        },
+        {
+          "name": "Action bar",
+          "meta": "table:playercreateinfo_action;`race` = {race} AND `class` = {class}"
+        },
+        {
+          "name": "Cast Spells",
+          "meta": "table:playercreateinfo_cast_spell;(`raceMask` = 0 OR (`raceMask` & (1 << ({race} - 1)) != 0)) AND (`classMask` =0 OR (`classMask` & (1 << ({class} - 1)) != 0))"
+        },
+        {
+          "name": "Skills",
+          "meta": "table:playercreateinfo_skills;(`raceMask` = 0 OR (`raceMask` & (1 << ({race} - 1)) != 0)) AND (`classMask` =0 OR (`classMask` & (1 << ({class} - 1)) != 0))"
+        },
+        {
+          "name": "Custom Spells",
+          "meta": "table:playercreateinfo_spell_custom;(`racemask` = 0 OR (`racemask` & (1 << ({race} - 1)) != 0)) AND (`classmask` =0 OR (`classmask` & (1 << ({class} - 1)) != 0))"
+        },
+        {
+          "name": "Initial items",
+          "meta": "table:playercreateinfo_item;`race` = {race} AND `class` = {class}"
         }
       ]
     }

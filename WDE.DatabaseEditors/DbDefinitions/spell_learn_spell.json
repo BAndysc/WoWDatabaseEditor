@@ -27,14 +27,12 @@
           "name": "When learned",
           "db_column_name": "entry",
           "value_type": "SpellParameter",
-          "read_only": true,
           "preferred_width": 235.0
         },
         {
           "name": "Spell to also learn",
           "db_column_name": "SpellID",
           "value_type": "SpellParameter",
-          "read_only": true,
           "preferred_width": 310.0
         },
         {

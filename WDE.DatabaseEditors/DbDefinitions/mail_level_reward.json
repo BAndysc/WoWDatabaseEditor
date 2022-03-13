@@ -1,0 +1,47 @@
+{
+  "id": "mail_level_reward",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Mail Level Reward",
+  "description": "On certain levels, you receive a mail with some text.",
+  "table_name": "mail_level_reward",
+  "table_index_name": "level",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "skip_quick_load": true,
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload mail_level_reward",
+  "picker": "Parameter",
+  "primary_key": [
+    "level",
+    "raceMask"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "Race Mask",
+          "db_column_name": "raceMask",
+          "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Mail Template Id",
+          "db_column_name": "mailTemplateId",
+          "value_type": "MailTemplateParameter"
+        },
+        {
+          "name": "Sender Entry",
+          "db_column_name": "senderEntry",
+          "value_type": "CreatureParameter"
+        }
+      ]
+    }
+  ]
+}

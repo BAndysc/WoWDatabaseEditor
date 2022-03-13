@@ -36,6 +36,7 @@ using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.History;
 using WDE.SmartScriptEditor.Inspections;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -970,7 +971,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
         
-        public Task<string> GenerateQuery()
+        public Task<IQuery> GenerateQuery()
         {
             return Task.FromResult(smartScriptExporter.GenerateSql(item, script));
         }

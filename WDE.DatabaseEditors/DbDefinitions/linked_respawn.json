@@ -1,0 +1,44 @@
+{
+  "id": "linked_respawn",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Linked Respawn",
+  "description": "This table links trash mobs to bosses so that if you kill the boss, the trash do not respawn before the instance is reset. Gameobjects can be linked too!",
+  "table_name": "linked_respawn",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "guid",
+    "linkType"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Dependant guid",
+          "db_column_name": "guid",
+          "value_type": "LinkedRespawnGuidDependantParameter",
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Master Guid",
+          "db_column_name": "linkedGuid",
+          "value_type": "LinkedRespawnGuidMasterParameter",
+          "preferred_width": 120.0
+        },
+        {
+          "name": "Link Type",
+          "db_column_name": "linkType",
+          "value_type": "LinkedRespawnTypeParameter",
+          "preferred_width": 510.0
+        }
+      ]
+    }
+  ]
+}

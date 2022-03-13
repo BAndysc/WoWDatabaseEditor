@@ -13,6 +13,7 @@ namespace WDE.Common.Services;
 public interface ITableEditorPickerService
 {
     Task<long?> PickByColumn(string table, DatabaseKey key, string column, long? initialValue, string? backupColumn = null);
+    Task ShowTable(string table, string? condition);
 }
 
 public struct DatabaseKey : IComparable<DatabaseKey>

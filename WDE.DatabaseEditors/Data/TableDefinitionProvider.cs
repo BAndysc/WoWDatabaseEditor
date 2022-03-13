@@ -36,6 +36,12 @@ namespace WDE.DatabaseEditors.Data
                 var definition =
                     serializationProvider.DeserializeTableDefinition<DatabaseTableDefinitionJson>(source.content);
 
+                if (string.IsNullOrEmpty(definition.MultiSolutionName))
+                    definition.MultiSolutionName = definition.Name;
+
+                if (string.IsNullOrEmpty(definition.SingleSolutionName))
+                    definition.SingleSolutionName = definition.Name;
+                
                 definition.TableColumns = new Dictionary<string, DatabaseColumnJson>();
                 foreach (var group in definition.Groups)
                 {

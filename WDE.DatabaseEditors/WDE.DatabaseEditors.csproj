@@ -27,6 +27,12 @@
       <None Update="DbDefinitions\**\*.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="DatabaseContextualParameters\*.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="DatabaseContextualParameters\AchievementValue2.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard">

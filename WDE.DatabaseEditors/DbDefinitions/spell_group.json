@@ -26,15 +26,13 @@
         {
           "name": "Id",
           "db_column_name": "id",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "uint"
         },
         {
           "name": "Spell Id",
           "db_column_name": "spell_id",
           "value_type": "SpellParameter",
-          "preferred_width": 400,
-          "read_only": true
+          "preferred_width": 400
         }
       ]
     }

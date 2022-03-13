@@ -38,6 +38,7 @@ using WDE.PacketViewer.Services;
 using WDE.PacketViewer.Settings;
 using WDE.PacketViewer.Solutions;
 using WDE.PacketViewer.Utils;
+using WDE.SqlQueryGenerator;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
@@ -1023,7 +1024,7 @@ namespace WDE.PacketViewer.ViewModels
         public IHistoryManager? History { get; }
         public UpdateHistoryViewModel UpdateHistoryViewModel { get; }
         public ISolutionItem SolutionItem { get; }
-        public Task<string> GenerateQuery() => Task.FromResult("");
+        public Task<IQuery> GenerateQuery() => Task.FromResult(Queries.Empty());
 
         public bool ShowExportToolbarButtons => false;
     }

@@ -1,0 +1,40 @@
+{
+  "id": "game_event_seasonal_questrelation",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event Seasonal Questrelation",
+  "single_solution_name": "Game Event Seasonal Questrelation",
+  "multi_solution_name": "Game Event Seasonal Questrelation",
+  "description": "Holds information on the game event seasonal quest relations to allow for resetting of quests with ZoneOrSort of -22.",
+  "table_name": "game_event_seasonal_questrelation",
+  "table_index_name": "questId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_.png",
+  "picker": "",
+  "primary_key": [
+    "questId",
+    "eventEntry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "eventEntry",
+          "value_type": "GameEventParameter",
+          "preferred_width": 295.0
+        },
+        {
+          "name": "Quest Id",
+          "db_column_name": "questId",
+          "value_type": "QuestParameter",
+          "preferred_width": 340.0
+        }
+      ]
+    }
+  ]
+}

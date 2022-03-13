@@ -25,13 +25,12 @@
           "name": "Quest Id",
           "db_column_name": "questId",
           "value_type": "QuestParameter",
-          "read_only": true,
           "preferred_width": 335.0
         },
         {
           "name": "Pool Id",
           "db_column_name": "poolId",
-          "value_type": "uint",
+          "value_type": "TableReference(quest_pool_template#poolId)Parameter",
           "preferred_width": 80.0
         },
         {

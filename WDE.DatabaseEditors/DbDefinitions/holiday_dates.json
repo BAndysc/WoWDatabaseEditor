@@ -1,0 +1,52 @@
+{
+  "id": "holiday_dates",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Holiday Dates",
+  "single_solution_name": "Holiday Dates",
+  "multi_solution_name": "Holiday Dates",
+  "description": "Define special event dates and duration",
+  "table_name": "holiday_dates",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "id",
+    "date_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Holiday",
+          "db_column_name": "id",
+          "value_type": "HolidaysParameter",
+          "preferred_width": 255.0
+        },
+        {
+          "name": "Date Index",
+          "db_column_name": "date_id",
+          "value_type": "uint",
+          "preferred_width": 130.0
+        },
+        {
+          "name": "Date Value",
+          "db_column_name": "date_value",
+          "value_type": "UnixTimestampSince2000Parameter",
+          "preferred_width": 175.0
+        },
+        {
+          "name": "Holiday Duration",
+          "db_column_name": "holiday_duration",
+          "value_type": "uint",
+          "preferred_width": 190.0
+        }
+      ]
+    }
+  ]
+}

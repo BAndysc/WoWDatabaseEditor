@@ -26,14 +26,12 @@
         {
           "name": "ID",
           "db_column_name": "ID",
-          "value_type": "CreatureGameobjectParameter",
-          "read_only": true
+          "value_type": "CreatureGameobjectParameter"
         },
         {
           "name": "Type",
           "db_column_name": "Type",
-          "value_type": "QuestGreetingTypeParameter",
-          "read_only": true
+          "value_type": "QuestGreetingTypeParameter"
         },
         {
           "name": "Greet Emote Type",

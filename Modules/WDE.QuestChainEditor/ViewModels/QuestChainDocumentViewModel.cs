@@ -26,6 +26,7 @@ using WDE.MVVM;
 using WDE.QuestChainEditor.Documents;
 using WDE.QuestChainEditor.Models;
 using WDE.QuestChainEditor.QueryGenerators;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.QuestChainEditor.ViewModels;
 
@@ -223,12 +224,12 @@ public class QuestChainDocumentViewModel : ObservableBase, ISolutionItemDocument
         return store;
     }
     
-    public async Task<string> GenerateQuery()
+    public async Task<IQuery> GenerateQuery()
     {
         var store = BuildCurrentQuestStore();
         var query = queryGenerator.Generate(store);
         var sql = sqlGenerator.GenerateQuery(query.ToList(), existingData);
-        return sql.QueryString;
+        return sql;
     }
 
     public bool AutoLayout

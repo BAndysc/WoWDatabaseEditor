@@ -1,0 +1,39 @@
+{
+  "id": "battlemaster_entry",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Battlemaster Entry",
+  "single_solution_name": "Battlemaster Entry",
+  "multi_solution_name": "Battlemaster Entry",
+  "description": "Holds information on which NPC can start what battleground or arena.",
+  "table_name": "battlemaster_entry",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "picker": "",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "NPC",
+          "db_column_name": "entry",
+          "value_type": "CreatureParameter",
+          "preferred_width": 290.0
+        },
+        {
+          "name": "Bg Template",
+          "db_column_name": "bg_template",
+          "value_type": "BattlegroundParameter",
+          "preferred_width": 280.0
+        }
+      ]
+    }
+  ]
+}

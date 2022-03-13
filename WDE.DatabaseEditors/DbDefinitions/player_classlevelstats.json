@@ -3,16 +3,13 @@
   "compatibility": [
     "TrinityWrath"
   ],
-  "name": "Player Classlevelstats",
-  "single_solution_name": "{name} player_classlevelstats editor",
-  "multi_solution_name": "multiple player_classlevelstats editor",
-  "description": "Here insert short description what is player_classlevelstats for",
+  "name": "Player class-level stats",
+  "description": "This table holds information on the base health and mana of characters when they level up. Each class has different level stats.",
   "table_name": "player_classlevelstats",
   "table_index_name": "class",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
   "group_name": "Advanced",
   "icon_path": "Icons/document_.png",
-  "reload_command": "reload player_classlevelstats",
   "picker": "Parameter",
   "skip_quick_load": true,
   "primary_key": [
@@ -26,8 +23,7 @@
         {
           "name": "Class",
           "db_column_name": "class",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "ClassParameter"
         },
         {
           "name": "Level",
@@ -35,12 +31,12 @@
           "value_type": "uint"
         },
         {
-          "name": "Basehp",
+          "name": "Base hp",
           "db_column_name": "basehp",
           "value_type": "uint"
         },
         {
-          "name": "Basemana",
+          "name": "Base mana",
           "db_column_name": "basemana",
           "value_type": "uint"
         }

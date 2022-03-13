@@ -1,0 +1,14 @@
+{
+    "name": "AchievementValue2Parameter",
+    "simple_switch": {
+        "column": "type",
+        "default": "Parameter",
+        "values": {
+            "2": "RaceParameter",
+            "21": "RaceParameter",
+            "5": "SpellEffectIndexParameter",
+            "7": "SpellEffectIndexParameter",
+            "8": "AchievementCriteriaValueCompareTypeParameter"
+        }
+    }
+}

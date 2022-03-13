@@ -26,7 +26,6 @@
           "name": "Faction",
           "db_column_name": "faction",
           "value_type": "RawFactionParameter",
-          "read_only": true,
           "preferred_width": 260.0
         },
         {

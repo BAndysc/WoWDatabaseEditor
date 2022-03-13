@@ -24,8 +24,7 @@
         {
           "name": "Seat Entry",
           "db_column_name": "SeatEntry",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "uint"
         },
         {
           "name": "Seat Orientation",

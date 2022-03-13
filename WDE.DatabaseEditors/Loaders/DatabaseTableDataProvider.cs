@@ -43,7 +43,13 @@ namespace WDE.DatabaseEditors.Loaders
             var columns = tableDefinitionJson.Groups
                 .SelectMany(x => x.Fields)
                 .Where(x => !x.IsConditionColumn && !x.IsMetaColumn)
-                .Select(x => $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`")
+                .Select(x =>
+                {
+                    var column =  $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`";
+                    if (x.IsUnixTimestamp)
+                        column = $"UNIX_TIMESTAMP({column}) AS `{x.DbColumnName}`";
+                    return column;
+                })
                 .Distinct();
             var names = string.Join(",", columns);
             var joins = "";
@@ -69,7 +75,13 @@ namespace WDE.DatabaseEditors.Loaders
             var columns = tableDefinitionJson.Groups
                 .SelectMany(x => x.Fields)
                 .Where(x => !x.IsConditionColumn && !x.IsMetaColumn)
-                .Select(x => $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`")
+                .Select(x =>
+                {
+                    var column =  $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`";
+                    if (x.IsUnixTimestamp)
+                        column = $"UNIX_TIMESTAMP({column}) AS `{x.DbColumnName}`";
+                    return column;
+                })
                 .Distinct();
             var names = string.Join(",", columns);
             var joins = "";

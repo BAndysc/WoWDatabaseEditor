@@ -63,7 +63,11 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
         KeyBindings.Add(new KeyBinding()
         {
             Gesture = new KeyGesture(Key.Enter),
-            Command = new DelegateCommand(() => OpenEditor())
+            Command = new DelegateCommand(() =>
+            {
+                if (IsSelectedCellValid)
+                    OpenEditor();
+            })
         });
     }
 
@@ -108,10 +112,23 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
         }
     }
 
+    protected override void OnPointerLeave(PointerEventArgs e)
+    {
+        Cursor = Cursor.Default;
+        base.OnPointerLeave(e);
+    }
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
         Cursor = (currentlyResizedColumn.HasValue || IsPointHeader(e.GetPosition(this))) ? new Cursor(StandardCursorType.SizeWestEast) : Cursor.Default;
+
+        if (CustomCellDrawer != null)
+        {
+            var point = e.GetCurrentPoint(this);
+            if (CustomCellDrawer.UpdateCursor(point.Position, point.Properties.IsLeftButtonPressed))
+                InvalidateVisual();
+        }
 
         if (currentlyResizedColumn.HasValue && Columns != null)
         {
@@ -179,6 +196,13 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
                 }
             }
         }
+        
+        if (CustomCellDrawer != null)
+        {
+            var point = e.GetCurrentPoint(this);
+            if (CustomCellDrawer.UpdateCursor(point.Position, point.Properties.IsLeftButtonPressed))
+                InvalidateVisual();
+        }
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
@@ -201,6 +225,13 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
             {
                 e.Handled = true;
             }
+        }
+        
+        if (CustomCellDrawer != null)
+        {
+            var point = e.GetCurrentPoint(this);
+            if (CustomCellDrawer.UpdateCursor(point.Position, point.Properties.IsLeftButtonPressed))
+                InvalidateVisual();
         }
     }
 

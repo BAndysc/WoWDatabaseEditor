@@ -1,0 +1,46 @@
+{
+  "id": "gameobject_questitem",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Gameobject Quest Item",
+  "description": "",
+  "table_name": "gameobject_questitem",
+  "table_index_name": "GameObjectEntry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Gameobject",
+  "icon_path": "Icons/document_.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "GameObjectEntry",
+    "Idx"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Game Object Entry",
+          "db_column_name": "GameObjectEntry",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Index",
+          "db_column_name": "Idx",
+          "value_type": "uint"
+        },
+        {
+          "name": "Item Id",
+          "db_column_name": "ItemId",
+          "value_type": "ItemParameter"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

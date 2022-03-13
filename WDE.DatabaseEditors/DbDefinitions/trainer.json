@@ -14,6 +14,7 @@
   "group_name": "Trainers",
   "icon_path": "Icons/document_.png",
   "reload_command": "reload trainer",
+  "picker": "",
   "primary_key": [
     "Id"
   ],
@@ -25,20 +26,25 @@
           "name": "Id",
           "db_column_name": "Id",
           "value_type": "uint",
-          "read_only": true
+          "preferred_width": 65.0
         },
         {
           "name": "Type",
           "db_column_name": "Type",
           "value_type": "TrainerTypeParameter",
           "default": 2,
-          "preferred_width": 160.0
+          "preferred_width": 130.0
         },
         {
           "name": "Requirement",
           "db_column_name": "Requirement",
           "value_type": "TrainerRequirementParameter",
-          "preferred_width": 175.0
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Spells",
+          "is_meta": true,
+          "meta": "table:trainer_spell;`TrainerId` = {Id}"
         },
         {
           "name": "Greeting",

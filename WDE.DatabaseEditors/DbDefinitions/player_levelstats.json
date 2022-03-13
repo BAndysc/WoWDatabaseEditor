@@ -3,18 +3,17 @@
   "compatibility": [
     "TrinityWrath"
   ],
-  "name": "Player Levelstats",
-  "single_solution_name": "{name} player_levelstats editor",
-  "multi_solution_name": "multiple player_levelstats editor",
-  "description": "Here insert short description what is player_levelstats for",
+  "name": "Player Level Stats",
+  "single_solution_name": "Player Level Stats",
+  "multi_solution_name": "Player Level Stats",
+  "description": "This table holds information on what stats are gained by characters when they level up. Each race-class combination has different level stats. All of the values in this table signify only the base stats of the race-class combination at a specific level.",
   "table_name": "player_levelstats",
   "table_index_name": "race",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Advanced",
   "icon_path": "Icons/document_.png",
-  "reload_command": "reload player_levelstats",
   "picker": "Parameter",
-  "skip_quick_load": true,
   "primary_key": [
     "race",
     "class",
@@ -27,13 +26,14 @@
         {
           "name": "Race",
           "db_column_name": "race",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "RaceParameter",
+          "preferred_width": 135.0
         },
         {
           "name": "Class",
           "db_column_name": "class",
-          "value_type": "uint"
+          "value_type": "ClassParameter",
+          "preferred_width": 125.0
         },
         {
           "name": "Level",
@@ -41,27 +41,27 @@
           "value_type": "uint"
         },
         {
-          "name": "Str",
+          "name": "Strength",
           "db_column_name": "str",
           "value_type": "uint"
         },
         {
-          "name": "Agi",
+          "name": "Agility",
           "db_column_name": "agi",
           "value_type": "uint"
         },
         {
-          "name": "Sta",
+          "name": "Stamina",
           "db_column_name": "sta",
           "value_type": "uint"
         },
         {
-          "name": "Inte",
+          "name": "Intellect",
           "db_column_name": "inte",
           "value_type": "uint"
         },
         {
-          "name": "Spi",
+          "name": "Spirit",
           "db_column_name": "spi",
           "value_type": "uint"
         }

@@ -30,6 +30,12 @@ public class CustomCellInteractor : ICustomCellInteractor
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
 
+        if (cell.ActionCommand != null && cell.ActionCommand.CanExecute(null))
+        {
+            cell.ActionCommand.Execute(null);
+            return true;
+        }
+        
         if (initialText != null)
             return false; // then use builtin-text editor
 
@@ -57,13 +63,21 @@ public class CustomCellInteractor : ICustomCellInteractor
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
-
         
         return false;
     }
     
-    public bool PointerUp(ITableCell cell, bool leftButton, bool rightButton)
+    public bool PointerUp(ITableCell c, bool leftButton, bool rightButton)
     {
+        if (c is not SingleRecordDatabaseCellViewModel cell)
+            return false;
+        
+        if (leftButton && cell.ActionCommand != null && cell.ActionCommand.CanExecute(null))
+        {
+            cell.ActionCommand.Execute(null);
+            return true;
+        }
+        
         return false;
     }
 

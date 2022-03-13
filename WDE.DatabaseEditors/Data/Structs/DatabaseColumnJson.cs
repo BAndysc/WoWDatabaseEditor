@@ -39,12 +39,12 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "autogenerate_comment")]
         public string? AutogenerateComment { get; set; }
+
+        [JsonIgnore]
+        public bool IsMetaColumn => !string.IsNullOrEmpty(Meta);
         
-        [JsonProperty(PropertyName = "is_meta")]
-        public bool IsMetaColumn { get; set; }
-        
-        [JsonProperty(PropertyName = "expression")]
-        public string? Expression { get; set; }
+        [JsonProperty(PropertyName = "meta")]
+        public string? Meta { get; set; }
 
         [JsonProperty(PropertyName = "preferred_width")]
         public float? PreferredWidth { get; set; }
@@ -52,5 +52,6 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonIgnore] public bool IsTypeString => ValueType is "string" || ValueType.EndsWith("StringParameter");
         [JsonIgnore] public bool IsTypeLong => ValueType is "long" or "uint" or "int" || (ValueType.EndsWith("Parameter") && !IsTypeString);
         [JsonIgnore] public bool IsTypeFloat => ValueType is "float";
+        [JsonIgnore] public bool IsUnixTimestamp => ValueType is "UnixTimestampParameter";
     }
 }

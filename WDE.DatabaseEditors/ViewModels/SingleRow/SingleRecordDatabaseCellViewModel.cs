@@ -61,6 +61,18 @@ public class SingleRecordDatabaseCellViewModel : BaseDatabaseCellViewModel, ITab
         }));
     }
 
+    public SingleRecordDatabaseCellViewModel(int columnIndex, string columnName, ICommand action, DatabaseEntityViewModel parent, DatabaseEntity entity, string label) : base(entity)
+    {
+        Parent = parent;
+        ColumnIndex = columnIndex * 2;
+        CanBeNull = false;
+        IsReadOnly = false;
+        ColumnName = columnName;
+        OriginalValueTooltip = null;
+        ActionCommand = action;
+        ActionLabel = label;
+    }
+    
     public SingleRecordDatabaseCellViewModel(int columnIndex, string columnName, ICommand action, DatabaseEntityViewModel parent, DatabaseEntity entity, System.IObservable<string> label) : base(entity)
     {
         Parent = parent;

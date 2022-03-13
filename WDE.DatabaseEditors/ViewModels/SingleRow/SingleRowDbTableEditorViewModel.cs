@@ -39,6 +39,8 @@ using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.MVVM;
+using WDE.Parameters.Parameters;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels.SingleRow
 {
@@ -52,17 +54,20 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IConditionEditService conditionEditService;
         private readonly IDatabaseEditorsSettings editorSettings;
+        private readonly ITableEditorPickerService tableEditorPickerService;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> removedKeys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> forceInsertKeys = new HashSet<DatabaseKey>();
+        private HashSet<(DatabaseKey key, string columnName)> forceUpdateCells = new HashSet<(DatabaseKey, string)>();
         private List<System.IDisposable> rowsDisposable = new();
         public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
 
         private bool showOnlyModified;
-        [AlsoNotify(nameof(SelectedRow))] [Notify] private int selectedRowIndex;
+        [AlsoNotify(nameof(SelectedEntity))] [AlsoNotify(nameof(SelectedRow))] [Notify] private int selectedRowIndex;
         [AlsoNotify(nameof(SelectedCell))] [Notify] private int selectedCellIndex;
+        public override DatabaseEntity? SelectedEntity => SelectedRow?.Entity;
         public DatabaseEntityViewModel? SelectedRow => selectedRowIndex >= 0 && selectedRowIndex < Rows.Count ? Rows[selectedRowIndex] : null;
         public SingleRecordDatabaseCellViewModel? SelectedCell => SelectedRow != null && selectedCellIndex >= 0 && selectedCellIndex < SelectedRow.Cells.Count ? SelectedRow.Cells[selectedCellIndex] : null;
         [Notify] private string rowsSummaryText = "";
@@ -170,7 +175,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
-            IStatusBar statusBar) 
+            IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -187,6 +192,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             this.modelGenerator = modelGenerator;
             this.conditionEditService = conditionEditService;
             this.editorSettings = editorSettings;
+            this.tableEditorPickerService = tableEditorPickerService;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -351,30 +357,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 if (hasColumn is DatabaseField<long> lf)
                     lf.Current.Value = view.ParentEntity.Conditions.Count > 0 ? 1 : 0;
             }
-        }
-        
-        private async Task Revert(SingleRecordDatabaseCellViewModel view)
-        {
-            if (!view.ParentEntity.ExistInDatabase || view.TableField == null)
-                return;
-            
-            if (!mySqlExecutor.IsConnected)
-                return;
-
-            if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                    .SetTitle("Reverting")
-                    .SetMainInstruction("Do you want to revert field in the database?")
-                    .SetContent(
-                        "Reverted field will become unmodified field and unmodified fields are not generated in query. Therefore if you want to revert the field in the database, it can be done now.\n\nDo you want to revert the field in the database now (this will execute query)?")
-                    .SetIcon(MessageBoxIcon.Information)
-                    .WithYesButton(true)
-                    .WithNoButton(false)
-                    .Build()))
-                return;
-
-            var query = queryGenerator.GenerateUpdateFieldQuery(tableDefinition, view.ParentEntity, view.TableField);
-            await mySqlExecutor.ExecuteSql(query);
-            History.MarkNoSave();
         }
 
         private Task EditParameter(SingleRecordDatabaseCellViewModel cell)
@@ -564,6 +546,30 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     var label = entity.ToObservable(e => e.Conditions).Select(c => "Edit (" + (c?.Count ?? 0) + ")");
                     cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, "Conditions", EditConditionsCommand, row, entity, label));
                 }
+                else if (column.IsMetaColumn)
+                {
+                    if (column.Meta!.StartsWith("table:"))
+                    {
+                        var table = column.Meta.Substring(6, column.Meta.IndexOf(";", 6) - 6);
+                        var condition = column.Meta.Substring(column.Meta.IndexOf(";", 6) + 1);
+                        cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, new DelegateCommand(
+                            () =>
+                            {
+                                var newCondition = condition;
+                                int indexOf = 0;
+                                indexOf = newCondition.IndexOf("{", indexOf);
+                                while (indexOf != -1)
+                                {
+                                    var columnName = newCondition.Substring(indexOf + 1, newCondition.IndexOf("}", indexOf) - indexOf - 1);
+                                    newCondition = newCondition.Replace("{" + columnName + "}", entity.GetCell(columnName)!.ToString());
+                                    indexOf = newCondition.IndexOf("{", indexOf + 1);
+                                }
+                                tableEditorPickerService.ShowTable(table, newCondition);
+                            }), row, entity, "Open"));
+                    }
+                    else
+                        throw new Exception("Unsupported meta column: " + column.Meta);
+                }
                 else
                 {
                     var cell = entity.GetCell(column.DbColumnName);
@@ -573,7 +579,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     IParameterValue parameterValue = null!;
                     if (cell is DatabaseField<long> longParam)
                     {
-                        parameterValue = new ParameterValue<long, DatabaseEntity>(entity, longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
+                        IParameter<long> parameter = parameterFactory.Factory(column.ValueType);
+                        parameterValue = new ParameterValue<long, DatabaseEntity>(entity, longParam.Current, longParam.Original, parameter);
                     }
                     else if (cell is DatabaseField<string> stringParam)
                     {
@@ -610,8 +617,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 ReKey(entity).ListenErrors();
             else
             {
-                if (!cell.IsModified)
-                    Revert(cell).ListenErrors();
+                if (!cell.IsModified && entity.Entity.ExistInDatabase)
+                {
+                    forceUpdateCells.Add((entity.Key, columnName));
+                    History.MarkNoSave();
+                }
             }
         }
 
@@ -639,7 +649,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Duplicate key")
                     .SetMainInstruction($"The key {newKey} is already in the database.")
-                    .SetContent("If you want to change existing key, just modify it.")
+                    .SetContent("If you want to change existing key, just modify it.\n\nIf you want to revert the key back to the previous value, _save the changes_ and then re-key again.")
                     .WithOkButton(false)
                     .Build());
             }
@@ -710,10 +720,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 SelectedRowIndex = 0;
         }
 
-        public override async Task<IList<(ISolutionItem, string)>> GenerateSplitQuery()
+        public override async Task<IList<(ISolutionItem, IQuery)>> GenerateSplitQuery()
         {
             var sql = await GenerateQuery();
-            return new List<(ISolutionItem, string)>() { (solutionItem, sql) };
+            return new List<(ISolutionItem, IQuery)>() { (solutionItem, sql) };
         }
         
         private T AutoDisposeEntity<T>(T entity) where T : IDisposable
@@ -722,17 +732,17 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return entity;
         }
 
-        protected override Task<string> GenerateSaveQuery()
+        protected override Task<IQuery> GenerateSaveQuery()
         {
             return GenerateQueryImpl(true);
         }
 
-        public override Task<string> GenerateQuery()
+        public override Task<IQuery> GenerateQuery()
         {
             return GenerateQueryImpl(false);
         }
 
-        private async Task<string> GenerateQueryImpl(bool saveQuery)
+        private async Task<IQuery> GenerateQueryImpl(bool saveQuery)
         {
             var newData = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e)) && (!saveQuery || !forceInsertKeys.Contains(e.Key))).ToList();
 
@@ -755,20 +765,54 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 data = await databaseTableDataProvider.Load(tableDefinition.Id, null, null, keys.Count, oldKeys);
                 if (data == null)
-                    return "ERROR";
+                    return Queries.Raw("ERROR");
                 solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
             }
 
             data = new DatabaseTableData(tableDefinition, data == null ? newData : data.Entities.Union(newData).ToList());
             
-            return queryGenerator
-                .GenerateQuery(GenerateKeys(),  GenerateDeletedKeys(), data).QueryString;
+            var query = queryGenerator
+                .GenerateQuery(GenerateKeys(),  GenerateDeletedKeys(), data);
+
+            if (!saveQuery)
+                return query;
+
+            IMultiQuery multi = Queries.BeginTransaction();
+            multi.Add(query);
+            foreach (var pair in forceUpdateCells)
+            {
+                var entity = Entities.FirstOrDefault(x => x.Key == pair.key);
+                var field = entity?.GetCell(pair.columnName);
+                if (entity == null || field == null)
+                    continue;
+                multi.Add(queryGenerator.GenerateUpdateFieldQuery(tableDefinition, entity, field));
+            }
+            return multi.Close();
         }
 
         protected override Task AfterSave()
         {
             forceInsertKeys.Clear();
+            forceUpdateCells.Clear();
             return Task.CompletedTask;
+        }
+
+        public async Task TryFind(DatabaseKey key)
+        {
+            if (tableDefinition.GroupByKeys.Count != 1)
+            {
+                Console.WriteLine("Try find with multiple-value key is not supported, but this is not crutial");
+                return;
+            }
+
+            var result = await mySqlExecutor.ExecuteSelectSql(Queries.Table(tableDefinition.TableName)
+                .Where(r => r.Column<long>(tableDefinition.GroupByKeys[0]) < key[0])
+                .Select("COUNT(*) AS C")
+                .QueryString);
+
+            var count = result[0]["C"];
+            OffsetQuery = Convert.ToInt64(count.Item2);
+            await ScheduleLoading();
         }
     }
 }

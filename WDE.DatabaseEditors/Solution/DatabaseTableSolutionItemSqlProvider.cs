@@ -6,6 +6,7 @@ using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.Solution
 {
@@ -22,15 +23,15 @@ namespace WDE.DatabaseEditors.Solution
             this.queryGenerator = queryGenerator;
         }
 
-        public async Task<string> GenerateSql(DatabaseTableSolutionItem item)
+        public async Task<IQuery> GenerateSql(DatabaseTableSolutionItem item)
         {
             IDatabaseTableData? tableData = await LoadTable(item);
 
             if (tableData == null)
-                return $"-- Unable to load data for {item} from the database";
+                return Queries.Raw("-- Unable to load data for {item} from the database");
 
             item.UpdateEntitiesWithOriginalValues(tableData.Entities);
-            return queryGenerator.GenerateQuery(item.Entries.Select(e => e.Key).ToList(), item.DeletedEntries, tableData).QueryString;
+            return queryGenerator.GenerateQuery(item.Entries.Select(e => e.Key).ToList(), item.DeletedEntries, tableData);
         }
 
         private Task<IDatabaseTableData?> LoadTable(DatabaseTableSolutionItem item)

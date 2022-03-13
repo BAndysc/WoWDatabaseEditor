@@ -26,15 +26,13 @@
         {
           "name": "Trainer Id",
           "db_column_name": "TrainerId",
-          "value_type": "uint",
-          "read_only": true,
+          "value_type": "TableReference(trainer#Id)Parameter",
           "preferred_width": 50.0
         },
         {
           "name": "Spell",
           "db_column_name": "SpellId",
           "value_type": "SpellParameter",
-          "read_only": true,
           "preferred_width": 145.0
         },
         {

@@ -1,0 +1,34 @@
+{
+  "id": "exploration_basexp",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Exploration Basexp",
+  "description": "This table holds the base experience point information needed for when a player explores a new zone.",
+  "table_name": "exploration_basexp",
+  "table_index_name": "level",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_.png",
+  "primary_key": [
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "Basexp",
+          "db_column_name": "basexp",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

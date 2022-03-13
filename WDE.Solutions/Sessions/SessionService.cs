@@ -16,6 +16,7 @@ using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.Solutions.Sessions
 {
@@ -159,7 +160,7 @@ namespace WDE.Solutions.Sessions
             await UpdateQuery(query);
         }
 
-        private async Task UpdateQuery(IList<(ISolutionItem, string)> query)
+        private async Task UpdateQuery(IList<(ISolutionItem, IQuery)> query)
         {
             if (CurrentSession == null)
                 return;
@@ -168,7 +169,7 @@ namespace WDE.Solutions.Sessions
                 return;
             
             foreach (var q in query)
-                CurrentSession.Insert(q.Item1, q.Item2);
+                CurrentSession.Insert(q.Item1, q.Item2.QueryString);
 
             CurrentSession.LastModified = DateTime.Now;
             this.FirstOrDefault(t => t.FileName == CurrentSession.FileName).Do(t => t.LastModified = DateTime.Now);

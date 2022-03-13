@@ -3,18 +3,17 @@
   "compatibility": [
     "TrinityWrath"
   ],
-  "name": "Playercreateinfo Item",
-  "single_solution_name": "{name} playercreateinfo_item editor",
-  "multi_solution_name": "multiple playercreateinfo_item editor",
-  "description": "Here insert short description what is playercreateinfo_item for",
+  "name": "Player createinfo Item",
+  "single_solution_name": "Player createinfo Items",
+  "multi_solution_name": "Player createinfo Items",
+  "description": "This table is used for any custom items that you might want to give to characters on creation. I used to be used to hold the normal items that characters get as well, but now that info is read from CharStartOutfit.dbc",
   "table_name": "playercreateinfo_item",
   "table_index_name": "race",
-  "record_mode": "MultiRecord",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Player create info",
   "icon_path": "Icons/document_.png",
-  "reload_command": "reload playercreateinfo_item",
   "picker": "Parameter",
-  "skip_quick_load": true,
   "primary_key": [
     "race",
     "class",
@@ -27,24 +26,27 @@
         {
           "name": "Race",
           "db_column_name": "race",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "RaceParameter",
+          "preferred_width": 220.0
         },
         {
           "name": "Class",
           "db_column_name": "class",
-          "value_type": "uint"
+          "value_type": "ClassParameter",
+          "preferred_width": 170.0
         },
         {
-          "name": "Itemid",
+          "name": "Item",
           "db_column_name": "itemid",
-          "value_type": "uint"
+          "value_type": "ItemParameter",
+          "preferred_width": 325.0
         },
         {
           "name": "Amount",
           "db_column_name": "amount",
           "value_type": "int",
-          "default": 1
+          "default": 1,
+          "preferred_width": 185.0
         }
       ]
     }

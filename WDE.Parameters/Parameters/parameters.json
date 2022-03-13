@@ -2916,5 +2916,342 @@
 			"1": {"name": "GameObject"},
 			"2": {"name": "Pool"}
 		}
+	},
+	"PlayerCreateinfoActionTypeParameter": {
+		"values": {
+			"0": {"name": "Spell"},
+			"64": {"name": "Macro"},
+			"128": {"name": "Item"}
+		}
+	},
+	"PlayercreateinfoActionButtonParameter": {
+		"values": {
+			"0": {"name": "1 (SHIFT + 1) (slot 1)"},
+			"1": {"name": "1 (SHIFT + 1) (slot 2)"},
+			"2": {"name": "1 (SHIFT + 1) (slot 3)"},
+			"3": {"name": "1 (SHIFT + 1) (slot 4)"},
+			"4": {"name": "1 (SHIFT + 1) (slot 5)"},
+			"5": {"name": "1 (SHIFT + 1) (slot 6)"},
+			"6": {"name": "1 (SHIFT + 1) (slot 7)"},
+			"7": {"name": "1 (SHIFT + 1) (slot 8)"},
+			"8": {"name": "1 (SHIFT + 1) (slot 9)"},
+			"9": {"name": "1 (SHIFT + 1) (slot 10)"},
+			"10": {"name": "1 (SHIFT + 1) (slot 11)"},
+			"11": {"name": "1 (SHIFT + 1) (slot 12)"},
+			"12": {"name": "2 (SHIFT + 2) (slot 1)"},
+			"13": {"name": "2 (SHIFT + 2) (slot 2)"},
+			"14": {"name": "2 (SHIFT + 2) (slot 3)"},
+			"15": {"name": "2 (SHIFT + 2) (slot 4)"},
+			"16": {"name": "2 (SHIFT + 2) (slot 5)"},
+			"17": {"name": "2 (SHIFT + 2) (slot 6)"},
+			"18": {"name": "2 (SHIFT + 2) (slot 7)"},
+			"19": {"name": "2 (SHIFT + 2) (slot 8)"},
+			"20": {"name": "2 (SHIFT + 2) (slot 9)"},
+			"21": {"name": "2 (SHIFT + 2) (slot 10)"},
+			"22": {"name": "2 (SHIFT + 2) (slot 11)"},
+			"23": {"name": "2 (SHIFT + 2) (slot 12)"},
+			"24": {"name": "3 (SHIFT + 3) Right Side Bar (slot 1)"},
+			"25": {"name": "3 (SHIFT + 3) Right Side Bar (slot 2)"},
+			"26": {"name": "3 (SHIFT + 3) Right Side Bar (slot 3)"},
+			"27": {"name": "3 (SHIFT + 3) Right Side Bar (slot 4)"},
+			"28": {"name": "3 (SHIFT + 3) Right Side Bar (slot 5)"},
+			"29": {"name": "3 (SHIFT + 3) Right Side Bar (slot 6)"},
+			"30": {"name": "3 (SHIFT + 3) Right Side Bar (slot 7)"},
+			"31": {"name": "3 (SHIFT + 3) Right Side Bar (slot 8)"},
+			"32": {"name": "3 (SHIFT + 3) Right Side Bar (slot 9)"},
+			"33": {"name": "3 (SHIFT + 3) Right Side Bar (slot 10)"},
+			"34": {"name": "3 (SHIFT + 3) Right Side Bar (slot 11)"},
+			"35": {"name": "3 (SHIFT + 3) Right Side Bar (slot 12)"},
+			"36": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 1)"},
+			"37": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 2)"},
+			"38": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 3)"},
+			"39": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 4)"},
+			"40": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 5)"},
+			"41": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 6)"},
+			"42": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 7)"},
+			"43": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 8)"},
+			"44": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 9)"},
+			"45": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 10)"},
+			"46": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 11)"},
+			"47": {"name": "4 (SHIFT + 4) Right Side Bar 2 (slot 12)"},
+			"48": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 1)"},
+			"49": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 2)"},
+			"50": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 3)"},
+			"51": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 4)"},
+			"52": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 5)"},
+			"53": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 6)"},
+			"54": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 7)"},
+			"55": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 8)"},
+			"56": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 9)"},
+			"57": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 10)"},
+			"58": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 11)"},
+			"59": {"name": "5 (SHIFT + 5) Bottom Rigth Bar (slot 12)"},
+			"60": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 1)"},
+			"61": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 2)"},
+			"62": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 3)"},
+			"63": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 4)"},
+			"64": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 5)"},
+			"65": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 6)"},
+			"66": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 7)"},
+			"67": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 8)"},
+			"68": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 9)"},
+			"69": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 10)"},
+			"70": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 11)"},
+			"71": {"name": "6 (SHIFT + 6) Bottom Left Bar (slot 12)"},
+			"72": {"name": "1 SpecialA (slot 1)"},
+			"73": {"name": "1 SpecialA (slot 2)"},
+			"74": {"name": "1 SpecialA (slot 3)"},
+			"75": {"name": "1 SpecialA (slot 4)"},
+			"76": {"name": "1 SpecialA (slot 5)"},
+			"77": {"name": "1 SpecialA (slot 6)"},
+			"78": {"name": "1 SpecialA (slot 7)"},
+			"79": {"name": "1 SpecialA (slot 8)"},
+			"80": {"name": "1 SpecialA (slot 9)"},
+			"81": {"name": "1 SpecialA (slot 10)"},
+			"82": {"name": "1 SpecialA (slot 11)"},
+			"83": {"name": "1 SpecialA (slot 12)"},
+			"84": {"name": "1 Special B (slot 1)"},
+			"85": {"name": "1 Special B (slot 2)"},
+			"86": {"name": "1 Special B (slot 3)"},
+			"87": {"name": "1 Special B (slot 4)"},
+			"88": {"name": "1 Special B (slot 5)"},
+			"89": {"name": "1 Special B (slot 6)"},
+			"90": {"name": "1 Special B (slot 7)"},
+			"91": {"name": "1 Special B (slot 8)"},
+			"92": {"name": "1 Special B (slot 9)"},
+			"93": {"name": "1 Special B (slot 10)"},
+			"94": {"name": "1 Special B (slot 11)"},
+			"95": {"name": "1 Special B (slot 12)"},
+			"96": {"name": "1 Special C (slot 1)"},
+			"97": {"name": "1 Special C (slot 2)"},
+			"98": {"name": "1 Special C (slot 3)"},
+			"99": {"name": "1 Special C (slot 4)"},
+			"100": {"name": "1 Special C (slot 5)"},
+			"101": {"name": "1 Special C (slot 6)"},
+			"102": {"name": "1 Special C (slot 7)"},
+			"103": {"name": "1 Special C (slot 8)"},
+			"104": {"name": "1 Special C (slot 9)"},
+			"105": {"name": "1 Special C (slot 10)"},
+			"106": {"name": "1 Special C (slot 11)"},
+			"107": {"name": "1 Special C (slot 12)"},
+			"108": {"name": "1 Special D (slot 1)"},
+			"109": {"name": "1 Special D (slot 2)"},
+			"110": {"name": "1 Special D (slot 3)"},
+			"111": {"name": "1 Special D (slot 4)"},
+			"112": {"name": "1 Special D (slot 5)"},
+			"113": {"name": "1 Special D (slot 6)"},
+			"114": {"name": "1 Special D (slot 7)"},
+			"115": {"name": "1 Special D (slot 8)"},
+			"116": {"name": "1 Special D (slot 9)"},
+			"117": {"name": "1 Special D (slot 10)"},
+			"118": {"name": "1 Special D (slot 11)"},
+			"119": {"name": "1 Special D (slot 12)"}
+		}
+	},
+	"SummonSlotParameter": {
+		"values": {
+			"0": {"name": "Pet"},
+			"1": {"name": "Totem fire"},
+			"2": {"name": "Totem earth"},
+			"3": {"name": "Totem water"},
+			"4": {"name": "Totem air"},
+			"5": {"name": "Minipet"},
+			"6": {"name": "Quest"}
+		}
+	},
+	"TotemSlotParameter": {
+		"values": {
+			"1": {"name": "Totem fire"},
+			"2": {"name": "Totem earth"},
+			"3": {"name": "Totem water"},
+			"4": {"name": "Totem air"}
+		}
+	},
+	"PetNameGenerationHalfParameter": {
+		"values": {
+			"0": {"name": "first half"},
+			"1": {"name": "second half"}
+		}
+	},
+	"LinkedRespawnTypeParameter": {
+		"values": {
+			"0": {"name": "Dependant: Creature, Master: Creature"},
+			"1": {"name": "Dependant: Creature, Master: Gameobject"},
+			"2": {"name": "Dependant: Gameobject, Master: Gameobject"},
+			"3": {"name": "Dependant: Gameobject, Master: Creature"}
+		}
+	},
+	"EncounterCreditTypeParameter": {
+		"values": {
+			"0": {"name": "monster kill credit"},
+			"1": {"name": "spell"}
+		}
+	},
+	"InstanceSpawnGroupInfoParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "activate spawn"},
+			"2": {"name": "block spawn"},
+			"4": {"name": "alliance only"},
+			"8": {"name": "horde only"},
+			"16": {"name": "link aggro"}
+		}
+	},
+	"InstanceSpawnGroupBossStateMaskParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "not started"},
+			"2": {"name": "in progress"},
+			"4": {"name": "fail"},
+			"8": {"name": "done"},
+			"16": {"name": "special"}
+		}
+	},
+	"SpawnObjectTypeParameter": {
+		"values": {
+			"0": {"name": "Creature"},
+			"1": {"name": "GameObject"}
+		}
+	},
+	"InvisibilityTypeParameter": {
+		"values": {
+			"0": {"name": "general"},
+			"1": {"name": "unk 1"},
+			"2": {"name": "unk 2"},
+			"3": {"name": "trap"},
+			"4": {"name": "unk 4"},
+			"5": {"name": "unk 5"},
+			"6": {"name": "drunk"},
+			"7": {"name": "unk 7"},
+			"8": {"name": "unk 8"},
+			"9": {"name": "unk 9"},
+			"10": {"name": "unk 10"},
+			"11": {"name": "unk 11"}
+		}
+	},
+	"GameobjectStateParameter": {
+		"values": {
+			"0": {"name": "active", "description": "show in world as used and not reset (closed door open)"},
+			"1": {"name": "ready", "description": "show in world as ready (closed door close)"},
+			"2": {"name": "active alternative", "description": "show in world as used in alt way and not reset (closed door open by cannon fire)"}
+		}
+	},
+	"GameEventAnnounceParameter": {
+		"values": {
+			"0": {"name": "never announce"},
+			"1": {"name": "always announce"},
+			"2": {"name": "announce if config"}
+		}
+	},
+	"DisableTypeParameter": {
+		"values": {
+			"0": {"name": "spell"},
+			"1": {"name": "quest"},
+			"2": {"name": "map"},
+			"3": {"name": "battleground"},
+			"4": {"name": "achievement criteria"},
+			"5": {"name": "outdoor pvp"},
+			"6": {"name": "vmap"},
+			"7": {"name": "mmap"},
+			"8": {"name": "lfg map"}
+		}
+	},
+	"DisableTypeSpellFlagsParameter": {
+		"isflag": true,
+		"values": {
+			"0": {"name": "enabled"},
+			"1": {"name": "disabled for players"},
+			"2": {"name": "disabled for creatures"},
+			"4": {"name": "disabled for pets"},
+			"8": {"name": "completely disabled"},
+			"16": {"name": "disabled in map", "description": "Put map IDs in param0 field"},
+			"32": {"name": "disabled in area", "description": "Put area IDs in param1 field"},
+			"64": {"name": "ignore LoS"},
+			"128": {"name": "disabled for gameobjects"},
+			"256": {"name": "disabled in arena"},
+			"512": {"name": "disabled in battlegrounds"}
+		}
+	},
+	"DisableTypeMapFlagsParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "DUNGEON_STATUSFLAG_NORMAL OR RAID_STATUSFLAG_10MAN_NORMAL"},
+			"2": {"name": "DUNGEON_STATUSFLAG_HEROIC OR RAID_STATUSFLAG_25MAN_NORMAL"},
+			"4": {"name": "RAID_STATUSFLAG_10MAN_HEROIC"},
+			"8": {"name": "RAID_STATUSFLAG_25MAN_HEROIC"}
+		}
+	},
+	"DisableTypeVMapFlagsParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "VMAP_DISABLE_AREAFLAG"},
+			"2": {"name": "VMAP_DISABLE_HEIGHT"},
+			"4": {"name": "VMAP_DISABLE_LOS"},
+			"8": {"name": "VMAP_LIQUIDSTATUS"}
+		}
+	},
+	"AchievementCriteriaTypeParameter": {
+		"values": {
+			"0": {"name": "None"},
+			"1": {"name": "Target creature"},
+			"2": {"name": "Target player class race"},
+			"3": {"name": "Target player less health"},
+			"4": {"name": "Target player dead"},
+			"5": {"name": "Player has aura"},
+			"6": {"name": "Player in area"},
+			"7": {"name": "Target player has aura"},
+			"8": {"name": "Value"},
+			"9": {"name": "Target Level"},
+			"10": {"name": "Target Gender"},
+			"11": {"name": "Script"},
+			"12": {"name": "Map difficulty"},
+			"13": {"name": "Map player count"},
+			"14": {"name": "Target Team"},
+			"15": {"name": "Player is drunk"},
+			"16": {"name": "Holiday"},
+			"17": {"name": "Bg loss team score"},
+			"18": {"name": "Instance script"},
+			"19": {"name": "Player has item level"},
+			"20": {"name": "Map"},
+			"21": {"name": "Player class race"},
+			"22": {"name": "Nth birthday"},
+			"23": {"name": "Player has title"}			
+		}
+	},
+	"AchievementCriteriaValueCompareTypeParameter": {
+		"values": {
+			"0": {"name": "=="},
+			"1": {"name": ">"},
+			"2": {"name": "<"},
+			"3": {"name": ">="},
+			"4": {"name": "<="}
+		}
+	},
+	"AchievementRequiredFactionParameter": {
+		"values": {
+			"-1": {"name": "both"},
+			"0": {"name": "horde"},
+			"1": {"name": "alliance"}
+		}
+	},
+	"AchievementFlagsParameter": {
+		"isflag": true,
+		"values": {
+			"1": {"name": "Counter", "description": "Just count statistic (never stop and complete)"},
+			"2": {"name": "Hidden", "description": "Not sent to client - internal use only"},
+			"4": {"name": "Store max value", "description": "Store only max value? used only in \"Reach level xx\""},
+			"8": {"name": "Summ", "description": "Use summ criteria value from all requirements (and calculate max value)"},
+			"16": {"name": "Max used", "description": "Show max criteria (and calculate max value ??)"},
+			"32": {"name": "Req count", "description": "Use not zero req count (and calculate max value)"},
+			"64": {"name": "Average", "description": "Show as average value (value / time_in_days) depend from other flag (by def use last criteria value)"},
+			"128": {"name": "Bar", "description": "Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)"},
+			"256": {"name": "Realm first reach"},
+			"512": {"name": "Realm first kill"}
+		}
+	},
+	"BattlefieldParameter": {
+		"values": {
+			"1": {"name": "Wintergrasp"}
+		}
 	}
 }

@@ -9,6 +9,7 @@ using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WoWDatabaseEditor.Services.SolutionService
 {
@@ -47,7 +48,7 @@ namespace WoWDatabaseEditor.Services.SolutionService
             this.sessionService = sessionService;
         }
 
-        private Task SaveSolutionToDatabaseTask(ISolutionItem item, ISolutionItemDocument? document, Func<ISolutionItem, ISolutionItemDocument?, Task<string>> queryGenerator)
+        private Task SaveSolutionToDatabaseTask(ISolutionItem item, ISolutionItemDocument? document, Func<ISolutionItem, ISolutionItemDocument?, Task<IQuery>> queryGenerator)
         {
             if (!CanSaveToDatabase)
                 return Task.CompletedTask;

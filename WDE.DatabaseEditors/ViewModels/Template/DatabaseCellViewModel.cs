@@ -10,7 +10,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public DatabaseRowViewModel Parent { get; }
         public IDatabaseField? TableField { get; }
         public bool IsVisible { get; private set; } = true;
-        public bool IsModified { get; private set; }
+        public bool IsModified => TableField?.IsModified ?? false;
         public string? OriginalValueTooltip { get; private set; }
         public bool CanBeNull => Parent.CanBeNull;
         public bool CanBeSetToNull => CanBeNull && !Parent.IsReadOnly;
@@ -23,7 +23,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             IParameterValue parameterValue, 
             IObservable<bool>? cellIsVisible) : base(parentEntity)
         {
-            Link(tableField, tf => tf.IsModified, () => IsModified);
+            Watch(tableField, tf => tf.IsModified, nameof(IsModified));
             Parent = parent;
             TableField = tableField;
             ParameterValue = parameterValue;

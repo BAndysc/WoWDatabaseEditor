@@ -6,11 +6,14 @@ using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.ViewModels;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
+using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -50,42 +53,88 @@ public class TableEditorPickerService : ITableEditorPickerService
         if (solutionItem == null)
             throw new UnsupportedTableException(table);
 
-        var tableViewModel = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
-        tableViewModel.AllowMultipleKeys = false;
-        if (initialValue.HasValue)
+        ViewModelBase tableViewModel;
+        if (definition.RecordMode == RecordMode.MultiRecord)
         {
-            tableViewModel.ToObservable(that => that.IsLoading)
-                .Where(@is => !@is)
-                .SubscribeOnce(@is =>
-                {
-                    var group = tableViewModel.Rows.FirstOrDefault(row => row.Key == key);
-                    if (group != null)
+            var multiRow = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            tableViewModel = multiRow;
+            multiRow.AllowMultipleKeys = false;
+            if (initialValue.HasValue)
+            {
+                tableViewModel.ToObservable(that => that.IsLoading)
+                    .Where(@is => !@is)
+                    .SubscribeOnce(@is =>
                     {
-                        var row = group.FirstOrDefault(r =>
-                            (r.Entity.GetCell(column) is DatabaseField<long> longField &&
-                             longField.Current.Value == initialValue) ||
-                            (backupColumn != null && r.Entity.GetCell(backupColumn) is DatabaseField<long> longField2 &&
-                             longField2.Current.Value == initialValue));
-                        if (row != null)
+                        var group = multiRow.Rows.FirstOrDefault(row => row.Key == key);
+                        if (group != null)
                         {
-                            mainThread.Delay(() => tableViewModel.SelectedRow = row, TimeSpan.FromMilliseconds(1));
+                            var row = group.FirstOrDefault(r =>
+                                (r.Entity.GetCell(column) is DatabaseField<long> longField &&
+                                 longField.Current.Value == initialValue) ||
+                                (backupColumn != null && r.Entity.GetCell(backupColumn) is DatabaseField<long> longField2 &&
+                                 longField2.Current.Value == initialValue));
+                            if (row != null)
+                            {
+                                mainThread.Delay(() => multiRow.SelectedRow = row, TimeSpan.FromMilliseconds(1));
+                            }
                         }
-                    }
-                });
+                    });
+            }
         }
-        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(MultiRowDbTableEditorViewModel), tableViewModel));
+        else if (definition.RecordMode == RecordMode.SingleRow)
+        {
+            var singleRow =
+                containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem),
+                    solutionItem));
+            tableViewModel = singleRow;
+            if (initialValue.HasValue)
+            {
+                singleRow.TryFind(new DatabaseKey(initialValue.Value)).ListenErrors();
+            }
+        }
+        else
+            throw new Exception("TemplateMode not (yet?) supported");
+
+        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel));
         if (await windowManager.ShowDialog(viewModel))
         {
-            var col = viewModel.SelectedRow?.Entity.GetCell(column);
+            var col = viewModel.SelectedRow?.GetCell(column);
             if (col is DatabaseField<long> longColumn)
                 return longColumn.Current.Value;
             if (backupColumn != null)
             {
-                col = viewModel.SelectedRow?.Entity.GetCell(backupColumn);
+                col = viewModel.SelectedRow?.GetCell(backupColumn);
                 if (col is DatabaseField<long> longColumn2)
                     return longColumn2.Current.Value;
             }
         }
         return null;
+    }
+
+    public async Task ShowTable(string table, string? condition)
+    {
+        var definition = definitionProvider.GetDefinition(table);
+        if (definition == null)
+            throw new UnsupportedTableException(table);
+
+        var solutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
+
+        ViewModelBase tableViewModel;
+        if (definition.RecordMode == RecordMode.SingleRow)
+        {
+            var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            tableViewModel = singleRow;
+            if (condition != null)
+            {
+                singleRow.FilterViewModel.FilterText = condition;
+                singleRow.FilterViewModel.ApplyFilter.Execute(null);
+            }
+        }
+        else
+            throw new Exception("TemplateMode and MultiRow not (yet?) supported");
+
+        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel));
+        viewModel.DisablePicking = true;
+        await windowManager.ShowDialog(viewModel);
     }
 }

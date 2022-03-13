@@ -24,13 +24,17 @@
         {
           "name": "Group Id",
           "db_column_name": "group_id",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "TableReference(spell_group#id)Parameter"
         },
         {
           "name": "Stack Rule",
           "db_column_name": "stack_rule",
           "value_type": "SpellGroupStackRule"
+        },
+        {
+          "name": "Spells",
+          "is_meta": true,
+          "meta": "table:spell_group;`id` = {group_id}"
         }
       ]
     }

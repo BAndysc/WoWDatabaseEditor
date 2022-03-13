@@ -26,14 +26,12 @@
         {
           "name": "Spell",
           "db_column_name": "spell_id",
-          "value_type": "SpellParameter",
-          "read_only": true
+          "value_type": "SpellParameter"
         },
         {
           "name": "Required Spell",
           "db_column_name": "req_spell",
-          "value_type": "SpellParameter",
-          "read_only": true
+          "value_type": "SpellParameter"
         }
       ]
     }

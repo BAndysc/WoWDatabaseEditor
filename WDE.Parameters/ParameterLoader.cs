@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Database;
@@ -82,6 +83,9 @@ namespace WDE.Parameters
             factory.Register("FlagParameter", new FlagParameter());
             factory.Register("PercentageParameter", new PercentageParameter());
             factory.Register("MoneyParameter", new MoneyParameter());
+            factory.Register("MinuteIntervalParameter", new MinuteIntervalParameter());
+            factory.Register("UnixTimestampParameter", new UnixTimestampParameter(0));
+            factory.Register("UnixTimestampSince2000Parameter", new UnixTimestampParameter(946681200));
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
                 (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
@@ -128,6 +132,34 @@ namespace WDE.Parameters
         }
     }
 
+    public class MinuteIntervalParameter : Parameter
+    {
+        public override string ToString(long minutes)
+        {
+            int years = (int) (minutes / 525600);
+            minutes -= years * 525600;
+            int months = (int) (minutes / 43200);
+            minutes -= months * 43200;
+            int days = (int) (minutes / 1440);
+            minutes -= days * 1440;
+            int hours = (int) (minutes / 60);
+            minutes -= hours * 60;
+            StringBuilder sb = new();
+             if (years > 0)
+                sb.Append(years).Append("y ");
+             if (months > 0)
+                sb.Append(months).Append("m ");
+             if (days > 0)
+                sb.Append(days).Append("d ");
+             if (hours > 0)
+                sb.Append(hours).Append("h ");
+             if (minutes > 0)
+                sb.Append(minutes).Append("min ");
+            
+            return sb.ToString();
+        }
+    }
+
     public class MoneyParameter : Parameter
     {
         public override string ToString(long key)
@@ -148,6 +180,21 @@ namespace WDE.Parameters
             if (silver > 0)
                 return $"{silver}s";
             return $"{copper}c";
+        }
+    }
+
+    public class UnixTimestampParameter : Parameter
+    {
+        private readonly long startOffset;
+
+        public UnixTimestampParameter(long startOffset)
+        {
+            this.startOffset = startOffset;
+        }
+        
+        public override string ToString(long key)
+        {
+            return DateTime.UnixEpoch.AddSeconds(startOffset + key).ToString("yyyy-MM-dd HH:mm:ss");
         }
     }
 

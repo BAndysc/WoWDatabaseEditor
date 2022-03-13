@@ -1,0 +1,39 @@
+{
+  "id": "game_event_battleground_holiday",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event Battleground Holiday",
+  "single_solution_name": "Game Event Battleground Holiday",
+  "multi_solution_name": "Game Event Battleground Holiday",
+  "description": "This table is used to add a holiday to a battleground, for things like extra reputation / honor.",
+  "table_name": "game_event_battleground_holiday",
+  "table_index_name": "EventEntry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_.png",
+  "picker": "",
+  "primary_key": [
+    "EventEntry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "EventEntry",
+          "value_type": "GameEventParameter",
+          "preferred_width": 320.0
+        },
+        {
+          "name": "Battleground",
+          "db_column_name": "BattlegroundID",
+          "value_type": "BattlegroundParameter",
+          "preferred_width": 310.0
+        }
+      ]
+    }
+  ]
+}

@@ -31,6 +31,7 @@ using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.MVVM;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
@@ -141,12 +142,12 @@ namespace WDE.DatabaseEditors.ViewModels
             return taskRunner.ScheduleTask($"Loading {Title}..", InternalLoadData);
         }
 
-        protected virtual Task<string> GenerateSaveQuery() => GenerateQuery();
+        protected virtual Task<IQuery> GenerateSaveQuery() => GenerateQuery();
         
-        public virtual Task<string> GenerateQuery()
+        public virtual Task<IQuery> GenerateQuery()
         {
             return Task.FromResult(queryGenerator
-                .GenerateQuery(GenerateKeys(), GenerateDeletedKeys(), new DatabaseTableData(tableDefinition, Entities)).QueryString);
+                .GenerateQuery(GenerateKeys(), GenerateDeletedKeys(), new DatabaseTableData(tableDefinition, Entities)));
         }
 
         protected virtual List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
@@ -162,15 +163,15 @@ namespace WDE.DatabaseEditors.ViewModels
                 {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
         }
 
-        public virtual Task<IList<(ISolutionItem, string)>> GenerateSplitQuery()
+        public virtual Task<IList<(ISolutionItem, IQuery)>> GenerateSplitQuery()
         {
             var keys = GenerateKeys();
-            IList<(ISolutionItem, string)> split = new List<(ISolutionItem, string)>();
+            IList<(ISolutionItem, IQuery)> split = new List<(ISolutionItem, IQuery)>();
             foreach (var key in keys)
             {
                 var entities = Entities.Where(e => e.Key == key).ToList();
                 var sql = queryGenerator
-                    .GenerateQuery(new List<DatabaseKey>(){key}, null, new DatabaseTableData(tableDefinition, entities)).QueryString;
+                    .GenerateQuery(new List<DatabaseKey>(){key}, null, new DatabaseTableData(tableDefinition, entities));
                 var splitItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
                 splitItem.Entries.Add(new SolutionItemDatabaseEntity(key, entities.Count > 0 && entities[0].ExistInDatabase, entities.Count > 0 ? GetOriginalFields(entities[0]) : null));
                 split.Add((splitItem, sql));
@@ -355,6 +356,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public IHistoryManager History { get; }
         protected DatabaseTableSolutionItem solutionItem;
         public ISolutionItem SolutionItem => solutionItem;
+        public virtual DatabaseEntity? SelectedEntity { get; }
         public abstract DatabaseEntity AddRow(DatabaseKey key);
     }
 }

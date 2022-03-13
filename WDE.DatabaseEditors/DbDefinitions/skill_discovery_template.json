@@ -26,14 +26,12 @@
         {
           "name": "Spell Id",
           "db_column_name": "spellId",
-          "value_type": "SpellParameter",
-          "read_only": true
+          "value_type": "SpellParameter"
         },
         {
           "name": "Req Spell",
           "db_column_name": "reqSpell",
-          "value_type": "SpellParameter",
-          "read_only": true
+          "value_type": "SpellParameter"
         },
         {
           "name": "Req Skill Value",

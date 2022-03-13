@@ -26,7 +26,6 @@
           "name": "Entry",
           "db_column_name": "entry",
           "value_type": "ZoneAreaParameter",
-          "read_only": true,
           "preferred_width": 305.0
         },
         {

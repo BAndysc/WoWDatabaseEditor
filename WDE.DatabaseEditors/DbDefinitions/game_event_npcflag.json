@@ -1,0 +1,46 @@
+{
+  "id": "game_event_npcflag",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event Npcflag",
+  "single_solution_name": "Game Event Npcflag",
+  "multi_solution_name": "Game Event Npcflag",
+  "description": "This table contains npcflags that are to be added to an NPC when the specified event is active for the creature with the given guid.",
+  "table_name": "game_event_npcflag",
+  "table_index_name": "eventEntry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_.png",
+  "picker": "",
+  "primary_key": [
+    "eventEntry",
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "eventEntry",
+          "value_type": "GameEventParameter",
+          "preferred_width": 210.0
+        },
+        {
+          "name": "Creature Guid",
+          "db_column_name": "guid",
+          "value_type": "CreatureGUIDParameter",
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Npc flag to add",
+          "db_column_name": "npcflag",
+          "value_type": "NpcFlagParameter",
+          "preferred_width": 450.0
+        }
+      ]
+    }
+  ]
+}

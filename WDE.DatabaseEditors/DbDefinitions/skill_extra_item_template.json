@@ -26,7 +26,6 @@
           "name": "Spell Id",
           "db_column_name": "spellId",
           "value_type": "SpellParameter",
-          "read_only": true,
           "preferred_width": 300.0
         },
         {
