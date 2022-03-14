@@ -10,7 +10,6 @@
   "table_name": "spell_bonus_data",
   "table_index_name": "entry",
   "record_mode": "SingleRow",
-  "icon_path": "Icons/document_.png",
   "reload_command": "reload spell_bonus_data",
   "picker": "SpellParameter",
   "primary_key": [

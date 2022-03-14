@@ -71,14 +71,18 @@ public partial class VeryFastTableView
                     var state = context.PushClip(rect);
                     if (CustomCellDrawer == null || !CustomCellDrawer.Draw(context, rect, cell))
                     {
-                        var ft = new FormattedText
+                        var text = cell.ToString();
+                        if (!string.IsNullOrEmpty(text))
                         {
-                            Text = cell.ToString(),
-                            Constraint = new Size(columnWidth - ColumnSpacing, RowHeight),
-                            Typeface = font,
-                            FontSize = 12
-                        };
-                        context.DrawText(textColor, new Point(x + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);
+                            var ft = new FormattedText
+                            {
+                                Text = text,
+                                Constraint = new Size(columnWidth - ColumnSpacing, RowHeight),
+                                Typeface = font,
+                                FontSize = 12
+                            };
+                            context.DrawText(textColor, new Point(x + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);   
+                        }
                     }
                     
                     state.Dispose();

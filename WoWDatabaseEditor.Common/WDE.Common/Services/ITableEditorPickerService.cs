@@ -12,7 +12,7 @@ namespace WDE.Common.Services;
 [UniqueProvider]
 public interface ITableEditorPickerService
 {
-    Task<long?> PickByColumn(string table, DatabaseKey key, string column, long? initialValue, string? backupColumn = null);
+    Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null);
     Task ShowTable(string table, string? condition);
 }
 
@@ -29,6 +29,30 @@ public struct DatabaseKey : IComparable<DatabaseKey>
         Key2 = null;
         Key3 = null;
         moreKeys = null;
+    }
+    
+    public DatabaseKey(long key, long key2)
+    {
+        Key = key;
+        Key2 = key2;
+        Key3 = null;
+        moreKeys = null;
+    }
+
+    public DatabaseKey(long key, long key2, long key3)
+    {
+        Key = key;
+        Key2 = key2;
+        Key3 = key3;
+        moreKeys = null;
+    }
+
+    public DatabaseKey(long key, long key2, long key3, IEnumerable<long> more)
+    {
+        Key = key;
+        Key2 = key2;
+        Key3 = key3;
+        moreKeys = more.ToList();
     }
     
     public DatabaseKey(IEnumerable<long> keys)
@@ -192,6 +216,17 @@ public struct DatabaseKey : IComparable<DatabaseKey>
             return $"({Key}/{Key2}/{Key3})";
         
         return $"({Key}/{Key2}/{Key3}/{string.Join('/', moreKeys)})";
+    }
+
+    public DatabaseKey WithAlso(long nextKey)
+    {
+        if (!Key2.HasValue)
+            return new DatabaseKey(Key, nextKey);
+        if (!Key3.HasValue)
+            return new DatabaseKey(Key, Key2.Value, nextKey);
+        if (moreKeys == null)
+            return new DatabaseKey(Key, Key2.Value, Key3.Value, new[]{nextKey});
+        return new  DatabaseKey(Key, Key2.Value, Key3.Value, moreKeys.Concat(new[]{nextKey}));
     }
 }
 

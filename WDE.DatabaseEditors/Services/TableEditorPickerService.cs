@@ -43,13 +43,16 @@ public class TableEditorPickerService : ITableEditorPickerService
         this.windowManager = windowManager;
     }
     
-    public async Task<long?> PickByColumn(string table, DatabaseKey key, string column, long? initialValue, string? backupColumn = null)
+    public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null)
     {
         var definition = definitionProvider.GetDefinition(table);
         if (definition == null)
             throw new UnsupportedTableException(table);
         
-        var solutionItem = await tableOpenService.Create(definition, key);
+        if (definition.RecordMode != RecordMode.SingleRow && !key.HasValue)
+            throw new Exception("Pick by column is not supported for multi-row tables without key");
+        
+        var solutionItem = await tableOpenService.Create(definition, key ?? default);
         if (solutionItem == null)
             throw new UnsupportedTableException(table);
 
@@ -83,13 +86,19 @@ public class TableEditorPickerService : ITableEditorPickerService
         }
         else if (definition.RecordMode == RecordMode.SingleRow)
         {
-            var singleRow =
-                containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem),
-                    solutionItem));
+            var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
             tableViewModel = singleRow;
+            if (key != null)
+            {
+                singleRow.FilterViewModel.FilterText = $"`{definition.GroupByKeys[0]}` = {key.Value[0]}";
+            }
             if (initialValue.HasValue)
             {
-                singleRow.TryFind(new DatabaseKey(initialValue.Value)).ListenErrors();
+                singleRow.TryFind(key.HasValue ? key.Value.WithAlso(initialValue.Value) : new DatabaseKey(initialValue.Value)).ListenErrors();
+            }
+            if (key != null)
+            {
+                singleRow.FilterViewModel.ApplyFilter.Execute(null);
             }
         }
         else

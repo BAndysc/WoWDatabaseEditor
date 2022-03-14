@@ -12,7 +12,6 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Advanced",
-  "icon_path": "Icons/document_.png",
   "picker": "",
   "primary_key": [
     "entry"
@@ -25,7 +24,7 @@
           "name": "NPC",
           "db_column_name": "entry",
           "value_type": "CreatureParameter",
-          "preferred_width": 290.0
+          "preferred_width": 275.0
         },
         {
           "name": "Bg Template",

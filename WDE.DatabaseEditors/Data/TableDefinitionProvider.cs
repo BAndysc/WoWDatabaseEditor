@@ -41,6 +41,9 @@ namespace WDE.DatabaseEditors.Data
 
                 if (string.IsNullOrEmpty(definition.SingleSolutionName))
                     definition.SingleSolutionName = definition.Name;
+
+                if (string.IsNullOrEmpty(definition.IconPath))
+                    definition.IconPath = "Icons/document_table.png";
                 
                 definition.TableColumns = new Dictionary<string, DatabaseColumnJson>();
                 foreach (var group in definition.Groups)

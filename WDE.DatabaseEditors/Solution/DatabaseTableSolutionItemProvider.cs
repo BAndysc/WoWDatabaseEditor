@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
@@ -38,27 +39,32 @@ namespace WDE.DatabaseEditors.Solution
         {
             foreach (var definition in definitionProvider.Definitions)
             {
-                yield return new DatabaseTableSolutionItemProvider(definition, 
-                    databaseProvider,
-                    tableOpenService,
-                    true);
+                if (definition.SkipQuickLoad)
+                    continue;
+                
+                if (definition.RecordMode == RecordMode.SingleRow)
+                    yield return new DatabaseTableSolutionItemProvider(definition, databaseProvider, tableOpenService, true);
+                else
+                    yield return new DatabaseTableSolutionItemNumberedProvider(definition, databaseProvider, tableOpenService, true);
             }
             foreach (var definition in definitionProvider.IncompatibleDefinitions)
             {
-                yield return new DatabaseTableSolutionItemProvider(definition, 
-                    databaseProvider,
-                    tableOpenService,
-                    false);
+                if (definition.SkipQuickLoad)
+                    continue;
+                if (definition.RecordMode == RecordMode.SingleRow)
+                    yield return new DatabaseTableSolutionItemProvider(definition, databaseProvider, tableOpenService, false);
+                else
+                    yield return new DatabaseTableSolutionItemNumberedProvider(definition, databaseProvider, tableOpenService, false);
             }
         }
     }
 
-    internal class DatabaseTableSolutionItemProvider : ISolutionItemProvider, IRelatedSolutionItemCreator, INumberSolutionItemProvider
+    internal class DatabaseTableSolutionItemProvider : ISolutionItemProvider, IRelatedSolutionItemCreator
     {
-        private readonly IDatabaseProvider databaseProvider;
-        private readonly ITableOpenService tableOpenService;
-        private readonly DatabaseTableDefinitionJson definition;
-        private readonly ImageUri itemIcon;
+        protected readonly IDatabaseProvider databaseProvider;
+        protected readonly ITableOpenService tableOpenService;
+        protected readonly DatabaseTableDefinitionJson definition;
+        protected readonly ImageUri itemIcon;
         private bool isCompatible;
         
         internal DatabaseTableSolutionItemProvider(DatabaseTableDefinitionJson definition,
@@ -124,12 +130,20 @@ namespace WDE.DatabaseEditors.Solution
                    related.Type == RelatedSolutionItem.RelatedType.QuestEntry &&
                    definition.Picker == "QuestParameter";
         }
-
+    }
+    
+    internal class DatabaseTableSolutionItemNumberedProvider : DatabaseTableSolutionItemProvider, INumberSolutionItemProvider
+    {
         public Task<ISolutionItem?> CreateSolutionItem(long number)
         {
             return tableOpenService.Create(definition, new DatabaseKey(number));
         }
 
         public string ParameterName => definition.Picker;
+
+        internal DatabaseTableSolutionItemNumberedProvider(DatabaseTableDefinitionJson definition, IDatabaseProvider databaseProvider, ITableOpenService tableOpenService, bool isCompatible) : base(definition, databaseProvider, tableOpenService, isCompatible)
+        {
+        }
     }
+
 }

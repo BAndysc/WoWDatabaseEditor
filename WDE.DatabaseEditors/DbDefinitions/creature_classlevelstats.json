@@ -1,0 +1,107 @@
+{
+  "id": "creature_classlevelstats",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature Classlevelstats",
+  "single_solution_name": "Creature Classlevelstats",
+  "multi_solution_name": "Creature Classlevelstats",
+  "description": "This table contains the base values for creature health, mana, armor, attack power, ranged attack power, damage, and experience.",
+  "table_name": "creature_classlevelstats",
+  "table_index_name": "level",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "picker": "",
+  "primary_key": [
+    "level",
+    "class"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "UnitClassParameter",
+          "preferred_width": 115.0
+        },
+        {
+          "name": "Base HP Vanilla",
+          "db_column_name": "basehp0",
+          "value_type": "uint",
+          "default": 1,
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Base HP TBC",
+          "db_column_name": "basehp1",
+          "value_type": "uint",
+          "default": 1,
+          "preferred_width": 85.0
+        },
+        {
+          "name": "Base HP Wrath",
+          "db_column_name": "basehp2",
+          "value_type": "uint",
+          "default": 1,
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Base mana",
+          "db_column_name": "basemana",
+          "value_type": "uint",
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Base armor",
+          "db_column_name": "basearmor",
+          "value_type": "uint",
+          "default": 1,
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Attack power",
+          "db_column_name": "attackpower",
+          "value_type": "uint",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Ranged attack power",
+          "db_column_name": "rangedattackpower",
+          "value_type": "uint",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Damage Base (Vanilla)",
+          "db_column_name": "damage_base",
+          "value_type": "float",
+          "preferred_width": 120.0
+        },
+        {
+          "name": "Damage Exp TBC",
+          "db_column_name": "damage_exp1",
+          "value_type": "float"
+        },
+        {
+          "name": "Damage Exp Wrath",
+          "db_column_name": "damage_exp2",
+          "value_type": "float"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

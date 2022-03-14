@@ -11,7 +11,6 @@
   "table_index_name": "QuestID",
   "record_mode": "MultiRecord",
   "group_name": "Quests",
-  "icon_path": "Icons/document_.png",
   "picker": "QuestParameter",
   "skip_quick_load": true,
   "primary_key": [

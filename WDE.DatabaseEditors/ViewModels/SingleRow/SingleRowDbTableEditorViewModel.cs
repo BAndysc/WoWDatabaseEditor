@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
+using System.Text;
 using System.Threading.Tasks;
 using AvaloniaStyles.Controls.FastTableView;
 using Newtonsoft.Json;
@@ -55,6 +56,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private readonly IConditionEditService conditionEditService;
         private readonly IDatabaseEditorsSettings editorSettings;
         private readonly ITableEditorPickerService tableEditorPickerService;
+        private readonly IMainThread mainThread;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
@@ -175,7 +177,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
-            IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService) 
+            IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService,
+            IMainThread mainThread)
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -193,6 +196,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             this.conditionEditService = conditionEditService;
             this.editorSettings = editorSettings;
             this.tableEditorPickerService = tableEditorPickerService;
+            this.mainThread = mainThread;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -374,7 +378,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), offsetQuery, limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData; ;
         }
-        
+
+        private DatabaseKey? beforeLoadSelectedRow;
         protected override async Task<bool> BeforeLoadData()
         {
             if (IsModified)
@@ -392,6 +397,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 if (result == 0)
                     await SaveDataNow();
             }
+            beforeLoadSelectedRow = SelectedRow?.Key;
             // save existing changes
             SelectedRowIndex = -1;
             UpdateSolutionItem();
@@ -442,9 +448,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
 
             await AsyncAddEntities(data.Entities);
+
+            SelectedRowIndex = beforeLoadSelectedRow.HasValue ? Entities.IndexIf(e => e.Key == beforeLoadSelectedRow) : (Entities.Count > 0 ? 0 : -1);
             
             var allRows = await tableDataProvider.GetCount(tableDefinition.Id, FilterViewModel.BuildWhere(), showOnlyModified ? keys : null);
-            RowsSummaryText = $"{offsetQuery + 1} - {offsetQuery + data.Entities.Count} of {allRows} rows";
+            var start = allRows == 0 ? 0 : offsetQuery + 1;
+            RowsSummaryText = $"{start} - {offsetQuery + data.Entities.Count} of {allRows} rows";
             historyHandler = History.AddHandler(new SingleRowTableEditorHistoryHandler(this));
         }
 
@@ -799,20 +808,35 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         public async Task TryFind(DatabaseKey key)
         {
-            if (tableDefinition.GroupByKeys.Count != 1)
+            var condition = $"`{tableDefinition.GroupByKeys[0]}` < {key[0]}";
+
+            for (int i = 1; i < key.Count; ++i)
             {
-                Console.WriteLine("Try find with multiple-value key is not supported, but this is not crutial");
-                return;
+                var sb = new StringBuilder();
+                for (int j = 0; j < i; ++j)
+                {
+                    sb.Append($"`{tableDefinition.GroupByKeys[j]}` = {key[j]} AND ");
+                }
+                sb.Append($"`{tableDefinition.GroupByKeys[i]}` < {key[i]}");
+                condition = $"({condition}) OR ({sb.ToString()})";
             }
 
-            var result = await mySqlExecutor.ExecuteSelectSql(Queries.Table(tableDefinition.TableName)
-                .Where(r => r.Column<long>(tableDefinition.GroupByKeys[0]) < key[0])
-                .Select("COUNT(*) AS C")
-                .QueryString);
+            var where = Queries.Table(tableDefinition.TableName)
+                .Where(r => r.Raw<bool>(condition));
+
+            if (!string.IsNullOrEmpty(FilterViewModel.BuildWhere()))
+                where = where.Where(r => r.Raw<bool>(FilterViewModel.BuildWhere()));
+
+            var query = where.Select("COUNT(*) AS C");
+
+            var result = await mySqlExecutor.ExecuteSelectSql(query.QueryString);
 
             var count = result[0]["C"];
-            OffsetQuery = Convert.ToInt64(count.Item2);
+            var offset = Convert.ToInt64(count.Item2);
+            var modifiedOffset = Math.Max(0, offset - LimitQuery + 1);
+            OffsetQuery = modifiedOffset;
             await ScheduleLoading();
+            mainThread.Delay(() => SelectedRowIndex = (int)(offset - modifiedOffset), TimeSpan.FromMilliseconds(1));
         }
     }
 }

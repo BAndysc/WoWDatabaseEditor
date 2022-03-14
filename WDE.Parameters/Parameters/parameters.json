@@ -3253,5 +3253,15 @@
 		"values": {
 			"1": {"name": "Wintergrasp"}
 		}
+	},
+	"FormationGroupAIParameter": {
+		"values": {
+			"0": {"name": "Noone assists noone and member don't follow the leader"},
+			"1": {"name": "The member aggroes if the leader aggroes"},
+			"2": {"name": "The leader aggroes if the member aggroes"},
+			"3": {"name": "Everyone assists everyone and member don't follow the leader"},
+			"512": {"name": "Noone assists noone and member follow the leader"},
+			"515": {"name": "Everyone assists everyone and member follow the leader"}
+		}
 	}
 }

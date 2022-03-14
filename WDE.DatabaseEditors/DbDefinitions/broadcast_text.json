@@ -1,0 +1,112 @@
+{
+  "id": "broadcast_text",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Broadcast Text",
+  "single_solution_name": "Broadcast Text",
+  "multi_solution_name": "Broadcast Text",
+  "description": "Broadcast texts are all possible texts used by npcs, fetched directly from retail. Usually you only want to read this table.",
+  "table_name": "broadcast_text",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "picker": "",
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "uint",
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Language",
+          "db_column_name": "LanguageID",
+          "value_type": "LanguageParameter",
+          "preferred_width": 115.0
+        },
+        {
+          "name": "Text",
+          "db_column_name": "Text",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 175.0
+        },
+        {
+          "name": "Text 1",
+          "db_column_name": "Text1",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 130.0
+        },
+        {
+          "name": "Emote 1",
+          "db_column_name": "EmoteID1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "preferred_width": 130.0
+        },
+        {
+          "name": "Emote Delay 1",
+          "db_column_name": "EmoteDelay1",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 2",
+          "db_column_name": "EmoteID2",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote Delay 2",
+          "db_column_name": "EmoteDelay2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 3",
+          "db_column_name": "EmoteID3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote Delay 3",
+          "db_column_name": "EmoteDelay3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Sound Entries ID",
+          "db_column_name": "SoundEntriesID",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emotes ID",
+          "db_column_name": "EmotesID",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "id": "creature_equip_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature Equip Template",
+  "single_solution_name": "Creature Equip Template",
+  "multi_solution_name": "Creature Equip Template",
+  "description": "Item sets for creatures per entry",
+  "table_name": "creature_equip_template",
+  "table_index_name": "CreatureID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
+  "picker": "",
+  "primary_key": [
+    "CreatureID",
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature ID",
+          "db_column_name": "CreatureID",
+          "value_type": "CreatureParameter",
+          "preferred_width": 260.0
+        },
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "uint",
+          "default": 1,
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Item 1 (RH)",
+          "db_column_name": "ItemID1",
+          "value_type": "ItemVisualParameter",
+          "zero_is_blank": true,
+          "preferred_width": 215.0
+        },
+        {
+          "name": "Item 2 (LH)",
+          "db_column_name": "ItemID2",
+          "value_type": "ItemVisualParameter",
+          "zero_is_blank": true,
+          "preferred_width": 170.0
+        },
+        {
+          "name": "Item 3 (Ranged)",
+          "db_column_name": "ItemID3",
+          "value_type": "ItemVisualParameter",
+          "zero_is_blank": true,
+          "preferred_width": 205.0
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "creature_questitem",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature Quest Item",
+  "single_solution_name": "Creature Quest Item",
+  "multi_solution_name": "Creature Quest Item",
+  "description": "",
+  "table_name": "creature_questitem",
+  "table_index_name": "CreatureEntry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Creature",
+  "picker": "",
+  "primary_key": [
+    "CreatureEntry",
+    "Idx"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature Entry",
+          "db_column_name": "CreatureEntry",
+          "value_type": "CreatureParameter",
+          "preferred_width": 285.0
+        },
+        {
+          "name": "Index",
+          "db_column_name": "Idx",
+          "value_type": "uint",
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Item",
+          "db_column_name": "ItemId",
+          "value_type": "ItemParameter",
+          "preferred_width": 225.0
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "preferred_width": 125.0
+        }
+      ]
+    }
+  ]
+}

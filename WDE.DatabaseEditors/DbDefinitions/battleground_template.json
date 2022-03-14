@@ -12,7 +12,6 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Advanced",
-  "icon_path": "Icons/document_.png",
   "reload_command": "reload battleground_template",
   "picker": "",
   "primary_key": [
@@ -26,7 +25,7 @@
           "name": "Battleground",
           "db_column_name": "ID",
           "value_type": "BattlegroundParameter",
-          "preferred_width": 295.0
+          "preferred_width": 275.0
         },
         {
           "name": "Min Players Per Team",

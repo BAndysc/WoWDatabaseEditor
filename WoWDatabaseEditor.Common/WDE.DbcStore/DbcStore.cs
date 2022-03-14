@@ -181,6 +181,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> WorldSafeLocsStore { get; internal set;} = new();
             public Dictionary<long, string> BattlegroundStore { get; internal set;} = new();
             public Dictionary<long, string> AchievementCriteriaStore { get; internal set;} = new();
+            public Dictionary<long, string> ItemDbcStore { get; internal set;} = new(); // item.dbc, not item-sparse.dbc
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -335,6 +336,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("WorldSafeLocParameter", new DbcParameter(WorldSafeLocsStore));
                 parameterFactory.Register("BattlegroundParameter", new DbcParameter(BattlegroundStore));
                 parameterFactory.Register("AchievementCriteriaParameter", new DbcParameter(AchievementCriteriaStore));
+                parameterFactory.Register("ItemVisualParameter", new DbcParameter(ItemDbcStore));
                 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {
@@ -366,7 +368,7 @@ namespace WDE.DbcStore
                     case DBCVersions.WOTLK_12340:
                     {
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 38;
+                        max = 39;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
                         Load("Faction.dbc", 0, 23, FactionStore, true);
@@ -428,12 +430,22 @@ namespace WDE.DbcStore
                         Load("WorldSafeLocs.dbc", 0, 5, WorldSafeLocsStore, true);
                         Load("BattlemasterList.dbc", 0, 11, BattlegroundStore, true);
                         Load("Achievement_Criteria.dbc", 0, 9, AchievementCriteriaStore, true);
+                        Load("Item.dbc", row =>
+                        {
+                            var id = row.GetUInt(0);
+                            var displayId = row.GetUInt(5);
+                            if (ItemDisplayInfoStore.TryGetValue(displayId, out var name))
+                                ItemDbcStore[id] = name;
+                            else
+                                ItemDbcStore[id] = "Item " + id;
+                        });
+                        
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
                         store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 39;
+                        max = 40;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -496,6 +508,15 @@ namespace WDE.DbcStore
                         Load("WorldSafeLocs.dbc", 0, 5, WorldSafeLocsStore);
                         Load("BattlemasterList.dbc", 0, 11, BattlegroundStore);
                         Load("Achievement_Criteria.dbc", 0, 9, AchievementCriteriaStore);
+                        Load("Item.dbc", row =>
+                        {
+                            var id = row.GetUInt(0);
+                            var displayId = row.GetUInt(5);
+                            if (ItemDisplayInfoStore.TryGetValue(displayId, out var name))
+                                ItemDbcStore[id] = name;
+                            else
+                                ItemDbcStore[id] = "Item " + id;
+                        });
                         break;
                     }
                     case DBCVersions.LEGION_26972:

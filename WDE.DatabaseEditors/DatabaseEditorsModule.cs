@@ -41,6 +41,7 @@ namespace WDE.DatabaseEditors
                 containerProvider.Resolve<IContextualParametersProvider>();
                 var pickerService = containerProvider.Resolve<IParameterPickerService>();
                 var factory = containerProvider.Resolve<IParameterFactory>();
+                factory.Register("EquipmentCreatureGuidParameter", containerProvider.Resolve<EquipmentCreatureGuidParameter>());
                 factory.Register("CreatureGUIDParameter", factory.Factory("TableReference(creature#guid)Parameter"));
                 factory.Register("GameobjectGUIDParameter", factory.Factory("TableReference(gameobject#guid)Parameter"));
                 var cr = factory.Factory("CreatureGUIDParameter");

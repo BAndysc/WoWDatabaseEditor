@@ -9,7 +9,6 @@
   "table_index_name": "class",
   "record_mode": "SingleRow",
   "group_name": "Advanced",
-  "icon_path": "Icons/document_.png",
   "picker": "Parameter",
   "skip_quick_load": true,
   "primary_key": [

@@ -11,7 +11,6 @@
   "table_index_name": "SeatEntry",
   "record_mode": "SingleRow",
   "group_name": "Vehicles",
-  "icon_path": "Icons/document_.png",
   "reload_command": "reload vehicle_seat_addon",
   "skip_quick_load": true,
   "primary_key": [
