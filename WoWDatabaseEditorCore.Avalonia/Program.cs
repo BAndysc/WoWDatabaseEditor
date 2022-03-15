@@ -18,7 +18,7 @@ namespace WoWDatabaseEditorCore.Avalonia
     public class Program
     {
         public static Type[] PreloadedModules = new Type[]{};
-        public static string ApplicationName = "WoW Database Editor 2021.3";
+        public static string ApplicationName = "WoW Database Editor 2022.1";
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.

@@ -81,7 +81,7 @@ public partial class VeryFastTableView
                 {
                     var rect = new Rect(x, y, Math.Max(0, columnWidth - ColumnSpacing), RowHeight);
                     var state = context.PushClip(rect);
-                    if (cellDrawer == null || !cellDrawer.Draw(context, rect, cell))
+                    if (cellDrawer == null || !cellDrawer.Draw(context, ref rect, cell))
                     {
                         var text = cell.ToString();
                         if (!string.IsNullOrEmpty(text))
@@ -89,11 +89,11 @@ public partial class VeryFastTableView
                             var ft = new FormattedText
                             {
                                 Text = text,
-                                Constraint = new Size(columnWidth - ColumnSpacing, RowHeight),
+                                Constraint = new Size(rect.Width, RowHeight),
                                 Typeface = font,
                                 FontSize = 12
                             };
-                            context.DrawText(textColor, new Point(x + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);   
+                            context.DrawText(textColor, new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);   
                         }
                     }
                     

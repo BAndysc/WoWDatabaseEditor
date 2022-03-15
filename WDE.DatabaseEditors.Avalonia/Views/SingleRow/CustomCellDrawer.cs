@@ -40,7 +40,7 @@ public class CustomCellDrawer : ICustomCellDrawer
         return true;
     }
 
-    public bool Draw(DrawingContext context, Rect rect, ITableCell c)
+    public bool Draw(DrawingContext context, ref Rect rect, ITableCell c)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
@@ -81,6 +81,7 @@ public class CustomCellDrawer : ICustomCellDrawer
             {
                 context.DrawImage(icn, new Rect(rect.X, rect.Center.Y - 18/2, 18, 18));
             }
+            rect = rect.Deflate(new Thickness(20, 0, 0, 0));
         }
         
         return false;
