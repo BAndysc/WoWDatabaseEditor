@@ -145,7 +145,7 @@ namespace WDE.Solutions.Sessions
             if (document is ISplitSolutionItemQueryGenerator solutionItemDocument)
                 await UpdateQuery(await solutionItemDocument.GenerateSplitQuery());
             else
-                await UpdateQuery(document.SolutionItem);
+                await UpdateQuery(new List<(ISolutionItem, IQuery)>(){(document.SolutionItem, await document.GenerateQuery())});
         }
 
         public async Task UpdateQuery(ISolutionItem solutionItem)

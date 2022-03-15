@@ -40,5 +40,9 @@ namespace WDE.Common.Services
         {
             return File.ReadAllBytes(fs.ResolvePhysicalPath(virtualPath).FullName);
         }
+        public static void WriteAllBytes(this IFileSystem fs, string virtualPath, byte[] bytes)
+        {
+            File.WriteAllBytes(fs.ResolvePhysicalPath(virtualPath).FullName, bytes);
+        }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WDE.Module.Attributes;
@@ -14,6 +13,7 @@ public interface ITableEditorPickerService
 {
     Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null);
     Task ShowTable(string table, string? condition);
+    Task ShowForeignKey1To1(string table, DatabaseKey key);
 }
 
 public struct DatabaseKey : IComparable<DatabaseKey>

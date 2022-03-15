@@ -241,7 +241,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             continue;
 
                         var newCells = new Dictionary<string, object?>();
-                        var foreignKeys = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKeys;
+                        var foreignKeys = tableData.TableDefinition.ForeignTableByName![table.Key].ForeignKeys;
                         for (int i = 0; i < foreignKeys.Length; ++i)
                             newCells[foreignKeys[i]] = entity.GetTypedValueOrThrow<long>(tableData.TableDefinition.PrimaryKey![i]);
                         foreach (var old in cells)
@@ -408,7 +408,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     IList<string> groupByKeys = definition.GroupByKeys;
                     if (table.Key != definition.TableName)
                     {
-                        groupByKeys = definition.ForeignTableByName[table.Key].ForeignKeys.Take(groupByKeys.Count).ToList();
+                        groupByKeys = definition.ForeignTableByName![table.Key].ForeignKeys.Take(groupByKeys.Count).ToList();
                         query.Table(table.Key)
                             .InsertIgnore(
                                 definition.ForeignTableByName[table.Key].ForeignKeys
@@ -450,7 +450,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             var updates = table.Value
                                 .Where(f => f.IsModified)
                                 .ToList();
-                            var primaryKeyColumn = definition.ForeignTableByName[table.Key].ForeignKeys.Take(definition.GroupByKeys.Count).ToList();
+                            var primaryKeyColumn = definition.ForeignTableByName![table.Key].ForeignKeys.Take(definition.GroupByKeys.Count).ToList();
                             query.Table(table.Key)
                                 .InsertIgnore(
                                     definition.ForeignTableByName[table.Key].ForeignKeys
@@ -495,7 +495,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             } 
             else
             {
-                var foreignKeys = definition.ForeignTableByName[tableName].ForeignKeys;
+                var foreignKeys = definition.ForeignTableByName![tableName].ForeignKeys;
 
                 var where = table
                     .Where(row =>

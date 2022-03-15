@@ -89,7 +89,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         public IDictionary<string, DatabaseColumnJson> TableColumns { get; set; } = null!;
         
         [JsonIgnore] 
-        public IDictionary<string, DatabaseForeignTableJson> ForeignTableByName { get; set; } = null!;
+        public IDictionary<string, DatabaseForeignTableJson>? ForeignTableByName { get; set; }
 
         [JsonIgnore]
         public IList<string> GroupByKeys

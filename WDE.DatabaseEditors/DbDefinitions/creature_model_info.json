@@ -48,7 +48,7 @@
         {
           "name": "Display ID Other Gender",
           "db_column_name": "DisplayID_Other_Gender",
-          "value_type": "CreatureModelDisplayParameter",
+          "value_type": "CreatureModelDataParameter",
           "preferred_width": 190.0,
           "zero_is_blank": true
         }

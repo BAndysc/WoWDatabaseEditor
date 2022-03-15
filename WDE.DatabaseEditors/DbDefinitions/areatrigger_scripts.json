@@ -12,6 +12,7 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Areatriggers",
+  "icon_path": "Icons/document_areatrigger.png",
   "picker": "",
   "primary_key": [
     "entry"
@@ -24,7 +25,7 @@
           "name": "Entry",
           "db_column_name": "entry",
           "value_type": "AreaTriggerParameter",
-          "preferred_width": 525.0
+          "preferred_width": 165.0
         },
         {
           "name": "Script Name",

@@ -14,6 +14,7 @@
   "group_name": "Spells",
   "reload_command": "reload spell_pet_auras",
   "picker": "SpellParameter",
+  "icon_path": "Icons/document_magic.png",
   "primary_key": [
     "spell",
     "effectId",

@@ -21,6 +21,11 @@ namespace WDE.Common.Parameters
         Dictionary<T, SelectOption>? Items { get; }
     }
 
+    public interface IParameterFromString<T>
+    {
+        T? FromString(string value);
+    }
+
     public struct ToStringOptions
     {
         public bool WithNumber;

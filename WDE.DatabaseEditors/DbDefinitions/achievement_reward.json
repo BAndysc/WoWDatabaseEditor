@@ -13,7 +13,7 @@
   "skip_quick_load": true,
   "group_name": "Achievements",
   "reload_command": "reload achievement_reward",
-  "picker": "",
+  "icon_path": "Icons/document_achievement.png",
   "primary_key": [
     "ID"
   ],

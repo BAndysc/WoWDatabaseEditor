@@ -14,6 +14,7 @@
   "group_name": "Quests",
   "reload_command": "reload quest_template",
   "picker": "QuestParameter",
+  "icon_path": "Icons/document_quest.png",
   "primary_key": [
     "ID"
   ],

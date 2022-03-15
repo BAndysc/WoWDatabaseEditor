@@ -13,7 +13,7 @@
   "skip_quick_load": true,
   "group_name": "Trainers",
   "reload_command": "reload trainer",
-  "picker": "",
+  "icon_path": "Icons/document_book.png",
   "primary_key": [
     "TrainerId",
     "SpellId"
@@ -43,7 +43,8 @@
         {
           "name": "Req Skill Line",
           "db_column_name": "ReqSkillLine",
-          "value_type": "SkillParameter"
+          "value_type": "SkillParameter",
+          "preferred_width": 205.0
         },
         {
           "name": "Req Skill Rank",

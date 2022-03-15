@@ -576,6 +576,15 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                                 tableEditorPickerService.ShowTable(table, newCondition);
                             }), row, entity, "Open"));
                     }
+                    else if (column.Meta!.StartsWith("one2one:"))
+                    {
+                        var table = column.Meta.Substring(8);
+                        cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, new DelegateCommand(
+                            () =>
+                            {
+                                tableEditorPickerService.ShowForeignKey1To1(table, entity.Key);
+                            }), row, entity, "Open"));
+                    }
                     else
                         throw new Exception("Unsupported meta column: " + column.Meta);
                 }

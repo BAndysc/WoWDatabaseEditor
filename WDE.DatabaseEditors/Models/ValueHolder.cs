@@ -71,21 +71,30 @@ namespace WDE.DatabaseEditors.Models
 
         public void UpdateFromString(string newValue)
         {
-            if (typeof(T) == typeof(string))
+            if (parameter is IParameterFromString<long?> fromString)
             {
-                Value = (T)(object)newValue;
+                var newVal = fromString.FromString(newValue);
+                if (newVal.HasValue)
+                    Value = (T)(object)(newVal.Value);
             }
-            else if (typeof(T) == typeof(long) && long.TryParse(newValue, out var longValue))
+            else
             {
-                Value = (T)(object)(longValue);
-            }
-            else if (typeof(T) == typeof(double) && double.TryParse(newValue, out var doubleValue))
-            {
-                Value = (T)(object)(doubleValue);
-            }
-            else if (typeof(T) == typeof(float) && float.TryParse(newValue, out var floatValue))
-            {
-                Value = (T)(object)(floatValue);
+                if (typeof(T) == typeof(string))
+                {
+                    Value = (T)(object)newValue;
+                }
+                else if (typeof(T) == typeof(long) && long.TryParse(newValue, out var longValue))
+                {
+                    Value = (T)(object)(longValue);
+                }
+                else if (typeof(T) == typeof(double) && double.TryParse(newValue, out var doubleValue))
+                {
+                    Value = (T)(object)(doubleValue);
+                }
+                else if (typeof(T) == typeof(float) && float.TryParse(newValue, out var floatValue))
+                {
+                    Value = (T)(object)(floatValue);
+                }   
             }
         }
 

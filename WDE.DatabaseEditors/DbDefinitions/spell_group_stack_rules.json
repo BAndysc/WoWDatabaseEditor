@@ -13,6 +13,7 @@
   "group_name": "Spells",
   "reload_command": "reload spell_group_stack_rules",
   "skip_quick_load": true,
+  "icon_path": "Icons/document_magic.png",
   "primary_key": [
     "group_id"
   ],

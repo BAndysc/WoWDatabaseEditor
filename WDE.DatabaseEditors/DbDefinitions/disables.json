@@ -12,6 +12,7 @@
   "record_mode": "SingleRow",
   "group_name": "Advanced",
   "reload_command": "reload disables",
+  "icon_path": "Icons/document_access_requirements.png",
   "picker": "Parameter",
   "primary_key": [
     "sourceType",

@@ -1,0 +1,54 @@
+{
+  "id": "creature_template_resistance",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature Template Resistance",
+  "single_solution_name": "Creature Template Resistance",
+  "multi_solution_name": "Creature Template Resistance",
+  "description": "Here insert short description what is creature_template_resistance for",
+  "table_name": "creature_template_resistance",
+  "table_index_name": "CreatureID",
+  "record_mode": "SingleRow",
+  "group_name": "Creature",
+  "icon_path": "Icons/document_.png",
+  "reload_command": "reload creature_template",
+  "picker": "",
+  "primary_key": [
+    "CreatureID",
+    "School"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature",
+          "db_column_name": "CreatureID",
+          "value_type": "CreatureParameter",
+          "preferred_width": 255.0
+        },
+        {
+          "name": "Spell school",
+          "db_column_name": "School",
+          "value_type": "SpellSchoolParameter",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Resistance",
+          "db_column_name": "Resistance",
+          "value_type": "int",
+          "can_be_null": true,
+          "preferred_width": 120.0
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true,
+          "preferred_width": 130.0
+        }
+      ]
+    }
+  ]
+}

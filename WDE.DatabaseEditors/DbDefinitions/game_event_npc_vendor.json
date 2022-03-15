@@ -12,7 +12,7 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Game events",
-  "picker": "",
+  "icon_path": "Icons/document_gameevent.png",
   "primary_key": [
     "guid",
     "item"

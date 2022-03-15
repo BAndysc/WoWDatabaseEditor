@@ -13,6 +13,7 @@
   "group_name": "Vehicles",
   "reload_command": "reload vehicle_accessory",
   "picker": "CreatureGUIDParameter",
+  "icon_path": "Icons/document_vehicle_template.png",
   "skip_quick_load": true,
   "primary_key": [
     "guid",

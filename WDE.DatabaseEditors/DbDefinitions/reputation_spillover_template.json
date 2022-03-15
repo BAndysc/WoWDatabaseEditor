@@ -12,6 +12,7 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Advanced",
+  "icon_path": "Icons/document_table.png",
   "reload_command": "reload reputation_spillover_template",
   "picker": "RawFactionParameter",
   "primary_key": [
@@ -25,7 +26,7 @@
           "name": "Faction",
           "db_column_name": "faction",
           "value_type": "RawFactionParameter",
-          "preferred_width": 205.0
+          "preferred_width": 185.0
         },
         {
           "name": "Faction 1",

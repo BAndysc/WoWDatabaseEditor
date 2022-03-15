@@ -4,12 +4,15 @@
     "TrinityWrath"
   ],
   "name": "Milling Loot Template",
+  "single_solution_name": "Milling Loot Template",
+  "multi_solution_name": "Milling Loot Template",
   "description": "",
   "table_name": "milling_loot_template",
   "table_index_name": "Entry",
   "record_mode": "SingleRow",
-  "group_name": "Advanced",
   "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_table.png",
   "reload_command": "reload milling_loot_template",
   "picker": "Parameter",
   "primary_key": [
@@ -23,17 +26,19 @@
         {
           "name": "Entry",
           "db_column_name": "Entry",
-          "value_type": "uint"
+          "value_type": "uint",
+          "preferred_width": 80.0
         },
         {
           "name": "Item",
           "db_column_name": "Item",
-          "value_type": "ItemParameter"
+          "value_type": "ItemParameter",
+          "preferred_width": 205.0
         },
         {
           "name": "Reference",
           "db_column_name": "Reference",
-          "value_type": "TableReference(reference_loot_template#Entry)Parameter"
+          "value_type": "LootReferenceParameter"
         },
         {
           "name": "Chance",

@@ -10,10 +10,11 @@
   "table_name": "quest_greeting",
   "table_index_name": "ID",
   "record_mode": "SingleRow",
+  "skip_quick_load": true,
   "group_name": "Quests",
+  "icon_path": "Icons/document_quest.png",
   "reload_command": "reload quest_greeting",
   "picker": "CreatureGameobjectParameter",
-  "skip_quick_load": true,
   "primary_key": [
     "ID",
     "Type"
@@ -25,28 +26,35 @@
         {
           "name": "ID",
           "db_column_name": "ID",
-          "value_type": "CreatureGameobjectParameter"
+          "value_type": "CreatureGameobjectParameter",
+          "preferred_width": 265.0
         },
         {
           "name": "Type",
           "db_column_name": "Type",
-          "value_type": "QuestGreetingTypeParameter"
+          "value_type": "QuestGreetingTypeParameter",
+          "preferred_width": 90.0
         },
         {
           "name": "Greet Emote Type",
           "db_column_name": "GreetEmoteType",
-          "value_type": "EmoteParameter"
+          "value_type": "EmoteParameter",
+          "preferred_width": 200.0,
+          "zero_is_blank": true
         },
         {
           "name": "Greet Emote Delay",
           "db_column_name": "GreetEmoteDelay",
-          "value_type": "uint"
+          "value_type": "uint",
+          "preferred_width": 125.0,
+          "zero_is_blank": true
         },
         {
           "name": "Greeting",
           "db_column_name": "Greeting",
           "value_type": "string",
-          "can_be_null": true
+          "can_be_null": true,
+          "preferred_width": 215.0
         },
         {
           "name": "Verified Build",

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Prism.Events;
@@ -67,6 +68,7 @@ namespace WDE.Parameters
                     quickAccessRegisteredParameters.Register(pair.Value.QuickAccess, pair.Key, pair.Value.Name);
             }
 
+            factory.Register("InvalidParameter", new InvalidParameter<long>());
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
@@ -132,7 +134,7 @@ namespace WDE.Parameters
         }
     }
 
-    public class MinuteIntervalParameter : Parameter
+    public class MinuteIntervalParameter : Parameter, IParameterFromString<long?>
     {
         public override string ToString(long minutes)
         {
@@ -158,9 +160,45 @@ namespace WDE.Parameters
             
             return sb.ToString();
         }
+
+        public long? FromString(string value)
+        {
+            if (long.TryParse(value, out var val))
+                return val;
+            var parts = value.Split(' ');
+            long minutes = 0;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+                if (!long.TryParse(part[..^1], out var num) &&
+                    !long.TryParse(part[..^4], out num))
+                    return null;
+                if (part.EndsWith("y"))
+                    minutes += num * 525600;
+                else if (part.EndsWith("m"))
+                    minutes += num * 43200;
+                else if (part.EndsWith("d"))
+                    minutes += num * 1440;
+                else if (part.EndsWith("h"))
+                    minutes += num * 60;
+                else if (part.EndsWith("min"))
+                    minutes += num;
+                else
+                    return null;
+            }
+            return minutes;
+        }
     }
 
-    public class MoneyParameter : Parameter
+    public class InvalidParameter<T> : IParameter<T> where T : notnull
+    {
+        public string? Prefix => null;
+        public bool HasItems => false;
+        public string ToString(T value) => "INVALID VALUE";
+        public Dictionary<T, SelectOption>? Items => null;
+    }
+
+    public class MoneyParameter : Parameter, IParameterFromString<long?>
     {
         public override string ToString(long key)
         {
@@ -180,6 +218,39 @@ namespace WDE.Parameters
             if (silver > 0)
                 return $"{silver}s";
             return $"{copper}c";
+        }
+
+        public long? FromString(string value)
+        {
+            if (long.TryParse(value, out var val))
+                return val;
+            long total = 0;
+            var parts = value.Split(' ');
+            foreach (var part in parts)
+            {
+                if (part.Length < 2)
+                    return null;
+                var unit = part[^1];
+                var amount = part.Substring(0, part.Length - 1);
+                if (!long.TryParse(amount, out var amountLong))
+                    return null;
+                switch (unit)
+                {
+                    case 'g':
+                        total += amountLong * 10000;
+                        break;
+                    case 's':
+                        total += amountLong * 100;
+                        break;
+                    case 'c':
+                        total += amountLong;
+                        break;
+                    default:
+                        return null;
+                }
+            }
+
+            return total;
         }
     }
 

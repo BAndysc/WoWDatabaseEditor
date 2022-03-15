@@ -12,7 +12,8 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Advanced",
-  "picker": "Parameter",
+  "icon_path": "Icons/document_bg.png",
+  "picker": "",
   "primary_key": [
     "TypeId"
   ],
@@ -24,7 +25,7 @@
           "name": "Zone",
           "db_column_name": "TypeId",
           "value_type": "BattlefieldParameter",
-          "preferred_width": 200.0
+          "preferred_width": 125.0
         },
         {
           "name": "Script Name",

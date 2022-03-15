@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
+using WDE.Common.Sessions;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
@@ -13,6 +15,7 @@ using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.ViewModels;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
+using WDE.DatabaseEditors.ViewModels.OneToOneForeignKey;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -28,18 +31,27 @@ public class TableEditorPickerService : ITableEditorPickerService
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly IContainerProvider containerProvider;
     private readonly IMainThread mainThread;
+    private readonly ISessionService sessionService;
+    private readonly Lazy<IDocumentManager> documentManager;
+    private readonly IMessageBoxService messageBoxService;
     private readonly IWindowManager windowManager;
 
     public TableEditorPickerService(ITableOpenService tableOpenService, 
         ITableDefinitionProvider definitionProvider, 
         IContainerProvider containerProvider,
         IMainThread mainThread,
+        ISessionService sessionService,
+        Lazy<IDocumentManager> documentManager,
+        IMessageBoxService messageBoxService,
         IWindowManager windowManager)
     {
         this.tableOpenService = tableOpenService;
         this.definitionProvider = definitionProvider;
         this.containerProvider = containerProvider;
         this.mainThread = mainThread;
+        this.sessionService = sessionService;
+        this.documentManager = documentManager;
+        this.messageBoxService = messageBoxService;
         this.windowManager = windowManager;
     }
     
@@ -126,24 +138,80 @@ public class TableEditorPickerService : ITableEditorPickerService
         if (definition == null)
             throw new UnsupportedTableException(table);
 
-        var solutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
-
-        ViewModelBase tableViewModel;
-        if (definition.RecordMode == RecordMode.SingleRow)
-        {
-            var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
-            tableViewModel = singleRow;
-            if (condition != null)
-            {
-                singleRow.FilterViewModel.FilterText = condition;
-                singleRow.FilterViewModel.ApplyFilter.Execute(null);
-            }
-        }
-        else
+        if (definition.RecordMode != RecordMode.SingleRow)
             throw new Exception("TemplateMode and MultiRow not (yet?) supported");
 
-        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel));
+        var solutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
+
+        var openIsNoSaveMode = await CheckIfItemIsOpened(solutionItem, definition);
+        var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+        if (condition != null)
+        {
+            singleRow.FilterViewModel.FilterText = condition;
+            singleRow.FilterViewModel.ApplyFilter.Execute(null);
+        }
+
+        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), singleRow),
+            (typeof(bool), openIsNoSaveMode));
         viewModel.DisablePicking = true;
         await windowManager.ShowDialog(viewModel);
+    }
+
+    public async Task ShowForeignKey1To1(string table, DatabaseKey key)
+    {
+        var definition = definitionProvider.GetDefinition(table);
+        if (definition == null)
+            throw new UnsupportedTableException(table);
+
+        if (definition.RecordMode != RecordMode.SingleRow)
+            throw new Exception("TemplateMode and MultiRow not supported, because we require 1 - 1 relation!");
+
+        var fakeSolutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
+
+        var openIsNoSaveMode = await CheckIfItemIsOpened(fakeSolutionItem, definition);
+
+        var viewModel = containerProvider.Resolve<OneToOneForeignKeyViewModel>(
+            (typeof(DatabaseKey), key), 
+            (typeof(bool), openIsNoSaveMode),
+            (typeof(DatabaseTableDefinitionJson), definition));
+
+        await windowManager.ShowDialog(viewModel);
+    }
+
+    private async Task<bool> CheckIfItemIsOpened(DatabaseTableSolutionItem fakeSolutionItem,
+        DatabaseTableDefinitionJson definition)
+    {
+        bool openIsNoSaveMode = false;
+        if (sessionService.IsOpened && !sessionService.IsPaused &&
+            documentManager.Value.TryFindDocument(fakeSolutionItem) is { } openedDocument)
+        {
+            var result = await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                .SetTitle("Document is already opened")
+                .SetMainInstruction($"{definition.Id} is already opened")
+                .SetContent(
+                    "This table is already being edited and you have an active session.\n Editing the same table in a new window would cause a session data loss.\n\nTherefore you can either close the current document or open the table without save feature enabled (you can still generate sql).")
+                .WithButton("Close document", true)
+                .WithButton("Open table without save", false)
+                .Build());
+            if (result)
+            {
+                await openedDocument.CloseCommand!.ExecuteAsync();
+                openIsNoSaveMode = documentManager.Value.OpenedDocuments.Contains(openedDocument);
+                if (openIsNoSaveMode)
+                {
+                    await messageBoxService.ShowDialog(new MessageBoxFactory<Unit>()
+                        .SetTitle("Document is still opened")
+                        .SetMainInstruction("Document is still opened")
+                        .SetContent("You didn't close the document. Opening the table without the save feature.")
+                        .Build());
+                }
+            }
+            else
+            {
+                openIsNoSaveMode = true;
+            }
+        }
+
+        return openIsNoSaveMode;
     }
 }

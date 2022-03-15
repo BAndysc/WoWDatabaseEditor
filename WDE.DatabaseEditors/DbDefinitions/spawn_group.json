@@ -1,0 +1,47 @@
+{
+  "id": "spawn_group",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spawn Group",
+  "single_solution_name": "Spawn Group",
+  "multi_solution_name": "Spawn Group",
+  "description": "This table contains Spawn Group members",
+  "table_name": "spawn_group",
+  "table_index_name": "groupId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Pools",
+  "icon_path": "Icons/document_table.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "groupId",
+    "spawnType",
+    "spawnId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Group Id",
+          "db_column_name": "groupId",
+          "value_type": "SpawnGroupTemplateParameter",
+          "preferred_width": 175.0
+        },
+        {
+          "name": "Spawn Type",
+          "db_column_name": "spawnType",
+          "value_type": "SpawnObjectTypeParameter",
+          "preferred_width": 215.0
+        },
+        {
+          "name": "Guid",
+          "db_column_name": "spawnId",
+          "value_type": "SpawnGroupGuidParameter",
+          "preferred_width": 145.0
+        }
+      ]
+    }
+  ]
+}

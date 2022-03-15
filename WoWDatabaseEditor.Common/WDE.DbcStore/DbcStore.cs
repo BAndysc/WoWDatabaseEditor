@@ -369,7 +369,7 @@ namespace WDE.DbcStore
                     {
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
                         max = 39;
-                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
+                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
                         Load("Faction.dbc", 0, 23, FactionStore, true);
                         Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
@@ -412,7 +412,7 @@ namespace WDE.DbcStore
                             var subject = row.GetString(1 + locale);
                             var body = row.GetString(18 + locale);
                             var name = string.IsNullOrEmpty(subject) ? body.TrimToLength(50) : subject;
-                            MailTemplateStore.Add(row.GetUInt(0), name);
+                            MailTemplateStore.Add(row.GetUInt(0), name.Replace("\n", ""));
                         });
                         Load("LFGDungeons.dbc", 0, 1, LFGDungeonStore, true);
                         Load("ItemSet.dbc", 0, 1, ItemSetStore, true);
@@ -446,7 +446,7 @@ namespace WDE.DbcStore
                     {
                         store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
                         max = 40;
-                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
+                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
                         Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
@@ -490,7 +490,7 @@ namespace WDE.DbcStore
                             var subject = row.GetString(1);
                             var body = row.GetString(2);
                             var name = string.IsNullOrEmpty(subject) ? body.TrimToLength(50) : subject;
-                            MailTemplateStore.Add(row.GetUInt(0), name);
+                            MailTemplateStore.Add(row.GetUInt(0), name.Replace("\n", ""));
                         });
                         Load("LFGDungeons.dbc", 0, 1, LFGDungeonStore);
                         Load("ItemSet.dbc", 0, 1, ItemSetStore);
@@ -522,7 +522,7 @@ namespace WDE.DbcStore
                     case DBCVersions.LEGION_26972:
                     {
                         max = 18;
-                        Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(16), $"Area trigger at {row.GetFloat(0)}, {row.GetFloat(1)}, {row.GetFloat(2)}"));
+                        Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(16), $"Area trigger"));
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
                         Load("AreaTable.db2", 0, 2, AreaStore);

@@ -81,7 +81,7 @@ namespace WDE.DatabaseEditors.Services
                     if (defi == null)
                     {
                         defi = tableDefinitionProvider.GetDefinitionByForeignTableName(updateQuery.TableName);
-                        if (defi?.ForeignTableByName.TryGetValue(updateQuery.TableName, out var foreignTable_) ?? false)
+                        if (defi?.ForeignTableByName?.TryGetValue(updateQuery.TableName, out var foreignTable_) ?? false)
                             foreignTable = foreignTable_;
                     }
 

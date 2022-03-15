@@ -1,6 +1,9 @@
 using Avalonia;
 using Avalonia.Media;
 using AvaloniaStyles.Controls.FastTableView;
+using WDE.Common.Avalonia.Utils;
+using WDE.DatabaseEditors.Avalonia.Services;
+using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow;
@@ -68,6 +71,16 @@ public class CustomCellDrawer : ICustomCellDrawer
         {
             context.DrawRectangle(null, ModifiedCellPen, rect);
             // don't return true, because we want to draw original value anyway
+        }
+
+        if (cell.ColumnName.ToLower() == "item" && cell.TableField is DatabaseField<long> longField)
+        {
+            var icons = ViewBind.ResolveViewModel<IItemIconsService>();
+            var icn = icons.GetIcon((uint)longField.Current.Value);
+            if (icn != null)
+            {
+                context.DrawImage(icn, new Rect(rect.X, rect.Center.Y - 18/2, 18, 18));
+            }
         }
         
         return false;

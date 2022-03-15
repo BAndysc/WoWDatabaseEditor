@@ -12,6 +12,7 @@
   "record_mode": "SingleRow",
   "reload_command": "reload spell_bonus_data",
   "picker": "SpellParameter",
+  "icon_path": "Icons/document_magic.png",
   "primary_key": [
     "entry"
   ],

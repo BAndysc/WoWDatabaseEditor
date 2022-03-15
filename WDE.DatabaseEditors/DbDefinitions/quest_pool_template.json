@@ -12,7 +12,7 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Quests",
-  "picker": "",
+  "icon_path": "Icons/document_quest.png",
   "primary_key": [
     "poolId"
   ],

@@ -13,6 +13,7 @@
   "group_name": "Spells",
   "reload_command": "reload spell_script_names",
   "skip_quick_load": true,
+  "icon_path": "Icons/document_magic.png",
   "picker": "SpellParameter",
   "primary_key": [
     "spell_id"

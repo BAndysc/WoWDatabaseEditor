@@ -10,6 +10,7 @@
   "record_mode": "SingleRow",
   "group_name": "Game events",
   "skip_quick_load": true,
+  "icon_path": "Icons/document_gameevent.png",
   "primary_key": [
     "eventEntry",
     "condition_id"

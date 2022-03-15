@@ -64,5 +64,13 @@
                 </DockPanel>
             </Grid>
         </TabItem>
+        <TabItem Header="Coverage">
+            <Grid RowDefinitions="Auto,*,Auto,*" DataContext="{CompiledBinding Coverage}">
+                <TextBlock  Text="Missing tables:" FontWeight="Bold"/>
+                <ListBox Grid.Row="1" Items="{CompiledBinding MissingTables}" />
+                <TextBlock  Text="Covered tables:" FontWeight="Bold" Grid.Row="2" />
+                <ListBox Grid.Row="3" Items="{CompiledBinding CoveredTables}" />
+            </Grid>
+        </TabItem>
     </TabControl>
 </UserControl>

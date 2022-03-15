@@ -29,5 +29,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             ChangedCell?.Invoke(this, cell, column);
             Changed?.Invoke(this);
         }
+
+        internal void DisposeAllCells()
+        {
+            foreach (var cell in Cells)
+            {
+                cell.Dispose();
+            }
+        }
     }
 }

@@ -4,15 +4,11 @@
     "TrinityWrath"
   ],
   "name": "Page Text",
-  "single_solution_name": "Page Text Table",
-  "multi_solution_name": "Page Text Table",
-  "description": "Here insert short description what is page_text for",
   "table_name": "page_text",
   "table_index_name": "ID",
   "record_mode": "SingleRow",
   "group_name": "Advanced",
   "reload_command": "reload page_text",
-  "picker": "",
   "skip_quick_load": true,
   "primary_key": [
     "ID"
@@ -24,8 +20,7 @@
         {
           "name": "ID",
           "db_column_name": "ID",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "uint"
         },
         {
           "name": "Text",

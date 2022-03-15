@@ -29,6 +29,7 @@ using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
+using WDE.DatabaseEditors.Utils;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.MVVM;
 using WDE.SqlQueryGenerator;
@@ -152,15 +153,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         protected virtual List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
         {
-            if (!entity.ExistInDatabase)
-                return null;
-            
-            var modified = entity.Fields.Where(f => f.IsModified).ToList();
-            if (modified.Count == 0)
-                return null;
-            
-            return modified.Select(f => new EntityOrigianlField()
-                {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
+            return entity.GetOriginalFields();
         }
 
         public virtual Task<IList<(ISolutionItem, IQuery)>> GenerateSplitQuery()

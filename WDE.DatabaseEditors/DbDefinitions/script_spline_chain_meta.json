@@ -1,0 +1,66 @@
+{
+  "id": "script_spline_chain_meta",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Script Spline Chain Meta",
+  "single_solution_name": "Script Spline Chain Meta",
+  "multi_solution_name": "Script Spline Chain Meta",
+  "description": "Define spline waypoint chains directly taken from sniffs",
+  "table_name": "script_spline_chain_meta",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_table.png",
+  "picker": "",
+  "primary_key": [
+    "entry",
+    "chainId",
+    "splineId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true,
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Chain Id",
+          "db_column_name": "chainId",
+          "value_type": "uint",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Spline Id",
+          "db_column_name": "splineId",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Expected Duration",
+          "db_column_name": "expectedDuration",
+          "value_type": "uint",
+          "preferred_width": 160.0
+        },
+        {
+          "name": "Ms Until Next",
+          "db_column_name": "msUntilNext",
+          "value_type": "uint",
+          "preferred_width": 155.0
+        },
+        {
+          "name": "Velocity",
+          "db_column_name": "velocity",
+          "value_type": "float",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "id": "quest_poi",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Quest Poi",
+  "single_solution_name": "Quest Poi",
+  "multi_solution_name": "Quest Poi",
+  "description": "",
+  "table_name": "quest_poi",
+  "table_index_name": "QuestID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Quests",
+  "icon_path": "Icons/document_point_of_interest.png",
+  "reload_command": "reload quest_poi",
+  "picker": "",
+  "primary_key": [
+    "QuestID",
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Quest",
+          "db_column_name": "QuestID",
+          "value_type": "QuestParameter",
+          "preferred_width": 245.0
+        },
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "TableReference(quest_poi_points#Idx1)Parameter",
+          "preferred_width": 40.0
+        },
+        {
+          "name": "Objective Index",
+          "db_column_name": "ObjectiveIndex",
+          "value_type": "int",
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Map",
+          "db_column_name": "MapID",
+          "value_type": "MapParameter",
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Zone or Area",
+          "db_column_name": "WorldMapAreaId",
+          "value_type": "ZoneAreaParameter",
+          "preferred_width": 130.0
+        },
+        {
+          "name": "Floor",
+          "db_column_name": "Floor",
+          "value_type": "uint",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Priority",
+          "db_column_name": "Priority",
+          "value_type": "uint",
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "uint",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

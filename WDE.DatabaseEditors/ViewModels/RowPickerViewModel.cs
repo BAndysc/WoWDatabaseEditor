@@ -28,7 +28,8 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
     private readonly ISolutionItemEditorRegistry solutionItemEditorRegistry;
     private readonly ISessionService sessionService;
     private readonly IMessageBoxService messageBoxService;
-    
+    private readonly bool noSaveMode;
+
     public bool DisablePicking { get; set; }
 
     public RowPickerViewModel(ViewModelBase baseViewModel,
@@ -39,14 +40,16 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
         IEventAggregator eventAggregator,
         ISolutionItemEditorRegistry solutionItemEditorRegistry,
         ISessionService sessionService,
-        IMessageBoxService messageBoxService)
+        IMessageBoxService messageBoxService,
+        bool noSaveMode = false)
     {
         this.baseViewModel = baseViewModel;
         this.solutionItemEditorRegistry = solutionItemEditorRegistry;
         this.sessionService = sessionService;
         this.messageBoxService = messageBoxService;
+        this.noSaveMode = noSaveMode;
         Watch(baseViewModel, o => o.IsModified, nameof(Title));
-        ExecuteChangedCommand = new AsyncAutoCommand(async () =>
+        ExecuteChangedCommand = noSaveMode ? AlwaysDisabledCommand.Command : new AsyncAutoCommand(async () =>
         {
             baseViewModel.Save.Execute(null);
             eventAggregator.GetEvent<DatabaseTableChanged>().Publish(baseViewModel.TableDefinition.TableName);

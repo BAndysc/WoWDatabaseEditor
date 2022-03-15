@@ -13,6 +13,7 @@
   "skip_quick_load": true,
   "group_name": "Pooling",
   "reload_command": "reload pool_members",
+  "icon_path": "Icons/document_pool_creature.png",
   "picker": "Parameter",
   "primary_key": [
     "type",

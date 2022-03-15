@@ -12,6 +12,7 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Advanced",
+  "icon_path": "Icons/document_table.png",
   "reload_command": "reload reputation_reward_rate",
   "picker": "RawFactionParameter",
   "primary_key": [
@@ -25,21 +26,21 @@
           "name": "Faction",
           "db_column_name": "faction",
           "value_type": "RawFactionParameter",
-          "preferred_width": 260.0
+          "preferred_width": 255.0
         },
         {
           "name": "Quest Rate",
           "db_column_name": "quest_rate",
           "value_type": "float",
           "default": 1.0,
-          "preferred_width": 110.0
+          "preferred_width": 85.0
         },
         {
           "name": "Quest Daily Rate",
           "db_column_name": "quest_daily_rate",
           "value_type": "float",
           "default": 1.0,
-          "preferred_width": 120.0
+          "preferred_width": 115.0
         },
         {
           "name": "Quest Weekly Rate",

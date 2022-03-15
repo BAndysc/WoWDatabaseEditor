@@ -168,6 +168,11 @@ public class PhantomCompletionComboBox : PhantomControlBase<CompletionComboBox>
     protected override void Save(CompletionComboBox element)
     {
         if (cellModel != null)
-            cellModel.OptionValue = (BaseDatabaseCellViewModel.ParameterOption?)element.SelectedItem;
+        {
+            if (element.SelectedItem is BaseDatabaseCellViewModel.ParameterOption option)
+                cellModel.OptionValue = option;
+            else if (long.TryParse(element.SearchText, out var longVal))
+                cellModel.OptionValue = new BaseDatabaseCellViewModel.ParameterOption(longVal, "");
+        }
     }
 }

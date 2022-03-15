@@ -58,6 +58,7 @@ public class SingleRecordDatabaseCellViewModel : BaseDatabaseCellViewModel, ITab
                 tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
             RaisePropertyChanged(nameof(OriginalValueTooltip));
             RaisePropertyChanged(nameof(AsBoolValue));
+            RaisePropertyChanged(nameof(IsModified));
         }));
     }
 

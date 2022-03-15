@@ -11,7 +11,7 @@ public partial class VeryFastTableView
 {
     protected override Size MeasureOverride(Size availableSize)
     {
-        availableSize = availableSize.WithHeight((Rows?.Count ?? 0) * RowHeight + DrawingStartOffsetY);
+        availableSize = availableSize.WithHeight(((Rows?.Count ?? 0) + 1) * RowHeight + DrawingStartOffsetY);
         availableSize = availableSize.WithWidth(0);
         if (Columns != null)
         {
@@ -37,6 +37,15 @@ public partial class VeryFastTableView
 
         double y = startIndex * RowHeight + DrawingStartOffsetY;
         bool odd = startIndex % 2 == 0;
+
+        Span<double> columnWidths = stackalloc double[Columns?.Count ?? 0];
+        if (Columns != null)
+        {
+            for (int i = 0; i < Columns.Count; i++)
+                columnWidths[i] = Columns[i].Width;
+        }
+
+        var cellDrawer = CustomCellDrawer;
         
         // we draw only the visible rows
         for (var index = startIndex; index < endIndex; index++)
@@ -48,20 +57,23 @@ public partial class VeryFastTableView
             // background
             context.FillRectangle(SelectedRowIndex == index ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
 
-            CustomCellDrawer?.DrawRow(context, row, rowRect);
+            cellDrawer?.DrawRow(context, row, rowRect);
             
             var textColor = index == SelectedRowIndex ? FocusTextBrush : TextBrush;
             
             int cellIndex = 0;
             foreach (var cell in row.CellsList)
             {
+                if (cellIndex >= columnWidths.Length)
+                    return;
+                
                 if (!IsColumnVisible(cellIndex))
                 {
                     cellIndex++;
                     continue;
                 }
-                
-                var columnWidth = GetColumnWidth(cellIndex);
+
+                var columnWidth = columnWidths[cellIndex];
 
                 // we draw only the visible columns
                 // todo: could be optimized so we don't iterate through all columns when we know we don't need to
@@ -69,7 +81,7 @@ public partial class VeryFastTableView
                 {
                     var rect = new Rect(x, y, Math.Max(0, columnWidth - ColumnSpacing), RowHeight);
                     var state = context.PushClip(rect);
-                    if (CustomCellDrawer == null || !CustomCellDrawer.Draw(context, rect, cell))
+                    if (cellDrawer == null || !cellDrawer.Draw(context, rect, cell))
                     {
                         var text = cell.ToString();
                         if (!string.IsNullOrEmpty(text))
