@@ -18,7 +18,9 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
 
         public IControl Build(object param)
         {
-            if (param is ViewModels.MultiRow.DatabaseCellViewModel { ActionCommand: { } } or ViewModels.SingleRow.SingleRecordDatabaseCellViewModel { ActionCommand: { } })
+            if (param is ViewModels.MultiRow.DatabaseCellViewModel { ActionCommand: { } } or 
+                ViewModels.SingleRow.SingleRecordDatabaseCellViewModel { ActionCommand: { } } or 
+                ViewModels.Template.DatabaseCellViewModel { ActionCommand: { } })
                 return CommandTemplate!.Build(param);
             if ((param is DatabaseCellViewModel vm && vm.ParameterValue is IParameterValue<long> holder && holder.Parameter is BoolParameter) ||
                 (param is ViewModels.MultiRow.DatabaseCellViewModel vm2 && vm2.ParameterValue is IParameterValue<long> holder2 && holder2.Parameter is BoolParameter) ||

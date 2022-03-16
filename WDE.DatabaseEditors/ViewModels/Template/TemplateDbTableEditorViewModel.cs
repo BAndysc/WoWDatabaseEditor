@@ -48,6 +48,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly ITeachingTipService teachingTipService;
         private readonly ICreatureStatCalculatorService creatureStatCalculatorService;
         private readonly ISessionService sessionService;
+        private readonly ITableEditorPickerService tableEditorPickerService;
 
         private readonly IDatabaseTableDataProvider tableDataProvider;
         
@@ -80,7 +81,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             ISolutionItemIconRegistry iconRegistry, ISessionService sessionService,
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
-            IStatusBar statusBar) : base(history, solutionItem, solutionItemName, 
+            IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory, 
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService,
@@ -95,6 +96,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             this.teachingTipService = teachingTipService;
             this.creatureStatCalculatorService = creatureStatCalculatorService;
             this.sessionService = sessionService;
+            this.tableEditorPickerService = tableEditorPickerService;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
 
@@ -290,6 +292,25 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                             new ValueHolder<string>("", false), StringParameter.Instance);
                         entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
                         cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, parameterValue));   
+                    }
+                    else if (column.Meta!.StartsWith("table:"))
+                    {
+                        var table = column.Meta.Substring(6, column.Meta.IndexOf(";", 6) - 6);
+                        var condition = column.Meta.Substring(column.Meta.IndexOf(";", 6) + 1);
+                        cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, new DelegateCommand(
+                            () =>
+                            {
+                                var newCondition = condition;
+                                int indexOf = 0;
+                                indexOf = newCondition.IndexOf("{", indexOf);
+                                while (indexOf != -1)
+                                {
+                                    var columnName = newCondition.Substring(indexOf + 1, newCondition.IndexOf("}", indexOf) - indexOf - 1);
+                                    newCondition = newCondition.Replace("{" + columnName + "}", entity.GetCell(columnName)!.ToString());
+                                    indexOf = newCondition.IndexOf("{", indexOf + 1);
+                                }
+                                tableEditorPickerService.ShowTable(table, newCondition);
+                            }), column.Name));
                     }
                     else
                         throw new Exception("Unsupported meta column: " + column.Meta!);

@@ -24,7 +24,7 @@
         {
           "name": "Spell",
           "db_column_name": "SpellId",
-          "value_type": "SpellParameter",
+          "value_type": "SpellOrRankedSpellParameter",
           "preferred_width": 225.0
         },
         {

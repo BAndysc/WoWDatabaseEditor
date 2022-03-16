@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using WDE.DatabaseEditors.Models;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -15,6 +16,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public bool CanBeNull => Parent.CanBeNull;
         public bool CanBeSetToNull => CanBeNull && !Parent.IsReadOnly;
         public bool CanBeReverted => !Parent.IsReadOnly;
+        public string? ActionLabel { get; }
+        public ICommand? ActionCommand { get; }
         private bool inConstructor = true;
 
         public DatabaseCellViewModel(DatabaseRowViewModel parent, 
@@ -69,6 +72,17 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 if (!inConstructor)
                     parent.AnyFieldModified();
             }));
+            inConstructor = false;
+        }
+
+        public DatabaseCellViewModel(DatabaseRowViewModel parent, 
+            DatabaseEntity parentEntity,
+            ICommand command,
+            string actionLabel) : base(parentEntity)
+        {
+            Parent = parent;
+            ActionCommand = command;
+            ActionLabel = actionLabel;
             inConstructor = false;
         }
     }

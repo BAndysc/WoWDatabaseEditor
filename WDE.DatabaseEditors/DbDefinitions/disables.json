@@ -11,8 +11,8 @@
   "table_index_name": "sourceType",
   "record_mode": "SingleRow",
   "group_name": "Advanced",
-  "reload_command": "reload disables",
   "icon_path": "Icons/document_access_requirements.png",
+  "reload_command": "reload disables",
   "picker": "Parameter",
   "primary_key": [
     "sourceType",
@@ -32,7 +32,7 @@
           "name": "Entry",
           "db_column_name": "entry",
           "value_type": "DisablesEntryParameter",
-          "preferred_width": 310.0
+          "preferred_width": 220.0
         },
         {
           "name": "Flags",

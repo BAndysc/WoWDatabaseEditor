@@ -51,7 +51,7 @@ namespace WoWDatabaseEditorCore.Managers
                 if (e.Type == CollectionEventType.Remove && e.Item is IDisposable disposable)
                     disposable.Dispose();
             });
-            OpenDocument(textDocumentService.CreateDocument("DEMO DEMO", "", "sql", true));
+            //OpenDocument(textDocumentService.CreateDocument("DEMO DEMO", "", "sql", true));
         }
 
         public IReadOnlyList<ITool> AllTools => allTools;
