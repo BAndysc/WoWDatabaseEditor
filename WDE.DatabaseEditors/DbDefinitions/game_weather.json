@@ -12,7 +12,7 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Advanced",
-  "picker": "",
+  "icon_path": "Icons/document_weather.png",
   "primary_key": [
     "zone"
   ],

@@ -11,7 +11,7 @@
   "table_index_name": "spawnId",
   "record_mode": "SingleRow",
   "skip_quick_load": true,
-  "group_name": "Advanced",
+  "group_name": "Gameobjects",
   "picker": "",
   "primary_key": [
     "spawnId"

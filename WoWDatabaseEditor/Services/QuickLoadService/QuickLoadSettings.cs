@@ -50,7 +50,16 @@ namespace WoWDatabaseEditorCore.Services.QuickLoadService
 
         public bool IsVisible(ISolutionItemProvider item)
         {
+            if (item.ByDefaultHideFromQuickStart)
+                return savedData?.Visible?.Contains(item.GetName()) ?? false;
             return !savedData?.Hidden?.Contains(item.GetName()) ?? true;
+        }
+
+        public bool IsVisible(QuickLoadItem item)
+        {
+            if (item.ByDefaultHidden)
+                return savedData?.Visible?.Contains(item.Name) ?? false;
+            return !savedData?.Hidden?.Contains(item.Name) ?? true;
         }
 
         public bool IsNewLineSeparator(ISolutionItemProvider item) => IsNewLineSeparator(item.GetName());
@@ -69,6 +78,11 @@ namespace WoWDatabaseEditorCore.Services.QuickLoadService
 
         public void ApplySavedSettings(IList<QuickLoadItem> items)
         {
+            foreach (var i in items)
+            {
+                i.IsVisible = IsVisible(i);
+            }
+            
             if (savedData == null)
                 return;
 
@@ -85,14 +99,6 @@ namespace WoWDatabaseEditorCore.Services.QuickLoadService
                     return indexA.CompareTo(indexB);
                 });
             }
-
-            if (savedData.Hidden != null)
-            {
-                foreach (var i in items)
-                {
-                    i.IsVisible = !savedData.Hidden.Contains(i.Name);
-                }
-            }
         }
 
         public void Update(ICollection<QuickLoadItem> items)
@@ -100,7 +106,8 @@ namespace WoWDatabaseEditorCore.Services.QuickLoadService
             savedData = new Data
             {
                 Order = items.Select(i => i.Name).ToArray(),
-                Hidden = items.Where(i => !i.IsVisible).Select(i => i.Name).ToArray()
+                Hidden = items.Where(i => !i.IsVisible && !i.ByDefaultHidden).Select(i => i.Name).ToArray(),
+                Visible = items.Where(i => i.IsVisible && i.ByDefaultHidden).Select(i => i.Name).ToArray()
             };
             userSettings.Update(savedData);
         }
@@ -109,6 +116,7 @@ namespace WoWDatabaseEditorCore.Services.QuickLoadService
         {
             public string[]? Order { get; set; }
             public string[]? Hidden { get; set; }
+            public string[]? Visible { get; set; }
         }
     }
 }

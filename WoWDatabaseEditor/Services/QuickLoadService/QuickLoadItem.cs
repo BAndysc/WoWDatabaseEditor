@@ -9,6 +9,7 @@ namespace WoWDatabaseEditorCore.Services.QuickLoadService
         private bool isVisible;
         public ImageUri Icon { get; }
         public string Name { get; }
+        public bool ByDefaultHidden { get; }
 
         public bool IsVisible
         {
@@ -21,12 +22,14 @@ namespace WoWDatabaseEditorCore.Services.QuickLoadService
             Name = name;
             Icon = icon;
             IsVisible = true;
+            ByDefaultHidden = false;
         }
 
         public QuickLoadItem(ISolutionItemProvider item)
         {
             Icon = item.GetImage();
             Name = item.GetName();
+            ByDefaultHidden = item.ByDefaultHideFromQuickStart;
             IsVisible = true;
         }
     }

@@ -11,7 +11,7 @@
   "table_index_name": "creature_id",
   "record_mode": "SingleRow",
   "skip_quick_load": true,
-  "group_name": "Creature",
+  "group_name": "Creatures",
   "reload_command": "reload creature_onkill_reputation",
   "picker": "",
   "primary_key": [

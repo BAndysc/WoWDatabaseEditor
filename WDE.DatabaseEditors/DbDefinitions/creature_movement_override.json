@@ -8,7 +8,7 @@
   "table_name": "creature_movement_override",
   "table_index_name": "SpawnId",
   "record_mode": "SingleRow",
-  "group_name": "Creature",
+  "group_name": "Creatures",
   "skip_quick_load": true,
   "reload_command": "reload creature_movement_override",
   "primary_key": [

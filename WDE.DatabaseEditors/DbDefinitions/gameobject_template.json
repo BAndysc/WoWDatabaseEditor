@@ -10,7 +10,7 @@
   "multi_solution_name": "Multiple gameobjects template",
   "picker": "GameobjectParameter",
   "icon_path": "Icons/document_gameobject_template.png",
-  "group_name": "Templates",
+  "group_name": "Gameobjects",
   "foreign_tables": [
     {
       "table_name": "gameobject_template_addon",

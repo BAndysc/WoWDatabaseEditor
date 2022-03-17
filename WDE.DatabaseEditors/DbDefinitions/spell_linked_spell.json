@@ -12,6 +12,7 @@
     "record_mode": "MultiRecord",
     "reload_command": "reload spell_linked_spell",
     "icon_path": "Icons/document_spell_linked.png",
+    "group_name": "Spells",
     "picker": "SpellParameter",
     "primary_key": [
       "spell_trigger",

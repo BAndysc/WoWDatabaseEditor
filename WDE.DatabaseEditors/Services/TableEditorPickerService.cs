@@ -68,6 +68,7 @@ public class TableEditorPickerService : ITableEditorPickerService
         if (solutionItem == null)
             throw new UnsupportedTableException(table);
 
+        bool openInNoSaveMode = IsItemAlreadyOpened((DatabaseTableSolutionItem)solutionItem, out _);
         ViewModelBase tableViewModel;
         if (definition.RecordMode == RecordMode.MultiRecord)
         {
@@ -116,7 +117,7 @@ public class TableEditorPickerService : ITableEditorPickerService
         else
             throw new Exception("TemplateMode not (yet?) supported");
 
-        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel));
+        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel), (typeof(bool), openInNoSaveMode));
         if (await windowManager.ShowDialog(viewModel))
         {
             var col = viewModel.SelectedRow?.GetCell(column);
@@ -177,13 +178,25 @@ public class TableEditorPickerService : ITableEditorPickerService
 
         await windowManager.ShowDialog(viewModel);
     }
+    
+    private bool IsItemAlreadyOpened(DatabaseTableSolutionItem fakeSolutionItem, out ISolutionItemDocument document)
+    {
+        document = null!;
+        if (sessionService.IsOpened && !sessionService.IsPaused &&
+            documentManager.Value.TryFindDocument(fakeSolutionItem) is { } openedDocument)
+        {
+            document = openedDocument;
+            return true;
+        }
+
+        return false;
+    }
 
     private async Task<bool> CheckIfItemIsOpened(DatabaseTableSolutionItem fakeSolutionItem,
         DatabaseTableDefinitionJson definition)
     {
         bool openIsNoSaveMode = false;
-        if (sessionService.IsOpened && !sessionService.IsPaused &&
-            documentManager.Value.TryFindDocument(fakeSolutionItem) is { } openedDocument)
+        if (IsItemAlreadyOpened(fakeSolutionItem, out var openedDocument))
         {
             var result = await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                 .SetTitle("Document is already opened")

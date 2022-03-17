@@ -39,22 +39,17 @@ namespace WDE.DatabaseEditors.Solution
         {
             foreach (var definition in definitionProvider.Definitions)
             {
-                if (definition.SkipQuickLoad)
-                    continue;
-                
                 if (definition.RecordMode == RecordMode.SingleRow)
-                    yield return new DatabaseTableSolutionItemProvider(definition, databaseProvider, tableOpenService, true);
+                    yield return new DatabaseTableSolutionItemProvider(definition, databaseProvider, tableOpenService, true, definition.SkipQuickLoad);
                 else
-                    yield return new DatabaseTableSolutionItemNumberedProvider(definition, databaseProvider, tableOpenService, true);
+                    yield return new DatabaseTableSolutionItemNumberedProvider(definition, databaseProvider, tableOpenService, true, definition.SkipQuickLoad);
             }
             foreach (var definition in definitionProvider.IncompatibleDefinitions)
             {
-                if (definition.SkipQuickLoad)
-                    continue;
                 if (definition.RecordMode == RecordMode.SingleRow)
-                    yield return new DatabaseTableSolutionItemProvider(definition, databaseProvider, tableOpenService, false);
+                    yield return new DatabaseTableSolutionItemProvider(definition, databaseProvider, tableOpenService, false, definition.SkipQuickLoad);
                 else
-                    yield return new DatabaseTableSolutionItemNumberedProvider(definition, databaseProvider, tableOpenService, false);
+                    yield return new DatabaseTableSolutionItemNumberedProvider(definition, databaseProvider, tableOpenService, false, definition.SkipQuickLoad);
             }
         }
     }
@@ -66,17 +61,21 @@ namespace WDE.DatabaseEditors.Solution
         protected readonly DatabaseTableDefinitionJson definition;
         protected readonly ImageUri itemIcon;
         private bool isCompatible;
-        
+
+        public bool ByDefaultHideFromQuickStart { get; }
+
         internal DatabaseTableSolutionItemProvider(DatabaseTableDefinitionJson definition,
             IDatabaseProvider databaseProvider,
             ITableOpenService tableOpenService,
-            bool isCompatible)
+            bool isCompatible,
+            bool byDefaultIsHiddenInQuickLoad)
         {
             this.databaseProvider = databaseProvider;
             this.tableOpenService = tableOpenService;
             this.definition = definition;
             this.itemIcon = new ImageUri($"Icons/document_big.png");
             this.isCompatible = isCompatible;
+            this.ByDefaultHideFromQuickStart = byDefaultIsHiddenInQuickLoad;
         }
 
         public string GetName() => definition.Name;
@@ -141,7 +140,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public string ParameterName => definition.Picker;
 
-        internal DatabaseTableSolutionItemNumberedProvider(DatabaseTableDefinitionJson definition, IDatabaseProvider databaseProvider, ITableOpenService tableOpenService, bool isCompatible) : base(definition, databaseProvider, tableOpenService, isCompatible)
+        internal DatabaseTableSolutionItemNumberedProvider(DatabaseTableDefinitionJson definition, IDatabaseProvider databaseProvider, ITableOpenService tableOpenService, bool isCompatible, bool byDefaultIsHiddenInQuickLoad) : base(definition, databaseProvider, tableOpenService, isCompatible, byDefaultIsHiddenInQuickLoad)
         {
         }
     }

@@ -6,14 +6,13 @@
   "name": "Creature Template Resistance",
   "single_solution_name": "Creature Template Resistance",
   "multi_solution_name": "Creature Template Resistance",
-  "description": "Here insert short description what is creature_template_resistance for",
+  "description": "Edit creature resistances (per entry)",
   "table_name": "creature_template_resistance",
   "table_index_name": "CreatureID",
   "record_mode": "SingleRow",
-  "group_name": "Creature",
-  "icon_path": "Icons/document_.png",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
   "reload_command": "reload creature_template",
-  "picker": "",
   "primary_key": [
     "CreatureID",
     "School"

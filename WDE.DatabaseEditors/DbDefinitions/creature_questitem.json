@@ -11,7 +11,7 @@
   "table_index_name": "CreatureEntry",
   "record_mode": "SingleRow",
   "skip_quick_load": true,
-  "group_name": "Creature",
+  "group_name": "Creatures",
   "picker": "",
   "primary_key": [
     "CreatureEntry",

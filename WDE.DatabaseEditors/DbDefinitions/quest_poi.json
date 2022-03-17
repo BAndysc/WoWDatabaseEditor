@@ -6,7 +6,7 @@
   "name": "Quest Poi",
   "single_solution_name": "Quest Poi",
   "multi_solution_name": "Quest Poi",
-  "description": "",
+  "description": "Contains metadata for quest points of interests",
   "table_name": "quest_poi",
   "table_index_name": "QuestID",
   "record_mode": "SingleRow",

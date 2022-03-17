@@ -2,60 +2,64 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:newItemService="clr-namespace:WoWDatabaseEditorCore.Services.NewItemService;assembly=WoWDatabaseEditorCore"
-             xmlns:newItemService1="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.NewItemService"
-             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
-             d:DataContext="{d:DesignInstance newItemService:NewItemDialogViewModel}"
+             x:DataType="newItemService:NewItemDialogViewModel"
              Name="Root"
              Margin="0,9,0,0">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="10" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
-        <controls:GroupingListBox Items="{Binding  ItemPrototypes}"
-                                 SelectedItem="{Binding SelectedPrototype}"
-                                 DoubleTapped="InputElement_OnDoubleTapped"
-                                 KeyDown="UIElement_OnKeyDown">
-            <controls:GroupingListBox.Styles>
-                <Style Selector="ListBoxItem">
-                    <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
-                </Style>
-            </controls:GroupingListBox.Styles>
-            <controls:GroupingListBox.ItemTemplate>
+    <Grid Margin="10" ColumnDefinitions="*,Auto,3*">
+        <ListBox Items="{CompiledBinding Categories}"
+                 VirtualizationMode="None"
+                 Margin="0,0,5,0"
+                 SelectedItem="{CompiledBinding SelectedCategory}">
+            <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <components:WdeImage Image="{Binding Image}" Width="32" Margin="0,0,6,0" Grid.RowSpan="2" />
-                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Grid.Column="1" />
-                        <TextBlock Text="{Binding Description}" TextWrapping="WrapWithOverflow" Grid.Column="1"
-                                   Grid.Row="1" />
-                    </Grid>
+                    <TextBlock Text="{CompiledBinding GroupName}" />
                 </DataTemplate>
-            </controls:GroupingListBox.ItemTemplate>
-        </controls:GroupingListBox>
-        <DockPanel IsEnabled="{Binding SelectedPrototype.RequiresName}" Grid.Row="2" LastChildFill="True" Margin="0,0,0,10">
-            <TextBlock VerticalAlignment="Center">Name:</TextBlock>
-            <TextBox Text="{Binding CustomName, Mode=TwoWay}" Margin="10,0,0,0" />
-        </DockPanel>
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="80" />
-            </Grid.ColumnDefinitions>
-            <Button Content="Cancel" Command="{Binding Cancel}" HorizontalAlignment="Stretch" />
-            <Button Grid.Column="2" Content="OK" Command="{Binding Accept}" HorizontalAlignment="Stretch"/>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <GridSplitter Grid.Column="1"/>
+        <Grid RowDefinitions="*,10,Auto,30" Grid.Column="2" Margin="5,0,0,0">
+                <ListBox Items="{CompiledBinding  SelectedCategory}"
+                                      VirtualizationMode="None"
+                                      SelectedItem="{CompiledBinding SelectedPrototype}"
+                                      DoubleTapped="InputElement_OnDoubleTapped"
+                                      KeyDown="UIElement_OnKeyDown">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem" x:DataType="newItemService:NewItemPrototypeInfo">
+                        <Setter Property="IsEnabled" Value="{CompiledBinding IsEnabled}" />
+                    </Style>
+                </ListBox.Styles>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <components:WdeImage Image="{CompiledBinding Image}" Width="32" Margin="0,0,6,0" Grid.RowSpan="2" />
+                            <TextBlock Text="{CompiledBinding Name}" FontWeight="Bold" Grid.Column="1" />
+                            <TextBlock Text="{CompiledBinding Description}" TextWrapping="WrapWithOverflow" Grid.Column="1" Grid.Row="1" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <DockPanel IsEnabled="{CompiledBinding SelectedPrototype.RequiresName, FallbackValue=False}" Grid.Row="2" LastChildFill="True" Margin="0,0,0,10">
+                <TextBlock VerticalAlignment="Center">Name:</TextBlock>
+                <TextBox Text="{CompiledBinding CustomName, Mode=TwoWay}" Margin="10,0,0,0" />
+            </DockPanel>
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="80" />
+                </Grid.ColumnDefinitions>
+                <Button Content="Cancel" Command="{CompiledBinding Cancel}" HorizontalAlignment="Stretch" />
+                <Button Grid.Column="2" Content="OK" Command="{CompiledBinding Accept}" HorizontalAlignment="Stretch"/>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>
