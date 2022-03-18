@@ -258,7 +258,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             RefreshQuery = new AsyncAutoCommand(ScheduleLoading);
             
             var definition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId);
-            FilterViewModel = new MySqlFilterViewModel(definition, ScheduleLoading);
+            FilterViewModel = new MySqlFilterViewModel(definition, ScheduleLoading, parameterFactory, parameterPickerService);
             
             var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
             var savedItem = sessionService.Find(pseudoItem);

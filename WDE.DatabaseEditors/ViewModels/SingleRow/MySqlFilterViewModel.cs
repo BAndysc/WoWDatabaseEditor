@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PropertyChanged.SourceGenerator;
+using WDE.Common.Parameters;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.MVVM;
@@ -12,17 +13,20 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow;
 public partial class MySqlFilterViewModel : ObservableBase
 {
     [AlsoNotify(nameof(ShowOperatorChoice))] [Notify] private FilterColumnViewModel? selectedColumn;
-    [Notify] private FilterOperatorViewModel? selectedOperator;
+    [Notify] private FilterOperatorViewModel selectedOperator;
     [Notify] private string filterText = "";
 
     public bool ShowOperatorChoice => !selectedColumn?.IsManualQuery() ?? false;
     
     public List<FilterColumnViewModel> Columns { get; } = new();
     public List<FilterOperatorViewModel> Operators { get; } = new();
-
+    public AsyncAutoCommand PickParameterCommand { get; }
     public AsyncAutoCommand ApplyFilter { get; }
     
-    public MySqlFilterViewModel(DatabaseTableDefinitionJson? tableDefinition, Func<Task> refilter)
+    public MySqlFilterViewModel(DatabaseTableDefinitionJson? tableDefinition,
+        Func<Task> refilter, 
+        IParameterFactory parameterFactory,
+        IParameterPickerService pickerService)
     {
         Columns.Add(FilterColumnViewModel.CreateRawSql());
 
@@ -30,7 +34,7 @@ public partial class MySqlFilterViewModel : ObservableBase
         {
             foreach (var column in tableDefinition.Groups.SelectMany(x => x.Fields))
             {
-                Columns.Add(FilterColumnViewModel.CreateFromColumn(column.Name, column.DbColumnName, column.ForeignTable ?? tableDefinition.TableName));
+                Columns.Add(FilterColumnViewModel.CreateFromColumn(column.Name, column.DbColumnName, column.ForeignTable ?? tableDefinition.TableName, column.ValueType));
             }
         }
         
@@ -53,12 +57,36 @@ public partial class MySqlFilterViewModel : ObservableBase
         selectedOperator = Operators[0];
         
         ApplyFilter = new AsyncAutoCommand(refilter);
+        PickParameterCommand = new AsyncAutoCommand(async () =>
+        {
+            if (parameterFactory.IsRegisteredLong(selectedColumn.ParameterKey!))
+            {
+                var param = parameterFactory.Factory(selectedColumn.ParameterKey!);
+                var picked = await pickerService.PickParameter(param, 0);
+                if (picked.ok)
+                    FilterText = picked.value.ToString();
+            }
+            else if (parameterFactory.IsRegisteredString(selectedColumn.ParameterKey!))
+            {
+                var param = parameterFactory.FactoryString(selectedColumn.ParameterKey!);
+                var picked = await pickerService.PickParameter(param, "");
+                if (picked.ok && picked.value != null)
+                    FilterText = picked.value;
+            }
+        }, () => selectedColumn != null && selectedColumn.ParameterKey != null && 
+                 (parameterFactory.IsRegisteredLong(selectedColumn.ParameterKey!) || 
+                 parameterFactory.IsRegisteredString(selectedColumn.ParameterKey!)));
+        On(() => SelectedColumn, _ => PickParameterCommand.RaiseCanExecuteChanged());
     }
 
     public string BuildWhere()
     {
         var where = "";
-        if ((selectedColumn?.IsManualQuery() ?? true) || selectedOperator == null || string.IsNullOrEmpty(filterText))
+        if (selectedOperator.Operator == "IS NULL")
+            where += "IS NULL";
+        else if (selectedOperator.Operator == "IS NOT NULL")
+            where += "IS NOT NULL";
+        else if ((selectedColumn?.IsManualQuery() ?? true) || string.IsNullOrEmpty(filterText))
         {
             where = filterText;
         }
@@ -74,10 +102,6 @@ public partial class MySqlFilterViewModel : ObservableBase
                 where += $"BETWEEN {filterText}";
             else if (selectedOperator.Operator == "NOT BETWEEN")
                 where += $"NOT BETWEEN {filterText}";
-            else if (selectedOperator.Operator == "IS NULL")
-                where += $"IS NULL";
-            else if (selectedOperator.Operator == "IS NOT NULL")
-                where += $"IS NOT NULL";
             else
                 where += $"{selectedOperator.Operator} '{escaped}'";
         }
@@ -91,22 +115,24 @@ public class FilterColumnViewModel
     public readonly string FriendlyName;
     public readonly string? ColumnName;
     public readonly string? TableName;
-    
-    public static FilterColumnViewModel CreateFromColumn(string friendlyName, string name, string tableName)
+    public readonly string? ParameterKey;
+
+    public static FilterColumnViewModel CreateFromColumn(string friendlyName, string name, string tableName, string parameterKey)
     {
-        return new(name, friendlyName, tableName);
+        return new(name, friendlyName, tableName, parameterKey);
     }
     
     public static FilterColumnViewModel CreateRawSql()
     {
-        return new(null, "Raw SQL", null);
+        return new(null, "Raw SQL", null, null);
     }
 
-    private FilterColumnViewModel(string? columnName, string friendlyName, string? tableName)
+    private FilterColumnViewModel(string? columnName, string friendlyName, string? tableName, string? parameterKey)
     {
         this.FriendlyName = friendlyName;
         this.ColumnName = columnName;
         TableName = tableName;
+        this.ParameterKey = (parameterKey?.EndsWith("Parameter") ?? false) ? parameterKey : null;
     }
     
     public bool IsManualQuery()

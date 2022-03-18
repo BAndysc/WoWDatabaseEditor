@@ -13,5 +13,6 @@
         <ComboBox Margin="0,0,4,0" SelectedItem="{CompiledBinding SelectedColumn}" Items="{CompiledBinding Columns}" />
         <ComboBox Margin="0,0,4,0" IsVisible="{CompiledBinding ShowOperatorChoice}" SelectedItem="{CompiledBinding SelectedOperator}" Items="{CompiledBinding Operators}" />
         <TextBox Text="{CompiledBinding FilterText}" />
+        <Button Content="..." Command="{CompiledBinding PickParameterCommand}" />
     </DockPanel>
 </UserControl>
