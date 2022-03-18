@@ -87,7 +87,8 @@ public readonly struct DatabaseKey : IComparable<DatabaseKey>
     }
     
     public int Count => Key.HasValue ? 1 + (Key2.HasValue ? 1 + (Key3.HasValue ? 1 + (moreKeys?.Count ?? 0) : 0) : 0) : 0;
-    
+    public static DatabaseKey PhantomKey => new DatabaseKey();
+
     public bool Equals(DatabaseKey other)
     {
         // no-key key should be equal to no other key (including other no-key key!)

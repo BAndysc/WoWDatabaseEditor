@@ -50,7 +50,7 @@ namespace WDE.DatabaseEditors.ViewModels
         protected readonly ISessionService sessionService;
         private readonly IDatabaseTableCommandService commandService;
         private readonly IParameterPickerService parameterPickerService;
-        private readonly IStatusBar statusBar;
+        protected readonly IStatusBar statusBar;
         private readonly IMySqlExecutor mySqlExecutor;
 
         protected ViewModelBase(IHistoryManager history,
@@ -182,6 +182,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 {
                     progress.Report(0, 2, "Generate query");
                     var query = await GenerateSaveQuery();
+                    Console.WriteLine(query);
                     progress.Report(1, 2, "Execute query");
                     try
                     {

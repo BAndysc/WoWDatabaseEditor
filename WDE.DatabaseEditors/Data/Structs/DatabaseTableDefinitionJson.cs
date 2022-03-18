@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using WDE.Common.Services;
 
 namespace WDE.DatabaseEditors.Data.Structs
 {
@@ -81,6 +82,10 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         [JsonProperty(PropertyName = "commands")]
         public IList<DatabaseCommandDefinitionJson>? Commands { get; set; }
+        
+        [JsonProperty(PropertyName = "auto_key")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public GuidType? AutoKeyValue { get; set; }
         
         [JsonIgnore]
         public string FileName { get; set; } = "";

@@ -11,7 +11,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
     // single row database entity
     public class DatabaseEntityViewModel : BindableBase, ITableRow
     {
-        public DatabaseKey Key => Entity.Key;
         public DatabaseEntity Entity { get; }
         public ObservableCollection<SingleRecordDatabaseCellViewModel> Cells { get; } = new();
         public bool IsPhantomEntity => Entity.Phantom;

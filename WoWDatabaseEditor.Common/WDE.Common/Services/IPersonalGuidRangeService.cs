@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 
@@ -21,6 +22,23 @@ public interface IPersonalGuidRangeService
 
 public static class PersonalGuidRangeExtensions
 {
+    private static async Task<T?> Wrap<T>(Func<Task<T>> func, GuidType type, IStatusBar status)
+    {
+        try
+        {
+            return await func();
+        }
+        catch (GuidServiceNotSetupException)
+        {
+            return default;
+        }
+        catch (NoMoreGuidsException)
+        {          
+            status.PublishNotification(new PlainNotification(NotificationType.Warning, "No more guids available for " + type));
+            return default;
+        }
+    }
+
     private static async Task<T?> Wrap<T>(Func<Task<T>> func, GuidType type, IMessageBoxService messageBoxService)
     {
         try
@@ -57,6 +75,16 @@ public static class PersonalGuidRangeExtensions
     public static async Task<uint?> GetNextGuidOrShowError(this IPersonalGuidRangeService service, GuidType type, IMessageBoxService messageBoxService)
     {
         return await Wrap<uint?>(async () => service.GetNextGuid(type), type, messageBoxService);
+    }
+    
+    public static async Task<uint?> GetNextGuidRangeOrShowError(this IPersonalGuidRangeService service, GuidType type, uint count, IStatusBar statusBar)
+    {
+        return await Wrap<uint?>(async () => service.GetNextGuidRange(type, count), type, statusBar);
+    }
+    
+    public static async Task<uint?> GetNextGuidOrShowError(this IPersonalGuidRangeService service, GuidType type, IStatusBar statusBar)
+    {
+        return await Wrap<uint?>(async () => service.GetNextGuid(type), type, statusBar);
     }
 }
 
