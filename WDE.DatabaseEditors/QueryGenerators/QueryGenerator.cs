@@ -42,7 +42,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 return GenerateSingleRecordQuery(keys, deletedKeys, tableData);
             return GenerateUpdateQuery(tableData);
         }
-
+        
         public IQuery GenerateSingleRecordQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)
         {
             var query = Queries.BeginTransaction();
@@ -51,7 +51,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             GeneratePrimaryKeyDeletion(tableData.TableDefinition, deletedKeys, query);
             
             //insert
-            query.Add(GenerateInsertQuery(tableData.Entities.Where(e => !e.ExistInDatabase).Select(e => e.Key).ToList(), tableData));
+            query.Add(GenerateInsertQuery(tableData.Entities.Where(e => !e.ExistInDatabase).Select(e => e.GenerateKey(tableData.TableDefinition)).ToList(), tableData));
             
             //update
             foreach (var entity in tableData.Entities)
@@ -128,7 +128,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
         }
 
         public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity) =>
-            GenerateDeleteQuery(table, entity.Key);
+            GenerateDeleteQuery(table, entity.GenerateKey(table));
         
         public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseKey key)
         {
@@ -176,7 +176,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 
                 var existInDatabaseComparison = x.ExistInDatabase.CompareTo(y.ExistInDatabase);
                 if (existInDatabaseComparison != 0) return existInDatabaseComparison;
-                return x.Key.CompareTo(y.Key);
+                return x.Phantom || y.Phantom ? 0 : x.Key.CompareTo(y.Key);
             }
         }
 
@@ -205,7 +205,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             var comparer = new EntityComparer(tableData.TableDefinition);
             foreach (var entity in tableData.Entities.OrderBy(t => t, comparer))
             {
-                if (!keys.Contains(entity.Key))
+                if (!entity.Phantom && !keys.Contains(entity.Key))
                     continue;
                 
                 bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new EntityKey(entity, tableData.TableDefinition));
@@ -459,7 +459,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                                             key => key.Item1,
                                             key => entity.GetTypedValueOrThrow<long>(key.Item2))
                                 );
-                            var where = GenerateWherePrimaryKey(primaryKeyColumn, query.Table(table.Key), entity.Key);
+                            var where = GenerateWherePrimaryKey(primaryKeyColumn, query.Table(table.Key), entity.GenerateKey(definition));
                             IUpdateQuery update = where
                                 .Set(updates[0].FieldName, FixUnixTimestamp(definition.TableColumns[updates[0].FieldName], updates[0].Object));
                             for (int i = 1; i < updates.Count; ++i)
@@ -491,7 +491,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             // todo: this might not be good after change to DatabaseKeys
             if (tableName == definition.TableName)
             {
-                return GenerateWherePrimaryKey(definition, table, entity.Key);
+                return GenerateWherePrimaryKey(definition, table, entity.GenerateKey(definition));
             } 
             else
             {

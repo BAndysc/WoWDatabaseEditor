@@ -23,6 +23,11 @@
       <Version>2.5.3</Version>
     </PackageReference>
     <PackageReference Include="FuzzySharp" Version="2.0.2" />
+    <PackageReference Include="PropertyChanged.SourceGenerator">
+      <Version>1.0.1</Version>
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Update="Icons\*.png">

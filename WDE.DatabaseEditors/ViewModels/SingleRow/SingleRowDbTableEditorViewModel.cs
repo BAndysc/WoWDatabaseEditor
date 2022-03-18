@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Events;
 using PropertyChanged.SourceGenerator;
+using ReactiveUI;
 using WDE.Common;
 using WDE.Common.Avalonia;
 using WDE.Common.Database;
@@ -160,11 +161,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public AsyncAutoCommand PreviousDataPage { get; }
         public AsyncAutoCommand RefreshQuery { get; }
         public AsyncAutoCommand NextDataPage { get; }
-
-        public event Action<DatabaseEntity>? OnDeletedQuery;
-        public event Action<DatabaseEntity, int>? OnKeyDeleted;
-        public event Action<DatabaseKey, int>? OnKeyAdded;
-
+        
         public SingleRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
@@ -280,7 +277,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         public override DatabaseEntity AddRow(DatabaseKey key)
         {
-            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
+            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, true);
             ForceInsertEntity(freshEntity, Entities.Count);
             return freshEntity;
         }
@@ -300,15 +297,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             return values;
         }
-        
-        private async Task AddNewEntity()
+
+        private async Task<bool> CheckIfKeyExistsAndWarn(DatabaseKey key)
         {
-            var newKey = await AskForNewKey();
-            if (newKey == null)
-                return;
-
-            DatabaseKey key = new DatabaseKey(newKey);
-
             if (await ContainsKey(key))
             {
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
@@ -318,13 +309,17 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     .WithOkButton(true)
                     .SetIcon(MessageBoxIcon.Error)
                     .Build());
-                return;
+                return false;
             }
-            
+
+            return true;
+        }
+
+        private async Task AddNewEntity()
+        {
+            DatabaseKey key = new DatabaseKey();
             var index = SelectedRow == null ? Entities.Count : selectedRowIndex + 1;
-            OnKeyAdded?.Invoke(key, index);
-            
-            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
+            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, true);
             ForceInsertEntity(freshEntity, index);
         }
         
@@ -449,7 +444,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             await AsyncAddEntities(data.Entities);
 
-            SelectedRowIndex = beforeLoadSelectedRow.HasValue ? Entities.IndexIf(e => e.Key == beforeLoadSelectedRow) : (Entities.Count > 0 ? 0 : -1);
+            SelectedRowIndex = beforeLoadSelectedRow.HasValue ? Entities.IndexIf(e => e.GenerateKey(TableDefinition) == beforeLoadSelectedRow) : (Entities.Count > 0 ? 0 : -1);
             
             var allRows = await tableDataProvider.GetCount(tableDefinition.Id, FilterViewModel.BuildWhere(), showOnlyModified ? keys : null);
             var start = allRows == 0 ? 0 : offsetQuery + 1;
@@ -477,9 +472,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         protected override void UpdateSolutionItem()
         {
-            var previousData = solutionItem.Entries.Where(e => Entities.All(entity => entity.Key != e.Key));
+            var previousData = solutionItem.Entries.Where(e => Entities.All(entity => entity.GenerateKey(TableDefinition) != e.Key));
             
-            solutionItem.Entries = Entities.Where(e => !e.ExistInDatabase || EntityIsModified(e))
+            solutionItem.Entries = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e)) && !e.Phantom)
                 .Select(e => new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, GetOriginalFields(e)))
                 .Union(previousData)
                 .ToList();
@@ -505,10 +500,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             var indexOfEntity = Entities.IndexOf(entity);
             Debug.Assert(indexOfEntity >= 0);
-            
-            keys.Remove(entity.Key);
-            removedKeys.Add(entity.Key);
-            forceInsertKeys.Remove(entity.Key);
+
+            if (!entity.Phantom)
+            {
+                keys.Remove(entity.Key);
+                removedKeys.Add(entity.Key);
+                forceInsertKeys.Remove(entity.Key);
+            }
             
             Entities.RemoveAt(indexOfEntity);
             if (SelectedRow?.Entity == entity)
@@ -528,13 +526,16 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         public override bool ForceInsertEntity(DatabaseEntity entity, int index, bool undoing = false)
         {
-            if (undoing)
-                forceInsertKeys.Add(entity.Key);
-            removedKeys.Remove(entity.Key);
-            var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
-            var savedItem = sessionService.Find(pseudoItem);
-            if (savedItem is DatabaseTableSolutionItem savedTableItem)
-                savedTableItem.UpdateEntitiesWithOriginalValues(new List<DatabaseEntity>(){entity});
+            if (!entity.Phantom)
+            {
+                if (undoing)
+                    forceInsertKeys.Add(entity.Key);
+                removedKeys.Remove(entity.Key);
+                var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
+                var savedItem = sessionService.Find(pseudoItem);
+                if (savedItem is DatabaseTableSolutionItem savedTableItem)
+                    savedTableItem.UpdateEntitiesWithOriginalValues(new List<DatabaseEntity>(){entity});
+            }
 
             var row = new DatabaseEntityViewModel(entity);
             row.Changed += OnRowChanged;
@@ -583,7 +584,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                             () =>
                             {
                                 tableEditorPickerService.ShowForeignKey1To1(table, entity.Key);
-                            }), row, entity, "Open"));
+                            }, () => !entity.Phantom), row, entity, "Open"));
                     }
                     else
                         throw new Exception("Unsupported meta column: " + column.Meta);
@@ -631,7 +632,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, string columnName)
         {
-            if (tableDefinition.GroupByKeys.Contains(columnName))
+            if (tableDefinition.GroupByKeys.Contains(columnName) && !entity.IsPhantomEntity)
                 ReKey(entity).ListenErrors();
             else
             {
@@ -713,6 +714,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             if (obj is not DatabaseEntityViewModel row)
                 return;
 
+            if (row.IsPhantomEntity)
+                return;
+            
             if (EntityIsModified(row.Entity))
                 keys.Add(row.Key);
             else
@@ -762,20 +766,20 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         private async Task<IQuery> GenerateQueryImpl(bool saveQuery)
         {
-            var newData = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e)) && (!saveQuery || !forceInsertKeys.Contains(e.Key))).ToList();
+            var newData = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e)) && (!saveQuery || (!e.Phantom && !forceInsertKeys.Contains(e.Key)))).ToList();
 
             if (saveQuery)
             {
                 foreach (var e in forceInsertKeys)
                 {
-                    var entity = Entities.FirstOrDefault(x => x.Key == e);
+                    var entity = Entities.Where(x => !x.Phantom).FirstOrDefault(x => x.Key == e);
                     if (entity == null)
                         continue;
                     newData.Add(entity.Clone(null, false));
                 }
             }
 
-            var newDataKeys = newData.Select(e => e.Key).ToArray();
+            var newDataKeys = newData.Select(e => e.GenerateKey(TableDefinition)).ToArray();
             var oldKeys = keys.Except(newDataKeys).ToArray();
             
             IDatabaseTableData? data = null;
@@ -799,7 +803,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             multi.Add(query);
             foreach (var pair in forceUpdateCells)
             {
-                var entity = Entities.FirstOrDefault(x => x.Key == pair.key);
+                var entity = Entities.Where(x => !x.Phantom).FirstOrDefault(x => x.Key == pair.key);
                 var field = entity?.GetCell(pair.columnName);
                 if (entity == null || field == null)
                     continue;
@@ -812,9 +816,22 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             forceInsertKeys.Clear();
             forceUpdateCells.Clear();
+            MaterializePhantomEntities();
             return Task.CompletedTask;
         }
 
+        private void MaterializePhantomEntities()
+        {
+            for (int i = Entities.Count - 1; i >= 0; --i)
+            {
+                if (!Entities[i].Phantom)
+                    return;
+                var clone = Entities[i].Clone(Entities[i].GenerateKey(TableDefinition));
+                ForceRemoveEntity(Entities[i]);
+                ForceInsertEntity(clone, i);
+            }
+        }
+        
         public async Task TryFind(DatabaseKey key)
         {
             var condition = $"`{tableDefinition.GroupByKeys[0]}` < {key[0]}";

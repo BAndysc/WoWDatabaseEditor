@@ -16,5 +16,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
+        <ProjectReference Include="..\Prism.Avalonia\src\Prism.Unity.Avalonia\Prism.Unity.Avalonia.csproj" />
     </ItemGroup>
 </Project>

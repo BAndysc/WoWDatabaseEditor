@@ -11,6 +11,7 @@ namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow;
 public class CustomCellDrawer : ICustomCellDrawer
 {
     private static IPen ModifiedCellPen = new Pen(Brushes.Red, 1);
+    private static IPen PhantomRowPen = new Pen(Brushes.Orange, 1);
     private static IPen ButtonTextPen = new Pen(new SolidColorBrush(Color.FromRgb(30, 30, 30)), 1);
     private static IPen ButtonBorderPen = new Pen(new SolidColorBrush(Color.FromRgb(245, 245, 245)), 1);
     private static IPen ButtonBackgroundPen = new Pen(new SolidColorBrush(Colors.White), 0);
@@ -27,9 +28,10 @@ public class CustomCellDrawer : ICustomCellDrawer
 
         if (!row.Entity.ExistInDatabase)
         {
-            context.FillRectangle(ModifiedCellPen.Brush, rect.WithWidth(5));
-            context.DrawLine(ModifiedCellPen, rect.TopLeft,rect.TopRight);
-            context.DrawLine(ModifiedCellPen, rect.BottomLeft, rect.BottomRight);
+            var pen = row.IsPhantomEntity ? PhantomRowPen : ModifiedCellPen;
+            context.FillRectangle(pen.Brush, rect.WithWidth(5));
+            context.DrawLine(pen, rect.TopLeft,rect.TopRight);
+            context.DrawLine(pen, rect.BottomLeft, rect.BottomRight);
         }
     }
 

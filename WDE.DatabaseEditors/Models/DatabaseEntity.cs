@@ -7,12 +7,15 @@ using WDE.Common.Annotations;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
 {
     public class DatabaseEntity : INotifyPropertyChanged
     {
+        private DatabaseKey key;
+        
         public Dictionary<string, IDatabaseField> Cells { get; }
 
         private IReadOnlyList<ICondition>? conditions;
@@ -24,7 +27,7 @@ namespace WDE.DatabaseEditors.Models
             {
                 var old = conditions;
                 conditions = value;
-                OnAction?.Invoke(new DatabaseEntityConditionsChangedHistoryAction(this, old, value));
+                OnConditionsChanged?.Invoke(this, old, value);
                 OnPropertyChanged();
             }
         }
@@ -33,21 +36,44 @@ namespace WDE.DatabaseEditors.Models
 
         public event System.Action<IHistoryAction>? OnAction;
         
+        public event System.Action<DatabaseEntity, IReadOnlyList<ICondition>?, IReadOnlyList<ICondition>?>? OnConditionsChanged;
+        
         public bool ExistInDatabase { get; set; }
+
+        public DatabaseKey GenerateKey(DatabaseTableDefinitionJson definition)
+        {
+            return Phantom ? new DatabaseKey(definition.PrimaryKey.Select(GetTypedValueOrThrow<long>)) : Key;
+        }
         
-        public DatabaseKey Key { get; }
+        public DatabaseKey Key
+        {
+            get
+            {
+                if (!key.IsPhantomKey)
+                    return key;
+                throw new Exception("Phantom key can't be generated");
+            }
+        }
+
+        public bool Phantom => key.IsPhantomKey;
         
-        public DatabaseEntity(bool existInDatabase, DatabaseKey key, Dictionary<string, IDatabaseField> cells, IReadOnlyList<ICondition>? conditions)
+        public DatabaseEntity(bool existInDatabase, 
+            DatabaseKey key,
+            Dictionary<string, IDatabaseField> cells,
+            IReadOnlyList<ICondition>? conditions)
         {
             ExistInDatabase = existInDatabase;
-            Key = key;
+            this.key = key;
             Cells = cells;
             Conditions = conditions;
             foreach (var databaseField in Cells)
             {
                 databaseField.Value.OnChanged += action =>
                 {
-                    OnAction?.Invoke(action);
+                    if (action is IDatabaseFieldHistoryAction a)
+                        OnAction?.Invoke(new DatabaseFieldWithKeyHistoryAction(a, key));
+                    else
+                        OnAction?.Invoke(action);
                 };
             }
         }

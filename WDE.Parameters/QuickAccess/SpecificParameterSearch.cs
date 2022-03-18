@@ -48,7 +48,7 @@ public class SpecificParameterSearch : IQuickAccessCommand
                     {
                         if ((parameterLong & option.Key) != 0)
                         {
-                            produce(new QuickAccessItem(ImageUri.Empty, option.Value.Name, option.Key.ToString(), option.Value.Description ?? "", quickCommands.CopyCommand, option.Key));
+                            produce(new QuickAccessItem(ImageUri.Empty, option.Value.Name, option.Key.ToString(), option.Value.Description ?? "", quickCommands.CopyCommand, option.Key, 70));
                         }
                     }
                 }
@@ -56,7 +56,7 @@ public class SpecificParameterSearch : IQuickAccessCommand
                 {
                     if (parameter.Items.TryGetValue(parameterLong, out var result))
                     {
-                        produce(new QuickAccessItem(ImageUri.Empty, result.Name, "(copy)", parameterLong.ToString(), quickCommands.CopyCommand, result.Name));
+                        produce(new QuickAccessItem(ImageUri.Empty, result.Name, "(copy)", parameterLong.ToString(), quickCommands.CopyCommand, result.Name, 70));
                     }
                 }
             }
@@ -68,7 +68,7 @@ public class SpecificParameterSearch : IQuickAccessCommand
                     if (i.Value.Name.Contains(parameterValue, StringComparison.OrdinalIgnoreCase))
                     {
                         total++;
-                        produce(new QuickAccessItem(ImageUri.Empty, i.Value.Name, i.Key.ToString(), i.Value.Description ?? "", quickCommands.CopyCommand, i.Key));
+                        produce(new QuickAccessItem(ImageUri.Empty, i.Value.Name, i.Key.ToString(), i.Value.Description ?? "", quickCommands.CopyCommand, i.Key, 70));
 
                         if (total > 100)
                         {
@@ -87,7 +87,7 @@ public class SpecificParameterSearch : IQuickAccessCommand
                 {
                     var keyName = parameterKey.key.Replace("Parameter", "");
                     var fullCommand = "/parameter " + keyName + " ";
-                    produce(new QuickAccessItem(ImageUri.Empty, keyName, "", "", quickCommands.SetSearchCommand, fullCommand));
+                    produce(new QuickAccessItem(ImageUri.Empty, keyName, "", "", quickCommands.SetSearchCommand, fullCommand, 70));
                 }
             }
             else
@@ -97,7 +97,7 @@ public class SpecificParameterSearch : IQuickAccessCommand
                 {
                     var keyName = proposal.Value.Replace("Parameter", "");
                     var fullCommand = "/parameter " + keyName + " ";
-                    produce(new QuickAccessItem(ImageUri.Empty, keyName, "", "", quickCommands.SetSearchCommand, fullCommand));
+                    produce(new QuickAccessItem(ImageUri.Empty, keyName, "", "", quickCommands.SetSearchCommand, fullCommand, 70));
                 }
             }
         }

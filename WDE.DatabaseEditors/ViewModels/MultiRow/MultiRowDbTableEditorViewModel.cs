@@ -169,7 +169,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public override DatabaseEntity AddRow(DatabaseKey key)
         {
-            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
+            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, false);
             if (autoIncrementColumn != null)
             {
                 long max = 0;

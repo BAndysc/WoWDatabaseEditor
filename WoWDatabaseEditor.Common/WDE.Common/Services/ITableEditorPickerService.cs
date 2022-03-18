@@ -16,13 +16,21 @@ public interface ITableEditorPickerService
     Task ShowForeignKey1To1(string table, DatabaseKey key);
 }
 
-public struct DatabaseKey : IComparable<DatabaseKey>
+public readonly struct DatabaseKey : IComparable<DatabaseKey>
 {
-    private long Key { get; }
-    private long? Key2 { get; }
-    private long? Key3 { get; }
-    private List<long>? moreKeys;
+    private readonly long? Key { get; }
+    private readonly long? Key2 { get; }
+    private readonly long? Key3 { get; }
+    private readonly List<long>? moreKeys;
 
+    public bool IsPhantomKey => !Key.HasValue;
+    
+    public DatabaseKey()
+    {
+        Key = Key2 = Key3 = null;
+        moreKeys = null;
+    }
+    
     public DatabaseKey(long key)
     {
         Key = key;
@@ -78,10 +86,13 @@ public struct DatabaseKey : IComparable<DatabaseKey>
         }
     }
     
-    public int Count => 1 + (Key2.HasValue ? 1 : 0) + (Key3.HasValue ? 1 : 0) + (moreKeys?.Count ?? 0);
+    public int Count => Key.HasValue ? 1 + (Key2.HasValue ? 1 + (Key3.HasValue ? 1 + (moreKeys?.Count ?? 0) : 0) : 0) : 0;
     
     public bool Equals(DatabaseKey other)
     {
+        // no-key key should be equal to no other key (including other no-key key!)
+        if (!Key.HasValue || !other.Key.HasValue)
+            return false;
         return Key == other.Key && Key2 == other.Key2 && Key3 == other.Key3 && KeysListEqual(other);
     }
 
@@ -112,7 +123,7 @@ public struct DatabaseKey : IComparable<DatabaseKey>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Key, Key2, Key3);
+        return Key.HasValue ? HashCode.Combine(Key, Key2, Key3) : 0;
     }
 
     public static bool operator ==(DatabaseKey left, DatabaseKey right)
@@ -130,7 +141,7 @@ public struct DatabaseKey : IComparable<DatabaseKey>
         get
         {
             if (index == 0)
-                return Key;
+                return Key!.Value;
             if (index == 1)
                 return Key2!.Value;
             if (index == 2)
@@ -143,7 +154,7 @@ public struct DatabaseKey : IComparable<DatabaseKey>
 
     public int CompareTo(DatabaseKey other)
     {
-        var keyComparison = Key.CompareTo(other.Key);
+        var keyComparison = Nullable.Compare(Key, other.Key);
         if (keyComparison != 0) return keyComparison;
         var key2Comparison = Nullable.Compare(Key2, other.Key2);
         if (key2Comparison != 0) return key2Comparison;
@@ -172,8 +183,10 @@ public struct DatabaseKey : IComparable<DatabaseKey>
 
     public override string ToString()
     {
+        if (!Key.HasValue)
+            return "(phantom)";
         if (!Key2.HasValue)
-            return Key.ToString();
+            return Key.ToString()!;
         if (!Key3.HasValue)
             return $"({Key}, {Key2})";
         if (moreKeys == null)
@@ -208,8 +221,10 @@ public struct DatabaseKey : IComparable<DatabaseKey>
     
     public readonly string Serialize()
     {
+        if (!Key.HasValue)
+            throw new Exception("No-key key shouldn't be serialized!");
         if (!Key2.HasValue)
-            return Key.ToString();
+            return Key.ToString()!;
         if (!Key3.HasValue)
             return $"({Key}/{Key2})";
         if (moreKeys == null)
@@ -220,13 +235,15 @@ public struct DatabaseKey : IComparable<DatabaseKey>
 
     public DatabaseKey WithAlso(long nextKey)
     {
+        if (!Key.HasValue)
+            throw new Exception("No-key key shouldn't be with-alsoed!");
         if (!Key2.HasValue)
-            return new DatabaseKey(Key, nextKey);
+            return new DatabaseKey(Key.Value, nextKey);
         if (!Key3.HasValue)
-            return new DatabaseKey(Key, Key2.Value, nextKey);
+            return new DatabaseKey(Key.Value, Key2.Value, nextKey);
         if (moreKeys == null)
-            return new DatabaseKey(Key, Key2.Value, Key3.Value, new[]{nextKey});
-        return new  DatabaseKey(Key, Key2.Value, Key3.Value, moreKeys.Concat(new[]{nextKey}));
+            return new DatabaseKey(Key.Value, Key2.Value, Key3.Value, new[]{nextKey});
+        return new  DatabaseKey(Key.Value, Key2.Value, Key3.Value, moreKeys.Concat(new[]{nextKey}));
     }
 }
 

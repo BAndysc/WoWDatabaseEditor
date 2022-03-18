@@ -1,4 +1,5 @@
 using WDE.Common.History;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 
@@ -8,12 +9,14 @@ namespace WDE.DatabaseEditors.History
     {
         private readonly MultiRowDbTableEditorViewModel viewModel;
         private readonly DatabaseEntity entity;
+        private readonly DatabaseKey actualKey;
 
         public DatabaseExecuteDeleteHistoryAction(MultiRowDbTableEditorViewModel viewModel,
             DatabaseEntity entity)
         {
             this.viewModel = viewModel;
             this.entity = entity;
+            actualKey = entity.GenerateKey(viewModel.TableDefinition);
         }
         
         public void Undo()
@@ -27,7 +30,7 @@ namespace WDE.DatabaseEditors.History
 
         public string GetDescription()
         {
-            return $"Executed DELETE query for {entity.Key}";
+            return $"Executed DELETE query for {actualKey}";
         }
     }
 }

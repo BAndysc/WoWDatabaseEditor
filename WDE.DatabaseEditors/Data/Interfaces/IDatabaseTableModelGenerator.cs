@@ -12,6 +12,6 @@ namespace WDE.DatabaseEditors.Data.Interfaces
         IDatabaseTableData? CreateDatabaseTable(DatabaseTableDefinitionJson tableDefinition, DatabaseKey[]? keys,
             IList<Dictionary<string, (System.Type type, object value)>> fieldsFromDb);
 
-        DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson tableDefinitionJson, DatabaseKey key);
+        DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson tableDefinitionJson, DatabaseKey key, bool phantomEntity);
     }
 }

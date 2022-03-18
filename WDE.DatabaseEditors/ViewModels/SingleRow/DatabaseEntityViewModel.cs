@@ -14,6 +14,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public DatabaseKey Key => Entity.Key;
         public DatabaseEntity Entity { get; }
         public ObservableCollection<SingleRecordDatabaseCellViewModel> Cells { get; } = new();
+        public bool IsPhantomEntity => Entity.Phantom;
 
         public DatabaseEntityViewModel(DatabaseEntity entity)
         {

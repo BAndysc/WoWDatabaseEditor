@@ -32,7 +32,7 @@ namespace WDE.DatabaseEditors.Data
             this.databaseFieldFactory = databaseFieldFactory;
         }
         
-        public DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson definition, DatabaseKey key)
+        public DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson definition, DatabaseKey key, bool phantomEntity)
         {
             Dictionary<string, IDatabaseField> columns = new(StringComparer.InvariantCultureIgnoreCase);
 
@@ -56,23 +56,26 @@ namespace WDE.DatabaseEditors.Data
                 {
                     valueHolder = new ValueHolder<float>(column.Default is float f ? f : 0.0f, column.CanBeNull && column.Default == null);
                 }
-                else if (type == "int" || type == "uint" || type == "long")
+                else if (type is "int" or "uint" or "long")
                 {
                     valueHolder = new ValueHolder<long>(column.Default is long f ? f : 0, column.CanBeNull && column.Default == null);
                 }
                 else
                     valueHolder = new ValueHolder<string>(column.Default is string f ? f : "", column.CanBeNull && column.Default == null);
-
-
+                
                 columns[column.DbColumnName] = databaseFieldFactory.CreateField(column.DbColumnName, valueHolder);
             }
 
-            int keyIndex = 0;
-            foreach (var name in definition.GroupByKeys)
+            Debug.Assert(phantomEntity == key.IsPhantomKey);
+            if (!phantomEntity)
             {
-                if (columns[name] is not DatabaseField<long> field)
-                    throw new Exception("Only long keys are supported now");
-                field.Current.Value = key[keyIndex++];
+                int keyIndex = 0;
+                foreach (var name in definition.GroupByKeys)
+                {
+                    if (columns[name] is not DatabaseField<long> field)
+                        throw new Exception("Only long keys are supported now");
+                    field.Current.Value = key[keyIndex++];
+                }   
             }
 
             return new DatabaseEntity(false, key, columns, null);
@@ -170,7 +173,7 @@ namespace WDE.DatabaseEditors.Data
                 foreach (var key in keys)
                 {
                     if (!providedKeys.Contains(key))
-                        rows.Add(CreateEmptyEntity(tableDefinition, key));
+                        rows.Add(CreateEmptyEntity(tableDefinition, key, false));
                 }   
             }
 

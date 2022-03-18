@@ -283,7 +283,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
 
     private DatabaseEntityViewModel CreateEmpty()
     {
-        var empty = modelGenerator.CreateEmptyEntity(tableDefinition, key);
+        var empty = modelGenerator.CreateEmptyEntity(tableDefinition, key, false);
         return Create(empty);
     }
 

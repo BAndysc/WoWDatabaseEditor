@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -41,7 +43,10 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
     public QuickAccessViewModel(IQuickAccessService quickAccessService)
     {
         this.quickAccessService = quickAccessService;
-        On(() => SearchText, text =>
+        AutoDispose(this
+            .ToObservable(x => x.SearchText)
+            .Throttle(TimeSpan.FromMilliseconds(100))
+            .Subscribe(text =>
         {
             pendingSearch?.Cancel();
             pendingSearch = null;
@@ -51,7 +56,7 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
             
             pendingSearch = new CancellationTokenSource();
             SearchAsync(text, pendingSearch).ListenErrors();
-        });
+        }));
 
         CloseQuickAccessCommand = new DelegateCommand(CloseSearch);
     }
@@ -65,6 +70,12 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
                 if (pendingSearch == token)
                     Items.Add(new QuickAccessItemViewModel(item));
             }, token.Token);
+            if (token.IsCancellationRequested)
+                return;
+            if (Items.Count < 20)
+            {
+                Items.Sort((x, y) => x!.Score.CompareTo(y!.Score));
+            }
         });
     }
 
@@ -102,6 +113,8 @@ public class QuickAccessItemViewModel
     public string BottomText => item.Description;
 
     public string MainText => item.Text;
+    
+    public byte Score => item.Score;
 
     public void Execute()
     {
