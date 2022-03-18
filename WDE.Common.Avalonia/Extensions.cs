@@ -1,4 +1,5 @@
 using System;
+using Avalonia;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
@@ -13,6 +14,17 @@ public static class Extensions
         return visual.FindAncestorOfType<T>();
     }
 
+    public static bool GetResource<T>(this object? _, string key, T defaultVal, out T outT)
+    {
+        outT = defaultVal;
+        if (Application.Current.Styles.TryGetResource(key, out var res) && res is T t)
+        {
+            outT = t;
+            return true;
+        }
+        return false;
+    }
+    
     // public static IObservable<T> Throttle<T>(this System.IObservable<T> observable, TimeSpan timeSpan)
     // {
     //     return new ThrottlingObservable<T>(observable, timeSpan);

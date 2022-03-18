@@ -25,7 +25,7 @@ namespace WDE.SqlQueryGenerator
 
         public IQuery Close()
         {
-            return new Query(new DummyMultiQuery(), string.Join(Environment.NewLine, queries.Select(q => q.QueryString)));
+            return new Query(new DummyMultiQuery(), string.Join(Environment.NewLine, queries.Select(q => q.QueryString).Where(q => !string.IsNullOrWhiteSpace(q))));
         }
     }
 

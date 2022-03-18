@@ -20,6 +20,8 @@ public abstract class PhantomControlBase<T> where T : Control
     private Visual? parent = null!;
     private IDisposable? clickDisposable = null;
     private T? element = null;
+    
+    public bool IsOpened { get; private set; }
 
     protected virtual void Cleanup(T element) {}
     protected abstract void Save(T element);
@@ -65,6 +67,7 @@ public abstract class PhantomControlBase<T> where T : Control
             }, RoutingStrategies.Tunnel);
         }
 
+        IsOpened = true;
         return true;
     }
     
@@ -87,6 +90,7 @@ public abstract class PhantomControlBase<T> where T : Control
             FocusManager.Instance!.Focus(inputElement);
         element = null;
         parent = null;
+        IsOpened = false;
     }
 }
 

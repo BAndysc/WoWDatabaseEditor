@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Media;
 using AvaloniaStyles.Controls.FastTableView;
+using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.DatabaseEditors.Avalonia.Services;
 using WDE.DatabaseEditors.Models;
@@ -29,6 +30,19 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
     private Point mouseCursor;
     private bool leftPressed;
     
+    
+
+    static CustomCellDrawer()
+    {
+        ModifiedCellPen.GetResource("FastTableView.ModifiedCellPen", ModifiedCellPen, out ModifiedCellPen);
+        PhantomRowPen.GetResource("FastTableView.PhantomRowPen", PhantomRowPen, out PhantomRowPen);
+        ButtonTextPen.GetResource("FastTableView.ButtonTextPen", ButtonTextPen, out ButtonTextPen);
+        ButtonBorderPen.GetResource("FastTableView.ButtonBorderPen", ButtonBorderPen, out ButtonBorderPen);
+        ButtonBackgroundPen.GetResource("FastTableView.ButtonBackgroundPen", ButtonBackgroundPen, out ButtonBackgroundPen);
+        ButtonBackgroundHoverPen.GetResource("FastTableView.ButtonBackgroundHoverPen", ButtonBackgroundHoverPen, out ButtonBackgroundHoverPen);
+        ButtonBackgroundPressedPen.GetResource("FastTableView.ButtonBackgroundPressedPen", ButtonBackgroundPressedPen, out ButtonBackgroundPressedPen);
+    }
+
     public void DrawRow(DrawingContext context, ITableRow r, Rect rect)
     {
         if (r is not DatabaseEntityViewModel row)

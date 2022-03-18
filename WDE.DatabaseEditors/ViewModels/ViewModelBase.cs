@@ -182,7 +182,6 @@ namespace WDE.DatabaseEditors.ViewModels
                 {
                     progress.Report(0, 2, "Generate query");
                     var query = await GenerateSaveQuery();
-                    Console.WriteLine(query);
                     progress.Report(1, 2, "Execute query");
                     try
                     {

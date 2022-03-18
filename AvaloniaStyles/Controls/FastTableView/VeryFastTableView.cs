@@ -29,8 +29,30 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
 
     private PhantomTextBox editor = new();
 
+    private static bool GetResource<T>(string key, T defaultVal, out T outT)
+    {
+        outT = defaultVal;
+        if (Application.Current.Styles.TryGetResource(key, out var res) && res is T t)
+        {
+            outT = t;
+            return true;
+        }
+        return false;
+    }
+    
     static VeryFastTableView()
     {
+        GetResource("FastTableView.OddRowBackground", OddRowBackground, out OddRowBackground);
+        GetResource("FastTableView.SelectedRowBackground", SelectedRowBackground, out SelectedRowBackground);
+        GetResource("FastTableView.EvenRowBackground", EvenRowBackground, out EvenRowBackground);
+        GetResource("FastTableView.HeaderBackground", HeaderBackground, out HeaderBackground);
+        GetResource("FastTableView.HeaderBorderBackground", HeaderBorderBackground, out HeaderBorderBackground);
+        GetResource("FastTableView.BorderPen", BorderPen, out BorderPen);
+        GetResource("FastTableView.FocusPen", FocusPen, out FocusPen);
+        GetResource("FastTableView.FocusOuterPen", FocusOuterPen, out FocusOuterPen);
+        GetResource("FastTableView.TextBrush", TextBrush, out TextBrush);
+        GetResource("FastTableView.FocusTextBrush", FocusTextBrush, out FocusTextBrush);
+        
         RowsProperty.Changed.AddClassHandler<VeryFastTableView>((view, e) =>
         {
             view.Rebind(e.OldValue as IReadOnlyList<ITableRow>, e.NewValue as IReadOnlyList<ITableRow>);

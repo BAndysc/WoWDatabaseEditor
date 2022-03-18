@@ -99,6 +99,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     }
                     History.MarkAsSaved(); // workaround for double showing message regarding unsaved changes
                     this.showOnlyModified = showOnlyModified;
+                    OffsetQuery = 0;
                     await ScheduleLoading();
                     RaisePropertyChanged(nameof(ShowOnlyModified));
                     ignoreShowOnlyModifiedEvents = false;
@@ -755,7 +756,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         private async Task<IQuery> GenerateQueryImpl(bool saveQuery)
         {
-            var newData = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e) || e.Phantom) && (!saveQuery || (e.Phantom || forceInsertKeys.Contains(e.Key)))).ToList();
+            var newData = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e) || e.Phantom) || (saveQuery && !e.Phantom && forceInsertKeys.Contains(e.Key))).ToList();
 
             if (saveQuery)
             {

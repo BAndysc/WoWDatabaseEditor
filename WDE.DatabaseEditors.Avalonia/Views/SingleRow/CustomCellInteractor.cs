@@ -73,7 +73,7 @@ public class CustomCellInteractor : CustomCellDrawerInteractorBase, ICustomCellI
             return false;
 
         var threeDots = GetThreeDotRectForCell(cellRect);
-        if (leftButton && threeDots.Contains(mouse) && cell.HasItems && !cell.UseItemPicker && !cell.UseFlagsPicker)
+        if (leftButton && threeDots.Deflate(3).Contains(mouse) && cell.HasItems && !cell.UseItemPicker && !cell.UseFlagsPicker)
         {
             switch (cell.ParameterValue)
             {

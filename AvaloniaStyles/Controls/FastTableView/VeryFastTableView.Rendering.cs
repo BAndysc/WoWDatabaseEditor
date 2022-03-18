@@ -115,7 +115,7 @@ public partial class VeryFastTableView
             odd = !odd;
         }
 
-        if (IsSelectedCellValid)
+        if (IsKeyboardFocusWithin && IsSelectedCellValid && !editor.IsOpened)
         {
             context.DrawRectangle(FocusOuterPen, SelectedCellRect, 4);
             context.DrawRectangle(FocusPen, SelectedCellRect, 4);
