@@ -303,6 +303,7 @@ namespace WDE.DatabaseEditors.ViewModels
         
         protected DatabaseTableDefinitionJson tableDefinition = null!;
         public DatabaseTableDefinitionJson TableDefinition => tableDefinition;
+        // DO NOT REORDER THINGS HERE, OR ELSE UNDO-REDO WILL BE BROKEN :(((
         public ObservableCollection<DatabaseEntity> Entities { get; } = new();
 
         public ObservableCollection<TableCommandViewModel> Commands { get; } = new();

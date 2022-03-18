@@ -36,6 +36,7 @@ public class Row : IRow
 public interface ITableCell : INotifyPropertyChanged
 {
     void UpdateFromString(string newValue);
+    string? StringValue { get; }
 }
 
 public class WdeCell : ITableCell
@@ -71,6 +72,8 @@ public class WdeCell : ITableCell
         else
             throw new NotImplementedException(value.GetType() + " is not supported");
     }
+
+    public string? StringValue => value.ToString();
 
     [NotifyPropertyChangedInvocator]
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

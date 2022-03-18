@@ -18,13 +18,13 @@ using WDE.DatabaseEditors.ViewModels.SingleRow;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow;
 
-public class CustomCellInteractor : ICustomCellInteractor
+public class CustomCellInteractor : CustomCellDrawerInteractorBase, ICustomCellInteractor
 {
     private IParameterPickerService ParameterPickerService => ViewBind.ContainerProvider.Resolve<IParameterPickerService>();
     private PhantomFlagsComboBox flagPicker = new();
     private PhantomCompletionComboBox comboBox = new();
+    private PhantomTextBox textBox = new();
 
-    
     public bool SpawnEditorFor(string? initialText, Visual parent, Rect rect, ITableCell c)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
@@ -50,16 +50,16 @@ public class CustomCellInteractor : ICustomCellInteractor
             comboBox.Spawn(parent, rect, cell);
             return true;
         }
-        if (cell.HasItems && longValue != null)
-        {
-            Pick(longValue).ListenErrors();
-            return true;
-        }
+        // if (cell.HasItems && longValue != null)
+        // {
+        //     Pick(longValue).ListenErrors();
+        //     return true;
+        // }
 
         return false;
     }
 
-    public bool PointerDown(ITableCell c, bool leftButton, bool rightButton, int clickCount)
+    public bool PointerDown(ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton, int clickCount)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
@@ -67,10 +67,24 @@ public class CustomCellInteractor : ICustomCellInteractor
         return false;
     }
     
-    public bool PointerUp(ITableCell c, bool leftButton, bool rightButton)
+    public bool PointerUp(ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
+
+        var threeDots = GetThreeDotRectForCell(cellRect);
+        if (leftButton && threeDots.Contains(mouse) && cell.HasItems && !cell.UseItemPicker && !cell.UseFlagsPicker)
+        {
+            switch (cell.ParameterValue)
+            {
+                case IParameterValue<long> longValue:
+                    Pick(longValue).ListenErrors();
+                    break;
+                case IParameterValue<string> stringValue:
+                    Pick(stringValue).ListenErrors();
+                    break;
+            }
+        }
         
         if (leftButton && cell.ActionCommand != null && cell.ActionCommand.CanExecute(null))
         {
@@ -87,7 +101,6 @@ public class CustomCellInteractor : ICustomCellInteractor
         if (ok)
             parameter.Value = value;
     }
-
 }
 
 

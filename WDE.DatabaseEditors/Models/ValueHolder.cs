@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Microsoft.VisualBasic.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.Parameters;
 
@@ -23,6 +22,7 @@ namespace WDE.DatabaseEditors.Models
         IParameter BaseParameter { get; }
         bool DefaultIsBlank { get; set; }
         void UpdateFromString(string newValue);
+        string? ValueAsString { get; }
     }
 
     public interface IParameterValue<T> : IParameterValue where T : notnull
@@ -97,6 +97,10 @@ namespace WDE.DatabaseEditors.Models
                 }   
             }
         }
+
+        public string? ValueAsString => Value?.ToString();
+
+        public event Action<Action<IParameterValue>, Action<IParameterValue>>? ValueChanged;
 
         private IParameter<T> parameter;
         private bool defaultIsBlank;

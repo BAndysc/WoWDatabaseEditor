@@ -10,8 +10,10 @@
   "table_name": "broadcast_text",
   "table_index_name": "ID",
   "record_mode": "SingleRow",
-  "group_name": "Advanced",
   "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_table.png",
+  "picker": "",
   "primary_key": [
     "ID"
   ],
@@ -36,7 +38,7 @@
           "db_column_name": "Text",
           "value_type": "string",
           "can_be_null": true,
-          "preferred_width": 175.0
+          "preferred_width": 170.0
         },
         {
           "name": "Text 1",

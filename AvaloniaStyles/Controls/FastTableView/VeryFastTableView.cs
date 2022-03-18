@@ -180,6 +180,8 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
             var properties = e.GetCurrentPoint(this).Properties;
             var cell = Rows[SelectedRowIndex].CellsList[SelectedCellIndex];
             if (CustomCellInteractor != null && CustomCellInteractor.PointerDown(cell,
+                    SelectedCellRect,
+                    e.GetPosition(this),
                     properties.IsLeftButtonPressed, 
                     properties.IsRightButtonPressed, 
                     e.ClickCount))
@@ -220,6 +222,8 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
         {
             var cell = Rows[SelectedRowIndex].CellsList[SelectedCellIndex];
             if (CustomCellInteractor != null && CustomCellInteractor.PointerUp(cell,
+                    SelectedCellRect,
+                    e.GetPosition(this),
                     e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased,
                     e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased))
             {
@@ -242,7 +246,7 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
         if (CustomCellInteractor == null ||
             !CustomCellInteractor.SpawnEditorFor(customText, this, SelectedCellRect, Rows[SelectedRowIndex].CellsList[SelectedCellIndex]))
         {
-            editor.Spawn(this, SelectedCellRect, customText ?? Rows[SelectedRowIndex].CellsList[SelectedCellIndex].ToString()!, customText == null, text =>
+            editor.Spawn(this, SelectedCellRect, customText ?? Rows[SelectedRowIndex].CellsList[SelectedCellIndex].StringValue ?? "", customText == null, text =>
             {
                 Rows[SelectedRowIndex].CellsList[SelectedCellIndex].UpdateFromString(text);
             });   
@@ -250,13 +254,13 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
     }
     
     public bool IsSelectedCellValid => SelectedCellIndex >= 0 && SelectedCellIndex < ColumnsCount && SelectedRowIndex >= 0 && SelectedRowIndex < Rows?.Count;
-    public Rect SelectedCellRect
+    public Rect SelectedCellRect => CellRect(SelectedCellIndex, SelectedRowIndex);
+
+    public Rect CellRect(int column, int row)
     {
-        get
-        {
-            var widthRect = GetColumnRect(SelectedCellIndex);
-            return new Rect(widthRect.x, SelectedRowIndex * RowHeight + DrawingStartOffsetY, widthRect.width, RowHeight);
-        }
+        var widthRect = GetColumnRect(column);
+        var width = Math.Max(0, widthRect.width - ColumnSpacing);
+        return new Rect(widthRect.x, row * RowHeight + DrawingStartOffsetY, width, RowHeight);
     }
 
     private ScrollViewer ScrollViewer => this.FindAncestorOfType<ScrollViewer>();

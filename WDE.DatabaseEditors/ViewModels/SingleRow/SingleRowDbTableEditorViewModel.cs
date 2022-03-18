@@ -406,6 +406,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             solutionManager.Refresh(SolutionItem);
             await mySqlExecutor.ExecuteSql(await GenerateQuery());
             await sessionService.UpdateQuery(this);
+            MaterializePhantomEntities();
             History.MarkAsSaved();
         }
         
@@ -670,37 +671,29 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             //         .Build());
             // }
             //else
-            var original = entity.Entity.Clone(oldKey, originalExistsInDb);
-            var clone = entity.Entity.Clone(newKey, false);
+            int indexOfRow = Rows.IndexOf(entity);
 
             {
                 historyHandler!.DoAction(new AnonymousHistoryAction("Change key", () =>
                 {
-                    var old = Rows.Select((row, index) => (row, index)).Where(pair => BuildKey(pair.row.Entity) == newRealKey).Select(pair => (int?)pair.index).FirstOrDefault();
-                    if (old.HasValue)
-                    {
-                        ForceRemoveEntity(Rows[old.Value].Entity);
-                        ForceInsertEntity(original, Math.Clamp(old.Value, 0, Rows.Count));
-                        int i = 0;
-                        foreach (var column in tableDefinition.GroupByKeys)
-                            original.SetTypedCellOrThrow(column, oldKey[i++]);
-                        forceInsertKeys.Add(oldKey);
-                    }
-                    else
-                        throw new Exception("Entity not found while re-keying");
+                    var old = Rows[indexOfRow];
+                    var original = old.Entity.Clone(oldKey, originalExistsInDb);
+                    ForceRemoveEntity(old.Entity);
+                    ForceInsertEntity(original, indexOfRow);
+                    int i = 0;
+                    foreach (var column in tableDefinition.GroupByKeys)
+                        original.SetTypedCellOrThrow(column, oldKey[i++]);
+                    Debug.Assert(!oldKey.IsPhantomKey);
+                    forceInsertKeys.Add(oldKey);
                 }, () =>
                 {
-                    var old = Rows.Select((row, index) => (row, index)).Where(pair => !pair.row.IsPhantomEntity && pair.row.Entity.Key == oldKey).Select(pair => (int?)pair.index).FirstOrDefault();
-                    if (old.HasValue)
-                    {
-                        ForceRemoveEntity(Rows[old.Value].Entity);
-                        ForceInsertEntity(clone, Math.Clamp(old.Value, 0, Rows.Count));
-                        int i = 0;
-                        foreach (var column in tableDefinition.GroupByKeys)
-                            clone.SetTypedCellOrThrow(column, newRealKey[i++]);
-                    }
-                    else
-                        throw new Exception("Entity not found while re-keying");
+                    var old = Rows[indexOfRow];
+                    var clone = old.Entity.Clone(newKey, false);
+                    ForceRemoveEntity(old.Entity);
+                    ForceInsertEntity(clone, indexOfRow);
+                    int i = 0;
+                    foreach (var column in tableDefinition.GroupByKeys)
+                        clone.SetTypedCellOrThrow(column, newRealKey[i++]);
                 }));
             }
         }
@@ -819,13 +812,37 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         private void MaterializePhantomEntities()
         {
+            List<int> indicesToMaterialize = null!;
             for (int i = Entities.Count - 1; i >= 0; --i)
             {
                 if (!Entities[i].Phantom)
                     continue;
-                var clone = Entities[i].Clone(Entities[i].GenerateKey(TableDefinition));
-                ForceRemoveEntity(Entities[i]);
-                ForceInsertEntity(clone, i);
+                indicesToMaterialize ??= new();
+                indicesToMaterialize.Add(i);
+            }
+            if (indicesToMaterialize != null)
+            {
+                historyHandler!.DoAction(new AnonymousHistoryAction("Materialized phantom entities", () =>
+                {
+                    foreach (var i in indicesToMaterialize)
+                    {
+                        keys.Remove(Entities[i].Key);
+                        var clone = Entities[i].Clone(DatabaseKey.PhantomKey);
+                        ForceRemoveEntity(Entities[i]);
+                        ForceInsertEntity(clone, i);
+                    }
+                }, () =>
+                {
+                    foreach (var i in indicesToMaterialize)
+                    {
+                        var realKey = Entities[i].GenerateKey(TableDefinition);
+                        var clone = Entities[i].Clone(realKey);
+                        ForceRemoveEntity(Entities[i]);
+                        ForceInsertEntity(clone, i);
+                        keys.Add(realKey);
+                    }
+                }));
+                History.MarkAsSaved();   
             }
         }
         

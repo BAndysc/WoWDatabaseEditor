@@ -35,6 +35,7 @@ namespace WDE.DatabaseEditors.Models
         public IEnumerable<IDatabaseField> Fields => Cells.Values;
 
         public event System.Action<IHistoryAction>? OnAction;
+        public event Action<DatabaseEntity, string, Action<IValueHolder>, Action<IValueHolder>>? FieldValueChanged;
         
         public event System.Action<DatabaseEntity, IReadOnlyList<ICondition>?, IReadOnlyList<ICondition>?>? OnConditionsChanged;
         
@@ -75,6 +76,10 @@ namespace WDE.DatabaseEditors.Models
                     else
                         OnAction?.Invoke(action);
                 };
+                databaseField.Value.ValueChanged += ((columnName, undo, redo) =>
+                {
+                    FieldValueChanged?.Invoke(this, columnName, undo, redo);
+                });
             }
         }
 

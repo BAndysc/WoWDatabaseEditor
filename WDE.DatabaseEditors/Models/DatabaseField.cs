@@ -24,6 +24,25 @@ namespace WDE.DatabaseEditors.Models
 
         private void OnValueChanged(T? old, T? nnew, bool wasNull, bool isNull)
         {
+            ValueChanged?.Invoke(columnName, val =>
+            {
+                if (val is ValueHolder<T> tVal)
+                {
+                    if (wasNull)
+                        tVal.SetNull();
+                    else
+                        tVal.Value = old;
+                }
+            }, val =>
+            {
+                if (val is ValueHolder<T> tVal)
+                {
+                    if (isNull)
+                        tVal.SetNull();
+                    else
+                        tVal.Value = nnew;
+                }
+            });
             OnChanged?.Invoke(new DatabaseFieldHistoryAction<T>(this, columnName, old, nnew, wasNull, isNull));
             OnPropertyChanged(nameof(IsModified));
         }
@@ -89,6 +108,8 @@ namespace WDE.DatabaseEditors.Models
             throw new Exception("Unexpected value of type " + typeof(T));
         }
 
+        public IValueHolder CurrentValue => Current;
+
         public IDatabaseField Clone()
         {
             var copy = new DatabaseField<T>(columnName, Current.Clone());
@@ -97,6 +118,8 @@ namespace WDE.DatabaseEditors.Models
         }
 
         public object? Object => Current.IsNull ? null : Current.Value;
+        // <ColumnName, <Undo>, <Redo>
+        public event Action<string, Action<IValueHolder>, Action<IValueHolder>>? ValueChanged;
 
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 

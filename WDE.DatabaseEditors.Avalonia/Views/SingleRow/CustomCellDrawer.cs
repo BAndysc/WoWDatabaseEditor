@@ -8,7 +8,15 @@ using WDE.DatabaseEditors.ViewModels.SingleRow;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow;
 
-public class CustomCellDrawer : ICustomCellDrawer
+public abstract class CustomCellDrawerInteractorBase
+{
+    protected Rect GetThreeDotRectForCell(Rect rect)
+    {
+        return new Rect(rect.Right - 32, rect.Y, 32, rect.Height);
+    }
+}
+
+public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawer
 {
     private static IPen ModifiedCellPen = new Pen(Brushes.Red, 1);
     private static IPen PhantomRowPen = new Pen(Brushes.Orange, 1);
@@ -42,6 +50,26 @@ public class CustomCellDrawer : ICustomCellDrawer
         return true;
     }
 
+    private void DrawButton(DrawingContext context, Rect rect, string text, int margin)
+    {
+        rect = rect.Deflate(margin);
+
+        bool isOver = rect.Contains(mouseCursor);
+            
+        context.DrawRectangle((isOver ? (leftPressed ? ButtonBackgroundPressedPen : ButtonBackgroundHoverPen) : ButtonBackgroundPen).Brush, ButtonBorderPen, rect, 4, 4);
+
+        var state = context.PushClip(rect);
+        var ft = new FormattedText
+        {
+            Text = text,
+            Constraint = new Size(rect.Width, rect.Height),
+            Typeface = Typeface.Default,
+            FontSize = 12
+        };
+        context.DrawText(ButtonTextPen.Brush, new Point(rect.Center.X - ft.Bounds.Width / 2, rect.Center.Y - ft.Bounds.Height / 2), ft);
+        state.Dispose();
+    }
+
     public bool Draw(DrawingContext context, ref Rect rect, ITableCell c)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
@@ -49,23 +77,7 @@ public class CustomCellDrawer : ICustomCellDrawer
 
         if (cell.ActionCommand != null)
         {
-            rect = rect.Deflate(3);
-
-            bool isOver = rect.Contains(mouseCursor);
-            
-            context.DrawRectangle((isOver ? (leftPressed ? ButtonBackgroundPressedPen : ButtonBackgroundHoverPen) : ButtonBackgroundPen).Brush, ButtonBorderPen, rect, 4, 4);
-
-            var state = context.PushClip(rect);
-            var ft = new FormattedText
-            {
-                Text = cell.ActionLabel,
-                Constraint = new Size(rect.Width, rect.Height),
-                Typeface = Typeface.Default,
-                FontSize = 12
-            };
-            context.DrawText(ButtonTextPen.Brush, new Point(rect.Center.X - ft.Bounds.Width / 2, rect.Center.Y - ft.Bounds.Height / 2), ft);
-            state.Dispose();
-
+            DrawButton(context, rect, cell.ActionLabel, 3);
             return true;
         }
         
@@ -75,6 +87,16 @@ public class CustomCellDrawer : ICustomCellDrawer
             // don't return true, because we want to draw original value anyway
         }
 
+        if (cell.HasItems && !cell.UseFlagsPicker && !cell.UseItemPicker)
+        {
+            if (rect.Contains(mouseCursor))
+            {
+                var threeDotRect = GetThreeDotRectForCell(rect);
+                DrawButton(context, threeDotRect, "...", 3);
+                rect = rect.Deflate(new Thickness(0, 0, threeDotRect.Width, 0));
+            }
+        }
+        
         if (cell.ColumnName.ToLower() == "item" && cell.TableField is DatabaseField<long> longField)
         {
             var icons = ViewBind.ResolveViewModel<IItemIconsService>();
@@ -85,7 +107,7 @@ public class CustomCellDrawer : ICustomCellDrawer
             }
             rect = rect.Deflate(new Thickness(20, 0, 0, 0));
         }
-        
+
         return false;
     }
 }

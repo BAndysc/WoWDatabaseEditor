@@ -155,7 +155,7 @@ namespace WDE.MySqlDatabaseCommon.Database
         
         public async Task ExecuteSql(string query)
         {
-            if (string.IsNullOrEmpty(query) || !IsConnected)
+            if (string.IsNullOrWhiteSpace(query) || !IsConnected)
                 return;
 
             databaseLogger.Log(query, null, TraceLevel.Info);

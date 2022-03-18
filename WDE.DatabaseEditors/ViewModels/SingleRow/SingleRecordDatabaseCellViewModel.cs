@@ -98,6 +98,8 @@ public class SingleRecordDatabaseCellViewModel : BaseDatabaseCellViewModel, ITab
         ParameterValue.UpdateFromString(newValue);
     }
 
+    public string? StringValue => ParameterValue?.ValueAsString;
+
     public override string? ToString()
     {
         return ParameterValue?.String;

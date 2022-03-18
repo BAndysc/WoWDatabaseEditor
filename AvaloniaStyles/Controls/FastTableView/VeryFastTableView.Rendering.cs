@@ -80,6 +80,7 @@ public partial class VeryFastTableView
                 if (x + columnWidth > scrollViewer.Offset.X && x < scrollViewer.Offset.X + scrollViewer.Viewport.Width)
                 {
                     var rect = new Rect(x, y, Math.Max(0, columnWidth - ColumnSpacing), RowHeight);
+                    var rectWidth = rect.Width;
                     var state = context.PushClip(rect);
                     if (cellDrawer == null || !cellDrawer.Draw(context, ref rect, cell))
                     {
@@ -93,6 +94,11 @@ public partial class VeryFastTableView
                                 Typeface = font,
                                 FontSize = 12
                             };
+                            if (Math.Abs(rectWidth - rect.Width) > 0.01)
+                            {
+                                state.Dispose();
+                                state = context.PushClip(rect);
+                            }
                             context.DrawText(textColor, new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);   
                         }
                     }
