@@ -13,10 +13,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow;
 public partial class MySqlFilterViewModel : ObservableBase
 {
     [AlsoNotify(nameof(ShowOperatorChoice))] [Notify] private FilterColumnViewModel? selectedColumn;
-    [Notify] private FilterOperatorViewModel selectedOperator;
+    [AlsoNotify(nameof(ShowFilterText))] [Notify] private FilterOperatorViewModel selectedOperator;
     [Notify] private string filterText = "";
 
     public bool ShowOperatorChoice => !selectedColumn?.IsManualQuery() ?? false;
+    public bool ShowFilterText => selectedOperator.Operator is not ("IS NULL" or "IS NOT NULL");
     
     public List<FilterColumnViewModel> Columns { get; } = new();
     public List<FilterOperatorViewModel> Operators { get; } = new();
@@ -64,24 +65,37 @@ public partial class MySqlFilterViewModel : ObservableBase
                 var param = parameterFactory.Factory(selectedColumn.ParameterKey!);
                 var picked = await pickerService.PickParameter(param, 0);
                 if (picked.ok)
+                {
                     FilterText = picked.value.ToString();
+                    await ApplyFilter.ExecuteAsync();
+                }
             }
             else if (parameterFactory.IsRegisteredString(selectedColumn.ParameterKey!))
             {
                 var param = parameterFactory.FactoryString(selectedColumn.ParameterKey!);
                 var picked = await pickerService.PickParameter(param, "");
                 if (picked.ok && picked.value != null)
+                {
                     FilterText = picked.value;
+                    await ApplyFilter.ExecuteAsync();
+                }
             }
         }, () => selectedColumn != null && selectedColumn.ParameterKey != null && 
                  (parameterFactory.IsRegisteredLong(selectedColumn.ParameterKey!) || 
                  parameterFactory.IsRegisteredString(selectedColumn.ParameterKey!)));
         On(() => SelectedColumn, _ => PickParameterCommand.RaiseCanExecuteChanged());
+        On(() => ShowFilterText, show =>
+        {
+            if (!show)
+                ApplyFilter.Execute(null);
+        });
     }
 
     public string BuildWhere()
     {
         var where = "";
+        var escaped = filterText.Replace("'", "\\'").Replace("%", "\\%");
+        where = $"`{selectedColumn?.TableName}`.`{selectedColumn?.ColumnName}` ";
         if (selectedOperator.Operator == "IS NULL")
             where += "IS NULL";
         else if (selectedOperator.Operator == "IS NOT NULL")
@@ -92,8 +106,6 @@ public partial class MySqlFilterViewModel : ObservableBase
         }
         else
         {
-            var escaped = filterText.Replace("'", "\\'").Replace("%", "\\%");
-            where = $"`{selectedColumn.TableName}`.`{selectedColumn.ColumnName}` ";
             if (selectedOperator.Operator == "LIKE")
                 where += $"LIKE '%{escaped}%'";
             else if (selectedOperator.Operator == "LIKE")

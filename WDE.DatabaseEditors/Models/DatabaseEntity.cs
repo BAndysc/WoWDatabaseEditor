@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
@@ -63,6 +64,7 @@ namespace WDE.DatabaseEditors.Models
             Dictionary<string, IDatabaseField> cells,
             IReadOnlyList<ICondition>? conditions)
         {
+            Debug.Assert(!(existInDatabase && key.IsPhantomKey)); // phantom keys can never exist in the database!!
             ExistInDatabase = existInDatabase;
             this.key = key;
             Cells = cells;

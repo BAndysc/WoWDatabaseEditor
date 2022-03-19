@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using AvaloniaStyles.Controls.FastTableView;
 using Newtonsoft.Json;
 using Prism.Commands;
@@ -64,6 +65,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> removedKeys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> forceInsertKeys = new HashSet<DatabaseKey>();
+        private HashSet<DatabaseKey> forceDeleteKeys = new HashSet<DatabaseKey>();
         private HashSet<(DatabaseKey key, string columnName)> forceUpdateCells = new HashSet<(DatabaseKey, string)>();
         private List<System.IDisposable> rowsDisposable = new();
         public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
@@ -77,6 +79,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         [Notify] private string rowsSummaryText = "";
         [Notify] private int limitQuery = 300;
         [Notify] private long offsetQuery = 0;
+        public override ICommand Copy { get; }
+        public override ICommand Paste { get; }
 
         private bool ignoreShowOnlyModifiedEvents;
         public bool ShowOnlyModified
@@ -177,7 +181,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
             IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService,
-            IMainThread mainThread, IPersonalGuidRangeService personalGuidRangeService)
+            IMainThread mainThread, IPersonalGuidRangeService personalGuidRangeService,
+            IClipboardService clipboardService)
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -229,10 +234,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             
             DuplicateSelectedCommand = new AsyncAutoCommand(async () =>
             {
-                var duplicate = SelectedRow!.Entity.Clone();
-                //todo ask for a new key
-                int index = SelectedRowIndex + 1;
-                ForceInsertEntity(duplicate, index);
+                var duplicate = SelectedRow!.Entity.Clone(DatabaseKey.PhantomKey, false);
+                await SetupPersonalGuidValue(duplicate);
+                ForceInsertEntity(duplicate, SelectedRowIndex + 1);
             }, () => SelectedRow != null);
             AutoDispose(this.ToObservable(() => SelectedRow).Subscribe(_ => DuplicateSelectedCommand.RaiseCanExecuteChanged()));
                 
@@ -256,6 +260,19 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 return ScheduleLoading();
             });
             RefreshQuery = new AsyncAutoCommand(ScheduleLoading);
+
+            Copy = new DelegateCommand(() =>
+            {
+                clipboardService.SetText(SelectedCell!.StringValue ?? "(null)");
+            }, () => SelectedCell != null).ObservesProperty(()=>SelectedCell);
+
+            Paste = new AsyncAutoCommand(async () =>
+            {
+                if (await clipboardService.GetText() is { } text)
+                {
+                    SelectedCell?.UpdateFromString(text);
+                }
+            }, () => SelectedCell != null);
             
             var definition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId);
             FilterViewModel = new MySqlFilterViewModel(definition, ScheduleLoading, parameterFactory, parameterPickerService);
@@ -302,19 +319,22 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return true;
         }
 
+        private async Task SetupPersonalGuidValue(DatabaseEntity entity)
+        {
+            if (TableDefinition.AutoKeyValue.HasValue && personalGuidRangeService.IsConfigured)
+            {
+                var nextGuid = await personalGuidRangeService.GetNextGuidOrShowError(TableDefinition.AutoKeyValue.Value, statusBar);
+                if (nextGuid.HasValue)
+                    entity.SetTypedCellOrThrow(TableDefinition.PrimaryKey[0], (long)nextGuid.Value);
+            }
+        }
+
         private async Task AddNewEntity()
         {
             DatabaseKey key = new DatabaseKey();
             var index = SelectedRow == null ? Entities.Count : selectedRowIndex + 1;
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, true);
-            if (TableDefinition.AutoKeyValue.HasValue && personalGuidRangeService.IsConfigured)
-            {
-                var nextGuid = await personalGuidRangeService.GetNextGuidOrShowError(TableDefinition.AutoKeyValue.Value, statusBar);
-                if (nextGuid.HasValue)
-                {
-                    freshEntity.SetTypedCellOrThrow(TableDefinition.PrimaryKey[0], (long)nextGuid.Value);
-                }
-            }
+            await SetupPersonalGuidValue(freshEntity);
             ForceInsertEntity(freshEntity, index);
         }
         
@@ -362,8 +382,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         // TODO
         protected override IReadOnlyList<DatabaseKey> GenerateKeys() => keys.ToList();
-        protected override IReadOnlyList<DatabaseKey>? GenerateDeletedKeys() => removedKeys.Count == 0 ? null : removedKeys.ToList();
-       
+        protected override IReadOnlyList<DatabaseKey>? GenerateDeletedKeys() => GenerateDeletedKeys(false);
+        protected IReadOnlyList<DatabaseKey>? GenerateDeletedKeys(bool saveQuery)
+        {
+            return removedKeys.Count == 0 ? forceDeleteKeys.ToList() : removedKeys.Union(forceDeleteKeys).ToList();
+        }
+
         protected override async Task<DatabaseTableData?> LoadData()
         {
             return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), offsetQuery, limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData; ;
@@ -527,6 +551,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 if (undoing)
                     forceInsertKeys.Add(entity.Key);
                 removedKeys.Remove(entity.Key);
+                forceDeleteKeys.Remove(entity.Key);
                 var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
                 var savedItem = sessionService.Find(pseudoItem);
                 if (savedItem is DatabaseTableSolutionItem savedTableItem)
@@ -783,8 +808,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             data = new DatabaseTableData(tableDefinition, data == null ? newData : data.Entities.Union(newData).ToList());
             
-            var query = queryGenerator
-                .GenerateQuery(GenerateKeys(),  GenerateDeletedKeys(), data);
+            var query = queryGenerator.GenerateQuery(GenerateKeys(), GenerateDeletedKeys(saveQuery), data);
 
             if (!saveQuery)
                 return query;
@@ -806,6 +830,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             forceInsertKeys.Clear();
             forceUpdateCells.Clear();
+            forceDeleteKeys.Clear();
             MaterializePhantomEntities();
             UpdateSolutionItem();
             return Task.CompletedTask;
@@ -828,6 +853,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     foreach (var i in indicesToMaterialize)
                     {
                         keys.Remove(Entities[i].Key);
+                        forceDeleteKeys.Add(Entities[i].Key);
                         var clone = Entities[i].Clone(DatabaseKey.PhantomKey);
                         ForceRemoveEntity(Entities[i]);
                         ForceInsertEntity(clone, i);
@@ -841,6 +867,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                         ForceRemoveEntity(Entities[i]);
                         ForceInsertEntity(clone, i);
                         keys.Add(realKey);
+                        forceDeleteKeys.Remove(Entities[i].Key);
                     }
                 }));
                 History.MarkAsSaved();   

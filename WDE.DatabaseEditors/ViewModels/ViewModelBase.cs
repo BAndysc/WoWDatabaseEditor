@@ -340,9 +340,9 @@ namespace WDE.DatabaseEditors.ViewModels
         
         public ICommand Undo => undoCommand;
         public ICommand Redo => redoCommand;
-        public ICommand Copy => AlwaysDisabledCommand.Command;
-        public ICommand Cut => AlwaysDisabledCommand.Command;
-        public ICommand Paste => AlwaysDisabledCommand.Command;
+        public virtual ICommand Copy => AlwaysDisabledCommand.Command;
+        public virtual ICommand Cut => AlwaysDisabledCommand.Command;
+        public virtual ICommand Paste => AlwaysDisabledCommand.Command;
         public ICommand Save { get; }
         public IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
