@@ -14,9 +14,7 @@ using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Events;
 using PropertyChanged.SourceGenerator;
-using ReactiveUI;
 using WDE.Common;
-using WDE.Common.Avalonia;
 using WDE.Common.Database;
 using WDE.Common.Disposables;
 using WDE.Common.History;
@@ -33,7 +31,6 @@ using WDE.DatabaseEditors.CustomCommands;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Extensions;
-using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.History.SingleRow;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
@@ -43,14 +40,12 @@ using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
-using WDE.Parameters.Parameters;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels.SingleRow
 {
     public partial class SingleRowDbTableEditorViewModel : ViewModelBase
     {
-        private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
         private readonly IMySqlExecutor mySqlExecutor;
@@ -61,6 +56,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private readonly ITableEditorPickerService tableEditorPickerService;
         private readonly IMainThread mainThread;
         private readonly IPersonalGuidRangeService personalGuidRangeService;
+        private readonly IMetaColumnsSupportService metaColumnsSupportService;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
@@ -68,20 +64,21 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private HashSet<DatabaseKey> forceInsertKeys = new HashSet<DatabaseKey>();
         private HashSet<DatabaseKey> forceDeleteKeys = new HashSet<DatabaseKey>();
         private HashSet<(DatabaseKey key, string columnName)> forceUpdateCells = new HashSet<(DatabaseKey, string)>();
-        private List<System.IDisposable> rowsDisposable = new();
+        private List<IDisposable> rowsDisposable = new();
         public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
 
         private bool showOnlyModified;
         [AlsoNotify(nameof(FocusedEntity))] [AlsoNotify(nameof(FocusedRow))] [Notify] private int focusedRowIndex;
-        [AlsoNotify(nameof(FocusedCell))] [Notify] private int focusedCellIndex;
+        [AlsoNotify(nameof(FocusedCell))] [Notify] private int focusedCellIndex = -1;
         public override DatabaseEntity? FocusedEntity => FocusedRow?.Entity;
         public DatabaseEntityViewModel? FocusedRow => focusedRowIndex >= 0 && focusedRowIndex < Rows.Count ? Rows[focusedRowIndex] : null;
         public SingleRecordDatabaseCellViewModel? FocusedCell => FocusedRow != null && focusedCellIndex >= 0 && focusedCellIndex < FocusedRow.Cells.Count ? FocusedRow.Cells[focusedCellIndex] : null;
         [Notify] private string rowsSummaryText = "";
         [Notify] private int limitQuery = 300;
-        [Notify] private long offsetQuery = 0;
+        [Notify] private long offsetQuery;
         public override ICommand Copy { get; }
         public override ICommand Paste { get; }
+        public override ICommand Cut { get; }
 
         private bool ignoreShowOnlyModifiedEvents;
         public bool ShowOnlyModified
@@ -169,7 +166,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public AsyncAutoCommand PreviousDataPage { get; }
         public AsyncAutoCommand RefreshQuery { get; }
         public AsyncAutoCommand NextDataPage { get; }
-        
+        public DatabaseKey? DefaultPartialKey { get; set; }
+
         public SingleRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
@@ -184,14 +182,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             IParameterPickerService parameterPickerService,
             IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService,
             IMainThread mainThread, IPersonalGuidRangeService personalGuidRangeService,
-            IClipboardService clipboardService)
+            IClipboardService clipboardService, IMetaColumnsSupportService metaColumnsSupportService)
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService,
             parameterPickerService, statusBar, mySqlExecutor)
         {
-            this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
             this.tableDataProvider = tableDataProvider;
             this.messageBoxService = messageBoxService;
@@ -204,6 +201,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             this.tableEditorPickerService = tableEditorPickerService;
             this.mainThread = mainThread;
             this.personalGuidRangeService = personalGuidRangeService;
+            this.metaColumnsSupportService = metaColumnsSupportService;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -219,7 +217,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             SetNullSelectedCommand = new DelegateCommand(() =>
             {
-                System.IDisposable? disp = null;
+                IDisposable? disp = null;
                 if (MultiSelection.MoreThanOne)
                     disp = historyHandler!.BulkEdit("Bulk set null");
                 foreach (var x in MultiSelection.AllReversed())
@@ -281,6 +279,17 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             Copy = new DelegateCommand(() =>
             {
                 clipboardService.SetText(FocusedCell!.StringValue ?? "(null)");
+            }, () => FocusedCell != null).ObservesProperty(()=>FocusedCell);
+
+            Cut = new DelegateCommand(() =>
+            {
+                Copy.Execute(null);
+                if (FocusedCell!.CanBeSetToNull)
+                    FocusedCell!.ParameterValue?.SetNull();
+                else if (FocusedCell!.ParameterValue is IParameterValue<long> longValue)
+                    longValue.Value = 0;
+                else
+                    FocusedCell!.UpdateFromString("");
             }, () => FocusedCell != null).ObservesProperty(()=>FocusedCell);
 
             Paste = new AsyncAutoCommand(async () =>
@@ -362,6 +371,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             DatabaseKey key = new DatabaseKey();
             var index = FocusedRow == null ? Entities.Count : focusedRowIndex + 1;
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, true);
+            if (DefaultPartialKey.HasValue)
+            {
+                for (int i = 0; i < DefaultPartialKey.Value.Count; ++i)
+                {
+                    freshEntity.SetTypedCellOrThrow(TableDefinition.PrimaryKey[i], DefaultPartialKey.Value[i]);
+                }
+            }
             await SetupPersonalGuidValue(freshEntity);
             ForceInsertEntity(freshEntity, index);
         }
@@ -411,14 +427,14 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         // TODO
         protected override IReadOnlyList<DatabaseKey> GenerateKeys() => keys.ToList();
         protected override IReadOnlyList<DatabaseKey>? GenerateDeletedKeys() => GenerateDeletedKeys(false);
-        protected IReadOnlyList<DatabaseKey>? GenerateDeletedKeys(bool saveQuery)
+        protected IReadOnlyList<DatabaseKey> GenerateDeletedKeys(bool saveQuery)
         {
             return removedKeys.Count == 0 ? forceDeleteKeys.ToList() : removedKeys.Union(forceDeleteKeys).ToList();
         }
 
         protected override async Task<DatabaseTableData?> LoadData()
         {
-            return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), offsetQuery, limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData; ;
+            return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), offsetQuery, limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData;
         }
 
         private DatabaseKey? beforeLoadSelectedRow;
@@ -607,36 +623,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 }
                 else if (column.IsMetaColumn)
                 {
-                    if (column.Meta!.StartsWith("table:"))
-                    {
-                        var table = column.Meta.Substring(6, column.Meta.IndexOf(";", 6) - 6);
-                        var condition = column.Meta.Substring(column.Meta.IndexOf(";", 6) + 1);
-                        cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, new DelegateCommand(
-                            () =>
-                            {
-                                var newCondition = condition;
-                                int indexOf = 0;
-                                indexOf = newCondition.IndexOf("{", indexOf);
-                                while (indexOf != -1)
-                                {
-                                    var columnName = newCondition.Substring(indexOf + 1, newCondition.IndexOf("}", indexOf) - indexOf - 1);
-                                    newCondition = newCondition.Replace("{" + columnName + "}", entity.GetCell(columnName)!.ToString());
-                                    indexOf = newCondition.IndexOf("{", indexOf + 1);
-                                }
-                                tableEditorPickerService.ShowTable(table, newCondition);
-                            }), row, entity, "Open"));
-                    }
-                    else if (column.Meta!.StartsWith("one2one:"))
-                    {
-                        var table = column.Meta.Substring(8);
-                        cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, new DelegateCommand(
-                            () =>
-                            {
-                                tableEditorPickerService.ShowForeignKey1To1(table, entity.Key);
-                            }, () => !entity.Phantom), row, entity, "Open"));
-                    }
-                    else
-                        throw new Exception("Unsupported meta column: " + column.Meta);
+                    var command = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                    cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, command, row, entity, "Open"));
                 }
                 else
                 {

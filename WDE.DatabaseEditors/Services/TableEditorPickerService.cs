@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -133,27 +134,42 @@ public class TableEditorPickerService : ITableEditorPickerService
         return null;
     }
 
-    public async Task ShowTable(string table, string? condition)
+    public async Task ShowTable(string table, string? condition, DatabaseKey? defaultPartialKey = null)
     {
         var definition = definitionProvider.GetDefinition(table);
         if (definition == null)
             throw new UnsupportedTableException(table);
 
-        if (definition.RecordMode != RecordMode.SingleRow)
-            throw new Exception("TemplateMode and MultiRow not (yet?) supported");
+        if (definition.RecordMode == RecordMode.Template)
+            throw new Exception("TemplateMode not (yet?) supported");
 
-        var solutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
-
-        var openIsNoSaveMode = await CheckIfItemIsOpened(solutionItem, definition);
-        var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
-        if (condition != null)
+        ViewModelBase viewModelBase;
+        bool openIsNoSaveMode = false;
+        if (definition.RecordMode == RecordMode.SingleRow)
         {
-            singleRow.FilterViewModel.FilterText = condition;
-            singleRow.FilterViewModel.ApplyFilter.Execute(null);
+            var solutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
+            openIsNoSaveMode = await CheckIfItemIsOpened(solutionItem, definition);
+            var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            singleRow.DefaultPartialKey = defaultPartialKey;
+            viewModelBase = singleRow;
+            if (condition != null)
+            {
+                singleRow.FilterViewModel.FilterText = condition;
+                singleRow.FilterViewModel.ApplyFilter.Execute(null);
+            }
+        }
+        else
+        {
+            Debug.Assert(definition.RecordMode == RecordMode.MultiRecord);
+            Debug.Assert(condition == null);
+            Debug.Assert(defaultPartialKey.HasValue);
+            var solutionItem = new DatabaseTableSolutionItem(defaultPartialKey.Value, true, definition.Id, false);
+            openIsNoSaveMode = await CheckIfItemIsOpened(solutionItem, definition);
+            var multiRow = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            viewModelBase = multiRow;
         }
 
-        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), singleRow),
-            (typeof(bool), openIsNoSaveMode));
+        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), viewModelBase), (typeof(bool), openIsNoSaveMode));
         viewModel.DisablePicking = true;
         await windowManager.ShowDialog(viewModel);
     }

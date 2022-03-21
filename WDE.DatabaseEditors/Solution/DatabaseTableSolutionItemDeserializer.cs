@@ -70,12 +70,13 @@ namespace WDE.DatabaseEditors.Solution
                 NullValueHandling = NullValueHandling.Ignore,
                 Converters = { new DatabaseKeyConverter() }
             });
-            var items = string.Join(",", item.Entries.Select(e => e.Key.Serialize()));
-            var deletedKeys = string.Join(",", item.DeletedEntries.Select(key => key.Serialize()));
+            bool ignoreKeys = (forMostRecentlyUsed && item.IgnoreEquality);
+            var items = ignoreKeys ? "" : string.Join(",", item.Entries.Select(e => e.Key.Serialize()));
+            var deletedKeys = ignoreKeys ? "" : string.Join(",", item.DeletedEntries.Select(key => key.Serialize()));
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 32,
-                StringValue = (forMostRecentlyUsed && item.IgnoreEquality) ? item.DefinitionId : $"{item.DefinitionId}:{items}:{deletedKeys}",
+                StringValue = $"{item.DefinitionId}:{items}:{deletedKeys}",
                 Comment = entries
             };
         }

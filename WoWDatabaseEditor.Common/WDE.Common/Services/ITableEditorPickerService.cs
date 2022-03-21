@@ -12,7 +12,7 @@ namespace WDE.Common.Services;
 public interface ITableEditorPickerService
 {
     Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null);
-    Task ShowTable(string table, string? condition);
+    Task ShowTable(string table, string? condition, DatabaseKey? defaultPartialKey = null);
     Task ShowForeignKey1To1(string table, DatabaseKey key);
 }
 

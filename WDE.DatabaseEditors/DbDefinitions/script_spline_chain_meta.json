@@ -12,7 +12,7 @@
   "record_mode": "SingleRow",
   "skip_quick_load": true,
   "group_name": "Waypoints",
-  "icon_path": "Icons/document_table.png",
+  "icon_path": "Icons/document_waypoints2.png",
   "picker": "",
   "primary_key": [
     "entry",

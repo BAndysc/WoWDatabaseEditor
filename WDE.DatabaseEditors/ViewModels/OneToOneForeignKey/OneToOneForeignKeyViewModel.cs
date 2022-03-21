@@ -34,7 +34,7 @@ using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels.OneToOneForeignKey;
 
-public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISolutionItemDocument
+public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISolutionItemDocument, IClosableDialog
 {
     private readonly IDatabaseTableDataProvider dataProvider;
     private readonly IDatabaseTableModelGenerator modelGenerator;
@@ -92,7 +92,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         Redo = history.RedoCommand();
         Accept = new DelegateCommand(() =>
         {
-            CloseOk?.Invoke();
+            AskIfSave(false).ListenErrors();
         });
         Cancel = new DelegateCommand(() =>
         {
@@ -121,7 +121,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             var editor = editorRegistry.GetEditor(item);
             await windowManager.ShowDialog((IDialog)editor);
         });
-        
+
         On(() => PresentInDatabase, @is =>
         {
             if (@is && Row == null)
@@ -312,9 +312,9 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     public int DesiredWidth => 400;
     public int DesiredHeight => 500;
     public string Title { get; }
-    public ICommand Copy => AlwaysDisabledCommand.Command;
-    public ICommand Cut => AlwaysDisabledCommand.Command;
-    public ICommand Paste => AlwaysDisabledCommand.Command;
+    public ICommand Copy => new AlwaysDisabledCommand();
+    public ICommand Cut => new AlwaysDisabledCommand();
+    public ICommand Paste => new AlwaysDisabledCommand();
     public ICommand Save { get; }
 
     public IAsyncCommand? CloseCommand { get; set; }
@@ -332,4 +332,37 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     public ICommand Redo { get; }
     public IHistoryManager History { get; }
     public bool IsModified => !History.IsSaved;
+    
+    private async Task AskIfSave(bool cancel)
+    {
+        if (IsModified)
+        {
+            var result = await messageBoxService.ShowDialog(new MessageBoxFactory<int>()
+                .SetTitle("Save changes")
+                .SetMainInstruction($"{Title} has unsaved changes")
+                .SetContent("Do you want to save them?")
+                .WithNoButton(1)
+                .WithYesButton(2)
+                .WithCancelButton(0)
+                .Build());
+            if (result == 0)
+                return;
+            if (result == 2)
+                ExecuteChangedCommand.Execute(null);
+        }
+        if (cancel)
+            CloseCancel?.Invoke();
+        else
+            CloseOk?.Invoke();
+    }
+    
+    public void OnClose()
+    {
+        if (IsModified)
+        {
+            AskIfSave(true).ListenErrors();
+        }
+        else
+            CloseCancel?.Invoke();
+    }
 }

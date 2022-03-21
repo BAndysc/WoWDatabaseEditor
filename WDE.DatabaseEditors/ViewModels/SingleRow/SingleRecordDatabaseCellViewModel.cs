@@ -4,7 +4,6 @@ using System.Windows.Input;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
-using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.Parameters;

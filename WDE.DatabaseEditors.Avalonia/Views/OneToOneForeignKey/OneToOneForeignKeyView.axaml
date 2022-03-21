@@ -9,6 +9,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="oneToOneForeignKey:OneToOneForeignKeyViewModel"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.OneToOneForeignKey.OneToOneForeignKeyView">
+    <UserControl.KeyBindings>
+        <BetterKeyBinding Gesture="Ctrl+Z" CustomCommand="{CompiledBinding Undo}" />
+        <BetterKeyBinding Gesture="Ctrl+Y" CustomCommand="{CompiledBinding Redo}" />
+        <BetterKeyBinding Gesture="Cmd+Z" CustomCommand="{CompiledBinding Undo}" />
+        <BetterKeyBinding Gesture="Cmd+Y" CustomCommand="{CompiledBinding Redo}" />
+    </UserControl.KeyBindings>
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

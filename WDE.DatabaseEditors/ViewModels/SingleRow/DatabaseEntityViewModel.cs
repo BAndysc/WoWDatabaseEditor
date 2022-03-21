@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AvaloniaStyles.Controls.FastTableView;
 using Prism.Mvvm;
-using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.SingleRow

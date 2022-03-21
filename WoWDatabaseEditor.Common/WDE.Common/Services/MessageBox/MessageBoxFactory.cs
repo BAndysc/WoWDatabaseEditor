@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using WDE.Common.Utils;
 
 namespace WDE.Common.Services.MessageBox
 {
@@ -134,7 +135,26 @@ namespace WDE.Common.Services.MessageBox
                     CancelButton = Buttons[0];
                 }
                 else
+                {
                     Buttons = buttons!.ToList();
+                    Buttons.Sort((a, b) => GetButtonOrder(a?.Name).CompareTo(GetButtonOrder(b?.Name)));
+                }
+            }
+
+            private int GetButtonOrder(string? name)
+            {
+                switch (name)
+                {
+                    case "Yes":
+                    case "Ok":
+                        return 1;
+                    case "No":
+                        return 2;
+                    case "Cancel":
+                        return 3;
+                    default:
+                        return 0;
+                }
             }
 
             public string Title { get; }
