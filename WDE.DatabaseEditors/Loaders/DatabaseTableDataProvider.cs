@@ -186,7 +186,7 @@ namespace WDE.DatabaseEditors.Loaders
                     else
                         customWhere = "(" + customWhere + ") AND " + whereKeys;
                 }
-                var sqlStatement = BuildSQLQueryForSingleRow(definition, customWhere, offset, limit);
+                var sqlStatement = BuildSQLQueryForSingleRow(definition, customWhere, offset, Math.Min(limit ?? 300, 3000));
                 try
                 {
                     result = await sqlExecutor.ExecuteSelectSql(sqlStatement);

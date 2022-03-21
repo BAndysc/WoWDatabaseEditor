@@ -118,6 +118,8 @@ public partial class VeryFastTableView
             default:
                 throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
         }
+        MultiSelection.Clear();
+        MultiSelection.Add(SelectedRowIndex);
     }
 
     private void EnsureRowVisible(int row)

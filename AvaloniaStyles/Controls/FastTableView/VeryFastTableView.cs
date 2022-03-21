@@ -100,25 +100,32 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
         if (e.Handled)
             return;
 
+        bool move = false;
         if (e.Key == Key.Down)
         {
-            e.Handled = MoveCursorDown();
+            e.Handled = move = MoveCursorDown();
         }
         else if (e.Key == Key.Up)
         {
-            e.Handled = MoveCursorUp();
+            e.Handled = move = MoveCursorUp();
         }
         else if (e.Key == Key.Left)
         {
-            e.Handled = MoveCursorLeft();
+            e.Handled = move = MoveCursorLeft();
         }
         else if (e.Key == Key.Right)
         {
-            e.Handled = MoveCursorRight();
+            e.Handled = move = MoveCursorRight();
         }
         else if (e.Key == Key.Tab)
         {
-            e.Handled = (e.KeyModifiers & KeyModifiers.Shift) != 0 ? MoveCursorPrevious() : MoveCursorNext();
+            e.Handled = move = (e.KeyModifiers & KeyModifiers.Shift) != 0 ? MoveCursorPrevious() : MoveCursorNext();
+        }
+        if (move)
+        {
+            if ((e.KeyModifiers & KeyModifiers.Shift) == 0)
+                MultiSelection.Clear();
+            MultiSelection.Add(SelectedRowIndex);
         }
     }
 
