@@ -75,7 +75,7 @@ public class QuestChainSolutionItemProvider : ISolutionItemProvider,
         return false;
     }
 
-    public ISmartScriptProjectItem Serialize(QuestChainSolutionItem item)
+    public ISmartScriptProjectItem Serialize(QuestChainSolutionItem item, bool forMostRecentlyUsed)
     {
         return new AbstractSmartScriptProjectItem()
         {

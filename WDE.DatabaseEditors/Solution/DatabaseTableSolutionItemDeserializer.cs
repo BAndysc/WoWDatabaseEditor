@@ -62,7 +62,7 @@ namespace WDE.DatabaseEditors.Solution
             return false;
         }
 
-        public ISmartScriptProjectItem Serialize(DatabaseTableSolutionItem item)
+        public ISmartScriptProjectItem Serialize(DatabaseTableSolutionItem item, bool forMostRecentlyUsed)
         {
             var entries = JsonConvert.SerializeObject(item.Entries, new JsonSerializerSettings()
             {
@@ -75,7 +75,7 @@ namespace WDE.DatabaseEditors.Solution
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 32,
-                StringValue = $"{item.DefinitionId}:{items}:{deletedKeys}",
+                StringValue = (forMostRecentlyUsed && item.IgnoreEquality) ? item.DefinitionId : $"{item.DefinitionId}:{items}:{deletedKeys}",
                 Comment = entries
             };
         }
