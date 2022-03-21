@@ -123,7 +123,8 @@ namespace WDE.SqlInterpreter
                 return false;
             
             var updates = context.singleUpdateStatement().updatedElement()
-                .Select(upd => new UpdateElement(upd.fullColumnName().GetText().DropQuotes()!))
+                .Select(upd => new UpdateElement(upd.fullColumnName().GetText().DropQuotes()!,
+                    upd.expression().GetText()))
                 .ToList();
             
             Queries.Add(new UpdateQuery(tableName, updates, where));

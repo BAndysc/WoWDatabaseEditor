@@ -48,6 +48,7 @@ public partial class VeryFastTableView
         var cellDrawer = CustomCellDrawer;
         
         // we draw only the visible rows
+        var selectionIterator = multiSelection.ContainsIterator;
         for (var index = startIndex; index < endIndex; index++)
         {
             var row = Rows[index];
@@ -55,11 +56,12 @@ public partial class VeryFastTableView
             var rowRect = new Rect(0, y, actualWidth, RowHeight);
             
             // background
-            context.FillRectangle(SelectedRowIndex == index ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
+            bool isSelected = SelectedRowIndex == index || selectionIterator.Contains(index);
+            context.FillRectangle(isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
 
             cellDrawer?.DrawRow(context, row, rowRect);
             
-            var textColor = index == SelectedRowIndex ? FocusTextBrush : TextBrush;
+            var textColor = isSelected ? FocusTextBrush : TextBrush;
             
             int cellIndex = 0;
             foreach (var cell in row.CellsList)
@@ -208,6 +210,9 @@ public partial class VeryFastTableView
     
     private int? GetRowIndexByY(double y)
     {
-        return (int)((y - DrawingStartOffsetY) / RowHeight);
+        var index = (int)((y - DrawingStartOffsetY) / RowHeight);
+        if (index >= Rows!.Count || index < 0)
+            return null;
+        return index;
     }
 }

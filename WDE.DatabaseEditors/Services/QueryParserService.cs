@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common;
@@ -72,6 +73,7 @@ namespace WDE.DatabaseEditors.Services
             IList<string> errors = new List<string>();
             HashSet<string> missingTables = new HashSet<string>();
             Dictionary<string, DatabaseTableSolutionItem> byTable = new();
+            Dictionary<string, List<DatabaseKey>> byTableToDelete = new();
             foreach (var q in queryEvaluator.Extract(query))
             {
                 if (q is UpdateQuery updateQuery)
@@ -106,10 +108,7 @@ namespace WDE.DatabaseEditors.Services
                         if (defi.RecordMode == RecordMode.SingleRow)
                         {
                             DatabaseTableSolutionItem? existing = null;
-                            if (byTable.TryGetValue(defi.Id, out existing))
-                            {
-                            }
-                            else
+                            if (!byTable.TryGetValue(defi.Id, out existing))
                             {
                                 var phantom = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
                                 existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
@@ -154,7 +153,31 @@ namespace WDE.DatabaseEditors.Services
                 }
                 else if (q is DeleteQuery deleteQuery)
                 {
+                    var defi = tableDefinitionProvider.GetDefinitionByTableName(deleteQuery.TableName);
+                    if (defi == null)
+                    {
+                        missingTables.Add(deleteQuery.TableName);
+                        continue;
+                    }
+
+                    if (defi.RecordMode != RecordMode.SingleRow)
+                        continue;
                     
+                    foreach (var condition in deleteQuery.Where.Conditions)
+                    {
+                        if (!TryBuildKey(defi, condition, out var key))
+                            continue;
+                        if (key.Count != defi.GroupByKeys.Count)
+                            continue;
+                        var old = await loader.Load(defi.Id, null,null,null, new[]{key});
+                        if (old == null || old.Entities.Count == 0)
+                        {
+                            if (!byTableToDelete.TryGetValue(defi.Id, out var toDelete))
+                                toDelete = byTableToDelete[defi.Id] = new();
+
+                            toDelete.Add(key);
+                        }
+                    }
                 }
                 else if (q is InsertQuery insertQuery)
                 {
@@ -164,33 +187,18 @@ namespace WDE.DatabaseEditors.Services
                         missingTables.Add(insertQuery.TableName);
                         continue;
                     }
-                
-                    int indexOf = -1;
-                    for (int i = 0; i < insertQuery.Columns.Count; ++i)
-                    {
-                        if (insertQuery.Columns[i].Equals(defi.TablePrimaryKeyColumnName,
-                            StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            indexOf = i;
-                            break;
-                        }
-                    }
 
-                    if (indexOf == -1)
+                    var keyIndices = defi.GroupByKeys.Select(key => insertQuery.Columns.IndexOf(key)).ToList();
+                    if (keyIndices.Count != defi.GroupByKeys.Count)
                     {
                         missingTables.Add(insertQuery.TableName);
                         continue;
                     }
 
-                    //todo: support for multiple primary keys
-
                     if (defi.RecordMode == RecordMode.SingleRow)
                     {
                         DatabaseTableSolutionItem? existing = null;
-                        if (byTable.TryGetValue(defi.Id, out existing))
-                        {
-                        }
-                        else
+                        if (!byTable.TryGetValue(defi.Id, out existing))
                         {
                             var phantom = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
                             existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
@@ -199,18 +207,19 @@ namespace WDE.DatabaseEditors.Services
                         }
                         foreach (var line in insertQuery.Inserts)
                         {
-                            if (line[indexOf] is not long lkey)
-                                continue;
-                            var key = new DatabaseKey(lkey);
+                            var key = new DatabaseKey(keyIndices.Select(index => line[index]).Select(x => (long)x));
                             if (existing.Entries.All(x => x.Key != key))
                                 existing.Entries.Add(new SolutionItemDatabaseEntity(key, false));
+                            if (byTableToDelete.TryGetValue(defi.Id, out var toDelete))
+                                toDelete.Remove(key);
                         }
                     }
                     else
                     {
+                        Debug.Assert(keyIndices.Count == 1);
                         foreach (var line in insertQuery.Inserts)
                         {
-                            if (line[indexOf] is not long lkey)
+                            if (line[keyIndices[0]] is not long lkey)
                                 continue;
                             var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
                             item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), false));
@@ -219,6 +228,22 @@ namespace WDE.DatabaseEditors.Services
                     }
                 }
             }
+
+            foreach (var toDelete in byTableToDelete)
+            {
+                DatabaseTableSolutionItem? existing = null;
+                if (!byTable.TryGetValue(toDelete.Key, out existing))
+                {
+                    var phantom = new DatabaseTableSolutionItem(toDelete.Key, false); // false, because we only have SingleRow here
+                    existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
+                    found.Add(existing);
+                }
+                existing.Entries.RemoveIf(e => toDelete.Value.Contains(e.Key));
+                existing.DeletedEntries ??= new();
+                existing.DeletedEntries.AddRange(toDelete.Value);
+                existing.DeletedEntries = existing.DeletedEntries.Distinct().ToList();
+            }
+            
             foreach (var missing in missingTables)
                 errors.Add($"Table `{missing}` is not supported in WDE, no item added to the session.");
         

@@ -9,7 +9,7 @@ namespace WDE.SqlInterpreter
 {
     [AutoRegister]
     [SingleInstance]
-    internal class QueryEvaluator : IQueryEvaluator
+    public class QueryEvaluator : IQueryEvaluator
     {
         public IReadOnlyList<IBaseQuery> Extract(string query)
         {

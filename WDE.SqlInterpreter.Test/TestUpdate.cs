@@ -102,5 +102,32 @@ namespace WDE.SqlInterpreter.Test
             Assert.AreEqual("x", result[0].Where.Conditions[2].Columns[0]);
             Assert.AreEqual(3L, result[0].Where.Conditions[2].Values[0]);
         }
+        
+        [Test]
+        public void SimpleNoBackticks()
+        {
+            var result = evaluator.ExtractUpdates("UPDATE creature_template SET faction = 35 WHERE entry = 31779").ToList();
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("creature_template", result[0].TableName);
+            CollectionAssert.AreEqual(new string[]{"faction"}, result[0].Updates.Select(s => s.ColumnName));
+            Assert.AreEqual(1, result[0].Where.Conditions.Length);
+            Assert.AreEqual(1, result[0].Where.Conditions[0].Columns.Length);
+            Assert.AreEqual("entry", result[0].Where.Conditions[0].Columns[0]);
+            Assert.AreEqual(31779L, result[0].Where.Conditions[0].Values[0]);
+        }
+        
+        [Test]
+        public void SimpleFloatNoBackticks()
+        {
+            var result = evaluator.ExtractUpdates("UPDATE creature SET position_x = 6443.63, position_y = 2039.9923, position_z = 551.1352, orientation = 2.6383197 WHERE guid = 121393").ToList();
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("creature", result[0].TableName);
+            CollectionAssert.AreEqual(new string[]{"position_x", "position_y", "position_z", "orientation"}, result[0].Updates.Select(s => s.ColumnName));
+            CollectionAssert.AreEqual(new string[]{"6443.63", "2039.9923", "551.1352", "2.6383197"}, result[0].Updates.Select(s => s.Value));
+            Assert.AreEqual(1, result[0].Where.Conditions.Length);
+            Assert.AreEqual(1, result[0].Where.Conditions[0].Columns.Length);
+            Assert.AreEqual("guid", result[0].Where.Conditions[0].Columns[0]);
+            Assert.AreEqual(121393L, result[0].Where.Conditions[0].Values[0]);
+        }
     }
 }

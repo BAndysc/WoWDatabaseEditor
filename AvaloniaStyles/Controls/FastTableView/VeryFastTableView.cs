@@ -174,9 +174,34 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
             {
                 var index = GetRowIndexByY(e.GetPosition(this).Y);
                 if (Rows == null || Rows.Count == 0 || !index.HasValue)
+                {
                     SelectedRowIndex = -1;
+                    multiSelection.Clear();
+                }
                 else
-                    SelectedRowIndex = Math.Clamp(index.Value, 0, Rows!.Count - 1);
+                {
+                    if ((e.KeyModifiers & KeyModifiers.Meta) != 0 || (e.KeyModifiers & KeyModifiers.Control) != 0)
+                        multiSelection.Add(index.Value);
+                    else if ((e.KeyModifiers & KeyModifiers.Shift) != 0)
+                    {
+                        if (SelectedRowIndex == -1)
+                        {
+                            multiSelection.Clear();
+                            multiSelection.Add(index.Value);
+                        }
+                        else
+                        {
+                            for (int i = Math.Min(SelectedRowIndex, index.Value); i <= Math.Max(SelectedRowIndex, index.Value); i++)
+                                multiSelection.Add(i);
+                        }
+                    }
+                    else
+                    {
+                        multiSelection.Clear();
+                        multiSelection.Add(index.Value);
+                    }
+                    SelectedRowIndex = index.Value;
+                }
             }
             // cell
             {

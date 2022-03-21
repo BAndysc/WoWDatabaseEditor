@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Data;
+using WDE.Common.Utils;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
@@ -15,6 +16,8 @@ public partial class VeryFastTableView
     public static readonly StyledProperty<ICustomCellDrawer?> CustomCellDrawerProperty = AvaloniaProperty.Register<VeryFastTableView, ICustomCellDrawer?>(nameof(CustomCellDrawer));
     public static readonly StyledProperty<ICustomCellInteractor?> CustomCellInteractorProperty = AvaloniaProperty.Register<VeryFastTableView, ICustomCellInteractor?>(nameof(CustomCellInteractor));
 
+    private IMultiIndexContainer multiSelection = new MultiIndexContainer(); 
+    
     private List<bool> columnVisibility = new List<bool>();
     
     public IReadOnlyList<int>? HiddenColumns
