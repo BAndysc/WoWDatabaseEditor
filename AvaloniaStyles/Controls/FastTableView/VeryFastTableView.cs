@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using JetBrains.Profiler.Api;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
@@ -168,6 +169,11 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
+        bool rangeSelectMode = (e.KeyModifiers & KeyModifiers.Shift) != 0;
+        bool multiSelectMode = (e.KeyModifiers & KeyModifiers.Control) != 0 || (e.KeyModifiers & KeyModifiers.Meta) != 0;
+        bool leftMouseButton = e.GetCurrentPoint(this).Properties.IsLeftButtonPressed;
+        bool rightMouseButton = e.GetCurrentPoint(this).Properties.IsRightButtonPressed;
+
         if (!IsPointHeader(e.GetPosition(this)))
         {
             // row
@@ -176,29 +182,37 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
                 if (Rows == null || Rows.Count == 0 || !index.HasValue)
                 {
                     SelectedRowIndex = -1;
-                    multiSelection.Clear();
+                    MultiSelection.Clear();
                 }
                 else
                 {
-                    if ((e.KeyModifiers & KeyModifiers.Meta) != 0 || (e.KeyModifiers & KeyModifiers.Control) != 0)
-                        multiSelection.Add(index.Value);
-                    else if ((e.KeyModifiers & KeyModifiers.Shift) != 0)
+                    if (multiSelectMode)
+                    {
+                        if (MultiSelection.Contains(index.Value))
+                            MultiSelection.Remove(index.Value);
+                        else
+                            MultiSelection.Add(index.Value);
+                    }
+                    else if (rangeSelectMode)
                     {
                         if (SelectedRowIndex == -1)
                         {
-                            multiSelection.Clear();
-                            multiSelection.Add(index.Value);
+                            MultiSelection.Clear();
+                            MultiSelection.Add(index.Value);
                         }
                         else
                         {
                             for (int i = Math.Min(SelectedRowIndex, index.Value); i <= Math.Max(SelectedRowIndex, index.Value); i++)
-                                multiSelection.Add(i);
+                                MultiSelection.Add(i);
                         }
                     }
                     else
                     {
-                        multiSelection.Clear();
-                        multiSelection.Add(index.Value);
+                        if (leftMouseButton || !MultiSelection.Contains(index.Value))
+                        {
+                            MultiSelection.Clear();
+                            MultiSelection.Add(index.Value);
+                        }
                     }
                     SelectedRowIndex = index.Value;
                 }
@@ -295,7 +309,7 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
         {
             editor.Spawn(this, SelectedCellRect, customText ?? Rows[SelectedRowIndex].CellsList[SelectedCellIndex].StringValue ?? "", customText == null, text =>
             {
-                Rows[SelectedRowIndex].CellsList[SelectedCellIndex].UpdateFromString(text);
+                ValueUpdateRequest?.Invoke(text);
             });   
         }
     }

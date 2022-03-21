@@ -48,7 +48,7 @@ public partial class VeryFastTableView
         var cellDrawer = CustomCellDrawer;
         
         // we draw only the visible rows
-        var selectionIterator = multiSelection.ContainsIterator;
+        var selectionIterator = MultiSelection.ContainsIterator;
         for (var index = startIndex; index < endIndex; index++)
         {
             var row = Rows[index];
@@ -56,7 +56,7 @@ public partial class VeryFastTableView
             var rowRect = new Rect(0, y, actualWidth, RowHeight);
             
             // background
-            bool isSelected = SelectedRowIndex == index || selectionIterator.Contains(index);
+            bool isSelected = selectionIterator.Contains(index);
             context.FillRectangle(isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
 
             cellDrawer?.DrawRow(context, row, rowRect);

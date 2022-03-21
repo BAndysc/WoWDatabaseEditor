@@ -350,7 +350,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public IHistoryManager History { get; }
         protected DatabaseTableSolutionItem solutionItem;
         public ISolutionItem SolutionItem => solutionItem;
-        public virtual DatabaseEntity? SelectedEntity { get; }
+        public virtual DatabaseEntity? FocusedEntity { get; }
         public abstract DatabaseEntity AddRow(DatabaseKey key);
     }
 }

@@ -141,4 +141,62 @@ public class MultiIndexContainerTests
         Assert.AreEqual(true, itr.Contains(14));
         Assert.AreEqual(false, itr.Contains(15));
     }
+
+    [Test]
+    public void TestRemove()
+    {
+        MultiIndexContainer c = new();
+        c.AddRange(-1, 0, 1, 4, 5, 6, 7, 8, 13, 14, 15, 17, 19);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (13, 15), (17, 17), (19, 19) }, c.DebugRanges);
+        c.Remove(17);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (13, 15), (19, 19) }, c.DebugRanges);
+        c.Remove(15);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (13, 14), (19, 19) }, c.DebugRanges);
+        c.Remove(14);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (13, 13), (19, 19) }, c.DebugRanges);
+        c.Remove(13);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (19, 19) }, c.DebugRanges);
+        c.AddRange(13, 14, 15);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (13, 15), (19, 19) }, c.DebugRanges);
+        c.Remove(13);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (14, 15), (19, 19) }, c.DebugRanges);
+        c.Remove(14);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (15, 15), (19, 19) }, c.DebugRanges);
+        c.Remove(15);
+        CollectionAssert.AreEqual(new[] { (-1, 1), (4, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(0);
+        CollectionAssert.AreEqual(new[] { (-1, -1),  (1, 1), (4, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(6);
+        CollectionAssert.AreEqual(new[] { (-1, -1),  (1, 1), (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(20);
+        CollectionAssert.AreEqual(new[] { (-1, -1),  (1, 1), (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(-2);
+        CollectionAssert.AreEqual(new[] { (-1, -1),  (1, 1), (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(0);
+        CollectionAssert.AreEqual(new[] { (-1, -1),  (1, 1), (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(0);
+        CollectionAssert.AreEqual(new[] { (-1, -1),  (1, 1), (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(6);
+        CollectionAssert.AreEqual(new[] { (-1, -1),  (1, 1), (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(10);
+        CollectionAssert.AreEqual(new[] { (-1, -1),  (1, 1), (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(1);
+        CollectionAssert.AreEqual(new[] { (-1, -1), (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(-1);
+        CollectionAssert.AreEqual(new[] { (4, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(4);
+        CollectionAssert.AreEqual(new[] { (5, 5), (7, 8), (19, 19) }, c.DebugRanges);
+        c.Remove(8);
+        CollectionAssert.AreEqual(new[] { (5, 5), (7, 7), (19, 19) }, c.DebugRanges);
+        c.Add(6);
+        CollectionAssert.AreEqual(new[] { (5, 7), (19, 19) }, c.DebugRanges);
+        c.Remove(6);
+        CollectionAssert.AreEqual(new[] { (5, 5), (7, 7), (19, 19) }, c.DebugRanges);
+        c.Remove(5);
+        CollectionAssert.AreEqual(new[] { (7, 7), (19, 19) }, c.DebugRanges);
+        c.Remove(7);
+        CollectionAssert.AreEqual(new[] { (19, 19) }, c.DebugRanges);
+        c.Remove(19);
+        CollectionAssert.AreEqual(new (int, int)[] { }, c.DebugRanges);
+    }
 }

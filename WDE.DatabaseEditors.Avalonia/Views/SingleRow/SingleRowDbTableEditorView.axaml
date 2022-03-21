@@ -157,10 +157,12 @@
             <ScrollViewer HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
                 <fastTableView:VeryFastTableView
                     TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
-                    SelectedRowIndex="{CompiledBinding SelectedRowIndex}"
-                    SelectedCellIndex="{CompiledBinding SelectedCellIndex}"
+                    SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
+                    SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
                     HiddenColumns="{CompiledBinding HiddenColumns}"
+                    MultiSelection="{CompiledBinding MultiSelection}"
                     Columns="{CompiledBinding Columns}"
+                    ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
                     Rows="{CompiledBinding Rows}">
                     <fastTableView:VeryFastTableView.CustomCellInteractor>
                         <singleRow1:CustomCellInteractor />
@@ -191,7 +193,7 @@
             <DockPanel LastChildFill="True">
                 <controls1:GroupingHeader GroupName="Selected row" DockPanel.Dock="Top" />
                 <ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
-                    <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{CompiledBinding SelectedRow}">
+                    <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{CompiledBinding FocusedRow}">
             
                     </ContentControl>
                 </ScrollViewer>

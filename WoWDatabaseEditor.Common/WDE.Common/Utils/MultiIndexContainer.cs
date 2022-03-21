@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace WDE.Common.Utils;
 
@@ -10,7 +11,9 @@ public interface IMultiIndexContainer
     bool Contains(int index);
     void Clear();
     IEnumerable<int> All();
+    IEnumerable<int> AllReversed();
     IEfficientContainsIterator ContainsIterator { get; }
+    bool MoreThanOne { get; }
 }
 
 public interface IEfficientContainsIterator
@@ -138,9 +141,34 @@ public class MultiIndexContainer : IMultiIndexContainer
         }
     }
 
-    public void Remove(int index)
+    public void Remove(int num)
     {
-        throw new System.NotImplementedException();
+        if (ranges.Count == 0)
+            return;
+        
+        var index = FindRangeStartHigherOrEquals(num);
+        if (index == -1 || index == ranges.Count || ranges[index].start > num)
+            return;
+
+        if (ranges[index].start == num)
+        {
+            if (ranges[index].end == num)
+                ranges.RemoveAt(index);
+            else
+                ranges[index] = (ranges[index].start + 1, ranges[index].end);
+        }
+        else if (ranges[index].end == num)
+        {
+            Debug.Assert(ranges[index].start != num); // handled in the previous case
+            ranges[index] = (ranges[index].start, ranges[index].end - 1);
+        }
+        else
+        {
+            var start = ranges[index].start;
+            var end = ranges[index].end;
+            ranges[index] = (start, num - 1);
+            ranges.Insert(index + 1, (num + 1, end));
+        }
     }
 
     public bool Contains(int num)
@@ -176,7 +204,24 @@ public class MultiIndexContainer : IMultiIndexContainer
         }
     }
 
+    public IEnumerable<int> AllReversed()
+    {
+        for (var index = ranges.Count - 1; index >= 0; index--)
+        {
+            var range = ranges[index];
+            if (range.start == range.end)
+                yield return range.start;
+            else
+            {
+                for (int i = range.end; i >= range.start; --i)
+                    yield return i;
+            }
+        }
+    }
+
     public IEfficientContainsIterator ContainsIterator => new EfficientContainsIterator(this);
+
+    public bool MoreThanOne => ranges.Count > 1 || (ranges.Count == 1 && ranges[0].start != ranges[0].end);
 
     private class EfficientContainsIterator : IEfficientContainsIterator
     {

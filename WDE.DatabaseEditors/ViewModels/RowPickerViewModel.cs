@@ -111,7 +111,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
             CloseCancel?.Invoke();
     }
     
-    public DatabaseEntity? SelectedRow => baseViewModel.SelectedEntity;
+    public DatabaseEntity? SelectedRow => baseViewModel.FocusedEntity;
     public object? MainViewModel => baseViewModel;
 
     public int DesiredWidth => 900;

@@ -57,11 +57,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             set
             {
                 SetProperty(ref selectedRow, value);
-                RaisePropertyChanged(nameof(SelectedEntity));
+                RaisePropertyChanged(nameof(FocusedEntity));
             }
         }
 
-        public override DatabaseEntity? SelectedEntity => SelectedRow?.Entity;
+        public override DatabaseEntity? FocusedEntity => SelectedRow?.Entity;
 
         private MultiRowSplitMode splitMode;
         public bool SplitView => splitMode != MultiRowSplitMode.None;

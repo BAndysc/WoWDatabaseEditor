@@ -106,8 +106,12 @@ namespace WDE.DatabaseEditors.Solution
             OriginalValues = originalValues;
         }
 
-        public readonly DatabaseKey Key;
-        public readonly bool ExistsInDatabase;
+        [JsonProperty("k")] public readonly DatabaseKey Key;
+        [JsonProperty("e")] public readonly bool ExistsInDatabase;
+
+        [JsonProperty("v")] public List<EntityOrigianlField>? OriginalValues { get; set; }
+        // legacy names, now using one byte property names for space saving
+        //[JsonProperty("OriginalValues")] private string _OriginalValues { set => OriginalValues = value; }
 
         public SolutionItemDatabaseEntity(SolutionItemDatabaseEntity copy)
         {
@@ -115,8 +119,6 @@ namespace WDE.DatabaseEditors.Solution
             ExistsInDatabase = copy.ExistsInDatabase;
             OriginalValues = copy.OriginalValues?.Select(c => new EntityOrigianlField(c)).ToList();
         }
-
-        public List<EntityOrigianlField>? OriginalValues { get; set; }
 
         public override string ToString()
         {

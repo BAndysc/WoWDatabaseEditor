@@ -8,6 +8,7 @@ namespace AvaloniaStyles.Controls.FastTableView;
 
 public partial class VeryFastTableView
 {
+    public event System.Action<string>? ValueUpdateRequest;
     public static readonly StyledProperty<IReadOnlyList<int>?> HiddenColumnsProperty = AvaloniaProperty.Register<VeryFastTableView, IReadOnlyList<int>?>(nameof(HiddenColumns));
     public static readonly StyledProperty<IReadOnlyList<ITableColumnHeader>?> ColumnsProperty = AvaloniaProperty.Register<VeryFastTableView, IReadOnlyList<ITableColumnHeader>?>(nameof(Columns));
     public static readonly StyledProperty<IReadOnlyList<ITableRow>?> RowsProperty = AvaloniaProperty.Register<VeryFastTableView, IReadOnlyList<ITableRow>?>(nameof(Rows));
@@ -15,9 +16,8 @@ public partial class VeryFastTableView
     public static readonly StyledProperty<int> SelectedCellIndexProperty = AvaloniaProperty.Register<VeryFastTableView, int>(nameof(SelectedCellIndex), defaultValue:-1, defaultBindingMode: BindingMode.TwoWay);
     public static readonly StyledProperty<ICustomCellDrawer?> CustomCellDrawerProperty = AvaloniaProperty.Register<VeryFastTableView, ICustomCellDrawer?>(nameof(CustomCellDrawer));
     public static readonly StyledProperty<ICustomCellInteractor?> CustomCellInteractorProperty = AvaloniaProperty.Register<VeryFastTableView, ICustomCellInteractor?>(nameof(CustomCellInteractor));
+    public static readonly StyledProperty<IMultiIndexContainer> MultiSelectionProperty = AvaloniaProperty.Register<VeryFastTableView, IMultiIndexContainer>(nameof(MultiSelection), defaultValue: new MultiIndexContainer());
 
-    private IMultiIndexContainer multiSelection = new MultiIndexContainer(); 
-    
     private List<bool> columnVisibility = new List<bool>();
     
     public IReadOnlyList<int>? HiddenColumns
@@ -60,5 +60,11 @@ public partial class VeryFastTableView
     {
         get => GetValue(CustomCellInteractorProperty);
         set => SetValue(CustomCellInteractorProperty, value);
+    }
+
+    public IMultiIndexContainer MultiSelection
+    {
+        get => GetValue(MultiSelectionProperty);
+        set => SetValue(MultiSelectionProperty, value);
     }
 }
