@@ -166,6 +166,7 @@ public class TableEditorPickerService : ITableEditorPickerService
             var solutionItem = new DatabaseTableSolutionItem(defaultPartialKey.Value, true, definition.Id, false);
             openIsNoSaveMode = await CheckIfItemIsOpened(solutionItem, definition);
             var multiRow = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            multiRow.AllowMultipleKeys = false;
             viewModelBase = multiRow;
         }
 

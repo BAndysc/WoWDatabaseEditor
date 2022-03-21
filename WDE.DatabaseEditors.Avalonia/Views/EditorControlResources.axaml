@@ -50,7 +50,6 @@
                     IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
                     Value="{Binding ParameterValue.Value}"
                     Padding="15,0,0,0"
-                    ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
                     StringValue="{Binding ParameterValue.String}">
                 </controls:FastCellView>
             </DataTemplate>

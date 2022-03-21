@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace WDE.Common.History
 {
-    public abstract class HistoryHandler
+    public class HistoryHandler
     {
         private readonly List<IHistoryAction> bulkEditing = new();
         private bool inBulkEditing;
         public event EventHandler<IHistoryAction> ActionPush = delegate { };
         public event EventHandler<IHistoryAction> ActionDone = delegate { };
 
-        protected IDisposable WithinBulk(string name)
+        public IDisposable WithinBulk(string name)
         {
             StartBulkEdit();
             return new EndBulkEditing(this, name);
@@ -32,7 +32,7 @@ namespace WDE.Common.History
             }
         }
 
-        protected void PushAction(IHistoryAction action)
+        public void PushAction(IHistoryAction action)
         {
             if (inBulkEditing)
                 bulkEditing.Add(action);

@@ -94,6 +94,9 @@
             <Setter Property="RemoveTemplateCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}" />
             <Setter Property="CanBeNull" Value="{Binding CanBeSetToNull, Mode=OneTime}" />
         </Style>
+        <Style Selector="controls2|FastCellView">
+            <Setter Property="ChooseParameterCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}" />
+        </Style>
     </UserControl.Styles>
     <UserControl.DataTemplates>
         <StaticResource ResourceKey="FieldValueDataTemplate" />

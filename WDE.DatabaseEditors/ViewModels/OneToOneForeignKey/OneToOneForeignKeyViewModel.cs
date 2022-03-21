@@ -45,13 +45,30 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private readonly IQueryGenerator queryGenerator;
     private readonly IMySqlExecutor mySqlExecutor;
     private readonly IMessageBoxService messageBoxService;
+    private readonly IParameterPickerService parameterPickerService;
     private readonly DatabaseTableDefinitionJson tableDefinition;
     private readonly DatabaseKey key;
     private readonly bool noSaveMode;
 
     private bool wasPresentInDatabase;
     [Notify] private bool presentInDatabase;
-    [Notify] public DatabaseEntityViewModel row;
+    private DatabaseEntityViewModel row;
+
+    public DatabaseEntityViewModel Row
+    {
+        get => row;
+        set
+        {
+            var old = row;
+            if (old != null)
+            {
+                old.Entity.OnAction -= OnEntityAction;
+            }
+            SetProperty(ref row, value);
+            if (value != null)
+                value.Entity.OnAction += OnEntityAction;
+        }
+    }
 
     public OneToOneForeignKeyViewModel(
         IDatabaseTableDataProvider dataProvider,
@@ -67,6 +84,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         IMessageBoxService messageBoxService,
         ISolutionItemEditorRegistry editorRegistry,
         IHistoryManager history,
+        IParameterPickerService parameterPickerService,
         DatabaseTableDefinitionJson tableDefinition,
         DatabaseKey key,
         bool noSaveMode)
@@ -83,6 +101,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         this.queryGenerator = queryGenerator;
         this.mySqlExecutor = mySqlExecutor;
         this.messageBoxService = messageBoxService;
+        this.parameterPickerService = parameterPickerService;
         this.tableDefinition = tableDefinition;
         this.History = history;
         this.key = key;
@@ -108,6 +127,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
 
             UpdateSolutionItemWithEverything();
             await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(this));
+            History.MarkAsSaved();
         });
         CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
         {
@@ -121,19 +141,82 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             var editor = editorRegistry.GetEditor(item);
             await windowManager.ShowDialog((IDialog)editor);
         });
-
+        OpenParameterWindow = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel>(EditParameter);
+        RevertCommand = new DelegateCommand<SingleRecordDatabaseCellViewModel?>(cell =>
+        {
+            cell!.ParameterValue!.Revert();
+        }, cell => cell != null && cell.CanBeReverted && (cell?.TableField?.IsModified ?? false));
+        SetNullCommand = new DelegateCommand<SingleRecordDatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
+        
         On(() => PresentInDatabase, @is =>
         {
+            if (@is)
+            {
+                handler.PushAction(new AnonymousHistoryAction("Make present in the database", () =>
+                {
+                    PresentInDatabase = false;
+                }, () =>
+                {
+                    PresentInDatabase = true;
+                }));
+            }
+            else
+            {
+                handler.PushAction(new AnonymousHistoryAction("Delete from the database", () =>
+                {
+                    PresentInDatabase = true;
+                }, () =>
+                {
+                    PresentInDatabase = false;
+                }));
+            }
             if (@is && Row == null)
             {
                 Row = CreateEmpty();
             }
         });
 
-        row = CreateEmpty();
+        Row = row = CreateEmpty();
         Title = this.tableDefinition.TableName + " of " + key;
-        
+
         Load().ListenErrors();
+    }
+
+    private Task EditParameter(SingleRecordDatabaseCellViewModel cell)
+    {
+        if (cell.ParameterValue != null)
+            return EditParameter(cell.ParameterValue);
+        return Task.CompletedTask;
+    }
+    
+    protected async Task EditParameter(IParameterValue parameterValue)
+    {
+        if (!parameterValue.BaseParameter.HasItems)
+            return;
+            
+        if (parameterValue is IParameterValue<long> valueHolder)
+        {
+            var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value);
+            if (result.ok)
+                valueHolder.Value = result.value;
+        }
+        else if (parameterValue is IParameterValue<string> stringValueHolder)
+        {
+            var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "");
+            if (result.ok)
+                stringValueHolder.Value = result.value;             
+        }
+    }
+    
+    private void SetToNull(SingleRecordDatabaseCellViewModel? view)
+    {
+        if (view != null && view.CanBeNull && !view.IsReadOnly) 
+            view.ParameterValue?.SetNull();
+    }
+
+    private void OnEntityAction(IHistoryAction action)
+    {
+        handler.PushAction(action);
     }
 
     private async Task SaveData()
@@ -307,6 +390,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             Row = Create(data.Entities[0]);
             PresentInDatabase = true;
         }
+        History.AddHandler(handler);
     }
     
     public int DesiredWidth => 400;
@@ -315,6 +399,9 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     public ICommand Copy => new AlwaysDisabledCommand();
     public ICommand Cut => new AlwaysDisabledCommand();
     public ICommand Paste => new AlwaysDisabledCommand();
+    public DelegateCommand<SingleRecordDatabaseCellViewModel?> RevertCommand { get; }
+    public DelegateCommand<SingleRecordDatabaseCellViewModel?> SetNullCommand { get; }
+    public AsyncAutoCommand<SingleRecordDatabaseCellViewModel> OpenParameterWindow { get; }
     public ICommand Save { get; }
 
     public IAsyncCommand? CloseCommand { get; set; }
@@ -330,6 +417,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     public event Action? CloseOk;
     public ICommand Undo { get; }
     public ICommand Redo { get; }
+    private HistoryHandler handler = new();
     public IHistoryManager History { get; }
     public bool IsModified => !History.IsSaved;
     

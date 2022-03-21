@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -15,7 +16,17 @@ using Thickness = Avalonia.Thickness;
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
     public class FastItemCellView : OpenableFastCellViewBase, IStyleable
-    {
+    {   
+        // todo: remove
+        private ICommand? chooseParameterCommand;
+        public static readonly DirectProperty<FastItemCellView, ICommand?> ChooseParameterCommandProperty = FastCellView.ChooseParameterCommandProperty.AddOwner<FastItemCellView>(o => o.ChooseParameterCommand, (o, v) => o.ChooseParameterCommand = v);
+        public ICommand? ChooseParameterCommand
+        {
+            get => chooseParameterCommand;
+            set => SetAndRaise(ChooseParameterCommandProperty, ref chooseParameterCommand, value);
+        }
+        // todo end
+        
         public static readonly DirectProperty<FastItemCellView, object?> SelectedItemProperty =
             AvaloniaProperty.RegisterDirect<FastItemCellView, object?>(
                 nameof(SelectedItem),
