@@ -116,7 +116,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         });
         GenerateCurrentSqlCommand = new AsyncAutoCommand(async () =>
         {
-            var sql = await GenerateQuery();
+            var sql = await GenerateThisQueryOnly();
             var item = new MetaSolutionSQL(new JustQuerySolutionItem(sql.QueryString));
             var editor = editorRegistry.GetEditor(item);
             await windowManager.ShowDialog((IDialog)editor);
@@ -131,13 +131,14 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         });
 
         row = CreateEmpty();
+        Title = this.tableDefinition.TableName + " of " + key;
         
         Load().ListenErrors();
     }
 
     private async Task SaveData()
     {
-        var query = await GenerateQuery();
+        var query = await GenerateThisQueryOnly();
         try
         {
             await mySqlExecutor.ExecuteSql(query);
@@ -310,7 +311,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     
     public int DesiredWidth => 400;
     public int DesiredHeight => 500;
-    public string Title => "One to one foreign key";
+    public string Title { get; }
     public ICommand Copy => AlwaysDisabledCommand.Command;
     public ICommand Cut => AlwaysDisabledCommand.Command;
     public ICommand Paste => AlwaysDisabledCommand.Command;
