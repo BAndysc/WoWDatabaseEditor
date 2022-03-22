@@ -301,10 +301,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             autoIncrementColumn = columns.FirstOrDefault(c => c.AutoIncrement);
             if (Columns.Count == 0)
             {
-                Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)
+                Columns.AddRange(columns.Select(c => AutoDispose(new DatabaseColumnHeaderViewModel(c)
                 {
                     Width = tablePersonalSettings.GetColumnWidth(TableDefinition.Id, c.DbColumnName, c.PreferredWidth ?? 120)
-                }));
+                })));
                 Columns.Each(col => col.ToObservable(c => c.Width)
                     .Skip(1)
                     .Throttle(TimeSpan.FromMilliseconds(300))

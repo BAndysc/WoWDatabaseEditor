@@ -492,12 +492,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
                 Debug.Assert(Columns.Count == 0);
-                Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)));
-                Columns.Each((col, i) =>
+                Columns.AddRange(columns.Select(c => AutoDispose(new DatabaseColumnHeaderViewModel(c)
                 {
-                    col.IsVisible = personalSettings.IsColumnVisible(TableDefinition.Id, col.DatabaseName);
-                    col.Width = personalSettings.GetColumnWidth(TableDefinition.Id, col.DatabaseName, col.Width);
-                });
+                    IsVisible = personalSettings.IsColumnVisible(TableDefinition.Id, c.DbColumnName),
+                    Width = personalSettings.GetColumnWidth(TableDefinition.Id, c.DbColumnName, c.PreferredWidth ?? 100)
+                })));
                 Columns.Each((col, i) => AutoDispose(col.ToObservable(x => x.IsVisible)
                     .Subscribe(@is =>
                     {

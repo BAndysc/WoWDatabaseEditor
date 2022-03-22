@@ -2,10 +2,11 @@ using AvaloniaStyles.Controls.FastTableView;
 using Prism.Mvvm;
 using PropertyChanged.SourceGenerator;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.MVVM;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public partial class DatabaseColumnHeaderViewModel : BindableBase, ITableColumnHeader
+    public partial class DatabaseColumnHeaderViewModel : ObservableBase, ITableColumnHeader
     {
         [Notify] private bool isVisible = true;
         public string Name { get; }
@@ -20,12 +21,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             Help = column.Help;
             PreferredWidth = column.PreferredWidth;
             width = PreferredWidth ?? 100;
-        }
-
-        public DatabaseColumnHeaderViewModel(string name, string databaseName)
-        {
-            Name = name;
-            DatabaseName = databaseName;
         }
 
         public string Header => Name;
