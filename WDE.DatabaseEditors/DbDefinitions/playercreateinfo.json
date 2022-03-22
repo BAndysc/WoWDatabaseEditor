@@ -1,0 +1,92 @@
+{
+  "id": "playercreateinfo",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player createinfo",
+  "single_solution_name": "Player createinfo",
+  "multi_solution_name": "Player createinfo",
+  "description": "This table holds the start positions of each class-race combinations for all newly created characters.",
+  "table_name": "playercreateinfo",
+  "table_index_name": "race",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Player create info",
+  "reload_command": "reload playercreateinfo",
+  "picker": "Parameter",
+  "primary_key": [
+    "race",
+    "class"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race",
+          "db_column_name": "race",
+          "value_type": "RaceParameter",
+          "preferred_width": 220.0
+        },
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "ClassParameter",
+          "preferred_width": 150.0
+        },
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter",
+          "preferred_width": 205.0
+        },
+        {
+          "name": "Zone",
+          "db_column_name": "zone",
+          "value_type": "ZoneAreaParameter",
+          "preferred_width": 200.0
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Action bar",
+          "meta": "table:playercreateinfo_action;`race` = {race} AND `class` = {class}"
+        },
+        {
+          "name": "Cast Spells",
+          "meta": "table:playercreateinfo_cast_spell;(`raceMask` = 0 OR (`raceMask` & (1 << ({race} - 1)) != 0)) AND (`classMask` =0 OR (`classMask` & (1 << ({class} - 1)) != 0))"
+        },
+        {
+          "name": "Skills",
+          "meta": "table:playercreateinfo_skills;(`raceMask` = 0 OR (`raceMask` & (1 << ({race} - 1)) != 0)) AND (`classMask` =0 OR (`classMask` & (1 << ({class} - 1)) != 0))"
+        },
+        {
+          "name": "Custom Spells",
+          "meta": "table:playercreateinfo_spell_custom;(`racemask` = 0 OR (`racemask` & (1 << ({race} - 1)) != 0)) AND (`classmask` =0 OR (`classmask` & (1 << ({class} - 1)) != 0))"
+        },
+        {
+          "name": "Initial items",
+          "meta": "table:playercreateinfo_item;`race` = {race} AND `class` = {class}"
+        }
+      ]
+    }
+  ]
+}

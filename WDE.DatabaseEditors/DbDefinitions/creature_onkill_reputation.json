@@ -1,0 +1,87 @@
+{
+  "id": "creature_onkill_reputation",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature On Kill Reputation",
+  "single_solution_name": "Creature On Kill Reputation",
+  "multi_solution_name": "Creature On Kill Reputation",
+  "description": "This table controls the reputation given by creatures when killed by other players.",
+  "table_name": "creature_onkill_reputation",
+  "table_index_name": "creature_id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
+  "reload_command": "reload creature_onkill_reputation",
+  "picker": "",
+  "primary_key": [
+    "creature_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature Id",
+          "db_column_name": "creature_id",
+          "value_type": "CreatureParameter",
+          "preferred_width": 265.0
+        },
+        {
+          "name": "Rew On Kill Rep Faction 1",
+          "db_column_name": "RewOnKillRepFaction1",
+          "value_type": "RawFactionParameter",
+          "preferred_width": 150.0
+        },
+        {
+          "name": "Max Standing 1",
+          "db_column_name": "MaxStanding1",
+          "value_type": "ReputationRankParameter",
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Is Team Award 1",
+          "db_column_name": "IsTeamAward1",
+          "value_type": "BoolParameter",
+          "preferred_width": 115.0
+        },
+        {
+          "name": "Rew On Kill Rep Value 1",
+          "db_column_name": "RewOnKillRepValue1",
+          "value_type": "int",
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Rew On Kill Rep Faction 2",
+          "db_column_name": "RewOnKillRepFaction2",
+          "value_type": "RawFactionParameter",
+          "preferred_width": 120.0
+        },
+        {
+          "name": "Max Standing 2",
+          "db_column_name": "MaxStanding2",
+          "value_type": "ReputationRankParameter",
+          "preferred_width": 155.0
+        },
+        {
+          "name": "Is Team Award 2",
+          "db_column_name": "IsTeamAward2",
+          "value_type": "BoolParameter",
+          "preferred_width": 125.0
+        },
+        {
+          "name": "Rew On Kill Rep Value 2",
+          "db_column_name": "RewOnKillRepValue2",
+          "value_type": "int",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Team Dependent",
+          "db_column_name": "TeamDependent",
+          "value_type": "BoolParameter",
+          "preferred_width": 120.0
+        }
+      ]
+    }
+  ]
+}

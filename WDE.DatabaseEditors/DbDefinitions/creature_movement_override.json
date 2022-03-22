@@ -1,0 +1,71 @@
+{
+  "id": "creature_movement_override",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature Movement Override",
+  "description": "Override default creature movement per guid",
+  "table_name": "creature_movement_override",
+  "table_index_name": "SpawnId",
+  "record_mode": "SingleRow",
+  "group_name": "Creatures",
+  "skip_quick_load": true,
+  "reload_command": "reload creature_movement_override",
+  "primary_key": [
+    "SpawnId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spawn Id",
+          "db_column_name": "SpawnId",
+          "value_type": "CreatureGUIDParameter"
+        },
+        {
+          "name": "Ground",
+          "db_column_name": "Ground",
+          "value_type": "BoolParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Swim",
+          "db_column_name": "Swim",
+          "value_type": "BoolParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Flight",
+          "db_column_name": "Flight",
+          "value_type": "BoolParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Rooted",
+          "db_column_name": "Rooted",
+          "value_type": "BoolParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Chase",
+          "db_column_name": "Chase",
+          "value_type": "BoolParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Random",
+          "db_column_name": "Random",
+          "value_type": "BoolParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Interaction Pause Timer",
+          "db_column_name": "InteractionPauseTimer",
+          "value_type": "uint",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

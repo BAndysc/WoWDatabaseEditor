@@ -1,0 +1,40 @@
+{
+  "id": "areatrigger_involvedrelation",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Areatrigger Involvedrelation",
+  "single_solution_name": "Areatrigger Involvedrelation",
+  "multi_solution_name": "Areatrigger Involvedrelation",
+  "description": "Enable a trigger to finish one condition of a quest (explore)",
+  "table_name": "areatrigger_involvedrelation",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Areatriggers",
+  "icon_path": "Icons/document_areatrigger.png",
+  "reload_command": "reload areatrigger_involvedrelation",
+  "picker": "",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "AreaTriggerParameter",
+          "preferred_width": 170.0
+        },
+        {
+          "name": "Quest",
+          "db_column_name": "quest",
+          "value_type": "QuestParameter",
+          "preferred_width": 340.0
+        }
+      ]
+    }
+  ]
+}

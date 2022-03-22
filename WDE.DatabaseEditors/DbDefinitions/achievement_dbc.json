@@ -1,0 +1,65 @@
+{
+  "id": "achievement_dbc",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Achievement Dbc",
+  "single_solution_name": "Achievement Dbc",
+  "multi_solution_name": "Achievement Dbc",
+  "description": "Stores achievement data that is missing in Achievement.dbc",
+  "table_name": "achievement_dbc",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Achievements",
+  "icon_path": "Icons/document_achievement.png",
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Achievement",
+          "db_column_name": "ID",
+          "value_type": "AchievementParameter"
+        },
+        {
+          "name": "Required Faction",
+          "db_column_name": "requiredFaction",
+          "value_type": "AchievementRequiredFactionParameter",
+          "default": -1
+        },
+        {
+          "name": "Map ID",
+          "db_column_name": "mapID",
+          "value_type": "MapParameter",
+          "default": -1
+        },
+        {
+          "name": "Points",
+          "db_column_name": "points",
+          "value_type": "uint"
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "flags",
+          "value_type": "AchievementFlagsParameter"
+        },
+        {
+          "name": "Count",
+          "db_column_name": "count",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Ref Achievement",
+          "db_column_name": "refAchievement",
+          "value_type": "uint",
+          "preferred_width": 145.0
+        }
+      ]
+    }
+  ]
+}

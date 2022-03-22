@@ -1,0 +1,45 @@
+{
+  "id": "player_classlevelstats",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player class-level stats",
+  "description": "This table holds information on the base health and mana of characters when they level up. Each class has different level stats.",
+  "table_name": "player_classlevelstats",
+  "table_index_name": "class",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "picker": "Parameter",
+  "skip_quick_load": true,
+  "primary_key": [
+    "class",
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "ClassParameter"
+        },
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "Base hp",
+          "db_column_name": "basehp",
+          "value_type": "uint"
+        },
+        {
+          "name": "Base mana",
+          "db_column_name": "basemana",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

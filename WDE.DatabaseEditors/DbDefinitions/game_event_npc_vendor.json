@@ -1,0 +1,66 @@
+{
+  "id": "game_event_npc_vendor",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event Npc Vendor",
+  "single_solution_name": "Game Event Npc Vendor",
+  "multi_solution_name": "Game Event Npc Vendor",
+  "description": "This table allows you to change the items a vendor sells, or to create a vendor list for an NPC who does not sell items unless an event is active.",
+  "table_name": "game_event_npc_vendor",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent.png",
+  "primary_key": [
+    "guid",
+    "item"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "eventEntry",
+          "value_type": "GameEventParameter",
+          "preferred_width": 230.0
+        },
+        {
+          "name": "Creature guid",
+          "db_column_name": "guid",
+          "value_type": "CreatureGUIDParameter",
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Slot",
+          "db_column_name": "slot",
+          "value_type": "int",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Item",
+          "db_column_name": "item",
+          "value_type": "ItemParameter",
+          "preferred_width": 280.0
+        },
+        {
+          "name": "Max count",
+          "db_column_name": "maxcount",
+          "value_type": "uint"
+        },
+        {
+          "name": "Increment time",
+          "db_column_name": "incrtime",
+          "value_type": "uint"
+        },
+        {
+          "name": "Extended Cost",
+          "db_column_name": "ExtendedCost",
+          "value_type": "ExtendedCostParameter"
+        }
+      ]
+    }
+  ]
+}

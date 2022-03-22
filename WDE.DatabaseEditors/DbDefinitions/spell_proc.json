@@ -1,0 +1,124 @@
+{
+  "id": "spell_proc",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell Proc",
+  "single_solution_name": "Spell Proc Table",
+  "multi_solution_name": "Spell Proc Table",
+  "description": "This table holds information on what events (or procs) certain spells are activated. All spells in this table must have apply a SPELL_AURA_PROC_TRIGGER_SPELL (42) aura. Any entries in this table will overwrite the existing proc settings in the spell's DBC entry.",
+  "table_name": "spell_proc",
+  "table_index_name": "SpellId",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "reload_command": "reload spell_proc",
+  "picker": "SpellParameter",
+  "icon_path": "Icons/document_magic.png",
+  "primary_key": [
+    "SpellId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "SpellId",
+          "value_type": "SpellOrRankedSpellParameter",
+          "preferred_width": 225.0
+        },
+        {
+          "name": "School Mask",
+          "db_column_name": "SchoolMask",
+          "value_type": "SpellSchoolMaskParameter",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Spell Family Name",
+          "db_column_name": "SpellFamilyName",
+          "value_type": "SpellFamilyNameParameter",
+          "preferred_width": 75.0
+        },
+        {
+          "name": "Spell Family Mask 0",
+          "db_column_name": "SpellFamilyMask0",
+          "value_type": "uint",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Spell Family Mask 1",
+          "db_column_name": "SpellFamilyMask1",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Spell Family Mask 2",
+          "db_column_name": "SpellFamilyMask2",
+          "value_type": "uint",
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Proc Flags",
+          "db_column_name": "ProcFlags",
+          "value_type": "SpellProcFlagParameter",
+          "preferred_width": 120.0
+        },
+        {
+          "name": "Spell Type Mask",
+          "db_column_name": "SpellTypeMask",
+          "value_type": "ProcSpellTypeMaskParameter",
+          "preferred_width": 115.0
+        },
+        {
+          "name": "Spell Phase Mask",
+          "db_column_name": "SpellPhaseMask",
+          "value_type": "ProcSpellPhaseMaskParameter",
+          "preferred_width": 190.0
+        },
+        {
+          "name": "Hit Mask",
+          "db_column_name": "HitMask",
+          "value_type": "ProcFlagsHitParameter",
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Attributes Mask",
+          "db_column_name": "AttributesMask",
+          "value_type": "ProcAttributesParameter",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Disable Effects Mask",
+          "db_column_name": "DisableEffectsMask",
+          "value_type": "DisableProcEffectMaskParameter",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Procs Per Minute",
+          "db_column_name": "ProcsPerMinute",
+          "value_type": "float",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Chance",
+          "db_column_name": "Chance",
+          "value_type": "float",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Cooldown",
+          "db_column_name": "Cooldown",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Charges",
+          "db_column_name": "Charges",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 145.0
+        }
+      ]
+    }
+  ]
+}

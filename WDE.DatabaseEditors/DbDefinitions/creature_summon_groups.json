@@ -1,0 +1,86 @@
+{
+    "id": "creature_summon_groups",
+    "compatibility": [
+      "TrinityWrath"
+    ],
+    "name": "Creature Summon Groups",
+    "description": "Used to define summon groups summoned later in the script",
+    "table_name": "creature_summon_groups",
+    "table_index_name": "summonerId",
+    "record_mode": "SingleRow",
+    "group_name": "Common scripting tables",
+    "icon_path": "Icons/document_creature_summon_groups.png",
+    "picker": "CreatureGameobjectNameParameter",
+    "primary_key": [
+      "summonerId",
+      "summonerType",
+      "groupId",
+      "entry"
+    ],
+    "groups": [
+      {
+        "group_name": "group",
+        "fields": [
+          {
+            "name": "Summoner Id",
+            "db_column_name": "summonerId",
+            "value_type": "CreatureSummonGroupSummonerParameter",
+            "preferred_width": 130.0
+          },
+          {
+            "name": "Summoner Type",
+            "help": "Depending on the summoner type, summoner id is either creature entry, gameobject entry or map entry",
+            "db_column_name": "summonerType",
+            "value_type": "CreatureSummonGroupSummonerTypeParameter",
+            "preferred_width": 130.0
+          },
+          {
+            "name": "Group Id",
+            "db_column_name": "groupId",
+            "value_type": "uint"
+          },
+          {
+            "name": "Entry",
+            "db_column_name": "entry",
+            "value_type": "CreatureParameter"
+          },
+          {
+            "name": "Position X",
+            "db_column_name": "position_x",
+            "value_type": "float"
+          },
+          {
+            "name": "Position Y",
+            "db_column_name": "position_y",
+            "value_type": "float"
+          },
+          {
+            "name": "Position Z",
+            "db_column_name": "position_z",
+            "value_type": "float"
+          },
+          {
+            "name": "Orientation",
+            "db_column_name": "orientation",
+            "value_type": "float"
+          },
+          {
+            "name": "Summon Type",
+            "db_column_name": "summonType",
+            "value_type": "SummonTypeParameter"
+          },
+          {
+            "name": "Summon Time",
+            "db_column_name": "summonTime",
+            "value_type": "uint"
+          },
+          {
+            "name": "Comment",
+            "db_column_name": "Comment",
+            "value_type": "string",
+            "default": ""
+          }
+        ]
+      }
+    ]
+  }

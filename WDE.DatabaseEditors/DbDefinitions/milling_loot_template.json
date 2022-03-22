@@ -1,0 +1,86 @@
+{
+  "id": "milling_loot_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Milling Loot Template",
+  "single_solution_name": "Milling Loot Template",
+  "multi_solution_name": "Milling Loot Template",
+  "description": "",
+  "table_name": "milling_loot_template",
+  "table_index_name": "Entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_table.png",
+  "reload_command": "reload milling_loot_template",
+  "picker": "Parameter",
+  "primary_key": [
+    "Entry",
+    "Item"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "Entry",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Item",
+          "db_column_name": "Item",
+          "value_type": "ItemParameter",
+          "preferred_width": 205.0
+        },
+        {
+          "name": "Reference",
+          "db_column_name": "Reference",
+          "value_type": "LootReferenceParameter"
+        },
+        {
+          "name": "Chance",
+          "db_column_name": "Chance",
+          "value_type": "float",
+          "default": 100.0
+        },
+        {
+          "name": "Quest Required",
+          "db_column_name": "QuestRequired",
+          "value_type": "int"
+        },
+        {
+          "name": "Loot Mode",
+          "db_column_name": "LootMode",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Group Id",
+          "db_column_name": "GroupId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min Count",
+          "db_column_name": "MinCount",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Max Count",
+          "db_column_name": "MaxCount",
+          "value_type": "uint",
+          "default": 1
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

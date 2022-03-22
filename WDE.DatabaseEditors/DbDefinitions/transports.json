@@ -1,0 +1,52 @@
+{
+  "id": "transports",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Transports",
+  "single_solution_name": "Transports Table",
+  "multi_solution_name": "Transports Table",
+  "description": "This table contains all type 15 transports (Boats and Zeppelins). All other transport types have their frame time read from TransportAnimation.dbc.",
+  "table_name": "transports",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_transports.png",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "uint",
+          "read_only": true,
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "GameobjectParameter",
+          "preferred_width": 330.0
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 390.0
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": ""
+        }
+      ]
+    }
+  ]
+}

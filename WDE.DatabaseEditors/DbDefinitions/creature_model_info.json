@@ -1,0 +1,58 @@
+{
+  "id": "creature_model_info",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature Model Info",
+  "single_solution_name": "Creature Model Info",
+  "multi_solution_name": "Creature Model Info",
+  "description": "This table contains all models of mobs, their gender and other information that are model related. ",
+  "table_name": "creature_model_info",
+  "table_index_name": "DisplayID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Creatures",
+  "picker": "",
+  "primary_key": [
+    "DisplayID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Display ID",
+          "db_column_name": "DisplayID",
+          "value_type": "CreatureModelDataParameter",
+          "preferred_width": 225.0
+        },
+        {
+          "name": "Bounding Radius",
+          "db_column_name": "BoundingRadius",
+          "value_type": "float",
+          "preferred_width": 170.0
+        },
+        {
+          "name": "Combat Reach",
+          "db_column_name": "CombatReach",
+          "value_type": "float",
+          "preferred_width": 170.0
+        },
+        {
+          "name": "Gender",
+          "db_column_name": "Gender",
+          "value_type": "GenderParameter",
+          "default": 2,
+          "preferred_width": 110.0
+        },
+        {
+          "name": "Display ID Other Gender",
+          "db_column_name": "DisplayID_Other_Gender",
+          "value_type": "CreatureModelDataParameter",
+          "preferred_width": 190.0,
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

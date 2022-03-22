@@ -1,0 +1,100 @@
+{
+  "id": "waypoint_scripts",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Waypoint Scripts",
+  "single_solution_name": "Waypoint Scripts Table",
+  "multi_solution_name": "Waypoint Scripts Table",
+  "description": "Old legacy waypoints_scripts. Better now use those",
+  "table_name": "waypoint_scripts",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Legacy",
+  "icon_path": "Icons/document_waypoints2.png",
+  "picker": "",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "uint",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Delay",
+          "db_column_name": "delay",
+          "value_type": "uint",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Command",
+          "db_column_name": "command",
+          "value_type": "uint",
+          "preferred_width": 85.0
+        },
+        {
+          "name": "Datalong",
+          "db_column_name": "datalong",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Datalong 2",
+          "db_column_name": "datalong2",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Dataint",
+          "db_column_name": "dataint",
+          "value_type": "uint",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "X",
+          "db_column_name": "x",
+          "value_type": "float",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Y",
+          "db_column_name": "y",
+          "value_type": "float",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Z",
+          "db_column_name": "z",
+          "value_type": "float",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "O",
+          "db_column_name": "o",
+          "value_type": "float",
+          "preferred_width": 85.0
+        },
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "int",
+          "read_only": true,
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "default": ""
+        }
+      ]
+    }
+  ]
+}

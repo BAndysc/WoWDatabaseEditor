@@ -1,0 +1,72 @@
+{
+  "id": "script_spline_chain_waypoints",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Script Spline Chain Waypoints",
+  "single_solution_name": "Script Spline Chain Waypoints",
+  "multi_solution_name": "Script Spline Chain Waypoints",
+  "description": "",
+  "table_name": "script_spline_chain_waypoints",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_waypoints2.png",
+  "picker": "",
+  "primary_key": [
+    "entry",
+    "chainId",
+    "splineId",
+    "wpId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Chain Id",
+          "db_column_name": "chainId",
+          "value_type": "uint",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Spline Id",
+          "db_column_name": "splineId",
+          "value_type": "uint",
+          "preferred_width": 70.0
+        },
+        {
+          "name": "WP Index",
+          "db_column_name": "wpId",
+          "value_type": "uint",
+          "preferred_width": 85.0
+        },
+        {
+          "name": "X",
+          "db_column_name": "x",
+          "value_type": "float",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Y",
+          "db_column_name": "y",
+          "value_type": "float",
+          "preferred_width": 95.0
+        },
+        {
+          "name": "Z",
+          "db_column_name": "z",
+          "value_type": "float",
+          "preferred_width": 90.0
+        }
+      ]
+    }
+  ]
+}

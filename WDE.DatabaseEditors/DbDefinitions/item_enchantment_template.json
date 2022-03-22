@@ -1,0 +1,45 @@
+{
+  "id": "item_enchantment_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Item Enchantment Template",
+  "single_solution_name": "Item Enchantment Template",
+  "multi_solution_name": "Item Enchantment Template",
+  "description": "",
+  "table_name": "item_enchantment_template",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "reload_command": "reload item_enchantment_template",
+  "picker": "Parameter",
+  "primary_key": [
+    "entry",
+    "ench"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "preferred_width": 95.0
+        },
+        {
+          "name": "Ench",
+          "db_column_name": "ench",
+          "value_type": "uint",
+          "preferred_width": 95.0
+        },
+        {
+          "name": "Chance",
+          "db_column_name": "chance",
+          "value_type": "float"
+        }
+      ]
+    }
+  ]
+}

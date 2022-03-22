@@ -1,0 +1,52 @@
+{
+  "id": "lfg_dungeon_rewards",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "LFG Dungeon Rewards",
+  "single_solution_name": "LFG Dungeon Rewards",
+  "multi_solution_name": "LFG Dungeon Rewards",
+  "description": "",
+  "table_name": "lfg_dungeon_rewards",
+  "table_index_name": "dungeonId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Instance",
+  "reload_command": "reload lfg_dungeon_rewards",
+  "picker": "",
+  "primary_key": [
+    "dungeonId",
+    "maxLevel"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Dungeon",
+          "db_column_name": "dungeonId",
+          "value_type": "LFGDungeonParameter",
+          "preferred_width": 305.0
+        },
+        {
+          "name": "Max Level",
+          "db_column_name": "maxLevel",
+          "value_type": "uint",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "First Quest Id",
+          "db_column_name": "firstQuestId",
+          "value_type": "QuestParameter",
+          "preferred_width": 295.0
+        },
+        {
+          "name": "Other Quest Id",
+          "db_column_name": "otherQuestId",
+          "value_type": "QuestParameter",
+          "preferred_width": 325.0
+        }
+      ]
+    }
+  ]
+}

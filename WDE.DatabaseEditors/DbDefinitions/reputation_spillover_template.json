@@ -1,0 +1,111 @@
+{
+  "id": "reputation_spillover_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Reputation Spillover Template",
+  "single_solution_name": "Reputation Spillover Template Table",
+  "multi_solution_name": "Reputation Spillover Template Table",
+  "description": "Defines how other faction behave depending on another faction reputation",
+  "table_name": "reputation_spillover_template",
+  "table_index_name": "faction",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_table.png",
+  "reload_command": "reload reputation_spillover_template",
+  "picker": "RawFactionParameter",
+  "primary_key": [
+    "faction"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Faction",
+          "db_column_name": "faction",
+          "value_type": "RawFactionParameter",
+          "preferred_width": 185.0
+        },
+        {
+          "name": "Faction 1",
+          "db_column_name": "faction1",
+          "value_type": "RawFactionParameter",
+          "preferred_width": 225.0
+        },
+        {
+          "name": "Rate 1",
+          "db_column_name": "rate_1",
+          "value_type": "float",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Rank 1",
+          "db_column_name": "rank_1",
+          "value_type": "ReputationRankParameter",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Faction 2",
+          "db_column_name": "faction2",
+          "value_type": "RawFactionParameter",
+          "zero_is_blank": true,
+          "preferred_width": 175.0
+        },
+        {
+          "name": "Rate 2",
+          "db_column_name": "rate_2",
+          "value_type": "float",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Rank 2",
+          "db_column_name": "rank_2",
+          "value_type": "ReputationRankParameter",
+          "zero_is_blank": true,
+          "preferred_width": 75.0
+        },
+        {
+          "name": "Faction 3",
+          "db_column_name": "faction3",
+          "value_type": "RawFactionParameter",
+          "zero_is_blank": true,
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Rate 3",
+          "db_column_name": "rate_3",
+          "value_type": "float",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Rank 3",
+          "db_column_name": "rank_3",
+          "value_type": "ReputationRankParameter",
+          "zero_is_blank": true,
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Faction 4",
+          "db_column_name": "faction4",
+          "value_type": "RawFactionParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Rate 4",
+          "db_column_name": "rate_4",
+          "value_type": "float",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Rank 4",
+          "db_column_name": "rank_4",
+          "value_type": "ReputationRankParameter",
+          "zero_is_blank": true,
+          "preferred_width": 85.0
+        }
+      ]
+    }
+  ]
+}

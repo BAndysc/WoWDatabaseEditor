@@ -1,0 +1,58 @@
+{
+  "id": "instance_spawn_groups",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Instance Spawn Groups",
+  "single_solution_name": "Instance Spawn Groups",
+  "multi_solution_name": "Instance Spawn Groups",
+  "description": "",
+  "table_name": "instance_spawn_groups",
+  "table_index_name": "instanceMapId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Instance",
+  "picker": "Parameter",
+  "primary_key": [
+    "instanceMapId",
+    "bossStateId",
+    "bossStates",
+    "spawnGroupId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Instance Map",
+          "db_column_name": "instanceMapId",
+          "value_type": "MapParameter",
+          "preferred_width": 305.0
+        },
+        {
+          "name": "Boss State Id",
+          "db_column_name": "bossStateId",
+          "value_type": "uint",
+          "preferred_width": 115.0
+        },
+        {
+          "name": "Boss States",
+          "db_column_name": "bossStates",
+          "value_type": "InstanceSpawnGroupBossStateMaskParameter",
+          "preferred_width": 165.0
+        },
+        {
+          "name": "Spawn Group",
+          "db_column_name": "spawnGroupId",
+          "value_type": "TableReference(spawn_group_template#groupId)Parameter"
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "flags",
+          "value_type": "InstanceSpawnGroupInfoParameter",
+          "preferred_width": 255.0
+        }
+      ]
+    }
+  ]
+}

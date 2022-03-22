@@ -1,0 +1,70 @@
+{
+  "id": "player_levelstats",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player Level Stats",
+  "single_solution_name": "Player Level Stats",
+  "multi_solution_name": "Player Level Stats",
+  "description": "This table holds information on what stats are gained by characters when they level up. Each race-class combination has different level stats. All of the values in this table signify only the base stats of the race-class combination at a specific level.",
+  "table_name": "player_levelstats",
+  "table_index_name": "race",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "picker": "Parameter",
+  "primary_key": [
+    "race",
+    "class",
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race",
+          "db_column_name": "race",
+          "value_type": "RaceParameter",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Class",
+          "db_column_name": "class",
+          "value_type": "ClassParameter",
+          "preferred_width": 125.0
+        },
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint"
+        },
+        {
+          "name": "Strength",
+          "db_column_name": "str",
+          "value_type": "uint"
+        },
+        {
+          "name": "Agility",
+          "db_column_name": "agi",
+          "value_type": "uint"
+        },
+        {
+          "name": "Stamina",
+          "db_column_name": "sta",
+          "value_type": "uint"
+        },
+        {
+          "name": "Intellect",
+          "db_column_name": "inte",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spirit",
+          "db_column_name": "spi",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

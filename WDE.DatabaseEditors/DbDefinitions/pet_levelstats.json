@@ -1,0 +1,99 @@
+{
+  "id": "pet_levelstats",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Pet Level stats",
+  "single_solution_name": "Pet Level stats",
+  "multi_solution_name": "Pet Level stats",
+  "description": "This table holds information on individual pet base stats based on level.",
+  "table_name": "pet_levelstats",
+  "table_index_name": "creature_entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "picker": "Parameter",
+  "primary_key": [
+    "creature_entry",
+    "level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature Entry",
+          "db_column_name": "creature_entry",
+          "value_type": "CreatureParameter",
+          "preferred_width": 245.0
+        },
+        {
+          "name": "Level",
+          "db_column_name": "level",
+          "value_type": "uint",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Hp",
+          "db_column_name": "hp",
+          "value_type": "uint",
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Mana",
+          "db_column_name": "mana",
+          "value_type": "uint",
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Armor",
+          "db_column_name": "armor",
+          "value_type": "uint",
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Strength",
+          "db_column_name": "str",
+          "value_type": "uint",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Agility",
+          "db_column_name": "agi",
+          "value_type": "uint",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Stamina",
+          "db_column_name": "sta",
+          "value_type": "uint",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Intellect",
+          "db_column_name": "inte",
+          "value_type": "uint",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Spirit",
+          "db_column_name": "spi",
+          "value_type": "uint",
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Min Damage",
+          "db_column_name": "min_dmg",
+          "value_type": "uint",
+          "preferred_width": 85.0
+        },
+        {
+          "name": "Max Damage",
+          "db_column_name": "max_dmg",
+          "value_type": "uint",
+          "preferred_width": 75.0
+        }
+      ]
+    }
+  ]
+}
