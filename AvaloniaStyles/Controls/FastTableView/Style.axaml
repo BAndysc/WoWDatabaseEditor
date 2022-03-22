@@ -1,0 +1,6 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:styles="clr-namespace:AvaloniaStyles.Styles">
+    <styles:StyleIncludeColorAware  DarkSource="avares://AvaloniaStyles/Controls/FastTableView/ColorsDark.axaml"
+                                    LightSource="avares://AvaloniaStyles/Controls/FastTableView/ColorsLight.axaml" />
+</Styles>

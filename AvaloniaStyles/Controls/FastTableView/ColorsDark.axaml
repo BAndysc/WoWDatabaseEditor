@@ -1,0 +1,23 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Styles.Resources>
+        <SolidColorBrush x:Key="FastTableView.OddRowBackground" Color="#202020" />
+        <SolidColorBrush x:Key="FastTableView.SelectedRowBackground" Color="#2C4C70" />
+        <SolidColorBrush x:Key="FastTableView.EvenRowBackground" Color="#2A2A2A" />
+        <SolidColorBrush x:Key="FastTableView.HeaderBackground" Color="#101010" />
+        <SolidColorBrush x:Key="FastTableView.TextBrush" Color="#D2D2D2" />
+        <SolidColorBrush x:Key="FastTableView.FocusTextBrush" Color="#D2D2D2" />
+        <Pen Thickness="1" x:Key="FastTableView.HeaderBorderBackground" Brush="#343434" />
+        <Pen Thickness="1" x:Key="FastTableView.BorderPen" Brush="White" />
+        <Pen Thickness="2" x:Key="FastTableView.FocusPen" Brush="White" />
+        <Pen Thickness="3" x:Key="FastTableView.FocusOuterPen" Brush="Black" />
+        
+        <Pen Thickness="1" Brush="Red" x:Key="FastTableView.ModifiedCellPen" />
+        <Pen Thickness="1" Brush="Orange" x:Key="FastTableView.PhantomRowPen" />
+        <Pen Thickness="1" Brush="#FFFFFF" x:Key="FastTableView.ButtonTextPen" />
+        <Pen Thickness="1" Brush="#12FFFFFF" x:Key="FastTableView.ButtonBorderPen" />
+        <Pen Thickness="1" Brush="#0FFFFFFF" x:Key="FastTableView.ButtonBackgroundPen" />
+        <Pen Thickness="1" Brush="#15FFFFFF" x:Key="FastTableView.ButtonBackgroundHoverPen" />
+        <Pen Thickness="1" Brush="#08FFFFFF" x:Key="FastTableView.ButtonBackgroundPressedPen" />
+    </Styles.Resources>
+</Styles>
