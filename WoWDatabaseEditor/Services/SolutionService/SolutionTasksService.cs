@@ -174,6 +174,11 @@ namespace WoWDatabaseEditor.Services.SolutionService
         {
             if (document.Save?.CanExecute(null) ?? false)
             {
+                if (document is IBeforeSaveConfirmDocument confirm)
+                {
+                    if (await confirm.ShallSavePreventClosing())
+                        return;
+                }
                 if (document.Save is IAsyncCommand async)
                     await async.ExecuteAsync();
                 else

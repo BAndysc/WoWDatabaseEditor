@@ -58,7 +58,15 @@ namespace WoWDatabaseEditorCore.Providers
                             if (DocumentManager.ActiveSolutionItemDocument != null)
                                 solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!).ListenErrors();
                             else
-                                documentManager.ActiveDocument!.Save.Execute(null);
+                            {
+                                async Task Func()
+                                {
+                                    if (documentManager.ActiveDocument is not IBeforeSaveConfirmDocument confirm || !await confirm.ShallSavePreventClosing()) 
+                                        documentManager.ActiveDocument!.Save.Execute(null);
+                                }
+
+                                Func().ListenErrors();
+                            }
                         },
                 () => solutionTasksService.CanSaveToDatabase && (DocumentManager.ActiveDocument?.Save.CanExecute(null) ?? false))
                     .ObservesProperty(() => DocumentManager.ActiveDocument)

@@ -159,7 +159,17 @@ namespace WoWDatabaseEditorCore.Managers
                         if (result == MessageBoxButtonType.Cancel)
                             close = false;
                         if (result == MessageBoxButtonType.Yes)
-                            editor.Save.Execute(null);
+                        {
+                            if (editor is IBeforeSaveConfirmDocument preventable)
+                            {
+                                if (await preventable.ShallSavePreventClosing())
+                                {
+                                    close = false;
+                                }
+                            }
+                            if (close)
+                                editor.Save.Execute(null);
+                        }
                     }
 
                     if (close)

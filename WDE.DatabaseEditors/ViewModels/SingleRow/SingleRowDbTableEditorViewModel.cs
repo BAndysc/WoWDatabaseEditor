@@ -44,7 +44,7 @@ using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels.SingleRow
 {
-    public partial class SingleRowDbTableEditorViewModel : ViewModelBase
+    public partial class SingleRowDbTableEditorViewModel : ViewModelBase, IBeforeSaveConfirmDocument
     {
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
@@ -339,9 +339,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return freshEntity;
         }
         
-        private async Task<bool> CheckIfKeyExistsAndWarn(DatabaseKey key)
+        private async Task<bool> CheckIfKeyExistsAndWarn(DatabaseKey key, int excludeIndex)
         {
-            if (await ContainsKey(key))
+            if (await ContainsKey(key, excludeIndex))
             {
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Key already added")
@@ -698,46 +698,28 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             if (newRealKey == entity.Entity.Key)
                 return; // no re-keying needed
             
-            // if (await ContainsKey(newRealKey))
-            // {
-            //     int i = 0;
-            //     // revert values
-            //     foreach (var column in tableDefinition.GroupByKeys)
-            //         entity.Entity.SetTypedCellOrThrow(column, entity.Entity.Key[i++]);
-            //
-            //     await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-            //         .SetTitle("Duplicate key")
-            //         .SetMainInstruction($"The key {newRealKey} is already in the database.")
-            //         .SetContent("If you want to change existing key, just modify it.\n\nIf you want to revert the key back to the previous value, _save the changes_ and then re-key again.")
-            //         .WithOkButton(false)
-            //         .Build());
-            // }
-            //else
             int indexOfRow = Rows.IndexOf(entity);
-
+            historyHandler!.DoAction(new AnonymousHistoryAction("Change key", () =>
             {
-                historyHandler!.DoAction(new AnonymousHistoryAction("Change key", () =>
-                {
-                    var old = Rows[indexOfRow];
-                    var original = old.Entity.Clone(oldKey, originalExistsInDb);
-                    ForceRemoveEntity(old.Entity);
-                    ForceInsertEntity(original, indexOfRow);
-                    int i = 0;
-                    foreach (var column in tableDefinition.GroupByKeys)
-                        original.SetTypedCellOrThrow(column, oldKey[i++]);
-                    Debug.Assert(!oldKey.IsPhantomKey);
-                    forceInsertKeys.Add(oldKey);
-                }, () =>
-                {
-                    var old = Rows[indexOfRow];
-                    var clone = old.Entity.Clone(newKey, false);
-                    ForceRemoveEntity(old.Entity);
-                    ForceInsertEntity(clone, indexOfRow);
-                    int i = 0;
-                    foreach (var column in tableDefinition.GroupByKeys)
-                        clone.SetTypedCellOrThrow(column, newRealKey[i++]);
-                }));
-            }
+                var old = Rows[indexOfRow];
+                var original = old.Entity.Clone(oldKey, originalExistsInDb);
+                ForceRemoveEntity(old.Entity);
+                ForceInsertEntity(original, indexOfRow);
+                int i = 0;
+                foreach (var column in tableDefinition.GroupByKeys)
+                    original.SetTypedCellOrThrow(column, oldKey[i++]);
+                Debug.Assert(!oldKey.IsPhantomKey);
+                forceInsertKeys.Add(oldKey);
+            }, () =>
+            {
+                var old = Rows[indexOfRow];
+                var clone = old.Entity.Clone(newKey, false);
+                ForceRemoveEntity(old.Entity);
+                ForceInsertEntity(clone, indexOfRow);
+                int i = 0;
+                foreach (var column in tableDefinition.GroupByKeys)
+                    clone.SetTypedCellOrThrow(column, newRealKey[i++]);
+            }));
         }
 
         private void OnRowChanged(ITableRow obj)
@@ -754,9 +736,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 keys.Remove(row.Entity.Key);
         }
 
-        private async Task<bool> ContainsKey(DatabaseKey key)
+        private async Task<bool> ContainsKey(DatabaseKey key, int excludeIndex = -1)
         {
-            if (Rows.Any(row => !row.IsPhantomEntity && row.Entity.Key == key))
+            if (Rows.Select((row, index) => (row, index)).Any(pair => pair.row.Entity.GenerateKey(TableDefinition) == key && pair.index != excludeIndex))
                 return true;
 
             return await databaseTableDataProvider.GetCount(tableDefinition.Id, null, new [] { key }) > 0;
@@ -841,7 +823,22 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
             return multi.Close();
         }
+        
+        public async Task<bool> ShallSavePreventClosing()
+        {
+            for (var index = 0; index < Entities.Count; index++)
+            {
+                var entity = Entities[index];
+                if (!entity.Phantom)
+                    continue;
 
+                if (!await CheckIfKeyExistsAndWarn(entity.GenerateKey(TableDefinition), index))
+                    return true;
+            }
+
+            return false;    
+        }
+        
         protected override Task AfterSave()
         {
             forceInsertKeys.Clear();

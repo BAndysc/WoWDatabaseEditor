@@ -199,7 +199,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 });
             Title = solutionItemName.GetName(SolutionItem);
         }
-        
+
         protected virtual Task AfterSave() => Task.CompletedTask;
 
         protected virtual Task<bool> BeforeLoadData() => Task.FromResult(true);

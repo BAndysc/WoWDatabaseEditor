@@ -6,6 +6,7 @@ namespace WDE.Common.History
     public class HistoryHandler
     {
         private readonly List<IHistoryAction> bulkEditing = new();
+        private readonly List<IHistoryAction> bulkEditingDoneActions = new();
         private bool inBulkEditing;
         public event EventHandler<IHistoryAction> ActionPush = delegate { };
         public event EventHandler<IHistoryAction> ActionDone = delegate { };
@@ -20,6 +21,7 @@ namespace WDE.Common.History
         {
             inBulkEditing = true;
             bulkEditing.Clear();
+            bulkEditingDoneActions.Clear();
         }
 
         protected void EndBulkEdit(string name)
@@ -29,6 +31,10 @@ namespace WDE.Common.History
                 inBulkEditing = false;
                 if (bulkEditing.Count > 0)
                     PushAction(new CompoundHistoryAction(name, bulkEditing.ToArray()));
+                else if (bulkEditingDoneActions.Count > 0)
+                    DoAction(new CompoundHistoryAction(name, bulkEditingDoneActions.ToArray()));
+                bulkEditing.Clear();
+                bulkEditingDoneActions.Clear();
             }
         }
 
@@ -43,7 +49,7 @@ namespace WDE.Common.History
         public void DoAction(IHistoryAction action)
         {
             if (inBulkEditing)
-                throw new Exception("Cannot execute action while bulk editing!");
+                bulkEditingDoneActions.Add(action);
             else
                 ActionDone(this, action);
         }

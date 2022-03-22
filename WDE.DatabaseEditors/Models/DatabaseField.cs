@@ -14,11 +14,11 @@ namespace WDE.DatabaseEditors.Models
     {
         private readonly string columnName;
 
-        public DatabaseField(string columnName, ValueHolder<T> current)
+        public DatabaseField(string columnName, ValueHolder<T> current, ValueHolder<T>? original = null)
         {
             this.columnName = columnName;
             Current = current;
-            Original = new ValueHolder<T>(current.Value, current.IsNull);
+            Original = original ?? new ValueHolder<T>(current.Value, current.IsNull);
             Current.ValueChanged += OnValueChanged;
         }
 
@@ -112,8 +112,7 @@ namespace WDE.DatabaseEditors.Models
 
         public IDatabaseField Clone()
         {
-            var copy = new DatabaseField<T>(columnName, Current.Clone());
-            copy.Original.Value = Original.Value;
+            var copy = new DatabaseField<T>(columnName, Current.Clone(), Original.Clone());
             return copy;
         }
 

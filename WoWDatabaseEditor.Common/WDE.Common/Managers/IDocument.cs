@@ -17,6 +17,11 @@ namespace WDE.Common.Managers
         IHistoryManager? History { get; }
         bool IsModified { get; }
     }
+
+    public interface IBeforeSaveConfirmDocument
+    {
+        Task<bool> ShallSavePreventClosing();
+    }
     
     public interface IDocument : IUndoRedoWindow, IDisposable, INotifyPropertyChanged
     {

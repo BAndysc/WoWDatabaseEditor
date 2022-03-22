@@ -53,7 +53,8 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
     private void FieldValueChanged(DatabaseEntity entity, string columnName, Action<IValueHolder> undo, Action<IValueHolder> redo)
     {
         var index = viewModel.Entities.IndexOf(entity);
-        PushAction(new SingleRowFieldCellValueChangedAction(viewModel, index, columnName, undo, redo));
+        if (entity.Phantom || !viewModel.TableDefinition.GroupByKeys.Contains(columnName))
+            PushAction(new SingleRowFieldCellValueChangedAction(viewModel, index, columnName, undo, redo));
     }
 
     private void OnConditionsChanged(DatabaseEntity entity, IReadOnlyList<ICondition>? old, IReadOnlyList<ICondition>? @new)
