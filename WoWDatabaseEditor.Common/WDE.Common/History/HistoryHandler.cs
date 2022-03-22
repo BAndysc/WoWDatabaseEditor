@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace WDE.Common.History
 {
@@ -29,9 +30,10 @@ namespace WDE.Common.History
             if (inBulkEditing)
             {
                 inBulkEditing = false;
+                // todo: this should be one history action
                 if (bulkEditing.Count > 0)
                     PushAction(new CompoundHistoryAction(name, bulkEditing.ToArray()));
-                else if (bulkEditingDoneActions.Count > 0)
+                if (bulkEditingDoneActions.Count > 0)
                     DoAction(new CompoundHistoryAction(name, bulkEditingDoneActions.ToArray()));
                 bulkEditing.Clear();
                 bulkEditingDoneActions.Clear();
