@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DynamicData;
 using Prism.Commands;
@@ -31,7 +32,6 @@ using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
-using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
@@ -45,6 +45,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IConditionEditService conditionEditService;
         private readonly IDatabaseEditorsSettings editorSettings;
+        private readonly ITablePersonalSettings tablePersonalSettings;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private Dictionary<DatabaseKey, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
@@ -133,7 +134,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
-            IStatusBar statusBar) 
+            IStatusBar statusBar, ITablePersonalSettings tablePersonalSettings) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -150,6 +151,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.modelGenerator = modelGenerator;
             this.conditionEditService = conditionEditService;
             this.editorSettings = editorSettings;
+            this.tablePersonalSettings = tablePersonalSettings;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -297,8 +299,20 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 .Where(c => c.DbColumnName != data.TableDefinition.TablePrimaryKeyColumnName)
                 .ToList();
             autoIncrementColumn = columns.FirstOrDefault(c => c.AutoIncrement);
-            Columns.Clear();
-            Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)));
+            if (Columns.Count == 0)
+            {
+                Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)
+                {
+                    Width = tablePersonalSettings.GetColumnWidth(TableDefinition.Id, c.DbColumnName, c.PreferredWidth ?? 120)
+                }));
+                Columns.Each(col => col.ToObservable(c => c.Width)
+                    .Skip(1)
+                    .Throttle(TimeSpan.FromMilliseconds(300))
+                    .Subscribe(width =>
+                    {
+                        tablePersonalSettings.UpdateWidth(TableDefinition.Id, col.DatabaseName, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
+                    }));   
+            }
             
             foreach (var entity in solutionItem.Entries)
                 EnsureKey(entity.Key);

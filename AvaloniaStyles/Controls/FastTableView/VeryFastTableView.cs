@@ -162,7 +162,7 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
 
         if (currentlyResizedColumn.HasValue && Columns != null)
         {
-            Columns[currentlyResizedColumn.Value].Width = Math.Max(5, resizingColumnStartWidth + e.GetPosition(this).X - resizingColumnStartPointerX);
+            Columns[currentlyResizedColumn.Value].Width = Math.Max(10, resizingColumnStartWidth + e.GetPosition(this).X - resizingColumnStartPointerX);
             //todo: this should observe width, but this might be good enough for now
             InvalidateVisual();
             InvalidateMeasure();

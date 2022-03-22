@@ -57,6 +57,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private readonly IMainThread mainThread;
         private readonly IPersonalGuidRangeService personalGuidRangeService;
         private readonly IMetaColumnsSupportService metaColumnsSupportService;
+        private readonly ITablePersonalSettings personalSettings;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
@@ -182,7 +183,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             IParameterPickerService parameterPickerService,
             IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService,
             IMainThread mainThread, IPersonalGuidRangeService personalGuidRangeService,
-            IClipboardService clipboardService, IMetaColumnsSupportService metaColumnsSupportService)
+            IClipboardService clipboardService, IMetaColumnsSupportService metaColumnsSupportService,
+            ITablePersonalSettings personalSettings)
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -202,6 +204,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             this.mainThread = mainThread;
             this.personalGuidRangeService = personalGuidRangeService;
             this.metaColumnsSupportService = metaColumnsSupportService;
+            this.personalSettings = personalSettings;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -490,20 +493,38 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
                 Debug.Assert(Columns.Count == 0);
                 Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)));
+                Columns.Each((col, i) =>
+                {
+                    col.IsVisible = personalSettings.IsColumnVisible(TableDefinition.Id, col.DatabaseName);
+                    col.Width = personalSettings.GetColumnWidth(TableDefinition.Id, col.DatabaseName, col.Width);
+                });
                 Columns.Each((col, i) => AutoDispose(col.ToObservable(x => x.IsVisible)
                     .Subscribe(@is =>
                     {
                         if (@is)
                         {
                             if (HiddenColumns.Contains(i))
+                            {
                                 HiddenColumns.Remove(i);
+                                personalSettings.UpdateVisibility(TableDefinition.Id, col.DatabaseName, @is);
+                            }
                         }
                         else
                         {
                             if (!HiddenColumns.Contains(i))
+                            {
                                 HiddenColumns.Add(i);
+                                personalSettings.UpdateVisibility(TableDefinition.Id, col.DatabaseName, @is);
+                            }
                         }
                     })));
+                Columns.Each(col => col.ToObservable(c => c.Width)
+                    .Skip(1)
+                    .Throttle(TimeSpan.FromMilliseconds(300))
+                    .Subscribe(width =>
+                    {
+                        personalSettings.UpdateWidth(TableDefinition.Id, col.DatabaseName, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
+                    }));
             }
 
             await AsyncAddEntities(data.Entities);

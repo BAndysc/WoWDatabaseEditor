@@ -74,9 +74,13 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
                     int index = 0;
                     foreach (var column in newList)
                     {
-                        var definition = new ColumnDefinition(column.PreferredWidth ?? 120, GridUnitType.Pixel);
+                        var definition = new ColumnDefinition(column.Width, GridUnitType.Pixel);
                         definition.SharedSizeGroup = column.DatabaseName;
                         definition.MinWidth = 30;
+                        definition.GetObservable(ColumnDefinition.WidthProperty).SubscribeAction(width =>
+                        {
+                            column.Width = width.Value;
+                        });
                         grid.ColumnDefinitions.Add(definition);
 
                         definition = new ColumnDefinition(5, GridUnitType.Pixel);
