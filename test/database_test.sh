@@ -40,17 +40,17 @@ for index in ${!URLs[*]}; do
 
         for i in sql/updates/world/${UPDATEs[$index]}/*.sql
         do
-            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"
         done
     else
         for i in data/sql/base/db_world/*.sql
         do
-            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"
         done
 
         for i in data/sql/updates/db_world/*.sql
         do
-            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"
         done
     fi
 
