@@ -16,10 +16,8 @@ namespace WDE.SqlInterpreter.Test
         [Test]
         public void NoQuotes()
         {
-            /* this should be supported, but it isn't now because of this antlr4 grammar */
-            /* if grammar is fixed (to accept column names without quotes, this test can be fixed */
             var result = evaluator.ExtractInserts("INSERT INTO `abc` (guid, name, surname) VALUES (5, 6, 7);").ToList();
-            Assert.AreEqual(0, result.Count);
+            Assert.AreEqual(1, result.Count);
         }
 
         [Test]

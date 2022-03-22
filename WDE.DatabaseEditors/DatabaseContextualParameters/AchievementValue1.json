@@ -1,0 +1,26 @@
+{
+    "name": "AchievementValue1Parameter",
+    "simple_switch": {
+        "column": "type",
+        "default": "Parameter",
+        "values": {
+            "1": "CreatureParameter",
+            "2": "ClassParameter",
+            "3": "PercentageParameter",
+            "4": "FactionParameter",
+            "5": "SpellParameter",
+            "6": "ZoneAreaParameter",
+            "7": "SpellParameter",
+            "10": "GenderParameter",
+            "11": "BoolParameter",
+            
+            "12": "MapDifficultyParameter",
+            "14": "TeamAllianceParameter",
+            "15": "DrunkStateParameter",
+            "16": "HolidaysParameter",
+            "20": "MapParameter",
+            "21": "ClassParameter",
+            "23": "CharTitleParameter"
+        }
+    }
+}

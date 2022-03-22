@@ -11,6 +11,7 @@ using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.TrinitySmartScriptEditor.Exporter
 {
@@ -314,9 +315,9 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
         }
 
-        public string GenerateSql(ISmartScriptSolutionItem item, SmartScript script)
+        public IQuery GenerateSql(ISmartScriptSolutionItem item, SmartScript script)
         {
-            return new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql().QueryString;
+            return new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
         }
     }
 }

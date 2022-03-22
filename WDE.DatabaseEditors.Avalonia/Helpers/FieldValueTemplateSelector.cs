@@ -18,10 +18,13 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
 
         public IControl Build(object param)
         {
-            if (param is ViewModels.MultiRow.DatabaseCellViewModel vm3 && vm3.ActionCommand != null)
+            if (param is ViewModels.MultiRow.DatabaseCellViewModel { ActionCommand: { } } or 
+                ViewModels.SingleRow.SingleRecordDatabaseCellViewModel { ActionCommand: { } } or 
+                ViewModels.Template.DatabaseCellViewModel { ActionCommand: { } })
                 return CommandTemplate!.Build(param);
-            if ((param is DatabaseCellViewModel vm && vm.ParameterValue is ParameterValue<long> holder && holder.Parameter is BoolParameter) ||
-                (param is ViewModels.MultiRow.DatabaseCellViewModel vm2 && vm2.ParameterValue is ParameterValue<long> holder2 && holder2.Parameter is BoolParameter))
+            if ((param is DatabaseCellViewModel vm && vm.ParameterValue is IParameterValue<long> holder && holder.Parameter is BoolParameter) ||
+                (param is ViewModels.MultiRow.DatabaseCellViewModel vm2 && vm2.ParameterValue is IParameterValue<long> holder2 && holder2.Parameter is BoolParameter) ||
+                (param is ViewModels.SingleRow.SingleRecordDatabaseCellViewModel vm3 && vm3.ParameterValue is IParameterValue<long> holder3 && holder3.Parameter is BoolParameter))
                 return BoolTemplate!.Build(param);
             if (param is BaseDatabaseCellViewModel vm5 && vm5.UseFlagsPicker)
                 return FlagsTemplate!.Build(param);
@@ -32,7 +35,7 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
 
         public bool Match(object data)
         {
-            return data is DatabaseCellViewModel or ViewModels.MultiRow.DatabaseCellViewModel;
+            return data is DatabaseCellViewModel or ViewModels.MultiRow.DatabaseCellViewModel or ViewModels.SingleRow.SingleRecordDatabaseCellViewModel;
         }
     }
 }

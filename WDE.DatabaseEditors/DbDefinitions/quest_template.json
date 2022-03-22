@@ -517,13 +517,13 @@
         {
           "name": "Reward money",
           "db_column_name": "RewardMoney",
-          "value_type": "int",
+          "value_type": "MoneyParameter",
           "help": "Money earned by completing the quest (if value > 0) or money requirement to complete the quest (if value < 0)."
         },
         {
           "name": "Reward bonus money",
           "db_column_name": "RewardBonusMoney",
-          "value_type": "uint",
+          "value_type": "MoneyParameter",
           "help": "The money a character at level 80 would get when they complete this quest."
         },
         {

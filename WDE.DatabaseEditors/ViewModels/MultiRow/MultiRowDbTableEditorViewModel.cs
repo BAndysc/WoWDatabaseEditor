@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DynamicData;
 using Prism.Commands;
@@ -30,7 +32,6 @@ using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
-using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
@@ -44,17 +45,24 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IConditionEditService conditionEditService;
         private readonly IDatabaseEditorsSettings editorSettings;
+        private readonly ITablePersonalSettings tablePersonalSettings;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
-        private Dictionary<uint, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
+        private Dictionary<DatabaseKey, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
         public ObservableCollection<DatabaseEntitiesGroupViewModel> Rows { get; } = new();
 
         private DatabaseEntityViewModel? selectedRow;
         public DatabaseEntityViewModel? SelectedRow
         {
             get => selectedRow;
-            set => SetProperty(ref selectedRow, value);
+            set
+            {
+                SetProperty(ref selectedRow, value);
+                RaisePropertyChanged(nameof(FocusedEntity));
+            }
         }
+
+        public override DatabaseEntity? FocusedEntity => SelectedRow?.Entity;
 
         private MultiRowSplitMode splitMode;
         public bool SplitView => splitMode != MultiRowSplitMode.None;
@@ -94,7 +102,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
         private DatabaseColumnJson? autoIncrementColumn;
 
-        private HashSet<uint> keys = new();
+        private HashSet<DatabaseKey> keys = new();
 
         public bool AllowMultipleKeys
         {
@@ -112,7 +120,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public event Action<DatabaseEntity>? OnDeletedQuery;
         public event Action<DatabaseEntity>? OnKeyDeleted;
-        public event Action<uint>? OnKeyAdded;
+        public event Action<DatabaseKey>? OnKeyAdded;
 
         public MultiRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
@@ -125,12 +133,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
             ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
             IDatabaseTableCommandService commandService,
-            IParameterPickerService parameterPickerService) 
+            IParameterPickerService parameterPickerService,
+            IStatusBar statusBar, ITablePersonalSettings tablePersonalSettings) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService, commandService,
-            parameterPickerService)
+            parameterPickerService, statusBar, mySqlExecutor)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
@@ -142,6 +151,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.modelGenerator = modelGenerator;
             this.conditionEditService = conditionEditService;
             this.editorSettings = editorSettings;
+            this.tablePersonalSettings = tablePersonalSettings;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -154,12 +164,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRowByGroup);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
             
+            Debug.Assert(tableDefinition.GroupByKeys.Count == 1);
+
             ScheduleLoading();
         }
 
-        public override DatabaseEntity AddRow(uint key)
+        public override DatabaseEntity AddRow(DatabaseKey key)
         {
-            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key);
+            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, false);
             if (autoIncrementColumn != null)
             {
                 long max = 0;
@@ -191,7 +203,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             if (!selected.HasValue)
                 return;
 
-            uint key = (uint) selected;
+            Debug.Assert(tableDefinition.GroupByKeys.Count == 1);
+
+            DatabaseKey key = new DatabaseKey(selected.Value);
 
             if (ContainsKey(key))
             {
@@ -205,7 +219,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return;
             }
             
-            var data = await tableDataProvider.Load(tableDefinition.Id, key);
+            var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, new[]{key});
             if (data == null) 
                 return;
 
@@ -275,7 +289,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             return Task.CompletedTask;
         }
 
-        protected override ICollection<uint> GenerateKeys() => keys;
+        protected override IReadOnlyList<DatabaseKey> GenerateKeys() => keys.ToList();
+        protected override IReadOnlyList<DatabaseKey>? GenerateDeletedKeys() => null;
 
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
@@ -284,8 +299,20 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 .Where(c => c.DbColumnName != data.TableDefinition.TablePrimaryKeyColumnName)
                 .ToList();
             autoIncrementColumn = columns.FirstOrDefault(c => c.AutoIncrement);
-            Columns.Clear();
-            Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)));
+            if (Columns.Count == 0)
+            {
+                Columns.AddRange(columns.Select(c => AutoDispose(new DatabaseColumnHeaderViewModel(c)
+                {
+                    Width = tablePersonalSettings.GetColumnWidth(TableDefinition.Id, c.DbColumnName, c.PreferredWidth ?? 120)
+                })));
+                Columns.Each(col => col.ToObservable(c => c.Width)
+                    .Skip(1)
+                    .Throttle(TimeSpan.FromMilliseconds(300))
+                    .Subscribe(width =>
+                    {
+                        tablePersonalSettings.UpdateWidth(TableDefinition.Id, col.DatabaseName, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
+                    }));   
+            }
             
             foreach (var entity in solutionItem.Entries)
                 EnsureKey(entity.Key);
@@ -356,12 +383,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
         }
         
-        public void DoAddKey(uint entity)
+        public void DoAddKey(DatabaseKey entity)
         {
             EnsureKey(entity);
         }
 
-        public void UndoAddKey(uint entity)
+        public void UndoAddKey(DatabaseKey entity)
         {
             RemoveKey(entity);
         }
@@ -385,9 +412,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             return ForceInsertEntity(entity, Entities.Count);
         }
 
-        public override bool ForceInsertEntity(DatabaseEntity entity, int index)
+        public override bool ForceInsertEntity(DatabaseEntity entity, int index, bool undoing = false)
         {
-            var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key);
+            var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key[0]);
             var row = new DatabaseEntityViewModel(entity, name);
             
             int columnIndex = 0;
@@ -409,7 +436,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     IParameterValue parameterValue = null!;
                     if (cell is DatabaseField<long> longParam)
                     {
-                        parameterValue = new ParameterValue<long>(longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
+                        parameterValue = new ParameterValue<long, DatabaseEntity>(entity, longParam.Current, longParam.Original, parameterFactory.Factory(column.ValueType));
                     }
                     else if (cell is DatabaseField<string> stringParam)
                     {
@@ -418,11 +445,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                             stringParam.Current.Value = stringParam.Current.Value.GetComment(column.CanBeNull);
                             stringParam.Original.Value = stringParam.Original.Value.GetComment(column.CanBeNull);
                         }
-                        parameterValue = new ParameterValue<string>(stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
+                        parameterValue = new ParameterValue<string, DatabaseEntity>(entity, stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
                     }
                     else if (cell is DatabaseField<float> floatParameter)
                     {
-                        parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
+                        parameterValue = new ParameterValue<float, DatabaseEntity>(entity, floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                     }
 
                     parameterValue.DefaultIsBlank = column.IsZeroBlank;
@@ -441,7 +468,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             return true;
         }
 
-        private void RemoveKey(uint entity)
+        private void RemoveKey(DatabaseKey entity)
         {
             if (keys.Remove(entity))
             {
@@ -450,28 +477,31 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
         }
 
-        private bool ContainsKey(uint key)
+        private bool ContainsKey(DatabaseKey key)
         {
             return keys.Contains(key);
         }
         
-        private void EnsureKey(uint entity)
+        private void EnsureKey(DatabaseKey entity)
         {
             if (keys.Add(entity))
             {
-                byEntryGroups[entity] = new DatabaseEntitiesGroupViewModel(entity, GenerateName(entity));
+                byEntryGroups[entity] = new DatabaseEntitiesGroupViewModel(entity, GenerateName(entity[0]));
                 Rows.Add(byEntryGroups[entity]);
             }
         }
 
-        private async Task AsyncAddEntities(IList<DatabaseEntity> tableDataEntities)
+        private async Task AsyncAddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
         {
-            List<DatabaseEntity> finalList = new();
             foreach (var entity in tableDataEntities)
             {
-                if (await AddEntity(entity))
-                    finalList.Add(entity);
+                await AddEntity(entity);
             }
+        }
+        
+        protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
+        {
+            return null; // because in multirow we always delete and reinsert all
         }
     }
 }

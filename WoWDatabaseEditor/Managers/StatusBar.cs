@@ -2,9 +2,13 @@
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Events;
+using PropertyChanged.SourceGenerator;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WoWDatabaseEditorCore.Services.ProblemsTool;
@@ -14,18 +18,27 @@ namespace WoWDatabaseEditorCore.Managers
 {
     [AutoRegister]
     [SingleInstance]
-    public class StatusBar : ObservableBase, IStatusBar
+    public partial class StatusBar : ObservableBase, IStatusBar
     {
         private readonly TasksViewModel tasksViewModel;
         private readonly IMainThread mainThread;
+        private readonly IPersonalGuidRangeService guidRangeService;
+        private readonly IClipboardService clipboardService;
+        private readonly IMessageBoxService messageBoxService;
 
         public StatusBar(Lazy<IDocumentManager> documentManager,
             TasksViewModel tasksViewModel, 
             IEventAggregator eventAggregator,
-            IMainThread mainThread)
+            IMainThread mainThread,
+            IPersonalGuidRangeService guidRangeService,
+            IClipboardService clipboardService,
+            IMessageBoxService messageBoxService)
         {
             this.tasksViewModel = tasksViewModel;
             this.mainThread = mainThread;
+            this.guidRangeService = guidRangeService;
+            this.clipboardService = clipboardService;
+            this.messageBoxService = messageBoxService;
 
             AutoDispose(eventAggregator.GetEvent<AllModulesLoaded>().Subscribe(() =>
             {
@@ -34,8 +47,54 @@ namespace WoWDatabaseEditorCore.Managers
             }, true));
             
             OpenProblemTool = new DelegateCommand(() => documentManager.Value.OpenTool<ProblemsViewModel>());
+
+            CopyNextCreatureGuidCommand = GenerateGuidCommand(GuidType.Creature);
+            CopyNextGameobjectGuidCommand = GenerateGuidCommand(GuidType.GameObject);
+            CopyCreatureGuidRangeCommand = GenerateGuidRangeCommand(GuidType.Creature, () => creatureGuidCount);
+            CopyGameobjectGuidRangeCommand = GenerateGuidRangeCommand(GuidType.GameObject, () => gameobjectGuidCount);
+            On(() => CreatureGuidCount, _ => CopyCreatureGuidRangeCommand.RaiseCanExecuteChanged());
+            On(() => GameobjectGuidCount, _ => CopyGameobjectGuidRangeCommand.RaiseCanExecuteChanged());
+        }
+        
+        private AsyncAutoCommand GenerateGuidCommand(GuidType type)
+        {
+            return new AsyncAutoCommand(async () =>
+            {
+                var guid = await guidRangeService.GetNextGuidOrShowError(type, messageBoxService);
+                if (guid.HasValue)
+                {
+                    clipboardService.SetText(guid.Value.ToString());
+                    PublishNotification(new PlainNotification(NotificationType.Info, "Copied " + guid.Value + $" to your clipboard ({type})"));
+                }
+            });
+        }
+        
+        private AsyncAutoCommand GenerateGuidRangeCommand(GuidType type, Func<uint> getter)
+        {
+            return new AsyncAutoCommand(async () =>
+            {
+                var count = getter();
+                var guid = await guidRangeService.GetNextGuidRangeOrShowError(type, count, messageBoxService);
+                if (guid.HasValue)
+                {
+                    clipboardService.SetText(guid.Value.ToString());
+                    PublishNotification(new PlainNotification(NotificationType.Info, "Copied " + guid.Value + $" to your clipboard ({type}). You have {count} consecutive guids"));
+                }
+            }, () => getter() > 0);
         }
 
+        public ICommand CopyNextCreatureGuidCommand { get; }
+        
+        public ICommand CopyNextGameobjectGuidCommand { get; }
+        
+        public AsyncAutoCommand CopyCreatureGuidRangeCommand { get; }
+        
+        public AsyncAutoCommand CopyGameobjectGuidRangeCommand { get; }
+
+        [Notify] private uint creatureGuidCount = 1;
+        
+        [Notify] private uint gameobjectGuidCount = 1;
+        
         public ICommand OpenProblemTool { get; }
 
         public int TotalProblems { get; set; }

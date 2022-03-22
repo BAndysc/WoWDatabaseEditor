@@ -10,6 +10,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
 using WDE.Common.CoreVersion;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.NewItemService
@@ -19,11 +20,12 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
     {
         private string customName = "New folder";
         private NewItemPrototypeInfo? selectedPrototype;
+        private NewItemPrototypeGroup? selectedCategory;
 
         public NewItemDialogViewModel(ISolutionItemProvideService provider, ICurrentCoreVersion currentCore)
         {
             Dictionary<string, NewItemPrototypeGroup> groups = new();
-            ItemPrototypes = new ObservableCollection<NewItemPrototypeGroup>();
+            Categories = new ObservableCollection<NewItemPrototypeGroup>();
 
             bool coreIsSpecific = currentCore.IsSpecified;
             foreach (var item in provider.All)
@@ -32,7 +34,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
                 {
                     group = new NewItemPrototypeGroup(item.GetGroupName());
                     groups[item.GetGroupName()] = group;
-                    ItemPrototypes.Add(group);
+                    Categories.Add(group);
                 }
 
                 bool isCompatible = item.IsCompatibleWithCore(currentCore.Current);
@@ -42,7 +44,6 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
 
                 var info = new NewItemPrototypeInfo(item, isCompatible);
                 group.Add(info);
-                FlatItemPrototypes.Add(info);
             }
 
             Accept = new DelegateCommand(() =>
@@ -54,29 +55,36 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
                 CloseCancel?.Invoke();
             });
 
-            if (ItemPrototypes.Count > 0 && ItemPrototypes[0].Count > 0)
-                SelectedPrototype = ItemPrototypes[0][0];
+            Categories.RemoveIf(c => c.Count == 0);
+            
+            if (Categories.Count > 0)
+                SelectedCategory = Categories[0];
+            
+            if (Categories.Count > 0 && Categories[0].Count > 0)
+                SelectedPrototype = Categories[0][0];
         }
 
         public void AllowFolders(bool showFolders)
         {
             if (!showFolders)
             {
-                FlatItemPrototypes.Remove(FlatItemPrototypes.Where(i => i.IsContainer).ToList());
-                foreach (var group in ItemPrototypes)
+                foreach (var group in Categories)
                     group.Remove(group.Where(i => i.IsContainer).ToList());
-                ItemPrototypes.Remove(ItemPrototypes.Where(i => i.Count == 0).ToList());
+                Categories.Remove(Categories.Where(i => i.Count == 0).ToList());
 
-                if (ItemPrototypes.Count > 0 && ItemPrototypes[0].Count > 0)
-                    SelectedPrototype = ItemPrototypes[0][0];
+                if (Categories.Count > 0 && Categories[0].Count > 0)
+                    SelectedPrototype = Categories[0][0];
             }
         }
         
-        public ObservableCollection<NewItemPrototypeGroup> ItemPrototypes { get; }
-        
-        // for WPF: can be removed when WPF is removed
-        public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
-        
+        public ObservableCollection<NewItemPrototypeGroup> Categories { get; }
+
+        public NewItemPrototypeGroup? SelectedCategory
+        {
+            get => selectedCategory;
+            set => SetProperty(ref selectedCategory, value);
+        }
+
         public NewItemPrototypeInfo? SelectedPrototype
         {
             get => selectedPrototype;
@@ -99,10 +107,10 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
 
         public ICommand Cancel { get; }
         public ICommand Accept { get; }
-        public int DesiredWidth => 600;
-        public int DesiredHeight => 430;
+        public int DesiredWidth => 700;
+        public int DesiredHeight => 580;
         public string Title => "New item";
-        public bool Resizeable => false;
+        public bool Resizeable => true;
         public event Action? CloseCancel;
         public event Action? CloseOk;
     }

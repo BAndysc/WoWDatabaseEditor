@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDBXEditor.Storage;
@@ -168,6 +169,19 @@ namespace WDE.DbcStore
             public Dictionary<long, string> ExtendedCostStore { get; internal set;} = new();
             public Dictionary<long, string> TaxiNodeStore { get; internal set;} = new();
             public Dictionary<long, (int, int)> TaxiPathsStore { get; internal set;} = new();
+            public Dictionary<long, string> SpellItemEnchantmentStore { get; internal set;} = new();
+            public Dictionary<long, string> AreaGroupStore { get; internal set;} = new();
+            public Dictionary<long, string> ItemDisplayInfoStore { get; internal set;} = new();
+            public Dictionary<long, string> MailTemplateStore { get; internal set;} = new();
+            public Dictionary<long, string> LFGDungeonStore { get; internal set;} = new();
+            public Dictionary<long, string> ItemSetStore { get; internal set;} = new();
+            public Dictionary<long, string> DungeonEncounterStore { get; internal set;} = new();
+            public Dictionary<long, string> HolidayNamesStore { get; internal set;} = new();
+            public Dictionary<long, string> HolidaysStore { get; internal set;} = new();
+            public Dictionary<long, string> WorldSafeLocsStore { get; internal set;} = new();
+            public Dictionary<long, string> BattlegroundStore { get; internal set;} = new();
+            public Dictionary<long, string> AchievementCriteriaStore { get; internal set;} = new();
+            public Dictionary<long, string> ItemDbcStore { get; internal set;} = new(); // item.dbc, not item-sparse.dbc
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -285,6 +299,7 @@ namespace WDE.DbcStore
                 
                 parameterFactory.Register("AchievementParameter", new DbcParameter(AchievementStore), QuickAccessMode.Full);
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore), QuickAccessMode.Limited);
+                parameterFactory.Register("RawFactionParameter", new DbcParameter(FactionStore), QuickAccessMode.Limited);
                 parameterFactory.Register("FactionParameter", new FactionParameter(FactionStore, FactionTemplateStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(SpellStore));
                 parameterFactory.Register("ItemDbcParameter", new DbcParameter(ItemStore));
@@ -307,10 +322,22 @@ namespace WDE.DbcStore
                 parameterFactory.Register("CreatureModelDataParameter", new CreatureModelParameter(CreatureModelDataStore, CreatureDisplayInfoStore));
                 parameterFactory.Register("GameObjectDisplayInfoParameter", new DbcFileParameter(GameObjectDisplayInfoStore));
                 parameterFactory.Register("LanguageParameter", new LanguageParameter(LanguageStore), QuickAccessMode.Limited);
-                parameterFactory.Register("AreaTriggerParameter", new LanguageParameter(AreaTriggerStore));
+                parameterFactory.Register("AreaTriggerParameter", new DbcParameter(AreaTriggerStore));
                 parameterFactory.Register("ZoneOrQuestSortParameter", new ZoneOrQuestSortParameter(AreaStore, QuestSortStore));
                 parameterFactory.Register("TaxiPathParameter", new TaxiPathParameter(TaxiPathsStore, TaxiNodeStore));
-
+                parameterFactory.Register("SpellItemEnchantmentParameter", new DbcParameter(SpellItemEnchantmentStore));
+                parameterFactory.Register("AreaGroupParameter", new DbcParameter(AreaGroupStore));
+                parameterFactory.Register("ItemDisplayInfoParameter", new DbcParameter(ItemDisplayInfoStore));
+                parameterFactory.Register("MailTemplateParameter", new DbcParameter(MailTemplateStore));
+                parameterFactory.Register("LFGDungeonParameter", new DbcParameter(LFGDungeonStore));
+                parameterFactory.Register("ItemSetParameter", new DbcParameter(ItemSetStore));
+                parameterFactory.Register("DungeonEncounterParameter", new DbcParameter(DungeonEncounterStore));
+                parameterFactory.Register("HolidaysParameter", new DbcParameter(HolidaysStore));
+                parameterFactory.Register("WorldSafeLocParameter", new DbcParameter(WorldSafeLocsStore));
+                parameterFactory.Register("BattlegroundParameter", new DbcParameter(BattlegroundStore));
+                parameterFactory.Register("AchievementCriteriaParameter", new DbcParameter(AchievementCriteriaStore));
+                parameterFactory.Register("ItemVisualParameter", new DbcParameter(ItemDbcStore));
+                
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {
                     case DBCVersions.WOTLK_12340:
@@ -341,8 +368,8 @@ namespace WDE.DbcStore
                     case DBCVersions.WOTLK_12340:
                     {
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 26;
-                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
+                        max = 39;
+                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
                         Load("Faction.dbc", 0, 23, FactionStore, true);
                         Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
@@ -376,13 +403,50 @@ namespace WDE.DbcStore
                         Load("ItemExtendedCost.dbc", row => ExtendedCostStore.Add(row.GetInt(0), GenerateCostDescription(row.GetInt(1), row.GetInt(2), row.GetInt(4))));
                         Load("TaxiNodes.dbc", 0, 5, TaxiNodeStore, true);
                         Load("TaxiPath.dbc",  row => TaxiPathsStore.Add(row.GetUInt(0), (row.GetInt(1), row.GetInt(2))));
+                        Load("SpellItemEnchantment.dbc", 0, 14, SpellItemEnchantmentStore, true);
+                        Load("AreaGroup.dbc",  row => AreaGroupStore.Add(row.GetUInt(0), BuildAreaGroupName(row, 1, 6)));
+                        Load("ItemDisplayInfo.dbc", 0, 5, ItemDisplayInfoStore);
+                        Load("MailTemplate.dbc", row =>
+                        {
+                            int locale = (int) dbcSettingsProvider.GetSettings().DBCLocale;
+                            var subject = row.GetString(1 + locale);
+                            var body = row.GetString(18 + locale);
+                            var name = string.IsNullOrEmpty(subject) ? body.TrimToLength(50) : subject;
+                            MailTemplateStore.Add(row.GetUInt(0), name.Replace("\n", ""));
+                        });
+                        Load("LFGDungeons.dbc", 0, 1, LFGDungeonStore, true);
+                        Load("ItemSet.dbc", 0, 1, ItemSetStore, true);
+                        Load("DungeonEncounter.dbc", 0, 5, DungeonEncounterStore, true);
+                        Load("HolidayNames.dbc", 0, 1, HolidayNamesStore, true);
+                        Load("Holidays.dbc", row =>
+                        {
+                            var id = row.GetUInt(0);
+                            var nameId = row.GetUInt(49);
+                            if (HolidayNamesStore.TryGetValue(nameId, out var name))
+                                HolidaysStore[id] = name;
+                            else
+                                HolidaysStore[id] = "Holiday " + id;
+                        });
+                        Load("WorldSafeLocs.dbc", 0, 5, WorldSafeLocsStore, true);
+                        Load("BattlemasterList.dbc", 0, 11, BattlegroundStore, true);
+                        Load("Achievement_Criteria.dbc", 0, 9, AchievementCriteriaStore, true);
+                        Load("Item.dbc", row =>
+                        {
+                            var id = row.GetUInt(0);
+                            var displayId = row.GetUInt(5);
+                            if (ItemDisplayInfoStore.TryGetValue(displayId, out var name))
+                                ItemDbcStore[id] = name;
+                            else
+                                ItemDbcStore[id] = "Item " + id;
+                        });
+                        
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
                         store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 28;
-                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger at {row.GetFloat(2)}, {row.GetFloat(3)}, {row.GetFloat(4)}"));
+                        max = 40;
+                        Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
                         Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
@@ -418,12 +482,47 @@ namespace WDE.DbcStore
                         Load("ItemExtendedCost.dbc", row => ExtendedCostStore.Add(row.GetInt(0), GenerateCostDescription(row.GetInt(1), row.GetInt(2), row.GetInt(4))));
                         Load("TaxiNodes.dbc", 0, 5, TaxiNodeStore);
                         Load("TaxiPath.dbc",  row => TaxiPathsStore.Add(row.GetUInt(0), (row.GetInt(1), row.GetInt(2))));
+                        Load("SpellItemEnchantment.dbc", 0, 14, SpellItemEnchantmentStore);
+                        Load("AreaGroup.dbc",  row => AreaGroupStore.Add(row.GetUInt(0), BuildAreaGroupName(row, 1, 6)));
+                        Load("ItemDisplayInfo.dbc", 0, 5, ItemDisplayInfoStore);
+                        Load("MailTemplate.dbc", row =>
+                        {
+                            var subject = row.GetString(1);
+                            var body = row.GetString(2);
+                            var name = string.IsNullOrEmpty(subject) ? body.TrimToLength(50) : subject;
+                            MailTemplateStore.Add(row.GetUInt(0), name.Replace("\n", ""));
+                        });
+                        Load("LFGDungeons.dbc", 0, 1, LFGDungeonStore);
+                        Load("ItemSet.dbc", 0, 1, ItemSetStore);
+                        Load("DungeonEncounter.dbc", 0, 5, DungeonEncounterStore);
+                        Load("HolidayNames.dbc", 0, 1, HolidayNamesStore);
+                        Load("Holidays.dbc", row =>
+                        {
+                            var id = row.GetUInt(0);
+                            var nameId = row.GetUInt(49);
+                            if (HolidayNamesStore.TryGetValue(nameId, out var name))
+                                HolidaysStore[id] = name;
+                            else
+                                HolidaysStore[id] = "Holiday " + id;
+                        });
+                        Load("WorldSafeLocs.dbc", 0, 5, WorldSafeLocsStore);
+                        Load("BattlemasterList.dbc", 0, 11, BattlegroundStore);
+                        Load("Achievement_Criteria.dbc", 0, 9, AchievementCriteriaStore);
+                        Load("Item.dbc", row =>
+                        {
+                            var id = row.GetUInt(0);
+                            var displayId = row.GetUInt(5);
+                            if (ItemDisplayInfoStore.TryGetValue(displayId, out var name))
+                                ItemDbcStore[id] = name;
+                            else
+                                ItemDbcStore[id] = "Item " + id;
+                        });
                         break;
                     }
                     case DBCVersions.LEGION_26972:
                     {
                         max = 18;
-                        Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(16), $"Area trigger at {row.GetFloat(0)}, {row.GetFloat(1)}, {row.GetFloat(2)}"));
+                        Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(16), $"Area trigger"));
                         Load("spell.db2", 0, 1, SpellStore);
                         Load("achievement.db2", 12, 1, AchievementStore);
                         Load("AreaTable.db2", 0, 2, AreaStore);
@@ -492,6 +591,32 @@ namespace WDE.DbcStore
                     default:
                         return;
                 }
+            }
+
+            private string BuildAreaGroupName(IDbcIterator row, int start, int count)
+            {
+                for (int i = start; i < start + count; ++i)
+                {
+                    var id = row.GetUInt(i);
+                    if (id == 0)
+                    {
+                        count = i - start;
+                        break;
+                    }
+                }
+
+                if (count == 1)
+                    return AreaStore[row.GetUInt(start)];
+                
+                StringBuilder sb = new();
+                for (int i = start; i < start + count; ++i)
+                {
+                    sb.Append(AreaStore[row.GetUInt(i)]);
+                    if (i != start + count - 1)
+                        sb.Append(", ");
+                }
+
+                return sb.ToString();
             }
 
             private string GenerateCostDescription(int honor, int arenaPoints, int item)

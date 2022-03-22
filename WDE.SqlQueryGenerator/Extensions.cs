@@ -8,6 +8,16 @@ using System.Text;
 
 namespace WDE.SqlQueryGenerator
 {
+    public struct SqlTimestamp
+    {
+        public readonly long Value;
+
+        public SqlTimestamp(long value)
+        {
+            Value = value;
+        }
+    }
+    
     public static class Extensions
     {
         public static IQuery InsertIgnore(this ITable table, Dictionary<string, object?> obj)
@@ -171,6 +181,20 @@ namespace WDE.SqlQueryGenerator
             return new Query(query.Table, $"DELETE FROM `{query.Table.TableName}` WHERE {query.Condition};");
         }
         
+        public static IQuery Select(this IWhere query)
+        {
+            if (query.Condition == "1")
+                return new Query(query.Table, $"SELECT * FROM `{query.Table.TableName}`;");
+            return new Query(query.Table, $"SELECT * FROM `{query.Table.TableName}` WHERE {query.Condition};");
+        }
+        
+        public static IQuery Select(this IWhere query, params string[] columns)
+        {
+            if (query.Condition == "1")
+                return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}`;");
+            return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}` WHERE {query.Condition};");
+        }
+
         public static IUpdateQuery ToUpdateQuery(this IWhere query)
         {
             return new UpdateQuery(query);
@@ -232,6 +256,10 @@ namespace WDE.SqlQueryGenerator
                 return d.ToString(CultureInfo.InvariantCulture);
             if (o is bool b)
                 return b ? "1" : "0";
+            if (o is DateTime dt)
+                return dt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+            if (o is SqlTimestamp ts)
+                return "FROM_UNIXTIME(" + ts.Value + ")";
             return o.ToString() ?? "[INVALID TYPE]";
         }
 

@@ -15,6 +15,8 @@ namespace WDE.Common.Parameters
             New = nnew;
         }
     }
+    
+    public interface IItemParameter : IParameter<long> {}
 
     public abstract class GenericBaseParameter<T> : IParameter<T> where T : notnull
     {

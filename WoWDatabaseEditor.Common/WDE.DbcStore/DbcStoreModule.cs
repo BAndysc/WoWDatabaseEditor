@@ -80,7 +80,7 @@ namespace WDE.DbcStore
             }
         }
         
-        internal class ItemParameter : ParameterNumbered
+        internal class ItemParameter : ParameterNumbered, IItemParameter
         {
             public ItemParameter(IParameter<long> dbc, IParameter<long> db)
             {

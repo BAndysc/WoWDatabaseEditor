@@ -9,9 +9,9 @@
   "description": "Use this table to define creatures that will spawn automatically on a vehicle",
   "table_name": "vehicle_template_accessory",
   "table_index_name": "entry",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "reload_command": "reload vehicle_template_accessory",
-  "group_name": "Common scripting tables",
+  "group_name": "Vehicles",
   "icon_path": "Icons/document_vehicle_template.png",
   "picker": "CreatureParameter",
   "primary_key": [

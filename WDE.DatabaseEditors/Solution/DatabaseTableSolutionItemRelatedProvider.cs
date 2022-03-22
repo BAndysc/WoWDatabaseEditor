@@ -33,7 +33,7 @@ namespace WDE.DatabaseEditors.Solution
         {
             if (item.Entries.Count == 1 &&
                 definitionToRelatedType.TryGetValue(item.DefinitionId, out var type))
-                return Task.FromResult<RelatedSolutionItem?>(new RelatedSolutionItem(type, item.Entries[0].Key));
+                return Task.FromResult<RelatedSolutionItem?>(new RelatedSolutionItem(type, item.Entries[0].Key[0]));
             return Task.FromResult<RelatedSolutionItem?>(null);
         }
     }

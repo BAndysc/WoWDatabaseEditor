@@ -10,7 +10,7 @@
   "table_name": "gossip_menu",
   "table_index_name": "MenuID",
   "icon_path": "Icons/gossip.png",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "reload_command": "reload gossip_menu",
   "picker": "GossipMenuParameter",
   "primary_key": [

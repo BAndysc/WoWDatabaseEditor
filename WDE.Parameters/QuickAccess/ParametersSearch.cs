@@ -103,7 +103,7 @@ public class ParametersSearch : IQuickAccessSearchProvider
                 
                 if (nameMatches || itemScore > 70)
                 {
-                    var quickItem = new QuickAccessItem(new ImageUri("Icons/icon_copy.png"), fullName,  item.Key.ToString(), model.name, quickCommands.CopyCommand, item.Key);
+                    var quickItem = new QuickAccessItem(new ImageUri("Icons/icon_copy.png"), fullName,  item.Key.ToString(), model.name, quickCommands.CopyCommand, item.Key, (byte)itemScore);
                     results.Add((-Math.Max(nameScore, itemScore), item.Key, quickItem));
                     total++;
 

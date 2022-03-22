@@ -6,6 +6,6 @@ namespace WDE.Common.Solution
     [UniqueProvider]
     public interface ISolutionItemSerializerRegistry
     {
-        ISmartScriptProjectItem Serialize(ISolutionItem item);
+        ISmartScriptProjectItem Serialize(ISolutionItem item, bool forMostRecentlyUsed);
     }
 }

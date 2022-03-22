@@ -9,6 +9,7 @@ using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.Module.Attributes;
 using WDE.SQLEditor.ViewModels;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.SQLEditor.Solutions
 {
@@ -31,9 +32,9 @@ namespace WDE.SQLEditor.Solutions
     [SingleInstance]
     public class QueryGenerator : ISolutionItemSqlProvider<CustomSqlSolutionItem>
     {
-        public Task<string> GenerateSql(CustomSqlSolutionItem item)
+        public Task<IQuery> GenerateSql(CustomSqlSolutionItem item)
         {
-            return Task.FromResult(item.Query);
+            return Task.FromResult(Queries.Raw(item.Query));
         }
     }
     
@@ -61,7 +62,7 @@ namespace WDE.SQLEditor.Solutions
             return false;
         }
 
-        public ISmartScriptProjectItem Serialize(CustomSqlSolutionItem item)
+        public ISmartScriptProjectItem Serialize(CustomSqlSolutionItem item, bool forMostRecentlyUsed)
         {
             return new AbstractSmartScriptProjectItem()
             {

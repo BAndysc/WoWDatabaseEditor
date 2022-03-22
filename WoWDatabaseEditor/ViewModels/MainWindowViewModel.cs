@@ -33,6 +33,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<AboutViewModel> aboutViewModelCreator;
         private readonly Func<QuickStartViewModel> quickStartCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
+        private readonly ISolutionTasksService solutionTasksService;
         private readonly ITablesToolService tablesToolService;
 
         private readonly Dictionary<string, ITool> toolById = new();
@@ -64,6 +65,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
+            this.solutionTasksService = solutionTasksService;
             this.tablesToolService = tablesToolService;
             Title = programNameService.Title;
             Subtitle = programNameService.Subtitle;
@@ -74,23 +76,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (item == null)
                     return;
 
-                if (DocumentManager.ActiveSolutionItemDocument!.Save?.CanExecute(null) ?? false)
-                {
-                    DocumentManager.ActiveSolutionItemDocument.Save.Execute(null);
-
-                    if (solutionTasksService.CanReloadRemotely)
-                        solutionTasksService.ReloadSolutionRemotelyTask(item);
-                }
-                else
-                {
-                    if (solutionTasksService.CanSaveAndReloadRemotely)
-                        solutionTasksService.SaveAndReloadSolutionTask(item);
-                    else if (solutionTasksService.CanSaveToDatabase)
-                        solutionTasksService.SaveSolutionToDatabaseTask(DocumentManager.ActiveSolutionItemDocument);
-                }
-                
-                taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(DocumentManager.ActiveSolutionItemDocument));
-
+                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!);
             }, () => DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase));
 
@@ -102,11 +88,11 @@ namespace WoWDatabaseEditorCore.ViewModels
                         async () =>
                         {
                             var sql = await queryGeneratorRegistry.GenerateSql(sid.SolutionItem);
-                            clipboardService.SetText(sql);
+                            clipboardService.SetText(sql.QueryString);
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "SQL copied!"));
                         });
                 }
-            }, _ => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+            }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
             
             GenerateCurrentSqlCommand = new DelegateCommand(() =>
             {
@@ -269,7 +255,16 @@ namespace WoWDatabaseEditorCore.ViewModels
 
                     if (result == MessageBoxButtonType.Yes)
                     {
+                        if (editor is IBeforeSaveConfirmDocument before)
+                        {
+                            if (await before.ShallSavePreventClosing())
+                                return false;
+                        }
                         editor.Save.Execute(null);
+                        if (editor is ISolutionItemDocument solutionItemDocument)
+                            await solutionTasksService.Save(solutionItemDocument);
+                        else
+                            editor.Save.Execute(null);
                         modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
                         DocumentManager.OpenedDocuments.Remove(editor);
                     }
@@ -281,7 +276,19 @@ namespace WoWDatabaseEditorCore.ViewModels
                     else if (result == MessageBoxButtonType.CustomA)
                     {
                         foreach (var m in modifiedDocuments)
-                            m.Save.Execute(null);
+                        {
+                            if (m is IBeforeSaveConfirmDocument before)
+                            {
+                                if (await before.ShallSavePreventClosing())
+                                {
+                                    return false;
+                                }
+                            }
+                            if (m is ISolutionItemDocument solutionItemDocument)
+                                await solutionTasksService.Save(solutionItemDocument);
+                            else
+                                m.Save.Execute(null);
+                        }
                         modifiedDocuments.Clear();
                     }
                     else if (result == MessageBoxButtonType.CustomB)

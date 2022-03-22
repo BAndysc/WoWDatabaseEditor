@@ -179,6 +179,9 @@ namespace WDE.MVVM
         
         public void Dispose()
         {
+            if (disposed)
+                return;
+            
             while (disposables.Count > 0)
             {
                 disposables[^1].Dispose();

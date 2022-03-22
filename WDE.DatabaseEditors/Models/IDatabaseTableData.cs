@@ -6,6 +6,6 @@ namespace WDE.DatabaseEditors.Models
     public interface IDatabaseTableData
     {
         DatabaseTableDefinitionJson TableDefinition { get; }
-        IList<DatabaseEntity> Entities { get; }
+        IReadOnlyList<DatabaseEntity> Entities { get; }
     }
 }

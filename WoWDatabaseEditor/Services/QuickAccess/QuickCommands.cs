@@ -37,5 +37,5 @@ internal class QuickCommands : IQuickCommands
     public ICommand CopyCommand { get; set; }
     public ICommand SetSearchCommand { get; set; }
     public ICommand NoCommand { get; set; }
-    public QuickAccessItem AndMoreItem => new QuickAccessItem(ImageUri.Empty, "...and more", "", "specify a more specific search", NoCommand, null);
+    public QuickAccessItem AndMoreItem => new QuickAccessItem(ImageUri.Empty, "...and more", "", "specify a more specific search", NoCommand, null, 0);
 }

@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:oneToOneForeignKey="clr-namespace:WDE.DatabaseEditors.ViewModels.OneToOneForeignKey;assembly=WDE.DatabaseEditors"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="oneToOneForeignKey:OneToOneForeignKeyViewModel"
+             x:Class="WDE.DatabaseEditors.Avalonia.Views.OneToOneForeignKey.OneToOneForeignKeyToolBar">
+    <ToolbarPanel>
+        <ButtonImage Image="Icons/icon_play.png"
+                     Command="{CompiledBinding ExecuteChangedCommand}" />
+        <ButtonImage Command="{CompiledBinding GenerateCurrentSqlCommand}"
+                     Text="To SQL" 
+                     Image="Icons/icon_to_sql.png" />
+        <ButtonImage Command="{CompiledBinding CopyCurrentSqlCommand}"
+                     ToolTip.Tip="Copy SQL" 
+                     Image="Icons/icon_copy_sql.png" />
+    </ToolbarPanel>
+</UserControl>

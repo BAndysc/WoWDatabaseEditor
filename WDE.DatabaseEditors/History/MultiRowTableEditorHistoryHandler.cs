@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using WDE.Common.Database;
 using WDE.Common.History;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.MVVM.Observable;
@@ -31,12 +34,14 @@ namespace WDE.DatabaseEditors.History
                 if (e.Type == CollectionEventType.Add)
                 {
                     e.Item.OnAction += PushAction;
+                    e.Item.OnConditionsChanged += OnConditionsChanged;
                     PushAction(new DatabaseEntityAddedHistoryAction(e.Item, e.Index, viewModel));
                 }
                 else if (e.Type == CollectionEventType.Remove)
                 {
                     PushAction(new DatabaseEntityRemovedHistoryAction(e.Item, e.Index, viewModel));
                     e.Item.OnAction -= PushAction;
+                    e.Item.OnConditionsChanged -= OnConditionsChanged;
                 }
             });
             viewModel.OnKeyDeleted += ViewModelOnDeleteQuery;
@@ -44,19 +49,24 @@ namespace WDE.DatabaseEditors.History
             viewModel.OnDeletedQuery += ViewModelOnDeletedQuery;
         }
 
+        private void OnConditionsChanged(DatabaseEntity entity, IReadOnlyList<ICondition>? old, IReadOnlyList<ICondition>? @new)
+        {
+            PushAction(new DatabaseEntityConditionsChangedHistoryAction(entity, old, @new, viewModel));
+        }
+        
         private void ViewModelOnDeletedQuery(DatabaseEntity obj)
         {
             PushAction(new DatabaseExecuteDeleteHistoryAction(viewModel, obj));
         }
 
-        private void ViewModelOnKeyAdded(uint key)
+        private void ViewModelOnKeyAdded(DatabaseKey key)
         {
             PushAction(new DatabaseKeyAddedHistoryAction(viewModel, key));
         }
 
         private void ViewModelOnDeleteQuery(DatabaseEntity obj)
         {
-            PushAction(new DatabaseKeyRemovedHistoryAction(viewModel, obj.Key));
+            PushAction(new DatabaseKeyRemovedHistoryAction(viewModel, obj.GenerateKey(viewModel.TableDefinition)));
         }
 
         private void UnbindTableData()

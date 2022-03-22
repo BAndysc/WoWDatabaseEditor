@@ -21,17 +21,40 @@ namespace WDE.DatabaseEditors.Models
         void Revert();
         IParameter BaseParameter { get; }
         bool DefaultIsBlank { get; set; }
+        void UpdateFromString(string newValue);
+        string? ValueAsString { get; }
     }
 
-    public sealed class ParameterValue<T> : IParameterValue where T : notnull
+    public interface IParameterValue<T> : IParameterValue where T : notnull
     {
+        object? Context { get; }
+        IParameter<T> Parameter { get; }
+        T? Value { get; set; }
+        Dictionary<T, SelectOption>? Items { get; }
+    }
+
+    public sealed class ParameterValue<T, TContext> : IParameterValue<T> where T : notnull
+    {
+        private readonly TContext context;
         private readonly ValueHolder<T> value;
         private readonly ValueHolder<T> originalValue;
 
+        public object? Context => context;
+        
         public T? Value
         {
             get => value.Value;
             set => this.value.Value = value;
+        }
+
+        public Dictionary<T, SelectOption>? Items
+        {
+            get
+            {
+                if (Parameter is IContextualParameter<T, TContext> contextualParameter)
+                    return contextualParameter.ItemsForContext(context);
+                return parameter.Items;
+            }
         }
 
         public IParameter BaseParameter => parameter;
@@ -45,6 +68,39 @@ namespace WDE.DatabaseEditors.Models
                 OnPropertyChanged(nameof(String));
             }
         }
+
+        public void UpdateFromString(string newValue)
+        {
+            if (parameter is IParameterFromString<long?> fromString)
+            {
+                var newVal = fromString.FromString(newValue);
+                if (newVal.HasValue)
+                    Value = (T)(object)(newVal.Value);
+            }
+            else
+            {
+                if (typeof(T) == typeof(string))
+                {
+                    Value = (T)(object)newValue;
+                }
+                else if (typeof(T) == typeof(long) && long.TryParse(newValue, out var longValue))
+                {
+                    Value = (T)(object)(longValue);
+                }
+                else if (typeof(T) == typeof(double) && double.TryParse(newValue, out var doubleValue))
+                {
+                    Value = (T)(object)(doubleValue);
+                }
+                else if (typeof(T) == typeof(float) && float.TryParse(newValue, out var floatValue))
+                {
+                    Value = (T)(object)(floatValue);
+                }   
+            }
+        }
+
+        public string? ValueAsString => Value?.ToString();
+
+        public event Action<Action<IParameterValue>, Action<IParameterValue>>? ValueChanged;
 
         private IParameter<T> parameter;
         private bool defaultIsBlank;
@@ -63,8 +119,9 @@ namespace WDE.DatabaseEditors.Models
             }
         }
 
-        public ParameterValue(ValueHolder<T> value, ValueHolder<T> originalValue, IParameter<T> parameter)
+        public ParameterValue(TContext context, ValueHolder<T> value, ValueHolder<T> originalValue, IParameter<T> parameter)
         {
+            this.context = context;
             this.value = value;
             this.originalValue = originalValue;
             this.parameter = parameter;
@@ -97,7 +154,11 @@ namespace WDE.DatabaseEditors.Models
         {
             if (DefaultIsBlank && Comparer<T>.Default.Compare(val.Value, default) == 0)
                 return "";
-            return val.IsNull ? "(null)" : parameter.ToString(val.Value!);
+            if (val.IsNull)
+                return "(null)";
+            if (parameter is IContextualParameter<T, TContext> contextualParameter)
+                return contextualParameter.ToString(val.Value!, context);
+            return parameter.ToString(val.Value!);
         }
         
         public override string ToString()

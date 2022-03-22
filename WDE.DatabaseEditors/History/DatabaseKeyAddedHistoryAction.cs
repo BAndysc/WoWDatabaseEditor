@@ -1,4 +1,5 @@
 using WDE.Common.History;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 
 namespace WDE.DatabaseEditors.History
@@ -6,10 +7,10 @@ namespace WDE.DatabaseEditors.History
     public class DatabaseKeyAddedHistoryAction : IHistoryAction
     {
         private readonly MultiRowDbTableEditorViewModel viewModel;
-        private readonly uint entity;
+        private readonly DatabaseKey entity;
 
         public DatabaseKeyAddedHistoryAction(MultiRowDbTableEditorViewModel viewModel,
-            uint entity)
+            DatabaseKey entity)
         {
             this.viewModel = viewModel;
             this.entity = entity;

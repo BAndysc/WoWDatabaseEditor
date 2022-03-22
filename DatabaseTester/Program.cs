@@ -112,7 +112,7 @@ public class Program
         foreach (var definition in allDefinitions)
         {
             Console.WriteLine("Table editor: " + definition.TableName);
-            var task = loader.Load(definition.Id, 1);
+            var task = loader.Load(definition.Id, null, null, null, new[]{new DatabaseKey(definition.GroupByKeys.Select(x => 1L))});
             task.Wait();
         }
         

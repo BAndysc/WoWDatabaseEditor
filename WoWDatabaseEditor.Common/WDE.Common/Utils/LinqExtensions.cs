@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,6 +39,25 @@ namespace WDE.Common.Utils
             }
 
             return dictionary; 
+        }
+        
+        public static void RemoveAll<T>(this ObservableCollection<T> collection)
+        {
+            for (int i = collection.Count - 1; i >= 0; --i)
+                collection.RemoveAt(i);
+        }
+
+        public static void Each<T>(this IEnumerable<T> collection, Action<T> action)
+        {
+            foreach (var x in collection)
+                action(x);
+        }
+
+        public static void Each<T>(this IEnumerable<T> collection, Action<T, int> action)
+        {
+            int index = 0;
+            foreach (var x in collection)
+                action(x, index++);
         }
     }
 }

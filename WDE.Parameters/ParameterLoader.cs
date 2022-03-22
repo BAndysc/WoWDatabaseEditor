@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Database;
@@ -66,6 +68,7 @@ namespace WDE.Parameters
                     quickAccessRegisteredParameters.Register(pair.Value.QuickAccess, pair.Key, pair.Value.Name);
             }
 
+            factory.Register("InvalidParameter", new InvalidParameter<long>());
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
@@ -81,6 +84,10 @@ namespace WDE.Parameters
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
             factory.Register("PercentageParameter", new PercentageParameter());
+            factory.Register("MoneyParameter", new MoneyParameter());
+            factory.Register("MinuteIntervalParameter", new MinuteIntervalParameter());
+            factory.Register("UnixTimestampParameter", new UnixTimestampParameter(0));
+            factory.Register("UnixTimestampSince2000Parameter", new UnixTimestampParameter(946681200));
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
                 (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
@@ -124,6 +131,141 @@ namespace WDE.Parameters
         public override string ToString(long key)
         {
             return key + "%";
+        }
+    }
+
+    public class MinuteIntervalParameter : Parameter, IParameterFromString<long?>
+    {
+        public override string ToString(long minutes)
+        {
+            int years = (int) (minutes / 525600);
+            minutes -= years * 525600;
+            int months = (int) (minutes / 43200);
+            minutes -= months * 43200;
+            int days = (int) (minutes / 1440);
+            minutes -= days * 1440;
+            int hours = (int) (minutes / 60);
+            minutes -= hours * 60;
+            StringBuilder sb = new();
+             if (years > 0)
+                sb.Append(years).Append("y ");
+             if (months > 0)
+                sb.Append(months).Append("m ");
+             if (days > 0)
+                sb.Append(days).Append("d ");
+             if (hours > 0)
+                sb.Append(hours).Append("h ");
+             if (minutes > 0)
+                sb.Append(minutes).Append("min ");
+            
+            return sb.ToString();
+        }
+
+        public long? FromString(string value)
+        {
+            if (long.TryParse(value, out var val))
+                return val;
+            var parts = value.Split(' ');
+            long minutes = 0;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+                if (!long.TryParse(part[..^1], out var num) &&
+                    !long.TryParse(part[..^4], out num))
+                    return null;
+                if (part.EndsWith("y"))
+                    minutes += num * 525600;
+                else if (part.EndsWith("m"))
+                    minutes += num * 43200;
+                else if (part.EndsWith("d"))
+                    minutes += num * 1440;
+                else if (part.EndsWith("h"))
+                    minutes += num * 60;
+                else if (part.EndsWith("min"))
+                    minutes += num;
+                else
+                    return null;
+            }
+            return minutes;
+        }
+    }
+
+    public class InvalidParameter<T> : IParameter<T> where T : notnull
+    {
+        public string? Prefix => null;
+        public bool HasItems => false;
+        public string ToString(T value) => "INVALID VALUE";
+        public Dictionary<T, SelectOption>? Items => null;
+    }
+
+    public class MoneyParameter : Parameter, IParameterFromString<long?>
+    {
+        public override string ToString(long key)
+        {
+            int gold = (int) (key / 10000);
+            int silver = (int) ((key % 10000) / 100);
+            int copper = (int) (key % 100);
+            if (gold > 0 && silver > 0 && copper > 0)
+                return $"{gold}g {silver}s {copper}c";
+            if (gold > 0 && silver > 0)
+                return $"{gold}g {silver}s";
+            if (gold > 0 && copper > 0)
+                return $"{gold}g {copper}c";
+            if (gold > 0)
+                return $"{gold}g";
+            if (silver > 0 && copper > 0)
+                return $"{silver}s {copper}c";
+            if (silver > 0)
+                return $"{silver}s";
+            return $"{copper}c";
+        }
+
+        public long? FromString(string value)
+        {
+            if (long.TryParse(value, out var val))
+                return val;
+            long total = 0;
+            var parts = value.Split(' ');
+            foreach (var part in parts)
+            {
+                if (part.Length < 2)
+                    return null;
+                var unit = part[^1];
+                var amount = part.Substring(0, part.Length - 1);
+                if (!long.TryParse(amount, out var amountLong))
+                    return null;
+                switch (unit)
+                {
+                    case 'g':
+                        total += amountLong * 10000;
+                        break;
+                    case 's':
+                        total += amountLong * 100;
+                        break;
+                    case 'c':
+                        total += amountLong;
+                        break;
+                    default:
+                        return null;
+                }
+            }
+
+            return total;
+        }
+    }
+
+    public class UnixTimestampParameter : Parameter
+    {
+        private readonly long startOffset;
+
+        public UnixTimestampParameter(long startOffset)
+        {
+            this.startOffset = startOffset;
+        }
+        
+        public override string ToString(long key)
+        {
+            return DateTime.UnixEpoch.AddSeconds(startOffset + key).ToString("yyyy-MM-dd HH:mm:ss");
         }
     }
 

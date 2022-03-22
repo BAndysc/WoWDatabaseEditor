@@ -33,6 +33,9 @@ namespace WDE.Common.Database
 
         public class QueryFailedDatabaseException : DatabaseExecutorException
         {
+            public QueryFailedDatabaseException(string message, Exception inner) : base(message, inner)
+            {
+            }
             public QueryFailedDatabaseException(Exception inner) : base("Failed to execute query", inner)
             {
             }

@@ -1,9 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using WDE.Common.Services;
 
 namespace WDE.DatabaseEditors.Data.Structs
 {
+    public enum RecordMode
+    {
+        Template,
+        MultiRecord,
+        SingleRow
+    }
+    
     [ExcludeFromCodeCoverage]
     public class DatabaseTableDefinitionJson
     {
@@ -31,11 +40,15 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "table_index_name")]
         public string TablePrimaryKeyColumnName { get; set; } = "";
         
-        [JsonProperty(PropertyName = "multi_record")]
-        public bool IsMultiRecord { get; set; }
+        [JsonProperty(PropertyName = "record_mode")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public RecordMode RecordMode { get; set; }
         
         [JsonProperty(PropertyName = "only_conditions")]
         public bool IsOnlyConditionsTable { get; set; }
+        
+        [JsonProperty(PropertyName = "skip_quick_load")]
+        public bool SkipQuickLoad { get; set; }
         
         [JsonProperty(PropertyName = "group_name")] 
         public string? GroupName { get; set; }
@@ -54,9 +67,9 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         [JsonProperty(PropertyName = "table_name_source_field")]
         public string? TableNameSource { get; set; }
-        
+
         [JsonProperty(PropertyName = "primary_key")]
-        public IList<string>? PrimaryKey { get; set; }
+        public IList<string> PrimaryKey { get; set; } = null!;
         
         [JsonProperty(PropertyName = "conditions")]
         public DatabaseConditionReferenceJson? Condition { get; set; }
@@ -70,6 +83,10 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "commands")]
         public IList<DatabaseCommandDefinitionJson>? Commands { get; set; }
         
+        [JsonProperty(PropertyName = "auto_key")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public GuidType? AutoKeyValue { get; set; }
+        
         [JsonIgnore]
         public string FileName { get; set; } = "";
         
@@ -77,7 +94,21 @@ namespace WDE.DatabaseEditors.Data.Structs
         public IDictionary<string, DatabaseColumnJson> TableColumns { get; set; } = null!;
         
         [JsonIgnore] 
-        public IDictionary<string, DatabaseForeignTableJson> ForeignTableByName { get; set; } = null!;
+        public IDictionary<string, DatabaseForeignTableJson>? ForeignTableByName { get; set; }
+
+        [JsonIgnore]
+        public IList<string> GroupByKeys
+        {
+            get
+            {
+                if (RecordMode == RecordMode.SingleRow)
+                    return PrimaryKey!;
+                return new List<string>(){PrimaryKey[0]};
+            }
+        }
+        
+        // single row table type ignores solution item entries quality, because there is no keys
+        [JsonIgnore] public bool IgnoreEquality => RecordMode == RecordMode.SingleRow;
     }
 
     public class DatabaseCommandDefinitionJson

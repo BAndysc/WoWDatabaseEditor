@@ -12,9 +12,12 @@
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
-    <Import Project="..\Module.props" />    
-    
+    <Import Project="..\Module.props" />
+    <Import Project="..\Avalonia.props" />
+
     <ItemGroup>
+      <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+      <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WDE.SqlInterpreter\WDE.SqlInterpreter.csproj" />
@@ -23,6 +26,18 @@
     <ItemGroup>
       <None Update="DbDefinitions\**\*.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="DatabaseContextualParameters\*.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="DatabaseContextualParameters\AchievementValue2.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="DatabaseContextualParameters\SpawnGroupGuidParameter.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="DatabaseContextualParameters\CreatureSummonGroupSummonerParameter.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
     <ItemGroup>
@@ -34,6 +49,14 @@
         </PackageReference>
       <PackageReference Include="DynamicData">
         <Version>7.2.1</Version>
+      </PackageReference>
+      <PackageReference Include="PropertyChanged.SourceGenerator">
+        <Version>1.0.1</Version>
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="System.Reactive">
+        <Version>5.0.0</Version>
       </PackageReference>
     </ItemGroup>
     <ItemGroup>

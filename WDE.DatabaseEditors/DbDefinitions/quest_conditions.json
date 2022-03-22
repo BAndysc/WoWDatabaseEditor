@@ -9,7 +9,7 @@
   "description": "Use to define custom conditions when quests can be taken",
   "table_name": "quest_condition",
   "table_index_name": "quest_id",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "icon_path": "Icons/document_quest_conditions.png",
   "group_name": "Common scripting tables",
   "picker": "QuestParameter",

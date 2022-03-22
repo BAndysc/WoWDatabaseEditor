@@ -72,7 +72,7 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
             var table = (isGameObject ? "gameobject" : "creature") + "_quest" + (isStarter ? "starter" : "ender");
             try
             {
-                var id = await tableEditorPickerService.PickByColumn(table, entry ?? 0, "quest", (uint)value);
+                var id = await tableEditorPickerService.PickByColumn(table, new DatabaseKey(entry ?? 0), "quest", (uint)value);
                 if (id.HasValue)
                     return (id.Value, true);
                 return (0, false);

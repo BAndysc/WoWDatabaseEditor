@@ -470,7 +470,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (sb.Length > 0)
                     sb.Append("\n    then ");
                 if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation)
-                    sb.Append("looks at " + packet.LookOrientation);
+                    sb.Append("set orientation to " + packet.LookOrientation);
                 else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookTarget)
                     sb.Append("looks at " + NiceGuid(packet.LookTarget.Target));
                 else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookPosition)

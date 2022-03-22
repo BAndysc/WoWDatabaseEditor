@@ -42,6 +42,8 @@ namespace WDE.SqlInterpreter.Extensions
                 return ulng;
             if (float.TryParse(str, out var flt))
                 return flt;
+            if (str.StartsWith("FROM_UNIXTIME(") && long.TryParse(str.Substring(14, str.Length - 15), out var unixTime))
+                return unixTime;
             throw new Exception("Do not understand " + str);
         }
     }

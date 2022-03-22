@@ -41,30 +41,35 @@ namespace WDE.Module
         
         protected void AutoRegisterByConvention(Assembly assembly, IContainerRegistry containerRegistry)
         {
-            IUnityContainer unityContainer = ((IContainerExtension<IUnityContainer>)containerRegistry).Instance;
+            //IUnityContainer unityContainer = ((IContainerExtension<IUnityContainer>)containerRegistry).Instance;
             var defaultRegisters = assembly.GetTypes().Where(t => !t.IsAbstract && t.IsDefined(typeof(AutoRegisterAttribute), true));
 
             foreach (Type register in defaultRegisters)
             {
-                bool singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
+                RegisterType(register, containerRegistry);
+            }
+        }
 
-                if (singleton)
-                    containerRegistry.RegisterSingleton(register);
+        protected void RegisterType(Type register, IContainerRegistry unityContainer)
+        {
+            bool singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
+
+            if (singleton)
+                unityContainer.RegisterSingleton(register);
                     
-                foreach (Type @interface in register.GetInterfaces())
+            foreach (Type @interface in register.GetInterfaces())
+            {
+                bool isUnique = !@interface.IsDefined(typeof(NonUniqueProviderAttribute), false);
+
+                string name = register + @interface.ToString();
+
+                if (singleton && isUnique)
                 {
-                    bool isUnique = !@interface.IsDefined(typeof(NonUniqueProviderAttribute), false);
-
-                    string name = register + @interface.ToString();
-
-                    if (singleton && isUnique)
-                    {
-                        containerRegistry.RegisterSingleton(@interface, register);
-                        //unityContainer.RegisterFactory(@interface, c => unityContainer.Resolve(register), new ContainerControlledLifetimeManager());
-                    }
-                    else
-                        containerRegistry.Register(@interface, register, isUnique ? null : name);
+                    unityContainer.RegisterSingleton(@interface, register);
+                    //unityContainer.RegisterFactory(@interface, c => unityContainer.Resolve(register), new ContainerControlledLifetimeManager());
                 }
+                else
+                    unityContainer.Register(@interface, register, isUnique ? null : name);
             }
         }
 

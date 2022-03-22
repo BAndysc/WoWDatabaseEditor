@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using WDE.Common.Services;
 
 namespace WoWDatabaseEditorCore.Services.ServerIntegration
@@ -20,6 +21,15 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
         public int LeftArguments => TotalArguments - iterator;
         
         public int TotalArguments => args.Length;
+        public string TakeRestArguments
+        {
+            get
+            {
+                var result = string.Join(" ", args.Skip(iterator));
+                iterator = TotalArguments;
+                return result;
+            }
+        }
 
         public bool TryGetString(out string word)
         {

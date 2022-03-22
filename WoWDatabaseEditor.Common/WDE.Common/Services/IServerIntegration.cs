@@ -34,6 +34,7 @@ namespace WDE.Common.Services
     {
         int LeftArguments { get; }
         int TotalArguments { get; }
+        string TakeRestArguments { get; }
         bool TryGetUint(out uint number);
         bool TryGetString(out string word);
     }

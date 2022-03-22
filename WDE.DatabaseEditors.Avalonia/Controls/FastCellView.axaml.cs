@@ -18,14 +18,6 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
     {
         private bool showChooseButton;
         public static readonly DirectProperty<FastCellView, bool> ShowChooseButtonProperty = AvaloniaProperty.RegisterDirect<FastCellView, bool>("ShowChooseButton", o => o.ShowChooseButton, (o, v) => o.ShowChooseButton = v);
-        private ICommand? chooseParameterCommand;
-        public static readonly DirectProperty<FastCellView, ICommand?> ChooseParameterCommandProperty = AvaloniaProperty.RegisterDirect<FastCellView, ICommand?>("ChooseParameterCommand", o => o.ChooseParameterCommand, (o, v) => o.ChooseParameterCommand = v);
-        
-        public ICommand? ChooseParameterCommand
-        {
-            get => chooseParameterCommand;
-            set => SetAndRaise(ChooseParameterCommandProperty, ref chooseParameterCommand, value);
-        }
 
         public bool ShowChooseButton
         {

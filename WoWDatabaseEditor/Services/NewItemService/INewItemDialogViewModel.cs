@@ -8,7 +8,7 @@ namespace WoWDatabaseEditorCore.Services.NewItemService
 {
     public interface INewItemDialogViewModel : IDialog
     {
-        ObservableCollection<NewItemPrototypeGroup> ItemPrototypes { get; }
+        ObservableCollection<NewItemPrototypeGroup> Categories { get; }
         NewItemPrototypeInfo? SelectedPrototype { get; }
         Task<ISolutionItem?> CreateSolutionItem();
         void AllowFolders(bool showFolders);

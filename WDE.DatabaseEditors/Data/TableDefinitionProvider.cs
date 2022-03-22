@@ -36,6 +36,15 @@ namespace WDE.DatabaseEditors.Data
                 var definition =
                     serializationProvider.DeserializeTableDefinition<DatabaseTableDefinitionJson>(source.content);
 
+                if (string.IsNullOrEmpty(definition.MultiSolutionName))
+                    definition.MultiSolutionName = definition.Name;
+
+                if (string.IsNullOrEmpty(definition.SingleSolutionName))
+                    definition.SingleSolutionName = definition.Name;
+
+                if (string.IsNullOrEmpty(definition.IconPath))
+                    definition.IconPath = "Icons/document_table.png";
+                
                 definition.TableColumns = new Dictionary<string, DatabaseColumnJson>();
                 foreach (var group in definition.Groups)
                 {

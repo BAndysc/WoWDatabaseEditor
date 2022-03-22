@@ -11,6 +11,6 @@ namespace WDE.Common.Solution
     [NonUniqueProvider]
     public interface ISolutionItemSerializer<T> : ISolutionItemSerializer where T : ISolutionItem
     {
-        ISmartScriptProjectItem Serialize(T item);
+        ISmartScriptProjectItem Serialize(T item, bool forMostRecentlyUsed);
     }
 }

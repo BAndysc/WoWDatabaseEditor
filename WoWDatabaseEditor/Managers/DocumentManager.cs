@@ -8,7 +8,9 @@ using Prism.Events;
 using Prism.Mvvm;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
@@ -21,6 +23,7 @@ namespace WoWDatabaseEditorCore.Managers
     {
         private readonly IEventAggregator eventAggregator;
         private readonly IMessageBoxService messageBoxService;
+        private readonly ISolutionTasksService solutionTasksService;
         private ISolutionItemDocument? activeSolutionItemDocument;
         private IDocument? activeDocument;
         private IFocusableTool? activeTool;
@@ -31,10 +34,13 @@ namespace WoWDatabaseEditorCore.Managers
 
         public DocumentManager(IEventAggregator eventAggregator, 
             IMessageBoxService messageBoxService,
+            ITextDocumentService textDocumentService,
+            ISolutionTasksService solutionTasksService,
             IEnumerable<ITool> tools)
         {
             this.eventAggregator = eventAggregator;
             this.messageBoxService = messageBoxService;
+            this.solutionTasksService = solutionTasksService;
             ActivateDocument = new DelegateCommand<IDocument>(doc => ActiveDocument = doc);
             foreach (var tool in tools)
             {
@@ -49,6 +55,7 @@ namespace WoWDatabaseEditorCore.Managers
                 if (e.Type == CollectionEventType.Remove && e.Item is IDisposable disposable)
                     disposable.Dispose();
             });
+            //OpenDocument(textDocumentService.CreateDocument("DEMO DEMO", "", "sql", true));
         }
 
         public IReadOnlyList<ITool> AllTools => allTools;
@@ -156,7 +163,23 @@ namespace WoWDatabaseEditorCore.Managers
                         if (result == MessageBoxButtonType.Cancel)
                             close = false;
                         if (result == MessageBoxButtonType.Yes)
-                            editor.Save.Execute(null);
+                        {
+                            if (editor is IBeforeSaveConfirmDocument preventable)
+                            {
+                                if (await preventable.ShallSavePreventClosing())
+                                {
+                                    close = false;
+                                }
+                            }
+
+                            if (close)
+                            {
+                                if (editor is ISolutionItemDocument solutionItemDocument)
+                                    solutionTasksService.Save(solutionItemDocument).ListenErrors();
+                                else
+                                    editor.Save.Execute(null);
+                            }
+                        }
                     }
 
                     if (close)

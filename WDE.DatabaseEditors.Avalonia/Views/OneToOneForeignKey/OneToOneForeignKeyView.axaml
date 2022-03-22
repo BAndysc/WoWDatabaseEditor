@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:oneToOneForeignKey="clr-namespace:WDE.DatabaseEditors.ViewModels.OneToOneForeignKey;assembly=WDE.DatabaseEditors"
+             xmlns:singleRow="clr-namespace:WDE.DatabaseEditors.ViewModels.SingleRow;assembly=WDE.DatabaseEditors"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             xmlns:controls="clr-namespace:WDE.DatabaseEditors.Avalonia.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="oneToOneForeignKey:OneToOneForeignKeyViewModel"
+             x:Name="rootWindow"
+             x:Class="WDE.DatabaseEditors.Avalonia.Views.OneToOneForeignKey.OneToOneForeignKeyView">
+    <UserControl.KeyBindings>
+        <BetterKeyBinding Gesture="Ctrl+Z" CustomCommand="{CompiledBinding Undo}" />
+        <BetterKeyBinding Gesture="Ctrl+Y" CustomCommand="{CompiledBinding Redo}" />
+        <BetterKeyBinding Gesture="Cmd+Z" CustomCommand="{CompiledBinding Undo}" />
+        <BetterKeyBinding Gesture="Cmd+Y" CustomCommand="{CompiledBinding Redo}" />
+    </UserControl.KeyBindings>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://WDE.DatabaseEditors.Avalonia/Views/EditorControlResources.axaml" />
+                <ResourceDictionary>
+                    <BoolToDoubleConverter x:Key="BoolToFloatConverter" WhenTrue="1" WhenFalse="0.4" />
+                    <ItemsPanelTemplate x:Key="VerticalRowPanel">
+                        <DynamicColumnsPanel 
+                            KeyboardNavigation.TabNavigation="Continue"
+                            MaximumColumnsCount="1" ColumnWidth="400" HorizontalSpacing="10" Spacing="5"></DynamicColumnsPanel>
+                    </ItemsPanelTemplate>
+                    <DataTemplate x:Key="VerticalRowTemplate" x:DataType="singleRow:DatabaseEntityViewModel">
+                        <ItemsPresenter 
+                            KeyboardNavigation.TabNavigation="Continue"
+                            Items="{CompiledBinding Cells, Mode=OneWay}"
+                            ItemsPanel="{StaticResource VerticalRowPanel}">
+                            <ItemsPresenter.ItemTemplate>
+                                <DataTemplate x:DataType="singleRow:SingleRecordDatabaseCellViewModel">
+                                    <DockPanel LastChildFill="True">
+                                        <TextBlock Text="{CompiledBinding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
+                                        <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{Binding}" Margin="20,0,0,0" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsPresenter.ItemTemplate>
+                        </ItemsPresenter>
+                    </DataTemplate>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
+                                       LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
+        <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastCellView.axaml" />
+        <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastBoolCellView.axaml" />
+
+        <Style Selector=":is(controls|FastCellViewBase)">
+            <Setter Property="IsModified" Value="{Binding IsModified}" />
+            <Setter Property="SetNullCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}" />
+            <Setter Property="RevertCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}" />
+            <Setter Property="CanBeNull" Value="{Binding CanBeSetToNull, Mode=OneTime}" />
+        </Style>
+        <Style Selector=":is(controls|FastCellView)">
+            <Setter Property="ChooseParameterCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}" />
+        </Style>
+    </UserControl.Styles>
+    <UserControl.DataTemplates>
+        <StaticResource ResourceKey="FieldValueDataTemplate" />
+    </UserControl.DataTemplates>
+    <DockPanel LastChildFill="True">
+        <CheckBox DockPanel.Dock="Top" IsChecked="{CompiledBinding PresentInDatabase}">Present in the database</CheckBox>
+        <ScrollViewer Opacity="{CompiledBinding PresentInDatabase, Converter={StaticResource BoolToFloatConverter}}" IsEnabled="{CompiledBinding PresentInDatabase}" AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
+            <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{CompiledBinding Row}">
+            
+            </ContentControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

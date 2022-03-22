@@ -34,6 +34,14 @@ public class ParameterPickerService : IParameterPickerService
             return (default, false);
         }
         
+        if (parameter is ICustomPickerParameter<long> customLong)
+        {
+            var val = await customLong.PickValue((long)(object)currentValue);
+            if (val.Item2)
+                return ((T)(object)val.Item1, true);
+            return (default, false);
+        }
+
         if (parameter is IParameter<long> longParameter && typeof(T) == typeof(long))
         {
             long? val = await itemFromListProvider.GetItemFromList(longParameter.Items, longParameter is FlagParameter, currentValue as long?);

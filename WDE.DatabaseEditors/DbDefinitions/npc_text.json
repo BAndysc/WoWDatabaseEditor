@@ -9,7 +9,7 @@
   "description": "Npc text is the text visible when you talk with an npc",
   "table_name": "npc_text",
   "table_index_name": "ID",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "picker": "NpcTextParameter",
   "group_name": "Common scripting tables",
   "icon_path": "Icons/document_npc_text.png",

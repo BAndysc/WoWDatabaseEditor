@@ -12,7 +12,9 @@ namespace WDE.DatabaseEditors.Models
         object? OriginalValue { get; set; }
         event Action<IHistoryAction> OnChanged;
         string ToQueryString();
+        IValueHolder CurrentValue { get; }
         IDatabaseField Clone();
         object? Object { get; }
+        event Action<string, Action<IValueHolder>, Action<IValueHolder>> ValueChanged;
     }
 }

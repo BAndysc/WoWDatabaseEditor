@@ -9,7 +9,7 @@ namespace WDE.SqlInterpreter
 {
     [AutoRegister]
     [SingleInstance]
-    internal class QueryEvaluator : IQueryEvaluator
+    public class QueryEvaluator : IQueryEvaluator
     {
         public IReadOnlyList<IBaseQuery> Extract(string query)
         {
@@ -27,6 +27,12 @@ namespace WDE.SqlInterpreter
         {
             var visitor = CreateVisitor(query);
             return visitor?.Updates ?? Enumerable.Empty<UpdateQuery>();
+        }
+
+        public IEnumerable<DeleteQuery> ExtractDeletes(string query)
+        {
+            var visitor = CreateVisitor(query);
+            return visitor?.Deletes ?? Enumerable.Empty<DeleteQuery>();
         }
 
         private static SqlVisitor? CreateVisitor(string query)

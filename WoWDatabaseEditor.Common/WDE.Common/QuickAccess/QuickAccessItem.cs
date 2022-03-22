@@ -5,7 +5,7 @@ namespace WDE.Common.QuickAccess;
 
 public struct QuickAccessItem
 {
-    public QuickAccessItem(ImageUri icon, string text, string action, string description, ICommand command, object? parameter)
+    public QuickAccessItem(ImageUri icon, string text, string action, string description, ICommand command, object? parameter, byte score = 50)
     {
         Icon = icon;
         Text = text;
@@ -13,6 +13,7 @@ public struct QuickAccessItem
         Description = description;
         Command = command;
         Parameter = parameter;
+        Score = score;
     }
 
     public ImageUri Icon { get; }
@@ -21,4 +22,5 @@ public struct QuickAccessItem
     public string Description { get; }
     public ICommand Command { get; }
     public object? Parameter { get; }
+    public byte Score { get; }
 }

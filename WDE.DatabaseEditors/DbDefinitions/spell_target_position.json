@@ -9,7 +9,7 @@
     "description": "Spell_target_position is used for defining fixed, absolute target position for spells",
     "table_name": "spell_target_position",
     "table_index_name": "ID",
-    "multi_record": true,
+    "record_mode": "MultiRecord",
     "icon_path": "Icons/document_spell_target_position.png",
     "reload_command": "reload spell_target_position",
     "picker": "SpellParameter",

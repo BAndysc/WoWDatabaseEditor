@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
@@ -35,12 +37,43 @@ namespace WDE.DatabaseEditors.Services
             this.sessionService = sessionService;
             this.loader = loader;
         }
+
+        private bool TryBuildKey(DatabaseTableDefinitionJson definition, EqualityWhereCondition condition, out DatabaseKey key)
+        {
+            key = default;
+            if (condition.Columns.Length != definition.GroupByKeys.Count ||
+                definition.GroupByKeys.Count == 0)
+                return false;
+
+            List<long>? values = null;
+            foreach (var groupBy in definition.GroupByKeys)
+            {
+                int index = condition.Columns.IndexIf(x => x.Equals(groupBy, StringComparison.InvariantCultureIgnoreCase));
+                if (index == -1)
+                    return false;
+                var value = condition.Values[index];
+                if (value is not long l)
+                    return false;
+                if (definition.GroupByKeys.Count == 1)
+                {
+                    key = new DatabaseKey(l);
+                    return true;
+                }
+                values = values ?? new();
+                values.Add(l);
+            }
+
+            key = new DatabaseKey(values!);
+            return true;
+        }
     
         public async Task<(IList<ISolutionItem> items, IList<string> errors)> GenerateItemsForQuery(string query)
         {
             IList<ISolutionItem> found = new List<ISolutionItem>();
             IList<string> errors = new List<string>();
             HashSet<string> missingTables = new HashSet<string>();
+            Dictionary<string, DatabaseTableSolutionItem> byTable = new();
+            Dictionary<string, List<DatabaseKey>> byTableToDelete = new();
             foreach (var q in queryEvaluator.Extract(query))
             {
                 if (q is UpdateQuery updateQuery)
@@ -50,7 +83,7 @@ namespace WDE.DatabaseEditors.Services
                     if (defi == null)
                     {
                         defi = tableDefinitionProvider.GetDefinitionByForeignTableName(updateQuery.TableName);
-                        if (defi?.ForeignTableByName.TryGetValue(updateQuery.TableName, out var foreignTable_) ?? false)
+                        if (defi?.ForeignTableByName?.TryGetValue(updateQuery.TableName, out var foreignTable_) ?? false)
                             foreignTable = foreignTable_;
                     }
 
@@ -59,34 +92,49 @@ namespace WDE.DatabaseEditors.Services
                         missingTables.Add(updateQuery.TableName);
                         continue;
                     }
-                
-                    if (
-                        (!foreignTable.HasValue && !updateQuery.Where.ColumnName.Equals(defi.TablePrimaryKeyColumnName, StringComparison.InvariantCultureIgnoreCase))
-                        ||
-                        (foreignTable.HasValue && !updateQuery.Where.ColumnName.Equals(foreignTable.Value.ForeignKeys[0], StringComparison.InvariantCultureIgnoreCase))
-                        )
+                    
+                    foreach (var condition in updateQuery.Where.Conditions)
                     {
-                        missingTables.Add(updateQuery.TableName);
-                        continue;
-                    }
-
-                    foreach (var key in updateQuery.Where.Values)
-                    {
-                        if (key is not long lkey)
+                        if (!TryBuildKey(defi, condition, out var key))
                             continue;
-                        var old = await loader.Load(defi.Id, (uint)lkey);
+                        var old = await loader.Load(defi.Id, null,null,null, new[]{key});
                         if (old == null || old.Entities.Count != 1 || !old.Entities[0].ExistInDatabase)
                         {
-                            errors.Add($"{defi.TableName} where {defi.TablePrimaryKeyColumnName} = {lkey} not found, no update");
+                            errors.Add($"{defi.TableName} where {defi.TablePrimaryKeyColumnName} = {key} not found, no update");
                             continue;
                         }
-                        var item = new DatabaseTableSolutionItem(defi.Id);
-                        item.Entries.Add(new SolutionItemDatabaseEntity((uint)lkey, true));
-                        var savedItem = sessionService.Find(item);
-                        if (savedItem != null)
-                            item = (DatabaseTableSolutionItem)savedItem.Clone();
 
-                        var originals = item.Entries[0].OriginalValues ??= new();
+                        List<EntityOrigianlField> originals;
+                        if (defi.RecordMode == RecordMode.SingleRow)
+                        {
+                            DatabaseTableSolutionItem? existing = null;
+                            if (!byTable.TryGetValue(defi.Id, out existing))
+                            {
+                                var phantom = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
+                                existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
+                                found.Add(existing);
+                                byTable[defi.Id] = existing;
+                            }
+
+                            var entry = existing.Entries.FirstOrDefault(e => e.Key == key);
+                            if (entry == null)
+                            {
+                                entry = new(key, true);
+                                existing.Entries.Add(entry);
+                            }
+                            originals = entry.OriginalValues ??= new();
+                        }
+                        else
+                        {
+                            var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
+                            item.Entries.Add(new SolutionItemDatabaseEntity(key, true));
+                            var savedItem = sessionService.Find(item);
+                            if (savedItem != null)
+                                item = (DatabaseTableSolutionItem)savedItem.Clone();
+
+                            originals = item.Entries[0].OriginalValues ??= new();
+                            found.Add(item);
+                        }
                         foreach (var upd in updateQuery.Updates)
                         {
                             var cell = old.Entities[0].GetCell(upd.ColumnName);
@@ -101,7 +149,34 @@ namespace WDE.DatabaseEditors.Services
                             };
                             originals.Add(original);
                         }
-                        found.Add(item);
+                    }
+                }
+                else if (q is DeleteQuery deleteQuery)
+                {
+                    var defi = tableDefinitionProvider.GetDefinitionByTableName(deleteQuery.TableName);
+                    if (defi == null)
+                    {
+                        missingTables.Add(deleteQuery.TableName);
+                        continue;
+                    }
+
+                    if (defi.RecordMode != RecordMode.SingleRow)
+                        continue;
+                    
+                    foreach (var condition in deleteQuery.Where.Conditions)
+                    {
+                        if (!TryBuildKey(defi, condition, out var key))
+                            continue;
+                        if (key.Count != defi.GroupByKeys.Count)
+                            continue;
+                        var old = await loader.Load(defi.Id, null,null,null, new[]{key});
+                        if (old == null || old.Entities.Count == 0)
+                        {
+                            if (!byTableToDelete.TryGetValue(defi.Id, out var toDelete))
+                                toDelete = byTableToDelete[defi.Id] = new();
+
+                            toDelete.Add(key);
+                        }
                     }
                 }
                 else if (q is InsertQuery insertQuery)
@@ -112,34 +187,63 @@ namespace WDE.DatabaseEditors.Services
                         missingTables.Add(insertQuery.TableName);
                         continue;
                     }
-                
-                    int indexOf = -1;
-                    for (int i = 0; i < insertQuery.Columns.Count; ++i)
-                    {
-                        if (insertQuery.Columns[i].Equals(defi.TablePrimaryKeyColumnName,
-                            StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            indexOf = i;
-                            break;
-                        }
-                    }
 
-                    if (indexOf == -1)
+                    var keyIndices = defi.GroupByKeys.Select(key => insertQuery.Columns.IndexOf(key)).ToList();
+                    if (keyIndices.Count != defi.GroupByKeys.Count)
                     {
                         missingTables.Add(insertQuery.TableName);
                         continue;
                     }
 
-                    foreach (var line in insertQuery.Inserts)
+                    if (defi.RecordMode == RecordMode.SingleRow)
                     {
-                        if (line[indexOf] is not long lkey)
-                            continue;
-                        var item = new DatabaseTableSolutionItem(defi.Id);
-                        item.Entries.Add(new SolutionItemDatabaseEntity((uint)lkey, false));
-                        found.Add(item);
+                        DatabaseTableSolutionItem? existing = null;
+                        if (!byTable.TryGetValue(defi.Id, out existing))
+                        {
+                            var phantom = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
+                            existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
+                            found.Add(existing);
+                            byTable[defi.Id] = existing;
+                        }
+                        foreach (var line in insertQuery.Inserts)
+                        {
+                            var key = new DatabaseKey(keyIndices.Select(index => line[index]).Select(x => (long)x));
+                            if (existing.Entries.All(x => x.Key != key))
+                                existing.Entries.Add(new SolutionItemDatabaseEntity(key, false));
+                            if (byTableToDelete.TryGetValue(defi.Id, out var toDelete))
+                                toDelete.Remove(key);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Assert(keyIndices.Count == 1);
+                        foreach (var line in insertQuery.Inserts)
+                        {
+                            if (line[keyIndices[0]] is not long lkey)
+                                continue;
+                            var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
+                            item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), false));
+                            found.Add(item);
+                        }
                     }
                 }
             }
+
+            foreach (var toDelete in byTableToDelete)
+            {
+                DatabaseTableSolutionItem? existing = null;
+                if (!byTable.TryGetValue(toDelete.Key, out existing))
+                {
+                    var phantom = new DatabaseTableSolutionItem(toDelete.Key, false); // false, because we only have SingleRow here
+                    existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
+                    found.Add(existing);
+                }
+                existing.Entries.RemoveIf(e => toDelete.Value.Contains(e.Key));
+                existing.DeletedEntries ??= new();
+                existing.DeletedEntries.AddRange(toDelete.Value);
+                existing.DeletedEntries = existing.DeletedEntries.Distinct().ToList();
+            }
+            
             foreach (var missing in missingTables)
                 errors.Add($"Table `{missing}` is not supported in WDE, no item added to the session.");
         

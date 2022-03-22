@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.SQLEditor.Providers
 {
@@ -16,13 +17,13 @@ namespace WDE.SQLEditor.Providers
             this.sqlGeneratorRegistry = sqlGeneratorRegistry;
         }
         
-        public async Task<string> GenerateSql(MetaSolutionSQL item)
+        public async Task<IQuery> GenerateSql(MetaSolutionSQL item)
         {
-            StringBuilder sb = new();
+            IMultiQuery multiQuery = Queries.BeginTransaction();
             foreach (var subitem in item.ItemsToGenerate)
-                sb.AppendLine(await sqlGeneratorRegistry.Value.GenerateSql(subitem));
-            
-            return sb.ToString();
+                multiQuery.Add(await sqlGeneratorRegistry.Value.GenerateSql(subitem));
+
+            return multiQuery.Close();
         }
     }
 }

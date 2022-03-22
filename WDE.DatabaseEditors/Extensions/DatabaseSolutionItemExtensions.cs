@@ -8,7 +8,7 @@ namespace WDE.DatabaseEditors.Extensions
     public static class DatabaseSolutionItemExtensions
     {
         public static void UpdateEntitiesWithOriginalValues(this DatabaseTableSolutionItem item,
-            IList<DatabaseEntity> entities)
+            IReadOnlyList<DatabaseEntity> entities)
         {
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             foreach (var solutionEntity in item.Entries)

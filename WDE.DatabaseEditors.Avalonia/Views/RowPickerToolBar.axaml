@@ -21,6 +21,7 @@
         <ButtonImage Command="{CompiledBinding PickSelected}"
                      ToolTip.Tip="Pick"
                      Text="Pick"
+                     IsVisible="{CompiledBinding DisablePicking, Converter={x:Static BoolConverters.Not}}"
                      Image="Icons/icon_right.png" />
     </ToolbarPanel>
 </UserControl>

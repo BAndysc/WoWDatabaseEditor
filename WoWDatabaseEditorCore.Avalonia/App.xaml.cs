@@ -111,7 +111,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             containerRegistry.RegisterInstance(Container);
             var vfs = new VirtualFileSystem();
             var fs = new FileSystem(vfs);
-            var userSettings = new UserSettings(fs, new DummyStatusBar());
+            var userSettings = new UserSettings(fs, new Lazy<IStatusBar>(new DummyStatusBar()));
             var currentCoreSettings = new CurrentCoreSettings(userSettings);
             
             modulesManager = new ModulesManager(currentCoreSettings);
@@ -277,6 +277,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             
             IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+            Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
         }
 
         private class Conflict

@@ -32,7 +32,7 @@ namespace WDE.Solutions.Sessions
             StringBuilder sb = new();
             foreach (var pair in session)
             {
-                var serialize = serializerRegistry.Serialize(pair.Item1);
+                var serialize = serializerRegistry.Serialize(pair.Item1, false);
                 sb.AppendLine($"{Begin}{serialize.Type};{serialize.Value};{serialize.Value2 ?? 0};{serialize.StringValue}");
                 sb.AppendLine(" -- " + serialize.Comment);
                 sb.Append(pair.Item2);

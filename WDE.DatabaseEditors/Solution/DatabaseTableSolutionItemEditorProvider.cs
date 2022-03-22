@@ -3,8 +3,10 @@ using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
+using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.DatabaseEditors.ViewModels.Template;
 using WDE.Module.Attributes;
 
@@ -36,8 +38,10 @@ namespace WDE.DatabaseEditors.Solution
                 throw new Exception("Cannot find table editor for definition " + item.DefinitionId + ". If you think this is a bug, please report it via Help -> Report a bug");
             }
             
-            if (definition.IsMultiRecord)
+            if (definition.RecordMode == RecordMode.MultiRecord)
                 return  containerRegistry.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), item));
+            if (definition.RecordMode == RecordMode.SingleRow)
+                return  containerRegistry.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), item));
             return containerRegistry.Resolve<TemplateDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), item));
         }
     }

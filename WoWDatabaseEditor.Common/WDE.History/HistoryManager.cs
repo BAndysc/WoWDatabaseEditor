@@ -63,35 +63,45 @@ namespace WDE.History
         public int UndoCount => Past.Count;
         public int RedoCount => Future.Count;
 
+        public void RemoveHandler(HistoryHandler handler)
+        {
+            handler.ActionPush -= HandlerOnActionPush;
+            handler.ActionDone -= HandlerOnActionDone;
+        }
+
         public T AddHandler<T>(T handler) where T : HistoryHandler
         {
-            handler.ActionPush += (sender, action) =>
-            {
-                if (!acceptNew)
-                    return;
-
-                EnsureLimits();
-                Past.Add(action);
-                Future.Clear();
-                RecalculateValues();
-            };
-            handler.ActionDone += (sender, action) =>
-            {
-                if (!acceptNew)
-                    throw new Exception("Cannot do history action when not accepting new actions");
-                
-                acceptNew = false;
-
-                EnsureLimits();
-                Past.Add(action);
-                Future.Clear();
-                RecalculateValues();
-                
-                action.Redo();
-                
-                acceptNew = true;
-            };
+            handler.ActionPush += HandlerOnActionPush;
+            handler.ActionDone += HandlerOnActionDone;
             return handler;
+        }
+
+        private void HandlerOnActionDone(object? sender, IHistoryAction action)
+        {
+            if (!acceptNew)
+                throw new Exception("Cannot do history action when not accepting new actions");
+            
+            acceptNew = false;
+
+            EnsureLimits();
+            Past.Add(action);
+            Future.Clear();
+            RecalculateValues();
+            
+            action.Redo();
+            
+            acceptNew = true;
+        }
+
+        private void HandlerOnActionPush(object? sender, IHistoryAction e)
+        {
+            if (!acceptNew)
+                return;
+
+            EnsureLimits();
+            Past.Add(e);
+            Future.Clear();
+            RecalculateValues();
         }
 
         private void EnsureLimits()
@@ -134,6 +144,8 @@ namespace WDE.History
         {
             if (Past.Count > 0)
                 savedPoint = Past[^1];
+            else
+                savedPoint = null;
             forceNoSave = false;
             RecalculateValues();
         }

@@ -53,7 +53,7 @@ namespace WDE.SqlQueryGenerator.Test
             var trans = Queries.BeginTransaction();
             trans.BlankLine();
             trans.BlankLine();
-            Assert.AreEqual(Environment.NewLine, trans.Close().QueryString);
+            Assert.AreEqual("", trans.Close().QueryString);
         }
         
         [Test]

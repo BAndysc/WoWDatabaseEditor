@@ -67,7 +67,7 @@ namespace WDE.SQLEditor.ViewModels
                 {
                     StringBuilder sb = new();
                     foreach (var subitem in item.ItemsToGenerate)
-                        sb.AppendLine(await sqlGeneratorsRegistry.GenerateSql(subitem));
+                        sb.AppendLine((await sqlGeneratorsRegistry.GenerateSql(subitem)).QueryString);
                     string sql = sb.ToString();
                     
                     Code.FromString(sql);

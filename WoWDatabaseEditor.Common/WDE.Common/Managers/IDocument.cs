@@ -6,6 +6,7 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.History;
 using WDE.Common.Types;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.Common.Managers
 {
@@ -15,6 +16,11 @@ namespace WDE.Common.Managers
         ICommand Redo { get; }
         IHistoryManager? History { get; }
         bool IsModified { get; }
+    }
+
+    public interface IBeforeSaveConfirmDocument
+    {
+        Task<bool> ShallSavePreventClosing();
     }
     
     public interface IDocument : IUndoRedoWindow, IDisposable, INotifyPropertyChanged
@@ -32,13 +38,13 @@ namespace WDE.Common.Managers
     public interface ISolutionItemDocument : IDocument
     {
         ISolutionItem SolutionItem { get; }
-        Task<string> GenerateQuery();
+        Task<IQuery> GenerateQuery();
         bool ShowExportToolbarButtons => true;
     }
 
     public interface ISplitSolutionItemQueryGenerator
     {
-        Task<IList<(ISolutionItem, string)>> GenerateSplitQuery();
+        Task<IList<(ISolutionItem, IQuery)>> GenerateSplitQuery();
     }
 
     public interface IProblemSourceDocument : IDocument
