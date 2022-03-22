@@ -233,7 +233,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             isDefault = false;
                         if (!isMainTable && columnDefinition.IsTypeLong && ((cell.Object == null && columnDefinition.Default != null) || cell.Object != null && !cell.Object.Equals(columnDefinition.Default ?? 0L)))
                             isDefault = false;
-                        return FixUnixTimestamp(columnDefinition, cell.Object);
+                        return FixUnixTimestampAndNullability(columnDefinition, cell.Object);
                     });
                     if (!isMainTable)
                     {
@@ -357,12 +357,23 @@ namespace WDE.DatabaseEditors.QueryGenerators
             var q = Queries.Table(column.ForeignTable ?? table.TableName);
             var where = GenerateConditionsForSingleRow(q, table, column.ForeignTable ?? table.TableName, entity);
             return where
-                .Set(field.FieldName, FixUnixTimestamp(column, field.Object))
+                .Set(field.FieldName, FixUnixTimestampAndNullability(column, field.Object))
                 .Update();
         }
 
-        private object? FixUnixTimestamp(DatabaseColumnJson column, object? value)
+        private object? FixUnixTimestampAndNullability(DatabaseColumnJson column, object? value)
         {
+            if (!column.CanBeNull && value == null)
+            {
+                if (column.Default != null)
+                    return column.Default;
+                if (column.IsTypeLong)
+                    return 0L;
+                if (column.IsTypeFloat)
+                    return 0f;
+                if (column.IsTypeString)
+                    return "";
+            }
             if (!column.IsUnixTimestamp)
                 return value;
             if (value is long l)
@@ -421,9 +432,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
                     var where = GenerateWherePrimaryKey(groupByKeys, query.Table(table.Key), entity.Key);
                     IUpdateQuery update = where
-                        .Set(updates[0].FieldName, FixUnixTimestamp(definition.TableColumns[updates[0].FieldName], updates[0].Object));
+                        .Set(updates[0].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
                     for (int i = 1; i < updates.Count; ++i)
-                        update = update.Set(updates[i].FieldName, FixUnixTimestamp(definition.TableColumns[updates[i].FieldName], updates[i].Object));
+                        update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
 
                     update.Update();
                 }
@@ -461,9 +472,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                                 );
                             var where = GenerateWherePrimaryKey(primaryKeyColumn, query.Table(table.Key), entity.GenerateKey(definition));
                             IUpdateQuery update = where
-                                .Set(updates[0].FieldName, FixUnixTimestamp(definition.TableColumns[updates[0].FieldName], updates[0].Object));
+                                .Set(updates[0].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
                             for (int i = 1; i < updates.Count; ++i)
-                                update = update.Set(updates[i].FieldName, FixUnixTimestamp(definition.TableColumns[updates[i].FieldName], updates[i].Object));
+                                update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
 
                             update.Update();
                         }
