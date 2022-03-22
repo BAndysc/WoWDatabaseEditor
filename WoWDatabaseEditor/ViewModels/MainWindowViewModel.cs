@@ -253,6 +253,11 @@ namespace WoWDatabaseEditorCore.ViewModels
 
                     if (result == MessageBoxButtonType.Yes)
                     {
+                        if (editor is IBeforeSaveConfirmDocument before)
+                        {
+                            if (await before.ShallSavePreventClosing())
+                                return false;
+                        }
                         editor.Save.Execute(null);
                         modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
                         DocumentManager.OpenedDocuments.Remove(editor);
@@ -265,7 +270,16 @@ namespace WoWDatabaseEditorCore.ViewModels
                     else if (result == MessageBoxButtonType.CustomA)
                     {
                         foreach (var m in modifiedDocuments)
+                        {
+                            if (m is IBeforeSaveConfirmDocument before)
+                            {
+                                if (await before.ShallSavePreventClosing())
+                                {
+                                    return false;
+                                }
+                            }
                             m.Save.Execute(null);
+                        }
                         modifiedDocuments.Clear();
                     }
                     else if (result == MessageBoxButtonType.CustomB)
