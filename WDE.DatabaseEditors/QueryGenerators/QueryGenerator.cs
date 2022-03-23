@@ -101,7 +101,10 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 {
                     table = query.Table(foreign.TableName);
                     if (keys.Count > 1 && keys[0].Count == 1)
-                        table.WhereIn(foreign.ForeignKeys[0], keys.Select(k => k[0])).Delete();
+                    {
+                        foreach (var chunk in keys.Select(k => k[0]).Chunk(128))
+                            table.WhereIn(foreign.ForeignKeys[0], chunk).Delete();
+                    }
                     else
                     {
                         foreach (var key in keys)
@@ -112,7 +115,10 @@ namespace WDE.DatabaseEditors.QueryGenerators
             
             table = query.Table(definition.TableName);
             if (keys.Count > 1 && keys[0].Count == 1)
-                table.WhereIn(definition.TablePrimaryKeyColumnName, keys.Select(k => k[0])).Delete();
+            {
+                foreach (var chunk in keys.Select(k => k[0]).Chunk(128))
+                    table.WhereIn(definition.TablePrimaryKeyColumnName, chunk).Delete();
+            }
             else
             {
                 foreach (var key in keys)
@@ -180,7 +186,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             }
         }
 
-        private IQuery GenerateInsertQuery(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
+        public IQuery GenerateInsertQuery(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
         {
             if (keys.Count == 0)
                 return Queries.Empty();

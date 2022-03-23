@@ -180,6 +180,8 @@
                             <MenuItem Header="-"></MenuItem>
                             <MenuItem Header="Delete row" Command="{CompiledBinding DeleteRowSelectedCommand}" />
                             <MenuItem Header="Duplicate row"  Command="{CompiledBinding DuplicateSelectedCommand}"/>
+                            <MenuItem Header="-"></MenuItem>
+                            <MenuItem Header="Generate insert query"  Command="{CompiledBinding GenerateInsertQueryForSelectedCommand}"/>
                         </MenuFlyout>
                     </fastTableView:VeryFastTableView.ContextFlyout>
                 </fastTableView:VeryFastTableView>

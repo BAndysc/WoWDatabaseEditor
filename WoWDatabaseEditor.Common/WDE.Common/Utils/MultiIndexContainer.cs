@@ -14,6 +14,7 @@ public interface IMultiIndexContainer
     IEnumerable<int> AllReversed();
     IEfficientContainsIterator ContainsIterator { get; }
     bool MoreThanOne { get; }
+    bool Empty { get; }
 }
 
 public interface IEfficientContainsIterator
@@ -25,8 +26,7 @@ public interface IEfficientContainsIterator
 public class MultiIndexContainer : IMultiIndexContainer
 {
     private List<(int start, int end)> ranges = new List<(int start, int end)>();
-    //(2,5) (7, 10)
-
+ 
     public IReadOnlyList<(int start, int end)> DebugRanges => ranges;
 
     private int FindFirstHigherThanEnd(int index)
@@ -222,6 +222,7 @@ public class MultiIndexContainer : IMultiIndexContainer
     public IEfficientContainsIterator ContainsIterator => new EfficientContainsIterator(this);
 
     public bool MoreThanOne => ranges.Count > 1 || (ranges.Count == 1 && ranges[0].start != ranges[0].end);
+    public bool Empty => ranges.Count == 0;
 
     private class EfficientContainsIterator : IEfficientContainsIterator
     {

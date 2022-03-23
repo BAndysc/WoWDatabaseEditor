@@ -8,6 +8,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
 {
     public interface IQueryGenerator
     {
+        public IQuery GenerateInsertQuery(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData);
         public IQuery GenerateQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData);
         public IQuery GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity, IDatabaseField field);
         public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity);

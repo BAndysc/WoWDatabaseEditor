@@ -27,12 +27,11 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
     private static IPen ButtonBackgroundPen = new Pen(new SolidColorBrush(Colors.White), 0);
     private static IPen ButtonBackgroundHoverPen = new Pen(new SolidColorBrush(Color.FromRgb(245, 245, 245)), 0);
     private static IPen ButtonBackgroundPressedPen = new Pen(new SolidColorBrush(Color.FromRgb(215, 215, 215)), 0);
-
+    private static IPen ButtonBackgroundDisabledPen = new Pen(new SolidColorBrush(Color.FromRgb(170, 170, 170)), 0);
+    
     private Point mouseCursor;
     private bool leftPressed;
     
-    
-
     static CustomCellDrawer()
     {
         ModifiedCellPen.GetResource("FastTableView.ModifiedCellPen", ModifiedCellPen, out ModifiedCellPen);
@@ -42,6 +41,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         ButtonBackgroundPen.GetResource("FastTableView.ButtonBackgroundPen", ButtonBackgroundPen, out ButtonBackgroundPen);
         ButtonBackgroundHoverPen.GetResource("FastTableView.ButtonBackgroundHoverPen", ButtonBackgroundHoverPen, out ButtonBackgroundHoverPen);
         ButtonBackgroundPressedPen.GetResource("FastTableView.ButtonBackgroundPressedPen", ButtonBackgroundPressedPen, out ButtonBackgroundPressedPen);
+        ButtonBackgroundDisabledPen.GetResource("FastTableView.ButtonBackgroundDisabledPen", ButtonBackgroundDisabledPen, out ButtonBackgroundDisabledPen);
     }
 
     public void DrawRow(DrawingContext context, ITableRow r, Rect rect)
@@ -65,13 +65,13 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         return true;
     }
 
-    private void DrawButton(DrawingContext context, Rect rect, string text, int margin)
+    private void DrawButton(DrawingContext context, Rect rect, string text, int margin, bool enabled = true)
     {
         rect = rect.Deflate(margin);
 
         bool isOver = rect.Contains(mouseCursor);
             
-        context.DrawRectangle((isOver ? (leftPressed ? ButtonBackgroundPressedPen : ButtonBackgroundHoverPen) : ButtonBackgroundPen).Brush, ButtonBorderPen, rect, 4, 4);
+        context.DrawRectangle((!enabled ? ButtonBackgroundDisabledPen : isOver ? (leftPressed ? ButtonBackgroundPressedPen : ButtonBackgroundHoverPen) : ButtonBackgroundPen).Brush, ButtonBorderPen, rect, 4, 4);
 
         var state = context.PushClip(rect);
         var ft = new FormattedText
@@ -92,7 +92,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
 
         if (cell.ActionCommand != null)
         {
-            DrawButton(context, rect, cell.ActionLabel, 3);
+            DrawButton(context, rect, cell.ActionLabel, 3, cell.ActionCommand.CanExecute(null));
             return true;
         }
         

@@ -30,9 +30,10 @@ public class CustomCellInteractor : CustomCellDrawerInteractorBase, ICustomCellI
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
 
-        if (cell.ActionCommand != null && cell.ActionCommand.CanExecute(null))
+        if (cell.ActionCommand != null)
         {
-            cell.ActionCommand.Execute(null);
+            if (cell.ActionCommand.CanExecute(null))
+                cell.ActionCommand.Execute(null);
             return true;
         }
         

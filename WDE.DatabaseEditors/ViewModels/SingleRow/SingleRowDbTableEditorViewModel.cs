@@ -17,6 +17,7 @@ using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Disposables;
+using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -161,6 +162,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         
         public AsyncAutoCommand DeleteRowSelectedCommand { get; }
         public DelegateCommand SetNullSelectedCommand { get; }
+        public DelegateCommand GenerateInsertQueryForSelectedCommand { get; }
         public AsyncAutoCommand DuplicateSelectedCommand { get; }
         public AsyncAutoCommand RevertSelectedCommand { get; }
         
@@ -257,7 +259,16 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 ForceInsertEntity(duplicate, FocusedRowIndex + 1);
             }, () => FocusedRow != null);
             AutoDispose(this.ToObservable(() => FocusedRow).Subscribe(_ => DuplicateSelectedCommand.RaiseCanExecuteChanged()));
-                
+
+            GenerateInsertQueryForSelectedCommand = new DelegateCommand(() =>
+            {
+                var selectedKeys = MultiSelection.All().Select(index => Entities[index].GenerateKey(TableDefinition)).ToList();
+                var tableData = new DatabaseTableData(TableDefinition, Entities);
+                var query = queryGenerator.GenerateInsertQuery(selectedKeys, tableData);
+                var item = new MetaSolutionSQL(new JustQuerySolutionItem(query));
+                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
+            }, () => !MultiSelection.Empty).ObservesProperty(() => FocusedRow);
+            
             foreach (var key in solutionItem.Entries.Select(x => x.Key))
                 keys.Add(key);
             

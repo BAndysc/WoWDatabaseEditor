@@ -151,6 +151,11 @@ public class JustQuerySolutionItem : ISolutionItem
     {
         Query = query;
     }
+    
+    public JustQuerySolutionItem(IQuery query)
+    {
+        Query = query.QueryString;
+    }
 }
 
 [AutoRegister]

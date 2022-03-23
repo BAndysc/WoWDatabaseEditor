@@ -19,5 +19,6 @@
         <Pen Thickness="1" Brush="White" x:Key="FastTableView.ButtonBackgroundPen" />
         <Pen Thickness="1" Brush="#F5F5F5" x:Key="FastTableView.ButtonBackgroundHoverPen" />
         <Pen Thickness="1" Brush="#D7D7D7" x:Key="FastTableView.ButtonBackgroundPressedPen" />
+        <Pen Thickness="1" Brush="#D2D2D2" x:Key="FastTableView.ButtonBackgroundDisabledPen" />
     </Styles.Resources>
 </Styles>

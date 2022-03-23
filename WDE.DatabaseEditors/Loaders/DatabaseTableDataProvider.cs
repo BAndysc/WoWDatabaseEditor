@@ -120,6 +120,8 @@ namespace WDE.DatabaseEditors.Loaders
             try
             {
                 var result = await sqlExecutor.ExecuteSelectSql(sql);
+                if (result.Count == 0)
+                    return 0;
                 return Convert.ToInt64(result[0]["num"].Item2);
             }
             catch (IMySqlExecutor.CannotConnectToDatabaseException)
