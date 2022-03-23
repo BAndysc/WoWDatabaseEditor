@@ -43,8 +43,11 @@ namespace WDE.PacketViewer.ViewModels
                 creatureNames[packet.QueryCreatureResponse.Entry] = packet.QueryCreatureResponse.Name;
 
             if (packet.KindCase == PacketHolder.KindOneofCase.QueryPlayerNameResponse)
-                playerNames[packet.QueryPlayerNameResponse.PlayerGuid] = packet.QueryPlayerNameResponse.PlayerName;
-
+            {
+                foreach (var pair in packet.QueryPlayerNameResponse.Responses)
+                    playerNames[pair.PlayerGuid] = pair.PlayerName;
+            }
+ 
             var guid = guidExtractorProcessor.Process(packet);
             var entry = entryExtractorProcessor.Process(packet);
 
