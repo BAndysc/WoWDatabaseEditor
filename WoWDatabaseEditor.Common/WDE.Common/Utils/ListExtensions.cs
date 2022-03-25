@@ -74,5 +74,16 @@ namespace WDE.Common.Utils
 
             return -1;
         }
+
+        public static int IndexOfIgnoreCase(this IReadOnlyList<string> list, string item)
+        {
+            for (int i = 0; i < list.Count; ++i)
+            {
+                if (list[i].Equals(item, StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
+
+            return -1;
+        }
     }
 }

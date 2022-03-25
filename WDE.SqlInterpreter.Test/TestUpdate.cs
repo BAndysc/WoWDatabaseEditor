@@ -123,11 +123,33 @@ namespace WDE.SqlInterpreter.Test
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("creature", result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"position_x", "position_y", "position_z", "orientation"}, result[0].Updates.Select(s => s.ColumnName));
-            CollectionAssert.AreEqual(new string[]{"6443.63", "2039.9923", "551.1352", "2.6383197"}, result[0].Updates.Select(s => s.Value));
+            CollectionAssert.AreEqual(new float[]{6443.63f, 2039.9923f, 551.1352f, 2.6383197f}, result[0].Updates.Select(s => s.Value).Cast<float>());
             Assert.AreEqual(1, result[0].Where.Conditions.Length);
             Assert.AreEqual(1, result[0].Where.Conditions[0].Columns.Length);
             Assert.AreEqual("guid", result[0].Where.Conditions[0].Columns[0]);
             Assert.AreEqual(121393L, result[0].Where.Conditions[0].Values[0]);
+        }
+        
+        [Test]
+        public void CaseDoesntMatter()
+        {
+            var result = evaluator.ExtractUpdates("update `abc` set `a` = 5 where `b` = 5;").ToList();
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("abc", result[0].TableName);
+            CollectionAssert.AreEqual(new string[]{"a"}, result[0].Updates.Select(s => s.ColumnName));
+            Assert.AreEqual(1, result[0].Where.Conditions.Length);
+            Assert.AreEqual(1, result[0].Where.Conditions[0].Columns.Length);
+            Assert.AreEqual("b", result[0].Where.Conditions[0].Columns[0]);
+            Assert.AreEqual(5L, result[0].Where.Conditions[0].Values[0]);
+        }
+        
+        [Test]
+        public void RawWhere()
+        {
+            var result = evaluator.ExtractUpdates("update `abc` set `a` = 5 where (`b` = 5 AND `c` = 1) OR (`a` = 5);").ToList();
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("`b` = 5 AND `c` = 1", result[0].Where.Conditions[0].RawSql);
+            Assert.AreEqual("`a` = 5", result[0].Where.Conditions[1].RawSql);
         }
     }
 }

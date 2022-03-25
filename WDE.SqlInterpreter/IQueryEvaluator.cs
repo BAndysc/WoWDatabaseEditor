@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using WDE.Common.Services.QueryParser.Models;
 using WDE.Module.Attributes;
-using WDE.SqlInterpreter.Models;
 
 namespace WDE.SqlInterpreter
 {

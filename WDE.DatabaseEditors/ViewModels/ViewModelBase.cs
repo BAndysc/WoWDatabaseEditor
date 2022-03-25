@@ -38,20 +38,21 @@ namespace WDE.DatabaseEditors.ViewModels
 {
     public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator, IAddRowKey
     {
-        private readonly ISolutionItemNameRegistry solutionItemName;
+        protected readonly ISolutionItemNameRegistry solutionItemName;
         protected readonly ISolutionManager solutionManager;
-        private readonly ISolutionTasksService solutionTasksService;
-        private readonly IQueryGenerator queryGenerator;
+        protected readonly ISolutionTasksService solutionTasksService;
+        protected readonly IQueryGenerator queryGenerator;
         protected readonly IDatabaseTableDataProvider databaseTableDataProvider;
-        private readonly IMessageBoxService messageBoxService;
-        private readonly ITaskRunner taskRunner;
-        private readonly IParameterFactory parameterFactory;
-        private readonly IItemFromListProvider itemFromListProvider;
+        protected readonly IMessageBoxService messageBoxService;
+        protected readonly ITaskRunner taskRunner;
+        protected readonly IParameterFactory parameterFactory;
+        protected readonly ITableDefinitionProvider tableDefinitionProvider;
+        protected readonly IItemFromListProvider itemFromListProvider;
         protected readonly ISessionService sessionService;
-        private readonly IDatabaseTableCommandService commandService;
-        private readonly IParameterPickerService parameterPickerService;
+        protected readonly IDatabaseTableCommandService commandService;
+        protected readonly IParameterPickerService parameterPickerService;
         protected readonly IStatusBar statusBar;
-        private readonly IMySqlExecutor mySqlExecutor;
+        protected readonly IMySqlExecutor mySqlExecutor;
 
         protected ViewModelBase(IHistoryManager history,
             DatabaseTableSolutionItem solutionItem,
@@ -81,6 +82,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.messageBoxService = messageBoxService;
             this.taskRunner = taskRunner;
             this.parameterFactory = parameterFactory;
+            this.tableDefinitionProvider = tableDefinitionProvider;
             this.itemFromListProvider = itemFromListProvider;
             this.sessionService = sessionService;
             this.commandService = commandService;

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Services;
+using WDE.Common.Services.QueryParser;
 using WDE.Common.Sessions;
 using WDE.Module.Attributes;
 

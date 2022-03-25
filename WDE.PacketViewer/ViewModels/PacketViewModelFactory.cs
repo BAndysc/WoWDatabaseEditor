@@ -45,7 +45,8 @@ namespace WDE.PacketViewer.ViewModels
             if (packet.KindCase == PacketHolder.KindOneofCase.QueryPlayerNameResponse)
             {
                 foreach (var pair in packet.QueryPlayerNameResponse.Responses)
-                    playerNames[pair.PlayerGuid] = pair.PlayerName;
+                    if (pair.PlayerGuid != null)
+                        playerNames[pair.PlayerGuid] = pair.PlayerName;
             }
  
             var guid = guidExtractorProcessor.Process(packet);

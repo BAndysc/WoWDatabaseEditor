@@ -38,6 +38,7 @@ using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
+using WDE.DatabaseEditors.Utils;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -582,15 +583,6 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return databaseEntity.Cells.Any(c => c.Value.IsModified);
         }
 
-        public void RedoExecuteDelete(DatabaseEntity entity)
-        {
-            if (mySqlExecutor.IsConnected)
-            {
-                mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
-                History.MarkNoSave();
-            }
-        }
-        
         public override bool ForceRemoveEntity(DatabaseEntity entity)
         {
             var indexOfEntity = Entities.IndexOf(entity);

@@ -1,13 +1,22 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using WDE.Common.Services.QueryParser.Models;
 using WDE.SqlInterpreter.Extensions;
-using WDE.SqlInterpreter.Models;
 
 namespace WDE.SqlInterpreter
 {
     internal class SqlVisitor : MySqlParserBaseVisitor<bool>
     {
+        private Dictionary<string, object> variables = new();
+
+        private string GetOriginalText(ParserRuleContext context)
+        {
+            return context.Start.InputStream.GetText(new Interval(context.Start.StartIndex, context.Stop.StopIndex));
+        }
+        
         private bool TryParseSimpleCondition(MySqlParser.ExpressionContext context, out WhereCondition where)
         {
             where = null!;
@@ -52,7 +61,7 @@ namespace WDE.SqlInterpreter
                         values.Add(subWhere.Conditions[0].Values[0]);
                     }
 
-                    where = new WhereCondition(new EqualityWhereCondition(columns.ToArray(), values.ToArray()));
+                    where = new WhereCondition(new EqualityWhereCondition(columns.ToArray(), values.ToArray(), GetOriginalText(logical)));
                     return true;
                 }
             }
@@ -64,7 +73,7 @@ namespace WDE.SqlInterpreter
                         return false;
 
                     @where = new WhereCondition(new EqualityWhereCondition(bcpc.left.GetText().DropQuotes()!,
-                        bcpc.right.GetText().ToType()));
+                        bcpc.right.GetText().ToType(variables), GetOriginalText(bcpc)));
                     return true;
                 } else if (pec.predicate() is MySqlParser.InPredicateContext inc)
                 {
@@ -75,9 +84,9 @@ namespace WDE.SqlInterpreter
                     int index = 0;
                     foreach (var expr in inc.expressions().expression())
                     {
-                        var value = expr.GetText().ToType()!;
+                        var value = expr.GetText().ToType(variables)!;
                         var subCondition = new EqualityWhereCondition(inc.predicate().GetText().DropQuotes()!,
-                            value);
+                            value, GetOriginalText(inc));
                         subconditions[index++] = subCondition;
                     }
                     @where = new WhereCondition(subconditions);
@@ -124,7 +133,7 @@ namespace WDE.SqlInterpreter
             
             var updates = context.singleUpdateStatement().updatedElement()
                 .Select(upd => new UpdateElement(upd.fullColumnName().GetText().DropQuotes()!,
-                    upd.expression().GetText()))
+                    upd.expression().GetText().ToType(variables)))
                 .ToList();
             
             Queries.Add(new UpdateQuery(tableName, updates, where));
@@ -148,11 +157,23 @@ namespace WDE.SqlInterpreter
                 .Where(line => line.expressionOrDefault().Length == columns.Count)
                 .Select(line =>
             {
-                return (IReadOnlyList<object>)line.expressionOrDefault().Select(val => val.GetText().ToType()).ToList();
+                return (IReadOnlyList<object>)line.expressionOrDefault().Select(val => val.GetText().ToType(variables)).ToList();
             }).ToList();
             if (inserts.Count > 0)
                 Queries.Add(new InsertQuery(tableName, columns, inserts));
             return base.VisitInsertStatement(context);
+        }
+
+        public override bool VisitSetVariable(MySqlParser.SetVariableContext context)
+        {
+            for (int i = 0; i < context.expression().Length; ++i)
+            {
+                var variableName = context.variableClause(i).GetText();
+                var expression = context.expression(i).GetText().ToType(variables);
+                if (expression != null)
+                    variables[variableName] = expression;
+            }
+            return true;
         }
 
         public IEnumerable<InsertQuery> Inserts => Queries.Where(q => q is InsertQuery).Cast<InsertQuery>();

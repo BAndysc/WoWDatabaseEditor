@@ -18,7 +18,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
     [AutoRegisterToParentScopeAttribute]
     public class SmartScriptSqlGenerator : ISolutionItemSqlProvider<SmartScriptSolutionItem>
     {
-        private readonly Lazy<IDatabaseProvider> database;
+        private readonly Lazy<ISmartScriptDatabaseProvider> database;
         private readonly IEventAggregator eventAggregator;
         private readonly Lazy<ISmartFactory> smartFactory;
         private readonly Lazy<ISmartDataManager> smartDataManager;
@@ -26,7 +26,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
         private readonly Lazy<ISmartScriptImporter> importer;
 
         public SmartScriptSqlGenerator(IEventAggregator eventAggregator,
-            Lazy<IDatabaseProvider> database,
+            Lazy<ISmartScriptDatabaseProvider> database,
             Lazy<ISmartFactory> smartFactory,
             Lazy<ISmartDataManager> smartDataManager,
             Lazy<ISmartScriptExporter> exporter,
@@ -43,8 +43,8 @@ namespace WDE.TrinitySmartScriptEditor.Providers
         public async Task<IQuery> GenerateSql(SmartScriptSolutionItem item)
         {
             SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService());
-            var lines = database.Value.GetScriptFor(item.Entry, item.SmartType).ToList();
-            var conditions = database.Value.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, item.Entry, (int)item.SmartType).ToList();
+            var lines = (await database.Value.GetScriptFor(item.Entry, item.SmartType)).ToList();
+            var conditions = database.Value.GetConditionsForScript(item.Entry, item.SmartType).ToList();
             await importer.Value.Import(script, true, lines, conditions, null);
             return exporter.Value.GenerateSql(item, script);
         }

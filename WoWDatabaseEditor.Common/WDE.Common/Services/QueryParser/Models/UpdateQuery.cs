@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace WDE.SqlInterpreter.Models;
+namespace WDE.Common.Services.QueryParser.Models;
 
 public class UpdateQuery : IBaseQuery
 {

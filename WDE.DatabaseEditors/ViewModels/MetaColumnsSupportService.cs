@@ -6,6 +6,7 @@ using WDE.Common.Services;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.ViewModels;
@@ -43,16 +44,7 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
             return new DelegateCommand(
                 () =>
                 {
-                    var newCondition = condition;
-                    int indexOf = 0;
-                    indexOf = newCondition.IndexOf("{", indexOf, StringComparison.Ordinal);
-                    while (indexOf != -1)
-                    {
-                        var columnName = newCondition.Substring(indexOf + 1, newCondition.IndexOf("}", indexOf, StringComparison.Ordinal) - indexOf - 1);
-                        newCondition = newCondition.Replace("{" + columnName + "}", entity.GetCell(columnName)!.ToString());
-                        indexOf = newCondition.IndexOf("{", indexOf + 1, StringComparison.Ordinal);
-                    }
-
+                    var newCondition = entity.FillTemplate(condition);
                     tableEditorPickerService.ShowTable(table, newCondition, keyParts.Length == 0 ? null : new DatabaseKey(keyParts.Select(entity.GetTypedValueOrThrow<long>))).ListenErrors();
                 });
         }

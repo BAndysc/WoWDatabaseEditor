@@ -13,6 +13,7 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Services.QueryParser;
 using WDE.Common.Sessions;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
