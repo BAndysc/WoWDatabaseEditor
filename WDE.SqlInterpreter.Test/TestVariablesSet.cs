@@ -57,6 +57,6 @@ public class TestVariablesSet
         Assert.AreEqual(1, result.Count);
         Assert.AreEqual("smart_script", result[0].TableName);
         Assert.AreEqual("entryorguid", result[0].Updates[0].ColumnName);
-        Assert.AreEqual("@B", ((UnknownSqlThing)result[0].Updates[0].Value!).Raw);
+        Assert.AreEqual("(SELECT MAX(id) FROM creature)", ((UnknownSqlThing)result[0].Updates[0].Value!).Raw);
     }
 }

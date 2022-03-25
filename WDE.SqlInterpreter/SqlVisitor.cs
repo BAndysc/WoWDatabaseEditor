@@ -169,7 +169,7 @@ namespace WDE.SqlInterpreter
             for (int i = 0; i < context.expression().Length; ++i)
             {
                 var variableName = context.variableClause(i).GetText();
-                var expression = context.expression(i).GetText().ToType(variables);
+                var expression = GetOriginalText(context.expression(i)).ToType(variables);
                 if (expression != null)
                     variables[variableName] = expression;
             }

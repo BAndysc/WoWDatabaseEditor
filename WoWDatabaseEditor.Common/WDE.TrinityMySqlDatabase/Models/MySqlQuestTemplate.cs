@@ -40,6 +40,40 @@ namespace WDE.TrinityMySqlDatabase.Models
     }
     
     [Table(Name = "quest_template")]
+    public class MySqlCataQuestTemplate : IQuestTemplate
+    {
+        private MySqlCataQuestTemplateAddon? addon;
+
+        [PrimaryKey]
+        [Column(Name = "ID")]
+        public uint Entry { get; set; }
+
+        [Column(Name = "LogTitle")]
+        public string Name { get; set; } = "";
+
+        public CharacterClasses AllowableClasses => addon == null ? CharacterClasses.None : (CharacterClasses)addon.AllowableClasses;
+
+        public CharacterRaces AllowableRaces => addon?.AllowableRaces ?? CharacterRaces.All;
+        
+        public int PrevQuestId => addon == null ? 0 : addon.PrevQuestId;
+
+        public int NextQuestId => addon == null ? 0 : addon.NextQuestId;
+
+        public int ExclusiveGroup => addon == null ? 0 : addon.ExclusiveGroup;
+        
+        public int BreadcrumbForQuestId => addon?.BreadcrumbForQuest ?? 0;
+
+        [Column(Name = "RewardNextQuest")]
+        public uint NextQuestInChain { get; set; }
+
+        public MySqlCataQuestTemplate SetAddon(MySqlCataQuestTemplateAddon? addon)
+        {
+            this.addon = addon;
+            return this;
+        }
+    }
+    
+    [Table(Name = "quest_template")]
     public class MySqlMasterQuestTemplate : IQuestTemplate
     {
         private MySqlQuestTemplateAddon? addon;

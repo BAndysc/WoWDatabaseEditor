@@ -173,4 +173,34 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         await using var model = Database();
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
     }
+    
+    protected virtual IQueryable<MySqlCataQuestTemplate> GetQuestsQuery(TrinityCataDatabase model)
+    {
+        return (from t in model.CataQuestTemplate
+            join addon in model.CataQuestTemplateAddon on t.Entry equals addon.Entry into adn
+            from subaddon in adn.DefaultIfEmpty()
+            orderby t.Entry
+            select t.SetAddon(subaddon));
+    }
+        
+    public override IEnumerable<IQuestTemplate> GetQuestTemplates()
+    {
+        using var model = Database();
+
+        return GetQuestsQuery(model).ToList<IQuestTemplate>();
+    }
+
+    public override async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+    {
+        await using var model = Database();
+        return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
+    }
+
+    public override IQuestTemplate? GetQuestTemplate(uint entry)
+    {
+        using var model = Database();
+        MySqlCataQuestTemplateAddon? addon = model.CataQuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
+        return model.CataQuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
+    }
+
 }

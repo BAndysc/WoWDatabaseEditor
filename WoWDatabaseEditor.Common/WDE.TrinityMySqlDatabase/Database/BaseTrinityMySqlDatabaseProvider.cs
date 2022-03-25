@@ -264,17 +264,17 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
         }
 
-        public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
-        {
-            using var model = Database();
-            return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);
-        }
-
-        public IQuestTemplate? GetQuestTemplate(uint entry)
+        public virtual IQuestTemplate? GetQuestTemplate(uint entry)
         {
             using var model = Database();
             MySqlQuestTemplateAddon? addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
+        }
+
+        public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
+        {
+            using var model = Database();
+            return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);
         }
 
         public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)

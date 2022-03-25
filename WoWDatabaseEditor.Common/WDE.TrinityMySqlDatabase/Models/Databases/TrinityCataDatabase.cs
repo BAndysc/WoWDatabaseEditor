@@ -12,4 +12,6 @@ public class TrinityCataDatabase : BaseTrinityDatabase
     public ITable<TrinityString> Strings => GetTable<TrinityString>();
     public ITable<TrinityMySqlSpellDbc> SpellDbc => GetTable<TrinityMySqlSpellDbc>();
     public ITable<MySqlGameObjectCata> GameObject => GetTable<MySqlGameObjectCata>();
+    public ITable<MySqlCataQuestTemplate> CataQuestTemplate => GetTable<MySqlCataQuestTemplate>();
+    public ITable<MySqlCataQuestTemplateAddon> CataQuestTemplateAddon => GetTable<MySqlCataQuestTemplateAddon>();
 }
