@@ -38,7 +38,13 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ScriptName")]
         public string ScriptName { get; set; } = "";
-
+        
+        [Column(Name = "unit_flags")]
+        public GameDefines.UnitFlags UnitFlags { get; set; }
+        
+        [Column(Name = "npcflag")]
+        public GameDefines.NpcFlags NpcFlags { get; set; }
+        
         public int ModelsCount => 4;
         public uint GetModel(int index)
         {
@@ -80,7 +86,13 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ScriptName")]
         public string ScriptName { get; set; } = "";
-
+        
+        [Column(Name = "unit_flags")]
+        public GameDefines.UnitFlags UnitFlags { get; set; }
+        
+        [Column(Name = "npcflag")]
+        public GameDefines.NpcFlags NpcFlags { get; set; }
+        
         public int ModelsCount => 0;
         public uint GetModel(int index)
         {

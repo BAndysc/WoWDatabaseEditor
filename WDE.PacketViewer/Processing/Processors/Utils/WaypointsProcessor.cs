@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using TheMaths;
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Utils;
 using WowPacketParser.Proto;

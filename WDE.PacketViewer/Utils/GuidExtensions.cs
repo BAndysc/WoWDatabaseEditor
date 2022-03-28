@@ -188,5 +188,12 @@ namespace WDE.PacketViewer.Utils
             
             return "Full: 0x0";
         }
+
+        public static ushort GetMapId(this UniversalGuid guid)
+        {
+            if (guid.Guid128 != null)
+                return guid.Guid128.GetMapId();
+            throw new Exception("Can't get Map from guid " + guid.ToWowParserString() + " because it's not a 128bit guid");
+        }
     }
 }

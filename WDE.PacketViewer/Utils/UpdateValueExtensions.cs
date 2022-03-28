@@ -51,6 +51,12 @@ public static class UpdateValueExtensions
         return val.HasValue;
     }
 
+    public static long GetIntOrDefault(this UpdateValues update, string field)
+    {
+        if (update.TryGetInt(field, out var v))
+            return v;
+        return 0;
+    }
 
     public static bool TryGetGuid(this UpdateValues update, string field, out UniversalGuid value)
     {

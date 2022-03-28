@@ -3,7 +3,7 @@ using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Runners
 {
-    public abstract class CompoundProcessor<T, R1> : PacketProcessor<T>, ITwoStepPacketProcessor<bool> where R1 : IPacketProcessor<T>
+    public abstract class CompoundProcessor<T, R1> : PacketProcessor<T>, ITwoStepPacketBoolProcessor where R1 : IPacketProcessor<T>
     {
         private readonly R1 r1;
 
@@ -19,7 +19,7 @@ namespace WDE.PacketViewer.Processing.Runners
         }
     }
     
-    public abstract class CompoundProcessor<T, R1, R2> : PacketProcessor<T>, ITwoStepPacketProcessor<bool> where R1 : IPacketProcessor<T> where R2 : IPacketProcessor<T>
+    public abstract class CompoundProcessor<T, R1, R2> : PacketProcessor<T>, ITwoStepPacketBoolProcessor where R1 : IPacketProcessor<T> where R2 : IPacketProcessor<T>
     {
         private readonly R1 r1;
         private readonly R2 r2;
@@ -37,7 +37,7 @@ namespace WDE.PacketViewer.Processing.Runners
             return true;
         }
     }
-    public abstract class CompoundProcessor<T, R1, R2, R3> : PacketProcessor<T>, ITwoStepPacketProcessor<bool> where R1 : IPacketProcessor<T> 
+    public abstract class CompoundProcessor<T, R1, R2, R3> : PacketProcessor<T>, ITwoStepPacketBoolProcessor where R1 : IPacketProcessor<T> 
         where R2 : IPacketProcessor<T>
         where R3 : IPacketProcessor<T>
     {
@@ -61,7 +61,7 @@ namespace WDE.PacketViewer.Processing.Runners
         }
     }
     
-    public abstract class CompoundProcessor<T, R1, R2, R3, R4> : PacketProcessor<T>, ITwoStepPacketProcessor<bool> where R1 : IPacketProcessor<T> 
+    public abstract class CompoundProcessor<T, R1, R2, R3, R4> : PacketProcessor<T>, ITwoStepPacketBoolProcessor where R1 : IPacketProcessor<T> 
         where R2 : IPacketProcessor<T>
         where R3 : IPacketProcessor<T>
         where R4 : IPacketProcessor<T>
