@@ -103,7 +103,7 @@ namespace WDE.DatabaseEditors.Data.Structs
             {
                 if (RecordMode == RecordMode.SingleRow)
                     return PrimaryKey!;
-                return new List<string>(){PrimaryKey[0]};
+                return new List<string>(){!string.IsNullOrWhiteSpace(TablePrimaryKeyColumnName) ? TablePrimaryKeyColumnName : PrimaryKey[0]};
             }
         }
         
