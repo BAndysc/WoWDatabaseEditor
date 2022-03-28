@@ -910,7 +910,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
         }
         
-        public async Task TryFind(DatabaseKey key)
+        public async Task TryFind(DatabaseKey key, string? customWhere = null)
         {
             var condition = $"`{tableDefinition.GroupByKeys[0]}` < {key[0]}";
 
@@ -928,6 +928,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             var where = Queries.Table(tableDefinition.TableName)
                 .Where(r => r.Raw<bool>(condition));
 
+            if (customWhere != null)
+            {
+                FilterViewModel.FilterText = customWhere;
+                FilterViewModel.SelectedColumn = FilterViewModel.RawSqlColumn;
+            }
+            
             if (!string.IsNullOrEmpty(FilterViewModel.BuildWhere()))
                 where = where.Where(r => r.Raw<bool>(FilterViewModel.BuildWhere()));
 
@@ -940,7 +946,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             var modifiedOffset = Math.Max(0, offset - LimitQuery + 1);
             OffsetQuery = modifiedOffset;
             await ScheduleLoading();
-            mainThread.Delay(() => FocusedRowIndex = (int)(offset - modifiedOffset), TimeSpan.FromMilliseconds(1));
+            mainThread.Delay(() =>
+            {
+                FocusedRowIndex = (int)(offset - modifiedOffset);
+                MultiSelection.Clear();
+                MultiSelection.Add(FocusedRowIndex);
+            }, TimeSpan.FromMilliseconds(1));
         }
 
         public void UpdateSelectedCells(string text)

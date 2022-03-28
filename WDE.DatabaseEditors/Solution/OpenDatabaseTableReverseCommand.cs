@@ -1,9 +1,12 @@
+using System;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Events;
+using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -15,11 +18,15 @@ namespace WDE.DatabaseEditors.Solution
     {
         private readonly IEventAggregator eventAggregator;
         private readonly ITableDefinitionProvider tableDefinitionProvider;
+        private readonly Lazy<IDocumentManager> documentManager;
 
-        public OpenDatabaseTableReverseCommand(IEventAggregator eventAggregator, ITableDefinitionProvider tableDefinitionProvider)
+        public OpenDatabaseTableReverseCommand(IEventAggregator eventAggregator,
+            ITableDefinitionProvider tableDefinitionProvider,
+            Lazy<IDocumentManager> documentManager)
         {
             this.eventAggregator = eventAggregator;
             this.tableDefinitionProvider = tableDefinitionProvider;
+            this.documentManager = documentManager;
         }
         
         public Task Invoke(ICommandArguments arguments)
@@ -34,6 +41,18 @@ namespace WDE.DatabaseEditors.Solution
             if (definition.RecordMode == RecordMode.SingleRow)
             {
                 eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality));
+                
+                if (!arguments.TryGetUint(out var entry_))
+                    return Task.CompletedTask;
+                
+                foreach (var doc in documentManager.Value.OpenedDocuments)
+                {
+                    if (doc is SingleRowDbTableEditorViewModel singleRow && singleRow.TableDefinition.Id == definition.Id)
+                    {
+                        var rest = arguments.TakeRestArguments;
+                        return singleRow.TryFind(new DatabaseKey(entry_), rest);
+                    }
+                }
                 return Task.CompletedTask;
             }
             

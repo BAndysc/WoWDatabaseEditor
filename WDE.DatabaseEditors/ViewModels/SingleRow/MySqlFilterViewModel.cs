@@ -23,13 +23,15 @@ public partial class MySqlFilterViewModel : ObservableBase
     public List<FilterOperatorViewModel> Operators { get; } = new();
     public AsyncAutoCommand PickParameterCommand { get; }
     public AsyncAutoCommand ApplyFilter { get; }
-    
+    public FilterColumnViewModel RawSqlColumn { get; }
+
     public MySqlFilterViewModel(DatabaseTableDefinitionJson? tableDefinition,
         Func<Task> refilter, 
         IParameterFactory parameterFactory,
         IParameterPickerService pickerService)
     {
-        Columns.Add(FilterColumnViewModel.CreateRawSql());
+        RawSqlColumn = FilterColumnViewModel.CreateRawSql();
+        Columns.Add(RawSqlColumn);
 
         if (tableDefinition != null)
         {
