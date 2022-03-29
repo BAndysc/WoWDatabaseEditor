@@ -46,6 +46,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private readonly IMySqlExecutor mySqlExecutor;
     private readonly IMessageBoxService messageBoxService;
     private readonly IParameterPickerService parameterPickerService;
+    private readonly ISolutionTasksService solutionTasksService;
     private readonly DatabaseTableDefinitionJson tableDefinition;
     private readonly DatabaseKey key;
     private readonly bool noSaveMode;
@@ -85,6 +86,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         ISolutionItemEditorRegistry editorRegistry,
         IHistoryManager history,
         IParameterPickerService parameterPickerService,
+        ISolutionTasksService solutionTasksService,
         DatabaseTableDefinitionJson tableDefinition,
         DatabaseKey key,
         bool noSaveMode)
@@ -102,6 +104,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         this.mySqlExecutor = mySqlExecutor;
         this.messageBoxService = messageBoxService;
         this.parameterPickerService = parameterPickerService;
+        this.solutionTasksService = solutionTasksService;
         this.tableDefinition = tableDefinition;
         this.History = history;
         this.key = key;
@@ -225,6 +228,13 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         try
         {
             await mySqlExecutor.ExecuteSql(query);
+
+            if (solutionTasksService.CanReloadRemotely)
+            {
+                var pseudo = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
+                pseudo.Entries.Add(new SolutionItemDatabaseEntity(key, false));
+                await solutionTasksService.ReloadSolutionRemotelyTask(pseudo);
+            }
         }
         catch (Exception e)
         {

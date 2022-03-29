@@ -30,6 +30,27 @@ namespace WDE.Common.Services
         bool TryMerge(IRemoteCommand other, out IRemoteCommand? mergedCommand);
     }
 
+    public class AnonymousRemoteCommand : IRemoteCommand
+    {
+        private readonly RemoteCommandPriority priority;
+        private readonly string command;
+
+        public AnonymousRemoteCommand(string command, RemoteCommandPriority priority = RemoteCommandPriority.Middle)
+        {
+            this.priority = priority;
+            this.command = command;
+        }
+
+        public RemoteCommandPriority Priority => priority;
+        public string GenerateCommand() => command;
+
+        public bool TryMerge(IRemoteCommand other, out IRemoteCommand? mergedCommand)
+        {
+            mergedCommand = null;
+            return false;
+        }
+    }
+
     public enum RemoteCommandPriority
     {
         VeryFirst = 0,

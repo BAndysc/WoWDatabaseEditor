@@ -5,10 +5,12 @@ namespace WDE.DatabaseEditors.Utils
     public class ReloadRemoteCommand : IRemoteCommand
     {
         private readonly string remoteCommand;
+        private readonly RemoteCommandPriority priority;
 
-        public ReloadRemoteCommand(string remoteCommand)
+        public ReloadRemoteCommand(string remoteCommand, RemoteCommandPriority priority)
         {
             this.remoteCommand = remoteCommand;
+            this.priority = priority;
         }
         
         public string GenerateCommand()
@@ -16,7 +18,7 @@ namespace WDE.DatabaseEditors.Utils
             return remoteCommand;
         }
 
-        public RemoteCommandPriority Priority => RemoteCommandPriority.Middle;
+        public RemoteCommandPriority Priority => priority;
 
         public bool TryMerge(IRemoteCommand other, out IRemoteCommand? mergedCommand)
         {

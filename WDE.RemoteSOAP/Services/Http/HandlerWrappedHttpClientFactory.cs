@@ -14,7 +14,7 @@ namespace WDE.RemoteSOAP.Services.Http
 
         public HttpClient CreateClient(string name)
         {
-            return new (Handler) {Timeout = TimeSpan.FromSeconds(1.5f)};
+            return new (Handler) {Timeout = TimeSpan.FromSeconds(3.5f)};
         }
     }
 }
