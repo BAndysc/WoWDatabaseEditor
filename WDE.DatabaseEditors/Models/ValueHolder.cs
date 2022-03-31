@@ -23,6 +23,7 @@ namespace WDE.DatabaseEditors.Models
         bool DefaultIsBlank { get; set; }
         void UpdateFromString(string newValue);
         string? ValueAsString { get; }
+        void RaiseChanged();
     }
 
     public interface IParameterValue<T> : IParameterValue where T : notnull
@@ -99,6 +100,11 @@ namespace WDE.DatabaseEditors.Models
         }
 
         public string? ValueAsString => Value?.ToString();
+        public void RaiseChanged()
+        {
+            OnPropertyChanged(nameof(String));
+            OnPropertyChanged(nameof(Value));
+        }
 
         public event Action<Action<IParameterValue>, Action<IParameterValue>>? ValueChanged;
 

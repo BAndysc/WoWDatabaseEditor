@@ -230,7 +230,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return false;
         }
 
-        private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue!);
+        private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue!, cell.ParentEntity);
 
         public override DatabaseEntity AddRow(DatabaseKey key)
         {

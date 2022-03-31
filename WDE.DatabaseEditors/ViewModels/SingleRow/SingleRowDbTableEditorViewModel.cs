@@ -435,7 +435,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private Task EditParameter(SingleRecordDatabaseCellViewModel cell)
         {
             if (cell.ParameterValue != null)
-                return EditParameter(cell.ParameterValue);
+                return EditParameter(cell.ParameterValue, cell.ParentEntity);
             return Task.CompletedTask;
         }
 

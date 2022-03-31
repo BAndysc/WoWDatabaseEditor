@@ -285,7 +285,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private Task EditParameter(DatabaseCellViewModel cell)
         {
             if (cell.ParameterValue != null)
-                return EditParameter(cell.ParameterValue);
+                return EditParameter(cell.ParameterValue, cell.ParentEntity);
             return Task.CompletedTask;
         }
 

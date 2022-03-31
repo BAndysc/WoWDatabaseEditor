@@ -26,6 +26,14 @@ public class ParameterPickerService : IParameterPickerService
             return (default, false);
         }
         
+        if (parameter is ICustomPickerContextualParameter<string> customStringPicker && context != null)
+        {
+            var val = await customStringPicker.PickValue((currentValue as string) ?? "", context);
+            if (val.Item2)
+                return ((T)(object)val.Item1, true);
+            return (default, false);
+        }
+        
         if (parameter is ICustomPickerParameter<string> customString)
         {
             var val = await customString.PickValue((currentValue as string) ?? "");

@@ -112,20 +112,20 @@ namespace WDE.DatabaseEditors.ViewModels
 
         protected abstract System.IDisposable BulkEdit(string name);
 
-        protected async Task EditParameter(IParameterValue parameterValue)
+        protected async Task EditParameter(IParameterValue parameterValue, DatabaseEntity entity)
         {
             if (!parameterValue.BaseParameter.HasItems)
                 return;
             
             if (parameterValue is IParameterValue<long> valueHolder)
             {
-                var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value);
+                var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value, entity);
                 if (result.ok)
                     valueHolder.Value = result.value;
             }
             else if (parameterValue is IParameterValue<string> stringValueHolder)
             {
-                var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "");
+                var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "", entity);
                 if (result.ok)
                     stringValueHolder.Value = result.value;             
             }

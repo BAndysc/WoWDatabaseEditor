@@ -10,7 +10,11 @@ public class ContextualParameterJson
     
     [JsonProperty("simple_switch")]
     public ContextualParameterSimpleSwitchJson? SimpleSwitch { get; set; }
+    
+    [JsonProperty("simple_string_switch")]
+    public ContextualParameterSimpleStringSwitchJson? SimpleStringSwitch { get; set; }
 }
+
 
 public class ContextualParameterSimpleSwitchJson
 {
@@ -22,4 +26,16 @@ public class ContextualParameterSimpleSwitchJson
 
     [JsonProperty("values")]
     public Dictionary<long, string> Values { get; set; } = null!;
+}
+
+public class ContextualParameterSimpleStringSwitchJson
+{
+    [JsonProperty("column")]
+    public string Column { get; set; } = "";
+
+    [JsonProperty("default")]
+    public string? Default { get; set; }
+
+    [JsonProperty("values")]
+    public Dictionary<string, string> Values { get; set; } = null!;
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Input;
+using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.MVVM;
@@ -22,6 +24,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public string ActionLabel { get; set; } = "";
         
         public string ColumnName { get; }
+        public string? DbColumnName { get; }
 
         public DatabaseCellViewModel(int columnIndex, DatabaseColumnJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue) : base(parentEntity)
         {
@@ -29,6 +32,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             CanBeNull = columnDefinition.CanBeNull;
             IsReadOnly = columnDefinition.IsReadOnly;
             ColumnName = columnDefinition.Name;
+            DbColumnName = columnDefinition.DbColumnName;
             Parent = parent;
             TableField = tableField;
             ParameterValue = parameterValue;
@@ -50,6 +54,21 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 RaisePropertyChanged(nameof(OriginalValueTooltip));
                 RaisePropertyChanged(nameof(AsBoolValue));
             }));
+            if (parameterValue.BaseParameter is DatabaseStringContextualParameter contextual)
+            {
+                var other = parent.Cells.FirstOrDefault(c => c.DbColumnName == contextual.Column);
+                if (other != null)
+                {
+                    AutoDispose(other.ParameterValue!.ToObservable().Subscribe(_ =>
+                    {
+                        parameterValue.RaiseChanged();
+                    }));                    
+                }
+                else
+                {
+                    Console.WriteLine("Couldn't find column " + contextual.Column);
+                }
+            }
         }
 
         public DatabaseCellViewModel(int columnIndex, string columnName, ICommand action, DatabaseEntityViewModel parent, DatabaseEntity entity, System.IObservable<string> label) : base(entity)

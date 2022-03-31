@@ -128,7 +128,12 @@ namespace WDE.DatabaseEditors.Expressions.Antlr
                 return fField.Current.ToString();
 
             if (cell is DatabaseField<string> sField)
-                return parameterFactory.FactoryString(column.ValueType).ToString(sField.Current.Value ?? "", new ToStringOptions(){WithNumber = false});
+            {
+                var sParam = parameterFactory.FactoryString(column.ValueType);
+                if (sParam is IContextualParameter<string, DatabaseEntity> sContext)
+                    return sContext.ToString(sField.Current.Value ?? "", entity!);
+                return sParam.ToString(sField.Current.Value ?? "", new ToStringOptions(){WithNumber = false});
+            }
             
             return "";
         }
