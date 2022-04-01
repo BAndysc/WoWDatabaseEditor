@@ -195,6 +195,29 @@ namespace WDE.DbcStore
                 dbcSettingsProvider = settingsProvider;
             }
 
+            private void LoadAndRegister(string filename, string parameter, int keyIndex, Func<IDbcIterator, string> getString)
+            {
+                Dictionary<long, SelectOption> dict = new();
+                Load(filename, row =>
+                {
+                    var id = row.GetUInt(keyIndex);
+                    dict[id] = new SelectOption(getString(row));
+                });
+                parameterFactory.Register(parameter, new Parameter()
+                {
+                    Items = dict
+                });
+            }
+
+            private void LoadAndRegister(string filename, string parameter, int keyIndex, int nameIndex, bool withLocale = false)
+            {
+                int locale = (int) DBCLocales.LANG_enUS;
+
+                if (withLocale)
+                    locale = (int) dbcSettingsProvider.GetSettings().DBCLocale;
+                LoadAndRegister(filename, parameter, keyIndex, r => r.GetString(nameIndex + locale));
+            }
+
             private void Load(string filename, Action<IDbcIterator> foreachRow)
             {
                 progress?.Report(now++, max, $"Loading {filename}");
@@ -368,7 +391,7 @@ namespace WDE.DbcStore
                     case DBCVersions.WOTLK_12340:
                     {
                         store.wrathSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 39;
+                        max = 43;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
                         Load("Faction.dbc", 0, 23, FactionStore, true);
@@ -439,13 +462,16 @@ namespace WDE.DbcStore
                             else
                                 ItemDbcStore[id] = "Item " + id;
                         });
-                        
+                        LoadAndRegister("SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
+                        LoadAndRegister("SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
+                        LoadAndRegister("SpellRange.dbc", "SpellRangeParameter", 0, 6, true);
+                        LoadAndRegister("SpellRadius.dbc", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         break;
                     }
                     case DBCVersions.CATA_15595:
                     {
                         store.cataSpellService.Load(dbcSettingsProvider.GetSettings().Path);
-                        max = 40;
+                        max = 44;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
                         Load("Faction.dbc", 0, 23, FactionStore);
@@ -517,6 +543,10 @@ namespace WDE.DbcStore
                             else
                                 ItemDbcStore[id] = "Item " + id;
                         });
+                        LoadAndRegister("SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
+                        LoadAndRegister("SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
+                        LoadAndRegister("SpellRange.dbc", "SpellRangeParameter", 0, 6);
+                        LoadAndRegister("SpellRadius.dbc", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         break;
                     }
                     case DBCVersions.LEGION_26972:
@@ -591,6 +621,37 @@ namespace WDE.DbcStore
                     default:
                         return;
                 }
+            }
+
+            private string GetRadiusDescription(int @base, int perLevel, int max)
+            {
+                if (perLevel == 0)
+                    return @base + " yd";
+                if (max == 0)
+                    return $"{@base} yd + {perLevel} yd/level";
+                return $"min({max} yd, {@base} yd + {perLevel} yd/level)";
+            }
+
+            private string GetCastTimeDescription(int @base, int perLevel, int min)
+            {
+                if (@base == 0 && perLevel == 0 && min == 0)
+                    return "Instant";
+                if (perLevel == 0)
+                    return @base.ToPrettyDuration();
+                if (min == 0)
+                    return $"{@base.ToPrettyDuration()} + {perLevel.ToPrettyDuration()}/level";
+                return $"max({min.ToPrettyDuration()}, {@base.ToPrettyDuration()} + {perLevel.ToPrettyDuration()}/level)";
+            }
+
+            private string GetDurationTimeDescription(int @base, int perLevel, int max)
+            {
+                if (@base == -1)
+                    return "Infinite";
+                if (perLevel == 0)
+                    return @base.ToPrettyDuration();
+                if (max == 0)
+                    return $"{@base.ToPrettyDuration()} + {perLevel.ToPrettyDuration()}/level";
+                return $"min({max.ToPrettyDuration()}, {@base.ToPrettyDuration()} + {perLevel.ToPrettyDuration()}/level)";
             }
 
             private string BuildAreaGroupName(IDbcIterator row, int start, int count)

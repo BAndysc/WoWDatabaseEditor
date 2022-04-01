@@ -114,5 +114,29 @@ namespace WDE.Common.Utils
 
             return sb.ToString();
         }
+
+        public static string ToPrettyDuration(this int milliseconds)
+        {
+            if (milliseconds == 0)
+                return "0 ms";
+            int seconds = milliseconds / 1000;
+            int minutes = seconds / 60;
+            int hours = minutes / 60;
+            int days = hours / 24;
+            hours %= 24;
+            minutes %= 60;
+            seconds %= 60;
+            milliseconds %= 1000;
+            StringBuilder sb = new();
+            if (hours > 0)
+                sb.Append($"{hours}h ");
+            if (minutes > 0)
+                sb.Append($"{minutes}m ");
+            if (seconds > 0)
+                sb.Append($"{seconds}s ");
+            if (milliseconds > 0)
+                sb.Append($"{milliseconds}ms");
+            return sb.ToString();
+        }
     }
 }
