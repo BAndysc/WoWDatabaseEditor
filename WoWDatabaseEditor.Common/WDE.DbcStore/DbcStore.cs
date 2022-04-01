@@ -465,7 +465,7 @@ namespace WDE.DbcStore
                         LoadAndRegister("SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellRange.dbc", "SpellRangeParameter", 0, 6, true);
-                        LoadAndRegister("SpellRadius.dbc", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
+                        LoadAndRegister("SpellRadius.dbc", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetFloat(1), row.GetFloat(2), row.GetFloat(3)));
                         break;
                     }
                     case DBCVersions.CATA_15595:
@@ -546,7 +546,7 @@ namespace WDE.DbcStore
                         LoadAndRegister("SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellRange.dbc", "SpellRangeParameter", 0, 6);
-                        LoadAndRegister("SpellRadius.dbc", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
+                        LoadAndRegister("SpellRadius.dbc", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetFloat(1), row.GetFloat(2), row.GetFloat(3)));
                         break;
                     }
                     case DBCVersions.LEGION_26972:
@@ -623,7 +623,7 @@ namespace WDE.DbcStore
                 }
             }
 
-            private string GetRadiusDescription(int @base, int perLevel, int max)
+            private string GetRadiusDescription(float @base, float perLevel, float max)
             {
                 if (perLevel == 0)
                     return @base + " yd";

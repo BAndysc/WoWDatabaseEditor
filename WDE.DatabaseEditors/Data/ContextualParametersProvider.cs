@@ -174,7 +174,8 @@ public class DatabaseStringContextualParameter : IContextualParameter<string, Da
             }
         }
 
-        return ("", false);
+        var res = await pickerService.PickParameter(StringParameter.Instance, value);
+        return (res.value ?? "", res.ok);
     }
 
     public string? Prefix { get; set; }

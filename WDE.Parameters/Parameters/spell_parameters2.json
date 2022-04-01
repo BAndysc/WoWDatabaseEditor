@@ -526,5 +526,20 @@
       "108": "TARGET_GAMEOBJECT_CONE",
       "110": "TARGET_UNIT_CONE_ENTRY_110"      
     }
+  },
+  "SpellDamageClassParameter": {
+    "values": {
+      "0": "NONE",
+      "1": "MAGIC",
+      "2": "MELEE",
+      "3": "RANGED"
+    }
+  },
+  "SpellPreventionTypeParameter": {
+    "values": {
+      "0": "none",
+      "1": "silence",
+      "2": "pacify"
+    }
   }
 }

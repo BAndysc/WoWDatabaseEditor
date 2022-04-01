@@ -20,15 +20,17 @@ namespace WDE.DatabaseEditors.ViewModels
         {
             get
             {
-                if (ParameterValue is not IParameterValue<long> p)
-                    return null;
-                return p.Items?.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList();
+                if (ParameterValue is IParameterValue<long> p)
+                    return p.Items?.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList();
+                if (ParameterValue is IParameterValue<string> s)
+                    return s.Items?.Select(pair => (object)new ParameterStringOption(pair.Key, pair.Value.Name)).ToList();
+                return null;
             }
         }
 
         public Dictionary<long, SelectOption>? Flags => ParameterValue is IParameterValue<long> p ? p.Items : null;
 
-        public ParameterOption? OptionValue
+        public object? OptionValue
         {
             get
             {
@@ -38,6 +40,12 @@ namespace WDE.DatabaseEditors.ViewModels
                         return new ParameterOption(p.Value, option.Name);
                     return new ParameterOption(p.Value, "Unknown");
                 }
+
+                if (ParameterValue is IParameterValue<string> s)
+                {
+                    if (s.Items != null && s.Items.TryGetValue(s.Value ?? "", out var option))
+                        return new ParameterStringOption(s.Value!, option.Name);
+                }
                 return null;
             }
             set
@@ -46,7 +54,11 @@ namespace WDE.DatabaseEditors.ViewModels
                 {
                     if (ParameterValue is IParameterValue<long> p)
                     {
-                        p.Value = value.Value;
+                        p.Value = ((ParameterOption)value).Value;
+                    }
+                    if (ParameterValue is IParameterValue<string> s)
+                    {
+                        s.Value = ((ParameterStringOption)value).Key;
                     }
                 }
             }
@@ -66,6 +78,24 @@ namespace WDE.DatabaseEditors.ViewModels
             public override string ToString()
             {
                 return $"{Name} ({Value})";
+            }
+        }
+        
+        public class ParameterStringOption
+        {
+            public readonly string Key;
+
+            public ParameterStringOption(string key, string value)
+            {
+                Key = key;
+                Value = value;
+            }
+
+            public string Value { get; }
+
+            public override string ToString()
+            {
+                return Value;
             }
         }
 
@@ -102,7 +132,10 @@ namespace WDE.DatabaseEditors.ViewModels
         }
 
         public bool HasItems => ParameterValue?.BaseParameter.HasItems ?? false;
-        public bool UseItemPicker => (ParameterValue is IParameterValue<long> vm) && vm.Items != null && vm.Items.Count < 300;
+
+        public bool UseItemPicker =>
+            (ParameterValue is IParameterValue<long> vm) && vm.Items != null && vm.Items.Count < 300 ||
+            (ParameterValue is IParameterValue<string> vm2) && vm2.Items != null && vm2.Items.Count < 300;
         public bool UseFlagsPicker => (ParameterValue is IParameterValue<long> vm) && vm.Parameter.HasItems && vm.Parameter is FlagParameter;
     }
 }

@@ -4,6 +4,7 @@ using NSubstitute;
 using NSubstitute.Core;
 using NUnit.Framework;
 using WDE.Common.Services;
+using WDE.Common.Services.QueryParser;
 using WDE.Common.Sessions;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
