@@ -925,6 +925,12 @@
 			}
 		}
 	},
+	"CreatureTypeMaskParameter": {
+		"mask_from": {
+			"name": "CreatureTypeParameter",
+			"offset": -1
+		}
+	},
 	"TypeFlagsParameter": {
 		"name": "Type flags",
 		"isflag": true,
@@ -1535,6 +1541,12 @@
 			"30": {"name": "STEALTH"},
 			"31": {"name": "MOONKIN"},
 			"32": {"name": "SPIRITOFREDEMPTION"}
+		}
+	},
+	"ShapeshiftFormMaskParameter": {
+		"mask_from": {
+			"name": "ShapeshiftFormParameter",
+			"offset": -1
 		}
 	},
 	"QuestStatusParameter": {
@@ -2258,7 +2270,6 @@
 			"5": {"name": "Judgement"},
 			"6": {"name": "Unknown 6"},
 			"7": {"name": "Hunter parry"},
-			"7": {"name": "Unknown 7"},
 			"8": {"name": "Unknown 8"},
 			"9": {"name": "Unknown 9"},
 			"10": {"name": "Warrior victory rush"},
@@ -2752,6 +2763,27 @@
 			"3": {"name": "Everyone assists everyone and member don't follow the leader"},
 			"512": {"name": "Noone assists noone and member follow the leader"},
 			"515": {"name": "Everyone assists everyone and member follow the leader"}
+		}
+	},
+	"ItemClassParameter": {
+		"values": {
+			"0": "consumable",
+			"1": "container",
+			"2": "weapon",
+			"3": "gem",
+			"4": "armor",
+			"5": "reagent",
+			"6": "projectile",
+			"7": "trade_goods",
+			"8": "generic",
+			"9": "recipe",
+			"10": "money",
+			"11": "quiver",
+			"12": "quest",
+			"13": "key",
+			"14": "permanent",
+			"15": "misc",
+			"16": "glyph"			
 		}
 	}
 }

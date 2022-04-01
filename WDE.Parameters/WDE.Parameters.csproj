@@ -13,10 +13,7 @@
   </PropertyGroup>
   <Import Project="..\Module.props" />
   <ItemGroup>
-    <None Update="Parameters\parameters.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Parameters\spell_parameters.json">
+    <None Update="Parameters\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

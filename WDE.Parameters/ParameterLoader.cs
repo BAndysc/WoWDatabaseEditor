@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -61,6 +62,21 @@ namespace WDE.Parameters
                     Parameter p = pair.Value.IsFlag ? new FlagParameter() : new Parameter();
                     p.Items = pair.Value.Values;
                     p.Prefix = pair.Value.Prefix;
+                    factory.Register(pair.Key, p);
+                }
+                else if (pair.Value.MaskFrom != null)
+                {
+                    Parameter p = new FlagParameter();
+                    var other = factory.Factory(pair.Value.MaskFrom.Value.Name);
+                    Debug.Assert(other.Items != null);
+                    p.Items = new Dictionary<long, SelectOption>();
+                    foreach (var arg in other.Items)
+                    {
+                        var key = 1L << (int)(arg.Key + pair.Value.MaskFrom.Value.Offset);
+                        if (arg.Key == 0 && pair.Value.MaskFrom.Value.Offset < 0)
+                            key = 0;
+                        p.Items.Add(key, arg.Value);
+                    }
                     factory.Register(pair.Key, p);
                 }
                 
