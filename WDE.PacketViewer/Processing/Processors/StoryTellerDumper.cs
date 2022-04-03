@@ -17,7 +17,7 @@ using WDE.PacketViewer.Utils;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector>,
+    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor>,
         IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor
     {
         private class WriterBuilder
@@ -49,6 +49,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly ISpellService spellService;
         private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly IPlayerGuidFollower playerGuidFollower;
+        private readonly ISpellCastProcessor spellCastProcessor;
         private readonly PrettyFlagParameter prettyFlagParameter;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly IDespawnDetector despawnDetector;
@@ -73,8 +74,9 @@ namespace WDE.PacketViewer.Processing.Processors
             HighLevelUpdateDump highLevelUpdateDump,
             IDespawnDetector despawnDetector,
             IPlayerGuidFollower playerGuidFollower,
+            ISpellCastProcessor spellCastProcessor,
             PrettyFlagParameter prettyFlagParameter,
-            bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector)
+            bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector, spellCastProcessor)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
@@ -85,6 +87,7 @@ namespace WDE.PacketViewer.Processing.Processors
             this.spellService = spellService;
             this.updateObjectFollower = updateObjectFollower;
             this.playerGuidFollower = playerGuidFollower;
+            this.spellCastProcessor = spellCastProcessor;
             this.prettyFlagParameter = prettyFlagParameter;
             this.highLevelUpdateDump = highLevelUpdateDump;
             this.despawnDetector = despawnDetector;
@@ -268,6 +271,22 @@ namespace WDE.PacketViewer.Processing.Processors
             return base.Process(basePacket, packet);
         }
 
+        protected override bool Process(PacketBase basePacket, PacketSpellStart packet)
+        {
+            if (!spellService.Exists(packet.Data.Spell))
+                return false;
+
+            if (spellCastProcessor.HasFinishedCastingAt(packet.Data.CastGuid, basePacket))
+                return false;
+            
+            string verb = " starts casting ";
+            if (spellCastProcessor.HasFailedCastingAt(packet.Data.CastGuid, basePacket))
+                verb = " tries to cast and fails ";
+
+            AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + verb + GetSpellName(packet.Data.Spell));
+            return true;
+        }
+        
         protected override bool Process(PacketBase basePacket, PacketSpellGo packet)
         {
             if (!spellService.Exists(packet.Data.Spell))
@@ -293,7 +312,35 @@ namespace WDE.PacketViewer.Processing.Processors
                 targetLine += "\n       }";
             }
 
-            AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + " casts: " + GetSpellName(packet.Data.Spell) + " " + targetLine);
+            string verb = "finishes casting";
+            if (spellCastProcessor.HasStartedCastingAt(packet.Data.CastGuid, basePacket))
+                verb = "starts and finishes casting";
+            
+            AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + $" {verb}: " + GetSpellName(packet.Data.Spell) + " " + targetLine);
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketSpellFailure packet)
+        {
+            if (!spellService.Exists(packet.Spell))
+                return false;
+
+            if (spellCastProcessor.HasStartedCastingAt(packet.CastGuid, basePacket))
+                return false;
+            
+            AppendLine(basePacket, packet.Caster, NiceGuid(packet.Caster) + $" failed casting spell " + GetSpellName(packet.Spell));
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketSpellCastFailed packet)
+        {
+            if (!spellService.Exists(packet.Spell))
+                return false;
+
+            if (spellCastProcessor.HasStartedCastingAt(packet.CastGuid, basePacket))
+                return false;
+
+            AppendLine(basePacket, null, $"Casting spell " + GetSpellName(packet.Spell) + " failed");
             return base.Process(basePacket, packet);
         }
 
