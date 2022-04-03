@@ -54,7 +54,7 @@ namespace WDE.Common.Utils
             {
                 if (char.IsLetter(c) || char.IsDigit(c))
                     sb.Append(char.ToUpperInvariant(c));
-                else if (c == ' ')
+                else if ((c == ' ' || c == '_') && sb.Length == 0 || sb[^1] != '_')
                     sb.Append('_');
             }
 

@@ -10,18 +10,18 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
     [AutoRegister]
     public class SpellNameDumperProvider : IPacketDumperProvider
     {
-        private readonly Lazy<ISpellStore> spellStore;
+        private readonly Func<SpellNameProcessor> processor;
 
-        public SpellNameDumperProvider(Lazy<ISpellStore> spellStore)
+        public SpellNameDumperProvider(Func<SpellNameProcessor> processor)
         {
-            this.spellStore = spellStore;
+            this.processor = processor;
         }
         
-        public string Name => "Spell name dump";
+        public string Name => "Spell and sound names";
         public string Description => "Generate all unique spell names as c++ like enum";
         public string Extension => "cpp";
         public ImageUri? Image { get; } = new ImageUri("Icons/document_spell_big.png");
         public Task<IPacketTextDumper> CreateDumper() =>
-            Task.FromResult<IPacketTextDumper>(new NameAsEnumDumper(new SpellNameProcessor(spellStore.Value)));
+            Task.FromResult<IPacketTextDumper>(new NameAsEnumDumper(processor()));
     }
 }
