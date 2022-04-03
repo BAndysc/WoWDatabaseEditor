@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using DynamicData;
 using Prism.Events;
+using PropertyChanged.SourceGenerator;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Types;
@@ -22,7 +23,7 @@ namespace WDE.DatabaseEditors.ViewModels;
 
 [AutoRegister]
 [SingleInstance]
-public class TablesListToolViewModel : ObservableBase, ITool
+public partial class TablesListToolViewModel : ObservableBase, ITool
 {
     private readonly ITableOpenService tableOpenService;
     private readonly IEventAggregator eventAggregator;
@@ -31,6 +32,7 @@ public class TablesListToolViewModel : ObservableBase, ITool
     private bool isSelected;
     private List<TableItemViewModel> allTables = new();
     private string searchText = "";
+    [Notify] private TableItemViewModel? selectedTable;
 
     public string Title => "Tables";
     public string UniqueId => "tables";
@@ -85,12 +87,20 @@ public class TablesListToolViewModel : ObservableBase, ITool
         DoOpenTable(item).ListenErrors();
     }
 
-    public void OpenOnly()
+    public bool OpenSelected()
     {
-        if (FilteredTables.Count == 1)
+        if (selectedTable != null)
+        {
+            DoOpenTable(selectedTable).ListenErrors();
+            return true;
+        }
+        else if (FilteredTables.Count == 1)
         {
             DoOpenTable(FilteredTables[0]).ListenErrors();
+            return true;
         }
+
+        return false;
     }
     
     private async Task DoOpenTable(TableItemViewModel item)

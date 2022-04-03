@@ -1,7 +1,11 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Utils;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia;
 using WDE.DatabaseEditors.ViewModels;
@@ -10,6 +14,9 @@ namespace WDE.DatabaseEditors.Avalonia.Views;
 
 public class TablesListToolView : UserControl
 {
+    private ListBox TablesListBox = null!;
+    private ISelectionAdapter SelectionAdapter = null!;
+    
     public TablesListToolView()
     {
         InitializeComponent();
@@ -18,6 +25,19 @@ public class TablesListToolView : UserControl
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        TablesListBox = this.FindControl<ListBox>("TablesListBox");
+        SelectionAdapter = new SelectingItemsControlSelectionAdapter(TablesListBox);
+        DispatcherTimer.RunOnce(() =>
+        {
+            var searchTextBox = this.FindControl<TextBox>("SearchTextBox");
+            searchTextBox?.Focus();
+            searchTextBox?.SelectAll();
+        }, TimeSpan.FromMilliseconds(1));
     }
 
     private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
@@ -60,7 +80,12 @@ public class TablesListToolView : UserControl
     {
         if (e.Key == Key.Enter)
         {
-            (DataContext as TablesListToolViewModel)!.OpenOnly();
+            e.Handled = (DataContext as TablesListToolViewModel)!.OpenSelected();
+        }
+        else if (e.Key is Key.Down or Key.Up)
+        {
+            SelectionAdapter.HandleKeyDown(e);
+            e.Handled = true;
         }
     }
 }

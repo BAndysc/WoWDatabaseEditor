@@ -7,8 +7,11 @@
              x:DataType="viewModels:TablesListToolViewModel"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.TablesListToolView">
     <DockPanel LastChildFill="True">
-        <TextBox KeyDown="Search_KeyDown" DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
-        <ListBox PointerReleased="InputElement_OnPointerReleased" KeyDown="InputElement_OnKeyDown" DoubleTapped="InputElement_OnDoubleTapped" VirtualizationMode="None" Items="{CompiledBinding FilteredTables}">
+        <TextBox Name="SearchTextBox" KeyDown="Search_KeyDown" DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
+        <ListBox Name="TablesListBox" PointerReleased="InputElement_OnPointerReleased" KeyDown="InputElement_OnKeyDown" DoubleTapped="InputElement_OnDoubleTapped" 
+                 VirtualizationMode="None" 
+                 Items="{CompiledBinding FilteredTables}"
+                 SelectedItem="{CompiledBinding SelectedTable, Mode=TwoWay}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel LastChildFill="True">
