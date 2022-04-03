@@ -1483,7 +1483,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             dialog.SetContent($"Selected source can be one of: {string.Join(", ", sourceData.Types ?? Enumerable.Empty<string>())}. However, current action requires one of: {string.Join(", ", actionData.TargetTypes  ?? Enumerable.Empty<string>())}");
                         else
                             dialog.SetContent($"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}");
-                        messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
+                        await messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
                     }
                     
                     smartFactory.UpdateSource(obj.Source, newId);
@@ -1587,7 +1587,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         originalAction.Comment = obj.Comment;
                     }
-                }, context: obj);
+                }, context: obj, focusFirstGroup: "Action");
             return viewModel;
         }
 
