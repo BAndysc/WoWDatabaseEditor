@@ -298,7 +298,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     }
                     else
                     {
-                        var command = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                        var (command, title) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, entity.GenerateKey(TableDefinition));
                         cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, command, column.Name));
                     }
                 }

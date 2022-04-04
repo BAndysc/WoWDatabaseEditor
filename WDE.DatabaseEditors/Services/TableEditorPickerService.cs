@@ -124,12 +124,13 @@ public class TableEditorPickerService : ITableEditorPickerService
             var col = viewModel.SelectedRow?.GetCell(column);
             if (col is DatabaseField<long> longColumn)
                 return longColumn.Current.Value;
-            if (backupColumn != null)
+            else if (backupColumn != null)
             {
                 col = viewModel.SelectedRow?.GetCell(backupColumn);
                 if (col is DatabaseField<long> longColumn2)
                     return longColumn2.Current.Value;
             }
+            Console.WriteLine($"Couldn't find column {column} or {backupColumn} in {tableViewModel.TableDefinition.Name}");
         }
         return null;
     }

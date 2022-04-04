@@ -646,8 +646,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var command = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, entity.GenerateKey(TableDefinition));
-                    cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, command, row, entity, "Open"));
+                    var (command, title) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                    cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
                 }
                 else
                 {

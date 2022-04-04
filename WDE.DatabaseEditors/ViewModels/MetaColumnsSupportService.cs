@@ -14,7 +14,7 @@ namespace WDE.DatabaseEditors.ViewModels;
 [UniqueProvider]
 public interface IMetaColumnsSupportService
 {
-    ICommand GenerateCommand(string metaColumn, DatabaseEntity entity, DatabaseKey realKey);
+    (ICommand, string) GenerateCommand(string metaColumn, DatabaseEntity entity, DatabaseKey realKey);
 }
 
 [AutoRegister]
@@ -23,15 +23,18 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
 {
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly ITableDefinitionProvider definitionProvider;
+    private readonly IRemoteConnectorService remoteConnectorService;
 
     public MetaColumnsSupportService(ITableEditorPickerService tableEditorPickerService,
-        ITableDefinitionProvider definitionProvider)
+        ITableDefinitionProvider definitionProvider,
+        IRemoteConnectorService remoteConnectorService)
     {
         this.tableEditorPickerService = tableEditorPickerService;
         this.definitionProvider = definitionProvider;
+        this.remoteConnectorService = remoteConnectorService;
     }
     
-    public ICommand GenerateCommand(string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
+    public (ICommand, string) GenerateCommand(string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
     {
         if (metaColumn.StartsWith("table:"))
         {
@@ -41,32 +44,42 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
             var table = parts[0];
             var condition = parts[1];
             var keyParts = parts.Length == 3 ? parts[2].Split(',') : new string[]{};
-            return new DelegateCommand(
+            return (new DelegateCommand(
                 () =>
                 {
                     var newCondition = entity.FillTemplate(condition);
                     tableEditorPickerService.ShowTable(table, newCondition, keyParts.Length == 0 ? null : new DatabaseKey(keyParts.Select(entity.GetTypedValueOrThrow<long>))).ListenErrors();
-                });
+                }), "Open");
         }
         if (metaColumn.StartsWith("tableByKey:"))
         {
             var table = metaColumn.Substring(11, metaColumn.IndexOf(";") - 11);
             var key = metaColumn.Substring(metaColumn.IndexOf(";") + 1);
-            return new DelegateCommand(() =>
+            return (new DelegateCommand(() =>
             {
                 tableEditorPickerService.ShowTable(table, null, new DatabaseKey(entity.GetTypedValueOrThrow<long>(key))).ListenErrors();
-            });
+            }), "Open");
         }
         if (metaColumn.StartsWith("one2one:"))
         {
             var table = metaColumn.Substring(8);
-            return new DelegateCommand(
+            return (new DelegateCommand(
                 () =>
                 {
                     tableEditorPickerService.ShowForeignKey1To1(table, entity.Key).ListenErrors();
-                }, () => !entity.Phantom);
+                }, () => !entity.Phantom), "Open");
+        }
+        if (metaColumn.StartsWith("invoke:"))
+        {
+            var command = metaColumn.Substring(7);
+            return (new AsyncAutoCommand(
+                () =>
+                {
+                    var result = entity.FillTemplate(command);
+                    return remoteConnectorService.ExecuteCommand(new AnonymousRemoteCommand(result));
+                }, () => !entity.Phantom), "Invoke");
         }
 
-        return new AlwaysDisabledCommand();
+        return (new AlwaysDisabledCommand(), "(invalid)");
     }
 }
