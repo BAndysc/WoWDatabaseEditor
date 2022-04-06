@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:findAnywhere="clr-namespace:WoWDatabaseEditorCore.Services.FindAnywhere;assembly=WoWDatabaseEditorCore"
+             xmlns:common="clr-namespace:WDE.Common.Services.FindAnywhere;assembly=WDE.Common"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="Root"
+             x:DataType="findAnywhere:FindAnywhereResultsViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.FindAnywhere.FindAnywhereResultsView">
+    <DockPanel>
+        <TextBlock Margin="10" FontWeight="Bold" DockPanel.Dock="Top" Text="{CompiledBinding SearchSummaryText, StringFormat=Search results for: {0}}"/>
+        <TextBlock DockPanel.Dock="Bottom" IsVisible="{CompiledBinding SearchingInProgress}" Opacity="0.5" TextAlignment="Center" Margin="5">Searching in progres...</TextBlock>
+        <Panel>
+            <TextBlock TextAlignment="Center" 
+                       IsVisible="{CompiledBinding NoResultsFound}"
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Center" 
+                       FontWeight="Bold">No results found.</TextBlock>
+            <ScrollViewer IsVisible="{CompiledBinding NoResultsFound, Converter={x:Static BoolConverters.Not}}">
+                <ItemsRepeater Items="{CompiledBinding Results}">
+                    <ItemsRepeater.Layout>
+                        <StackLayout Spacing="10" DisableVirtualization="False"></StackLayout>
+                    </ItemsRepeater.Layout>
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate DataType="common:IFindAnywhereResult">
+                            <Border Padding="10,5,10,5" Name="Border">
+                                <DockPanel>
+                                    <WdeImage Margin="0,0,10,0" Image="{CompiledBinding Icon}" DockPanel.Dock="Left" Width="32" />
+                                    <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top" FontWeight="Bold" Text="{CompiledBinding Title}" />
+                                    <TextBlock Text="{CompiledBinding Description}" />
+                                </DockPanel>
+                                <Interaction.Behaviors>
+                                    <EventTriggerBehavior EventName="PointerReleased" SourceObject="{Binding #Border}">
+                                        <InvokeCommandAction Command="{Binding #Root.DataContext.OpenCommand}" CommandParameter="{CompiledBinding }" />
+                                    </EventTriggerBehavior>
+                                    <utils:PressedClassBehaviour />
+                                </Interaction.Behaviors>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                    <ItemsRepeater.Styles>
+                        <Style Selector="Border">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                        <Style Selector="Border:pointerover">
+                            <Setter Property="Background" Value="#06000000" />
+                        </Style>
+                        <Style Selector="Border:pressed">
+                            <Setter Property="Background" Value="#10000000" />
+                        </Style>
+                    </ItemsRepeater.Styles>
+                </ItemsRepeater>
+            </ScrollViewer>
+        </Panel>
+    </DockPanel>
+</UserControl>

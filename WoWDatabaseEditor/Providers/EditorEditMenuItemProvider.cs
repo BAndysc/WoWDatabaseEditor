@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Prism.Commands;
@@ -7,7 +8,9 @@ using WDE.Common.Managers;
 using WDE.Common.Menu;
 using WDE.Common.QuickAccess;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.Services.FindAnywhere;
 
 namespace WoWDatabaseEditorCore.Providers
 {
@@ -21,7 +24,9 @@ namespace WoWDatabaseEditorCore.Providers
 
         public EditorEditMenuItemProvider(IDocumentManager documentManager,
             ITablesToolService tablesToolService,
-            IQuickAccessViewModel quickAccessViewModel)
+            IQuickAccessViewModel quickAccessViewModel,
+            Lazy<IWindowManager> windowManager,
+            Func<IFindAnywhereDialogViewModel> findAnywhereDialog)
         {
             DocumentManager = documentManager;
             SubItems = new List<IMenuItem>();
@@ -75,6 +80,12 @@ namespace WoWDatabaseEditorCore.Providers
             SubItems.Add(new ModuleMenuItem("Open quick commands",
                 new DelegateCommand(() => quickAccessViewModel.OpenSearch("/")),
                 new("Control+Shift+R")));
+            
+            SubItems.Add(new ModuleManuSeparatorItem());
+            
+            SubItems.Add(new ModuleMenuItem("Find anywhere",
+                new AsyncAutoCommand(() => windowManager.Value.ShowDialog(findAnywhereDialog())),
+                new("Control+Shift+F")));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

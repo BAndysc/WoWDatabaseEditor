@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using LinqKit;
 using LinqToDB;
 using LinqToDB.Data;
 using WDE.Common.CoreVersion;
@@ -478,6 +479,51 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
         public abstract Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
 
+        public async Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
+        {
+            await using var model = Database();
+            var predicate = PredicateBuilder.New<MySqlSmartScriptLine>();
+            foreach (var value in conditions)
+            {
+                if (value.what == IDatabaseProvider.SmartLinePropertyType.Action)
+                {
+                    if (value.parameterIndex == 1)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam1 == value.valueToSearch);
+                    else if (value.parameterIndex == 2)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam2 == value.valueToSearch);
+                    else if (value.parameterIndex == 3)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam3 == value.valueToSearch);
+                    else if (value.parameterIndex == 4)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam4 == value.valueToSearch);
+                    else if (value.parameterIndex == 5)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam5 == value.valueToSearch);
+                    else if (value.parameterIndex == 6)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam6 == value.valueToSearch);
+                }
+                else if (value.what == IDatabaseProvider.SmartLinePropertyType.Event)
+                {
+                    if (value.parameterIndex == 1)
+                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam1 == value.valueToSearch);
+                    else if (value.parameterIndex == 2)
+                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam2 == value.valueToSearch);
+                    else if (value.parameterIndex == 3)
+                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam3 == value.valueToSearch);
+                    else if (value.parameterIndex == 4)
+                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam4 == value.valueToSearch);
+                }
+                else if (value.what == IDatabaseProvider.SmartLinePropertyType.Target)
+                {
+                    if (value.parameterIndex == 1)
+                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam1 == value.valueToSearch);
+                    else if (value.parameterIndex == 2)
+                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam2 == value.valueToSearch);
+                    else if (value.parameterIndex == 3)
+                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam3 == value.valueToSearch);
+                }
+            }
+            return await model.SmartScript.Where(predicate).ToListAsync<ISmartScriptLine>();    
+        }
+        
         public virtual Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
 
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()

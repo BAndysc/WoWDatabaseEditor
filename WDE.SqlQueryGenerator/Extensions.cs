@@ -151,11 +151,24 @@ namespace WDE.SqlQueryGenerator
             throw new Exception();
         }
         
+        public static IWhere ToWhere(this ITable table)
+        {
+            return new Where(table);
+        }
+
         public static IWhere Where(this IWhere where, Expression<Func<IRow, bool>> predicate)
         {
             var condition = new ToSqlExpression().Visit(new SimplifyExpression().Visit(predicate.Body));
             if (condition is ConstantExpression c && c.Value is string s)
-                return new Where(where.Table, $"({where.Condition}) AND ({s})");
+                return new Where(where.Table, where.IsEmpty ? s : $"({where.Condition}) AND ({s})");
+            throw new Exception();
+        }
+
+        public static IWhere OrWhere(this IWhere where, Expression<Func<IRow, bool>> predicate)
+        {
+            var condition = new ToSqlExpression().Visit(new SimplifyExpression().Visit(predicate.Body));
+            if (condition is ConstantExpression c && c.Value is string s)
+                return new Where(where.Table, where.IsEmpty ? s : $"({where.Condition}) OR ({s})");
             throw new Exception();
         }
 
@@ -169,9 +182,15 @@ namespace WDE.SqlQueryGenerator
         {
             var str = string.Join(", ", values);
             if (skipBrackets)
-                return new Where(where.Table, $"{where.Condition} AND `{columnName}` IN ({str})");
+            {
+                var s = $"`{columnName}` IN ({str})";
+                return new Where(where.Table, where.IsEmpty ? s : $"{where.Condition} AND {s}");
+            }
             else
-                return new Where(where.Table, $"({where.Condition}) AND (`{columnName}` IN ({str}))");
+            {
+                var s = $"`{columnName}` IN ({str})";
+                return new Where(where.Table, where.IsEmpty ? s : $"({where.Condition}) AND ({s})");
+            }
         }
         
         public static IQuery Delete(this IWhere query)

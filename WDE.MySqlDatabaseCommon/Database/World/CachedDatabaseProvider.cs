@@ -237,6 +237,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => nonCachedDatabase.GetCreatureTextsByEntryAsync(entry);
 
         public Task<IList<IItem>?> GetItemTemplatesAsync() => nonCachedDatabase.GetItemTemplatesAsync();
+        public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => nonCachedDatabase.FindSmartScriptLinesBy(conditions);
 
         public Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => nonCachedDatabase.GetSpawnGroupTemplatesAsync();
 

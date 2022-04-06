@@ -75,6 +75,16 @@ namespace WDE.Common.Database
         Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => Task.FromResult<IList<ISpawnGroupTemplate>?>(null);
 
         Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
+
+        Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);
+
+        public enum SmartLinePropertyType
+        {
+            Event,
+            Action,
+            Target,
+            Source
+        }
         
         [Flags]
         public enum ConditionKeyMask

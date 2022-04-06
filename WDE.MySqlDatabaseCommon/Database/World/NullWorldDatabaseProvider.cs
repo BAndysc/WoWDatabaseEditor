@@ -93,7 +93,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<ITrinityString>> GetStringsAsync() => Task.FromResult<IList<ITrinityString>>(new List<ITrinityString>());
         
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync() => Task.FromResult<IList<IDatabaseSpellDbc>>(new List<IDatabaseSpellDbc>());
-        
+       
+        public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => Task.FromResult<IList<ISmartScriptLine>>(new List<ISmartScriptLine>());
+
         public Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult(new List<ICreatureTemplate>());
 
         public Task<List<ICreature>> GetCreaturesAsync() => Task.FromResult(new List<ICreature>());

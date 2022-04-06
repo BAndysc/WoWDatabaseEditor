@@ -1903,7 +1903,7 @@
         "name": "SMART_ACTION_CALL_TIMED_ACTIONLIST",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "ID"
             },
             {
@@ -2043,27 +2043,27 @@
         "name": "SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 1"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 2"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 3"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 4"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 5"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 6"
             }
         ],
@@ -2077,11 +2077,11 @@
         "name": "SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID min"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID max"
             },
             {

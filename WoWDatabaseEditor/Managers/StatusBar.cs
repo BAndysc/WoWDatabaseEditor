@@ -23,16 +23,16 @@ namespace WoWDatabaseEditorCore.Managers
         private readonly TasksViewModel tasksViewModel;
         private readonly IMainThread mainThread;
         private readonly IPersonalGuidRangeService guidRangeService;
-        private readonly IClipboardService clipboardService;
-        private readonly IMessageBoxService messageBoxService;
+        private readonly Lazy<IClipboardService> clipboardService;
+        private readonly Lazy<IMessageBoxService> messageBoxService;
 
         public StatusBar(Lazy<IDocumentManager> documentManager,
             TasksViewModel tasksViewModel, 
             IEventAggregator eventAggregator,
             IMainThread mainThread,
             IPersonalGuidRangeService guidRangeService,
-            IClipboardService clipboardService,
-            IMessageBoxService messageBoxService)
+            Lazy<IClipboardService> clipboardService,
+            Lazy<IMessageBoxService> messageBoxService)
         {
             this.tasksViewModel = tasksViewModel;
             this.mainThread = mainThread;
@@ -60,10 +60,10 @@ namespace WoWDatabaseEditorCore.Managers
         {
             return new AsyncAutoCommand(async () =>
             {
-                var guid = await guidRangeService.GetNextGuidOrShowError(type, messageBoxService);
+                var guid = await guidRangeService.GetNextGuidOrShowError(type, messageBoxService.Value);
                 if (guid.HasValue)
                 {
-                    clipboardService.SetText(guid.Value.ToString());
+                    clipboardService.Value.SetText(guid.Value.ToString());
                     PublishNotification(new PlainNotification(NotificationType.Info, "Copied " + guid.Value + $" to your clipboard ({type})"));
                 }
             });
@@ -74,10 +74,10 @@ namespace WoWDatabaseEditorCore.Managers
             return new AsyncAutoCommand(async () =>
             {
                 var count = getter();
-                var guid = await guidRangeService.GetNextGuidRangeOrShowError(type, count, messageBoxService);
+                var guid = await guidRangeService.GetNextGuidRangeOrShowError(type, count, messageBoxService.Value);
                 if (guid.HasValue)
                 {
-                    clipboardService.SetText(guid.Value.ToString());
+                    clipboardService.Value.SetText(guid.Value.ToString());
                     PublishNotification(new PlainNotification(NotificationType.Info, "Copied " + guid.Value + $" to your clipboard ({type}). You have {count} consecutive guids"));
                 }
             }, () => getter() > 0);

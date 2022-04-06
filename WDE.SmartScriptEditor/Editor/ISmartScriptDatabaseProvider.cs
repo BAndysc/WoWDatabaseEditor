@@ -11,5 +11,6 @@ namespace WDE.SmartScriptEditor.Editor
         IEnumerable<IConditionLine> GetConditionsForScript(int entryOrGuid, SmartScriptType type);
         IEnumerable<IConditionLine> GetConditionsForSourceTarget(int entryOrGuid, SmartScriptType type);
         Task InstallConditionsForScript(IEnumerable<IConditionLine> conditions, int entryOrGuid, SmartScriptType type);
+        Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);
     }
 }
