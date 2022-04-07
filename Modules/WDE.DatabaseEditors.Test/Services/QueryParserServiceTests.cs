@@ -65,7 +65,10 @@ public class QueryParserServiceTests
 
         dataLoader.Load(default!, default, default, default, default)
             .ReturnsForAnyArgs(
-                Task.FromResult<IDatabaseTableData>(new DatabaseTableData(definition, new List<DatabaseEntity>())));
+                Task.FromResult<IDatabaseTableData>(new DatabaseTableData(definition, new List<DatabaseEntity>()
+                {
+                    new DatabaseEntity(true, new DatabaseKey(0, 18675), new Dictionary<string, IDatabaseField>(), null)
+                })));
 
         tableDefinitionProvider
             .GetDefinition("table")
@@ -76,11 +79,10 @@ public class QueryParserServiceTests
             .Returns(definition);
 
 
+        var evaluator = new QueryEvaluator();
         parserService = new QueryParserService(
-            tableDefinitionProvider,
-            new QueryEvaluator(),
-            sessionService,
-            dataLoader
+            evaluator,
+            () => new QueryParserService.Context(evaluator, new []{new GenericTableQueryParserProvider(tableDefinitionProvider, dataLoader, sessionService)})
         );
     }
 

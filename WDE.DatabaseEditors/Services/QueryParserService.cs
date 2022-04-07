@@ -25,16 +25,13 @@ namespace WDE.DatabaseEditors.Services
     {
         private readonly IQueryEvaluator queryEvaluator;
         private readonly Func<Context> contextGenerator;
-        private readonly IContainerProvider ioc;
 
         public QueryParserService(
             IQueryEvaluator queryEvaluator,
-            Func<Context> contextGenerator,
-            IContainerProvider ioc)
+            Func<Context> contextGenerator)
         {
             this.queryEvaluator = queryEvaluator;
             this.contextGenerator = contextGenerator;
-            this.ioc = ioc;
         }
 
         public Task<(IList<ISolutionItem> items, IList<string> errors)> GenerateItemsForQuery(string query)
