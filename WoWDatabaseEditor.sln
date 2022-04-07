@@ -195,6 +195,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBFileReaderLib", "DBCD\DBF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.AnniversaryInfo", "Modules\WDE.AnniversaryInfo\WDE.AnniversaryInfo.csproj", "{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.EventScriptsEditor", "Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj", "{7431ED24-207C-44B0-871A-FFF037C92EAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -537,6 +539,10 @@ Global
 		{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -604,6 +610,7 @@ Global
 		{DACACBB1-29B3-435E-B1E5-CCE54C76D3A5} = {8A37024A-7A68-4BCB-B800-766D92E041EF}
 		{F63A6DDA-874A-41FF-A707-3B95862036A5} = {4C553308-1140-42F2-B99C-90402248A983}
 		{DC3C17DD-7B7B-483D-B6F0-08B196AF87C0} = {5B4101BE-5A22-4B88-9E94-FFC484E04BDE}
+		{7431ED24-207C-44B0-871A-FFF037C92EAF} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}

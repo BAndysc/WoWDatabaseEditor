@@ -34,5 +34,6 @@ namespace WDE.Trinity
         public string ConditionSourcesFile => "SmartData/condition_sources.json";
         public CharacterRaces AllRaces => CharacterRaces.AllCatataclysm;
         public CharacterClasses AllClasses => CharacterClasses.AllCataclysm;
+        public bool SupportsEventScripts => true;
     }
 }

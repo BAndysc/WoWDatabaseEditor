@@ -17,6 +17,7 @@ namespace WDE.Common.CoreVersion
         bool SupportsRbac => true;
         bool SupportsSpecialCommands => false;
         bool SupportsReverseCommands => false;
+        bool SupportsEventScripts => false;
     }
     
     public interface IGameVersionFeatures

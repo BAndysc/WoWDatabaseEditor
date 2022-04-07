@@ -68,6 +68,12 @@ namespace WDE.Common.Avalonia.Components
                 var darkUri = Path.ChangeExtension(uri, null) + "_dark" + extension;
                 if (File.Exists(darkUri))
                     uri = darkUri;
+                else
+                {
+                    var alternativeUri = uri.Replace("_big", "_dark_big");
+                    if (File.Exists(alternativeUri))
+                        uri = alternativeUri;
+                }
             }
             
             if (GlobalApplication.HighDpi)

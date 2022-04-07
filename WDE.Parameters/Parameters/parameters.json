@@ -2785,5 +2785,15 @@
 			"15": "misc",
 			"16": "glyph"			
 		}
+	},
+	"EventScriptTalkTypeParameter": {
+		"values": {
+			"0": "Say",
+			"1": "Yell",
+			"2": "Text emote",
+			"3": "Boss emote",
+			"4": "Whisper",
+			"5": "Boss whisper"
+		}
 	}
 }

@@ -36,5 +36,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
         public ITable<MySqlPointOfInterest> PointsOfInterest => GetTable<MySqlPointOfInterest>();
         public ITable<MySqlCreatureText> CreatureTexts => GetTable<MySqlCreatureText>();
+        public ITable<MySqlEventScriptLine> EventScripts => GetTable<MySqlEventScriptLine>();
+        public ITable<MySqlWaypointScriptLine> WaypointScripts => GetTable<MySqlWaypointScriptLine>();
+        public ITable<MySqlSpellScriptLine> SpellScripts => GetTable<MySqlSpellScriptLine>();
     }
 }

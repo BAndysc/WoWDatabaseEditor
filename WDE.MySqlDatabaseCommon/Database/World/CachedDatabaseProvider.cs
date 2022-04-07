@@ -313,7 +313,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         }
 
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => nonCachedDatabase.GetBroadcastTextByIdAsync(id);
-        
+
+        public Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => nonCachedDatabase.FindEventScriptLinesBy(conditions);
+
+        public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => nonCachedDatabase.GetEventScript(type, id);
+
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
         {
             if (databaseSpellDbcCache != null)

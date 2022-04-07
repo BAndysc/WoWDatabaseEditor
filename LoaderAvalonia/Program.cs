@@ -27,6 +27,7 @@ using WDE.Updater;
 using WDE.WorldMap;
 using WDE.WoWHeadConnector;
 using WDE.AnniversaryInfo;
+using WDE.EventScriptsEditor;
 
 namespace LoaderAvalonia
 {
@@ -64,7 +65,8 @@ namespace LoaderAvalonia
                 typeof(SmartScriptModule),
                 typeof(TrinityModule),
                 typeof(AzerothModule),
-                typeof(AnniversaryModule)
+                typeof(AnniversaryModule),
+                typeof(EventScriptsModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

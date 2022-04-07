@@ -14,6 +14,7 @@
     <Import Project="..\Module.props" />    
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+      <ProjectReference Include="..\Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj" />
       <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
       <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.CommonViews.Avalonia\WDE.CommonViews.Avalonia.csproj" />

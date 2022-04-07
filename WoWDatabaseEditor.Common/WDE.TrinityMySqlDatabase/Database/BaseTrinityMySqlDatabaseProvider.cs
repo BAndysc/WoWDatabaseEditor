@@ -9,6 +9,7 @@ using LinqToDB.Data;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.MySqlDatabaseCommon.CommonModels;
 using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
@@ -526,6 +527,46 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public virtual Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
 
+        private ExpressionStarter<T> GenerateWhereConditionsForEventScript<T>(IEnumerable<(uint command, int dataIndex, long valueToSearch)> conditions) where T : IEventScriptLine
+        {
+            var predicate = PredicateBuilder.New<T>();
+            foreach (var value in conditions)
+            {
+                if (value.dataIndex == 0)
+                    predicate = predicate.Or(o => o.Command == value.command && o.DataLong1 == (ulong)value.valueToSearch);
+                else if (value.dataIndex == 1)
+                    predicate = predicate.Or(o => o.Command == value.command && o.DataLong2 == (ulong)value.valueToSearch);
+                else if (value.dataIndex == 2)
+                    predicate = predicate.Or(o => o.Command == value.command && o.DataInt == (int)value.valueToSearch);
+            }
+            return predicate;
+        }
+
+        public async Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
+        {
+            await using var model = Database();
+            var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+            var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+            var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+            return events.Concat(spells).Concat(waypoints).ToList();
+        }
+        
+        public async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
+        {
+            await using var model = Database();
+            switch (type)
+            {
+                case EventScriptType.Event:
+                    return await model.EventScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+                case EventScriptType.Spell:
+                    return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+                case EventScriptType.Waypoint:
+                    return await model.WaypointScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+        
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
             if (!Supports<IAuthRbacPermission>())

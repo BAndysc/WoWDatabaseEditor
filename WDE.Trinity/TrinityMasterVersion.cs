@@ -37,5 +37,6 @@ namespace WDE.Trinity
         public string ConditionSourcesFile => "SmartData/condition_sources.json";
         public CharacterRaces AllRaces => CharacterRaces.AllShadowlands;
         public CharacterClasses AllClasses => CharacterClasses.AllShadowlands;
+        public bool SupportsEventScripts => true;
     }
 }

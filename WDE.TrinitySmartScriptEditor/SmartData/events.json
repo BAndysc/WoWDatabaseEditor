@@ -2088,7 +2088,7 @@
     "name": "SMART_EVENT_GO_EVENT_INFORM",
     "parameters": [
       {
-        "type": "Parameter",
+        "type": "EventScriptParameter",
         "name": "Event ID",
         "description": "For example, gameobject of type \"gobber\""
       }

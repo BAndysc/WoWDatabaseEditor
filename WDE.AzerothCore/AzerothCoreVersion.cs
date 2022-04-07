@@ -42,5 +42,6 @@ namespace WDE.AzerothCore
         public string ConditionSourcesFile => "SmartData/condition_sources.json";
         public CharacterRaces AllRaces => CharacterRaces.AllWrath;
         public CharacterClasses AllClasses => CharacterClasses.AllWrath;
+        public bool SupportsEventScripts => true;
     }
 }
