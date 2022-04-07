@@ -25,5 +25,7 @@ namespace WDE.DbcStore.Spells
             (SpellTarget.NoTarget, SpellTarget.NoTarget);
 
         public uint GetSpellEffectMiscValueA(uint spellId, int index) => 0;
+        
+        public uint GetSpellEffectTriggerSpell(uint spellId, int index) => 0;
     }
 }

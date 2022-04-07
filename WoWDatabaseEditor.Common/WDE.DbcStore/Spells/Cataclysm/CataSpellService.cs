@@ -328,5 +328,12 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 return effect.EffectMiscValueA;
             return 0;
         }
+
+        public uint GetSpellEffectTriggerSpell(uint spellId, int index)
+        {
+            if (TryGetEffect(spellId, index, out var effect))
+                return effect.EffectTriggerSpell;
+            return 0;
+        }
     }
 }

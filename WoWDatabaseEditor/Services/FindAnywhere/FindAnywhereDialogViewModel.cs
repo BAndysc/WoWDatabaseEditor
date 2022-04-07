@@ -36,14 +36,18 @@ public partial class FindAnywhereDialogViewModel : ObservableBase, IFindAnywhere
         Sources.Add(new FindSourceDialog("Creature entry", "CreatureParameter", "CreatureGameobjectParameter", "ConditionObjectEntryParameter"));
         Sources.Add(new FindSourceDialog("Game object entry", "GameobjectParameter", "CreatureGameobjectParameter", "ConditionObjectEntryParameter"));
         Sources.Add(new FindSourceDialog("Spell", "SpellParameter", "SpellAreaSpellParameter", "SpellOrRankedSpellParameter", "MultiSpellParameter"));
+        Sources.Add(new FindSourceDialog("Quest", "QuestParameter"));
         Sources.Add(new FindSourceDialog("Faction", "FactionParameter"));
         Sources.Add(new FindSourceDialog("Map", "MapParameter"));
         Sources.Add(new FindSourceDialog("Zone/area", "ZoneAreaParameter"));
         Sources.Add(new FindSourceDialog("Emote", "EmoteParameter"));
         Sources.Add(new FindSourceDialog("Item", "ItemParameter"));
         Sources.Add(new FindSourceDialog("Sound", "SoundParameter"));
+        Sources.Add(new FindSourceDialog("Achievement", "AchievementParameter"));
+        Sources.Add(new FindSourceDialog("Skill", "SkillParameter"));
+        Sources.Add(new FindSourceDialog("Event", "EventScriptParameter"));
         Sources.Add(new FindSourceDialog("Timed action list", "TimedActionListParameter"));
-
+        
         selectedSource = Sources[0];
         
         Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
