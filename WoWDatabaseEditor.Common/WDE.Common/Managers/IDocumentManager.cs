@@ -29,6 +29,20 @@ namespace WDE.Common.Managers
 
     public static class DocumentManagerExtensions
     {
+        public static T? TryFindDocumentEditor<T>(this IDocumentManager documentManager, Func<T, bool> selector) where T : class
+        {
+            foreach (var docu in documentManager.OpenedDocuments)
+            {
+                if (docu is T t)
+                {
+                    if (selector(t))
+                        return t;
+                }
+            }
+
+            return null;
+        }
+        
         public static ISolutionItemDocument? TryFindDocument(this IDocumentManager documentManager, ISolutionItem item)
         {
             foreach (var docu in documentManager.OpenedDocuments)
