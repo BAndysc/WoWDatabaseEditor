@@ -50,7 +50,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
             if (definition.IsOnlyConditionsTable)
                 continue;
             
-            foreach (var tableGroup in definition.TableColumns.Values.GroupBy(c => c.ForeignTable ?? definition.TableName))
+            foreach (var tableGroup in definition.Groups.SelectMany(group => group.Fields.Select(column => (group, column))).GroupBy(c => c.column.ForeignTable ?? definition.TableName))
             {
                 var tableName = tableGroup.Key;
                 var table = Queries.Table(tableName);
@@ -61,11 +61,20 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                     where = where.OrWhere(row => row.Column<long>(definition.TablePrimaryKeyColumnName) == parameterValue);
                 }
                 
-                foreach (var column in tableGroup)
+                foreach (var (group, column) in tableGroup)
                 {
                     if (parameterName.IndexOf(column.ValueType) != -1)
-                        where = where.OrWhere(row => row.Column<long>(column.DbColumnName) == parameterValue);
+                    {
+                        if (group.ShowIf is {} showIf)
+                            where = where.OrWhere(row => row.Column<long>(column.DbColumnName) == parameterValue && row.Column<long>(showIf.ColumnName) == showIf.Value);
+                        else
+                            where = where.OrWhere(row => row.Column<long>(column.DbColumnName) == parameterValue);
+                    }
                 }
+
+                if (where.IsEmpty)
+                    continue;
+                
                 var select = where.Select();
                 var result = await executor.ExecuteSelectSql(select.QueryString);
 
