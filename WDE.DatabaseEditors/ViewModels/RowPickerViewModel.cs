@@ -41,6 +41,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
         ISolutionItemEditorRegistry solutionItemEditorRegistry,
         ISessionService sessionService,
         IMessageBoxService messageBoxService,
+        ISolutionTasksService solutionTasksService,
         bool noSaveMode = false)
     {
         this.baseViewModel = baseViewModel;
@@ -54,6 +55,8 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
             baseViewModel.Save.Execute(null);
             eventAggregator.GetEvent<DatabaseTableChanged>().Publish(baseViewModel.TableDefinition.TableName);
             await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(baseViewModel));
+            if (solutionTasksService.CanReloadRemotely)
+                await solutionTasksService.ReloadSolutionRemotelyTask(baseViewModel.SolutionItem);
         });
         CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
         {
