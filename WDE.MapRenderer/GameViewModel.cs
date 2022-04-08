@@ -54,6 +54,7 @@ namespace WDE.MapRenderer
     {
         private readonly Lazy<IDocumentManager> documentManager;
         private readonly GameViewSettings settings;
+        private readonly IMainThread mainThread;
         public Game Game { get; }
         public event Action? RequestDispose;
 
@@ -137,7 +138,7 @@ namespace WDE.MapRenderer
                 registeredViewModels = moduleManager.ViewModels;
                 registeredViewModels.CollectionChanged += RegisteredViewModelsOnCollectionChanged;
                 
-                Dispatcher.UIThread.Post(() => vm.SelectedMap = vm.Maps.FirstOrDefault(x => x.Id == gameContext.CurrentMap.Id), DispatcherPriority.Background);
+                Dispatcher.UIThread.Post(() => vm.SelectedMap = vm.Maps?.FirstOrDefault(x => x.Id == gameContext.CurrentMap.Id), DispatcherPriority.Background);
                 gameContext.ChangedMap += newMapId =>
                 {
                     Dispatcher.UIThread.Post(() => vm.SelectedMap = vm.Maps.FirstOrDefault(x => x.Id == newMapId), DispatcherPriority.Background);
@@ -215,10 +216,12 @@ Tris: " + stats.TrianglesDrawn;
             Game game,
             GameProperties gameProperties,
             Lazy<IDocumentManager> documentManager,
-            GameViewSettings settings)
+            GameViewSettings settings,
+            IMainThread mainThread)
         {
             this.documentManager = documentManager;
             this.settings = settings;
+            this.mainThread = mainThread;
             MapData = mapData;
             Game = game;
             Properties = gameProperties;
@@ -262,6 +265,7 @@ Tris: " + stats.TrianglesDrawn;
             {
                 if (@is)
                 {
+                    state = 1;
                     if (!mpqService.IsConfigured())
                     {
                         messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
@@ -273,11 +277,26 @@ Tris: " + stats.TrianglesDrawn;
                             .Build()).ListenErrors();
                     }
                 }
-                else
-                {
-                    Game.DoDispose();
-                }
             });
+        }
+
+        private int state = 0;
+        
+        public bool CanClose()
+        {
+            if (state == 1)
+            {
+                Game.DoDispose();
+                state = 2;
+                mainThread.Delay(() =>
+                {
+                    Visibility = false;
+                }, TimeSpan.FromMilliseconds(10));
+                return false;
+            }
+
+            state = 0;
+            return true;
         }
 
         public bool OverrideLighting

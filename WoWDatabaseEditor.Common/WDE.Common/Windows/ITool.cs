@@ -12,6 +12,7 @@ namespace WDE.Common.Windows
         ToolPreferedPosition PreferedPosition { get; }
         bool OpenOnStart { get; }
         bool IsSelected { get; set; }
+        bool CanClose() => true;
     }
 
     public interface IFocusableTool : ITool

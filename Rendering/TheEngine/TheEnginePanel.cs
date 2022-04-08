@@ -150,7 +150,14 @@ namespace TheEngine
 
         protected override void OnOpenGlRender(GlInterface gl, int fb)
         {
-            if (engine == null || delayedDispose)
+            if (delayedDispose)
+            {
+                Cleanup();
+                delayedDispose = false;
+                return;
+            }
+            
+            if (engine == null || disposed)
                 return;
             
             engine.statsManager.PixelSize = new Vector2(PixelSize.Item1, PixelSize.Item2);
@@ -259,13 +266,14 @@ namespace TheEngine
             game?.Update(delta);
         }
 
+        private bool disposed;
         private bool delayedDispose;
         private void GameOnRequestDispose()
         {
             if (game != null)
                 game.RequestDispose -= GameOnRequestDispose;
             delayedDispose = true;
-            Cleanup();
+            disposed = true;
         }
 
         protected virtual void Render(float delta)
