@@ -167,7 +167,7 @@ namespace WDE.SmartScriptEditor.Models
             Dictionary<int, List<SmartCondition>> conds = new();
             if (conditions != null)
             {
-                int prevElseGroup = 0;
+                Dictionary<int, int> prevElseGroupPerLine = new();
                 foreach (IConditionLine line in conditions)
                 {
                     SmartCondition? condition = SafeConditionFactory(line);
@@ -178,12 +178,15 @@ namespace WDE.SmartScriptEditor.Models
                     if (!conds.ContainsKey(line.SourceGroup - 1))
                         conds[line.SourceGroup - 1] = new List<SmartCondition>();
 
+                    if (!prevElseGroupPerLine.TryGetValue(line.SourceGroup - 1, out var prevElseGroup))
+                        prevElseGroup = prevElseGroupPerLine[line.SourceGroup - 1] = 0;
+                    
                     if (prevElseGroup != line.ElseGroup && conds[line.SourceGroup - 1].Count > 0)
                     {
                         var or = SafeConditionFactory(-1);
                         if (or != null)
                             conds[line.SourceGroup - 1].Add(or);
-                        prevElseGroup = line.ElseGroup;
+                        prevElseGroupPerLine[line.SourceGroup - 1] = line.ElseGroup;
                     }
 
                     conds[line.SourceGroup - 1].Add(condition);
