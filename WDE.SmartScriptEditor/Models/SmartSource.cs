@@ -43,6 +43,10 @@ namespace WDE.SmartScriptEditor.Models
             get => conditions;
             set
             {
+                if (value != null && value.Count == 0)
+                    value = null;
+                if (ReferenceEquals(conditions, value))
+                    return;
                 var old = conditions;
                 conditions = value;
                 OnConditionsChanged?.Invoke(this, old, value);
