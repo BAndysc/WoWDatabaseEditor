@@ -60,6 +60,25 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
                                              row.Column<long>(colName) == parameterValue);
             }
         }
+        
+        foreach (var cond in dataManager.AllConditionSourceData)
+        {
+            if (parameterName.IndexOf(cond.Group.Type) != -1)
+            {
+                where = where.OrWhere(row => row.Column<int>("SourceTypeOrReferenceId") == cond.Id &&
+                                             row.Column<long>("SourceGroup") == parameterValue);
+            }
+            if (parameterName.IndexOf(cond.SourceId.Type) != -1)
+            {
+                where = where.OrWhere(row => row.Column<int>("SourceTypeOrReferenceId") == cond.Id &&
+                                             row.Column<long>("SourceId") == parameterValue);
+            }
+            if (parameterName.IndexOf(cond.Entry.Type) != -1)
+            {
+                where = where.OrWhere(row => row.Column<int>("SourceTypeOrReferenceId") == cond.Id &&
+                                             row.Column<long>("SourceEntry") == parameterValue);
+            }
+        }
 
         var result = await mySqlExecutor.ExecuteSelectSql(where.Select().QueryString);
         foreach (var row in result)
