@@ -1063,7 +1063,7 @@
 			}
 		}
 	},
-	"SpellMechanicParameter": {
+	"SpellMechanicMaskParameter": {
 		"name": "Spell mechanics",
 		"isflag": true,
 		"prefix": "MECHANIC_",

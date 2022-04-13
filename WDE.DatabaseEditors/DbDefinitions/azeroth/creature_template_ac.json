@@ -438,7 +438,7 @@
         {
           "name": "Mechanic immune mask",
           "db_column_name": "mechanic_immune_mask",
-          "value_type": "SpellMechanicParameter"
+          "value_type": "SpellMechanicMaskParameter"
         },
         {
           "name": "School immune mask",
