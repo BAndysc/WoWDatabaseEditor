@@ -55,7 +55,30 @@ namespace WDE.MapRenderer
         private readonly Lazy<IDocumentManager> documentManager;
         private readonly GameViewSettings settings;
         private readonly IMainThread mainThread;
-        public Game Game { get; }
+        private Func<Game> gameCreator { get; }
+        private Game? currentGame;
+        public Game? CurrentGame
+        {
+            get => currentGame;
+            set
+            {
+                if (currentGame != null)
+                {
+                    currentGame.OnFailedInitialize -= OnFailedGameInitialize;
+                }
+                SetProperty(ref currentGame, value);
+                if (value != null)
+                {
+                    value.OnFailedInitialize += OnFailedGameInitialize;   
+                }
+            }
+        }
+
+        private void OnFailedGameInitialize()
+        {
+            Dispatcher.UIThread.Post(() => Visibility = false, DispatcherPriority.Background);
+        }
+
         public event Action? RequestDispose;
 
         private MapViewModel? selectedMap;
@@ -213,7 +236,7 @@ Tris: " + stats.TrianglesDrawn;
             ITaskRunner taskRunner,
             IMessageBoxService messageBoxService,
             IGameView gameView,
-            Game game,
+            Func<Game> gameCreator,
             GameProperties gameProperties,
             Lazy<IDocumentManager> documentManager,
             GameViewSettings settings,
@@ -223,7 +246,7 @@ Tris: " + stats.TrianglesDrawn;
             this.settings = settings;
             this.mainThread = mainThread;
             MapData = mapData;
-            Game = game;
+            this.gameCreator = gameCreator;
             Properties = gameProperties;
             Properties.OverrideLighting = settings.OverrideLighting;
             Properties.DisableTimeFlow = settings.DisableTimeFlow;
@@ -234,11 +257,7 @@ Tris: " + stats.TrianglesDrawn;
             Properties.ShowAreaTriggers = settings.ShowAreaTriggers;
 
             gameView.RegisterGameModule(container => container.Resolve<GameProxy>((typeof(GameViewModel), this)));
-
-            Game.OnFailedInitialize += () =>
-            {
-                Dispatcher.UIThread.Post(() => Visibility = false, DispatcherPriority.Background);
-            };
+            
             AutoDispose(new ActionDisposable(() =>
             {
                 RequestDispose?.Invoke();
@@ -265,6 +284,7 @@ Tris: " + stats.TrianglesDrawn;
             {
                 if (@is)
                 {
+                    CurrentGame = gameCreator();
                     state = 1;
                     if (!mpqService.IsConfigured())
                     {
@@ -286,7 +306,8 @@ Tris: " + stats.TrianglesDrawn;
         {
             if (state == 1)
             {
-                Game.DoDispose();
+                currentGame?.DoDispose();
+                currentGame = null;
                 state = 2;
                 mainThread.Delay(() =>
                 {
@@ -433,7 +454,10 @@ Tris: " + stats.TrianglesDrawn;
         
         public void Move(GameCameraViewModel item, double x, double y)
         {
-            var cameraManager = Game.Resolve<CameraManager>();
+            if (currentGame == null)
+                return;
+            
+            var cameraManager = currentGame.Resolve<CameraManager>();
             if (cameraManager != null)
             {
                 cameraManager.Relocate(new Vector3((float)x, (float)y, 200).ToOpenGlPosition());

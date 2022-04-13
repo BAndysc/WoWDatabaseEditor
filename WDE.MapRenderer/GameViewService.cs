@@ -38,7 +38,7 @@ namespace WDE.MapRenderer
         {
             documentManager.Value.OpenTool<GameViewModel>();
             var tool = documentManager.Value.GetTool<GameViewModel>();
-            return tool.Game;
+            return tool.CurrentGame;
         }
     }
 }
