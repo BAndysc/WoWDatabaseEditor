@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SyntaxDefinition name="Story teller" extensions=".story" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    <Color name="Punctuation" foreground="#ced6e0" />
+    <Color name="Header" foreground="#3498db" fontWeight="bold" />
+    <Color name="Digits" foreground="#f1c40f" />
+    <Color name="Coords" foreground="#1abc9c" />
+    <Color name="Comment" foreground="#767676" />
+    <RuleSet ignoreCase="true">
+        <Rule color="Comment">
+            \([^0-9].+\)
+        </Rule>
+        <Rule color="Header">
+            Path\s\d+|Segment\s\d+
+        </Rule>
+        <Rule color="Coords">
+            \(-?\d+\.\d+,\s*-?\d+\.\d+,\s*-?\d+\.\d+\)
+        </Rule>
+        <Rule color="Punctuation">
+            [?,.;()\[\]{}+\-/%*&lt;&gt;^=~!&amp;]+
+        </Rule>
+        <Rule color="Digits">\b0[xX][0-9a-fA-F]+|(\b\d+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?</Rule>
+    </RuleSet>
+</SyntaxDefinition>
