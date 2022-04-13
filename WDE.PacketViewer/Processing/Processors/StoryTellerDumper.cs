@@ -8,6 +8,7 @@ using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Processing.Processors.Utils;
 using WowPacketParser.Proto;
@@ -17,7 +18,7 @@ using WDE.PacketViewer.Utils;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor>,
+    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor, IFromGuidSpawnTimeProcessor>,
         IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor
     {
         private class WriterBuilder
@@ -51,6 +52,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly IPlayerGuidFollower playerGuidFollower;
         private readonly ISpellCastProcessor spellCastProcessor;
         private readonly PrettyFlagParameter prettyFlagParameter;
+        private readonly IFromGuidSpawnTimeProcessor fromGuidSpawnTimeProcessor;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly IDespawnDetector despawnDetector;
         private WriterBuilder? writer = null;
@@ -76,7 +78,8 @@ namespace WDE.PacketViewer.Processing.Processors
             IPlayerGuidFollower playerGuidFollower,
             ISpellCastProcessor spellCastProcessor,
             PrettyFlagParameter prettyFlagParameter,
-            bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector, spellCastProcessor)
+            IFromGuidSpawnTimeProcessor fromGuidSpawnTimeProcessor,
+            bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector, spellCastProcessor, fromGuidSpawnTimeProcessor)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
@@ -89,6 +92,7 @@ namespace WDE.PacketViewer.Processing.Processors
             this.playerGuidFollower = playerGuidFollower;
             this.spellCastProcessor = spellCastProcessor;
             this.prettyFlagParameter = prettyFlagParameter;
+            this.fromGuidSpawnTimeProcessor = fromGuidSpawnTimeProcessor;
             this.highLevelUpdateDump = highLevelUpdateDump;
             this.despawnDetector = despawnDetector;
 
@@ -138,7 +142,10 @@ namespace WDE.PacketViewer.Processing.Processors
                     state.writer.WriteLine();
                     if (perGuidWriter != null)
                         state.writer.Write("   ");
-                    state.writer.WriteLine("After " + diff.TotalMilliseconds + " ms");
+                    if (diff.TotalMilliseconds > 60000)
+                        state.writer.WriteLine($"After {diff.ToNiceString()} ({diff.TotalMilliseconds} ms)");
+                    else
+                        state.writer.WriteLine($"After {diff.TotalMilliseconds} ms");
                     state.lastTime = packet.Time.ToDateTime();
                 }
             }
@@ -606,8 +613,10 @@ namespace WDE.PacketViewer.Processing.Processors
                     continue;
                 var spawnTime = despawnDetector.GetSpawnLength(created.Guid, basePacket.Number);
                 var createType = created.CreateType == CreateObjectType.InRange ? "In range " : "Spawned ";
+                var spawnedAgo = fromGuidSpawnTimeProcessor.TryGetSpawnTime(created.Guid, basePacket.Time.ToDateTime());
                 SetAppendOnNext(createType + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation) +
-                                (spawnTime == null ? "" : $" (despawned in {spawnTime.Value.TotalSeconds} seconds)"));
+                                (spawnTime == null ? "" : $" (will be destroyed in {spawnTime.Value.ToNiceString()})") +
+                                (spawnedAgo.HasValue && spawnedAgo.Value.TotalMilliseconds > 1000 ? $" (spawned {spawnedAgo.Value.ToNiceString()} ago)" : ""));
                 PrintValues(basePacket, created.Guid, created.Values, false);
                 SetAppendOnNext(null);
             }

@@ -10,7 +10,7 @@
             [A-Z_0-9]+(\s\+\s\d+)?\s=
         </Rule>
         <Rule color="Header">
-            After\s*(\d)+\s*ms
+            After\s*(\d)+\s*ms|After.+ms\)
         </Rule>
         <Rule color="Coords">
             \(-?\d+\.\d+,\s*-?\d+\.\d+,\s*-?\d+\.\d+\)
