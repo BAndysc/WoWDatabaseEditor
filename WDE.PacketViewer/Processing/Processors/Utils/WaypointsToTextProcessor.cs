@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,29 +32,49 @@ namespace WDE.PacketViewer.Processing.Processors.Utils
                          .State
                          .OrderBy(pair => randomnessMap[pair.Key]))
             {
+                if (unit.Key.Type == UniversalHighGuid.Player)
+                    continue;
+                
                 if (unit.Value.Paths.Count == 0)
                     continue;
 
                 var randomness = waypointProcessor.RandomMovementPacketRatio(unit.Key);
                 sb.AppendLine("Creature " + unit.Key.ToWowParserString() + $" (entry: {unit.Key.Entry})  randomness: {(randomness) * 100:0.00}%");
                 int i = 0;
+                DateTime? prevPathFinishedTime = null;
                 foreach (var path in unit.Value.Paths)
                 {
+                    if (path.IsFirstPathAfterSpawn)
+                        sb.AppendLine("    (object created, so it's his first path ever)");
                     if (!path.IsContinuationAfterPause)
-                        sb.AppendLine(" (despawn) ");
-                    sb.AppendLine("  Path " + i++);
+                        sb.AppendLine("    (despawn) ");
+
+                    if (prevPathFinishedTime != null && path.IsContinuationAfterPause)
+                    {
+                        var wait = (path.PathStartTime - prevPathFinishedTime.Value);
+                        if (wait.TotalSeconds < 10)
+                            sb.AppendLine($"    (wait {(ulong)wait.TotalMilliseconds} ms)");
+                        else
+                            sb.AppendLine($"    (wait {wait.ToNiceString()} [{(ulong)wait.TotalMilliseconds} ms])");
+                    }
+                    
+                    sb.AppendLine("* Path " + i++);
 
                     int j = 0;
                     foreach (var segment in path.Segments)
                     {
-                        sb.AppendLine("  Segment " + j++);
+                        sb.AppendLine("   Segment " + j++);
                         foreach (var p in segment.Waypoints)
                         {
                             sb.AppendLine($"    ({p.X}, {p.Y}, {p.Z})");
                         }
                     }
 
+                    if (path.DestroysAfterPath)
+                        sb.AppendLine("    (object destroyed, so this is the last point for sure)");
                     sb.AppendLine("");
+
+                    prevPathFinishedTime = path.PathStartTime + TimeSpan.FromMilliseconds(path.TotalMoveTime);
                 }
             }
 

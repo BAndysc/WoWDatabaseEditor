@@ -19,6 +19,7 @@ namespace WDE.PacketViewer.Processing.Processors
         
         public class UnitMovementState
         {
+            public bool JustSpawned { get; set; }
             public bool InCombat { get; set; }
             public DateTime LastMovement { get; set; }
             public uint LastMoveTime { get; set; }
@@ -31,10 +32,13 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public class Path
         {
+            public DateTime PathStartTime;
             public int FirstPacketNumber;
             public List<Segment> Segments { get; } = new();
 
             public bool IsContinuationAfterPause;
+            public bool DestroysAfterPath;
+            public bool IsFirstPathAfterSpawn;
             public uint TotalMoveTime => (uint)Segments.Sum(s => s.MoveTime);
         }
 
@@ -49,11 +53,11 @@ namespace WDE.PacketViewer.Processing.Processors
             }
 
             public float? FinalOrientation { get; }
-            public uint MoveTime { get; }
+            public uint MoveTime { get; set; }
             public Vec3 InitialNpcPosition { get; }
             public List<Vec3> Waypoints { get; } = new();
             public float OriginalDistance { get; }
-            
+
             public float FinalLength()
             {
                 float dist = 0;
@@ -116,7 +120,11 @@ namespace WDE.PacketViewer.Processing.Processors
             
             if (state.LastMoveTime == 0 || resumeAfterPause)
             {
-                state.Paths.Add(new IWaypointProcessor.Path(){FirstPacketNumber = basePacket.Number, IsContinuationAfterPause = !firstMovementAfterSpawn && resumeAfterPause});
+                state.Paths.Add(new IWaypointProcessor.Path(){FirstPacketNumber = basePacket.Number,
+                    IsContinuationAfterPause = !firstMovementAfterSpawn && resumeAfterPause,
+                    PathStartTime = basePacket.Time.ToDateTime()
+                });
+                state.Paths[^1].IsFirstPathAfterSpawn = state.Paths.Count == 1 && state.JustSpawned;
                 state.LastSegment = null;
             }
             else if (state.Paths.Count > 0 && !resumeAfterPause)
@@ -147,8 +155,10 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (rejectAt > -1)
                 {
                     int toRemove = (state.LastSegment.Waypoints.Count - rejectAt);
+                    state.Paths[^1].Segments[^1].MoveTime = (uint)(howManyFinished * state.Paths[^1].Segments[^1].MoveTime);
                     for (int i = 0; i < toRemove; ++i)
                         state.Paths[^1].Segments[^1].Waypoints.RemoveAt(state.Paths[^1].Segments[^1].Waypoints.Count - 1);
+                    state.Paths[^1].Segments[^1].Waypoints.Add(packet.Position);
                 }
 
                 if (state.Paths[^1].Segments[^1].Waypoints.Count == 0)
@@ -195,6 +205,7 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             foreach (var create in packet.Created)
             {
+                Get(create.Guid).JustSpawned = create.CreateType == CreateObjectType.Spawn;
                 if (create.Values.TryGetInt("UNIT_FIELD_FLAGS", out var flags))
                     Get(create.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
             }
@@ -207,7 +218,10 @@ namespace WDE.PacketViewer.Processing.Processors
 
             foreach (var destroyed in packet.Destroyed)
             {
-                Get(destroyed.Guid).LastDestroyed = basePacket.Number;
+                var state = Get(destroyed.Guid);
+                if (state.Paths.Count > 0)
+                    state.Paths[^1].DestroysAfterPath = true;
+                state.LastDestroyed = basePacket.Number;
             }
 
             foreach (var outOfRange in packet.OutOfRange)
@@ -250,18 +264,25 @@ namespace WDE.PacketViewer.Processing.Processors
                 }
                 foreach (var s in path.Segments)
                 {
-                    foreach (var w in s.Waypoints)
+                    for (var index = 0; index < s.Waypoints.Count; index++)
                     {
+                        var w = s.Waypoints[index];
                         thisPoint = new Vector2(w.X, w.Y);
                         var thisForward = (thisPoint - prevPoint).Normalized;
                         var dotProduct = Vector2.Dot(prevForward, thisForward);
+
+                        if (index != s.Waypoints.Count - 1 && // if this is the last point, then we want to check its angle
+                            Math.Abs(dotProduct) > 0.90f) // going almost straight, let's ignore the point, as it is most likely a Z correction waypoint
+                        {
+                            continue;
+                        }
 
                         if (i >= 2 && !pathAfterDespawn)
                         {
                             anglesSum += dotProduct;
                             anglesCount += 1;
                         }
-                
+
                         prevPoint = thisPoint;
                         prevForward = thisForward;
                         i++;

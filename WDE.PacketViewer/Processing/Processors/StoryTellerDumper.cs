@@ -458,7 +458,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     return true;
 
                 int i = 1;
-                sb.AppendLine($"goes by waypoints [{path.TotalMoveTime} ms]: {{");
+                sb.AppendLine($"goes by waypoints [{TimeSpan.FromMilliseconds(path.TotalMoveTime).ToNiceString()} ({path.TotalMoveTime} ms)]: {{");
                 foreach (var segment in path.Segments)
                 {
                     sb.AppendLine($"     Segment {i++}, dist: {segment.OriginalDistance}, average speed: {segment.OriginalDistance / segment.MoveTime * 1000} yd/s");
