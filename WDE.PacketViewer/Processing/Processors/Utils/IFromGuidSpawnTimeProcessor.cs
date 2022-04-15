@@ -45,7 +45,7 @@ public class FromGuidSpawnTimeProcessor : IFromGuidSpawnTimeProcessor
                         serverTimeDiff = packet.BaseData.Time.ToDateTime() - currentServerTime;
                         hasServerTimeDiff = true;
                         hasServerTimeDiffFromSpawnTime = true;
-                        break;
+                        return false;
                     }
                 }
             }

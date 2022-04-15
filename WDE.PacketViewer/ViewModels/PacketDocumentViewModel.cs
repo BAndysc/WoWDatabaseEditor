@@ -644,6 +644,29 @@ namespace WDE.PacketViewer.ViewModels
                             }
                         }
                     }
+                    
+                    // ReSharper disable once SuspiciousTypeConversion.Global
+                    if (pair.dumper is IUnfilteredTwoStepPacketBoolProcessor unfilteredPreprocessor)
+                    {
+                        var all = splitUpdate ? AllPacketsSplit! : AllPackets!;
+                        packetsCount += all.Count;
+                        for (var index = 0; index < all.Count; index++)
+                        {
+                            var packet = all[index];
+                            i++;
+                            if (!unfilteredPreprocessor.UnfilteredPreProcess(packet.Packet))
+                            {
+                                i += all.Count - index;
+                                break;
+                            }
+                            if ((i % 100) == 0)
+                            {
+                                if (cancellationToken.IsCancellationRequested)
+                                    break;
+                                Report(i * 1.0f / packetsCount);
+                            }
+                        }
+                    }
 
                     if (pair.dumper is IUnfilteredPacketProcessor unfilteredPacketProcessor)
                     {

@@ -18,8 +18,8 @@ using WDE.PacketViewer.Utils;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor, IFromGuidSpawnTimeProcessor>,
-        IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor
+    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor, IAuraSlotTracker>,
+        IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor, IUnfilteredTwoStepPacketBoolProcessor
     {
         private class WriterBuilder
         {
@@ -53,13 +53,13 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly ISpellCastProcessor spellCastProcessor;
         private readonly PrettyFlagParameter prettyFlagParameter;
         private readonly IFromGuidSpawnTimeProcessor fromGuidSpawnTimeProcessor;
+        private readonly IAuraSlotTracker auraSlotTracker;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly IDespawnDetector despawnDetector;
         private WriterBuilder? writer = null;
         private Dictionary<UniversalGuid, WriterBuilder>? perGuidWriter = null;
         private readonly Dictionary<UniversalGuid, int> guids = new();
         private int currentShortGuid;
-        private readonly Dictionary<UniversalGuid, Dictionary<int, uint>> auras = new();
         private readonly Dictionary<uint, Dictionary<uint, string>> gossips = new();
 
         public bool RequiresSplitUpdateObject => true;
@@ -79,7 +79,8 @@ namespace WDE.PacketViewer.Processing.Processors
             ISpellCastProcessor spellCastProcessor,
             PrettyFlagParameter prettyFlagParameter,
             IFromGuidSpawnTimeProcessor fromGuidSpawnTimeProcessor,
-            bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector, spellCastProcessor, fromGuidSpawnTimeProcessor)
+            IAuraSlotTracker auraSlotTracker,
+            bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector, spellCastProcessor, auraSlotTracker)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
@@ -93,6 +94,7 @@ namespace WDE.PacketViewer.Processing.Processors
             this.spellCastProcessor = spellCastProcessor;
             this.prettyFlagParameter = prettyFlagParameter;
             this.fromGuidSpawnTimeProcessor = fromGuidSpawnTimeProcessor;
+            this.auraSlotTracker = auraSlotTracker;
             this.highLevelUpdateDump = highLevelUpdateDump;
             this.despawnDetector = despawnDetector;
 
@@ -254,27 +256,37 @@ namespace WDE.PacketViewer.Processing.Processors
 
         protected override bool Process(PacketBase basePacket, PacketAuraUpdate packet)
         {
-            if (!auras.ContainsKey(packet.Unit))
-                auras[packet.Unit] = new Dictionary<int, uint>();
-            SetAppendOnNext(NiceGuid(packet.Unit) + " auras update:");
-            foreach (var update in packet.Updates)
+            if (packet.Updates.Count == 1)
             {
-                if (update.Remove && auras[packet.Unit].ContainsKey(update.Slot))
+                var update = packet.Updates[0];
+                if (update.Remove)
                 {
-                    if (spellService.Exists(auras[packet.Unit][update.Slot]))
-                        AppendLine(basePacket, packet.Unit,
-                        "    removed aura: " + GetSpellName(auras[packet.Unit][update.Slot]));
-                    auras[packet.Unit].Remove(update.Slot);
+                    var spellId = auraSlotTracker.GetSpellForAuraSlot(packet.Unit, update.Slot);
+                    if (spellId.HasValue && spellService.Exists(spellId.Value))
+                        AppendLine(basePacket, packet.Unit, NiceGuid(packet.Unit) + $" removed aura: {GetSpellName(spellId.Value)}");
                 }
-                else if (!update.Remove)
-                {
-                    auras[packet.Unit][update.Slot] = update.Spell;
-                    
-                    if (spellService.Exists(update.Spell))
-                        AppendLine(basePacket, packet.Unit, "    applied aura: " + GetSpellName(update.Spell));
-                }
+                else if (spellService.Exists(update.Spell))
+                    AppendLine(basePacket, packet.Unit, NiceGuid(packet.Unit) + $" applied aura: {GetSpellName(update.Spell)}");
             }
-            SetAppendOnNext(null);
+            else
+            {
+                SetAppendOnNext(NiceGuid(packet.Unit) + " auras update:");
+                foreach (var update in packet.Updates)
+                {
+                    if (update.Remove)
+                    {               
+                        var spellId = auraSlotTracker.GetSpellForAuraSlot(packet.Unit, update.Slot);
+                        if (spellId.HasValue && spellService.Exists(spellId.Value))
+                            AppendLine(basePacket, packet.Unit, "    removed aura: " + GetSpellName(spellId.Value));
+                    }
+                    else if (!update.Remove)
+                    {
+                        if (spellService.Exists(update.Spell))
+                            AppendLine(basePacket, packet.Unit, "    applied aura: " + GetSpellName(update.Spell));
+                    }
+                }
+                SetAppendOnNext(null);   
+            }
             return base.Process(basePacket, packet);
         }
 
@@ -286,9 +298,9 @@ namespace WDE.PacketViewer.Processing.Processors
             if (spellCastProcessor.HasFinishedCastingAt(packet.Data.CastGuid, basePacket))
                 return false;
             
-            string verb = " starts casting ";
+            string verb = " starts casting: ";
             if (spellCastProcessor.HasFailedCastingAt(packet.Data.CastGuid, basePacket))
-                verb = " tries to cast and fails ";
+                verb = " tries to cast and fails: ";
 
             AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + verb + GetSpellName(packet.Data.Spell));
             return true;
@@ -818,6 +830,11 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             if (unfiltered.KindCase == PacketHolder.KindOneofCase.UpdateObject)
                 updateObjectFollower.Process(unfiltered);
+        }
+
+        public bool UnfilteredPreProcess(PacketHolder packet)
+        {
+            return fromGuidSpawnTimeProcessor.Process(packet);
         }
     }
 }
