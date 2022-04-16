@@ -256,7 +256,7 @@ namespace WDE.DatabaseEditors.ViewModels
                         return messageBoxService.WrapError(() => 
                             WrapBulkEdit(
                             () => WrapBlockingTask(
-                                () => cmd.Process(command, new DatabaseTableData(data.TableDefinition, Entities))
+                                () => cmd.Process(command, new DatabaseTableData(data.TableDefinition, Entities), this)
                                 ), cmd.Name));
                     })));
                 }
@@ -271,7 +271,7 @@ namespace WDE.DatabaseEditors.ViewModels
                         return messageBoxService.WrapError(() => 
                             WrapBulkEdit(
                                 () => WrapBlockingTask(() => cmdPerKey.Process(command,
-                            new DatabaseTableData(data.TableDefinition, Entities), GenerateKeys().Select(k => (uint)k[0]).ToList(), this))
+                            new DatabaseTableData(data.TableDefinition, Entities), GenerateKeys().ToList(), this))
                                     , cmdPerKey.Name));
                     })));
                 }

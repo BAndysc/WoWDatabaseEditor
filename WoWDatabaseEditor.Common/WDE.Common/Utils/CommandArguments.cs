@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using WDE.Common.Services;
 
-namespace WoWDatabaseEditorCore.Services.ServerIntegration
+namespace WDE.Common.Utils
 {
     public class CommandArguments : ICommandArguments
     {

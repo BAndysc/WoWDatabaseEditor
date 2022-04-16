@@ -4,6 +4,7 @@ using WDE.Common.Database;
 using WDE.Common.Types;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.ViewModels;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.CustomCommands.Commands
@@ -22,7 +23,7 @@ namespace WDE.DatabaseEditors.CustomCommands.Commands
             this.databaseProvider = databaseProvider;
         }
         
-        public async Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData)
+        public async Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData, IAddRowKey addRow)
         {
             if (definition.Parameters == null || definition.Parameters.Length != 2)
                 throw new Exception("Invalid command definition");
