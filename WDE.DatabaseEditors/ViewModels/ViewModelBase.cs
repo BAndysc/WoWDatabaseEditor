@@ -107,6 +107,7 @@ namespace WDE.DatabaseEditors.ViewModels
             };
             
             tableDefinition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId)!;
+            LoadAndCreateCommands();
             nameGeneratorParameter = parameterFactory.Factory(tableDefinition.Picker);
         }
 
@@ -232,8 +233,6 @@ namespace WDE.DatabaseEditors.ViewModels
             }
 
             solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
-
-            LoadAndCreateCommands(data);
             
             Entities.RemoveAll();
             await InternalLoadData(data);
@@ -241,12 +240,12 @@ namespace WDE.DatabaseEditors.ViewModels
             return true;
         }
 
-        private void LoadAndCreateCommands(DatabaseTableData data)
+        private void LoadAndCreateCommands()
         {
-            if (data.TableDefinition.Commands == null)
+            if (tableDefinition.Commands == null)
                 return;
 
-            foreach (var command in data.TableDefinition.Commands)
+            foreach (var command in tableDefinition.Commands)
             {
                 var cmd = commandService.FindCommand(command.CommandId);
                 if (cmd != null)
@@ -256,7 +255,7 @@ namespace WDE.DatabaseEditors.ViewModels
                         return messageBoxService.WrapError(() => 
                             WrapBulkEdit(
                             () => WrapBlockingTask(
-                                () => cmd.Process(command, new DatabaseTableData(data.TableDefinition, Entities), this)
+                                () => cmd.Process(command, new DatabaseTableData(tableDefinition, Entities), this)
                                 ), cmd.Name));
                     })));
                 }
@@ -271,7 +270,7 @@ namespace WDE.DatabaseEditors.ViewModels
                         return messageBoxService.WrapError(() => 
                             WrapBulkEdit(
                                 () => WrapBlockingTask(() => cmdPerKey.Process(command,
-                            new DatabaseTableData(data.TableDefinition, Entities), GenerateKeys().ToList(), this))
+                            new DatabaseTableData(tableDefinition, Entities), GenerateKeys().ToList(), this))
                                     , cmdPerKey.Name));
                     })));
                 }
