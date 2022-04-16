@@ -17,7 +17,7 @@ namespace WDE.Solutions.Sessions
         private readonly ISolutionItemSerializerRegistry serializerRegistry;
         private readonly ISolutionItemDeserializerRegistry deserializerRegistry;
         private const string Begin = " -- BEGIN WDE ";
-        private static readonly Regex BeginRegex = new Regex(@"^ -- BEGIN WDE (\d+);(\d+);(\d+);(.*)$");
+        private static readonly Regex BeginRegex = new Regex(@"^ -- BEGIN WDE (\d+);(-?\d+);(-?\d+);(.*)$");
         private const string End = " -- END WDE";
 
         public SessionSerializerDeserializer(ISolutionItemSerializerRegistry serializerRegistry,
@@ -72,18 +72,18 @@ namespace WDE.Solutions.Sessions
                                 Comment = comment
                             };
                             if (!deserializerRegistry.TryDeserialize(abstractItem, out currentSolutionItem))
-                                throw new Exception("Invalid session file");
+                                throw new Exception("Invalid session file (can't deserialize solution item)");
                         }
                         else
-                            throw new Exception("Invalid session file");
+                            throw new Exception("Invalid session file (double BEGIN)");
                     }
                     else
-                        throw new Exception("Invalid session file");
+                        throw new Exception("Invalid session file (can't parse BEGIN)");
                 }
                 else if (line.StartsWith(End))
                 {
                     if (currentSolutionItem == null)
-                        throw new Exception("Invalid session file");
+                        throw new Exception("Invalid session file (END without proper BEGIN)");
                     
                     currentSession.Insert(currentSolutionItem, sql.ToString());
                     sql.Clear();
