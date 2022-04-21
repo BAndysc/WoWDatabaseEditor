@@ -628,7 +628,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 var spawnedAgo = fromGuidSpawnTimeProcessor.TryGetSpawnTime(created.Guid, basePacket.Time.ToDateTime());
                 SetAppendOnNext(createType + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation) +
                                 (spawnTime == null ? "" : $" (will be destroyed in {spawnTime.Value.ToNiceString()})") +
-                                (spawnedAgo.HasValue && spawnedAgo.Value.TotalMilliseconds > 1000 ? $" (spawned {spawnedAgo.Value.ToNiceString()} ago)" : ""));
+                                (spawnedAgo.HasValue && (spawnedAgo.Value.TotalMilliseconds > 1000 || created.CreateType == CreateObjectType.InRange) ? $" (spawned {spawnedAgo.Value.ToNiceString()} ago)" : ""));
                 PrintValues(basePacket, created.Guid, created.Values, false);
                 SetAppendOnNext(null);
             }
