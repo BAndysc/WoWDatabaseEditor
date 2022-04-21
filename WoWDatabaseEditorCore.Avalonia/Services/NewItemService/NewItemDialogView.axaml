@@ -17,7 +17,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <GridSplitter Grid.Column="1"/>
+        <GridSplitter Grid.Column="1" Classes="vertical" />
         <Grid RowDefinitions="*,10,Auto,30" Grid.Column="2" Margin="5,0,0,0">
                 <ListBox Items="{CompiledBinding  SelectedCategory}"
                                       VirtualizationMode="None"

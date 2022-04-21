@@ -6,6 +6,21 @@ namespace WDE.Common.Utils
 {
     public static class StringExtensions
     {
+        public static string ToHumanFriendlyFileSize(this ulong size)
+        {
+            if (size < 1024)
+                return size + " B";
+            var s = (float)size;
+            s /= 1024.0f;
+            if (s < 1024)
+                return s.ToString("0.00") + " KB";
+            s /= 1024.0f;
+            if (s < 1024)
+                return s.ToString("0.00") + " MB";
+            s /= 1024.0f;
+            return s.ToString("0.00") + " GB";
+        }
+    
         public static string RemoveTags(this string s)
         {
             StringBuilder result = new();

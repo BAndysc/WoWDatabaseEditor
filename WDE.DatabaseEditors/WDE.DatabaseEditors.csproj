@@ -51,7 +51,7 @@
         <Version>7.2.1</Version>
       </PackageReference>
       <PackageReference Include="PropertyChanged.SourceGenerator">
-        <Version>1.0.1</Version>
+        <Version>1.0.3</Version>
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

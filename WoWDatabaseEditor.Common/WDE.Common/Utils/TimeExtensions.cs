@@ -29,7 +29,9 @@ public static class TimeExtensions
 
         if (sb.Length > 0)
             sb.Remove(sb.Length - 1, 1);
-
+        else
+            return $"{span.TotalMilliseconds}ms";
+        
         return sb.ToString();
     }
 }

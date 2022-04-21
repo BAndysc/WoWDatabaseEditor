@@ -23,7 +23,7 @@
                                   
                     </ListBox>                    
                 </DockPanel>
-                <GridSplitter Grid.Column="1" />
+                <GridSplitter Grid.Column="1" Classes="vertical" />
                 <avaloniaEdit:TextEditor Grid.Column="2"
                                          IsEnabled="{CompiledBinding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                                          SyntaxHighlighting="Json" 
@@ -53,7 +53,7 @@
                         </ListBox.ItemTemplate>
                     </ListBox>                    
                 </DockPanel>
-                <GridSplitter Grid.Column="1" />
+                <GridSplitter Grid.Column="1" Classes="vertical" />
                 <DockPanel Grid.Column="2">
                     <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">Raport:</TextBlock>
                     <avaloniaEdit:TextEditor Document="{CompiledBinding Raport, Converter={StaticResource DocumentConverter}}" 

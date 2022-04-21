@@ -10,6 +10,11 @@ namespace WDE.Common.Menu
         List<IMenuItem> SubItems { get; }
         MainMenuItemSortPriority SortPriority { get; }
     }
+    
+    [NonUniqueProvider]
+    public interface IToolMenuItem : IMenuCommandItem
+    {
+    }
 
     public enum MainMenuItemSortPriority
     {

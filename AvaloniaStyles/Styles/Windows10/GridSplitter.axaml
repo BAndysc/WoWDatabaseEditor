@@ -1,0 +1,28 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="GridSplitter.vertical">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Border HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{TemplateBinding Background}" Width="1" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="GridSplitter.horizontal">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{TemplateBinding Background}" Height="1" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

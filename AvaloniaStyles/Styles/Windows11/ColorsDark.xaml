@@ -25,15 +25,13 @@
         <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#08FFFFFF" />
         <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#0BFFFFFF" />
         
-        
-        <SolidColorBrush x:Key="ButtonForeground" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="ButtonForeground" Color="#d4d4d4" />
         <LinearGradientBrush x:Key="ControlElevationBorderBrush" StartPoint="0,0" EndPoint="0,3">
             <LinearGradientBrush.GradientStops>
                 <GradientStop Offset="0.33" Color="{StaticResource ControlStrokeColorSecondary}" />
                 <GradientStop Offset="1" Color="{StaticResource ControlStrokeColorDefault}" />
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
-        <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ControlElevationBorderBrush" />
         
         <!-- textbox -->
         <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,1</Thickness>

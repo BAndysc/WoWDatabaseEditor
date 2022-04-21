@@ -17,6 +17,7 @@
         <StyleInclude Source="avares://AvaloniaStyles/Controls/DropDownButton.axaml" />
         
         <!--<StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabStrip.xaml" />-->
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GridSplitter.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/SideBar.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ToolsTabControl.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Button.axaml" />

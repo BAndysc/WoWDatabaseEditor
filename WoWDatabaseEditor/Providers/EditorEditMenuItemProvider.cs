@@ -23,10 +23,7 @@ namespace WoWDatabaseEditorCore.Providers
         public IDocumentManager DocumentManager { get; }
 
         public EditorEditMenuItemProvider(IDocumentManager documentManager,
-            ITablesToolService tablesToolService,
-            IQuickAccessViewModel quickAccessViewModel,
-            Lazy<IWindowManager> windowManager,
-            Func<IFindAnywhereDialogViewModel> findAnywhereDialog)
+            ITablesToolService tablesToolService)
         {
             DocumentManager = documentManager;
             SubItems = new List<IMenuItem>();
@@ -72,20 +69,6 @@ namespace WoWDatabaseEditorCore.Providers
                         tablesToolService.Open();
                 }),
                 new("Control+T")));
-
-            SubItems.Add(new ModuleMenuItem("Open quick access",
-                new DelegateCommand(() => quickAccessViewModel.OpenSearch("")),
-                new("Control+R")));
-            
-            SubItems.Add(new ModuleMenuItem("Open quick commands",
-                new DelegateCommand(() => quickAccessViewModel.OpenSearch("/")),
-                new("Control+Shift+R")));
-            
-            SubItems.Add(new ModuleManuSeparatorItem());
-            
-            SubItems.Add(new ModuleMenuItem("Find anywhere",
-                new AsyncAutoCommand(() => windowManager.Value.ShowDialog(findAnywhereDialog())),
-                new("Control+Shift+F")));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

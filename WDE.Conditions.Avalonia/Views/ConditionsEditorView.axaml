@@ -46,7 +46,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <GridSplitter Grid.Row="2" />
+        <GridSplitter Grid.Row="2" Classes="horizontal" />
         <Border Padding="10" Grid.Row="3"
                 IsVisible="{Binding SelectedCondition, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
                 ClipToBounds="True">
