@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 17.0.31903.59
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaGraph", "Modules\AvaloniaGraph\AvaloniaGraph.csproj", "{173E0418-F924-4525-81FF-A1F0684824CA}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoaderAvalonia", "LoaderAvalonia\LoaderAvalonia.csproj", "{8B25EEAE-2DDD-4D62-A426-619FE21D2711}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoWDatabaseEditorCore", "WoWDatabaseEditor\WoWDatabaseEditorCore.csproj", "{99C9E82C-C594-446D-AA59-8FFBC43AD226}"
@@ -543,7 +545,12 @@ Global
 		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
+	        {173E0418-F924-4525-81FF-A1F0684824CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{173E0418-F924-4525-81FF-A1F0684824CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{173E0418-F924-4525-81FF-A1F0684824CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{173E0418-F924-4525-81FF-A1F0684824CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		
+EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
