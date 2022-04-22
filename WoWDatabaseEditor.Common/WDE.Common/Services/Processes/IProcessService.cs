@@ -4,12 +4,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using WDE.Module.Attributes;
 
-namespace WoWDatabaseEditorCore.Services.Processes
+namespace WDE.Common.Services.Processes
 {
     public interface IProcess
     {
         bool IsRunning { get; }
         void Kill();
+    }
+
+    [UniqueProvider]
+    public interface IProgramFinder
+    {
+        string? TryLocate(params string[] names);
     }
 
     [UniqueProvider]

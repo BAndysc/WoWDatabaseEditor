@@ -2,7 +2,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace WoWDatabaseEditorCore.Services.Processes
+namespace WDE.Common.Services.Processes
 {
     public static class ProcessServiceExtensions
     {

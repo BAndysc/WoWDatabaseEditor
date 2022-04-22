@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using WDE.Common.Services.Processes;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.Processes

@@ -85,5 +85,21 @@ namespace WDE.Common.Utils
 
             return -1;
         }
+
+        public static void AddIfNotNull<T>(this IList<T> list, T? element)
+        {
+            if (element != null)
+                list.Add(element);
+        }
+
+        public static void AddIfNotNull<T>(this IList<T> list, IEnumerable<T?>? elements)
+        {
+            if (elements != null)
+            {
+                foreach (var element in elements)
+                    if (element != null)
+                        list.Add(element);
+            }
+        }
     }
 }

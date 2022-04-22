@@ -65,7 +65,7 @@ public partial class FindAnywhereResultsViewModel : ObservableBase, IFindAnywher
             }
             else if (result.CustomCommand != null)
             {
-                result.CustomCommand?.Execute(null);
+                result.CustomCommand?.Execute(result);
             }
         });
     }
