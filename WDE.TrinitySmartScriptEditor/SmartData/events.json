@@ -2369,7 +2369,123 @@
         "Creature"
       ]
     }
-  },  
+  },
+  {
+    "id": 83,
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "name": "SMART_EVENT_ON_SPELL_CAST",
+    "tags": [ "TrinityWrath", "TrinityMaster" ],
+    "parameters": [
+      {
+        "type": "SpellParameter",
+        "name": "Spell",
+        "description": "If 0, any spell will trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
+    "description": "On {pram1value:choose(0):any spell|spell {pram1}} cast {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+    "name_readable": "On spell cast",
+    "invoker": {
+      "name": "Caster",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
+
+  {
+    "id": 84,
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "name": "SMART_EVENT_ON_SPELL_FAILED",
+    "tags": [ "TrinityWrath", "TrinityMaster" ],
+    "parameters": [
+      {
+        "type": "SpellParameter",
+        "name": "Spell",
+        "description": "If 0, any spell will trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
+    "description": "On {pram1value:choose(0):any spell|spell {pram1}} failed {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+    "name_readable": "On spell failed",
+    "invoker": {
+      "name": "Caster",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
+
+  {
+    "id": 85,
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "name": "SMART_EVENT_ON_SPELL_START",
+    "tags": [ "TrinityWrath", "TrinityMaster" ],
+    "parameters": [
+      {
+        "type": "SpellParameter",
+        "name": "Spell",
+        "description": "If 0, any spell will trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
+    "description": "On {pram1value:choose(0):any spell|spell {pram1}} start {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+    "name_readable": "On spell start",
+    "invoker": {
+      "name": "Caster",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
   {
     "id": 101,
     "name": "SMART_EVENT_NEAR_PLAYERS_AC",

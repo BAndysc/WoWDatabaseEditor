@@ -60,7 +60,10 @@
             "SMART_EVENT_TARGET_BUFFED",
             "SMART_EVENT_VICTIM_CASTING",
             "SMART_EVENT_FRIENDLY_MISSING_BUFF",
-            "SMART_EVENT_DUMMY_EFFECT"
+            "SMART_EVENT_DUMMY_EFFECT",
+            "SMART_EVENT_ON_SPELL_START",
+            "SMART_EVENT_ON_SPELL_FAILED",
+            "SMART_EVENT_ON_SPELL_CAST"
         ]
     },
     {
