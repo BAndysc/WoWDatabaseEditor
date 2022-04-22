@@ -35,7 +35,7 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
         this.mainThreadLazy = mainThreadLazy;
     }
     
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, long parameterValue, CancellationToken cancellationToken)
+    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         var command = new AsyncAutoCommand(() => messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>()
             .SetTitle("DBC entry")
@@ -60,7 +60,7 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
             });
         }
         
-        if (parameterName.IndexOf("SpellParameter") != -1)
+        if (parameterNames.IndexOf("SpellParameter") != -1)
         {
             if (spellStore.HasSpell((uint)parameterValue))
             {
@@ -80,7 +80,7 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
                     var type = spellService.GetSpellEffectType(spell, i);
                     if (type == SpellEffectType.SendEvent)
                     {
-                        if (parameterName.IndexOf("EventScriptParameter") != -1)
+                        if (parameterNames.IndexOf("EventScriptParameter") != -1)
                         {
                             var @event = spellService.GetSpellEffectMiscValueA(spell, i);
                             if (@event == parameterValue)
@@ -91,7 +91,7 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
                     }
                     else if (type == SpellEffectType.Summon)
                     {
-                        if (parameterName.IndexOf("CreatureParameter") != -1)
+                        if (parameterNames.IndexOf("CreatureParameter") != -1)
                         {
                             var entry = spellService.GetSpellEffectMiscValueA(spell, i);
                             if (entry == parameterValue)
@@ -102,7 +102,7 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
                     }
 
                     var triggerSpell = spellService.GetSpellEffectTriggerSpell(spell, i);
-                    if (triggerSpell == parameterValue && parameterName.IndexOf("SpellParameter") != -1)
+                    if (triggerSpell == parameterValue && parameterNames.IndexOf("SpellParameter") != -1)
                         AddThing(spell, name, $"Effect {i}: Trigger spell {triggerSpell}", new ImageUri("Icons/document_spell_linked_big.png"));
                 }
             }

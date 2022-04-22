@@ -447,7 +447,9 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract IGameObject? GetGameObjectByGuid(uint guid);
 
         public abstract IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
-        
+        public abstract Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
+        public abstract Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
+
         public abstract IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
 
 

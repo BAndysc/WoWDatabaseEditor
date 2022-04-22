@@ -89,6 +89,18 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         return model.Creature.OrderBy(t => t.Entry).ToList<ICreature>();
     }
 
+    public override async Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry)
+    {
+        await using var model = Database();
+        return await model.Creature.Where(g => g.Entry == entry).ToListAsync<ICreature>();
+    }
+
+    public override async Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
+    {
+        await using var model = Database();
+        return await model.GameObject.Where(g => g.Entry == entry).ToListAsync<IGameObject>();
+    }
+
     public override async Task<List<ICreature>> GetCreaturesAsync()
     {
         await using var model = Database();

@@ -70,11 +70,14 @@ public partial class FindAnywhereResultsViewModel : ObservableBase, IFindAnywher
         });
     }
     
-    public async Task Search(IReadOnlyList<string> parameter, long value)
+    public async Task Search(IReadOnlyList<string> parameter, IReadOnlyList<long> values)
     {
         SearchingInProgress = true;
-        SearchSummaryText = parameter[0].Replace("Parameter", "") + " = " + value;
-        await findAnywhereService.Find(this, parameter, value, cancellationTokenSource.Token);
+        if (values.Count == 1)
+            SearchSummaryText = parameter[0].Replace("Parameter", "") + " = " + values[0];
+        else
+            SearchSummaryText = parameter[0].Replace("Parameter", "") + " IN (" + string.Join(", ", values) + ")";
+        await findAnywhereService.Find(this, parameter, values, cancellationTokenSource.Token);
         SearchingInProgress = false;
         if (Results.Count == 0)
             NoResultsFound = true;

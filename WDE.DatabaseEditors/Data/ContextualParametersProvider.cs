@@ -78,8 +78,18 @@ public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEn
 {
     private readonly IParameterPickerService pickerService;
     private Dictionary<long, IParameter<long>> parameters = new();
+    private Dictionary<IParameter<long>, List<long>> reverseParameters = new();
     private string column;
     private IParameter<long> defaultParameter;
+
+    public string DependantColumn => column;
+
+    public IReadOnlyList<long>? DependantColumnValuesForParameter(IParameter<long> param)
+    {
+        if (reverseParameters.TryGetValue(param, out var list))
+            return list;
+        return null;
+    }
 
     public DatabaseContextualParameter(IParameterFactory factory, 
         IParameterPickerService pickerService,
@@ -94,6 +104,9 @@ public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEn
                 throw new Exception("Unknown parameter " + param.Value + " but expected to be known!");
             var p =  factory.Factory(param.Value);
             parameters[param.Key] = p;
+            if (!reverseParameters.TryGetValue(p, out var list))
+                list = reverseParameters[p] = new List<long>();
+            list.Add(param.Key);
         }
     }
 

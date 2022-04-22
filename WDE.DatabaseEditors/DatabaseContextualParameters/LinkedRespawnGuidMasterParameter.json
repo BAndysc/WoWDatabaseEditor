@@ -1,0 +1,13 @@
+{
+    "name": "LinkedRespawnGuidMasterParameter",
+    "simple_switch": {
+        "column": "linkType",
+        "default": "Parameter",
+        "values": {
+            "0": "CreatureGUIDParameter",
+            "3": "CreatureGUIDParameter",
+            "1": "GameobjectGUIDParameter",
+            "2": "GameobjectGUIDParameter"
+        }
+    }
+}

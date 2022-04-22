@@ -62,6 +62,9 @@ namespace WDE.Parameters
 
         public bool IsRegisteredLong(string type)
         {
+            if (type.StartsWith("TableReference("))
+                Factory(type);
+            
             return parameters.ContainsKey(type);
         }
 

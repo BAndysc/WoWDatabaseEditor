@@ -520,7 +520,7 @@
 				"description": "Creature or gameobject entry"
 			},
 			{
-				"type": "Parameter",
+				"type": "ConditionObjectGuidParameter",
 				"name": "Guid from DB"
 			}
 		],
@@ -866,7 +866,7 @@
 				"description": "Creature or gameobject entry"
 			},
 			{
-				"type": "Parameter",
+				"type": "ConditionObjectGuidParameter",
 				"name": "Guid from DB"
 			}
 		],

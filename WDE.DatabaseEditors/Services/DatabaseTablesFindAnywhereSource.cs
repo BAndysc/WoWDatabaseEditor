@@ -10,12 +10,15 @@ using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Services.FindAnywhere;
 using WDE.Common.Types;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.Parameters;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.Module.Attributes;
@@ -31,19 +34,22 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly Lazy<IDocumentManager> documentManager;
     private readonly IEventAggregator eventAggregator;
+    private readonly IParameterFactory parameterFactory;
 
     public DatabaseTablesFindAnywhereSource(IMySqlExecutor executor,
             ITableDefinitionProvider definitionProvider,
             Lazy<IDocumentManager> documentManager,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IParameterFactory parameterFactory)
     {
         this.executor = executor;
         this.definitionProvider = definitionProvider;
         this.documentManager = documentManager;
         this.eventAggregator = eventAggregator;
+        this.parameterFactory = parameterFactory;
     }
     
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, long parameterValue, CancellationToken cancellationToken)
+    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         foreach (var definition in definitionProvider.Definitions)
         {
@@ -56,19 +62,40 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                 var table = Queries.Table(tableName);
                 var where = table.ToWhere();
 
-                if (tableName == definition.TableName && definition.Picker != null && parameterName.IndexOf(definition.Picker) != -1)
+                if (tableName == definition.TableName && definition.Picker != null && parameterNames.IndexOf(definition.Picker) != -1)
                 {
                     where = where.OrWhere(row => row.Column<long>(definition.TablePrimaryKeyColumnName) == parameterValue);
                 }
                 
                 foreach (var (group, column) in tableGroup)
                 {
-                    if (parameterName.IndexOf(column.ValueType) != -1)
+                    if (parameterNames.IndexOf(column.ValueType) != -1)
                     {
                         if (group.ShowIf is {} showIf)
                             where = where.OrWhere(row => row.Column<long>(column.DbColumnName) == parameterValue && row.Column<long>(showIf.ColumnName) == showIf.Value);
                         else
                             where = where.OrWhere(row => row.Column<long>(column.DbColumnName) == parameterValue);
+                    }
+                    else
+                    {
+                        var columnParameter = parameterFactory.Factory(column.ValueType);
+                        if (columnParameter is DatabaseContextualParameter dependantParameter)
+                        {
+                            foreach (var parameterName in parameterNames)
+                            {
+                                var parameter = parameterFactory.Factory(parameterName);
+                                var values = dependantParameter.DependantColumnValuesForParameter(parameter);
+                                if (values != null && values.Count > 0)
+                                {
+                                    foreach (var value in values)
+                                    {
+                                        where = where.OrWhere(row =>
+                                            row.Column<long>(dependantParameter.DependantColumn) == value &&
+                                            row.Column<long>(column.DbColumnName) == parameterValue);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 

@@ -9,5 +9,6 @@ namespace WDE.Common.Services.FindAnywhere;
 public interface IFindAnywhereService
 {
     void OpenFind(IReadOnlyList<string> parameterName, long value);
-    Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, long parameterValue, CancellationToken cancellationToken);
+    void OpenFind(IReadOnlyList<string> parameterName, IReadOnlyList<long> values);
+    Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, IReadOnlyList<long> parameterValue, CancellationToken cancellationToken);
 }

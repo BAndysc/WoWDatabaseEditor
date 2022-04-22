@@ -176,6 +176,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetCreatureTemplates();
         }
 
+        public Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
+        {
+            return nonCachedDatabase.GetGameObjectsByEntryAsync(entry);
+        }
+
         public IEnumerable<ICreature> GetCreatures()
         {
             if (creatureCache != null)
@@ -333,6 +338,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => nonCachedDatabase.GetCreaturesByEntry(entry);
 
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => nonCachedDatabase.GetGameObjectsByEntry(entry);
+        
+        public Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry) => nonCachedDatabase.GetCreaturesByEntryAsync(entry);
 
         public IEnumerable<ICoreCommandHelp> GetCommands() => nonCachedDatabase.GetCommands();
 

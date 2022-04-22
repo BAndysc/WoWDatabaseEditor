@@ -28,21 +28,24 @@ public class FindAnywhereService : IFindAnywhereService
         this.sources = sources.OrderBy(x => x.Order).ToList();
     }
     
-    public void OpenFind(IReadOnlyList<string> parameter, long value)
+    public void OpenFind(IReadOnlyList<string> parameter, long value) => OpenFind(parameter, new List<long>(){value});
+
+    public void OpenFind(IReadOnlyList<string> parameter, IReadOnlyList<long> values)
     {
         var results = resultsCreator();
-        results.Search(parameter, value).ListenErrors();
+        results.Search(parameter, values).ListenErrors();
         documentManager.Value.OpenDocument(results);
     }
 
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, long parameterValue, CancellationToken cancellationToken)
+    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, IReadOnlyList<long> parameterValue, CancellationToken cancellationToken)
     {
         foreach (var source in sources)
         {
             if (cancellationToken.IsCancellationRequested)
                 return;
             
-            await source.Find(resultContext, parameterName, parameterValue, cancellationToken);
+            foreach (var val in parameterValue)
+                await source.Find(resultContext, parameterName, val, cancellationToken);
         }
     }
 }

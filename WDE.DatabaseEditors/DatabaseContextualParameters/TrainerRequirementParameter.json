@@ -1,0 +1,12 @@
+{
+    "name": "TrainerRequirementParameter",
+    "simple_switch": {
+        "column": "Type",
+        "default": "Parameter",
+        "values": {
+            "0": "ClassParameter",
+            "1": "RaceParameter",
+            "2": "SpellParameter"
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "InstanceEncounterCreatureSpellParameter",
+  "simple_switch": {
+    "column": "creditType",
+    "default": "Parameter",
+    "values": {
+      "0": "CreatureParameter",
+      "1": "SpellParameter"
+    }
+  }
+}

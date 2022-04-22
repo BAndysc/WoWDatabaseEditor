@@ -31,7 +31,7 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
         this.messageBoxService = messageBoxService;
     }
     
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, long parameterValue, CancellationToken cancellationToken)
+    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         var command = new DelegateCommand(() =>
         {
@@ -39,7 +39,7 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
                 .SetTitle("Operation not supported yet")
                 .SetMainInstruction("Conditions not yet supported")
                 .SetContent("Sorry, opening conditions directly is not yet supported")
-                .WithButton("Sorry again", false)
+                .WithButton("Sorry again", false, true, true)
                 .Build()).ListenErrors();
         });
         var table = Queries.Table("conditions");
@@ -51,29 +51,58 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
 
             for (int i = 0; i < cond.Parameters.Count; ++i)
             {
-                if (parameterName.IndexOf(cond.Parameters[i].Type) == -1)
-                    continue;
+                if (cond.Parameters[i].Type == "ConditionObjectEntryParameter")
+                {
+                    if (parameterNames.IndexOf("CreatureParameter") != -1)
+                    {
+                        where = where.OrWhere(row => row.Column<int>("ConditionValue1") == 3 &&
+                                                     row.Column<long>("ConditionValue3") == parameterValue);
+                    }
+                    else if (parameterNames.IndexOf("GameobjectParameter") != -1)
+                    {
+                        where = where.OrWhere(row => row.Column<int>("ConditionValue1") == 5 &&
+                                                     row.Column<long>("ConditionValue3") == parameterValue);
+                    }
+                }
+                else if (cond.Parameters[i].Type == "ConditionObjectGuidParameter")
+                {
+                    if (parameterNames.IndexOf("CreatureGUIDParameter") != -1)
+                    {
+                        where = where.OrWhere(row => row.Column<int>("ConditionValue1") == 3 &&
+                                                     row.Column<long>("ConditionValue3") == parameterValue);
+                    }
+                    else if (parameterNames.IndexOf("GameobjectGUIDParameter") != -1)
+                    {
+                        where = where.OrWhere(row => row.Column<int>("ConditionValue1") == 5 &&
+                                                     row.Column<long>("ConditionValue3") == parameterValue);
+                    }
+                }
+                else
+                {
+                    if (parameterNames.IndexOf(cond.Parameters[i].Type) == -1)
+                        continue;
 
-                var colName = "ConditionValue" + (i + 1);
+                    var colName = "ConditionValue" + (i + 1);
 
-                where = where.OrWhere(row => row.Column<int>("ConditionTypeOrReference") == cond.Id &&
-                                             row.Column<long>(colName) == parameterValue);
+                    where = where.OrWhere(row => row.Column<int>("ConditionTypeOrReference") == cond.Id &&
+                                                 row.Column<long>(colName) == parameterValue);   
+                }
             }
         }
         
         foreach (var cond in dataManager.AllConditionSourceData)
         {
-            if (parameterName.IndexOf(cond.Group.Type) != -1)
+            if (parameterNames.IndexOf(cond.Group.Type) != -1)
             {
                 where = where.OrWhere(row => row.Column<int>("SourceTypeOrReferenceId") == cond.Id &&
                                              row.Column<long>("SourceGroup") == parameterValue);
             }
-            if (parameterName.IndexOf(cond.SourceId.Type) != -1)
+            if (parameterNames.IndexOf(cond.SourceId.Type) != -1)
             {
                 where = where.OrWhere(row => row.Column<int>("SourceTypeOrReferenceId") == cond.Id &&
                                              row.Column<long>("SourceId") == parameterValue);
             }
-            if (parameterName.IndexOf(cond.Entry.Type) != -1)
+            if (parameterNames.IndexOf(cond.Entry.Type) != -1)
             {
                 where = where.OrWhere(row => row.Column<int>("SourceTypeOrReferenceId") == cond.Id &&
                                              row.Column<long>("SourceEntry") == parameterValue);

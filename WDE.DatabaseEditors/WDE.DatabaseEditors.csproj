@@ -30,15 +30,6 @@
       <None Update="DatabaseContextualParameters\*.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="DatabaseContextualParameters\AchievementValue2.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="DatabaseContextualParameters\SpawnGroupGuidParameter.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="DatabaseContextualParameters\CreatureSummonGroupSummonerParameter.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard">

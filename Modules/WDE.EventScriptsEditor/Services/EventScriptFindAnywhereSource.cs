@@ -30,12 +30,12 @@ public class EventScriptFindAnywhereSource : IFindAnywhereSource
         this.viewModelFactory = viewModelFactory;
     }
     
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, long parameterValue, CancellationToken cancellationToken)
+    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         EventScriptType? lookForType = null;
-        if (parameterName.IndexOf("EventScriptParameter") != -1)
+        if (parameterNames.IndexOf("EventScriptParameter") != -1)
             lookForType = EventScriptType.Event;
-        else if (parameterName.IndexOf("SpellParameter") != -1)
+        else if (parameterNames.IndexOf("SpellParameter") != -1)
             lookForType = EventScriptType.Spell;
 
         if (lookForType.HasValue)
@@ -54,7 +54,7 @@ public class EventScriptFindAnywhereSource : IFindAnywhereSource
             }
         }
         
-        var found = await databaseProvider.FindEventScriptLinesBy(GenerateConditions(parameterName, parameterValue).ToList());
+        var found = await databaseProvider.FindEventScriptLinesBy(GenerateConditions(parameterNames, parameterValue).ToList());
         foreach (var f in found)
         {
             var item = new EventScriptSolutionItem(f.Type, f.Id);

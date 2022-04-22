@@ -1,0 +1,12 @@
+{
+  "name": "DisablesFlagsParameter",
+  "simple_switch": {
+    "column": "sourceType",
+    "default": "Parameter",
+    "values": {
+      "0": "DisableTypeSpellFlagsParameter",
+      "2": "DisableTypeMapFlagsParameter",
+      "6": "DisableTypeVMapFlagsParameter"
+    }
+  }
+}

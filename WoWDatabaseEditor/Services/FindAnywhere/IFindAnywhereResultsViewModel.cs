@@ -8,5 +8,5 @@ namespace WoWDatabaseEditorCore.Services.FindAnywhere;
 [UniqueProvider]
 public interface IFindAnywhereResultsViewModel : IDocument
 {
-    Task Search(IReadOnlyList<string> parameter, long value);
+    Task Search(IReadOnlyList<string> parameter, IReadOnlyList<long> value);
 }
