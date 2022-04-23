@@ -32,6 +32,7 @@ namespace WDE.Parameters
             data = new(StringComparer.OrdinalIgnoreCase);
             parameters = new(StringComparer.OrdinalIgnoreCase);
             stringParameters = new(StringComparer.OrdinalIgnoreCase);
+            Register("Parameter", new Parameter());
         }
 
         public IParameter<long> Factory(string type)

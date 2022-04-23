@@ -537,16 +537,10 @@
 				"type": "FlagParameter",
 				"name": "Type Mask",
 				"values": {
-					"1": {"name": "TYPEMASK_OBJECT"},
-					"2": {"name": "TYPEMASK_ITEM"},
-					"6": {"name": "TYPEMASK_CONTAINER", "description": "TYPEMASK_ITEM | 0x0004"},
-					"8": {"name": "TYPEMASK_UNIT"},
-					"16": {"name": "TYPEMASK_PLAYER"},
-					"32": {"name": "TYPEMASK_GAMEOBJECT"},
-					"64": {"name": "TYPEMASK_DYNAMICOBJECT"},
-					"128": {"name": "TYPEMASK_CORPSE"},
-					"256": {"name": "TYPEMASK_AREATRIGGER"},
-					"88": {"name": "TYPEMASK_SEER", "description": "TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT"}
+					"8": {"name": "player or creature"},
+					"16": {"name": "player"},
+					"32": {"name": "gameobject"},
+					"128": {"name": "corpse"}
 				}
 			}
 		],

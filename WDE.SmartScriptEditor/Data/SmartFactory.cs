@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Prism.Ioc;
 using WDE.Common;
 using WDE.Common.CoreVersion;
@@ -347,12 +348,7 @@ namespace WDE.SmartScriptEditor.Data
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
                 string key = data.Parameters[i].Type;
-                if (data.Parameters[i].Values != null)
-                {
-                    key = $"{data.Name}_{i}";
-                    if (!parameterFactory.IsRegisteredLong(key))
-                        parameterFactory.Register(key, data.Parameters[i].Type == "FlagParameter" ? new FlagParameter(){Items = data.Parameters[i].Values} : new Parameter(){Items = data.Parameters[i].Values});
-                }
+                Debug.Assert(parameterFactory.IsRegisteredLong(key));
                 
                 IParameter<long> parameter = parameterFactory.Factory(key);
                 element.GetParameter(i).Name = data.Parameters[i].Name;
@@ -380,13 +376,8 @@ namespace WDE.SmartScriptEditor.Data
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
                 string key = data.Parameters[i].Type;
-                if (data.Parameters[i].Values != null)
-                {
-                    key = $"{data.Name}_{i}";
-                    if (!parameterFactory.IsRegisteredLong(key))
-                        parameterFactory.Register(key, new Parameter(){Items = data.Parameters[i].Values});
-                }
-                
+                if (!parameterFactory.IsRegisteredLong(key))
+                    Debug.Assert(parameterFactory.IsRegisteredLong(key));
                 IParameter<long> parameter = parameterFactory.Factory(key);
 
                 element.GetParameter(i).Name = data.Parameters[i].Name;
