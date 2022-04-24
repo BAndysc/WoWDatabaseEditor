@@ -3362,6 +3362,32 @@
     },
 
     {
+      "id": 150,
+      "tags": [ "TrinityMaster" ],
+      "name": "SMART_ACTION_TRIGGER_GAME_EVENT",
+      "parameters": [
+        {
+          "type": "Parameter",
+          "name": "Event Id"
+        },
+        {
+          "type": "BoolParameter",
+          "name": "Use Target as Game Event Source"
+        }
+      ],
+      "implicit_source": "SMART_TARGET_SELF",
+      "description": "{pram2value:choose(0):{source}|{target}}: Trigger game event id {pram1} with target {pram2value:choose(0):{target}|{source}}",
+      "description_rules": [
+          {
+              "description": "{pram2value:choose(0):[s]Triggering player[/s]|{target}}: Trigger game event id {pram1} with target {pram2value:choose(0):{target}|[s]Triggering player[/s]}",
+              "condition": "script.source_type == 2 || script.source_type == 11 || script.source_type == 12"
+          }
+      ],
+      "name_readable": "Trigger Game Event",
+      "target_types": [ "Creature", "Player", "GameObject" ]
+    },
+
+    {
         "id": 201,
         "name": "SMART_ACTION_MOVE_TO_POS_TARGET_AC",
         "tags": ["Azeroth"],
