@@ -295,7 +295,8 @@
             "SMART_ACTION_NONE",
             "SMART_ACTION_PLAY_CINEMATIC",
             "SMART_ACTION_OVERRIDE_LIGHT",
-            "SMART_ACTION_OVERRIDE_WEATHER"
+            "SMART_ACTION_OVERRIDE_WEATHER",
+            "SMART_ACTION_TRIGGER_GAME_EVENT"
         ]
     },
     {
