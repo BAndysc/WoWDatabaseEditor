@@ -3262,7 +3262,7 @@
     {
         "id": 144,
         "name": "SMART_ACTION_SET_IMMUNE_PC",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -3277,7 +3277,7 @@
     {
         "id": 145,
         "name": "SMART_ACTION_SET_IMMUNE_NPC",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -3292,7 +3292,7 @@
     {
         "id": 146,
         "name": "SMART_ACTION_SET_UNINTERACTIBLE",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",
