@@ -41,6 +41,8 @@ namespace WDE.SmartScriptEditor.Data
 
             if (!parameterFactory.IsRegisteredLong("StoredTargetParameter"))
             {
+                parameterFactory.Register("EventScriptParameter", new Parameter());
+                parameterFactory.Register("TimedActionListParameter", new Parameter());
                 parameterFactory.Register("GossipMenuOptionParameter", new GossipMenuOptionParameter(databaseProvider, tableEditorPickerService, itemFromListProvider));
                 parameterFactory.Register("CreatureTextParameter", new CreatureTextParameter(databaseProvider, tableEditorPickerService, itemFromListProvider));
                 parameterFactory.Register("QuestStarterParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, true));
@@ -348,7 +350,8 @@ namespace WDE.SmartScriptEditor.Data
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
                 string key = data.Parameters[i].Type;
-                Debug.Assert(parameterFactory.IsRegisteredLong(key));
+                if (!parameterFactory.IsRegisteredLong(key))
+                    Console.WriteLine("Parameter type " + key + " is not registered");
                 
                 IParameter<long> parameter = parameterFactory.Factory(key);
                 element.GetParameter(i).Name = data.Parameters[i].Name;
