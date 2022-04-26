@@ -159,6 +159,9 @@ namespace WDE.MpqReader.Structures
                         
                             bool fill = (b & 0x80) > 0;
                             int n = b & 0x7F;
+                            if (n == 0)
+                                break;
+                            
                             b = reader.ReadByte();
                         
                             for (int kk = 0; kk < n && offO < 4096; kk++)
@@ -295,12 +298,27 @@ namespace WDE.MpqReader.Structures
         }
     }
 
+    public struct SMChunkInfo
+    {
+        public uint Offset { get; set; }
+        public uint Size { get; set; }
+
+        public SMChunkInfo(IBinaryReader reader)
+        {
+            Offset = reader.ReadUInt32();
+            Size = reader.ReadUInt32();
+            reader.ReadUInt32(); // flags always 0
+            reader.ReadUInt32(); // padding
+        }
+    }
+
     public class ADT
     {
         public string[] Textures { get; }
         public WorldMapObjectPlacementData[] WorldMapObjects { get; }
         public M2PlacementData[] M2Objects { get; }
-        public AdtChunk[] Chunks { get; } = new AdtChunk[256];
+        public SMChunkInfo[] ChunkInfo { get; } = new SMChunkInfo[16 * 16];
+        public AdtChunk[] Chunks { get; } = new AdtChunk[16 * 16];
     
         public ADT(IBinaryReader reader)
         {
@@ -320,6 +338,12 @@ namespace WDE.MpqReader.Structures
 
                 if (chunkName == "MTEX")
                     Textures = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, false, out _);
+                else if (chunkName == "MCIN")
+                {
+                    for (int i = 0; i < 16 * 16; ++i)
+                        ChunkInfo[i] = new SMChunkInfo(partialReader);
+                    Debug.Assert(partialReader.IsFinished());
+                }
                 else if (chunkName == "MWMO")
                     ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out wmosNameOffsets);
                 else if (chunkName == "MWID")
@@ -333,7 +357,11 @@ namespace WDE.MpqReader.Structures
                 else if (chunkName == "MDDF")
                     M2Objects = ReadM2PlacementData(partialReader, m2Ids);
                 else if (chunkName == "MCNK")
+                {
+                    Debug.Assert(ChunkInfo[chunkId].Offset == offset - 8);
+                    Debug.Assert(ChunkInfo[chunkId].Size == size + 8);
                     Chunks[chunkId++] = new AdtChunk(partialReader);
+                }
             
                 reader.Offset = offset + size;
             }

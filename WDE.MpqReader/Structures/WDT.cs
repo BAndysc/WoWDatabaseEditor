@@ -46,7 +46,7 @@ namespace WDE.MpqReader.Structures
         public WDTHeader Header { get; }
         public WDTChunk[,] Chunks { get; }
         public string? Mwmo { get; }
-        public MODF WorldMapObject { get; }
+        public MODF? WorldMapObject { get; }
 
         public WDT(IBinaryReader reader)
         {
