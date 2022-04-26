@@ -22,12 +22,12 @@ namespace WDE.MapRenderer.Utils
         }
 
         private static readonly Quaternion ArrowX = Quaternion.LookRotation(Vector3.Left, Vector3.Up);
-        private static readonly Quaternion ArrowY = Quaternion.LookRotation(Vector3.Forward, Vector3.Up);
+        private static readonly Quaternion ArrowY = Quaternion.LookRotation(Vector3.Backward, Vector3.Up);
         private static readonly Quaternion ArrowZ = Quaternion.FromEuler(0, 0, -90);
         
-        private static readonly Quaternion PlaneX = Quaternion.LookRotation(Vector3.Forward, Vector3.Up);
-        private static readonly Quaternion PlaneY = Quaternion.LookRotation(Vector3.Left, Vector3.Up);
-        private static readonly Quaternion PlaneZ = Quaternion.LookRotation(Vector3.Up, Vector3.Up);
+        private static readonly Quaternion PlaneZ = Quaternion.LookRotation(Vector3.Forward, Vector3.Up);
+        private static readonly Quaternion PlaneY = Quaternion.FromEuler(-90, 0, -90);
+        private static readonly Quaternion PlaneX = Quaternion.LookRotation(Vector3.Up, Vector3.Up);
 
         // wow direction hit test
         public enum HitType
