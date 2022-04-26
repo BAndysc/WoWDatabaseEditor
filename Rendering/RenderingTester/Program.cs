@@ -5,6 +5,7 @@ using Prism.Events;
 using Prism.Ioc;
 using RenderingTester;
 using TheEngine;
+using TheMaths;
 using Unity;using WDE.AzerothCore;
 using WDE.Common.CoreVersion;
 using WDE.Common.DBC;
@@ -19,6 +20,7 @@ using WDE.MPQ;
 using WDE.Parameters;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
+using Vector3 = TheMaths.Vector3;
 
 var nativeWindowSettings = new NativeWindowSettings()
 {
@@ -41,7 +43,8 @@ registry.Register<IStatusBar, DummyStatusBar>();
 registry.Register<IGameProperties, DummyGameProperties>();
 registry.Register<IMessageBoxService, DummyMessageBox>();
 registry.Register<IDatabaseClientFileOpener, DatabaseClientFileOpener>();
-registry.Register<IMainThread, MainThread>();
+var mainThread = new MainThread();
+registry.RegisterInstance<IMainThread>(mainThread);
 registry.RegisterInstance<IEventAggregator>(new EventAggregator());
 new MpqModule().RegisterTypes(registry);
 new WoWDatabaseEditorCore.MainModule().RegisterTypes(registry);
@@ -50,6 +53,8 @@ new ParametersModule().RegisterTypes(registry);
 new TrinityModule().RegisterTypes(registry);
 new AzerothModule().RegisterTypes(registry);
 
+SynchronizationContext.SetSynchronizationContext(mainThread);
+
 var game = provider.Resolve<Game>();
-using var window = new TheEngineOpenTkWindow(GameWindowSettings.Default, nativeWindowSettings, game);
+using var window = new GameStandaloneWindow(GameWindowSettings.Default, nativeWindowSettings, game, mainThread);
 window.Run();
