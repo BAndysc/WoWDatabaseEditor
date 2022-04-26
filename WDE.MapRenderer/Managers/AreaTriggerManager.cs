@@ -94,7 +94,7 @@ namespace WDE.MapRenderer.Managers
                 if (areaTrigger.Shape == AreaTriggerShape.Box)
                 {
                     height = areaTrigger.BoxHeight / 2;
-                    t.Scale = new Vector3( areaTrigger.BoxWidth / 2, areaTrigger.BoxLength / 2, areaTrigger.BoxHeight/2);
+                    t.Scale = new Vector3( areaTrigger.BoxLength / 2, areaTrigger.BoxWidth / 2, areaTrigger.BoxHeight/2);
                     t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(areaTrigger.BoxYaw), 0.0f);
                     
                     renderManager.Render(boxMesh, transcluentMaterial, 0, t);
