@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Prism.Ioc;
 using WDE.Common;
 using WDE.Common.CoreVersion;
@@ -380,7 +379,7 @@ namespace WDE.SmartScriptEditor.Data
             {
                 string key = data.Parameters[i].Type;
                 if (!parameterFactory.IsRegisteredLong(key))
-                    Debug.Assert(parameterFactory.IsRegisteredLong(key));
+                    Console.WriteLine("Parameter type " + key + " is not registered");
                 IParameter<long> parameter = parameterFactory.Factory(key);
 
                 element.GetParameter(i).Name = data.Parameters[i].Name;
