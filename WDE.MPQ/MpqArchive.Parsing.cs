@@ -211,7 +211,7 @@ namespace WDE.MPQ
                 var sectorData = _reader.Read(tempBuffer, 0, length);
                 Debug.Assert(sectorData == length);
 
-                if (blockEntry.IsCompressed && left > length)
+                if (blockEntry.IsCompressed && left > length && decompressedLength != SectorSize)
                 {
                     var compressionFlags = (CompressionFlags) tempBuffer[0];
                     
